@@ -35,6 +35,7 @@ from typing import (
     Dict,
     cast,
     Sequence,
+    Any,
 )
 
 try:
@@ -109,22 +110,6 @@ if TYPE_CHECKING:
     )
 
 RT = TypeVar('RT')
-
-
-def log(  # skipcq: PY-D0003
-    func: Callable[..., RT], *args: object, **kwargs: object  # pylint: disable=W0613
-) -> Callable[..., RT]:
-    logger = logging.getLogger(func.__module__)
-
-    @functools.wraps(func)
-    def decorator(*args: object, **kwargs: object) -> RT:  # pylint: disable=W0613
-        logger.debug('Entering: %s', func.__name__)
-        result = func(*args, **kwargs)
-        logger.debug(result)
-        logger.debug('Exiting: %s', func.__name__)
-        return result
-
-    return decorator
 
 
 class Bot(TelegramObject):
@@ -202,6 +187,21 @@ class Bot(TelegramObject):
             self.private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
             )
+
+    # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
+    # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
+    def _log(func: Any):  # type: ignore[no-untyped-def] # skipcq: PY-D0003
+        logger = logging.getLogger(func.__module__)
+
+        @functools.wraps(func)
+        def decorator(*args, **kwargs):  # type: ignore[no-untyped-def] # pylint: disable=W0613
+            logger.debug('Entering: %s', func.__name__)
+            result = func(*args, **kwargs)
+            logger.debug(result)
+            logger.debug('Exiting: %s', func.__name__)
+            return result
+
+        return decorator
 
     def _insert_defaults(  # pylint: disable=no-self-use
         self, data: Dict[str, object], timeout: ODVInput[float]
@@ -377,7 +377,7 @@ class Bot(TelegramObject):
         """:obj:`str`: Bot's @username."""
         return f'@{self.username}'
 
-    @log
+    @_log
     def get_me(self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None) -> User:
         """A simple method for testing your bot's auth token. Requires no parameters.
 
@@ -402,7 +402,7 @@ class Bot(TelegramObject):
 
         return self._bot  # type: ignore[return-value]
 
-    @log
+    @_log
     def send_message(
         self,
         chat_id: Union[int, str],
@@ -474,7 +474,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def delete_message(
         self,
         chat_id: Union[str, int],
@@ -520,7 +520,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def forward_message(
         self,
         chat_id: Union[int, str],
@@ -570,7 +570,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_photo(
         self,
         chat_id: Union[int, str],
@@ -660,7 +660,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_audio(
         self,
         chat_id: Union[int, str],
@@ -781,7 +781,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_document(
         self,
         chat_id: Union[int, str],
@@ -890,7 +890,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_sticker(
         self,
         chat_id: Union[int, str],
@@ -954,7 +954,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_video(
         self,
         chat_id: Union[int, str],
@@ -1080,7 +1080,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_video_note(
         self,
         chat_id: Union[int, str],
@@ -1179,7 +1179,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_animation(
         self,
         chat_id: Union[int, str],
@@ -1296,7 +1296,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_voice(
         self,
         chat_id: Union[int, str],
@@ -1394,7 +1394,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_media_group(
         self,
         chat_id: Union[int, str],
@@ -1445,7 +1445,7 @@ class Bot(TelegramObject):
 
         return Message.de_list(result, self)  # type: ignore
 
-    @log
+    @_log
     def send_location(
         self,
         chat_id: Union[int, str],
@@ -1541,7 +1541,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def edit_message_live_location(
         self,
         chat_id: Union[str, int] = None,
@@ -1630,7 +1630,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def stop_message_live_location(
         self,
         chat_id: Union[str, int] = None,
@@ -1680,7 +1680,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_venue(
         self,
         chat_id: Union[int, str],
@@ -1792,7 +1792,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_contact(
         self,
         chat_id: Union[int, str],
@@ -1878,7 +1878,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_game(
         self,
         chat_id: Union[int, str],
@@ -1931,7 +1931,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def send_chat_action(
         self,
         chat_id: Union[str, int],
@@ -2048,7 +2048,7 @@ class Bot(TelegramObject):
                     res.input_message_content.disable_web_page_preview
                 )
 
-    @log
+    @_log
     def answer_inline_query(
         self,
         inline_query_id: str,
@@ -2151,7 +2151,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def get_user_profile_photos(
         self,
         user_id: Union[str, int],
@@ -2192,7 +2192,7 @@ class Bot(TelegramObject):
 
         return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def get_file(
         self,
         file_id: Union[
@@ -2252,7 +2252,7 @@ class Bot(TelegramObject):
 
         return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def ban_chat_member(
         self,
         chat_id: Union[str, int],
@@ -2311,7 +2311,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def unban_chat_member(
         self,
         chat_id: Union[str, int],
@@ -2355,7 +2355,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def answer_callback_query(
         self,
         callback_query_id: str,
@@ -2418,7 +2418,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def edit_message_text(
         self,
         text: str,
@@ -2490,7 +2490,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def edit_message_caption(
         self,
         chat_id: Union[str, int] = None,
@@ -2565,7 +2565,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def edit_message_media(
         self,
         media: 'InputMedia',
@@ -2631,7 +2631,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def edit_message_reply_markup(
         self,
         chat_id: Union[str, int] = None,
@@ -2692,7 +2692,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def get_updates(
         self,
         offset: int = None,
@@ -2776,7 +2776,7 @@ class Bot(TelegramObject):
 
         return Update.de_list(result, self)  # type: ignore[return-value]
 
-    @log
+    @_log
     def set_webhook(
         self,
         url: str,
@@ -2867,7 +2867,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def delete_webhook(
         self,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2903,7 +2903,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def leave_chat(
         self,
         chat_id: Union[str, int],
@@ -2934,7 +2934,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def get_chat(
         self,
         chat_id: Union[str, int],
@@ -2967,7 +2967,7 @@ class Bot(TelegramObject):
 
         return Chat.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def get_chat_administrators(
         self,
         chat_id: Union[str, int],
@@ -3002,7 +3002,7 @@ class Bot(TelegramObject):
 
         return ChatMember.de_list(result, self)  # type: ignore
 
-    @log
+    @_log
     def get_chat_member_count(
         self,
         chat_id: Union[str, int],
@@ -3035,7 +3035,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def get_chat_member(
         self,
         chat_id: Union[str, int],
@@ -3068,7 +3068,7 @@ class Bot(TelegramObject):
 
         return ChatMember.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def set_chat_sticker_set(
         self,
         chat_id: Union[str, int],
@@ -3101,7 +3101,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def delete_chat_sticker_set(
         self,
         chat_id: Union[str, int],
@@ -3154,7 +3154,7 @@ class Bot(TelegramObject):
 
         return WebhookInfo.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def set_game_score(
         self,
         user_id: Union[int, str],
@@ -3218,7 +3218,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def get_game_high_scores(
         self,
         user_id: Union[int, str],
@@ -3271,7 +3271,7 @@ class Bot(TelegramObject):
 
         return GameHighScore.de_list(result, self)  # type: ignore
 
-    @log
+    @_log
     def send_invoice(
         self,
         chat_id: Union[int, str],
@@ -3450,7 +3450,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def answer_shipping_query(  # pylint: disable=C0103
         self,
         shipping_query_id: str,
@@ -3519,7 +3519,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def answer_pre_checkout_query(  # pylint: disable=C0103
         self,
         pre_checkout_query_id: str,
@@ -3578,7 +3578,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def restrict_chat_member(
         self,
         chat_id: Union[str, int],
@@ -3635,7 +3635,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def promote_chat_member(
         self,
         chat_id: Union[str, int],
@@ -3737,7 +3737,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def set_chat_permissions(
         self,
         chat_id: Union[str, int],
@@ -3773,7 +3773,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def set_chat_administrator_custom_title(
         self,
         chat_id: Union[int, str],
@@ -3813,7 +3813,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def export_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -3854,7 +3854,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def create_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -3927,7 +3927,7 @@ class Bot(TelegramObject):
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def edit_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -4005,7 +4005,7 @@ class Bot(TelegramObject):
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def revoke_chat_invite_link(
         self,
         chat_id: Union[str, int],
@@ -4043,7 +4043,7 @@ class Bot(TelegramObject):
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def approve_chat_join_request(
         self,
         chat_id: Union[str, int],
@@ -4080,7 +4080,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def decline_chat_join_request(
         self,
         chat_id: Union[str, int],
@@ -4117,7 +4117,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def set_chat_photo(
         self,
         chat_id: Union[str, int],
@@ -4156,7 +4156,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def delete_chat_photo(
         self,
         chat_id: Union[str, int],
@@ -4190,7 +4190,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def set_chat_title(
         self,
         chat_id: Union[str, int],
@@ -4226,7 +4226,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def set_chat_description(
         self,
         chat_id: Union[str, int],
@@ -4265,7 +4265,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def pin_chat_message(
         self,
         chat_id: Union[str, int],
@@ -4310,7 +4310,7 @@ class Bot(TelegramObject):
             'pinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
         )
 
-    @log
+    @_log
     def unpin_chat_message(
         self,
         chat_id: Union[str, int],
@@ -4351,7 +4351,7 @@ class Bot(TelegramObject):
             'unpinChatMessage', data, timeout=timeout, api_kwargs=api_kwargs
         )
 
-    @log
+    @_log
     def unpin_all_chat_messages(
         self,
         chat_id: Union[str, int],
@@ -4386,7 +4386,7 @@ class Bot(TelegramObject):
             'unpinAllChatMessages', data, timeout=timeout, api_kwargs=api_kwargs
         )
 
-    @log
+    @_log
     def get_sticker_set(
         self,
         name: str,
@@ -4416,7 +4416,7 @@ class Bot(TelegramObject):
 
         return StickerSet.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def upload_sticker_file(
         self,
         user_id: Union[str, int],
@@ -4461,7 +4461,7 @@ class Bot(TelegramObject):
 
         return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def create_new_sticker_set(
         self,
         user_id: Union[str, int],
@@ -4550,7 +4550,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def add_sticker_to_set(
         self,
         user_id: Union[str, int],
@@ -4630,7 +4630,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def set_sticker_position_in_set(
         self,
         sticker: str,
@@ -4664,7 +4664,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def delete_sticker_from_set(
         self,
         sticker: str,
@@ -4694,7 +4694,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def set_sticker_set_thumb(
         self,
         name: str,
@@ -4746,7 +4746,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def set_passport_data_errors(
         self,
         user_id: Union[str, int],
@@ -4787,7 +4787,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def send_poll(
         self,
         chat_id: Union[int, str],
@@ -4904,7 +4904,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def stop_poll(
         self,
         chat_id: Union[int, str],
@@ -4949,7 +4949,7 @@ class Bot(TelegramObject):
 
         return Poll.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-    @log
+    @_log
     def send_dice(
         self,
         chat_id: Union[int, str],
@@ -5014,7 +5014,7 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    @log
+    @_log
     def get_my_commands(
         self,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5062,7 +5062,7 @@ class Bot(TelegramObject):
 
         return BotCommand.de_list(result, self)  # type: ignore[return-value,arg-type]
 
-    @log
+    @_log
     def set_my_commands(
         self,
         commands: List[Union[BotCommand, Tuple[str, str]]],
@@ -5118,7 +5118,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def delete_my_commands(
         self,
         scope: BotCommandScope = None,
@@ -5165,7 +5165,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    @log
+    @_log
     def log_out(self, timeout: ODVInput[float] = DEFAULT_NONE) -> bool:
         """
         Use this method to log out from the cloud Bot API server before launching the bot locally.
@@ -5188,7 +5188,7 @@ class Bot(TelegramObject):
         """
         return self._post('logOut', timeout=timeout)  # type: ignore[return-value]
 
-    @log
+    @_log
     def close(self, timeout: ODVInput[float] = DEFAULT_NONE) -> bool:
         """
         Use this method to close the bot instance before moving it from one local server to
@@ -5210,7 +5210,7 @@ class Bot(TelegramObject):
         """
         return self._post('close', timeout=timeout)  # type: ignore[return-value]
 
-    @log
+    @_log
     def copy_message(
         self,
         chat_id: Union[int, str],
