@@ -29,6 +29,7 @@ from apscheduler.job import Job as APSJob
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.utils.types import JSONDict
+from .extbot import ExtBot
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher
@@ -116,7 +117,7 @@ class JobQueue:
 
         """
         self._dispatcher = dispatcher
-        if dispatcher.bot.defaults:
+        if isinstance(dispatcher.bot, ExtBot) and dispatcher.bot.defaults:
             self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
 
     def run_once(

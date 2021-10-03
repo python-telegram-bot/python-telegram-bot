@@ -195,7 +195,7 @@ class TestDispatcher:
             self.count = 5
 
         # set defaults value to dp.bot
-        dp.bot.defaults = Defaults(run_async=run_async)
+        dp.bot._defaults = Defaults(run_async=run_async)
         try:
             dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
             dp.add_error_handler(self.error_handler_context)
@@ -207,7 +207,7 @@ class TestDispatcher:
 
         finally:
             # reset dp.bot.defaults values
-            dp.bot.defaults = None
+            dp.bot._defaults = None
 
     @pytest.mark.parametrize(
         ['run_async', 'expected_output'], [(True, 'running async'), (False, None)]
@@ -217,7 +217,7 @@ class TestDispatcher:
             self.received = 'running async'
 
         # set defaults value to dp.bot
-        dp.bot.defaults = Defaults(run_async=run_async)
+        dp.bot._defaults = Defaults(run_async=run_async)
         try:
             dp.add_handler(MessageHandler(Filters.all, lambda u, c: None))
             monkeypatch.setattr(dp, 'run_async', mock_run_async)
@@ -226,7 +226,7 @@ class TestDispatcher:
 
         finally:
             # reset defaults value
-            dp.bot.defaults = None
+            dp.bot._defaults = None
 
     def test_run_async_multiple(self, bot, dp, dp2):
         def get_dispatcher_name(q):
@@ -823,7 +823,7 @@ class TestDispatcher:
         dp.process_update(update)
         assert self.count == 0
 
-        dp.bot.defaults = Defaults(run_async=True)
+        dp.bot._defaults = Defaults(run_async=True)
         try:
             for group in range(5):
                 dp.add_handler(MessageHandler(Filters.text, dummy_callback), group=group)
@@ -832,7 +832,7 @@ class TestDispatcher:
             dp.process_update(update)
             assert self.count == 0
         finally:
-            dp.bot.defaults = None
+            dp.bot._defaults = None
 
     @pytest.mark.parametrize('run_async', [DEFAULT_FALSE, False])
     def test_update_persistence_one_sync(self, monkeypatch, dp, run_async):
@@ -865,7 +865,7 @@ class TestDispatcher:
 
         monkeypatch.setattr(dp, 'update_persistence', update_persistence)
         monkeypatch.setattr(dp, 'run_async', dummy_callback)
-        dp.bot.defaults = Defaults(run_async=run_async)
+        dp.bot._defaults = Defaults(run_async=run_async)
 
         try:
             for group in range(5):
@@ -875,7 +875,7 @@ class TestDispatcher:
             dp.process_update(update)
             assert self.count == expected
         finally:
-            dp.bot.defaults = None
+            dp.bot._defaults = None
 
     def test_custom_context_init(self, bot):
         cc = ContextTypes(
