@@ -1,0 +1,37 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[FEATURE]"
+labels: ["enhancement"]
+
+body:
+  - type: textarea
+    id: related-problem
+    attributes:
+      label: "What kind of feature are you missing? Where do you notice a shortcoming of PTB?"
+      description: "A clear and concise description of what the problem is."
+      placeholder: "Example: I want to do X, but there is no way to do it."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Describe the solution you'd like"
+      description: "A clear and concise description of what you want to happen."
+      placeholder: "Example: I think it would be nice if you would add feature Y so I can do X."
+    validations:
+      required: true
+        
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Describe alternatives you've considered"
+      description: "A clear and concise description of any alternative solutions or features you've considered."
+      placeholder: "Example: I considered Z to be able to do X, but that didn't work because..."
+      
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: "Additional context"
+      description: "Add any other context or screenshots about the feature request here."
+      placeholder: "Example: Here's a photo of my cat!"
