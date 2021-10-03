@@ -49,8 +49,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         :meth:`telegram.ext.BasePersistence.insert_bot`.
 
     .. versionchanged:: 14.0
-        The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
-        The parameter and attribute ``filename`` were replaced by :attr:`filepath.
+        * The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
+        * The parameter and attribute ``filename`` were replaced by :attr:`filepath.
 
     Args:
         filepath (:obj:`str` | :obj: 'pathlib.Path'): The filename for storing the pickle files.

@@ -68,7 +68,7 @@ class TestFiles:
         assert telegram.utils.files.parse_file_input(string) == expected
 
     def test_parse_file_input_file_like(self):
-        source_file: Path = Path('tests/data/game.gif')
+        source_file = Path('tests/data/game.gif')
         with source_file.open('rb') as file:
             parsed = telegram.utils.files.parse_file_input(file)
 
@@ -84,7 +84,7 @@ class TestFiles:
         assert parsed.filename == 'test_file'
 
     def test_parse_file_input_bytes(self):
-        source_file: Path = Path('tests/data/text_file.txt')
+        source_file = Path('tests/data/text_file.txt')
         parsed = telegram.utils.files.parse_file_input(source_file.read_bytes())
 
         assert isinstance(parsed, InputFile)
