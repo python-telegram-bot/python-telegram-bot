@@ -40,9 +40,9 @@ from typing import (
 
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized, TelegramError
 from telegram.ext import Dispatcher
-from telegram.ext.utils.types import BT
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
 from .utils.stack import was_called_by
+from .utils.types import BT
 from ..utils.warnings import warn
 
 if TYPE_CHECKING:

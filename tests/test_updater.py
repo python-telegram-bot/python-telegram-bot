@@ -52,6 +52,7 @@ from telegram.ext import (
     ExtBot,
     Updater,
     UpdaterBuilder,
+    DispatcherBuilder,
 )
 from telegram.ext.utils.webhookhandler import WebhookServer
 
@@ -136,6 +137,19 @@ class TestUpdater:
         # i.e. check that the builders are "empty"/new
         builder_1.token(updater.bot.token)
         builder_2.token(updater.bot.token)
+
+    def test_warn_con_pool(self, bot, recwarn, dp):
+        DispatcherBuilder().bot(bot).workers(5).build()
+        UpdaterBuilder().bot(bot).workers(8).build()
+        UpdaterBuilder().bot(bot).workers(2).build()
+        assert len(recwarn) == 2
+        for idx, value in enumerate((9, 12)):
+            warning = (
+                'The Connection pool of Request object is smaller (8) than the '
+                f'recommended value of {value}.'
+            )
+            assert str(recwarn[idx].message) == warning
+            assert recwarn[idx].filename == __file__, "wrong stacklevel!"
 
     @pytest.mark.parametrize(
         ('error',),

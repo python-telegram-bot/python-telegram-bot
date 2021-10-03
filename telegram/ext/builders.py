@@ -21,7 +21,6 @@
 # flake8: noqa: E501
 # pylint: disable=line-too-long
 """This module contains the Builder classes for the telegram.ext module."""
-import warnings
 from queue import Queue
 from threading import Event
 from typing import (
@@ -43,6 +42,7 @@ from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
 from telegram.utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_FALSE
 from telegram.request import Request
 from telegram.utils.types import ODVInput, DVInput
+from telegram.utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram.ext import (
@@ -243,7 +243,7 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         con_pool_size = self._get_connection_pool_size(self._workers)
         actual_size = dispatcher.bot.request.con_pool_size
         if actual_size < con_pool_size:
-            warnings.warn(
+            warn(
                 f'The Connection pool of Request object is smaller ({actual_size}) than the '
                 f'recommended value of {con_pool_size}.',
                 stacklevel=stack_level,

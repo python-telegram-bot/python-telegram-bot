@@ -85,7 +85,11 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             that raised the error. Only present when the raising function was run asynchronously
             using :meth:`telegram.ext.Dispatcher.run_async`.
         job (:class:`telegram.ext.Job`): Optional. The job which originated this callback.
-            Only present when passed to the callback of :class:`telegram.ext.Job`.
+            Only present when passed to the callback of :class:`telegram.ext.Job` or in error
+            handlers if the error is caused by a job.
+
+            .. versionchanged:: 14.0
+                :attr:`job` is now also present in error handlers if the error is caused by a job.
 
     """
 
@@ -250,6 +254,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]',
         async_args: Union[List, Tuple] = None,
         async_kwargs: Dict[str, object] = None,
+        job: 'Job' = None,
     ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
@@ -263,12 +268,15 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             error (:obj:`Exception`): The error.
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
                 context.
-            async_args (List[:obj:`object`]): Optional. Positional arguments of the function that
+            async_args (List[:obj:`object`], optional): Positional arguments of the function that
                 raised the error. Pass only when the raising function was run asynchronously using
                 :meth:`telegram.ext.Dispatcher.run_async`.
-            async_kwargs (Dict[:obj:`str`, :obj:`object`]): Optional. Keyword arguments of the
+            async_kwargs (Dict[:obj:`str`, :obj:`object`], optional): Keyword arguments of the
                 function that raised the error. Pass only when the raising function was run
                 asynchronously using :meth:`telegram.ext.Dispatcher.run_async`.
+            job (:class:`telegram.ext.Job`, optional): The job associated with the error.
+
+                .. versionadded:: 14.0
 
         Returns:
             :class:`telegram.ext.CallbackContext`
@@ -277,6 +285,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.error = error
         self.async_args = async_args
         self.async_kwargs = async_kwargs
+        self.job = job
         return self
 
     @classmethod

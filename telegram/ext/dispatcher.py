@@ -41,7 +41,7 @@ from uuid import uuid4
 
 from telegram import Update
 from telegram.error import TelegramError
-from telegram.ext import BasePersistence, ContextTypes
+from telegram.ext import BasePersistence, ContextTypes, ExtBot
 from telegram.ext.handler import Handler
 from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
@@ -51,6 +51,7 @@ from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
 from .utils.stack import was_called_by
 
 if TYPE_CHECKING:
+    from .jobqueue import Job
     from .builders import InitDispatcherBuilder
 
 DEFAULT_GROUP: int = 0
@@ -510,7 +511,11 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         handled_only_async = all(sync_modes)
         if handled:
             # Respect default settings
-            if all(mode is DEFAULT_FALSE for mode in sync_modes) and self.bot.defaults:
+            if (
+                all(mode is DEFAULT_FALSE for mode in sync_modes)
+                and isinstance(self.bot, ExtBot)
+                and self.bot.defaults
+            ):
                 handled_only_async = self.bot.defaults.run_async
             # If update was only handled by async handlers, we don't need to update here
             if not handled_only_async:
@@ -665,7 +670,12 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
             return
 
-        if run_async is DEFAULT_FALSE and self.bot.defaults and self.bot.defaults.run_async:
+        if (
+            run_async is DEFAULT_FALSE
+            and isinstance(self.bot, ExtBot)
+            and self.bot.defaults
+            and self.bot.defaults.run_async
+        ):
             run_async = True
 
         self.error_handlers[callback] = run_async
@@ -684,6 +694,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         update: Optional[object],
         error: Exception,
         promise: Promise = None,
+        job: 'Job' = None,
     ) -> bool:
         """Dispatches an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
@@ -702,6 +713,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             error (:obj:`Exception`): The error that was raised.
             promise (:class:`telegram.utils.Promise`, optional): The promise whose pooled function
                 raised the error.
+            job (:class:`telegram.ext.Job`, optional): The job that caused the error.
+
+                .. versionadded:: 14.0
 
         Returns:
             :obj:`bool`: :obj:`True` if one of the error handlers raised
@@ -713,7 +727,12 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
                 context = self.context_types.context.from_error(
-                    update, error, self, async_args=async_args, async_kwargs=async_kwargs
+                    update=update,
+                    error=error,
+                    dispatcher=self,
+                    async_args=async_args,
+                    async_kwargs=async_kwargs,
+                    job=job,
                 )
                 if run_async:
                     self.run_async(callback, update, context, update=update)

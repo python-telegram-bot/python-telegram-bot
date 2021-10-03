@@ -1,0 +1,68 @@
+name: Question
+description: Get help with errors or general questions
+title: "[QUESTION]"
+labels: ["question"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Hey there, you have a question? We are happy to answer. Please make sure no similar question was opened already.
+
+        To make it easier for us to help you, please read this [article](https://git.io/JURJO).
+
+        Please mind that there is also a users' [Telegram group](https://t.me/pythontelegrambotgroup) for questions about the library. Questions asked there might be answered quicker than here. Moreover, [GitHub Discussions](https://git.io/JG3rk) offer a slightly better format to discuss usage questions.
+
+  - type: textarea
+    id: issue-faced
+    attributes:
+      label: "Issue I am facing"
+      description: "Please describe the issue here in as much detail as possible"
+    validations:
+      required: true
+      
+  - type: textarea
+    id: traceback
+    attributes:
+      label: "Traceback to the issue"
+      description: "If you are facing a specific error message, please paste the traceback here. This will be automatically formatted into python code, so no need for backticks."
+      placeholder: |
+        Traceback (most recent call last):
+          File "/home/bot.py", line 1, in main
+            foo = bar()
+          ...
+        telegram.error.BadRequest: Traceback not found
+      render: python
+        
+  - type: textarea
+    id: related-code
+    attributes:
+      label: "Related part of your code"
+      description: "This will be automatically formatted into code (python), so no need for backticks."
+      placeholder: |
+        logging.basicConfig(
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+        )
+
+        logger = logging.getLogger(__name__)
+      render: python
+
+  - type: markdown
+    attributes:
+      value: "### Configuration"
+
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating System
+    validations: 
+      required: true
+      
+  - type: textarea
+    id: versions
+    attributes:
+      label: Version of Python, python-telegram-bot & dependencies
+      description: Paste the output of `$ python -m telegram` here. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+    validations: 
+      required: true
