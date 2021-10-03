@@ -89,6 +89,9 @@ class CallbackContext(Generic[UD, CD, BD]):
             Only present when passed to the callback of :class:`telegram.ext.Job` or in error
             handlers if the error is caused by a job.
 
+            .. versionchanged:: 14.0
+                :attr:`job` is now also present in error handlers if the error is caused by a job.
+
     """
 
     __slots__ = (
