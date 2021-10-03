@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, Gener
 from telegram.ext.utils.promise import Promise
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.ext.utils.types import CCT
+from .extbot import ExtBot
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher
@@ -112,6 +113,7 @@ class Handler(Generic[UT, CCT], ABC):
         run_async = self.run_async
         if (
             self.run_async is DEFAULT_FALSE
+            and isinstance(dispatcher.bot, ExtBot)
             and dispatcher.bot.defaults
             and dispatcher.bot.defaults.run_async
         ):
