@@ -52,9 +52,6 @@ def test_parse_illegal_json():
         Request._parse(server_response)
 
 
-__destination_path = Path.cwd() / 'tests' / 'data' / 'local_file.txt'
-
-
 @pytest.mark.parametrize(
     "destination_path_type",
     [str, Path],

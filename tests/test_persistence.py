@@ -1852,16 +1852,18 @@ class TestPicklePersistence:
         assert nested_ch.conversations[nested_ch._get_key(update)] == 1
         assert nested_ch.conversations == pickle_persistence.conversations['name3']
 
-    @pytest.mark.parametrize('filepath', ['pickletest', Path('pickletest')])
-    def test_filepath_argument_types(self, filepath):
+    @pytest.mark.parametrize('path_type', [str, Path])
+    def test_filepath_argument_types(self, path_type):
+        filepath = Path('pickletest')
         pick_persist = PicklePersistence(
-            filepath=filepath,
+            filepath=path_type(filepath),
             single_file=False,
-            on_flush=True,
+            on_flush=False,
         )
         pick_persist.update_user_data(1, 1)
 
         assert pick_persist.get_user_data()[1] == 1
+        assert filepath.with_name(filepath.name + "_user_data").is_file()
 
     def test_with_job(self, job_queue, dp, pickle_persistence):
         dp.bot.arbitrary_callback_data = True

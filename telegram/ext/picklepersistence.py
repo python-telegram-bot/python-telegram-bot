@@ -43,11 +43,10 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by
         :attr:`REPLACED_BOT` and insert the bot set with
         :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
-            that changes to the bot apply to the saved objects, too. If you change the bot's
-            token, this may lead to e.g. ``Chat not found`` errors.
-            For the limitations on replacing bots see:
-                * :meth:`telegram.ext.BasePersistence.replace_bot`
-                * :meth:`telegram.ext.BasePersistence.insert_bot`.
+        that changes to the bot apply to the saved objects, too. If you change the bots token, this
+        may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
+        :meth:`telegram.ext.BasePersistence.replace_bot` and
+        :meth:`telegram.ext.BasePersistence.insert_bot`.
 
     .. versionchanged:: 14.0
         * The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
@@ -175,7 +174,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         except OSError:
             return None
         except pickle.UnpicklingError as exc:
-            raise TypeError(f"File {filepath} does not contain valid pickle data") from exc
+            raise TypeError(f"File {filepath.name} does not contain valid pickle data") from exc
         except Exception as exc:
             raise TypeError(f"Something went wrong unpickling {filepath}") from exc
 

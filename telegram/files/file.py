@@ -116,7 +116,7 @@ class File(TelegramObject):
             * Returns :obj:`pathlib.Path` object in cases where previously returned `str` object.
 
         Args:
-            custom_path (:obj: `pathlib.Path` | :obj:`str`, optional): Custom path.
+            custom_path (:obj:`pathlib.Path` | :obj:`str`, optional): Custom path.
             out (:obj:`io.BufferedWriter`, optional): A file-like object. Must be opened for
                 writing in binary mode, if applicable.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
