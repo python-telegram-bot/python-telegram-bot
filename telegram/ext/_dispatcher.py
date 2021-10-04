@@ -661,9 +661,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
                 called when an error is raised. Callback signature:
-                ``def callback(update: Update, context: CallbackContext)``
-
-                The error that happened will be present in context.error.
+                ``def callback(update: Update, context: CallbackContext)``.
+                The error that happened will be present in ``context.error``.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run
                 asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
         """
