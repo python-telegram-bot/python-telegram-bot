@@ -21,7 +21,7 @@
 from ._telegramobject import TelegramObject
 from ._botcommand import BotCommand
 from ._user import User
-from .files._chatphoto import ChatPhoto
+from ._files._chatphoto import ChatPhoto
 from ._chat import Chat
 from ._chatlocation import ChatLocation
 from ._chatinvitelink import ChatInviteLink
@@ -36,17 +36,17 @@ from ._chatmember import (
 )
 from ._chatmemberupdated import ChatMemberUpdated
 from ._chatpermissions import ChatPermissions
-from .files._photosize import PhotoSize
-from .files._audio import Audio
-from .files._voice import Voice
-from .files._document import Document
-from .files._animation import Animation
-from .files._sticker import Sticker, StickerSet, MaskPosition
-from .files._video import Video
-from .files._contact import Contact
-from .files._location import Location
-from .files._venue import Venue
-from .files._videonote import VideoNote
+from ._files._photosize import PhotoSize
+from ._files._audio import Audio
+from ._files._voice import Voice
+from ._files._document import Document
+from ._files._animation import Animation
+from ._files._sticker import Sticker, StickerSet, MaskPosition
+from ._files._video import Video
+from ._files._contact import Contact
+from ._files._location import Location
+from ._files._venue import Venue
+from ._files._videonote import VideoNote
 from ._chataction import ChatAction
 from ._dice import Dice
 from ._userprofilephotos import UserProfilePhotos
@@ -56,12 +56,12 @@ from ._replymarkup import ReplyMarkup
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._forcereply import ForceReply
-from .files._inputfile import InputFile
-from .files._file import File
+from ._files._inputfile import InputFile
+from ._files._file import File
 from ._parsemode import ParseMode
 from ._messageentity import MessageEntity
 from ._messageid import MessageId
-from .games._game import Game
+from ._games._game import Game
 from ._poll import Poll, PollOption, PollAnswer
 from ._voicechat import (
     VoiceChatStarted,
@@ -71,58 +71,58 @@ from ._voicechat import (
 )
 from ._loginurl import LoginUrl
 from ._proximityalerttriggered import ProximityAlertTriggered
-from .games._callbackgame import CallbackGame
-from .payment._shippingaddress import ShippingAddress
-from .payment._orderinfo import OrderInfo
-from .payment._successfulpayment import SuccessfulPayment
-from .payment._invoice import Invoice
-from .passport._credentials import EncryptedCredentials
-from .passport._passportfile import PassportFile
-from .passport._data import IdDocumentData, PersonalDetails, ResidentialAddress
-from .passport._encryptedpassportelement import EncryptedPassportElement
-from .passport._passportdata import PassportData
-from .inline._inlinekeyboardbutton import InlineKeyboardButton
-from .inline._inlinekeyboardmarkup import InlineKeyboardMarkup
+from ._games._callbackgame import CallbackGame
+from ._payment._shippingaddress import ShippingAddress
+from ._payment._orderinfo import OrderInfo
+from ._payment._successfulpayment import SuccessfulPayment
+from ._payment._invoice import Invoice
+from ._passport._credentials import EncryptedCredentials
+from ._passport._passportfile import PassportFile
+from ._passport._data import IdDocumentData, PersonalDetails, ResidentialAddress
+from ._passport._encryptedpassportelement import EncryptedPassportElement
+from ._passport._passportdata import PassportData
+from ._inline._inlinekeyboardbutton import InlineKeyboardButton
+from ._inline._inlinekeyboardmarkup import InlineKeyboardMarkup
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from ._message import Message
 from ._callbackquery import CallbackQuery
 from ._choseninlineresult import ChosenInlineResult
-from .inline._inputmessagecontent import InputMessageContent
-from .inline._inlinequery import InlineQuery
-from .inline._inlinequeryresult import InlineQueryResult
-from .inline._inlinequeryresultarticle import InlineQueryResultArticle
-from .inline._inlinequeryresultaudio import InlineQueryResultAudio
-from .inline._inlinequeryresultcachedaudio import InlineQueryResultCachedAudio
-from .inline._inlinequeryresultcacheddocument import InlineQueryResultCachedDocument
-from .inline._inlinequeryresultcachedgif import InlineQueryResultCachedGif
-from .inline._inlinequeryresultcachedmpeg4gif import InlineQueryResultCachedMpeg4Gif
-from .inline._inlinequeryresultcachedphoto import InlineQueryResultCachedPhoto
-from .inline._inlinequeryresultcachedsticker import InlineQueryResultCachedSticker
-from .inline._inlinequeryresultcachedvideo import InlineQueryResultCachedVideo
-from .inline._inlinequeryresultcachedvoice import InlineQueryResultCachedVoice
-from .inline._inlinequeryresultcontact import InlineQueryResultContact
-from .inline._inlinequeryresultdocument import InlineQueryResultDocument
-from .inline._inlinequeryresultgif import InlineQueryResultGif
-from .inline._inlinequeryresultlocation import InlineQueryResultLocation
-from .inline._inlinequeryresultmpeg4gif import InlineQueryResultMpeg4Gif
-from .inline._inlinequeryresultphoto import InlineQueryResultPhoto
-from .inline._inlinequeryresultvenue import InlineQueryResultVenue
-from .inline._inlinequeryresultvideo import InlineQueryResultVideo
-from .inline._inlinequeryresultvoice import InlineQueryResultVoice
-from .inline._inlinequeryresultgame import InlineQueryResultGame
-from .inline._inputtextmessagecontent import InputTextMessageContent
-from .inline._inputlocationmessagecontent import InputLocationMessageContent
-from .inline._inputvenuemessagecontent import InputVenueMessageContent
-from .payment._labeledprice import LabeledPrice
-from .inline._inputinvoicemessagecontent import InputInvoiceMessageContent
-from .inline._inputcontactmessagecontent import InputContactMessageContent
-from .payment._shippingoption import ShippingOption
-from .payment._precheckoutquery import PreCheckoutQuery
-from .payment._shippingquery import ShippingQuery
+from ._inline._inputmessagecontent import InputMessageContent
+from ._inline._inlinequery import InlineQuery
+from ._inline._inlinequeryresult import InlineQueryResult
+from ._inline._inlinequeryresultarticle import InlineQueryResultArticle
+from ._inline._inlinequeryresultaudio import InlineQueryResultAudio
+from ._inline._inlinequeryresultcachedaudio import InlineQueryResultCachedAudio
+from ._inline._inlinequeryresultcacheddocument import InlineQueryResultCachedDocument
+from ._inline._inlinequeryresultcachedgif import InlineQueryResultCachedGif
+from ._inline._inlinequeryresultcachedmpeg4gif import InlineQueryResultCachedMpeg4Gif
+from ._inline._inlinequeryresultcachedphoto import InlineQueryResultCachedPhoto
+from ._inline._inlinequeryresultcachedsticker import InlineQueryResultCachedSticker
+from ._inline._inlinequeryresultcachedvideo import InlineQueryResultCachedVideo
+from ._inline._inlinequeryresultcachedvoice import InlineQueryResultCachedVoice
+from ._inline._inlinequeryresultcontact import InlineQueryResultContact
+from ._inline._inlinequeryresultdocument import InlineQueryResultDocument
+from ._inline._inlinequeryresultgif import InlineQueryResultGif
+from ._inline._inlinequeryresultlocation import InlineQueryResultLocation
+from ._inline._inlinequeryresultmpeg4gif import InlineQueryResultMpeg4Gif
+from ._inline._inlinequeryresultphoto import InlineQueryResultPhoto
+from ._inline._inlinequeryresultvenue import InlineQueryResultVenue
+from ._inline._inlinequeryresultvideo import InlineQueryResultVideo
+from ._inline._inlinequeryresultvoice import InlineQueryResultVoice
+from ._inline._inlinequeryresultgame import InlineQueryResultGame
+from ._inline._inputtextmessagecontent import InputTextMessageContent
+from ._inline._inputlocationmessagecontent import InputLocationMessageContent
+from ._inline._inputvenuemessagecontent import InputVenueMessageContent
+from ._payment._labeledprice import LabeledPrice
+from ._inline._inputinvoicemessagecontent import InputInvoiceMessageContent
+from ._inline._inputcontactmessagecontent import InputContactMessageContent
+from ._payment._shippingoption import ShippingOption
+from ._payment._precheckoutquery import PreCheckoutQuery
+from ._payment._shippingquery import ShippingQuery
 from ._webhookinfo import WebhookInfo
-from .games._gamehighscore import GameHighScore
+from ._games._gamehighscore import GameHighScore
 from ._update import Update
-from .files._inputmedia import (
+from ._files._inputmedia import (
     InputMedia,
     InputMediaVideo,
     InputMediaPhoto,
@@ -130,7 +130,7 @@ from .files._inputmedia import (
     InputMediaAudio,
     InputMediaDocument,
 )
-from .passport._passportelementerrors import (
+from ._passport._passportelementerrors import (
     PassportElementError,
     PassportElementErrorDataField,
     PassportElementErrorFile,
@@ -142,7 +142,7 @@ from .passport._passportelementerrors import (
     PassportElementErrorTranslationFiles,
     PassportElementErrorUnspecified,
 )
-from .passport._credentials import (
+from ._passport._credentials import (
     Credentials,
     DataCredentials,
     SecureData,
