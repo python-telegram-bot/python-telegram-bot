@@ -164,7 +164,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             filename = self.filepath.name
             raise TypeError(f"File {filename} does not contain valid pickle data") from exc
         except Exception as exc:
-            raise TypeError(f"Something went wrong unpickling {self.filepath}") from exc
+            raise TypeError(f"Something went wrong unpickling {self.filepath.name}") from exc
 
     @staticmethod
     def _load_file(filepath: Path) -> Any:
@@ -176,7 +176,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         except pickle.UnpicklingError as exc:
             raise TypeError(f"File {filepath.name} does not contain valid pickle data") from exc
         except Exception as exc:
-            raise TypeError(f"Something went wrong unpickling {filepath}") from exc
+            raise TypeError(f"Something went wrong unpickling {filepath.name}") from exc
 
     def _dump_singlefile(self) -> None:
         data = {
