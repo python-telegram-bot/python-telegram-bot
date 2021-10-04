@@ -1865,8 +1865,7 @@ class TestPicklePersistence:
         pick_persist.update_user_data(1, 1)
 
         assert pick_persist.get_user_data()[1] == 1
-        filepath = Path(filepath)
-        assert filepath.with_name(filepath.name + "_user_data").is_file()
+        assert Path(filepath).is_file()
 
     def test_with_job(self, job_queue, dp, pickle_persistence):
         dp.bot.arbitrary_callback_data = True
