@@ -22,9 +22,9 @@ from typing import Optional, TypeVar, Union, Callable, TYPE_CHECKING, Pattern, M
 
 from telegram import Update
 
-from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.ext import Handler
-from .utils.types import CCT
+from ._utils.types import CCT
 
 RT = TypeVar('RT')
 

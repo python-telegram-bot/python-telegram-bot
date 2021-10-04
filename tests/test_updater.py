@@ -56,7 +56,7 @@ from telegram.ext import (
     ExtBot,
 )
 from telegram.warnings import PTBDeprecationWarning
-from telegram.ext.utils.webhookhandler import WebhookServer
+from telegram.ext._utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
     sys.platform == 'win32',

@@ -20,7 +20,7 @@
 
 .. versionchanged:: 14.0
    Previously, the contents of this module were available through the (no longer existing)
-   module ``telegram.utils.helpers``.
+   module ``telegram._utils.helpers``.
 
 Warning:
     Contents of this module are intended to be used internally by the library and *not* by the
@@ -31,7 +31,7 @@ Warning:
 from pathlib import Path
 from typing import Optional, Union, Type, Any, cast, IO, TYPE_CHECKING
 
-from telegram.utils.types import FileInput
+from telegram._utils.types import FileInput
 
 if TYPE_CHECKING:
     from telegram import TelegramObject, InputFile

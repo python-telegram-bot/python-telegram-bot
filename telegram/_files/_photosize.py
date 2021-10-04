@@ -21,8 +21,8 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import TelegramObject
-from telegram.utils.defaultvalue import DEFAULT_NONE
-from telegram.utils.types import JSONDict, ODVInput
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot, File

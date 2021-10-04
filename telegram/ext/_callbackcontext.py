@@ -34,12 +34,12 @@ from typing import (
 
 from telegram import Update, CallbackQuery
 from telegram.ext import ExtBot
-from telegram.ext.utils.types import UD, CD, BD
+from telegram.ext._utils.types import UD, CD, BD
 
 if TYPE_CHECKING:
     from telegram import Bot
     from telegram.ext import Dispatcher, Job, JobQueue
-    from telegram.ext.utils.types import CCT
+    from telegram.ext._utils.types import CCT
 
 
 class CallbackContext(Generic[UD, CD, BD]):

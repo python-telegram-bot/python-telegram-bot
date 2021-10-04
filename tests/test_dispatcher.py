@@ -38,7 +38,7 @@ from telegram.ext import (
     DispatcherHandlerStop,
 )
 
-from telegram.utils.defaultvalue import DEFAULT_FALSE
+from telegram._utils.defaultvalue import DEFAULT_FALSE
 from telegram.error import TelegramError
 from tests.conftest import create_dp
 from collections import defaultdict

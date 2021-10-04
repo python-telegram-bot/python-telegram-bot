@@ -37,7 +37,7 @@ from telegram import (
     ChatMemberOwner,
 )
 
-from telegram.utils.datetime import from_timestamp
+from telegram._utils.datetime import from_timestamp
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 chat_member_updated = ChatMemberUpdated(

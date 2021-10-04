@@ -22,8 +22,8 @@ from typing import DefaultDict, Dict, Optional, Tuple, cast
 from collections import defaultdict
 
 from telegram.ext import BasePersistence, PersistenceInput
-from telegram.ext.utils.types import ConversationDict, CDCData
-from telegram.utils.types import JSONDict
+from telegram.ext._utils.types import ConversationDict, CDCData
+from telegram._utils.types import JSONDict
 
 try:
     import ujson as json

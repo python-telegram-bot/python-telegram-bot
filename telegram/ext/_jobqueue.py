@@ -25,7 +25,7 @@ import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.job import Job as APSJob
 
-from telegram.utils.types import JSONDict
+from telegram._utils.types import JSONDict
 from .extbot import ExtBot
 
 if TYPE_CHECKING:

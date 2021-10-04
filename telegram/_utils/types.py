@@ -38,7 +38,7 @@ from typing import (
 
 if TYPE_CHECKING:
     from telegram import InputFile  # noqa: F401
-    from telegram.utils.defaultvalue import DefaultValue  # noqa: F401
+    from telegram._utils.defaultvalue import DefaultValue  # noqa: F401
 
 FileLike = Union[IO, 'InputFile']
 """Either an open file handler or a :class:`telegram.InputFile`."""

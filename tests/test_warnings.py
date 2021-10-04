@@ -21,7 +21,7 @@ from collections import defaultdict
 
 import pytest
 
-from telegram.utils.warnings import warn
+from telegram._utils.warnings import warn
 from telegram.warnings import PTBUserWarning, PTBRuntimeWarning, PTBDeprecationWarning
 
 

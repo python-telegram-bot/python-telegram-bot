@@ -21,7 +21,7 @@
 
 from telegram import Update
 from telegram.ext import Handler
-from .utils.types import CCT
+from ._utils.types import CCT
 
 
 class PreCheckoutQueryHandler(Handler[Update, CCT]):

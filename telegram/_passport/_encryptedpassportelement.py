@@ -28,7 +28,7 @@ from telegram import (
     TelegramObject,
 )
 from telegram._passport._credentials import decrypt_json
-from telegram.utils.types import JSONDict
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot, Credentials
