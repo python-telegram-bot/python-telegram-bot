@@ -55,7 +55,7 @@ from telegram import (
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.ext import ExtBot, Defaults, InvalidCallbackData
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TelegramError
-from telegram.utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram.helpers import escape_markdown
 from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION
 from tests.bots import FALLBACKS

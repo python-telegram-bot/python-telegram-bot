@@ -20,8 +20,8 @@ from pathlib import Path
 
 import pytest
 
-import telegram.utils.datetime
-import telegram.utils.files
+import telegram._utils.datetime
+import telegram._utils.files
 from telegram import InputFile, Animation, MessageEntity
 
 
@@ -40,7 +40,7 @@ class TestFiles:
         ],
     )
     def test_is_local_file(self, string, expected):
-        assert telegram.utils.files.is_local_file(string) == expected
+        assert telegram._utils.files.is_local_file(string) == expected
 
     @pytest.mark.parametrize(
         'string,expected',
@@ -65,18 +65,20 @@ class TestFiles:
         ],
     )
     def test_parse_file_input_string(self, string, expected):
-        assert telegram.utils.files.parse_file_input(string) == expected
+        assert telegram._utils.files.parse_file_input(string) == expected
 
     def test_parse_file_input_file_like(self):
         with open('tests/data/game.gif', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(file)
+            parsed = telegram._utils.files.parse_file_input(file)
 
         assert isinstance(parsed, InputFile)
         assert not parsed.attach
         assert parsed.filename == 'game.gif'
 
         with open('tests/data/game.gif', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(file, attach=True, filename='test_file')
+            parsed = telegram._utils.files.parse_file_input(
+                file, attach=True, filename='test_file'
+            )
 
         assert isinstance(parsed, InputFile)
         assert parsed.attach
@@ -84,14 +86,14 @@ class TestFiles:
 
     def test_parse_file_input_bytes(self):
         with open('tests/data/text_file.txt', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(file.read())
+            parsed = telegram._utils.files.parse_file_input(file.read())
 
         assert isinstance(parsed, InputFile)
         assert not parsed.attach
         assert parsed.filename == 'application.octet-stream'
 
         with open('tests/data/text_file.txt', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(
+            parsed = telegram._utils.files.parse_file_input(
                 file.read(), attach=True, filename='test_file'
             )
 
@@ -101,9 +103,9 @@ class TestFiles:
 
     def test_parse_file_input_tg_object(self):
         animation = Animation('file_id', 'unique_id', 1, 1, 1)
-        assert telegram.utils.files.parse_file_input(animation, Animation) == 'file_id'
-        assert telegram.utils.files.parse_file_input(animation, MessageEntity) is animation
+        assert telegram._utils.files.parse_file_input(animation, Animation) == 'file_id'
+        assert telegram._utils.files.parse_file_input(animation, MessageEntity) is animation
 
     @pytest.mark.parametrize('obj', [{1: 2}, [1, 2], (1, 2)])
     def test_parse_file_input_other(self, obj):
-        assert telegram.utils.files.parse_file_input(obj) is obj
+        assert telegram._utils.files.parse_file_input(obj) is obj

@@ -35,10 +35,10 @@ from telegram.ext import (
     Handler,
     InlineQueryHandler,
 )
-from telegram.ext.utils.promise import Promise
-from telegram.ext.utils.types import ConversationDict
-from telegram.ext.utils.types import CCT
-from telegram.utils.warnings import warn
+from telegram.ext._utils.promise import Promise
+from telegram.ext._utils.types import ConversationDict
+from telegram.ext._utils.types import CCT
+from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job

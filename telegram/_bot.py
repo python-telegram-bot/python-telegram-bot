@@ -91,12 +91,12 @@ from telegram import (
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
 from telegram.warnings import PTBDeprecationWarning
-from telegram.utils.warnings import warn
-from telegram.utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
-from telegram.utils.datetime import to_timestamp
-from telegram.utils.files import is_local_file, parse_file_input
+from telegram._utils.warnings import warn
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
+from telegram._utils.datetime import to_timestamp
+from telegram._utils.files import is_local_file, parse_file_input
 from telegram.request import Request
-from telegram.utils.types import FileInput, JSONDict, ODVInput, DVInput
+from telegram._utils.types import FileInput, JSONDict, ODVInput, DVInput
 
 if TYPE_CHECKING:
     from telegram.ext import Defaults
@@ -227,7 +227,7 @@ class Bot(TelegramObject):
     ) -> Optional[float]:
         """
         Inserts the defaults values for optional kwargs for which tg.ext.Defaults provides
-        convenience functionality, i.e. the kwargs with a tg.utils.helpers.DefaultValue default
+        convenience functionality, i.e. the kwargs with a tg._utils.helpers.DefaultValue default
 
         data is edited in-place. As timeout is not passed via the kwargs, it needs to be passed
         separately and gets returned.

@@ -24,7 +24,7 @@ from unittest import mock
 
 import pytest
 
-from telegram.utils import datetime as tg_dtm
+from telegram._utils import datetime as tg_dtm
 from telegram.ext import Defaults
 
 

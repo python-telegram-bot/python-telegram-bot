@@ -20,7 +20,7 @@
 
 .. versionchanged:: 14.0
    Previously, the contents of this module were available through the (no longer existing)
-   module ``telegram.utils.helpers``.
+   module ``telegram._utils.helpers``.
 
 Warning:
     Contents of this module are intended to be used internally by the library and *not* by the
