@@ -490,7 +490,7 @@ class Job:
         """Executes the callback function independently of the jobs schedule. Also calls
         :meth:`telegram.ext.Dispatcher.update_persistence`.
 
-        .. versionchaged:: 14.0
+        .. versionchanged:: 14.0
             Calls :meth:`telegram.ext.Dispatcher.update_persistence`.
 
         Args:
