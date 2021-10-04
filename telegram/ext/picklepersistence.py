@@ -176,7 +176,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         except pickle.UnpicklingError as exc:
             raise TypeError(f"File {filepath.name} does not contain valid pickle data") from exc
         except Exception as exc:
-            raise TypeError(f"Something went wrong unpickling {filepath}") from exc
+            raise TypeError(f"Something went wrong unpickling {filepath.name}") from exc
 
     def _dump_singlefile(self) -> None:
         data = {
