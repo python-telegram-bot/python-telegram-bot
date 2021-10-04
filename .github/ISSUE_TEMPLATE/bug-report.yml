@@ -1,0 +1,76 @@
+name: Bug Report
+description: Create a report to help us improve
+title: "[BUG]"
+labels: ["bug :bug:"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting issues of python-telegram-bot!
+
+        Use this template to notify us if you found a bug.
+
+        To make it easier for us to help you please enter detailed information below.
+
+        Please note, we only support the latest version of python-telegram-bot and master branch. Please make sure to upgrade & recreate the issue on the latest version prior to opening an issue.
+      
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      value: |
+        1. 
+        2.
+        3.
+    validations:
+      required: true
+        
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected behaviour
+      description: Tell us what should happen
+    validations:
+      required: true
+      
+  - type: textarea
+    id: actual-behaviour
+    attributes:
+      label: Actual behaviour
+      description: Tell us what happens instead
+    validations:
+      required: true
+      
+  - type: markdown
+    attributes:
+      value: "### Configuration"
+
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating System
+    validations: 
+      required: true
+
+  - type: textarea
+    id: versions
+    attributes:
+      label: Version of Python, python-telegram-bot & dependencies
+      description: Paste the output of `$ python -m telegram` here. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+    validations: 
+      required: true
+      
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Insert logs here (if necessary). This will be automatically formatted into code, so no need for backticks.
+      render: python
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: You may provide any other additional context to the bug here.
