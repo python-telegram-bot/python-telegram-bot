@@ -132,7 +132,7 @@ def done(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    persistence = PicklePersistence(filename='conversationbot')
+    persistence = PicklePersistence(filepath='conversationbot')
     updater = Updater.builder().token("TOKEN").persistence(persistence).build()
 
     # Get the dispatcher to register handlers

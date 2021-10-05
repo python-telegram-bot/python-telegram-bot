@@ -24,6 +24,7 @@ import os
 import socket
 import sys
 import warnings
+from pathlib import Path
 
 try:
     import ujson as json
@@ -80,6 +81,7 @@ def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: d
     Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
     \\ and " and replace any \n and \r with a space.
+
     """
     value = value.replace('\\', '\\\\').replace('"', '\\"')
     value = value.replace('\r', ' ').replace('\n', ' ')
@@ -382,17 +384,18 @@ class Request:
 
         return self._request_wrapper('GET', url, **urlopen_kwargs)
 
-    def download(self, url: str, filename: str, timeout: float = None) -> None:
+    def download(self, url: str, filepath: Union[Path, str], timeout: float = None) -> None:
         """Download a file by its URL.
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
+            filepath (:obj:`pathlib.Path` | :obj:`str`): The filepath to download the file to.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            filename (:obj:`str`): The filename within the path to download the file.
+
+        .. versionchanged:: 14.0
+            The ``filepath`` parameter now also accepts :obj:`pathlib.Path` objects as argument.
 
         """
-        buf = self.retrieve(url, timeout=timeout)
-        with open(filename, 'wb') as fobj:
-            fobj.write(buf)
+        Path(filepath).write_bytes(self.retrieve(url, timeout))
