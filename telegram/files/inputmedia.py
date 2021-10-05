@@ -53,7 +53,7 @@ class InputMedia(TelegramObject):
 
         if self.caption_entities:
             data['caption_entities'] = [
-                ce.to_dict() for ce in self.caption_entities  # pylint: disable=E1133
+                ce.to_dict() for ce in self.caption_entities  # pylint: disable=not-an-iterable
             ]
 
         return data

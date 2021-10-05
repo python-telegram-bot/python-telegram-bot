@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116,W0613
+# pylint: disable=missing-function-docstring, unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -66,7 +66,8 @@ class CustomContext(CallbackContext[dict, ChatData, dict]):
         context = super().from_update(update, dispatcher)
 
         if context.chat_data and isinstance(update, Update) and update.effective_message:
-            context._message_id = update.effective_message.message_id  # pylint: disable=W0212
+            # pylint: disable=protected-access
+            context._message_id = update.effective_message.message_id
 
         # Remember to return the object
         return context
