@@ -65,7 +65,7 @@ class TestWarnings:
 
     def test_warn(self, recwarn):
         expected_file = (
-            pathlib.Path(__file__).parent.parent.resolve() / 'telegram' / 'utils' / 'warnings.py'
+            pathlib.Path(__file__).parent.parent.resolve() / 'telegram' / '_utils' / 'warnings.py'
         )
 
         warn('test message')

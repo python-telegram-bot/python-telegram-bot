@@ -45,8 +45,8 @@ from telegram.error import TelegramError
 from telegram.ext import BasePersistence, ContextTypes, ExtBot, Handler
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram._utils.warnings import warn
-from telegram.ext._utils.promise import Promise
-from telegram.ext._utils.types import CCT, UD, CD, BD
+from ._utils.promise import Promise
+from ._utils.types import CCT, UD, CD, BD
 from ._callbackdatacache import CallbackDataCache
 
 if TYPE_CHECKING:

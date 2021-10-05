@@ -30,7 +30,7 @@ from typing import (
 )
 
 from telegram.ext import BasePersistence, PersistenceInput
-from telegram.ext._contexttypes import ContextTypes
+from ._contexttypes import ContextTypes
 from ._utils.types import UD, CD, BD, ConversationDict, CDCData
 
 
