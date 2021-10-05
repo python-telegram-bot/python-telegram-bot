@@ -30,16 +30,16 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 @pytest.fixture(scope='function')
 def audio_file():
-    f = open('tests/data/telegram.mp3', 'rb')
+    f = Path('tests/data/telegram.mp3').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def audio(bot, chat_id):
-    with open('tests/data/telegram.mp3', 'rb') as f:
+    with Path('tests/data/telegram.mp3').open('rb') as f:
         return bot.send_audio(
-            chat_id, audio=f, timeout=50, thumb=open('tests/data/thumb.jpg', 'rb')
+            chat_id, audio=f, timeout=50, thumb=Path('tests/data/thumb.jpg').open('rb')
         ).audio
 
 
@@ -132,11 +132,11 @@ class TestAudio:
         assert new_file.file_size == self.file_size
         assert new_file.file_id == audio.file_id
         assert new_file.file_unique_id == audio.file_unique_id
-        assert new_file.file_path.startswith('https://')
+        assert str(new_file.file_path).startswith('https://')
 
         new_file.download('telegram.mp3')
 
-        assert os.path.isfile('telegram.mp3')
+        assert Path('telegram.mp3').is_file()
 
     @flaky(3, 1)
     def test_send_mp3_url_file(self, bot, chat_id, audio):

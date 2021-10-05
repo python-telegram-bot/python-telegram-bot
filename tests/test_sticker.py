@@ -30,39 +30,37 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 @pytest.fixture(scope='function')
 def sticker_file():
-    f = open('tests/data/telegram.webp', 'rb')
-    yield f
-    f.close()
+    with Path('tests/data/telegram.webp').open('rb') as file:
+        yield file
 
 
 @pytest.fixture(scope='class')
 def sticker(bot, chat_id):
-    with open('tests/data/telegram.webp', 'rb') as f:
+    with Path('tests/data/telegram.webp').open('rb') as f:
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
 @pytest.fixture(scope='function')
 def animated_sticker_file():
-    f = open('tests/data/telegram_animated_sticker.tgs', 'rb')
-    yield f
-    f.close()
+    with Path('tests/data/telegram_animated_sticker.tgs').open('rb') as f:
+        yield f
 
 
 @pytest.fixture(scope='class')
 def animated_sticker(bot, chat_id):
-    with open('tests/data/telegram_animated_sticker.tgs', 'rb') as f:
+    with Path('tests/data/telegram_animated_sticker.tgs').open('rb') as f:
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
 @pytest.fixture(scope='function')
 def video_sticker_file():
-    with open('tests/data/telegram_video_sticker.webm', 'rb') as f:
+    with Path('tests/data/telegram_video_sticker.webm').open('rb') as f:
         yield f
 
 
 @pytest.fixture(scope='class')
 def video_sticker(bot, chat_id):
-    with open('tests/data/telegram_video_sticker.webm', 'rb') as f:
+    with Path('tests/data/telegram_video_sticker.webm').open('rb') as f:
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
@@ -153,7 +151,7 @@ class TestSticker:
 
         new_file.download('telegram.webp')
 
-        assert os.path.isfile('telegram.webp')
+        assert Path('telegram.webp').is_file()
 
     @flaky(3, 1)
     def test_resend(self, bot, chat_id, sticker):
@@ -377,9 +375,8 @@ def video_sticker_set(bot):
 
 @pytest.fixture(scope='function')
 def sticker_set_thumb_file():
-    f = open('tests/data/sticker_set_thumb.png', 'rb')
-    yield f
-    f.close()
+    with Path('tests/data/sticker_set_thumb.png').open('rb') as file:
+        yield file
 
 
 class TestStickerSet:
@@ -455,7 +452,7 @@ class TestStickerSet:
 
     @flaky(3, 1)
     def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
-        with open('tests/data/telegram_sticker.png', 'rb') as f:
+        with Path('tests/data/telegram_sticker.png').open('rb') as f:
             # chat_id was hardcoded as 95205500 but it stopped working for some reason
             file = bot.upload_sticker_file(chat_id, f)
         assert file
@@ -476,13 +473,13 @@ class TestStickerSet:
         assert bot.add_sticker_to_set(
             chat_id,
             f'animated_test_by_{bot.username}',
-            tgs_sticker=open('tests/data/telegram_animated_sticker.tgs', 'rb'),
+            tgs_sticker=Path('tests/data/telegram_animated_sticker.tgs').open('rb'),
             emojis='😄',
         )
 
     @flaky(3, 1)
     def test_bot_methods_1_webm(self, bot, chat_id):
-        with open('tests/data/telegram_video_sticker.webm', 'rb') as f:
+        with Path('tests/data/telegram_video_sticker.webm').open('rb') as f:
             assert bot.add_sticker_to_set(
                 chat_id, f'video_test_by_{bot.username}', webm_sticker=f, emojis='🤔'
             )

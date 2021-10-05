@@ -36,7 +36,7 @@ def video_note_file():
 
 @pytest.fixture(scope='class')
 def video_note(bot, chat_id):
-    with open('tests/data/telegram2.mp4', 'rb') as f:
+    with Path('tests/data/telegram2.mp4').open('rb') as f:
         return bot.send_video_note(chat_id, video_note=f, timeout=50).video_note
 
 
@@ -123,7 +123,7 @@ class TestVideoNote:
 
         new_file.download('telegram2.mp4')
 
-        assert os.path.isfile('telegram2.mp4')
+        assert Path('telegram2.mp4').is_file()
 
     @flaky(3, 1)
     def test_resend(self, bot, chat_id, video_note):
