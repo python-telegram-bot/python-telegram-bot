@@ -378,7 +378,7 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
         monkeypatch.setattr(
-            'telegram.ext.utils.webhookhandler.WebhookServer.__init__', webhook_server_init
+            'telegram.ext._utils.webhookhandler.WebhookServer.__init__', webhook_server_init
         )
 
         ip = '127.0.0.1'

@@ -160,7 +160,7 @@ from ._botcommandscope import (
     BotCommandScopeChatMember,
 )
 from ._bot import Bot
-from .version import __version__, bot_api_version  # noqa: F401
+from ._version import __version__, bot_api_version  # noqa: F401
 
 __author__ = 'devs@python-telegram-bot.org'
 
