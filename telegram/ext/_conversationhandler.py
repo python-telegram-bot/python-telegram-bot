@@ -35,7 +35,7 @@ from telegram.ext import (
     Handler,
     InlineQueryHandler,
 )
-from telegram._utils.warnings import warn
+from .._utils.warnings import warn
 from ._utils.promise import Promise
 from ._utils.types import ConversationDict
 from ._utils.types import CCT

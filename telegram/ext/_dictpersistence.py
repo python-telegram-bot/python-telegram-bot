@@ -22,7 +22,7 @@ from typing import DefaultDict, Dict, Optional, Tuple, cast
 from collections import defaultdict
 
 from telegram.ext import BasePersistence, PersistenceInput
-from telegram._utils.types import JSONDict
+from .._utils.types import JSONDict
 from ._utils.types import ConversationDict, CDCData
 
 try:

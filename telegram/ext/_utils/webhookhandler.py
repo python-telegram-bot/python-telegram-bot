@@ -31,7 +31,7 @@ from tornado.ioloop import IOLoop
 
 from telegram import Update
 from telegram.ext import ExtBot
-from telegram._utils.types import JSONDict
+from ..._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot

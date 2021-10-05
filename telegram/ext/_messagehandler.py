@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union
 
 from telegram import Update
 from telegram.ext import BaseFilter, Filters, Handler
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from .._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 from ._utils.types import CCT
 

@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, List, Optional
 
 from telegram import InlineKeyboardButton, ReplyMarkup
-from telegram._utils.types import JSONDict
+from .._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot

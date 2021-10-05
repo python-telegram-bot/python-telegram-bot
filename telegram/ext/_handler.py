@@ -20,10 +20,10 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, Generic
 
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from .._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from ._utils.promise import Promise
 from ._utils.types import CCT
-from .extbot import ExtBot
+from ._extbot import ExtBot
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher

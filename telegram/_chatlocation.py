@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import TelegramObject
-from telegram._utils.types import JSONDict
+from ._utils.types import JSONDict
 
 from ._files._location import Location
 

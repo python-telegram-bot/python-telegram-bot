@@ -34,7 +34,7 @@ from telegram import (
     constants,
 )
 
-from telegram._utils.types import JSONDict
+from ._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot, Chat, User  # noqa

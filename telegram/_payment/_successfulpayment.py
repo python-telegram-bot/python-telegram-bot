@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import OrderInfo, TelegramObject
-from telegram._utils.types import JSONDict
+from .._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot

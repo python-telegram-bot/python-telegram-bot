@@ -24,8 +24,8 @@ except ImportError:
 
 from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple
 
-from telegram._utils.types import JSONDict
-from telegram._utils.warnings import warn
+from ._utils.types import JSONDict
+from ._utils.warnings import warn
 
 if TYPE_CHECKING:
     from telegram import Bot

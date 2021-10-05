@@ -43,8 +43,8 @@ from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized, Tel
 from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
 from telegram.warnings import PTBDeprecationWarning
 from telegram.request import Request
-from telegram._utils.defaultvalue import DEFAULT_FALSE, DefaultValue
-from telegram._utils.warnings import warn
+from .._utils.defaultvalue import DEFAULT_FALSE, DefaultValue
+from .._utils.warnings import warn
 from ._utils.types import CCT, UD, CD, BD
 from ._utils.webhookhandler import WebhookAppClass, WebhookServer
 

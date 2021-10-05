@@ -21,7 +21,7 @@
 from typing import Any, List, Union, Sequence
 
 from telegram import KeyboardButton, ReplyMarkup
-from telegram._utils.types import JSONDict
+from ._utils.types import JSONDict
 
 
 class ReplyKeyboardMarkup(ReplyMarkup):

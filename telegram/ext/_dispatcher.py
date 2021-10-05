@@ -43,8 +43,8 @@ from uuid import uuid4
 from telegram import Update
 from telegram.error import TelegramError
 from telegram.ext import BasePersistence, ContextTypes, ExtBot, Handler
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-from telegram._utils.warnings import warn
+from .._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from .._utils.warnings import warn
 from ._utils.promise import Promise
 from ._utils.types import CCT, UD, CD, BD
 from ._callbackdatacache import CallbackDataCache

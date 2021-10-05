@@ -22,8 +22,8 @@
 from typing import TYPE_CHECKING, Any, Union, Tuple, List
 
 from telegram import InlineQueryResult, MessageEntity
-from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import ODVInput
+from .._utils.defaultvalue import DEFAULT_NONE
+from .._utils.types import ODVInput
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup

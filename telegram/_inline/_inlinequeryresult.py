@@ -22,7 +22,7 @@
 from typing import Any
 
 from telegram import TelegramObject
-from telegram._utils.types import JSONDict
+from .._utils.types import JSONDict
 
 
 class InlineQueryResult(TelegramObject):

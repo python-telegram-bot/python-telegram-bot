@@ -60,7 +60,7 @@ from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TelegramError
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram.helpers import escape_markdown
-from telegram.utils.defaultvalue import DefaultValue
+from telegram._utils.defaultvalue import DefaultValue
 from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION, build_kwargs
 from tests.bots import FALLBACKS
 

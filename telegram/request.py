@@ -72,7 +72,7 @@ from telegram.error import (
     TimedOut,
     Unauthorized,
 )
-from telegram._utils.types import JSONDict
+from ._utils.types import JSONDict
 
 
 def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: disable=W0613
