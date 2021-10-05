@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import os
+from pathlib import Path
+
 import pytest
 from flaky import flaky
 
@@ -73,7 +75,7 @@ class TestChatPhoto:
 
         new_file.download('telegram.jpg')
 
-        assert os.path.isfile('telegram.jpg')
+        assert Path('telegram.jpg').is_file()
 
         new_file = bot.get_file(chat_photo.big_file_id)
 
@@ -82,7 +84,7 @@ class TestChatPhoto:
 
         new_file.download('telegram.jpg')
 
-        assert os.path.isfile('telegram.jpg')
+        assert Path('telegram.jpg').is_file()
 
     def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
         def test(url, data, **kwargs):

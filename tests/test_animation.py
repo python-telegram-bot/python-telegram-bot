@@ -30,14 +30,14 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 @pytest.fixture(scope='function')
 def animation_file():
-    f = open('tests/data/game.gif', 'rb')
+    f = Path('tests/data/game.gif').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def animation(bot, chat_id):
-    with open('tests/data/game.gif', 'rb') as f:
+    with Path('tests/data/game.gif').open('rb') as f:
         return bot.send_animation(
             chat_id, animation=f, timeout=50, thumb=open('tests/data/thumb.jpg', 'rb')
         ).animation
@@ -120,9 +120,9 @@ class TestAnimation:
         assert new_file.file_id == animation.file_id
         assert new_file.file_path.startswith('https://')
 
-        new_file.download('game.gif')
+        new_filepath: Path = new_file.download('game.gif')
 
-        assert os.path.isfile('game.gif')
+        assert new_filepath.is_file()
 
     @flaky(3, 1)
     def test_send_animation_url_file(self, bot, chat_id, animation):

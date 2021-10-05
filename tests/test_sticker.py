@@ -30,27 +30,27 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 @pytest.fixture(scope='function')
 def sticker_file():
-    f = open('tests/data/telegram.webp', 'rb')
+    f = Path('tests/data/telegram.webp').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def sticker(bot, chat_id):
-    with open('tests/data/telegram.webp', 'rb') as f:
+    with Path('tests/data/telegram.webp').open('rb') as f:
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
 @pytest.fixture(scope='function')
 def animated_sticker_file():
-    f = open('tests/data/telegram_animated_sticker.tgs', 'rb')
+    f = Path('tests/data/telegram_animated_sticker.tgs').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def animated_sticker(bot, chat_id):
-    with open('tests/data/telegram_animated_sticker.tgs', 'rb') as f:
+    with Path('tests/data/telegram_animated_sticker.tgs').open('rb') as f:
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
@@ -138,7 +138,7 @@ class TestSticker:
 
         new_file.download('telegram.webp')
 
-        assert os.path.isfile('telegram.webp')
+        assert Path('telegram.webp').is_file()
 
     @flaky(3, 1)
     def test_resend(self, bot, chat_id, sticker):
@@ -370,7 +370,7 @@ class TestStickerSet:
 
     @flaky(3, 1)
     def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
-        with open('tests/data/telegram_sticker.png', 'rb') as f:
+        with Path('tests/data/telegram_sticker.png').open('rb') as f:
             file = bot.upload_sticker_file(95205500, f)
         assert file
         assert bot.add_sticker_to_set(

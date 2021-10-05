@@ -100,7 +100,7 @@ def message(bot, chat_id):
 
 @pytest.fixture(scope='class')
 def media_message(bot, chat_id):
-    with open('tests/data/telegram.ogg', 'rb') as f:
+    with Path('tests/data/telegram.ogg').open('rb') as f:
         return bot.send_voice(chat_id, voice=f, caption='my caption', timeout=10)
 
 
@@ -1925,7 +1925,7 @@ class TestBot:
         def func():
             assert bot.set_chat_photo(channel_id, f)
 
-        with open('tests/data/telegram_test_channel.jpg', 'rb') as f:
+        with Path('tests/data/telegram_test_channel.jpg').open('rb') as f:
             expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
     def test_set_chat_photo_local_files(self, monkeypatch, bot, chat_id):

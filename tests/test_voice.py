@@ -30,14 +30,14 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 @pytest.fixture(scope='function')
 def voice_file():
-    f = open('tests/data/telegram.ogg', 'rb')
+    f = Path('tests/data/telegram.ogg').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def voice(bot, chat_id):
-    with open('tests/data/telegram.ogg', 'rb') as f:
+    with Path('tests/data/telegram.ogg').open('rb') as f:
         return bot.send_voice(chat_id, voice=f, timeout=50).voice
 
 
@@ -111,9 +111,9 @@ class TestVoice:
         assert new_file.file_unique_id == voice.file_unique_id
         assert new_file.file_path.startswith('https://')
 
-        new_file.download('telegram.ogg')
+        new_filepath = new_file.download('telegram.ogg')
 
-        assert os.path.isfile('telegram.ogg')
+        assert new_filepath.is_file()
 
     @flaky(3, 1)
     def test_send_ogg_url_file(self, bot, chat_id, voice):

@@ -120,7 +120,7 @@ def bot(bot_info):
 
 @pytest.fixture(scope='session')
 def raw_bot(bot_info):
-    return DictBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest())
+    return DictBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest(8))
 
 
 DEFAULT_BOTS = {}
