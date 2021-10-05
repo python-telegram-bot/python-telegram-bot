@@ -1166,10 +1166,11 @@ class TestMessage:
         assert check_shortcut_signature(
             Message.copy, Bot.copy_message, ['from_chat_id', 'message_id'], []
         )
-        assert check_shortcut_call(message.copy, message.bot, 'copy_message')
-        assert check_defaults_handling(message.copy, message.bot)
+        message.set_bot(Bot)
+        assert check_shortcut_call(message.copy, message.get_bot(), 'copy_message')
+        assert check_defaults_handling(message.copy, message.get_bot())
 
-        monkeypatch.setattr(message.bot, 'copy_message', make_assertion)
+        monkeypatch.setattr(message.get_bot(), 'copy_message', make_assertion)
         assert message.copy(123456, disable_notification=disable_notification)
         assert message.copy(
             123456, reply_markup=keyboard, disable_notification=disable_notification
