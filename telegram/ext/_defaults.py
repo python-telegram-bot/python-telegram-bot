@@ -22,8 +22,8 @@ from typing import NoReturn, Optional, Dict, Any
 
 import pytz
 
-from .._utils.defaultvalue import DEFAULT_NONE
-from .._utils.types import ODVInput
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import ODVInput
 
 
 class Defaults:

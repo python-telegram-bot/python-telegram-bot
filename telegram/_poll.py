@@ -24,8 +24,8 @@ import sys
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, ClassVar
 
 from telegram import MessageEntity, TelegramObject, User, constants
-from ._utils.datetime import from_timestamp, to_timestamp
-from ._utils.types import JSONDict
+from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot

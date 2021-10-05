@@ -22,7 +22,7 @@
 from telegram import Update
 
 from telegram.ext import Handler
-from ._utils.types import CCT
+from telegram.ext._utils.types import CCT
 
 
 class PollHandler(Handler[Update, CCT]):

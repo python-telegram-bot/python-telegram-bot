@@ -25,7 +25,7 @@ from typing import IO, TYPE_CHECKING, Any, Optional, Union
 
 from telegram import TelegramObject
 from telegram._passport._credentials import decrypt
-from .._utils.files import is_local_file
+from telegram._utils.files import is_local_file
 
 if TYPE_CHECKING:
     from telegram import Bot, FileCredentials

@@ -21,8 +21,8 @@
 from typing import Any, Union, Tuple, List
 
 from telegram import InputMessageContent, MessageEntity
-from .._utils.defaultvalue import DEFAULT_NONE
-from .._utils.types import JSONDict, ODVInput
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 
 
 class InputTextMessageContent(InputMessageContent):

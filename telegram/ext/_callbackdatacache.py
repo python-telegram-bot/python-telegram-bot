@@ -53,8 +53,8 @@ from telegram import (
     User,
 )
 from telegram.error import TelegramError
-from .._utils.datetime import to_float_timestamp
-from ._utils.types import CDCData
+from telegram._utils.datetime import to_float_timestamp
+from telegram.ext._utils.types import CDCData
 
 if TYPE_CHECKING:
     from telegram.ext import ExtBot

@@ -43,7 +43,7 @@ except ImportError:
 
 from telegram import TelegramObject
 from telegram.error import PassportDecryptionError
-from .._utils.types import JSONDict
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot

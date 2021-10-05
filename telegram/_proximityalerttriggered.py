@@ -20,7 +20,7 @@
 from typing import Any, Optional, TYPE_CHECKING
 
 from telegram import TelegramObject, User
-from ._utils.types import JSONDict
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot

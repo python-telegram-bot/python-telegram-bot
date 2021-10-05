@@ -20,8 +20,8 @@
 """This module contains the auxiliary class ContextTypes."""
 from typing import Type, Generic, overload, Dict  # pylint: disable=W0611
 
-from ._callbackcontext import CallbackContext
-from ._utils.types import CCT, UD, CD, BD
+from telegram.ext._callbackcontext import CallbackContext
+from telegram.ext._utils.types import CCT, UD, CD, BD
 
 
 class ContextTypes(Generic[CCT, UD, CD, BD]):

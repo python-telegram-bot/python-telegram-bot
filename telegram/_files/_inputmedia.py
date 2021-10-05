@@ -30,9 +30,9 @@ from telegram import (
     Video,
     MessageEntity,
 )
-from .._utils.defaultvalue import DEFAULT_NONE
-from .._utils.files import parse_file_input
-from .._utils.types import FileInput, JSONDict, ODVInput
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.files import parse_file_input
+from telegram._utils.types import FileInput, JSONDict, ODVInput
 
 
 class InputMedia(TelegramObject):

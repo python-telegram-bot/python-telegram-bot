@@ -21,8 +21,8 @@
 from typing import Callable, Type, TypeVar, Union
 
 from telegram.ext import Handler
-from ._utils.types import CCT
-from .._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram.ext._utils.types import CCT
+from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 RT = TypeVar('RT')
 UT = TypeVar('UT')

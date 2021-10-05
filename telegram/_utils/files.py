@@ -31,7 +31,7 @@ Warning:
 from pathlib import Path
 from typing import Optional, Union, Type, Any, cast, IO, TYPE_CHECKING
 
-from .._utils.types import FileInput
+from telegram._utils.types import FileInput
 
 if TYPE_CHECKING:
     from telegram import TelegramObject, InputFile

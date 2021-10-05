@@ -22,11 +22,11 @@ from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional, ClassVar, Union, Tuple, Any
 
 from telegram import ChatPhoto, TelegramObject, constants
-from ._utils.types import JSONDict, FileInput, ODVInput, DVInput
+from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput
+from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
 
-from ._chatpermissions import ChatPermissions
-from ._chatlocation import ChatLocation
-from ._utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
+from telegram._chatpermissions import ChatPermissions
+from telegram._chatlocation import ChatLocation
 
 if TYPE_CHECKING:
     from telegram import (

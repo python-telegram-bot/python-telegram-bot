@@ -32,8 +32,8 @@ from typing import (
 )
 
 from telegram.ext import BasePersistence, PersistenceInput
-from ._contexttypes import ContextTypes
-from ._utils.types import UD, CD, BD, ConversationDict, CDCData
+from telegram.ext._contexttypes import ContextTypes
+from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 
 
 class PicklePersistence(BasePersistence[UD, CD, BD]):

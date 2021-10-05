@@ -21,7 +21,7 @@
 from typing import Any, Union, Optional, TYPE_CHECKING, Dict, Type
 
 from telegram import TelegramObject, constants
-from ._utils.types import JSONDict
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot

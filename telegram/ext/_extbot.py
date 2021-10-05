@@ -47,10 +47,10 @@ from telegram import (
     InputMedia,
 )
 
-from ._callbackdatacache import CallbackDataCache
-from .._utils.types import JSONDict, ODVInput, DVInput
-from .._utils.defaultvalue import DEFAULT_NONE, DefaultValue
-from .._utils.datetime import to_timestamp
+from telegram._utils.types import JSONDict, ODVInput, DVInput
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
+from telegram._utils.datetime import to_timestamp
+from telegram.ext._callbackdatacache import CallbackDataCache
 
 if TYPE_CHECKING:
     from telegram import InlineQueryResult, MessageEntity

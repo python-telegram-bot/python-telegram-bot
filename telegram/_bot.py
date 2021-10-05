@@ -93,10 +93,10 @@ from telegram import (
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
 from telegram.request import Request
-from ._utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
-from ._utils.datetime import to_timestamp
-from ._utils.files import is_local_file, parse_file_input
-from ._utils.types import FileInput, JSONDict, ODVInput, DVInput
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
+from telegram._utils.datetime import to_timestamp
+from telegram._utils.files import is_local_file, parse_file_input
+from telegram._utils.types import FileInput, JSONDict, ODVInput, DVInput
 
 if TYPE_CHECKING:
     from telegram import (

@@ -56,9 +56,9 @@ from telegram import (
     VoiceChatScheduled,
 )
 from telegram.helpers import escape_markdown
-from ._utils.datetime import from_timestamp, to_timestamp
-from ._utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
-from ._utils.types import JSONDict, FileInput, ODVInput, DVInput
+from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
+from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput
 
 if TYPE_CHECKING:
     from telegram import (

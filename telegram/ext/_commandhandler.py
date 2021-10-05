@@ -22,9 +22,9 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple, TypeVar
 
 from telegram import MessageEntity, Update
 from telegram.ext import BaseFilter, Filters, Handler
-from .._utils.types import SLT
-from .._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-from ._utils.types import CCT
+from telegram._utils.types import SLT
+from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram.ext._utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher

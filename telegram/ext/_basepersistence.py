@@ -25,8 +25,8 @@ from telegram import Bot
 from telegram.ext import ExtBot
 
 from telegram.warnings import PTBRuntimeWarning
-from .._utils.warnings import warn
-from ._utils.types import UD, CD, BD, ConversationDict, CDCData
+from telegram._utils.warnings import warn
+from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 
 
 class PersistenceInput(NamedTuple):

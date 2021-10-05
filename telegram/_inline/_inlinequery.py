@@ -22,8 +22,8 @@
 from typing import TYPE_CHECKING, Any, Optional, Union, Callable, ClassVar, Sequence
 
 from telegram import Location, TelegramObject, User, constants
-from .._utils.defaultvalue import DEFAULT_NONE
-from .._utils.types import JSONDict, ODVInput
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot, InlineQueryResult

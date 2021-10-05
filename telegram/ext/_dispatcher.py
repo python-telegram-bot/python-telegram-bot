@@ -43,11 +43,11 @@ from uuid import uuid4
 from telegram import Update
 from telegram.error import TelegramError
 from telegram.ext import BasePersistence, ContextTypes, ExtBot, Handler
-from .._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-from .._utils.warnings import warn
-from ._utils.promise import Promise
-from ._utils.types import CCT, UD, CD, BD
-from ._callbackdatacache import CallbackDataCache
+from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram._utils.warnings import warn
+from telegram.ext._utils.promise import Promise
+from telegram.ext._utils.types import CCT, UD, CD, BD
+from telegram.ext._callbackdatacache import CallbackDataCache
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -528,7 +528,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         """
         # Unfortunately due to circular imports this has to be here
-        from ._conversationhandler import ConversationHandler  # pylint: disable=C0415
+        from telegram.ext._conversationhandler import ConversationHandler  # pylint: disable=C0415
 
         if not isinstance(handler, Handler):
             raise TypeError(f'handler is not an instance of {Handler.__name__}')
