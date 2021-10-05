@@ -124,7 +124,7 @@ class Promise:
 
     def add_done_callback(self, callback: Callable) -> None:
         """
-        Callback to be run when :class:`telegram.ext.utils.promise.Promise` becomes done.
+        Callback to be run when :class:`telegram.ext._utils.promise.Promise` becomes done.
 
         Note:
             Callback won't be called if :attr:`pooled_function`

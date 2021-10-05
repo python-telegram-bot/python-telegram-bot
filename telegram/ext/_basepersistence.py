@@ -398,30 +398,30 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def get_user_data(self) -> DefaultDict[int, UD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
-        :obj:`defaultdict(telegram.ext.utils.types.UD)` with integer keys.
+        :obj:`defaultdict(telegram.ext._utils.types.UD)` with integer keys.
 
         Returns:
-            DefaultDict[:obj:`int`, :class:`telegram.ext.utils.types.UD`]: The restored user data.
+            DefaultDict[:obj:`int`, :class:`telegram.ext._utils.types.UD`]: The restored user data.
         """
 
     @abstractmethod
     def get_chat_data(self) -> DefaultDict[int, CD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
-        :obj:`defaultdict(telegram.ext.utils.types.CD)` with integer keys.
+        :obj:`defaultdict(telegram.ext._utils.types.CD)` with integer keys.
 
         Returns:
-            DefaultDict[:obj:`int`, :class:`telegram.ext.utils.types.CD`]: The restored chat data.
+            DefaultDict[:obj:`int`, :class:`telegram.ext._utils.types.CD`]: The restored chat data.
         """
 
     @abstractmethod
     def get_bot_data(self) -> BD:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
-        :class:`telegram.ext.utils.types.BD`.
+        :class:`telegram.ext._utils.types.BD`.
 
         Returns:
-            :class:`telegram.ext.utils.types.BD`: The restored bot data.
+            :class:`telegram.ext._utils.types.BD`: The restored bot data.
         """
 
     @abstractmethod
@@ -435,7 +435,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Returns:
-            Optional[:class:`telegram.ext.utils.types.CDCData`]: The restored meta data or
+            Optional[:class:`telegram.ext._utils.types.CDCData`]: The restored meta data or
             :obj:`None`, if no data was stored.
         """
 
@@ -473,7 +473,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:class:`telegram.ext.utils.types.UD`): The
+            data (:class:`telegram.ext._utils.types.UD`): The
                 :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
 
@@ -484,7 +484,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:class:`telegram.ext.utils.types.CD`): The
+            data (:class:`telegram.ext._utils.types.CD`): The
                 :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
 
@@ -494,7 +494,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         handled an update.
 
         Args:
-            data (:class:`telegram.ext.utils.types.BD`): The
+            data (:class:`telegram.ext._utils.types.BD`): The
                 :attr:`telegram.ext.Dispatcher.bot_data`.
         """
 
@@ -511,7 +511,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
-            user_data (:class:`telegram.ext.utils.types.UD`): The ``user_data`` of a single user.
+            user_data (:class:`telegram.ext._utils.types.UD`): The ``user_data`` of a single user.
         """
 
     @abstractmethod
@@ -527,7 +527,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
-            chat_data (:class:`telegram.ext.utils.types.CD`): The ``chat_data`` of a single chat.
+            chat_data (:class:`telegram.ext._utils.types.CD`): The ``chat_data`` of a single chat.
         """
 
     @abstractmethod
@@ -542,7 +542,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Args:
-            bot_data (:class:`telegram.ext.utils.types.BD`): The ``bot_data``.
+            bot_data (:class:`telegram.ext._utils.types.BD`): The ``bot_data``.
         """
 
     @abstractmethod
@@ -556,7 +556,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Args:
-            data (:class:`telegram.ext.utils.types.CDCData`): The relevant data to restore
+            data (:class:`telegram.ext._utils.types.CDCData`): The relevant data to restore
                 :class:`telegram.ext.CallbackDataCache`.
         """
 

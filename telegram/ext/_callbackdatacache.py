@@ -126,7 +126,7 @@ class CallbackDataCache:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
         maxsize (:obj:`int`, optional): Maximum number of items in each of the internal mappings.
             Defaults to 1024.
-        persistent_data (:obj:`telegram.ext.utils.types.CDCData`, optional): Data to initialize
+        persistent_data (:obj:`telegram.ext._utils.types.CDCData`, optional): Data to initialize
             the cache with, as returned by :meth:`telegram.ext.BasePersistence.get_callback_data`.
 
     Attributes:
@@ -162,7 +162,7 @@ class CallbackDataCache:
 
     @property
     def persistence_data(self) -> CDCData:
-        """:obj:`telegram.ext.utils.types.CDCData`: The data that needs to be persisted to allow
+        """:obj:`telegram.ext._utils.types.CDCData`: The data that needs to be persisted to allow
         caching callback data across bot reboots.
         """
         # While building a list/dict from the LRUCaches has linear runtime (in the number of
