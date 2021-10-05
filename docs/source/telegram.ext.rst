@@ -53,11 +53,3 @@ Arbitrary Callback Data
 
     telegram.ext.callbackdatacache
     telegram.ext.invalidcallbackdata
-
-utils
------
-
-.. toctree::
-
-    telegram.ext.utils.promise
-    telegram.ext.utils.types
