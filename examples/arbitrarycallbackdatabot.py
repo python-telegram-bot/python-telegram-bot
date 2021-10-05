@@ -84,7 +84,7 @@ def handle_invalid_button(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Run the bot."""
     # We use persistence to demonstrate how buttons can still work after the bot was restarted
-    persistence = PicklePersistence(filename='arbitrarycallbackdatabot.pickle')
+    persistence = PicklePersistence(filepath='arbitrarycallbackdatabot')
     # Create the Updater and pass it your bot's token.
     updater = Updater("TOKEN", persistence=persistence, arbitrary_callback_data=True)
 
