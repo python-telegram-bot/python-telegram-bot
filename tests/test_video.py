@@ -30,14 +30,14 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 @pytest.fixture(scope='function')
 def video_file():
-    f = open('tests/data/telegram.mp4', 'rb')
+    f = Path('tests/data/telegram.mp4').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def video(bot, chat_id):
-    with open('tests/data/telegram.mp4', 'rb') as f:
+    with Path('tests/data/telegram.mp4').open('rb') as f:
         return bot.send_video(chat_id, video=f, timeout=50).video
 
 
@@ -141,7 +141,7 @@ class TestVideo:
 
         new_file.download('telegram.mp4')
 
-        assert os.path.isfile('telegram.mp4')
+        assert Path('telegram.mp4').is_file()
 
     @flaky(3, 1)
     def test_send_mp4_file_url(self, bot, chat_id, video):

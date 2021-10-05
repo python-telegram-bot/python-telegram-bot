@@ -43,7 +43,7 @@ def photo_file():
 @pytest.fixture(scope='class')
 def _photo(bot, chat_id):
     def func():
-        with open('tests/data/telegram.jpg', 'rb') as f:
+        with Path('tests/data/telegram.jpg').open('rb') as f:
             return bot.send_photo(chat_id, photo=f, timeout=50).photo
 
     return expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
@@ -288,7 +288,7 @@ class TestPhoto:
 
         new_file.download('telegram.jpg')
 
-        assert os.path.isfile('telegram.jpg') is True
+        assert Path('telegram.jpg').is_file()
 
     @flaky(3, 1)
     def test_send_url_jpg_file(self, bot, chat_id, thumb, photo):
@@ -343,7 +343,7 @@ class TestPhoto:
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
         """
-        with open('tests/data/测试.png', 'rb') as f:
+        with Path('tests/data/测试.png').open('rb') as f:
             message = bot.send_photo(photo=f, chat_id=chat_id)
 
         photo = message.photo[-1]
@@ -356,21 +356,21 @@ class TestPhoto:
 
     @flaky(3, 1)
     def test_send_bytesio_jpg_file(self, bot, chat_id):
-        file_name = 'tests/data/telegram_no_standard_header.jpg'
+        filepath: Path = Path('tests/data/telegram_no_standard_header.jpg')
 
         # raw image bytes
-        raw_bytes = BytesIO(open(file_name, 'rb').read())
+        raw_bytes = BytesIO(filepath.read_bytes())
         input_file = InputFile(raw_bytes)
         assert input_file.mimetype == 'application/octet-stream'
 
         # raw image bytes with name info
-        raw_bytes = BytesIO(open(file_name, 'rb').read())
-        raw_bytes.name = file_name
+        raw_bytes = BytesIO(filepath.read_bytes())
+        raw_bytes.name = str(filepath)
         input_file = InputFile(raw_bytes)
         assert input_file.mimetype == 'image/jpeg'
 
         # send raw photo
-        raw_bytes = BytesIO(open(file_name, 'rb').read())
+        raw_bytes = BytesIO(filepath.read_bytes())
         message = bot.send_photo(chat_id, photo=raw_bytes)
         photo = message.photo[-1]
         assert isinstance(photo.file_id, str)

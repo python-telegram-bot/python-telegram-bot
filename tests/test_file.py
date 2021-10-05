@@ -92,7 +92,7 @@ class TestFile:
             bot.get_file(file_id='')
 
     def test_download_mutuall_exclusive(self, file):
-        with pytest.raises(ValueError, match='custom_path and out are mutually exclusive'):
+        with pytest.raises(ValueError, match='`custom_path` and `out` are mutually exclusive'):
             file.download('custom_path', 'out')
 
     def test_download(self, monkeypatch, file):
@@ -103,41 +103,44 @@ class TestFile:
         out_file = file.download()
 
         try:
-            with open(out_file, 'rb') as fobj:
-                assert fobj.read() == self.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
-            os.unlink(out_file)
+            out_file.unlink()
 
     def test_download_local_file(self, local_file):
-        assert local_file.download() == local_file.file_path
+        assert local_file.download() == Path(local_file.file_path)
 
-    def test_download_custom_path(self, monkeypatch, file):
+    @pytest.mark.parametrize(
+        'custom_path_type', [str, Path], ids=['str custom_path', 'pathlib.Path custom_path']
+    )
+    def test_download_custom_path(self, monkeypatch, file, custom_path_type):
         def test(*args, **kwargs):
             return self.file_content
 
         monkeypatch.setattr('telegram.request.Request.retrieve', test)
         file_handle, custom_path = mkstemp()
+        custom_path = Path(custom_path)
         try:
-            out_file = file.download(custom_path)
+            out_file = file.download(custom_path_type(custom_path))
             assert out_file == custom_path
-
-            with open(out_file, 'rb') as fobj:
-                assert fobj.read() == self.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
             os.close(file_handle)
-            os.unlink(custom_path)
+            custom_path.unlink()
 
-    def test_download_custom_path_local_file(self, local_file):
+    @pytest.mark.parametrize(
+        'custom_path_type', [str, Path], ids=['str custom_path', 'pathlib.Path custom_path']
+    )
+    def test_download_custom_path_local_file(self, local_file, custom_path_type):
         file_handle, custom_path = mkstemp()
+        custom_path = Path(custom_path)
         try:
-            out_file = local_file.download(custom_path)
+            out_file = local_file.download(custom_path_type(custom_path))
             assert out_file == custom_path
-
-            with open(out_file, 'rb') as fobj:
-                assert fobj.read() == self.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
             os.close(file_handle)
-            os.unlink(custom_path)
+            custom_path.unlink()
 
     def test_download_no_filename(self, monkeypatch, file):
         def test(*args, **kwargs):
@@ -148,12 +151,11 @@ class TestFile:
         monkeypatch.setattr('telegram.request.Request.retrieve', test)
         out_file = file.download()
 
-        assert out_file[-len(file.file_id) :] == file.file_id
+        assert str(out_file)[-len(file.file_id) :] == file.file_id
         try:
-            with open(out_file, 'rb') as fobj:
-                assert fobj.read() == self.file_content
+            assert out_file.read_bytes() == self.file_content
         finally:
-            os.unlink(out_file)
+            out_file.unlink()
 
     def test_download_file_obj(self, monkeypatch, file):
         def test(*args, **kwargs):

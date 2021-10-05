@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from pathlib import Path
+
 import pytest
 
 from telegram.error import TelegramError
@@ -48,3 +50,16 @@ def test_parse_illegal_json():
 
     with pytest.raises(TelegramError, match='Invalid server response'):
         Request._parse(server_response)
+
+
+@pytest.mark.parametrize(
+    "destination_path_type",
+    [str, Path],
+    ids=['str destination_path', 'pathlib.Path destination_path'],
+)
+def test_download(destination_path_type):
+    destination_filepath = Path.cwd() / 'tests' / 'data' / 'downloaded_request.txt'
+    request = Request()
+    request.download("http://google.com", destination_path_type(destination_filepath))
+    assert destination_filepath.is_file()
+    destination_filepath.unlink()
