@@ -94,36 +94,35 @@ class MessageEntity(TelegramObject):
 
         return cls(**data)
 
-    MENTION: ClassVar[str] = constants.MESSAGEENTITY_MENTION
-    """:const:`telegram.constants.MESSAGEENTITY_MENTION`"""
-    HASHTAG: ClassVar[str] = constants.MESSAGEENTITY_HASHTAG
-    """:const:`telegram.constants.MESSAGEENTITY_HASHTAG`"""
-    CASHTAG: ClassVar[str] = constants.MESSAGEENTITY_CASHTAG
-    """:const:`telegram.constants.MESSAGEENTITY_CASHTAG`"""
-    PHONE_NUMBER: ClassVar[str] = constants.MESSAGEENTITY_PHONE_NUMBER
-    """:const:`telegram.constants.MESSAGEENTITY_PHONE_NUMBER`"""
-    BOT_COMMAND: ClassVar[str] = constants.MESSAGEENTITY_BOT_COMMAND
-    """:const:`telegram.constants.MESSAGEENTITY_BOT_COMMAND`"""
-    URL: ClassVar[str] = constants.MESSAGEENTITY_URL
-    """:const:`telegram.constants.MESSAGEENTITY_URL`"""
-    EMAIL: ClassVar[str] = constants.MESSAGEENTITY_EMAIL
-    """:const:`telegram.constants.MESSAGEENTITY_EMAIL`"""
-    BOLD: ClassVar[str] = constants.MESSAGEENTITY_BOLD
-    """:const:`telegram.constants.MESSAGEENTITY_BOLD`"""
-    ITALIC: ClassVar[str] = constants.MESSAGEENTITY_ITALIC
-    """:const:`telegram.constants.MESSAGEENTITY_ITALIC`"""
-    CODE: ClassVar[str] = constants.MESSAGEENTITY_CODE
-    """:const:`telegram.constants.MESSAGEENTITY_CODE`"""
-    PRE: ClassVar[str] = constants.MESSAGEENTITY_PRE
-    """:const:`telegram.constants.MESSAGEENTITY_PRE`"""
-    TEXT_LINK: ClassVar[str] = constants.MESSAGEENTITY_TEXT_LINK
-    """:const:`telegram.constants.MESSAGEENTITY_TEXT_LINK`"""
-    TEXT_MENTION: ClassVar[str] = constants.MESSAGEENTITY_TEXT_MENTION
-    """:const:`telegram.constants.MESSAGEENTITY_TEXT_MENTION`"""
-    UNDERLINE: ClassVar[str] = constants.MESSAGEENTITY_UNDERLINE
-    """:const:`telegram.constants.MESSAGEENTITY_UNDERLINE`"""
-    STRIKETHROUGH: ClassVar[str] = constants.MESSAGEENTITY_STRIKETHROUGH
-    """:const:`telegram.constants.MESSAGEENTITY_STRIKETHROUGH`"""
-    ALL_TYPES: ClassVar[List[str]] = constants.MESSAGEENTITY_ALL_TYPES
-    """:const:`telegram.constants.MESSAGEENTITY_ALL_TYPES`\n
-    List of all the types"""
+    MENTION: ClassVar[str] = constants.MessageEntityType.MENTION
+    """:const:`telegram.constants.MessageEntityType.MENTION`"""
+    HASHTAG: ClassVar[str] = constants.MessageEntityType.HASHTAG
+    """:const:`telegram.constants.MessageEntityType.HASHTAG`"""
+    CASHTAG: ClassVar[str] = constants.MessageEntityType.CASHTAG
+    """:const:`telegram.constants.MessageEntityType.CASHTAG`"""
+    PHONE_NUMBER: ClassVar[str] = constants.MessageEntityType.PHONE_NUMBER
+    """:const:`telegram.constants.MessageEntityType.PHONE_NUMBER`"""
+    BOT_COMMAND: ClassVar[str] = constants.MessageEntityType.BOT_COMMAND
+    """:const:`telegram.constants.MessageEntityType.BOT_COMMAND`"""
+    URL: ClassVar[str] = constants.MessageEntityType.URL
+    """:const:`telegram.constants.MessageEntityType.URL`"""
+    EMAIL: ClassVar[str] = constants.MessageEntityType.EMAIL
+    """:const:`telegram.constants.MessageEntityType.EMAIL`"""
+    BOLD: ClassVar[str] = constants.MessageEntityType.BOLD
+    """:const:`telegram.constants.MessageEntityType.BOLD`"""
+    ITALIC: ClassVar[str] = constants.MessageEntityType.ITALIC
+    """:const:`telegram.constants.MessageEntityType.ITALIC`"""
+    CODE: ClassVar[str] = constants.MessageEntityType.CODE
+    """:const:`telegram.constants.MessageEntityType.CODE`"""
+    PRE: ClassVar[str] = constants.MessageEntityType.PRE
+    """:const:`telegram.constants.MessageEntityType.PRE`"""
+    TEXT_LINK: ClassVar[str] = constants.MessageEntityType.TEXT_LINK
+    """:const:`telegram.constants.MessageEntityType.TEXT_LINK`"""
+    TEXT_MENTION: ClassVar[str] = constants.MessageEntityType.TEXT_MENTION
+    """:const:`telegram.constants.MessageEntityType.TEXT_MENTION`"""
+    UNDERLINE: ClassVar[str] = constants.MessageEntityType.UNDERLINE
+    """:const:`telegram.constants.MessageEntityType.UNDERLINE`"""
+    STRIKETHROUGH: ClassVar[str] = constants.MessageEntityType.STRIKETHROUGH
+    """:const:`telegram.constants.MessageEntityType.STRIKETHROUGH`"""
+    ALL_TYPES: ClassVar[List[str]] = list(constants.MessageEntityType)
+    """List[:obj:`str`]: A list of all available message entity types."""

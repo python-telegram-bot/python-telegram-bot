@@ -63,18 +63,18 @@ class ChatMember(TelegramObject):
 
     __slots__ = ('user', 'status')
 
-    ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
-    """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
-    CREATOR: ClassVar[str] = constants.CHATMEMBER_CREATOR
-    """:const:`telegram.constants.CHATMEMBER_CREATOR`"""
-    KICKED: ClassVar[str] = constants.CHATMEMBER_KICKED
-    """:const:`telegram.constants.CHATMEMBER_KICKED`"""
-    LEFT: ClassVar[str] = constants.CHATMEMBER_LEFT
-    """:const:`telegram.constants.CHATMEMBER_LEFT`"""
-    MEMBER: ClassVar[str] = constants.CHATMEMBER_MEMBER
-    """:const:`telegram.constants.CHATMEMBER_MEMBER`"""
-    RESTRICTED: ClassVar[str] = constants.CHATMEMBER_RESTRICTED
-    """:const:`telegram.constants.CHATMEMBER_RESTRICTED`"""
+    ADMINISTRATOR: ClassVar[str] = constants.ChatMemberStatus.ADMINISTRATOR
+    """:const:`telegram.constants.ChatMemberStatus.ADMINISTRATOR`"""
+    CREATOR: ClassVar[str] = constants.ChatMemberStatus.CREATOR
+    """:const:`telegram.constants.ChatMemberStatus.CREATOR`"""
+    KICKED: ClassVar[str] = constants.ChatMemberStatus.KICKED
+    """:const:`telegram.constants.ChatMemberStatus.KICKED`"""
+    LEFT: ClassVar[str] = constants.ChatMemberStatus.LEFT
+    """:const:`telegram.constants.ChatMemberStatus.LEFT`"""
+    MEMBER: ClassVar[str] = constants.ChatMemberStatus.MEMBER
+    """:const:`telegram.constants.ChatMemberStatus.MEMBER`"""
+    RESTRICTED: ClassVar[str] = constants.ChatMemberStatus.RESTRICTED
+    """:const:`telegram.constants.ChatMemberStatus.RESTRICTED`"""
 
     def __init__(self, user: User, status: str, **_kwargs: object):
         # Required by all subclasses

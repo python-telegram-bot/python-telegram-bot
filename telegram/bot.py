@@ -426,7 +426,7 @@ class Bot(TelegramObject):
                 parsing. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
             parse_mode (:obj:`str`): Send Markdown or HTML, if you want Telegram apps to show bold,
                 italic, fixed-width text or inline URLs in your bot's message. See the constants in
-                :class:`telegram.ParseMode` for the available modes.
+                :class:`telegram.constants.ParseMode` for the available modes.
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of :attr:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
@@ -613,7 +613,7 @@ class Bot(TelegramObject):
                 by file_id), 0-1024 characters after entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -714,7 +714,7 @@ class Bot(TelegramObject):
                 parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -830,7 +830,7 @@ class Bot(TelegramObject):
                 content type detection for files uploaded using multipart/form-data.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -1013,7 +1013,7 @@ class Bot(TelegramObject):
                 by file_id), 0-1024 characters after entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -1242,7 +1242,7 @@ class Bot(TelegramObject):
                 animations by file_id), 0-1024 characters after entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -1344,7 +1344,7 @@ class Bot(TelegramObject):
                 parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -2446,7 +2446,7 @@ class Bot(TelegramObject):
             text (:obj:`str`): New text of the message, 1-4096 characters after entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in your bot's message. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of :attr:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
@@ -2518,7 +2518,7 @@ class Bot(TelegramObject):
                 entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -4708,8 +4708,8 @@ class Bot(TelegramObject):
                 answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most
                 2 line feeds after entities parsing.
             explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
-                explanation. See the constants in :class:`telegram.ParseMode` for the available
-                modes.
+                explanation. See the constants in :class:`telegram.constants.ParseMode` for the
+                available modes.
             explanation_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -5118,7 +5118,7 @@ class Bot(TelegramObject):
             caption (:obj:`str`, optional): New caption for media, 0-1024 characters after
                 entities parsing. If not specified, the original caption is kept.
             parse_mode (:obj:`str`, optional): Mode for parsing entities in the new caption. See
-                the constants in :class:`telegram.ParseMode` for the available modes.
+                the constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in the new caption, which can be specified instead
                 of parse_mode.

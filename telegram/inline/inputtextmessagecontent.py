@@ -37,7 +37,7 @@ class InputTextMessageContent(InputMessageContent):
             parsing. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of
             :attr:`parse_mode`.
@@ -50,7 +50,7 @@ class InputTextMessageContent(InputMessageContent):
             parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption, which can be specified instead of
             :attr:`parse_mode`.

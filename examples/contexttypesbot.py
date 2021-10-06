@@ -13,7 +13,8 @@ bot.
 from collections import defaultdict
 from typing import DefaultDict, Optional, Set
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.constants import ParseMode
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -56,7 +57,7 @@ class CustomContext(CallbackContext[dict, ChatData, dict]):
     def message_clicks(self, value: int) -> None:
         """Allow to change the count"""
         if not self._message_id:
-            raise RuntimeError('There is no message associated with this context obejct.')
+            raise RuntimeError('There is no message associated with this context object.')
         self.chat_data.clicks_per_message[self._message_id] = value
 
     @classmethod

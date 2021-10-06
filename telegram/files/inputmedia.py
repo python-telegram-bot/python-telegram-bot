@@ -94,7 +94,7 @@ class InputMediaAnimation(InputMedia):
             after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
         width (:obj:`int`, optional): Animation width.
@@ -185,7 +185,7 @@ class InputMediaPhoto(InputMedia):
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
 
@@ -247,7 +247,7 @@ class InputMediaVideo(InputMedia):
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
         width (:obj:`int`, optional): Video width.
@@ -361,7 +361,7 @@ class InputMediaAudio(InputMedia):
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
@@ -463,7 +463,7 @@ class InputMediaDocument(InputMedia):
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
         thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of

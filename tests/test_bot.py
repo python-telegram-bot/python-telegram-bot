@@ -31,7 +31,6 @@ from flaky import flaky
 from telegram import (
     Bot,
     Update,
-    ChatAction,
     User,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -45,7 +44,6 @@ from telegram import (
     InlineQueryResultDocument,
     Dice,
     MessageEntity,
-    ParseMode,
     CallbackQuery,
     Message,
     Chat,
@@ -55,7 +53,7 @@ from telegram import (
     File,
     InputMedia,
 )
-from telegram.constants import MAX_INLINE_QUERY_RESULTS
+from telegram.constants import MAX_INLINE_QUERY_RESULTS, ChatAction, ParseMode
 from telegram.ext import ExtBot
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TelegramError
 from telegram.ext.callbackdatacache import InvalidCallbackData

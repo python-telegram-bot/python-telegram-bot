@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=W0622
 """This module contains objects representing Telegram bot command scopes."""
-from typing import Any, Union, Optional, TYPE_CHECKING, Dict, Type
+from typing import Any, Union, Optional, TYPE_CHECKING, Dict, Type, ClassVar
 
 from telegram import TelegramObject, constants
 from telegram.utils.types import JSONDict
@@ -59,20 +59,20 @@ class BotCommandScope(TelegramObject):
 
     __slots__ = ('type',)
 
-    DEFAULT = constants.BOT_COMMAND_SCOPE_DEFAULT
-    """:const:`telegram.constants.BOT_COMMAND_SCOPE_DEFAULT`"""
-    ALL_PRIVATE_CHATS = constants.BOT_COMMAND_SCOPE_ALL_PRIVATE_CHATS
-    """:const:`telegram.constants.BOT_COMMAND_SCOPE_ALL_PRIVATE_CHATS`"""
-    ALL_GROUP_CHATS = constants.BOT_COMMAND_SCOPE_ALL_GROUP_CHATS
-    """:const:`telegram.constants.BOT_COMMAND_SCOPE_ALL_GROUP_CHATS`"""
-    ALL_CHAT_ADMINISTRATORS = constants.BOT_COMMAND_SCOPE_ALL_CHAT_ADMINISTRATORS
-    """:const:`telegram.constants.BOT_COMMAND_SCOPE_ALL_CHAT_ADMINISTRATORS`"""
-    CHAT = constants.BOT_COMMAND_SCOPE_CHAT
-    """:const:`telegram.constants.BOT_COMMAND_SCOPE_CHAT`"""
-    CHAT_ADMINISTRATORS = constants.BOT_COMMAND_SCOPE_CHAT_ADMINISTRATORS
-    """:const:`telegram.constants.BOT_COMMAND_SCOPE_CHAT_ADMINISTRATORS`"""
-    CHAT_MEMBER = constants.BOT_COMMAND_SCOPE_CHAT_MEMBER
-    """:const:`telegram.constants.BOT_COMMAND_SCOPE_CHAT_MEMBER`"""
+    DEFAULT: ClassVar[str] = constants.BotCommandScopeType.DEFAULT
+    """:const:`telegram.constants.BotCommandScopeType.DEFAULT`"""
+    ALL_PRIVATE_CHATS: ClassVar[str] = constants.BotCommandScopeType.ALL_PRIVATE_CHATS
+    """:const:`telegram.constants.BotCommandScopeType.ALL_PRIVATE_CHATS`"""
+    ALL_GROUP_CHATS: ClassVar[str] = constants.BotCommandScopeType.ALL_GROUP_CHATS
+    """:const:`telegram.constants.BotCommandScopeType.ALL_GROUP_CHATS`"""
+    ALL_CHAT_ADMINISTRATORS: ClassVar[str] = constants.BotCommandScopeType.ALL_CHAT_ADMINISTRATORS
+    """:const:`telegram.constants.BotCommandScopeType.ALL_CHAT_ADMINISTRATORS`"""
+    CHAT: ClassVar[str] = constants.BotCommandScopeType.CHAT
+    """:const:`telegram.constants.BotCommandScopeType.CHAT`"""
+    CHAT_ADMINISTRATORS: ClassVar[str] = constants.BotCommandScopeType.CHAT_ADMINISTRATORS
+    """:const:`telegram.constants.BotCommandScopeType.CHAT_ADMINISTRATORS`"""
+    CHAT_MEMBER: ClassVar[str] = constants.BotCommandScopeType.CHAT_MEMBER
+    """:const:`telegram.constants.BotCommandScopeType.CHAT_MEMBER`"""
 
     def __init__(self, type: str, **_kwargs: Any):
         self.type = type

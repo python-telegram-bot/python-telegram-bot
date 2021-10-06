@@ -258,14 +258,14 @@ class MaskPosition(TelegramObject):
 
     __slots__ = ('point', 'scale', 'x_shift', 'y_shift')
 
-    FOREHEAD: ClassVar[str] = constants.STICKER_FOREHEAD
-    """:const:`telegram.constants.STICKER_FOREHEAD`"""
-    EYES: ClassVar[str] = constants.STICKER_EYES
-    """:const:`telegram.constants.STICKER_EYES`"""
-    MOUTH: ClassVar[str] = constants.STICKER_MOUTH
-    """:const:`telegram.constants.STICKER_MOUTH`"""
-    CHIN: ClassVar[str] = constants.STICKER_CHIN
-    """:const:`telegram.constants.STICKER_CHIN`"""
+    FOREHEAD: ClassVar[str] = constants.MaskPosition.FOREHEAD
+    """:const:`telegram.constants.MaskPosition.FOREHEAD`"""
+    EYES: ClassVar[str] = constants.MaskPosition.EYES
+    """:const:`telegram.constants.MaskPosition.EYES`"""
+    MOUTH: ClassVar[str] = constants.MaskPosition.MOUTH
+    """:const:`telegram.constants.MaskPosition.MOUTH`"""
+    CHIN: ClassVar[str] = constants.MaskPosition.CHIN
+    """:const:`telegram.constants.MaskPosition.CHIN`"""
 
     def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **_kwargs: Any):
         self.point = point

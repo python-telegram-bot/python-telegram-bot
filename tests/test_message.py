@@ -41,19 +41,18 @@ from telegram import (
     Invoice,
     SuccessfulPayment,
     PassportData,
-    ParseMode,
     Poll,
     PollOption,
     ProximityAlertTriggered,
     Dice,
     Bot,
-    ChatAction,
     VoiceChatStarted,
     VoiceChatEnded,
     VoiceChatParticipantsInvited,
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
 )
+from telegram.constants import ParseMode, ChatAction
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 from tests.test_passport import RAW_PASSPORT_DATA

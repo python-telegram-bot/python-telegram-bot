@@ -35,7 +35,6 @@ from telegram import (
     Invoice,
     Location,
     MessageEntity,
-    ParseMode,
     PassportData,
     PhotoSize,
     Poll,
@@ -55,6 +54,7 @@ from telegram import (
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
 )
+from telegram.constants import ParseMode
 from telegram.helpers import escape_markdown
 from telegram.utils.datetime import from_timestamp, to_timestamp
 from telegram.utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
@@ -799,8 +799,8 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Note:
-            :attr:`telegram.ParseMode.MARKDOWN` is a legacy mode, retained by Telegram for
-            backward compatibility. You should use :meth:`reply_markdown_v2` instead.
+            :attr:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by Telegram
+            for backward compatibility. You should use :meth:`reply_markdown_v2` instead.
 
         Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
@@ -2755,14 +2755,14 @@ class Message(TelegramObject):
     @property
     def text_markdown(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message
-        using :class:`telegram.ParseMode.MARKDOWN`.
+        using :class:`telegram.constants.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
         Note:
-            :attr:`telegram.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram for
-            backward compatibility. You should use :meth:`text_markdown_v2` instead.
+            :attr:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram
+            for backward compatibility. You should use :meth:`text_markdown_v2` instead.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -2773,7 +2773,7 @@ class Message(TelegramObject):
     @property
     def text_markdown_v2(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message
-        using :class:`telegram.ParseMode.MARKDOWN_V2`.
+        using :class:`telegram.constants.ParseMode.MARKDOWN_V2`.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
@@ -2787,14 +2787,14 @@ class Message(TelegramObject):
     @property
     def text_markdown_urled(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message
-        using :class:`telegram.ParseMode.MARKDOWN`.
+        using :class:`telegram.constants.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         Note:
-            :attr:`telegram.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram for
-            backward compatibility. You should use :meth:`text_markdown_v2_urled` instead.
+            :attr:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram
+            for backward compatibility. You should use :meth:`text_markdown_v2_urled` instead.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -2805,7 +2805,7 @@ class Message(TelegramObject):
     @property
     def text_markdown_v2_urled(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message
-        using :class:`telegram.ParseMode.MARKDOWN_V2`.
+        using :class:`telegram.constants.ParseMode.MARKDOWN_V2`.
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
@@ -2819,14 +2819,14 @@ class Message(TelegramObject):
     @property
     def caption_markdown(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message's
-        caption using :class:`telegram.ParseMode.MARKDOWN`.
+        caption using :class:`telegram.constants.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
 
         Note:
-            :attr:`telegram.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram for
-            backward compatibility. You should use :meth:`caption_markdown_v2` instead.
+            :attr:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram
+            for backward compatibility. You should use :meth:`caption_markdown_v2` instead.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -2837,7 +2837,7 @@ class Message(TelegramObject):
     @property
     def caption_markdown_v2(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message's
-        caption using :class:`telegram.ParseMode.MARKDOWN_V2`.
+        caption using :class:`telegram.constants.ParseMode.MARKDOWN_V2`.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
@@ -2853,14 +2853,14 @@ class Message(TelegramObject):
     @property
     def caption_markdown_urled(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message's
-        caption using :class:`telegram.ParseMode.MARKDOWN`.
+        caption using :class:`telegram.constants.ParseMode.MARKDOWN`.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         Note:
-            :attr:`telegram.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram for
-            backward compatibility. You should use :meth:`caption_markdown_v2_urled` instead.
+            :attr:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram
+            for backward compatibility. You should use :meth:`caption_markdown_v2_urled` instead.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -2871,7 +2871,7 @@ class Message(TelegramObject):
     @property
     def caption_markdown_v2_urled(self) -> str:
         """Creates an Markdown-formatted string from the markup entities found in the message's
-        caption using :class:`telegram.ParseMode.MARKDOWN_V2`.
+        caption using :class:`telegram.constants.ParseMode.MARKDOWN_V2`.
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.

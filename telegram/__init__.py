@@ -47,7 +47,6 @@ from .files.contact import Contact
 from .files.location import Location
 from .files.venue import Venue
 from .files.videonote import VideoNote
-from .chataction import ChatAction
 from .dice import Dice
 from .userprofilephotos import UserProfilePhotos
 from .keyboardbuttonpolltype import KeyboardButtonPollType
@@ -58,7 +57,6 @@ from .replykeyboardremove import ReplyKeyboardRemove
 from .forcereply import ForceReply
 from .files.inputfile import InputFile
 from .files.file import File
-from .parsemode import ParseMode
 from .messageentity import MessageEntity
 from .messageid import MessageId
 from .games.game import Game
@@ -168,6 +166,7 @@ __all__ = (  # Keep this alphabetically ordered
     'Animation',
     'Audio',
     'Bot',
+    'bot_api_version',
     'BotCommand',
     'BotCommandScope',
     'BotCommandScopeAllChatAdministrators',
@@ -180,7 +179,6 @@ __all__ = (  # Keep this alphabetically ordered
     'CallbackGame',
     'CallbackQuery',
     'Chat',
-    'ChatAction',
     'ChatInviteLink',
     'ChatLocation',
     'ChatMember',
@@ -256,7 +254,6 @@ __all__ = (  # Keep this alphabetically ordered
     'MessageEntity',
     'MessageId',
     'OrderInfo',
-    'ParseMode',
     'PassportData',
     'PassportElementError',
     'PassportElementErrorDataField',
