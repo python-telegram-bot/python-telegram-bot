@@ -2280,6 +2280,15 @@ officedocument.wordprocessingml.document")``.
 
         edited_channel_post = _EditedChannelPost()
 
+        class _Edited(UpdateFilter):
+            __slots__ = ()
+            name = 'Filters.update.edited'
+
+            def filter(self, update: Update) -> bool:
+                return update.edited_message is not None or update.edited_channel_post is not None
+
+        edited = _Edited()
+
         class _ChannelPosts(UpdateFilter):
             __slots__ = ()
             name = 'Filters.update.channel_posts'
