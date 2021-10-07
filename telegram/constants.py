@@ -75,6 +75,8 @@ class _StringEnum(str, Enum):
     stringification.
     """
 
+    __slots__ = ()
+
     def __repr__(self) -> str:
         return f'<{self.__class__.__name__}.{self.name}>'
 
@@ -96,6 +98,8 @@ class BotCommandScopeType(_StringEnum):
 
     .. versionadded:: 14.0
     """
+
+    __slots__ = ()
 
     DEFAULT = 'default'
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeDefault`."""
@@ -119,6 +123,8 @@ class ChatAction(_StringEnum):
 
     .. versionadded:: 14.0
     """
+
+    __slots__ = ()
 
     FIND_LOCATION = 'find_location'
     """:obj:`str`: A chat indicating the bot is selecting a location."""
@@ -149,6 +155,8 @@ class ChatMemberStatus(_StringEnum):
     .. versionadded:: 14.0
     """
 
+    __slots__ = ()
+
     ADMINISTRATOR = 'administrator'
     """:obj:`str`: A :class:`telegram.ChatMember` who is administrator of the chat."""
     CREATOR = 'creator'
@@ -169,6 +177,8 @@ class ChatType(_StringEnum):
 
     .. versionadded:: 14.0
     """
+
+    __slots__ = ()
 
     SENDER = 'sender'
     """:obj:`str`: A :class:`telegram.Chat` that represents the chat of a :class:`telegram.User`
@@ -191,6 +201,8 @@ class DiceEmoji(_StringEnum):
     .. versionadded:: 14.0
     """
 
+    __slots__ = ()
+
     DICE = '🎲'
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎲``."""
     DARTS = '🎯'
@@ -212,6 +224,8 @@ class FileSizeLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
+    __slots__ = ()
+
     FILESIZE_DOWNLOAD = int(20e6)  # (20MB)
     """:obj:`int`: Bots can download files of up to 20MB in size."""
     FILESIZE_UPLOAD = int(50e6)  # (50MB)
@@ -226,6 +240,8 @@ class FloodLimit(IntEnum):
 
     .. versionadded:: 14.0
     """
+
+    __slots__ = ()
 
     MESSAGES_PER_SECOND_PER_CHAT = 1
     """:obj:`int`: The number of messages that can be send per second in a particular chat.
@@ -250,6 +266,8 @@ class InlineKeyboardMarkupLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
+    __slots__ = ()
+
     TOTAL_BUTTON_NUMBER = 100
     """:obj:`int`: Maximum number of buttons that can be attached to a message.
 
@@ -271,6 +289,8 @@ class MaskPosition(_StringEnum):
     .. versionadded:: 14.0
     """
 
+    __slots__ = ()
+
     FOREHEAD = 'forehead'
     """:obj:`str`: Mask position for a sticker on the forehead."""
     EYES = 'eyes'
@@ -287,6 +307,8 @@ class MessageEntityType(_StringEnum):
 
     .. versionadded:: 14.0
     """
+
+    __slots__ = ()
 
     MENTION = 'mention'
     """:obj:`str`: Message entities representing a mention."""
@@ -328,6 +350,8 @@ class MessageLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
+    __slots__ = ()
+
     TEXT_LENGTH = 4096
     """:obj:`int`: Maximum number of characters for a text message."""
     CAPTION_LENGTH = 1024
@@ -348,6 +372,8 @@ class ParseMode(_StringEnum):
 
     .. versionadded:: 14.0
     """
+
+    __slots__ = ()
 
     MARKDOWN = 'Markdown'
     """:obj:`str`: Markdown parse mode.
@@ -370,6 +396,8 @@ class PollLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
+    __slots__ = ()
+
     QUESTION_LENGTH = 300
     """:obj:`str`: Maximum number of characters of the polls question."""
     OPTION_LENGTH = 100
@@ -384,6 +412,8 @@ class PollType(_StringEnum):
     .. versionadded:: 14.0
     """
 
+    __slots__ = ()
+
     REGULAR = 'regular'
     """:obj:`str`: regular polls."""
     QUIZ = 'quiz'
@@ -396,6 +426,8 @@ class UpdateType(_StringEnum):
 
     .. versionadded:: 14.0
     """
+
+    __slots__ = ()
 
     MESSAGE = 'message'
     """:obj:`str`: Updates with :attr:`telegram.Update.message`."""

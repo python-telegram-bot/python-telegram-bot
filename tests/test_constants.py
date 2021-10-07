@@ -22,10 +22,25 @@ import pytest
 from flaky import flaky
 
 from telegram import constants
+from telegram.constants import _StringEnum
 from telegram.error import BadRequest
 
 
+class TestEnum(_StringEnum):
+    FOO = 'foo'
+    BAR = 'bar'
+
+
 class TestConstants:
+    def test_string_representation(self):
+        assert repr(TestEnum.FOO) == '<TesEnum.FOO>'
+        assert str(TestEnum.FOO) == '<TesEnum.FOO>'
+
+    def test_string_inheritance(self):
+        assert isinstance(TestEnum.FOO, str)
+        assert TestEnum.FOO + TestEnum.BAR == 'foobar'
+        assert TestEnum.FOO.replace('o', 'a') == 'faa'
+
     @flaky(3, 1)
     def test_max_message_length(self, bot, chat_id):
         bot.send_message(chat_id=chat_id, text='a' * constants.MessageLimit.TEXT_LENGTH)
