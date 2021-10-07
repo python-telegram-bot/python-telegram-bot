@@ -41,9 +41,12 @@ class TelegramObject:
     # https://www.python.org/dev/peps/pep-0526/#class-and-instance-variable-annotations
     if TYPE_CHECKING:
         _id_attrs: Tuple[object, ...]
+        _bot: Optional['Bot']
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
-    __slots__ = ('_id_attrs',)
+    #   throws pylint AttributeInRef error as tg.__bot not in __slots__
+    #   fails message/test_slot_behaviour otherwise
+    __slots__ = ('_id_attrs', '_bot')
 
     def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':  # pylint: disable=W0613
         # We add _id_attrs in __new__ instead of __init__ since we want to add this to the slots
@@ -135,6 +138,24 @@ class TelegramObject:
         if data.get('from_user'):
             data['from'] = data.pop('from_user', None)
         return data
+
+    def get_bot(self) -> 'Bot':
+        """Why does this function do what it does? - Follow convention see
+        How to Contribute
+
+        Returns:
+            :obj:'Bot'
+        """
+        if self._bot is None:
+            raise RuntimeError(
+                'This object has no bot associated with it. \
+                Shortcuts cannot be used'
+            )
+        return self._bot
+
+    def set_bot(self, bot: 'Bot') -> None:
+        """ See above """
+        self._bot = bot
 
     def __eq__(self, other: object) -> bool:
         # pylint: disable=no-member

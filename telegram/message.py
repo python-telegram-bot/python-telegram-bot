@@ -477,7 +477,7 @@ class Message(TelegramObject):
         poll: Poll = None,
         forward_sender_name: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        _bot: 'Bot' = None,
+        bot: 'Bot' = None,
         dice: Dice = None,
         via_bot: User = None,
         proximity_alert_triggered: ProximityAlertTriggered = None,
@@ -547,22 +547,11 @@ class Message(TelegramObject):
         self.voice_chat_ended = voice_chat_ended
         self.voice_chat_participants_invited = voice_chat_participants_invited
         self.reply_markup = reply_markup
-        self._bot: Optional['Bot'] = None
+        self._bot = bot
 
         self._effective_attachment = DEFAULT_NONE
 
         self._id_attrs = (self.message_id, self.chat)
-
-    def get_bot(self) -> 'Bot':
-        if self._bot is None:
-            raise RuntimeError(
-                'This object has no bot associated with it. \
-                Shortcuts cannot be used'
-            )
-        return self._bot
-
-    def set_bot(self, bot: 'Bot') -> None:
-        self._bot = bot
 
     @property
     def chat_id(self) -> int:
@@ -729,8 +718,12 @@ class Message(TelegramObject):
         else:
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
             # logic into ExtBot
-            if hasattr(self._bot, 'defaults') and self._bot.defaults:  # type: ignore[union-attr]
-                default_quote = self._bot.defaults.quote  # type: ignore[union-attr]
+            #  if statement type ignore[..attr-]
+            #  not working over multiple lines - mypy0.910,python3.9.7
+            if hasattr(self.get_bot(), 'defaults') and self.get_bot().defaults:  # type: ignore
+                default_quote = (
+                    self.get_bot().defaults.quote  # type: ignore[union-attr, attr-defined]
+                )
             else:
                 default_quote = None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:

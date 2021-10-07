@@ -255,6 +255,8 @@ class TestBot:
                 'parse_data',
                 'get_updates',
                 'getUpdates',
+                'get_bot',
+                'set_bot',
             ]
         ],
     )
