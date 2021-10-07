@@ -2319,4 +2319,6 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Update.edited_channel_post`
         channel_posts: Updates with either :attr:`telegram.Update.channel_post` or
             :attr:`telegram.Update.edited_channel_post`
+        edited: Updates with either :attr:`telegram.Update.edited_message` or
+            :attr:`telegram.Update.edited_channel_post`
     """
