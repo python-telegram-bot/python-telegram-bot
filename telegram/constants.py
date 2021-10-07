@@ -20,6 +20,9 @@ Unless noted otherwise, all constants in this module were extracted from the
 `Telegram Bots FAQ <https://core.telegram.org/bots/faq>`_ and
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
+.. versionchanged:: 14.0
+    Since v14.0, most of the constants in this module are grouped into enums.
+
 Attributes:
     BOT_API_VERSION (:obj:`str`): `5.3`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
