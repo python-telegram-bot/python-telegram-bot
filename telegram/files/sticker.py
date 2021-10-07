@@ -74,7 +74,6 @@ class Sticker(TelegramObject):
     """
 
     __slots__ = (
-        'bot',
         'width',
         'file_id',
         'is_animated',
@@ -114,7 +113,7 @@ class Sticker(TelegramObject):
         self.file_size = file_size
         self.set_name = set_name
         self.mask_position = mask_position
-        self.bot = bot
+        self._bot = bot
 
         self._id_attrs = (self.file_unique_id,)
 
@@ -145,7 +144,9 @@ class Sticker(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        return self.get_bot().get_file(
+            file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs
+        )
 
 
 class StickerSet(TelegramObject):

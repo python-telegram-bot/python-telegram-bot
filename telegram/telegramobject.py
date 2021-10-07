@@ -44,15 +44,17 @@ class TelegramObject:
         _bot: Optional['Bot']
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
-    #   throws pylint AttributeInRef error as tg.__bot not in __slots__
-    #   fails message/test_slot_behaviour otherwise
-    __slots__ = ('_id_attrs', '_bot')
+    __slots__ = (
+        '_id_attrs',
+        '_bot',
+    )
 
     def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':  # pylint: disable=W0613
         # We add _id_attrs in __new__ instead of __init__ since we want to add this to the slots
         # w/o calling __init__ in all of the subclasses. This is what we also do in BaseFilter.
         instance = super().__new__(cls)
         instance._id_attrs = ()
+        instance._bot = None  # test_slow_behaviour fails without this extra argument here.
         return instance
 
     def __str__(self) -> str:
@@ -140,11 +142,13 @@ class TelegramObject:
         return data
 
     def get_bot(self) -> 'Bot':
-        """Why does this function do what it does? - Follow convention see
-        How to Contribute
+        """Returns the bot object if it has been set for a TelegramObject (User, Chat, Bot etc).
 
+        Raises:
+            A RuntimeError in the rare edge cases where users manually instantiated a
+            TelegramObject and forgot to pass the bot.
         Returns:
-            :obj:'Bot'
+           The Bot object.
         """
         if self._bot is None:
             raise RuntimeError(
@@ -154,7 +158,7 @@ class TelegramObject:
         return self._bot
 
     def set_bot(self, bot: 'Bot') -> None:
-        """ See above """
+        """Set bot on a TelegramObject."""
         self._bot = bot
 
     def __eq__(self, other: object) -> bool:

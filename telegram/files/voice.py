@@ -59,7 +59,6 @@ class Voice(TelegramObject):
     """
 
     __slots__ = (
-        'bot',
         'file_id',
         'file_size',
         'duration',
@@ -84,7 +83,7 @@ class Voice(TelegramObject):
         # Optionals
         self.mime_type = mime_type
         self.file_size = file_size
-        self.bot = bot
+        self._bot = bot
 
         self._id_attrs = (self.file_unique_id,)
 
@@ -102,4 +101,6 @@ class Voice(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        return self.get_bot().get_file(
+            file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs
+        )

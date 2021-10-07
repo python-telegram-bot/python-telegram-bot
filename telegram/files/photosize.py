@@ -58,7 +58,7 @@ class PhotoSize(TelegramObject):
 
     """
 
-    __slots__ = ('bot', 'width', 'file_id', 'file_size', 'height', 'file_unique_id')
+    __slots__ = ('width', 'file_id', 'file_size', 'height', 'file_unique_id')
 
     def __init__(
         self,
@@ -77,7 +77,7 @@ class PhotoSize(TelegramObject):
         self.height = int(height)
         # Optionals
         self.file_size = file_size
-        self.bot = bot
+        self._bot = bot
 
         self._id_attrs = (self.file_unique_id,)
 
@@ -95,4 +95,6 @@ class PhotoSize(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        return self.get_bot().get_file(
+            file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs
+        )

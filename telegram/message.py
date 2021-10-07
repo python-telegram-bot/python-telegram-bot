@@ -345,7 +345,6 @@ class Message(TelegramObject):
         'media_group_id',
         'caption',
         'video',
-        '_bot',
         'entities',
         'via_bot',
         'new_chat_members',

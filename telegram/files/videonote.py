@@ -62,7 +62,6 @@ class VideoNote(TelegramObject):
     """
 
     __slots__ = (
-        'bot',
         'length',
         'file_id',
         'file_size',
@@ -90,7 +89,7 @@ class VideoNote(TelegramObject):
         # Optionals
         self.thumb = thumb
         self.file_size = file_size
-        self.bot = bot
+        self._bot = bot
 
         self._id_attrs = (self.file_unique_id,)
 
@@ -120,4 +119,6 @@ class VideoNote(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        return self.get_bot().get_file(
+            file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs
+        )

@@ -104,7 +104,6 @@ class User(TelegramObject):
         'can_join_groups',
         'supports_inline_queries',
         'id',
-        '_bot',
         'language_code',
     )
 
