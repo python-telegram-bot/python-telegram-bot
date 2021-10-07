@@ -68,14 +68,15 @@ class TestFiles:
         assert telegram.utils.files.parse_file_input(string) == expected
 
     def test_parse_file_input_file_like(self):
-        with open('tests/data/game.gif', 'rb') as file:
+        source_file = Path('tests/data/game.gif')
+        with source_file.open('rb') as file:
             parsed = telegram.utils.files.parse_file_input(file)
 
         assert isinstance(parsed, InputFile)
         assert not parsed.attach
         assert parsed.filename == 'game.gif'
 
-        with open('tests/data/game.gif', 'rb') as file:
+        with source_file.open('rb') as file:
             parsed = telegram.utils.files.parse_file_input(file, attach=True, filename='test_file')
 
         assert isinstance(parsed, InputFile)
@@ -83,17 +84,16 @@ class TestFiles:
         assert parsed.filename == 'test_file'
 
     def test_parse_file_input_bytes(self):
-        with open('tests/data/text_file.txt', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(file.read())
+        source_file = Path('tests/data/text_file.txt')
+        parsed = telegram.utils.files.parse_file_input(source_file.read_bytes())
 
         assert isinstance(parsed, InputFile)
         assert not parsed.attach
         assert parsed.filename == 'application.octet-stream'
 
-        with open('tests/data/text_file.txt', 'rb') as file:
-            parsed = telegram.utils.files.parse_file_input(
-                file.read(), attach=True, filename='test_file'
-            )
+        parsed = telegram.utils.files.parse_file_input(
+            source_file.read_bytes(), attach=True, filename='test_file'
+        )
 
         assert isinstance(parsed, InputFile)
         assert parsed.attach
