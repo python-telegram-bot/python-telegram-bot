@@ -26,20 +26,20 @@ from telegram.constants import _StringEnum
 from telegram.error import BadRequest
 
 
-class TestEnum(_StringEnum):
+class EnumTest(_StringEnum):
     FOO = 'foo'
     BAR = 'bar'
 
 
 class TestConstants:
     def test_string_representation(self):
-        assert repr(TestEnum.FOO) == '<TesEnum.FOO>'
-        assert str(TestEnum.FOO) == '<TesEnum.FOO>'
+        assert repr(EnumTest.FOO) == '<EnumTest.FOO>'
+        assert str(EnumTest.FOO) == 'EnumTest.FOO'
 
     def test_string_inheritance(self):
-        assert isinstance(TestEnum.FOO, str)
-        assert TestEnum.FOO + TestEnum.BAR == 'foobar'
-        assert TestEnum.FOO.replace('o', 'a') == 'faa'
+        assert isinstance(EnumTest.FOO, str)
+        assert EnumTest.FOO + EnumTest.BAR == 'foobar'
+        assert EnumTest.FOO.replace('o', 'a') == 'faa'
 
     @flaky(3, 1)
     def test_max_message_length(self, bot, chat_id):
