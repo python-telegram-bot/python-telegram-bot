@@ -22,7 +22,7 @@
 import imghdr
 import logging
 import mimetypes
-import os
+from pathlib import Path
 from typing import IO, Optional, Tuple, Union
 from uuid import uuid4
 
@@ -47,6 +47,7 @@ class InputFile:
         input_file_content (:obj:`bytes`): The binary content of the file to send.
         filename (:obj:`str`): Optional. Filename for the file to be sent.
         attach (:obj:`str`): Optional. Attach id for sending multiple files.
+        mimetype (:obj:`str`): Optional. The mimetype inferred from the file to be sent.
 
     """
 
@@ -63,7 +64,7 @@ class InputFile:
         if filename:
             self.filename = filename
         elif hasattr(obj, 'name') and not isinstance(obj.name, int):  # type: ignore[union-attr]
-            self.filename = os.path.basename(obj.name)  # type: ignore[union-attr]
+            self.filename = Path(obj.name).name  # type: ignore[union-attr]
 
         image_mime_type = self.is_image(self.input_file_content)
         if image_mime_type:

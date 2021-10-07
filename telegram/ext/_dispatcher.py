@@ -45,13 +45,13 @@ from telegram.error import TelegramError
 from telegram.ext import BasePersistence, ContextTypes, ExtBot, Handler
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram._utils.warnings import warn
-from ._utils.promise import Promise
-from ._utils.types import CCT, UD, CD, BD
-from ._callbackdatacache import CallbackDataCache
+from telegram.ext._utils.promise import Promise
+from telegram.ext._utils.types import CCT, UD, CD, BD
+from telegram.ext._callbackdatacache import CallbackDataCache
 
 if TYPE_CHECKING:
     from telegram import Bot
-    from telegram.ext import JobQueue, CallbackContext
+    from telegram.ext import JobQueue, Job, CallbackContext
 
 DEFAULT_GROUP: int = 0
 
@@ -492,7 +492,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         handled_only_async = all(sync_modes)
         if handled:
             # Respect default settings
-            if all(mode is DEFAULT_FALSE for mode in sync_modes) and self.bot.defaults:
+            if (
+                all(mode is DEFAULT_FALSE for mode in sync_modes)
+                and isinstance(self.bot, ExtBot)
+                and self.bot.defaults
+            ):
                 handled_only_async = self.bot.defaults.run_async
             # If update was only handled by async handlers, we don't need to update here
             if not handled_only_async:
@@ -524,7 +528,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         """
         # Unfortunately due to circular imports this has to be here
-        from ._conversationhandler import ConversationHandler  # pylint: disable=C0415
+        from telegram.ext._conversationhandler import ConversationHandler  # pylint: disable=C0415
 
         if not isinstance(handler, Handler):
             raise TypeError(f'handler is not an instance of {Handler.__name__}')
@@ -636,7 +640,10 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
                 called when an error is raised.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+            Callback signature:
+
+
+            ``def callback(update: Update, context: CallbackContext)``
 
                 The error that happened will be present in context.error.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run
@@ -646,7 +653,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')
             return
 
-        if run_async is DEFAULT_FALSE and self.bot.defaults and self.bot.defaults.run_async:
+        if (
+            run_async is DEFAULT_FALSE
+            and isinstance(self.bot, ExtBot)
+            and self.bot.defaults
+            and self.bot.defaults.run_async
+        ):
             run_async = True
 
         self.error_handlers[callback] = run_async
@@ -665,6 +677,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         update: Optional[object],
         error: Exception,
         promise: Promise = None,
+        job: 'Job' = None,
     ) -> bool:
         """Dispatches an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
@@ -683,6 +696,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             error (:obj:`Exception`): The error that was raised.
             promise (:class:`telegram._utils.Promise`, optional): The promise whose pooled function
                 raised the error.
+            job (:class:`telegram.ext.Job`, optional): The job that caused the error.
+
+                .. versionadded:: 14.0
 
         Returns:
             :obj:`bool`: :obj:`True` if one of the error handlers raised
@@ -694,7 +710,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         if self.error_handlers:
             for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
                 context = self.context_types.context.from_error(
-                    update, error, self, async_args=async_args, async_kwargs=async_kwargs
+                    update=update,
+                    error=error,
+                    dispatcher=self,
+                    async_args=async_args,
+                    async_kwargs=async_kwargs,
+                    job=job,
                 )
                 if run_async:
                     self.run_async(callback, update, context, update=update)

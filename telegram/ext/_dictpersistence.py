@@ -23,7 +23,7 @@ from collections import defaultdict
 
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram._utils.types import JSONDict
-from ._utils.types import ConversationDict, CDCData
+from telegram.ext._utils.types import ConversationDict, CDCData
 
 try:
     import ujson as json

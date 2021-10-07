@@ -45,8 +45,8 @@ from telegram.warnings import PTBDeprecationWarning
 from telegram.request import Request
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DefaultValue
 from telegram._utils.warnings import warn
-from ._utils.types import CCT, UD, CD, BD
-from ._utils.webhookhandler import WebhookAppClass, WebhookServer
+from telegram.ext._utils.types import CCT, UD, CD, BD
+from telegram.ext._utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
     from telegram.ext import BasePersistence, Defaults, CallbackContext

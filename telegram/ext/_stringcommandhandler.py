@@ -20,10 +20,9 @@
 
 from typing import TYPE_CHECKING, Callable, List, Optional, TypeVar, Union
 
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-
 from telegram.ext import Handler
-from ._utils.types import CCT
+from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram.ext._utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher

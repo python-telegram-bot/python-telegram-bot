@@ -26,7 +26,6 @@ from ._handler import Handler
 from ._callbackcontext import CallbackContext
 from ._contexttypes import ContextTypes
 from ._dispatcher import Dispatcher, DispatcherHandlerStop
-
 from ._jobqueue import JobQueue, Job
 from ._updater import Updater
 from ._callbackqueryhandler import CallbackQueryHandler
