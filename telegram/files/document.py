@@ -21,15 +21,13 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import PhotoSize
-from telegram.files.basemedium import _BaseMedium
-from telegram.files.mediaattrmixins import _FileNameMixin, _MimeTypeMixin, _ThumbPsMixin
-
+from telegram.files.basethumbedmedium import _BaseThumbedMedium
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-class Document(_BaseMedium, _FileNameMixin, _MimeTypeMixin, _ThumbPsMixin):
+class Document(_BaseThumbedMedium):
     """This object represents a general file
     (as opposed to photos, voice messages and audio files).
 
@@ -61,10 +59,7 @@ class Document(_BaseMedium, _FileNameMixin, _MimeTypeMixin, _ThumbPsMixin):
 
     """
 
-    __slots__ = (
-        'file_name',
-        'mime_type',
-    )
+    __slots__ = ('file_name', 'mime_type')
 
     def __init__(
         self,
@@ -77,7 +72,6 @@ class Document(_BaseMedium, _FileNameMixin, _MimeTypeMixin, _ThumbPsMixin):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
-        super().__init__(file_id, file_unique_id, file_size, bot)
-        _FileNameMixin.__init__(self, file_name)
-        _MimeTypeMixin.__init__(self, mime_type)
-        _ThumbPsMixin.__init__(self, thumb)
+        super().__init__(file_id, file_unique_id, file_size, thumb, bot)
+        self.mime_type = mime_type
+        self.file_name = file_name

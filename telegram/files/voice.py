@@ -20,14 +20,13 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram.files.mediaattrmixins import _DurationMixin, _MimeTypeMixin
 from telegram.files.basemedium import _BaseMedium
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-class Voice(_BaseMedium, _DurationMixin, _MimeTypeMixin):
+class Voice(_BaseMedium):
     """This object represents a voice note.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -70,5 +69,5 @@ class Voice(_BaseMedium, _DurationMixin, _MimeTypeMixin):
         **_kwargs: Any,
     ):
         super().__init__(file_id, file_unique_id, file_size, bot)
-        _DurationMixin.__init__(self, duration)
-        _MimeTypeMixin.__init__(self, mime_type)
+        self.duration = int(duration)
+        self.mime_type = mime_type

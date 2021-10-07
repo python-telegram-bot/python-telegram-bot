@@ -21,29 +21,13 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import PhotoSize
-from telegram.files.basemedium import _BaseMedium
-from telegram.files.mediaattrmixins import (
-    _DurationMixin,
-    _FileNameMixin,
-    _MimeTypeMixin,
-    _ThumbPsMixin,
-    _WidthHeightMixin,
-)
+from telegram.files.basethumbedmedium import _BaseThumbedMedium
 
 if TYPE_CHECKING:
     from telegram import Bot
 
-Ancestors = (
-    _BaseMedium,
-    _DurationMixin,
-    _FileNameMixin,
-    _MimeTypeMixin,
-    _ThumbPsMixin,
-    _WidthHeightMixin,
-)
 
-
-class Video(*Ancestors):  # type: ignore[too-many-ancestors, misc]
+class Video(_BaseThumbedMedium):
     """This object represents a video file.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -81,7 +65,7 @@ class Video(*Ancestors):  # type: ignore[too-many-ancestors, misc]
 
     """
 
-    __slots__ = ('duration', 'height', 'mime_type', 'thumb', 'width')
+    __slots__ = ('duration', 'file_name', 'height', 'mime_type', 'width')
 
     def __init__(
         self,
@@ -97,9 +81,9 @@ class Video(*Ancestors):  # type: ignore[too-many-ancestors, misc]
         file_name: str = None,
         **_kwargs: Any,
     ):
-        super().__init__(file_id, file_unique_id, file_size, bot)
-        _DurationMixin.__init__(self, duration)
-        _FileNameMixin.__init__(self, file_name)
-        _MimeTypeMixin.__init__(self, mime_type)
-        _ThumbPsMixin.__init__(self, thumb)
-        _WidthHeightMixin.__init__(self, width, height)
+        super().__init__(file_id, file_unique_id, file_size, thumb, bot)
+        self.width = int(width)
+        self.height = int(height)
+        self.duration = duration
+        self.mime_type = mime_type
+        self.file_name = file_name

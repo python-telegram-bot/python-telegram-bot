@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Telegram Animation."""
+"""Common base class for media objects"""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, TypeVar
 
@@ -71,10 +71,10 @@ class _BaseMedium(TelegramObject):
     ):
         # Required
         self.file_id: str = str(file_id)
-        self.file_unique_id: str = str(file_unique_id)
+        self.file_unique_id = str(file_unique_id)
         # Optionals
-        self.file_size: int | None = file_size
-        self.bot: Bot | None = bot
+        self.file_size = file_size
+        self.bot = bot
 
         self._id_attrs = (self.file_unique_id,)
 
@@ -85,9 +85,6 @@ class _BaseMedium(TelegramObject):
 
         if not data:
             return None
-
-        if 'thumb' in data:
-            data['thumb'] = _BaseMedium.de_json(data.get('thumb'), bot)
 
         return cls(bot=bot, **data)
 

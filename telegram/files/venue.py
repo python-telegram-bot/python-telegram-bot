@@ -21,14 +21,13 @@
 from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import Location, TelegramObject
-from telegram.files.mediaattrmixins import _TitleMixin
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-class Venue(TelegramObject, _TitleMixin):
+class Venue(TelegramObject):
     """This object represents a venue.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -82,9 +81,9 @@ class Venue(TelegramObject, _TitleMixin):
         google_place_type: str = None,
         **_kwargs: Any,
     ):
-        _TitleMixin.__init__(self, title)
         # Required
         self.location = location
+        self.title = title
         self.address = address
         # Optionals
         self.foursquare_id = foursquare_id

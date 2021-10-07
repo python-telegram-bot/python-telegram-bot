@@ -18,25 +18,16 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Audio."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from telegram import PhotoSize
-from telegram.files.basemedium import _BaseMedium
-from telegram.files.mediaattrmixins import (
-    _DurationMixin,
-    _FileNameMixin,
-    _MimeTypeMixin,
-    _TitleMixin,
-    _ThumbPsMixin,
-)
+from telegram.files.basethumbedmedium import _BaseThumbedMedium
 
 if TYPE_CHECKING:
     from telegram import Bot
 
-Ancestors = _BaseMedium, _DurationMixin, _FileNameMixin, _MimeTypeMixin, _ThumbPsMixin, _TitleMixin
 
-
-class Audio(*Ancestors):  # type: ignore[too-many-ancestors, misc]
+class Audio(_BaseThumbedMedium):
     """This object represents an audio file to be treated as music by the Telegram clients.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -77,7 +68,7 @@ class Audio(*Ancestors):  # type: ignore[too-many-ancestors, misc]
 
     """
 
-    __slots__ = ('duration', 'file_name', 'mime_type', 'performer', 'thumb', 'title')
+    __slots__ = ('duration', 'file_name', 'mime_type', 'performer', 'title')
 
     def __init__(
         self,
@@ -93,10 +84,9 @@ class Audio(*Ancestors):  # type: ignore[too-many-ancestors, misc]
         file_name: str = None,
         **_kwargs: Any,
     ):
-        super().__init__(file_id, file_unique_id, file_size, bot)
-        _DurationMixin.__init__(self, duration)
-        _FileNameMixin.__init__(self, file_name)
-        _MimeTypeMixin.__init__(self, mime_type)
-        _ThumbPsMixin.__init__(self, thumb)
-        _TitleMixin.__init__(self, title)
-        self.performer: Optional[str] = performer
+        super().__init__(file_id, file_unique_id, file_size, thumb, bot)
+        self.duration = duration
+        self.performer = performer
+        self.title = title
+        self.mime_type = mime_type
+        self.file_name = file_name

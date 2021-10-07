@@ -21,15 +21,14 @@
 from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
 
 from telegram import PhotoSize, TelegramObject, constants
-from telegram.files.basemedium import _BaseMedium
-from telegram.files.mediaattrmixins import _ThumbPsMixin, _TitleMixin, _WidthHeightMixin
+from telegram.files.basethumbedmedium import _BaseThumbedMedium
 from telegram.utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-class Sticker(_BaseMedium, _ThumbPsMixin, _WidthHeightMixin):
+class Sticker(_BaseThumbedMedium):
     """This object represents a sticker.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -74,15 +73,7 @@ class Sticker(_BaseMedium, _ThumbPsMixin, _WidthHeightMixin):
 
     """
 
-    __slots__ = (
-        'emoji',
-        'height',
-        'is_animated',
-        'mask_position',
-        'set_name',
-        'thumb',
-        'width',
-    )
+    __slots__ = ('emoji', 'height', 'is_animated', 'mask_position', 'set_name', 'width')
 
     def __init__(
         self,
@@ -99,12 +90,10 @@ class Sticker(_BaseMedium, _ThumbPsMixin, _WidthHeightMixin):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
-        super().__init__(file_id, file_unique_id, file_size, bot)
-        _ThumbPsMixin.__init__(self, thumb)
-        _WidthHeightMixin.__init__(self, width, height)
-        # Required
+        super().__init__(file_id, file_unique_id, file_size, thumb, bot)
+        self.width = int(width)
+        self.height = int(height)
         self.is_animated = is_animated
-        # Optionals
         self.emoji = emoji
         self.set_name = set_name
         self.mask_position = mask_position
@@ -123,7 +112,7 @@ class Sticker(_BaseMedium, _ThumbPsMixin, _WidthHeightMixin):
         return cls(bot=bot, **data)
 
 
-class StickerSet(TelegramObject, _ThumbPsMixin, _TitleMixin):
+class StickerSet(TelegramObject):
     """This object represents a sticker set.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -168,8 +157,8 @@ class StickerSet(TelegramObject, _ThumbPsMixin, _TitleMixin):
         thumb: PhotoSize = None,
         **_kwargs: Any,
     ):
-        _TitleMixin.__init__(self, title)
-        _ThumbPsMixin.__init__(self, thumb)
+        self.title = title
+        self.thumb = thumb
         self.name = name
         self.is_animated = is_animated
         self.contains_masks = contains_masks

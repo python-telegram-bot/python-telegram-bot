@@ -21,15 +21,13 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import PhotoSize
-from telegram.files.mediaattrmixins import _DurationMixin, _ThumbPsMixin
-from telegram.files.basemedium import _BaseMedium
-
+from telegram.files.basethumbedmedium import _BaseThumbedMedium
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-class VideoNote(_BaseMedium, _DurationMixin, _ThumbPsMixin):
+class VideoNote(_BaseThumbedMedium):
     """This object represents a video message (available in Telegram apps as of v.4.0).
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -62,7 +60,7 @@ class VideoNote(_BaseMedium, _DurationMixin, _ThumbPsMixin):
 
     """
 
-    __slots__ = ('duration', 'length', 'thumb')
+    __slots__ = ('duration', 'length')
 
     def __init__(
         self,
@@ -75,7 +73,6 @@ class VideoNote(_BaseMedium, _DurationMixin, _ThumbPsMixin):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
-        super().__init__(file_id, file_unique_id, file_size, bot)
-        _DurationMixin.__init__(self, duration)
-        _ThumbPsMixin.__init__(self, thumb)
+        super().__init__(file_id, file_unique_id, file_size, thumb, bot)
         self.length: int = int(length)
+        self.duration: int = duration

@@ -21,13 +21,12 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram.files.basemedium import _BaseMedium
-from telegram.files.mediaattrmixins import _WidthHeightMixin
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-class PhotoSize(_BaseMedium, _WidthHeightMixin):
+class PhotoSize(_BaseMedium):
     """This object represents one size of a photo or a file/sticker thumbnail.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -70,4 +69,5 @@ class PhotoSize(_BaseMedium, _WidthHeightMixin):
         **_kwargs: Any,
     ):
         super().__init__(file_id, file_unique_id, file_size, bot)
-        _WidthHeightMixin.__init__(self, width, height)
+        self.width = int(width)
+        self.height = int(height)

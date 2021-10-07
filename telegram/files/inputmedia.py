@@ -30,15 +30,13 @@ from telegram import (
     Video,
     MessageEntity,
 )
-from telegram.files.mediaattrmixins import (
-    _DurationMixin,
-    _ThumbFiMixin,
-    _WidthHeightMixin,
-    _TitleMixin,
-)
+
 from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.files import parse_file_input
 from telegram.utils.types import FileInput, JSONDict, ODVInput
+
+
+MediaType = Union[Animation, Audio, Document, PhotoSize, Video]
 
 
 class InputMedia(TelegramObject):
@@ -76,18 +74,16 @@ class InputMedia(TelegramObject):
     def __init__(
         self,
         media_type: str,
-        media: Union[str, InputFile],
+        media: Union[str, InputFile, MediaType],
         caption: str = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
     ):
-        self.type: str = media_type
-        self.media: Union[str, InputFile] = media
-        self.caption: Optional[str] = caption
-        self.caption_entities: Optional[
-            Union[List[MessageEntity], Tuple[MessageEntity, ...]]
-        ] = caption_entities
-        self.parse_mode: ODVInput[str] = parse_mode
+        self.type = media_type
+        self.media = media
+        self.caption = caption
+        self.caption_entities = caption_entities
+        self.parse_mode = parse_mode
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -100,8 +96,12 @@ class InputMedia(TelegramObject):
 
         return data
 
+    @staticmethod
+    def _get_thumb_object(thumb: Optional[FileInput]) -> Optional[Union[str, InputFile]]:
+        return parse_file_input(thumb, attach=True) if thumb is not None else thumb
 
-class InputMediaAnimation(InputMedia, _DurationMixin, _ThumbFiMixin, _WidthHeightMixin):
+
+class InputMediaAnimation(InputMedia):
     """Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 
     Note:
@@ -175,14 +175,15 @@ class InputMediaAnimation(InputMedia, _DurationMixin, _ThumbFiMixin, _WidthHeigh
             width = media.width if width is None else width
             height = media.height if height is None else height
             duration = media.duration if duration is None else duration
-            media: str = media.file_id  # type: ignore[no-redef]
+            media = media.file_id
         else:
             media = parse_file_input(media, attach=True, filename=filename)
 
         super().__init__('animation', media, caption, caption_entities, parse_mode)
-        _DurationMixin.__init__(self, duration)
-        _ThumbFiMixin.__init__(self, thumb)
-        _WidthHeightMixin.__init__(self, width, height)
+        self.thumb = InputMedia._get_thumb_object(thumb)
+        self.width = width
+        self.height = height
+        self.duration = duration
 
 
 class InputMediaPhoto(InputMedia):
@@ -234,7 +235,7 @@ class InputMediaPhoto(InputMedia):
         super().__init__('photo', media, caption, caption_entities, parse_mode)
 
 
-class InputMediaVideo(InputMedia, _DurationMixin, _ThumbFiMixin, _WidthHeightMixin):
+class InputMediaVideo(InputMedia):
     """Represents a video to be sent.
 
     Note:
@@ -317,17 +318,19 @@ class InputMediaVideo(InputMedia, _DurationMixin, _ThumbFiMixin, _WidthHeightMix
             width = width if width is not None else media.width
             height = height if height is not None else media.height
             duration = duration if duration is not None else media.duration
-            media: str = media.file_id  # type: ignore[no-redef]
+            media = media.file_id
         else:
             media = parse_file_input(media, attach=True, filename=filename)
+
         super().__init__('video', media, caption, caption_entities, parse_mode)
-        _DurationMixin.__init__(self, duration)
-        _ThumbFiMixin.__init__(self, thumb)
-        _WidthHeightMixin.__init__(self, width, height)
-        self.supports_streaming: bool = False if supports_streaming is None else supports_streaming
+        self.width = width
+        self.height = height
+        self.duration = duration
+        self.thumb = InputMedia._get_thumb_object(thumb)
+        self.supports_streaming = False if supports_streaming is None else supports_streaming
 
 
-class InputMediaAudio(InputMedia, _DurationMixin, _ThumbFiMixin, _TitleMixin):
+class InputMediaAudio(InputMedia):
     """Represents an audio file to be treated as music to be sent.
 
     Note:
@@ -404,19 +407,19 @@ class InputMediaAudio(InputMedia, _DurationMixin, _ThumbFiMixin, _TitleMixin):
             duration = media.duration if duration is None else duration
             performer = media.performer if performer is None else performer
             title = media.title if title is None else title
-            media = media.title
+            media = media.file_id
         else:
             media = parse_file_input(media, attach=True, filename=filename)
 
         cap_ent = caption_entities
-        super().__init__('audio', media, caption, cap_ent, parse_mode)  # type: ignore[arg-type]
-        _DurationMixin.__init__(self, duration)
-        _ThumbFiMixin.__init__(self, thumb)
-        _TitleMixin.__init__(self, title)
-        self.performer: Optional[str] = performer
+        super().__init__('audio', media, caption, cap_ent, parse_mode)
+        self.thumb = InputMedia._get_thumb_object(thumb)
+        self.duration = duration
+        self.title = title
+        self.performer = performer
 
 
-class InputMediaDocument(InputMedia, _ThumbFiMixin):
+class InputMediaDocument(InputMedia):
     """Represents a general file to be sent.
 
     Args:
@@ -481,5 +484,5 @@ class InputMediaDocument(InputMedia, _ThumbFiMixin):
     ):
         media = parse_file_input(media, Document, attach=True, filename=filename)
         super().__init__('document', media, caption, caption_entities, parse_mode)
-        _ThumbFiMixin.__init__(self, thumb)
-        self.disable_content_type_detection: Optional[bool] = disable_content_type_detection
+        self.thumb = InputMedia._get_thumb_object(thumb)
+        self.disable_content_type_detection = disable_content_type_detection
