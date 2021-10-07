@@ -209,8 +209,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         return cls._replace_bot(obj, {})
 
     @classmethod
-    # pylint: disable=too-many-return-statements
-    def _replace_bot(cls, obj: object, memo: Dict[int, object]) -> object:
+    def _replace_bot(  # pylint: disable=too-many-return-statements
+        cls, obj: object, memo: Dict[int, object]
+    ) -> object:
         obj_id = id(obj)
         if obj_id in memo:
             return memo[obj_id]
