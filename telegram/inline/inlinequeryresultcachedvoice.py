@@ -82,7 +82,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         voice_file_id: str,
         title: str,
         caption: str = None,

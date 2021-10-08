@@ -50,12 +50,12 @@ class ShippingOption(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         title: str,
         prices: List['LabeledPrice'],
         **_kwargs: Any,
     ):
-        self.id = id  # pylint: disable=C0103
+        self.id = id  # pylint: disable=invalid-name
         self.title = title
         self.prices = prices
 

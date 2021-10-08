@@ -61,7 +61,7 @@ class TypeHandler(Handler[UT, CCT]):
 
     def __init__(
         self,
-        type: Type[UT],  # pylint: disable=W0622
+        type: Type[UT],  # pylint: disable=redefined-builtin
         callback: Callable[[UT, CCT], RT],
         strict: bool = False,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
@@ -70,8 +70,8 @@ class TypeHandler(Handler[UT, CCT]):
             callback,
             run_async=run_async,
         )
-        self.type = type  # pylint: disable=E0237
-        self.strict = strict  # pylint: disable=E0237
+        self.type = type  # pylint: disable=assigning-non-slot
+        self.strict = strict  # pylint: disable=assigning-non-slot
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -85,4 +85,4 @@ class TypeHandler(Handler[UT, CCT]):
         """
         if not self.strict:
             return isinstance(update, self.type)
-        return type(update) is self.type  # pylint: disable=C0123
+        return type(update) is self.type  # pylint: disable=unidiomatic-typecheck

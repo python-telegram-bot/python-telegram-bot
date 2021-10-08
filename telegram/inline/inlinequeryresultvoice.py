@@ -86,7 +86,7 @@ class InlineQueryResultVoice(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         voice_url: str,
         title: str,
         voice_duration: int = None,

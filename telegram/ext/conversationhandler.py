@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=R0201
+# pylint: disable=no-self-use
 """This module contains the ConversationHandler."""
 
 import logging
@@ -212,7 +212,7 @@ class ConversationHandler(Handler[Update, CCT]):
     WAITING: ClassVar[int] = -3
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
     previous ``@run_sync`` decorated running handler to finish."""
-    # pylint: disable=W0231
+    # pylint: disable=super-init-not-called
     def __init__(
         self,
         entry_points: List[Handler[Update, CCT]],
@@ -511,7 +511,8 @@ class ConversationHandler(Handler[Update, CCT]):
                 )
                 self.logger.exception("%s", exc)
 
-    def check_update(self, update: object) -> CheckUpdateType:  # pylint: disable=R0911
+    # pylint: disable=too-many-return-statements
+    def check_update(self, update: object) -> CheckUpdateType:
         """
         Determines whether an update should be handled by this conversationhandler, and if so in
         which state the conversation currently is.

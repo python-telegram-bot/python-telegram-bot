@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0112, C0103, W0221
+# pylint: disable=empty-docstring,  invalid-name,  arguments-differ
 """This module contains the Filters for use with the MessageHandler class."""
 
 import re
@@ -112,7 +112,8 @@ class BaseFilter(ABC):
 
     __slots__ = ('_name', '_data_filter')
 
-    def __new__(cls, *args: object, **kwargs: object) -> 'BaseFilter':  # pylint: disable=W0613
+    # pylint: disable=unused-argument
+    def __new__(cls, *args: object, **kwargs: object) -> 'BaseFilter':
         # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
         instance = super().__new__(cls)
         instance._name = None
@@ -150,7 +151,7 @@ class BaseFilter(ABC):
 
     @name.setter
     def name(self, name: Optional[str]) -> None:
-        self._name = name  # pylint: disable=E0237
+        self._name = name  # pylint: disable=assigning-non-slot
 
     def __repr__(self) -> str:
         # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
@@ -299,7 +300,8 @@ class MergedFilter(UpdateFilter):
                 base[k] = comp_value
         return base
 
-    def filter(self, update: Update) -> Union[bool, DataDict]:  # pylint: disable=R0911
+    # pylint: disable=too-many-return-statements
+    def filter(self, update: Update) -> Union[bool, DataDict]:
         base_output = self.base_filter(update)
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
@@ -1523,7 +1525,7 @@ officedocument.wordprocessingml.document")``.
             raise RuntimeError(f'Cannot set name for Filters.{self.__class__.__name__}')
 
     class user(_ChatUserBaseFilter):
-        # pylint: disable=W0235
+        # pylint: disable=useless-super-delegation
         """Filters messages to allow only those which are from specified user ID(s) or
         username(s).
 
@@ -1624,7 +1626,7 @@ officedocument.wordprocessingml.document")``.
             return super().remove_chat_ids(user_id)
 
     class via_bot(_ChatUserBaseFilter):
-        # pylint: disable=W0235
+        # pylint: disable=useless-super-delegation
         """Filters messages to allow only those which are from specified via_bot ID(s) or
         username(s).
 
@@ -1726,7 +1728,7 @@ officedocument.wordprocessingml.document")``.
             return super().remove_chat_ids(bot_id)
 
     class chat(_ChatUserBaseFilter):
-        # pylint: disable=W0235
+        # pylint: disable=useless-super-delegation
         """Filters messages to allow only those which are from a specified chat ID or username.
 
         Examples:
@@ -1809,7 +1811,7 @@ officedocument.wordprocessingml.document")``.
             return super().remove_chat_ids(chat_id)
 
     class forwarded_from(_ChatUserBaseFilter):
-        # pylint: disable=W0235
+        # pylint: disable=useless-super-delegation
         """Filters messages to allow only those which are forwarded from the specified chat ID(s)
         or username(s) based on :attr:`telegram.Message.forward_from` and
         :attr:`telegram.Message.forward_from_chat`.
@@ -1902,7 +1904,7 @@ officedocument.wordprocessingml.document")``.
             return super().remove_chat_ids(chat_id)
 
     class sender_chat(_ChatUserBaseFilter):
-        # pylint: disable=W0235
+        # pylint: disable=useless-super-delegation
         """Filters messages to allow only those which are from a specified sender chat's chat ID or
         username.
 

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0114
+# pylint: disable=missing-module-docstring
 import subprocess
 import sys
 from typing import Optional
