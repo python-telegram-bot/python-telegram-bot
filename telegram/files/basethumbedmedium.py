@@ -38,6 +38,8 @@ class _BaseThumbedMedium(_BaseMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    .. versionadded:: 14.0
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -46,6 +48,7 @@ class _BaseThumbedMedium(_BaseMedium):
             Can't be used to download or reuse the file.
         file_name (:obj:`str`, optional): Original animation filename as defined by sender.
         file_size (:obj:`int`, optional): File size.
+        thumb (:class:`telegram.PhotoSize`, optional): Animation thumbnail as defined by sender.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -56,6 +59,7 @@ class _BaseThumbedMedium(_BaseMedium):
             Can't be used to download or reuse the file.
         file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
         file_size (:obj:`int`): Optional. File size.
+        thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined by sender.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """

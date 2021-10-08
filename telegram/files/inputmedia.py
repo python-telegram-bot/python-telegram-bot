@@ -43,6 +43,11 @@ class InputMedia(TelegramObject):
     """
     Base class for Telegram InputMedia Objects.
 
+    .. versionchanged:: 14.0:
+        * Added :meth:`__init__` responsible for initializing attributes common to all deriving
+            classes.
+        * Added static :meth:`_get_thumb_object`.
+
     Args:
         media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.Animation` |  :class:`telegram.Audio` | \
