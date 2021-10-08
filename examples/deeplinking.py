@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116,W0613
+# pylint: disable=missing-function-docstring, unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """Bot that explains Telegram's "Deep Linking Parameters" functionality.

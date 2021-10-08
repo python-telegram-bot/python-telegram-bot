@@ -102,7 +102,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         mpeg4_url: str,
         thumb_url: str,
         mpeg4_width: int = None,
