@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=R0902,R0913
+# pylint: disable=too-many-instance-attributes, too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -75,7 +75,7 @@ class InlineQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         query: str,
         offset: str,
@@ -85,7 +85,7 @@ class InlineQuery(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.id = id  # pylint: disable=C0103
+        self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
         self.query = query
         self.offset = offset

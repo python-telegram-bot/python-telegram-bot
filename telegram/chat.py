@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=W0622
+# pylint: disable=redefined-builtin
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -229,7 +229,7 @@ class Chat(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.id = int(id)  # pylint: disable=C0103
+        self.id = int(id)  # pylint: disable=invalid-name
         self.type = type
         # Optionals
         self.title = title
@@ -294,7 +294,7 @@ class Chat(TelegramObject):
             return None
 
         data['photo'] = ChatPhoto.de_json(data.get('photo'), bot)
-        from telegram import Message  # pylint: disable=C0415
+        from telegram import Message  # pylint: disable=import-outside-toplevel
 
         data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
         data['permissions'] = ChatPermissions.de_json(data.get('permissions'), bot)
@@ -1472,7 +1472,7 @@ class Chat(TelegramObject):
         options: List[str],
         is_anonymous: bool = True,
         # We use constant.POLL_REGULAR instead of Poll.REGULAR here to avoid circular imports
-        type: str = constants.POLL_REGULAR,  # pylint: disable=W0622
+        type: str = constants.POLL_REGULAR,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool = False,
         correct_option_id: int = None,
         is_closed: bool = None,

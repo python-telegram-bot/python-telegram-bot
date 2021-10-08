@@ -56,7 +56,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         sticker_file_id: str,
         reply_markup: 'ReplyMarkup' = None,
         input_message_content: 'InputMessageContent' = None,

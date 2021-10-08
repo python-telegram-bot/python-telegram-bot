@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=R0201
+# pylint: disable=no-self-use
 """This module contains the class Defaults, which allows to pass default values to Updater."""
 from typing import NoReturn, Optional, Dict, Any
 

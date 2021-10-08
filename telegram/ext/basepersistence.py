@@ -113,7 +113,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     )
 
     def __new__(
-        cls, *args: object, **kwargs: object  # pylint: disable=W0613
+        cls, *args: object, **kwargs: object  # pylint: disable=unused-argument
     ) -> 'BasePersistence':
         """This overrides the get_* and update_* methods to use insert/replace_bot.
         That has the side effect that we always pass deepcopied data to those methods, so in
@@ -209,7 +209,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         return cls._replace_bot(obj, {})
 
     @classmethod
-    def _replace_bot(cls, obj: object, memo: Dict[int, object]) -> object:  # pylint: disable=R0911
+    def _replace_bot(  # pylint: disable=too-many-return-statements
+        cls, obj: object, memo: Dict[int, object]
+    ) -> object:
         obj_id = id(obj)
         if obj_id in memo:
             return memo[obj_id]
@@ -309,7 +311,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
         return self._insert_bot(obj, {})
 
-    def _insert_bot(self, obj: object, memo: Dict[int, object]) -> object:  # pylint: disable=R0911
+    # pylint: disable=too-many-return-statements
+    def _insert_bot(self, obj: object, memo: Dict[int, object]) -> object:
         obj_id = id(obj)
         if obj_id in memo:
             return memo[obj_id]

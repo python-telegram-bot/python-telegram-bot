@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=R0903
+# pylint: disable=too-few-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -168,13 +168,13 @@ class Poll(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         question: str,
         options: List[PollOption],
         total_voter_count: int,
         is_closed: bool,
         is_anonymous: bool,
-        type: str,  # pylint: disable=W0622
+        type: str,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool,
         correct_option_id: int = None,
         explanation: str = None,
@@ -183,7 +183,7 @@ class Poll(TelegramObject):
         close_date: datetime.datetime = None,
         **_kwargs: Any,
     ):
-        self.id = id  # pylint: disable=C0103
+        self.id = id  # pylint: disable=invalid-name
         self.question = question
         self.options = options
         self.total_voter_count = total_voter_count
