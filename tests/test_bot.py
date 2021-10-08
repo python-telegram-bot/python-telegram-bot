@@ -99,8 +99,8 @@ def message(bot, chat_id):
 
 
 @pytest.fixture(scope='class')
-def media_message(bot, chat_id):
-    with Path('tests/data/telegram.ogg').open('rb') as f:
+def media_message(bot, chat_id, tests_data_path):
+    with tests_data_path.joinpath('telegram.ogg').open('rb') as f:
         return bot.send_voice(chat_id, voice=f, caption='my caption', timeout=10)
 
 

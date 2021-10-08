@@ -29,15 +29,15 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 
 @pytest.fixture(scope='function')
-def audio_file():
-    f = Path('tests/data/telegram.mp3').open('rb')
+def audio_file(tests_data_path):
+    f = tests_data_path.joinpath('telegram.mp3').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def audio(bot, chat_id):
-    with Path('tests/data/telegram.mp3').open('rb') as f:
+def audio(bot, chat_id, tests_data_path):
+    with tests_data_path.joinpath('telegram.mp3').open('rb') as f:
         return bot.send_audio(
             chat_id, audio=f, timeout=50, thumb=Path('tests/data/thumb.jpg').open('rb')
         ).audio
@@ -210,10 +210,10 @@ class TestAudio:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_audio_local_files(self, monkeypatch, bot, chat_id):
+    def test_send_audio_local_files(self, monkeypatch, bot, chat_id, tests_data_path):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
+        expected = tests_data_path.joinpath('telegram.jpg').as_uri()
         file = 'tests/data/telegram.jpg'
 
         def make_assertion(_, data, *args, **kwargs):

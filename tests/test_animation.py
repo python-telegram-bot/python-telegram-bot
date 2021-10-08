@@ -29,15 +29,15 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 
 @pytest.fixture(scope='function')
-def animation_file():
-    f = Path('tests/data/game.gif').open('rb')
+def animation_file(tests_data_path):
+    f = tests_data_path.joinpath('game.gif').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def animation(bot, chat_id):
-    with Path('tests/data/game.gif').open('rb') as f:
+def animation(bot, chat_id, tests_data_path):
+    with tests_data_path.joinpath('game.gif').open('rb') as f:
         return bot.send_animation(
             chat_id, animation=f, timeout=50, thumb=open('tests/data/thumb.jpg', 'rb')
         ).animation
@@ -188,20 +188,40 @@ class TestAnimation:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_animation_local_files(self, monkeypatch, bot, chat_id):
+    def test_send_animation_local_files(self, monkeypatch, bot, chat_id, tests_data_path):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
+        expected = tests_data_path.joinpath('telegram.jpg').as_uri()
         file = 'tests/data/telegram.jpg'
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
+            print(expected)
+            print(f"rel: {Path(expected)}")
+            print(data.get('animation'), data.get('thumb'))
             test_flag = data.get('animation') == expected and data.get('thumb') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)
         bot.send_animation(chat_id, file, thumb=file)
         assert test_flag
         monkeypatch.delattr(bot, '_post')
+
+    # def test_send_animation_local_files(self, monkeypatch, bot, chat_id):
+    #     # For just test that the correct paths are passed as we have no local bot API set up
+    #     test_flag = False
+    #     expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
+    #     file = 'tests/data/telegram.jpg'
+    #
+    #     def make_assertion(_, data, *args, **kwargs):
+    #         nonlocal test_flag
+    #         print(expected)
+    #         print(data.get('animation'), data.get('thumb'))
+    #         test_flag = data.get('animation') == expected and data.get('thumb') == expected
+    #
+    #     monkeypatch.setattr(bot, '_post', make_assertion)
+    #     bot.send_animation(chat_id, file, thumb=file)
+    #     assert test_flag
+    #     monkeypatch.delattr(bot, '_post')
 
     @flaky(3, 1)
     @pytest.mark.parametrize(

@@ -222,19 +222,19 @@ def updater(bot):
 
 @pytest.fixture(scope='function')
 def tests_data_path():
-    Path(__file__).parent.resolve() / "data"
+    return Path(__file__).parent.resolve() / "data"
 
 
 @pytest.fixture(scope='function')
 def thumb_file(tests_data_path):
-    f = tests_data_path('tests/data/thumb.jpg', 'rb')
+    f = tests_data_path.joinpath('thumb.jpg').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def class_thumb_file():
-    f = open('tests/data/thumb.jpg', 'rb')
+def class_thumb_file(tests_data_path):
+    f = tests_data_path.joinpath('thumb.jpg').open('rb')
     yield f
     f.close()
 
