@@ -62,7 +62,12 @@ class TelegramObject:
         return str(self.to_dict())
 
     def __getitem__(self, item: str) -> object:
-        return getattr(self, item, None)
+        if item == 'from':
+            item = 'from_user'
+        try:
+            return getattr(self, item)
+        except AttributeError:
+            raise KeyError
 
     @staticmethod
     def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
