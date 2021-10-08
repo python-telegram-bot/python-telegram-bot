@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects"""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, Type, Optional
 
 from telegram import TelegramObject
 from telegram.utils.defaultvalue import DEFAULT_NONE
@@ -80,7 +80,7 @@ class _BaseMedium(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
-    def de_json(cls: type[MT], data: JSONDict | None, bot: Bot) -> MT | None:
+    def de_json(cls: Type[MT], data: Optional[JSONDict], bot: Bot) -> Optional[MT]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

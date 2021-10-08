@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects with thumbnails"""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, Optional, Type
 
 from telegram import PhotoSize
 from telegram.files.basemedium import _BaseMedium
@@ -79,7 +79,7 @@ class _BaseThumbedMedium(_BaseMedium):
         self.thumb = thumb
 
     @classmethod
-    def de_json(cls: type[ThumbedMT], data: JSONDict | None, bot: Bot) -> ThumbedMT | None:
+    def de_json(cls: Type[ThumbedMT], data: Optional[JSONDict], bot: Bot) -> Optional[ThumbedMT]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
