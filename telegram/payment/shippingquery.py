@@ -58,14 +58,14 @@ class ShippingQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         invoice_payload: str,
         shipping_address: ShippingAddress,
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
-        self.id = id  # pylint: disable=C0103
+        self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
         self.invoice_payload = invoice_payload
         self.shipping_address = shipping_address
@@ -87,7 +87,7 @@ class ShippingQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(  # pylint: disable=C0103
+    def answer(  # pylint: disable=invalid-name
         self,
         ok: bool,
         shipping_options: List[ShippingOption] = None,

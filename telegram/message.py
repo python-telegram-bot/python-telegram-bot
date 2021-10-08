@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=R0902,R0913
+# pylint: disable=too-many-instance-attributes, too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -705,7 +705,7 @@ class Message(TelegramObject):
 
         return self._effective_attachment  # type: ignore
 
-    def __getitem__(self, item: str) -> Any:  # pylint: disable=R1710
+    def __getitem__(self, item: str) -> Any:  # pylint: disable=inconsistent-return-statements
         return self.chat.id if item == 'chat_id' else super().__getitem__(item)
 
     def to_dict(self) -> JSONDict:
@@ -1583,7 +1583,7 @@ class Message(TelegramObject):
         question: str,
         options: List[str],
         is_anonymous: bool = True,
-        type: str = Poll.REGULAR,  # pylint: disable=W0622
+        type: str = Poll.REGULAR,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool = False,
         correct_option_id: int = None,
         is_closed: bool = None,

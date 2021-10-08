@@ -79,7 +79,7 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         audio_file_id: str,
         caption: str = None,
         reply_markup: 'ReplyMarkup' = None,

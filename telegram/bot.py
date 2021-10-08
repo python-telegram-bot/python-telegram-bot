@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# pylint: disable=E0611,E0213,E1102,E1101,R0913,R0904
+# pylint: disable=no-name-in-module, no-self-argument, not-callable, no-member, too-many-arguments
+# pylint: disable=too-many-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -194,7 +195,7 @@ class Bot(TelegramObject):
         logger = logging.getLogger(func.__module__)
 
         @functools.wraps(func)
-        def decorator(*args, **kwargs):  # type: ignore[no-untyped-def] # pylint: disable=W0613
+        def decorator(*args, **kwargs):  # type: ignore[no-untyped-def]
             logger.debug('Entering: %s', func.__name__)
             result = func(*args, **kwargs)
             logger.debug(result)
@@ -337,7 +338,7 @@ class Bot(TelegramObject):
         return self._bot
 
     @property
-    def id(self) -> int:  # pylint: disable=C0103
+    def id(self) -> int:  # pylint: disable=invalid-name
         """:obj:`int`: Unique identifier for this bot."""
         return self.bot.id
 
@@ -2087,7 +2088,7 @@ class Bot(TelegramObject):
 
         return result  # type: ignore[return-value]
 
-    def _effective_inline_results(  # pylint: disable=R0201
+    def _effective_inline_results(  # pylint: disable=no-self-use
         self,
         results: Union[
             Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
@@ -2144,7 +2145,7 @@ class Bot(TelegramObject):
         return effective_results, next_offset
 
     @no_type_check  # mypy doesn't play too well with hasattr
-    def _insert_defaults_for_ilq_results(  # pylint: disable=R0201
+    def _insert_defaults_for_ilq_results(  # pylint: disable=no-self-use
         self, res: 'InlineQueryResult'
     ) -> None:
         """The reason why this method exists is similar to the description of _insert_defaults
@@ -2152,7 +2153,7 @@ class Bot(TelegramObject):
         DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries
         from the json data.
         """
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         if hasattr(res, 'parse_mode'):
             res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, 'input_message_content') and res.input_message_content:
@@ -3651,7 +3652,7 @@ class Bot(TelegramObject):
         )
 
     @_log
-    def answer_shipping_query(  # pylint: disable=C0103
+    def answer_shipping_query(  # pylint: disable=invalid-name
         self,
         shipping_query_id: str,
         ok: bool,
@@ -3720,7 +3721,7 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @_log
-    def answer_pre_checkout_query(  # pylint: disable=C0103
+    def answer_pre_checkout_query(  # pylint: disable=invalid-name
         self,
         pre_checkout_query_id: str,
         ok: bool,
@@ -3762,7 +3763,7 @@ class Bot(TelegramObject):
         """
         ok = bool(ok)
 
-        if not (ok ^ (error_message is not None)):  # pylint: disable=C0325
+        if not (ok ^ (error_message is not None)):  # pylint: disable=superfluous-parens
             raise TelegramError(
                 'answerPreCheckoutQuery: If ok is True, there should '
                 'not be error_message; if ok is False, error_message '
@@ -5016,7 +5017,7 @@ class Bot(TelegramObject):
         question: str,
         options: List[str],
         is_anonymous: bool = True,
-        type: str = Poll.REGULAR,  # pylint: disable=W0622
+        type: str = Poll.REGULAR,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool = False,
         correct_option_id: int = None,
         is_closed: bool = None,

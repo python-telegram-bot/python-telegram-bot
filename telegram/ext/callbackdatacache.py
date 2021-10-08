@@ -24,7 +24,7 @@ from threading import Lock
 from typing import Dict, Tuple, Union, Optional, MutableMapping, TYPE_CHECKING, cast
 from uuid import uuid4
 
-from cachetools import LRUCache  # pylint: disable=E0401
+from cachetools import LRUCache  # pylint: disable=import-error
 
 from telegram import (
     InlineKeyboardMarkup,

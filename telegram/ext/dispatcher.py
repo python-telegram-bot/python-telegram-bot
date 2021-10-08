@@ -259,7 +259,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         # For backward compatibility, we allow a "singleton" mode for the dispatcher. When there's
         # only one instance of Dispatcher, it will be possible to use the `run_async` decorator.
         with self.__singleton_lock:
-            if self.__singleton_semaphore.acquire(blocking=False):  # pylint: disable=R1732
+            # pylint: disable=consider-using-with
+            if self.__singleton_semaphore.acquire(blocking=False):
                 self._set_singleton(self)
             else:
                 self._set_singleton(None)
@@ -528,7 +529,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         """
         # Unfortunately due to circular imports this has to be here
-        from .conversationhandler import ConversationHandler  # pylint: disable=C0415
+        # pylint: disable=import-outside-toplevel
+        from .conversationhandler import ConversationHandler
 
         if not isinstance(handler, Handler):
             raise TypeError(f'handler is not an instance of {Handler.__name__}')
@@ -628,7 +630,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
     def add_error_handler(
         self,
         callback: Callable[[object, CCT], None],
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,  # pylint: disable=W0621
+        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ) -> None:
         """Registers an error handler in the Dispatcher. This handler will receive every error
         which happens in your bot. See the docs of :meth:`dispatch_error` for more details on how
@@ -708,7 +710,10 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         async_kwargs = None if not promise else promise.kwargs
 
         if self.error_handlers:
-            for callback, run_async in self.error_handlers.items():  # pylint: disable=W0621
+            for (
+                callback,
+                run_async,
+            ) in self.error_handlers.items():  # pylint: disable=redefined-outer-name
                 context = self.context_types.context.from_error(
                     update=update,
                     error=error,

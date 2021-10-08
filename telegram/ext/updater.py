@@ -158,7 +158,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         private_key_password: bytes = None,
         user_sig_handler: Callable = None,
         request_kwargs: Dict[str, Any] = None,
-        persistence: 'BasePersistence' = None,  # pylint: disable=E0601
+        persistence: 'BasePersistence' = None,  # pylint: disable=used-before-assignment
         defaults: 'Defaults' = None,
         base_file_url: str = None,
         arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
@@ -810,7 +810,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 self.user_sig_handler(signum, frame)
         else:
             self.logger.warning('Exiting immediately!')
-            # pylint: disable=C0415,W0212
+            # pylint: disable=import-outside-toplevel, protected-access
             import os
 
             os._exit(1)

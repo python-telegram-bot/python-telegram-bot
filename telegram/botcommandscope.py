@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=W0622
+# pylint: disable=redefined-builtin
 """This module contains objects representing Telegram bot command scopes."""
 from typing import Any, Union, Optional, TYPE_CHECKING, Dict, Type
 

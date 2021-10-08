@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=R0201
+# pylint: disable=no-self-use
 """This module contains the CallbackContext class."""
 from queue import Queue
 from typing import (
@@ -296,12 +296,12 @@ class CallbackContext(Generic[UD, CD, BD]):
             if chat:
                 self._chat_id_and_data = (
                     chat.id,
-                    dispatcher.chat_data[chat.id],  # pylint: disable=W0212
+                    dispatcher.chat_data[chat.id],  # pylint: disable=protected-access
                 )
             if user:
                 self._user_id_and_data = (
                     user.id,
-                    dispatcher.user_data[user.id],  # pylint: disable=W0212
+                    dispatcher.user_data[user.id],  # pylint: disable=protected-access
                 )
         return self
 

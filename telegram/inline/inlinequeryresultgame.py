@@ -49,14 +49,14 @@ class InlineQueryResultGame(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         game_short_name: str,
         reply_markup: 'ReplyMarkup' = None,
         **_kwargs: Any,
     ):
         # Required
         super().__init__('game', id)
-        self.id = id  # pylint: disable=W0622
+        self.id = id  # pylint: disable=redefined-builtin
         self.game_short_name = game_short_name
 
         self.reply_markup = reply_markup

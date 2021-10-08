@@ -110,7 +110,7 @@ class InlineQueryResultVideo(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         video_url: str,
         mime_type: str,
         thumb_url: str,
