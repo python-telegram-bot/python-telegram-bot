@@ -319,7 +319,8 @@ class TestMessage:
     def test_dict_approach(self, message):
         assert message['text'] == message.text
         assert message['chat_id'] == message.chat_id
-        assert message['no_key'] is None
+        with pytest.raises(KeyError):
+            message['no_key']
 
     def test_parse_entity(self):
         text = (
