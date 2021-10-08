@@ -67,16 +67,16 @@ class PollAnswer(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`options_ids` are equal.
 
-    Attributes:
-        poll_id (:obj:`str`): Unique poll identifier.
-        user (:class:`telegram.User`): The user, who changed the answer to the poll.
-        option_ids (List[:obj:`int`]): Identifiers of answer options, chosen by the user.
-
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
         user (:class:`telegram.User`): The user, who changed the answer to the poll.
         option_ids (List[:obj:`int`]): 0-based identifiers of answer options, chosen by the user.
             May be empty if the user retracted their vote.
+
+    Attributes:
+        poll_id (:obj:`str`): Unique poll identifier.
+        user (:class:`telegram.User`): The user, who changed the answer to the poll.
+        option_ids (List[:obj:`int`]): Identifiers of answer options, chosen by the user.
 
     """
 
@@ -109,25 +109,6 @@ class Poll(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
-    Attributes:
-        id (:obj:`str`): Unique poll identifier.
-        question (:obj:`str`): Poll question, 1-300 characters.
-        options (List[:class:`PollOption`]): List of poll options.
-        total_voter_count (:obj:`int`): Total number of users that voted in the poll.
-        is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
-        is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
-        type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
-        allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`): Optional. Identifier of the correct answer option.
-        explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
-            answer or taps on the lamp icon in a quiz-style poll.
-        explanation_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities
-            like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
-        open_period (:obj:`int`): Optional. Amount of time in seconds the poll will be active
-            after creation.
-        close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
-            automatically closed.
-
     Args:
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, 1-300 characters.
@@ -147,6 +128,25 @@ class Poll(TelegramObject):
             after creation.
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the
             poll will be automatically closed. Converted to :obj:`datetime.datetime`.
+
+    Attributes:
+        id (:obj:`str`): Unique poll identifier.
+        question (:obj:`str`): Poll question, 1-300 characters.
+        options (List[:class:`PollOption`]): List of poll options.
+        total_voter_count (:obj:`int`): Total number of users that voted in the poll.
+        is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
+        is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
+        type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
+        allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
+        correct_option_id (:obj:`int`): Optional. Identifier of the correct answer option.
+        explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
+            answer or taps on the lamp icon in a quiz-style poll.
+        explanation_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities
+            like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
+        open_period (:obj:`int`): Optional. Amount of time in seconds the poll will be active
+            after creation.
+        close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
+            automatically closed.
 
     """
 
