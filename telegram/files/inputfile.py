@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=W0622,E0611
+# pylint: disable=redefined-builtin, no-name-in-module
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022

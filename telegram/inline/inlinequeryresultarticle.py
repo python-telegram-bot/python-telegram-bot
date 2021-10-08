@@ -77,7 +77,7 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         title: str,
         input_message_content: 'InputMessageContent',
         reply_markup: 'ReplyMarkup' = None,

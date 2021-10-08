@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=R0903
+# pylint: disable=too-few-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022

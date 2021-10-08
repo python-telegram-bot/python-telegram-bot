@@ -64,7 +64,7 @@ class MessageEntity(TelegramObject):
 
     def __init__(
         self,
-        type: str,  # pylint: disable=W0622
+        type: str,  # pylint: disable=redefined-builtin
         offset: int,
         length: int,
         url: str = None,

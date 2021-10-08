@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=R0201
+# pylint: disable=no-self-use
 """This module contains the auxiliary class ContextTypes."""
-from typing import Type, Generic, overload, Dict  # pylint: disable=W0611
+from typing import Type, Generic, overload, Dict  # pylint: disable=unused-import
 
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.utils.types import CCT, UD, CD, BD
