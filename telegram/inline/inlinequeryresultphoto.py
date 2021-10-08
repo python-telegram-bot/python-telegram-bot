@@ -98,7 +98,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         photo_url: str,
         thumb_url: str,
         photo_width: int = None,
