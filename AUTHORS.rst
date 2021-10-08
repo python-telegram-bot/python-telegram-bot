@@ -100,6 +100,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Sahil Sharma <https://github.com/sahilsharma811>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
+- `Simon Damberg <https://github.com/SimonDamberg>`_
 - `Simon Schürrle <https://github.com/SitiSchu>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `syntx <https://github.com/syntx>`_
