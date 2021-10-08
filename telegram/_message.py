@@ -653,9 +653,6 @@ class Message(TelegramObject):
 
         return self._effective_attachment  # type: ignore[return-value]
 
-    def __getitem__(self, item: str) -> Any:  # pylint: disable=inconsistent-return-statements
-        return self.chat.id if item == 'chat_id' else super().__getitem__(item)
-
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
