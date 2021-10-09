@@ -43,7 +43,10 @@ if TYPE_CHECKING:
 FileLike = Union[IO, 'InputFile']
 """Either an open file handler or a :class:`telegram.InputFile`."""
 
-FileInput = Union[str, bytes, FileLike, Path]
+FilePathInput = Union[str, Path]
+"""A filepath either as string or as :obj:`pathlib.Path` object."""
+
+FileInput = Union[FilePathInput, bytes, FileLike]
 """Valid input for passing files to Telegram. Either a file id as string, a file like object,
 a local file path as string, :class:`pathlib.Path` or the file contents as :obj:`bytes`."""
 

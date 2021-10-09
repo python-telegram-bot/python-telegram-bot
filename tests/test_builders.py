@@ -20,6 +20,7 @@
 """
 We mainly test on UpdaterBuilder because it has all methods that DispatcherBuilder already has
 """
+from pathlib import Path
 from random import randint
 from threading import Event
 
@@ -250,3 +251,22 @@ class TestBuilder:
         else:
             assert isinstance(obj, CustomDispatcher)
             assert obj.arg == 2
+
+    @pytest.mark.parametrize('input_type', ('bytes', 'str', 'Path'))
+    def test_all_private_key_input_types(self, builder, bot, input_type):
+        private_key = Path('tests/data/private.key')
+        password = Path('tests/data/private_key.password')
+
+        if input_type == 'bytes':
+            private_key = private_key.read_bytes()
+            password = password.read_bytes()
+        if input_type == 'str':
+            private_key = str(private_key)
+            password = str(password)
+
+        builder.token(bot.token).private_key(
+            private_key=private_key,
+            password=password,
+        )
+        bot = builder.build().bot
+        assert bot.private_key

@@ -28,12 +28,12 @@ from typing import (
     overload,
     cast,
     DefaultDict,
-    Union,
 )
 
 from telegram.ext import BasePersistence, PersistenceInput
 from .utils.types import UD, CD, BD, ConversationDict, CDCData
 from .contexttypes import ContextTypes
+from ..utils.types import FilePathInput
 
 
 class PicklePersistence(BasePersistence[UD, CD, BD]):
@@ -107,7 +107,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     @overload
     def __init__(
         self: 'PicklePersistence[Dict, Dict, Dict]',
-        filepath: Union[Path, str],
+        filepath: FilePathInput,
         store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
@@ -117,7 +117,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     @overload
     def __init__(
         self: 'PicklePersistence[UD, CD, BD]',
-        filepath: Union[Path, str],
+        filepath: FilePathInput,
         store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
@@ -127,7 +127,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     def __init__(
         self,
-        filepath: Union[Path, str],
+        filepath: FilePathInput,
         store_data: PersistenceInput = None,
         single_file: bool = True,
         on_flush: bool = False,
