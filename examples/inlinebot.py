@@ -23,23 +23,22 @@ from telegram.ext import Updater, InlineQueryHandler, CommandHandler, CallbackCo
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     update.message.reply_text('Hi!')
 
 
-def help_command(update: Update, context: CallbackContext) -> None:
+def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
-def inlinequery(update: Update, context: CallbackContext) -> None:
+def inlinequery(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Handle the inline query."""
     query = update.inline_query.query
 
@@ -74,7 +73,7 @@ def inlinequery(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

@@ -16,13 +16,14 @@ from typing import Tuple, Optional
 
 from telegram import Update, Chat, ChatMember, ParseMode, ChatMemberUpdated
 from telegram.ext import (
-    Updater,
     CommandHandler,
-    CallbackContext,
     ChatMemberHandler,
+    Updater,
+    CallbackContext,
 )
 
 # Enable logging
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -66,7 +67,7 @@ def extract_status_change(
     return was_member, is_member
 
 
-def track_chats(update: Update, context: CallbackContext) -> None:
+def track_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Tracks the chats the bot is in."""
     result = extract_status_change(update.my_chat_member)
     if result is None:
@@ -101,7 +102,7 @@ def track_chats(update: Update, context: CallbackContext) -> None:
             context.bot_data.setdefault("channel_ids", set()).discard(chat.id)
 
 
-def show_chats(update: Update, context: CallbackContext) -> None:
+def show_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Shows which chats the bot is in"""
     user_ids = ", ".join(str(uid) for uid in context.bot_data.setdefault("user_ids", set()))
     group_ids = ", ".join(str(gid) for gid in context.bot_data.setdefault("group_ids", set()))
@@ -114,7 +115,7 @@ def show_chats(update: Update, context: CallbackContext) -> None:
     update.effective_message.reply_text(text)
 
 
-def greet_chat_members(update: Update, context: CallbackContext) -> None:
+def greet_chat_members(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Greets new users in chats and announces when someone leaves"""
     result = extract_status_change(update.chat_member)
     if result is None:
@@ -139,7 +140,7 @@ def greet_chat_members(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

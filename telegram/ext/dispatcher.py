@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the Dispatcher class."""
-
+import inspect
 import logging
 import weakref
 from collections import defaultdict
+from pathlib import Path
 from queue import Empty, Queue
 from threading import BoundedSemaphore, Event, Lock, Thread, current_thread
 from time import sleep
 from typing import (
-    TYPE_CHECKING,
     Callable,
     DefaultDict,
     Dict,
@@ -35,8 +35,7 @@ from typing import (
     Union,
     Generic,
     TypeVar,
-    overload,
-    cast,
+    TYPE_CHECKING,
 )
 from uuid import uuid4
 
@@ -48,11 +47,12 @@ from telegram.ext.callbackdatacache import CallbackDataCache
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.utils.warnings import warn
 from telegram.ext.utils.promise import Promise
-from telegram.ext.utils.types import CCT, UD, CD, BD
+from telegram.ext.utils.types import CCT, UD, CD, BD, BT, JQ, PT
+from .utils.stack import was_called_by
 
 if TYPE_CHECKING:
-    from telegram import Bot
-    from telegram.ext import JobQueue, Job, CallbackContext
+    from .jobqueue import Job
+    from .builders import InitDispatcherBuilder
 
 DEFAULT_GROUP: int = 0
 
@@ -90,24 +90,15 @@ class DispatcherHandlerStop(Exception):
         self.state = state
 
 
-class Dispatcher(Generic[CCT, UD, CD, BD]):
+class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
     """This class dispatches all kinds of updates to its registered handlers.
 
-    Args:
-        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
-        update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
-        job_queue (:class:`telegram.ext.JobQueue`, optional): The :class:`telegram.ext.JobQueue`
-                instance to pass onto handler callbacks.
-        workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
-            ``@run_async`` decorator and :meth:`run_async`. Defaults to 4.
-        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
-            store data that should be persistent over restarts.
-        context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
-            of :class:`telegram.ext.ContextTypes` to customize the types used in the
-            ``context`` interface. If not passed, the defaults documented in
-            :class:`telegram.ext.ContextTypes` will be used.
+    Note:
+         This class may not be initialized directly. Use :class:`telegram.ext.DispatcherBuilder` or
+         :meth:`builder` (for convenience).
 
-            .. versionadded:: 13.6
+    .. versionchanged:: 14.0
+        Initialization is now done through the :class:`telegram.ext.DispatcherBuilder`.
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -121,10 +112,29 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
-        context_types (:class:`telegram.ext.ContextTypes`): Container for the types used
-            in the ``context`` interface.
+        exception_event (:class:`threading.Event`): When this event is set, the dispatcher will
+            stop processing updates. If this dispatcher is used together with an
+            :class:`telegram.ext.Updater`, then this event will be the same object as
+            :attr:`telegram.ext.Updater.exception_event`.
+        handlers (Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]): A dictionary mapping each
+            handler group to the list of handlers registered to that group.
 
-            .. versionadded:: 13.6
+            .. seealso::
+                :meth:`add_handler`
+        groups (List[:obj:`int`]): A list of all handler groups that have handlers registered.
+
+            .. seealso::
+                :meth:`add_handler`
+        error_handlers (Dict[:obj:`callable`, :obj:`bool`]): A dict, where the keys are error
+            handlers and the values indicate whether they are to be run asynchronously via
+            :meth:`run_async`.
+
+            .. seealso::
+                :meth:`add_error_handler`
+        running (:obj:`bool`): Indicates if this dispatcher is running.
+
+            .. seealso::
+                :meth:`start`, :meth:`stop`
 
     """
 
@@ -143,7 +153,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         'error_handlers',
         'running',
         '__stop_event',
-        '__exception_event',
+        'exception_event',
         '__async_queue',
         '__async_threads',
         'bot',
@@ -156,51 +166,37 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
     __singleton = None
     logger = logging.getLogger(__name__)
 
-    @overload
     def __init__(
-        self: 'Dispatcher[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict]',
-        bot: 'Bot',
+        self: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]',
+        *,
+        bot: BT,
         update_queue: Queue,
-        workers: int = 4,
-        exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
-        persistence: BasePersistence = None,
+        job_queue: JQ,
+        workers: int,
+        persistence: PT,
+        context_types: ContextTypes[CCT, UD, CD, BD],
+        exception_event: Event,
+        stack_level: int = 4,
     ):
-        ...
+        if not was_called_by(
+            inspect.currentframe(), Path(__file__).parent.resolve() / 'builders.py'
+        ):
+            warn(
+                '`Dispatcher` instances should be built via the `DispatcherBuilder`.',
+                stacklevel=2,
+            )
 
-    @overload
-    def __init__(
-        self: 'Dispatcher[CCT, UD, CD, BD]',
-        bot: 'Bot',
-        update_queue: Queue,
-        workers: int = 4,
-        exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
-        persistence: BasePersistence = None,
-        context_types: ContextTypes[CCT, UD, CD, BD] = None,
-    ):
-        ...
-
-    def __init__(
-        self,
-        bot: 'Bot',
-        update_queue: Queue,
-        workers: int = 4,
-        exception_event: Event = None,
-        job_queue: 'JobQueue' = None,
-        persistence: BasePersistence = None,
-        context_types: ContextTypes[CCT, UD, CD, BD] = None,
-    ):
         self.bot = bot
         self.update_queue = update_queue
         self.job_queue = job_queue
         self.workers = workers
-        self.context_types = cast(ContextTypes[CCT, UD, CD, BD], context_types or ContextTypes())
+        self.context_types = context_types
+        self.exception_event = exception_event
 
         if self.workers < 1:
             warn(
                 'Asynchronous callbacks can not be processed without at least one worker thread.',
-                stacklevel=2,
+                stacklevel=stack_level,
             )
 
         self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
@@ -211,8 +207,12 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         if persistence:
             if not isinstance(persistence, BasePersistence):
                 raise TypeError("persistence must be based on telegram.ext.BasePersistence")
+
             self.persistence = persistence
+            # This raises an exception if persistence.store_data.callback_data is True
+            # but self.bot is not an instance of ExtBot - so no need to check that later on
             self.persistence.set_bot(self.bot)
+
             if self.persistence.store_data.user_data:
                 self.user_data = self.persistence.get_user_data()
                 if not isinstance(self.user_data, defaultdict):
@@ -228,31 +228,26 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                         f"bot_data must be of type {self.context_types.bot_data.__name__}"
                     )
             if self.persistence.store_data.callback_data:
-                self.bot = cast(ExtBot, self.bot)
                 persistent_data = self.persistence.get_callback_data()
                 if persistent_data is not None:
                     if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
                         raise ValueError('callback_data must be a 2-tuple')
-                    self.bot.callback_data_cache = CallbackDataCache(
-                        self.bot,
-                        self.bot.callback_data_cache.maxsize,
+                    # Mypy doesn't know that persistence.set_bot (see above) already checks that
+                    # self.bot is an instance of ExtBot if callback_data should be stored ...
+                    self.bot.callback_data_cache = CallbackDataCache(  # type: ignore[attr-defined]
+                        self.bot,  # type: ignore[arg-type]
+                        self.bot.callback_data_cache.maxsize,  # type: ignore[attr-defined]
                         persistent_data=persistent_data,
                     )
         else:
             self.persistence = None
 
         self.handlers: Dict[int, List[Handler]] = {}
-        """Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]: Holds the handlers per group."""
         self.groups: List[int] = []
-        """List[:obj:`int`]: A list with all groups."""
         self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
-        """Dict[:obj:`callable`, :obj:`bool`]: A dict, where the keys are error handlers and the
-        values indicate whether they are to be run asynchronously."""
 
         self.running = False
-        """:obj:`bool`: Indicates if this dispatcher is running."""
         self.__stop_event = Event()
-        self.__exception_event = exception_event or Event()
         self.__async_queue: Queue = Queue()
         self.__async_threads: Set[Thread] = set()
 
@@ -265,9 +260,16 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             else:
                 self._set_singleton(None)
 
-    @property
-    def exception_event(self) -> Event:  # skipcq: PY-D0003
-        return self.__exception_event
+    @staticmethod
+    def builder() -> 'InitDispatcherBuilder':
+        """Convenience method. Returns a new :class:`telegram.ext.DispatcherBuilder`.
+
+        .. versionadded:: 14.0
+        """
+        # Unfortunately this needs to be here due to cyclical imports
+        from telegram.ext import DispatcherBuilder  # pylint: disable=import-outside-toplevel
+
+        return DispatcherBuilder()
 
     def _init_async_threads(self, base_name: str, workers: int) -> None:
         base_name = f'{base_name}_' if base_name else ''
@@ -368,7 +370,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
     def start(self, ready: Event = None) -> None:
         """Thread target of thread 'dispatcher'.
 
-        Runs in background and processes the update queue.
+        Runs in background and processes the update queue. Also starts :attr:`job_queue`, if set.
 
         Args:
             ready (:obj:`threading.Event`, optional): If specified, the event will be set once the
@@ -381,11 +383,13 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 ready.set()
             return
 
-        if self.__exception_event.is_set():
+        if self.exception_event.is_set():
             msg = 'reusing dispatcher after exception event is forbidden'
             self.logger.error(msg)
             raise TelegramError(msg)
 
+        if self.job_queue:
+            self.job_queue.start()
         self._init_async_threads(str(uuid4()), self.workers)
         self.running = True
         self.logger.debug('Dispatcher started')
@@ -401,7 +405,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 if self.__stop_event.is_set():
                     self.logger.debug('orderly stopping')
                     break
-                if self.__exception_event.is_set():
+                if self.exception_event.is_set():
                     self.logger.critical('stopping due to exception in another thread')
                     break
                 continue
@@ -414,7 +418,10 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         self.logger.debug('Dispatcher thread stopped')
 
     def stop(self) -> None:
-        """Stops the thread."""
+        """Stops the thread and :attr:`job_queue`, if set.
+        Also calls :meth:`update_persistence` and :meth:`BasePersistence.flush` on
+        :attr:`persistence`, if set.
+        """
         if self.running:
             self.__stop_event.set()
             while self.running:
@@ -435,6 +442,17 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             thr.join()
             self.__async_threads.remove(thr)
             self.logger.debug('async thread %s/%s has ended', i + 1, total)
+
+        if self.job_queue:
+            self.job_queue.stop()
+            self.logger.debug('JobQueue was shut down.')
+
+        self.update_persistence()
+        if self.persistence:
+            self.persistence.flush()
+
+        # Clear the connection pool
+        self.bot.request.stop()
 
     @property
     def has_running_threads(self) -> bool:  # skipcq: PY-D0003
@@ -602,10 +620,11 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                     user_ids = []
 
             if self.persistence.store_data.callback_data:
-                self.bot = cast(ExtBot, self.bot)
                 try:
+                    # Mypy doesn't know that persistence.set_bot (see above) already checks that
+                    # self.bot is an instance of ExtBot if callback_data should be stored ...
                     self.persistence.update_callback_data(
-                        self.bot.callback_data_cache.persistence_data
+                        self.bot.callback_data_cache.persistence_data  # type: ignore[attr-defined]
                     )
                 except Exception as exc:
                     self.dispatch_error(update, exc)
@@ -641,11 +660,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
-                called when an error is raised.
-            Callback signature:
-
-
-            ``def callback(update: Update, context: CallbackContext)``
+                called when an error is raised. Callback signature:
+                ``def callback(update: Update, context: CallbackContext)``
 
                 The error that happened will be present in context.error.
             run_async (:obj:`bool`, optional): Whether this handlers callback should be run
