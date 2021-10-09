@@ -658,7 +658,7 @@ class Updater(Generic[BT, DT]):
                 self.user_signal_handler(signum, frame)
         else:
             self.logger.warning('Exiting immediately!')
-            # pylint: disable=C0415,W0212
+            # pylint: disable=import-outside-toplevel, protected-access
             import os
 
             os._exit(1)

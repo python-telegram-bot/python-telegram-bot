@@ -88,7 +88,7 @@ class InlineQueryResultAudio(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         audio_url: str,
         title: str,
         performer: str = None,

@@ -88,7 +88,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         video_file_id: str,
         title: str,
         description: str = None,

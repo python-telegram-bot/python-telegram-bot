@@ -1941,6 +1941,7 @@ class TestFilters:
         assert not Filters.update.channel_post(update)
         assert not Filters.update.edited_channel_post(update)
         assert not Filters.update.channel_posts(update)
+        assert not Filters.update.edited(update)
         assert Filters.update(update)
 
     def test_update_type_edited_message(self, update):
@@ -1951,6 +1952,7 @@ class TestFilters:
         assert not Filters.update.channel_post(update)
         assert not Filters.update.edited_channel_post(update)
         assert not Filters.update.channel_posts(update)
+        assert Filters.update.edited(update)
         assert Filters.update(update)
 
     def test_update_type_channel_post(self, update):
@@ -1961,6 +1963,7 @@ class TestFilters:
         assert Filters.update.channel_post(update)
         assert not Filters.update.edited_channel_post(update)
         assert Filters.update.channel_posts(update)
+        assert not Filters.update.edited(update)
         assert Filters.update(update)
 
     def test_update_type_edited_channel_post(self, update):
@@ -1971,6 +1974,7 @@ class TestFilters:
         assert not Filters.update.channel_post(update)
         assert Filters.update.edited_channel_post(update)
         assert Filters.update.channel_posts(update)
+        assert Filters.update.edited(update)
         assert Filters.update(update)
 
     def test_merged_short_circuit_and(self, update, base_class):

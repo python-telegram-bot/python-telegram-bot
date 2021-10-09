@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=W0622
+# pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram InlineQueryResult."""
 
 from typing import Any
@@ -51,7 +51,7 @@ class InlineQueryResult(TelegramObject):
     def __init__(self, type: str, id: str, **_kwargs: Any):
         # Required
         self.type = str(type)
-        self.id = str(id)  # pylint: disable=C0103
+        self.id = str(id)  # pylint: disable=invalid-name
 
         self._id_attrs = (self.id,)
 
@@ -59,7 +59,7 @@ class InlineQueryResult(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        # pylint: disable=E1101
+        # pylint: disable=no-member
         if (
             hasattr(self, 'caption_entities')
             and self.caption_entities  # type: ignore[attr-defined]

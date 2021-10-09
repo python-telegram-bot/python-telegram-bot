@@ -96,7 +96,7 @@ class InlineQueryResultLocation(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         latitude: float,
         longitude: float,
         title: str,
