@@ -94,7 +94,7 @@ class InlineQuery(TelegramObject):
         self.location = location
         self.chat_type = chat_type
 
-        self._bot = bot
+        self.set_bot(bot)
         self._id_attrs = (self.id,)
 
     @classmethod

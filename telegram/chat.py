@@ -230,7 +230,7 @@ class Chat(TelegramObject):
         self.linked_chat_id = linked_chat_id
         self.location = location
 
-        self._bot = bot
+        self.set_bot(bot)
         self._id_attrs = (self.id,)
 
     @property

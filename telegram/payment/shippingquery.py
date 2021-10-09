@@ -70,7 +70,7 @@ class ShippingQuery(TelegramObject):
         self.invoice_payload = invoice_payload
         self.shipping_address = shipping_address
 
-        self._bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 

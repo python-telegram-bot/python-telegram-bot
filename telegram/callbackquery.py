@@ -124,7 +124,7 @@ class CallbackQuery(TelegramObject):
         self.inline_message_id = inline_message_id
         self.game_short_name = game_short_name
 
-        self._bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 

@@ -89,7 +89,7 @@ class VideoNote(TelegramObject):
         # Optionals
         self.thumb = thumb
         self.file_size = file_size
-        self._bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.file_unique_id,)
 

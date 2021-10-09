@@ -132,7 +132,7 @@ class User(TelegramObject):
         self.can_join_groups = can_join_groups
         self.can_read_all_group_messages = can_read_all_group_messages
         self.supports_inline_queries = supports_inline_queries
-        self._bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 

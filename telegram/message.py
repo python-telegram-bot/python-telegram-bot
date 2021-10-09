@@ -546,7 +546,7 @@ class Message(TelegramObject):
         self.voice_chat_ended = voice_chat_ended
         self.voice_chat_participants_invited = voice_chat_participants_invited
         self.reply_markup = reply_markup
-        self._bot = bot
+        self.set_bot(bot)
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -717,8 +717,6 @@ class Message(TelegramObject):
         else:
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
             # logic into ExtBot
-            #  if statement type ignore[..attr-]
-            #  not working over multiple lines - mypy0.910,python3.9.7
             if hasattr(self.get_bot(), 'defaults') and self.get_bot().defaults:  # type: ignore
                 default_quote = (
                     self.get_bot().defaults.quote  # type: ignore[union-attr, attr-defined]

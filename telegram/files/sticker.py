@@ -113,7 +113,7 @@ class Sticker(TelegramObject):
         self.file_size = file_size
         self.set_name = set_name
         self.mask_position = mask_position
-        self._bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.file_unique_id,)
 

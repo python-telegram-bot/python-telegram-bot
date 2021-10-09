@@ -82,7 +82,7 @@ class PassportFile(TelegramObject):
         self.file_size = file_size
         self.file_date = file_date
         # Optionals
-        self._bot = bot
+        self.set_bot(bot)
         self._credentials = credentials
 
         self._id_attrs = (self.file_unique_id,)

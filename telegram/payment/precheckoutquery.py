@@ -97,7 +97,7 @@ class PreCheckoutQuery(TelegramObject):
         self.shipping_option_id = shipping_option_id
         self.order_info = order_info
 
-        self._bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 

@@ -328,10 +328,10 @@ class TestVideo:
             return kwargs['file_id'] == video.file_id
 
         assert check_shortcut_signature(Video.get_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(video.get_file, video._bot, 'get_file')
-        assert check_defaults_handling(video.get_file, video._bot)
+        assert check_shortcut_call(video.get_file, video.get_bot(), 'get_file')
+        assert check_defaults_handling(video.get_file, video.get_bot())
 
-        monkeypatch.setattr(video._bot, 'get_file', make_assertion)
+        monkeypatch.setattr(video.get_bot(), 'get_file', make_assertion)
         assert video.get_file()
 
     def test_equality(self, video):

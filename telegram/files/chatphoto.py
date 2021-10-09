@@ -86,7 +86,7 @@ class ChatPhoto(TelegramObject):
         self.big_file_id = big_file_id
         self.big_file_unique_id = big_file_unique_id
 
-        self._bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (
             self.small_file_unique_id,

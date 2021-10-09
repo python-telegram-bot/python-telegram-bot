@@ -89,7 +89,7 @@ class File(TelegramObject):
         # Optionals
         self.file_size = file_size
         self.file_path = file_path
-        self._bot = bot
+        self.set_bot(bot)
         self._credentials: Optional['FileCredentials'] = None
 
         self._id_attrs = (self.file_unique_id,)

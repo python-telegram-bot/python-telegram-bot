@@ -115,5 +115,4 @@ The following wonderful people contributed directly or indirectly to this projec
 - `zeshuaro <https://github.com/zeshuaro>`_
 - `zpavloudis <https://github.com/zpavloudis>`_
 
-
 Please add yourself here alphabetically when you submit your first pull request.

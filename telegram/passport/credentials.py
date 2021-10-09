@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2021
@@ -149,7 +149,7 @@ class EncryptedCredentials(TelegramObject):
 
         self._id_attrs = (self.data, self.hash, self.secret)
 
-        self._bot = bot
+        self.set_bot(bot)
         self._decrypted_secret = None
         self._decrypted_data: Optional['Credentials'] = None
 

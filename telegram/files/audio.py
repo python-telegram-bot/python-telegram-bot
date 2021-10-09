@@ -106,7 +106,7 @@ class Audio(TelegramObject):
         self.mime_type = mime_type
         self.file_size = file_size
         self.thumb = thumb
-        self._bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.file_unique_id,)
 

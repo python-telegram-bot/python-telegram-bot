@@ -103,7 +103,7 @@ class Video(TelegramObject):
         self.file_name = file_name
         self.mime_type = mime_type
         self.file_size = file_size
-        self._bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.file_unique_id,)
 

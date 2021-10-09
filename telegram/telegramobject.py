@@ -55,7 +55,7 @@ class TelegramObject:
         # w/o calling __init__ in all of the subclasses. This is what we also do in BaseFilter.
         instance = super().__new__(cls)
         instance._id_attrs = ()
-        instance._bot = None  # test_slow_behaviour fails without this extra argument here.
+        instance._bot = None
         return instance
 
     def __str__(self) -> str:
@@ -143,13 +143,14 @@ class TelegramObject:
         return data
 
     def get_bot(self) -> 'Bot':
-        """Returns the bot object if it has been set for a TelegramObject (User, Chat, Bot etc).
+        """Returns the :class:`telegram.Bot` instance associated with this object.
+
+        .. seealso:: :meth: `set_bot`
+
+        .. versionadded: 14.0
 
         Raises:
-            A RuntimeError in the rare edge cases where users manually instantiated a
-            TelegramObject and forgot to pass the bot.
-        Returns:
-           The Bot object.
+            RuntimeError: If no :class:`telegram.Bot` instance was set for this object.
         """
         if self._bot is None:
             raise RuntimeError(
@@ -159,7 +160,15 @@ class TelegramObject:
         return self._bot
 
     def set_bot(self, bot: 'Bot') -> None:
-        """Set bot on a TelegramObject."""
+        """Sets the :class:`telegram.Bot` instance associated with this object.
+
+        .. seealso:: :meth: `get_bot`
+
+        .. versionadded: 14.0
+
+        Arguments:
+            bot (:class:`telegram.Bot`): The bot instance.
+        """
         self._bot = bot
 
     def __eq__(self, other: object) -> bool:
