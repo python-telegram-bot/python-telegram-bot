@@ -198,8 +198,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """Returns the user_data from the pickle file if it exists or an empty :obj:`defaultdict`.
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`dict` | :class:`ContextTypes.user_data`]: \
-            The restored user data.
+            DefaultDict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`]:
+                The restored user data.
         """
         if self.user_data:
             pass
@@ -218,8 +218,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """Returns the chat_data from the pickle file if it exists or an empty :obj:`defaultdict`.
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`dict` | :class:`ContextTypes.chat_data`]: \
-            The restored chat data.
+            DefaultDict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`]:
+                The restored chat data.
         """
         if self.chat_data:
             pass
@@ -236,10 +236,10 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     def get_bot_data(self) -> BD:
         """Returns the bot_data from the pickle file if it exists or an empty object of type
-        :obj:`dict` | :class:`ContextTypes.bot_data`.
+        :obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`.
 
         Returns:
-            :obj:`dict` | :class:`ContextTypes.bot_data`: The restored bot data.
+            :obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`: The restored bot data.
         """
         if self.bot_data:
             pass
@@ -259,8 +259,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-            Dict[:obj:`str`, :obj:`any`]]], Dict[:obj:`str`, :obj:`str`]]: \
-            The restored meta data or :obj:`None`, if no data was stored.
+                Dict[:obj:`str`, :obj:`any`]]], Dict[:obj:`str`, :obj:`str`]]:
+                The restored meta data or :obj:`None`, if no data was stored.
         """
         if self.callback_data:
             pass
@@ -322,7 +322,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict` | :class:`ContextTypes.user_data`): The
+            data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`): The
                 :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
         if self.user_data is None:
@@ -341,7 +341,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict` | :class:`ContextTypes.chat_data`): The
+            data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`): The
                 :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
         if self.chat_data is None:
@@ -359,7 +359,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """Will update the bot_data and depending on :attr:`on_flush` save the pickle file.
 
         Args:
-            data (:obj:`dict` | :class:`ContextTypes.bot_data`): The
+            data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`): The
                 :attr:`telegram.ext.Dispatcher.bot_data`.
         """
         if self.bot_data == data:
@@ -379,8 +379,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Args:
             data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-            Dict[:obj:`str`, :obj:`any`]]], Dict[:obj:`str`, :obj:`str`]]): \
-            The relevant data to restore :class:`telegram.ext.CallbackDataCache`.
+                Dict[:obj:`str`, :obj:`any`]]], Dict[:obj:`str`, :obj:`str`]]):
+                The relevant data to restore :class:`telegram.ext.CallbackDataCache`.
         """
         if self.callback_data == data:
             return

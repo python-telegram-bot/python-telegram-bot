@@ -165,8 +165,8 @@ class CallbackDataCache:
 
     @property
     def persistence_data(self) -> CDCData:
-        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
-        Dict[:obj:`str`, :obj:`str`]]: The data that needs to be persisted to allow \
+        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]],
+        Dict[:obj:`str`, :obj:`str`]]: The data that needs to be persisted to allow
         caching callback data across bot reboots.
         """
         # While building a list/dict from the LRUCaches has linear runtime (in the number of

@@ -271,8 +271,8 @@ class DictPersistence(BasePersistence):
 
         Returns:
             Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
-            Dict[:obj:`str`, :obj:`str`]]: The restored meta data or :obj:`None`, \
-            if no data was stored.
+                Dict[:obj:`str`, :obj:`str`]]: The restored meta data or :obj:`None`, \
+                if no data was stored.
         """
         if self.callback_data is None:
             self._callback_data = None
@@ -353,8 +353,8 @@ class DictPersistence(BasePersistence):
 
         Args:
             data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
-            Dict[:obj:`str`, :obj:`str`]]): The relevant data to restore \
-            :class:`telegram.ext.CallbackDataCache`.
+                Dict[:obj:`str`, :obj:`str`]]): The relevant data to restore
+                :class:`telegram.ext.CallbackDataCache`.
         """
         if self._callback_data == data:
             return
