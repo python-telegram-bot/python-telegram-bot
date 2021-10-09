@@ -15,13 +15,14 @@ from typing import DefaultDict, Optional, Set
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import (
-    Updater,
     CommandHandler,
     CallbackContext,
     ContextTypes,
     CallbackQueryHandler,
     TypeHandler,
     Dispatcher,
+    ExtBot,
+    Updater,
 )
 
 
@@ -32,8 +33,8 @@ class ChatData:
         self.clicks_per_message: DefaultDict[int, int] = defaultdict(int)
 
 
-# The [dict, ChatData, dict] is for type checkers like mypy
-class CustomContext(CallbackContext[dict, ChatData, dict]):
+# The [ExtBot, dict, ChatData, dict] is for type checkers like mypy
+class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
     """Custom class for context."""
 
     def __init__(self, dispatcher: Dispatcher):
@@ -113,7 +114,7 @@ def track_users(update: Update, context: CustomContext) -> None:
 def main() -> None:
     """Run the bot."""
     context_types = ContextTypes(context=CustomContext, chat_data=ChatData)
-    updater = Updater("TOKEN", context_types=context_types)
+    updater = Updater.builder().token("TOKEN").context_types(context_types).build()
 
     dispatcher = updater.dispatcher
     # run track_users in its own group to not interfere with the user handlers

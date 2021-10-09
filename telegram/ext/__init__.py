@@ -46,6 +46,7 @@ from .pollhandler import PollHandler
 from .chatmemberhandler import ChatMemberHandler
 from .defaults import Defaults
 from .callbackdatacache import CallbackDataCache, InvalidCallbackData
+from .builders import DispatcherBuilder, UpdaterBuilder
 
 __all__ = (
     'BaseFilter',
@@ -61,6 +62,7 @@ __all__ = (
     'Defaults',
     'DictPersistence',
     'Dispatcher',
+    'DispatcherBuilder',
     'DispatcherHandlerStop',
     'ExtBot',
     'Filters',
@@ -83,4 +85,5 @@ __all__ = (
     'TypeHandler',
     'UpdateFilter',
     'Updater',
+    'UpdaterBuilder',
 )

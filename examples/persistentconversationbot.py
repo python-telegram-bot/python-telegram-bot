@@ -19,20 +19,20 @@ from typing import Dict
 
 from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
 from telegram.ext import (
-    Updater,
     CommandHandler,
     MessageHandler,
     Filters,
     ConversationHandler,
     PicklePersistence,
+    Updater,
     CallbackContext,
 )
+
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 CHOOSING, TYPING_REPLY, TYPING_CHOICE = range(3)
@@ -51,7 +51,7 @@ def facts_to_str(user_data: Dict[str, str]) -> str:
     return "\n".join(facts).join(['\n', '\n'])
 
 
-def start(update: Update, context: CallbackContext) -> int:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Start the conversation, display any stored data and ask user for input."""
     reply_text = "Hi! My name is Doctor Botter."
     if context.user_data:
@@ -69,7 +69,7 @@ def start(update: Update, context: CallbackContext) -> int:
     return CHOOSING
 
 
-def regular_choice(update: Update, context: CallbackContext) -> int:
+def regular_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Ask the user for info about the selected predefined choice."""
     text = update.message.text.lower()
     context.user_data['choice'] = text
@@ -84,7 +84,7 @@ def regular_choice(update: Update, context: CallbackContext) -> int:
     return TYPING_REPLY
 
 
-def custom_choice(update: Update, context: CallbackContext) -> int:
+def custom_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Ask the user for a description of a custom category."""
     update.message.reply_text(
         'Alright, please send me the category first, for example "Most impressive skill"'
@@ -93,7 +93,7 @@ def custom_choice(update: Update, context: CallbackContext) -> int:
     return TYPING_CHOICE
 
 
-def received_information(update: Update, context: CallbackContext) -> int:
+def received_information(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Store info provided by user and ask for the next category."""
     text = update.message.text
     category = context.user_data['choice']
@@ -110,14 +110,14 @@ def received_information(update: Update, context: CallbackContext) -> int:
     return CHOOSING
 
 
-def show_data(update: Update, context: CallbackContext) -> None:
+def show_data(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Display the gathered info."""
     update.message.reply_text(
         f"This is what you already told me: {facts_to_str(context.user_data)}"
     )
 
 
-def done(update: Update, context: CallbackContext) -> int:
+def done(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Display the gathered info and end the conversation."""
     if 'choice' in context.user_data:
         del context.user_data['choice']
@@ -133,7 +133,7 @@ def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
     persistence = PicklePersistence(filepath='conversationbot')
-    updater = Updater("TOKEN", persistence=persistence)
+    updater = Updater.builder().token("TOKEN").persistence(persistence).build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

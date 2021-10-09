@@ -18,19 +18,25 @@ bot.
 import logging
 
 from telegram import Update, ForceReply
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import (
+    CommandHandler,
+    MessageHandler,
+    Filters,
+    Updater,
+    CallbackContext,
+)
+
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     update.message.reply_markdown_v2(
@@ -39,12 +45,12 @@ def start(update: Update, context: CallbackContext) -> None:
     )
 
 
-def help_command(update: Update, context: CallbackContext) -> None:
+def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text('Help!')
 
 
-def echo(update: Update, context: CallbackContext) -> None:
+def echo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     update.message.reply_text(update.message.text)
 
@@ -52,7 +58,7 @@ def echo(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
