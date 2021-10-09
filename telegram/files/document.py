@@ -34,9 +34,6 @@ class Document(_BaseThumbedMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    .. versionchanged:: 14.0:
-        * Inherits _BaseThumbedMedium
-
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -75,6 +72,13 @@ class Document(_BaseThumbedMedium):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
-        super().__init__(file_id, file_unique_id, file_size, thumb, bot)
+        super().__init__(
+            file_id=file_id,
+            file_unique_id=file_unique_id,
+            file_size=file_size,
+            thumb=thumb,
+            bot=bot,
+        )
+        # Optional
         self.mime_type = mime_type
         self.file_name = file_name

@@ -120,8 +120,7 @@ class TelegramObject:
         # attributes used by that class itself, and not its superclass(es). Hence we get its MRO
         # and then get their attributes. The `[:-2]` slice excludes the `object` class & the
         # TelegramObject class itself.
-        classes = [c for c in self.__class__.__mro__[:-2] if not c.__name__.endswith('Mixin')]
-        attrs = {attr for cls in classes for attr in getattr(cls, '__slots__')}
+        attrs = {attr for cls in self.__class__.__mro__[:-2] for attr in cls.__slots__}
         for key in attrs:
             if key == 'bot' or key.startswith('_'):
                 continue

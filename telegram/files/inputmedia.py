@@ -30,11 +30,9 @@ from telegram import (
     Video,
     MessageEntity,
 )
-
 from telegram.utils.defaultvalue import DEFAULT_NONE
 from telegram.utils.files import parse_file_input
 from telegram.utils.types import FileInput, JSONDict, ODVInput
-
 
 MediaType = Union[Animation, Audio, Document, PhotoSize, Video]
 
@@ -44,9 +42,8 @@ class InputMedia(TelegramObject):
     Base class for Telegram InputMedia Objects.
 
     .. versionchanged:: 14.0:
-        * Added :meth:`__init__` responsible for initializing attributes common to all deriving
-            classes.
-        * Added static :meth:`_get_thumb_object`.
+        Added arguments and attributes :attr:`media_type`, :attr:`media`, :attr:`caption`,
+            :attr:`caption_entities`, :attr:`parse_mode`.
 
     Args:
         media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
@@ -102,7 +99,7 @@ class InputMedia(TelegramObject):
         return data
 
     @staticmethod
-    def _get_thumb_object(thumb: Optional[FileInput]) -> Optional[Union[str, InputFile]]:
+    def _parse_thumb_input(thumb: Optional[FileInput]) -> Optional[Union[str, InputFile]]:
         return parse_file_input(thumb, attach=True) if thumb is not None else thumb
 
 
@@ -185,7 +182,7 @@ class InputMediaAnimation(InputMedia):
             media = parse_file_input(media, attach=True, filename=filename)
 
         super().__init__('animation', media, caption, caption_entities, parse_mode)
-        self.thumb = InputMedia._get_thumb_object(thumb)
+        self.thumb = self._parse_thumb_input(thumb)
         self.width = width
         self.height = height
         self.duration = duration
@@ -331,8 +328,8 @@ class InputMediaVideo(InputMedia):
         self.width = width
         self.height = height
         self.duration = duration
-        self.thumb = InputMedia._get_thumb_object(thumb)
-        self.supports_streaming = False if supports_streaming is None else supports_streaming
+        self.thumb = self._parse_thumb_input(thumb)
+        self.supports_streaming = supports_streaming
 
 
 class InputMediaAudio(InputMedia):
@@ -416,9 +413,8 @@ class InputMediaAudio(InputMedia):
         else:
             media = parse_file_input(media, attach=True, filename=filename)
 
-        cap_ent = caption_entities
-        super().__init__('audio', media, caption, cap_ent, parse_mode)
-        self.thumb = InputMedia._get_thumb_object(thumb)
+        super().__init__('audio', media, caption, caption_entities, parse_mode)
+        self.thumb = self._parse_thumb_input(thumb)
         self.duration = duration
         self.title = title
         self.performer = performer
@@ -489,5 +485,5 @@ class InputMediaDocument(InputMedia):
     ):
         media = parse_file_input(media, Document, attach=True, filename=filename)
         super().__init__('document', media, caption, caption_entities, parse_mode)
-        self.thumb = InputMedia._get_thumb_object(thumb)
+        self.thumb = self._parse_thumb_input(thumb)
         self.disable_content_type_detection = disable_content_type_detection

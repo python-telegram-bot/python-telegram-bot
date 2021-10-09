@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects"""
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, TypeVar, Type, Optional
+from typing import TYPE_CHECKING, TypeVar
 
 from telegram import TelegramObject
 from telegram.utils.defaultvalue import DEFAULT_NONE
@@ -35,8 +35,6 @@ class _BaseMedium(TelegramObject):
     """Base class for objects representing the various media file types.
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
-
-    .. versionadded:: 14.0
 
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -68,7 +66,6 @@ class _BaseMedium(TelegramObject):
         file_unique_id: str,
         file_size: int = None,
         bot: Bot = None,
-        **_kwargs: Any,
     ):
         # Required
         self.file_id: str = str(file_id)
@@ -78,16 +75,6 @@ class _BaseMedium(TelegramObject):
         self.bot = bot
 
         self._id_attrs = (self.file_unique_id,)
-
-    @classmethod
-    def de_json(cls: Type[MT], data: Optional[JSONDict], bot: Bot) -> Optional[MT]:
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        return cls(bot=bot, **data)
 
     def get_file(
         self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
