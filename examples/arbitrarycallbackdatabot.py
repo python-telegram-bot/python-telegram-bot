@@ -11,27 +11,29 @@ from typing import List, Tuple, cast
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     CallbackQueryHandler,
-    CallbackContext,
     InvalidCallbackData,
     PicklePersistence,
+    Updater,
+    CallbackContext,
 )
 
+
+# Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
 
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends a message with 5 inline buttons attached."""
     number_list: List[int] = []
     update.message.reply_text('Please choose:', reply_markup=build_keyboard(number_list))
 
 
-def help_command(update: Update, context: CallbackContext) -> None:
+def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Displays info on how to use the bot."""
     update.message.reply_text(
         "Use /start to test this bot. Use /clear to clear the stored data so that you can see "
@@ -39,10 +41,10 @@ def help_command(update: Update, context: CallbackContext) -> None:
     )
 
 
-def clear(update: Update, context: CallbackContext) -> None:
+def clear(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Clears the callback data cache"""
-    context.bot.callback_data_cache.clear_callback_data()  # type: ignore[attr-defined]
-    context.bot.callback_data_cache.clear_callback_queries()  # type: ignore[attr-defined]
+    context.bot.callback_data_cache.clear_callback_data()
+    context.bot.callback_data_cache.clear_callback_queries()
     update.effective_message.reply_text('All clear!')
 
 
@@ -53,7 +55,7 @@ def build_keyboard(current_list: List[int]) -> InlineKeyboardMarkup:
     )
 
 
-def list_button(update: Update, context: CallbackContext) -> None:
+def list_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
     query.answer()
@@ -73,7 +75,7 @@ def list_button(update: Update, context: CallbackContext) -> None:
     context.drop_callback_data(query)
 
 
-def handle_invalid_button(update: Update, context: CallbackContext) -> None:
+def handle_invalid_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Informs the user that the button is no longer available."""
     update.callback_query.answer()
     update.effective_message.edit_text(
@@ -86,7 +88,13 @@ def main() -> None:
     # We use persistence to demonstrate how buttons can still work after the bot was restarted
     persistence = PicklePersistence(filepath='arbitrarycallbackdatabot')
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN", persistence=persistence, arbitrary_callback_data=True)
+    updater = (
+        Updater.builder()
+        .token("TOKEN")
+        .persistence(persistence)
+        .arbitrary_callback_data(True)
+        .build()
+    )
 
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CommandHandler('help', help_command))
