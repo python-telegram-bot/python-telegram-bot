@@ -16,9 +16,20 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=missing-module-docstring
+import inspect
+from pathlib import Path
 
-from telegram import constants
+from telegram.ext.utils.stack import was_called_by
 
-__version__ = '13.7'
-bot_api_version = constants.BOT_API_VERSION  # pylint: disable=invalid-name
+
+class TestStack:
+    def test_none_input(self):
+        assert not was_called_by(None, None)
+
+    def test_called_by_current_file(self):
+        frame = inspect.currentframe()
+        file = Path(__file__)
+        assert was_called_by(frame, file)
+
+    # Testing a call by a different file is somewhat hard but it's covered in
+    # TestUpdater/Dispatcher.test_manual_init_warning

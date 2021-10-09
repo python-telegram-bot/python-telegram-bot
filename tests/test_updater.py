@@ -48,14 +48,12 @@ from telegram import (
 )
 from telegram.error import Unauthorized, InvalidToken, TimedOut, RetryAfter, TelegramError
 from telegram.ext import (
-    Updater,
-    Dispatcher,
-    DictPersistence,
-    Defaults,
     InvalidCallbackData,
     ExtBot,
+    Updater,
+    UpdaterBuilder,
+    DispatcherBuilder,
 )
-from telegram.warnings import PTBDeprecationWarning
 from telegram.ext.utils.webhookhandler import WebhookServer
 
 signalskip = pytest.mark.skipif(
@@ -90,12 +88,6 @@ class TestUpdater:
     offset = 0
     test_flag = False
 
-    def test_slot_behaviour(self, updater, mro_slots):
-        for at in updater.__slots__:
-            at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
-            assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
-
     @pytest.fixture(autouse=True)
     def reset(self):
         self.message_count = 0
@@ -113,18 +105,49 @@ class TestUpdater:
         self.received = update.message.text
         self.cb_handler_called.set()
 
-    def test_warn_arbitrary_callback_data(self, bot, recwarn):
-        Updater(bot=bot, arbitrary_callback_data=True)
+    def test_slot_behaviour(self, updater, mro_slots):
+        for at in updater.__slots__:
+            at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
+
+    def test_manual_init_warning(self, recwarn):
+        Updater(
+            bot=None,
+            dispatcher=None,
+            update_queue=None,
+            exception_event=None,
+            user_signal_handler=None,
+        )
         assert len(recwarn) == 1
-        assert 'Passing arbitrary_callback_data to an Updater' in str(recwarn[0].message)
+        assert (
+            str(recwarn[-1].message)
+            == '`Updater` instances should be built via the `UpdaterBuilder`.'
+        )
+        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
+
+    def test_builder(self, updater):
+        builder_1 = updater.builder()
+        builder_2 = updater.builder()
+        assert isinstance(builder_1, UpdaterBuilder)
+        assert isinstance(builder_2, UpdaterBuilder)
+        assert builder_1 is not builder_2
+
+        # Make sure that setting a token doesn't raise an exception
+        # i.e. check that the builders are "empty"/new
+        builder_1.token(updater.bot.token)
+        builder_2.token(updater.bot.token)
 
     def test_warn_con_pool(self, bot, recwarn, dp):
-        dp = Dispatcher(bot, Queue(), workers=5)
-        Updater(bot=bot, workers=8)
-        Updater(dispatcher=dp, workers=None)
+        DispatcherBuilder().bot(bot).workers(5).build()
+        UpdaterBuilder().bot(bot).workers(8).build()
+        UpdaterBuilder().bot(bot).workers(2).build()
         assert len(recwarn) == 2
-        for idx, value in enumerate((12, 9)):
-            warning = f'Connection pool of Request object is smaller than optimal value {value}'
+        for idx, value in enumerate((9, 12)):
+            warning = (
+                'The Connection pool of Request object is smaller (8) than the '
+                f'recommended value of {value}.'
+            )
             assert str(recwarn[idx].message) == warning
             assert recwarn[idx].filename == __file__, "wrong stacklevel!"
 
@@ -305,9 +328,21 @@ class TestUpdater:
             updater.bot.callback_data_cache.clear_callback_data()
             updater.bot.callback_data_cache.clear_callback_queries()
 
-    def test_start_webhook_no_warning_or_error_logs(self, caplog, updater, monkeypatch):
+    @pytest.mark.parametrize('use_dispatcher', (True, False))
+    def test_start_webhook_no_warning_or_error_logs(
+        self, caplog, updater, monkeypatch, use_dispatcher
+    ):
+        if not use_dispatcher:
+            updater.dispatcher = None
+
+        self.test_flag = 0
+
+        def set_flag():
+            self.test_flag += 1
+
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
+        monkeypatch.setattr(updater.bot._request, 'stop', lambda *args, **kwargs: set_flag())
         # prevent api calls from @info decorator when updater.bot.id is used in thread names
         monkeypatch.setattr(updater.bot, '_bot', User(id=123, first_name='bot', is_bot=True))
 
@@ -317,6 +352,8 @@ class TestUpdater:
             updater.start_webhook(ip, port)
             updater.stop()
         assert not caplog.records
+        # Make sure that bot.request.stop() has been called exactly once
+        assert self.test_flag == 1
 
     def test_webhook_ssl(self, monkeypatch, updater):
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
@@ -606,7 +643,7 @@ class TestUpdater:
         def user_signal_inc(signum, frame):
             temp_var['a'] = 1
 
-        updater.user_sig_handler = user_signal_inc
+        updater.user_signal_handler = user_signal_inc
         updater.start_polling(0.01)
         Thread(target=partial(self.signal_sender, updater=updater)).start()
         updater.idle()
@@ -614,47 +651,3 @@ class TestUpdater:
         sleep(0.5)
         assert updater.running is False
         assert temp_var['a'] != 0
-
-    def test_create_bot(self):
-        updater = Updater('123:abcd')
-        assert updater.bot is not None
-
-    def test_mutual_exclude_token_bot(self):
-        bot = Bot('123:zyxw')
-        with pytest.raises(ValueError):
-            Updater(token='123:abcd', bot=bot)
-
-    def test_no_token_or_bot_or_dispatcher(self):
-        with pytest.raises(ValueError):
-            Updater()
-
-    def test_mutual_exclude_bot_private_key(self):
-        bot = Bot('123:zyxw')
-        with pytest.raises(ValueError):
-            Updater(bot=bot, private_key=b'key')
-
-    def test_mutual_exclude_bot_dispatcher(self, bot):
-        dispatcher = Dispatcher(bot, None)
-        bot = Bot('123:zyxw')
-        with pytest.raises(ValueError):
-            Updater(bot=bot, dispatcher=dispatcher)
-
-    def test_mutual_exclude_persistence_dispatcher(self, bot):
-        dispatcher = Dispatcher(bot, None)
-        persistence = DictPersistence()
-        with pytest.raises(ValueError):
-            Updater(dispatcher=dispatcher, persistence=persistence)
-
-    def test_mutual_exclude_workers_dispatcher(self, bot):
-        dispatcher = Dispatcher(bot, None)
-        with pytest.raises(ValueError):
-            Updater(dispatcher=dispatcher, workers=8)
-
-    def test_mutual_exclude_custom_context_dispatcher(self):
-        dispatcher = Dispatcher(None, None)
-        with pytest.raises(ValueError):
-            Updater(dispatcher=dispatcher, context_types=True)
-
-    def test_defaults_warning(self, bot):
-        with pytest.warns(PTBDeprecationWarning, match='no effect when a Bot is passed'):
-            Updater(bot=bot, defaults=Defaults())

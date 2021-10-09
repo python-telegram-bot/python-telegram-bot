@@ -33,6 +33,8 @@ from telegram.ext import (
     JobQueue,
     BasePersistence,
     ContextTypes,
+    DispatcherBuilder,
+    UpdaterBuilder,
 )
 from telegram.ext import PersistenceInput
 from telegram.ext.dispatcher import Dispatcher, DispatcherHandlerStop
@@ -57,12 +59,6 @@ class TestDispatcher:
     )
     received = None
     count = 0
-
-    def test_slot_behaviour(self, dp2, mro_slots):
-        for at in dp2.__slots__:
-            at = f"_Dispatcher{at}" if at.startswith('__') and not at.endswith('__') else at
-            assert getattr(dp2, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
 
     @pytest.fixture(autouse=True, name='reset')
     def reset_fixture(self):
@@ -103,14 +99,54 @@ class TestDispatcher:
         ):
             self.received = context.error.message
 
-    def test_less_than_one_worker_warning(self, dp, recwarn):
-        Dispatcher(dp.bot, dp.update_queue, job_queue=dp.job_queue, workers=0)
+    def test_slot_behaviour(self, dp2, mro_slots):
+        for at in dp2.__slots__:
+            at = f"_Dispatcher{at}" if at.startswith('__') and not at.endswith('__') else at
+            assert getattr(dp2, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
+
+    def test_manual_init_warning(self, recwarn):
+        Dispatcher(
+            bot=None,
+            update_queue=None,
+            workers=7,
+            exception_event=None,
+            job_queue=None,
+            persistence=None,
+            context_types=ContextTypes(),
+        )
+        assert len(recwarn) == 1
+        assert (
+            str(recwarn[-1].message)
+            == '`Dispatcher` instances should be built via the `DispatcherBuilder`.'
+        )
+        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
+
+    @pytest.mark.parametrize(
+        'builder',
+        (DispatcherBuilder(), UpdaterBuilder()),
+        ids=('DispatcherBuilder', 'UpdaterBuilder'),
+    )
+    def test_less_than_one_worker_warning(self, dp, recwarn, builder):
+        builder.bot(dp.bot).workers(0).build()
         assert len(recwarn) == 1
         assert (
             str(recwarn[0].message)
             == 'Asynchronous callbacks can not be processed without at least one worker thread.'
         )
         assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
+
+    def test_builder(self, dp):
+        builder_1 = dp.builder()
+        builder_2 = dp.builder()
+        assert isinstance(builder_1, DispatcherBuilder)
+        assert isinstance(builder_2, DispatcherBuilder)
+        assert builder_1 is not builder_2
+
+        # Make sure that setting a token doesn't raise an exception
+        # i.e. check that the builders are "empty"/new
+        builder_1.token(dp.bot.token)
+        builder_2.token(dp.bot.token)
 
     def test_one_context_per_update(self, dp):
         def one(update, context):
@@ -162,7 +198,7 @@ class TestDispatcher:
         with pytest.raises(
             TypeError, match='persistence must be based on telegram.ext.BasePersistence'
         ):
-            Dispatcher(bot, None, persistence=my_per())
+            DispatcherBuilder().bot(bot).persistence(my_per()).build()
 
     def test_error_handler_that_raises_errors(self, dp):
         """
@@ -579,7 +615,7 @@ class TestDispatcher:
             ),
         )
         my_persistence = OwnPersistence()
-        dp = Dispatcher(bot, None, persistence=my_persistence)
+        dp = DispatcherBuilder().bot(bot).persistence(my_persistence).build()
         dp.add_handler(CommandHandler('start', start1))
         dp.add_error_handler(error)
         dp.process_update(update)
@@ -884,7 +920,7 @@ class TestDispatcher:
             bot_data=complex,
         )
 
-        dispatcher = Dispatcher(bot, Queue(), context_types=cc)
+        dispatcher = DispatcherBuilder().bot(bot).context_types(cc).build()
 
         assert isinstance(dispatcher.user_data[1], int)
         assert isinstance(dispatcher.chat_data[1], float)
@@ -899,12 +935,15 @@ class TestDispatcher:
                 type(context.bot_data),
             )
 
-        dispatcher = Dispatcher(
-            bot,
-            Queue(),
-            context_types=ContextTypes(
-                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
-            ),
+        dispatcher = (
+            DispatcherBuilder()
+            .bot(bot)
+            .context_types(
+                ContextTypes(
+                    context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+                )
+            )
+            .build()
         )
         dispatcher.add_error_handler(error_handler)
         dispatcher.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
@@ -922,12 +961,15 @@ class TestDispatcher:
                 type(context.bot_data),
             )
 
-        dispatcher = Dispatcher(
-            bot,
-            Queue(),
-            context_types=ContextTypes(
-                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
-            ),
+        dispatcher = (
+            DispatcherBuilder()
+            .bot(bot)
+            .context_types(
+                ContextTypes(
+                    context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+                )
+            )
+            .build()
         )
         dispatcher.add_handler(MessageHandler(Filters.all, callback))
 

@@ -49,7 +49,8 @@ class TelegramObject:
         '_bot',
     )
 
-    def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':  # pylint: disable=W0613
+    # pylint: disable=unused-argument
+    def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':
         # We add _id_attrs in __new__ instead of __init__ since we want to add this to the slots
         # w/o calling __init__ in all of the subclasses. This is what we also do in BaseFilter.
         instance = super().__new__(cls)
