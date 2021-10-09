@@ -53,12 +53,12 @@ from telegram import (
 )
 from telegram.ext import (
     Dispatcher,
-    JobQueue,
-    Updater,
     MessageFilter,
     Defaults,
     UpdateFilter,
     ExtBot,
+    DispatcherBuilder,
+    UpdaterBuilder,
 )
 from telegram.error import BadRequest
 from telegram.utils.defaultvalue import DefaultValue, DEFAULT_NONE
@@ -173,8 +173,7 @@ def provider_token(bot_info):
 def create_dp(bot):
     # Dispatcher is heavy to init (due to many threads and such) so we have a single session
     # scoped one here, but before each test, reset it (dp fixture below)
-    dispatcher = DictDispatcher(bot, Queue(), job_queue=JobQueue(), workers=2)
-    dispatcher.job_queue.set_dispatcher(dispatcher)
+    dispatcher = DispatcherBuilder().bot(bot).workers(2).dispatcher_class(DictDispatcher).build()
     thr = Thread(target=dispatcher.start)
     thr.start()
     sleep(2)
@@ -202,7 +201,7 @@ def dp(_dp):
     _dp.handlers = {}
     _dp.groups = []
     _dp.error_handlers = {}
-    _dp.__exception_event = Event()
+    _dp.exception_event = Event()
     _dp.__stop_event = Event()
     _dp.__async_queue = Queue()
     _dp.__async_threads = set()
@@ -212,7 +211,7 @@ def dp(_dp):
 
 @pytest.fixture(scope='function')
 def updater(bot):
-    up = Updater(bot=bot, workers=2)
+    up = UpdaterBuilder().bot(bot).workers(2).build()
     yield up
     if up.running:
         up.stop()

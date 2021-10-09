@@ -21,6 +21,7 @@
 from typing import Type, Generic, overload, Dict  # pylint: disable=unused-import
 
 from telegram.ext.callbackcontext import CallbackContext
+from telegram.ext.extbot import ExtBot  # pylint: disable=unused-import
 from telegram.ext.utils.types import CCT, UD, CD, BD
 
 
@@ -54,7 +55,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[Dict, Dict, Dict], Dict, Dict, Dict]',
+        self: 'ContextTypes[CallbackContext[ExtBot, Dict, Dict, Dict], Dict, Dict, Dict]',
     ):
         ...
 
@@ -64,19 +65,22 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[UD, Dict, Dict], UD, Dict, Dict]', user_data: Type[UD]
+        self: 'ContextTypes[CallbackContext[ExtBot, UD, Dict, Dict], UD, Dict, Dict]',
+        user_data: Type[UD],
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[Dict, CD, Dict], Dict, CD, Dict]', chat_data: Type[CD]
+        self: 'ContextTypes[CallbackContext[ExtBot, Dict, CD, Dict], Dict, CD, Dict]',
+        chat_data: Type[CD],
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[Dict, Dict, BD], Dict, Dict, BD]', bot_data: Type[BD]
+        self: 'ContextTypes[CallbackContext[ExtBot, Dict, Dict, BD], Dict, Dict, BD]',
+        bot_data: Type[BD],
     ):
         ...
 
@@ -100,7 +104,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[UD, CD, Dict], UD, CD, Dict]',
+        self: 'ContextTypes[CallbackContext[ExtBot, UD, CD, Dict], UD, CD, Dict]',
         user_data: Type[UD],
         chat_data: Type[CD],
     ):
@@ -108,7 +112,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[UD, Dict, BD], UD, Dict, BD]',
+        self: 'ContextTypes[CallbackContext[ExtBot, UD, Dict, BD], UD, Dict, BD]',
         user_data: Type[UD],
         bot_data: Type[BD],
     ):
@@ -116,7 +120,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[Dict, CD, BD], Dict, CD, BD]',
+        self: 'ContextTypes[CallbackContext[ExtBot, Dict, CD, BD], Dict, CD, BD]',
         chat_data: Type[CD],
         bot_data: Type[BD],
     ):
@@ -151,7 +155,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[UD, CD, BD], UD, CD, BD]',
+        self: 'ContextTypes[CallbackContext[ExtBot, UD, CD, BD], UD, CD, BD]',
         user_data: Type[UD],
         chat_data: Type[CD],
         bot_data: Type[BD],

@@ -94,8 +94,8 @@ class ExtBot(telegram.bot.Bot):
     def __init__(
         self,
         token: str,
-        base_url: str = None,
-        base_file_url: str = None,
+        base_url: str = 'https://api.telegram.org/bot',
+        base_file_url: str = 'https://api.telegram.org/file/bot',
         request: 'Request' = None,
         private_key: bytes = None,
         private_key_password: bytes = None,

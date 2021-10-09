@@ -1166,23 +1166,23 @@ officedocument.wordprocessingml.document")``.
 
         name = 'Filters.status_update'
 
-        def filter(self, message: Update) -> bool:
+        def filter(self, update: Update) -> bool:
             return bool(
-                self.new_chat_members(message)
-                or self.left_chat_member(message)
-                or self.new_chat_title(message)
-                or self.new_chat_photo(message)
-                or self.delete_chat_photo(message)
-                or self.chat_created(message)
-                or self.message_auto_delete_timer_changed(message)
-                or self.migrate(message)
-                or self.pinned_message(message)
-                or self.connected_website(message)
-                or self.proximity_alert_triggered(message)
-                or self.voice_chat_scheduled(message)
-                or self.voice_chat_started(message)
-                or self.voice_chat_ended(message)
-                or self.voice_chat_participants_invited(message)
+                self.new_chat_members(update)
+                or self.left_chat_member(update)
+                or self.new_chat_title(update)
+                or self.new_chat_photo(update)
+                or self.delete_chat_photo(update)
+                or self.chat_created(update)
+                or self.message_auto_delete_timer_changed(update)
+                or self.migrate(update)
+                or self.pinned_message(update)
+                or self.connected_website(update)
+                or self.proximity_alert_triggered(update)
+                or self.voice_chat_scheduled(update)
+                or self.voice_chat_started(update)
+                or self.voice_chat_ended(update)
+                or self.voice_chat_participants_invited(update)
             )
 
     status_update = _StatusUpdate()

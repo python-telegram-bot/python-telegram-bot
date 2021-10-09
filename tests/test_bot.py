@@ -184,7 +184,7 @@ class TestBot:
 
     @flaky(3, 1)
     def test_invalid_token_server_response(self, monkeypatch):
-        monkeypatch.setattr('telegram.Bot._validate_token', lambda x, y: True)
+        monkeypatch.setattr('telegram.Bot._validate_token', lambda x, y: '')
         bot = Bot('12')
         with pytest.raises(InvalidToken):
             bot.get_me()
