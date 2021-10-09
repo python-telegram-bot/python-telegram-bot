@@ -25,10 +25,11 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from typing import TypeVar, TYPE_CHECKING, Tuple, List, Dict, Any, Optional
+from typing import TypeVar, TYPE_CHECKING, Tuple, List, Dict, Any, Optional, Union
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext  # noqa: F401
+    from telegram.ext import CallbackContext, JobQueue, BasePersistence  # noqa: F401
+    from telegram import Bot
 
 
 ConversationDict = Dict[Tuple[int, ...], Optional[object]]
@@ -50,6 +51,11 @@ CCT = TypeVar('CCT', bound='CallbackContext')
 
 .. versionadded:: 13.6
 """
+BT = TypeVar('BT', bound='Bot')
+"""Type of the bot.
+
+.. versionadded:: 14.0
+"""
 UD = TypeVar('UD')
 """Type of the user data for a single user.
 
@@ -65,3 +71,11 @@ BD = TypeVar('BD')
 
 .. versionadded:: 13.6
 """
+JQ = TypeVar('JQ', bound=Union[None, 'JobQueue'])
+"""Type of the job queue.
+
+.. versionadded:: 14.0"""
+PT = TypeVar('PT', bound=Union[None, 'BasePersistence'])
+"""Type of the persistence.
+
+.. versionadded:: 14.0"""
