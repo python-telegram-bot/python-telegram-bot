@@ -146,7 +146,7 @@ class InputMediaAnimation(InputMedia):
         duration (:obj:`int`, optional): Animation duration.
 
     Attributes:
-        type (:obj:`str`): ``animation``.
+        type (:obj:`str`): 'animation'.
         media (:obj:`str` | :class:`telegram.InputFile`): Animation to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -214,7 +214,7 @@ class InputMediaPhoto(InputMedia):
             entities that appear in the caption, which can be specified instead of parse_mode.
 
     Attributes:
-        type (:obj:`str`): ``photo``.
+        type (:obj:`str`): 'photo'.
         media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -285,7 +285,7 @@ class InputMediaVideo(InputMedia):
                Accept :obj:`bytes` as input.
 
     Attributes:
-        type (:obj:`str`): ``video``.
+        type (:obj:`str`): 'video'.
         media (:obj:`str` | :class:`telegram.InputFile`): Video file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -377,7 +377,7 @@ class InputMediaAudio(InputMedia):
                Accept :obj:`bytes` as input.
 
     Attributes:
-        type (:obj:`str`): ``audio``.
+        type (:obj:`str`): 'audio'.
         media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -458,7 +458,7 @@ class InputMediaDocument(InputMedia):
             the document is sent as part of an album.
 
     Attributes:
-        type (:obj:`str`): ``document``.
+        type (:obj:`str`): 'document'.
         media (:obj:`str` | :class:`telegram.InputFile`): File to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
