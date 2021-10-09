@@ -26,15 +26,17 @@ from telegram import InputFile, Animation, MessageEntity
 
 
 class TestFiles:
+    tests_data_path = Path(__file__).parent.resolve() / "data"
+
     @pytest.mark.parametrize(
         'string,expected',
         [
-            ('tests/data/game.gif', True),
-            ('tests/data', False),
-            (str(Path.cwd() / 'tests' / 'data' / 'game.gif'), True),
-            (str(Path.cwd() / 'tests' / 'data'), False),
-            (Path.cwd() / 'tests' / 'data' / 'game.gif', True),
-            (Path.cwd() / 'tests' / 'data', False),
+            (str(tests_data_path / 'game.gif'), True),
+            (str(tests_data_path), False),
+            (str(tests_data_path / 'game.gif'), True),
+            (str(tests_data_path), False),
+            (tests_data_path / 'game.gif', True),
+            (tests_data_path, False),
             ('https:/api.org/file/botTOKEN/document/file_3', False),
             (None, False),
         ],
@@ -45,19 +47,13 @@ class TestFiles:
     @pytest.mark.parametrize(
         'string,expected',
         [
-            ('tests/data/game.gif', (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri()),
-            ('tests/data', 'tests/data'),
+            (tests_data_path / 'game.gif', tests_data_path.joinpath('game.gif').as_uri()),
+            (tests_data_path, tests_data_path),
             ('file://foobar', 'file://foobar'),
-            (
-                str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
-                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
-            ),
-            (str(Path.cwd() / 'tests' / 'data'), str(Path.cwd() / 'tests' / 'data')),
-            (
-                Path.cwd() / 'tests' / 'data' / 'game.gif',
-                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
-            ),
-            (Path.cwd() / 'tests' / 'data', Path.cwd() / 'tests' / 'data'),
+            (str(tests_data_path / 'game.gif'), tests_data_path.joinpath('game.gif').as_uri()),
+            (str(tests_data_path), str(tests_data_path)),
+            (tests_data_path / 'game.gif', tests_data_path.joinpath('game.gif').as_uri()),
+            (tests_data_path, tests_data_path),
             (
                 'https:/api.org/file/botTOKEN/document/file_3',
                 'https:/api.org/file/botTOKEN/document/file_3',
@@ -67,8 +63,8 @@ class TestFiles:
     def test_parse_file_input_string(self, string, expected):
         assert telegram.utils.files.parse_file_input(string) == expected
 
-    def test_parse_file_input_file_like(self):
-        source_file = Path('tests/data/game.gif')
+    def test_parse_file_input_file_like(self, data_file):
+        source_file = data_file('game.gif')
         with source_file.open('rb') as file:
             parsed = telegram.utils.files.parse_file_input(file)
 
@@ -83,8 +79,8 @@ class TestFiles:
         assert parsed.attach
         assert parsed.filename == 'test_file'
 
-    def test_parse_file_input_bytes(self):
-        source_file = Path('tests/data/text_file.txt')
+    def test_parse_file_input_bytes(self, data_file):
+        source_file = data_file('text_file.txt')
         parsed = telegram.utils.files.parse_file_input(source_file.read_bytes())
 
         assert isinstance(parsed, InputFile)

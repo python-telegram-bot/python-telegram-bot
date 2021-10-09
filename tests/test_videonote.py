@@ -28,15 +28,15 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 
 @pytest.fixture(scope='function')
-def video_note_file():
-    f = open('tests/data/telegram2.mp4', 'rb')
+def video_note_file(data_file):
+    f = data_file('telegram2.mp4').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def video_note(bot, chat_id):
-    with Path('tests/data/telegram2.mp4').open('rb') as f:
+def video_note(bot, chat_id, class_data_file):
+    with class_data_file('telegram2.mp4').open('rb') as f:
         return bot.send_video_note(chat_id, video_note=f, timeout=50).video_note
 
 
@@ -163,11 +163,11 @@ class TestVideoNote:
         assert video_note_dict['duration'] == video_note.duration
         assert video_note_dict['file_size'] == video_note.file_size
 
-    def test_send_video_note_local_files(self, monkeypatch, bot, chat_id):
+    def test_send_video_note_local_files(self, monkeypatch, bot, chat_id, data_file):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
-        file = 'tests/data/telegram.jpg'
+        file = data_file('telegram.jpg')
+        expected = file.as_uri()
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag

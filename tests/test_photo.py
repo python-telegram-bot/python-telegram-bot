@@ -34,16 +34,16 @@ from tests.conftest import (
 
 
 @pytest.fixture(scope='function')
-def photo_file():
-    f = open('tests/data/telegram.jpg', 'rb')
+def photo_file(data_file):
+    f = data_file('telegram.jpg').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def _photo(bot, chat_id):
+def _photo(bot, chat_id, class_data_file):
     def func():
-        with Path('tests/data/telegram.jpg').open('rb') as f:
+        with class_data_file('telegram.jpg').open('rb') as f:
             return bot.send_photo(chat_id, photo=f, timeout=50).photo
 
     return expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
@@ -227,11 +227,11 @@ class TestPhoto:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_photo_local_files(self, monkeypatch, bot, chat_id):
+    def test_send_photo_local_files(self, monkeypatch, bot, chat_id, data_file):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
-        file = 'tests/data/telegram.jpg'
+        file = data_file('telegram.jpg')
+        expected = file.as_uri()
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
@@ -337,11 +337,11 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    def test_send_file_unicode_filename(self, bot, chat_id):
+    def test_send_file_unicode_filename(self, bot, chat_id, data_file):
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
         """
-        with Path('tests/data/测试.png').open('rb') as f:
+        with data_file('测试.png').open('rb') as f:
             message = bot.send_photo(photo=f, chat_id=chat_id)
 
         photo = message.photo[-1]
@@ -353,8 +353,8 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    def test_send_bytesio_jpg_file(self, bot, chat_id):
-        filepath: Path = Path('tests/data/telegram_no_standard_header.jpg')
+    def test_send_bytesio_jpg_file(self, bot, chat_id, data_file):
+        filepath = data_file('telegram_no_standard_header.jpg')
 
         # raw image bytes
         raw_bytes = BytesIO(filepath.read_bytes())

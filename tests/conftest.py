@@ -221,20 +221,41 @@ def updater(bot):
 
 
 @pytest.fixture(scope='function')
-def tests_data_path():
-    return Path(__file__).parent.resolve() / "data"
+def data_file():
+    def _make_file_path(filename: str):
+        return Path(__file__).parent.resolve() / "data" / filename
+
+    return _make_file_path
+
+
+@pytest.fixture(scope='class')
+def class_data_file():
+    def _make_file_path(filename: str):
+        return Path(__file__).parent.resolve() / "data" / filename
+
+    return _make_file_path
 
 
 @pytest.fixture(scope='function')
-def thumb_file(tests_data_path):
-    f = tests_data_path.joinpath('thumb.jpg').open('rb')
+def telegram_file(data_file):
+    telegram_file = data_file('telegram')
+
+    def _with_extension(extension: str):
+        return telegram_file.with_suffix(extension)
+
+    return _with_extension
+
+
+@pytest.fixture(scope='function')
+def thumb_file(data_file):
+    f = data_file('thumb.jpg').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def class_thumb_file(tests_data_path):
-    f = tests_data_path.joinpath('thumb.jpg').open('rb')
+def class_thumb_file(data_file):
+    f = data_file('thumb.jpg').open('rb')
     yield f
     f.close()
 

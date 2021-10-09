@@ -29,15 +29,15 @@ from tests.conftest import check_shortcut_signature, check_shortcut_call, check_
 
 
 @pytest.fixture(scope='function')
-def document_file():
-    f = open('tests/data/telegram.png', 'rb')
+def document_file(data_file):
+    f = data_file('telegram.png').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def document(bot, chat_id):
-    with Path('tests/data/telegram.png').open('rb') as f:
+def document(bot, chat_id, class_data_file):
+    with class_data_file('telegram.png').open('rb') as f:
         return bot.send_document(chat_id, document=f, timeout=50).document
 
 
@@ -234,11 +234,11 @@ class TestDocument:
                     chat_id, document, reply_to_message_id=reply_to_message.message_id
                 )
 
-    def test_send_document_local_files(self, monkeypatch, bot, chat_id):
+    def test_send_document_local_files(self, monkeypatch, bot, chat_id, data_file):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
-        file = 'tests/data/telegram.jpg'
+        file = data_file('telegram.jpg')
+        expected = file.as_uri()
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
