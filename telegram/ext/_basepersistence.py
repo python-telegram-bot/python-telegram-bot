@@ -405,7 +405,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
           * Type from :class:`ContextTypes.user_data` if ContextTypes are used.
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`Dict`/:class:`ContextTypes.chat_data`]: \
+            DefaultDict[:obj:`int`, :obj:`dict` | :class:`ContextTypes.user_data`]: \
             The restored user data.
         """
 
@@ -420,7 +420,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
           * Type from :class:`ContextTypes.chat_data` if ContextTypes are used.
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`Dict`/:class:`ContextTypes.chat_data`]: \
+            DefaultDict[:obj:`int`, :obj:`dict` | :class:`ContextTypes.chat_data`]: \
             The restored chat data.
         """
 
@@ -435,7 +435,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
           * Type from :class:`ContextTypes.bot_data` if ContextTypes are used.
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`Dict`/:class:`ContextTypes.bot_data`]: \
+            DefaultDict[:obj:`int`, :obj:`dict` | :class:`ContextTypes.bot_data`]: \
             The restored bot data.
         """
 
@@ -451,7 +451,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-            Dict[:obj:`str`, :obj:`any`]]], Dict[:obj:`str`, :obj:`str`]]: \
+            Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]: \
             The restored meta data or :obj:`None`, if no data was stored.
         """
 
@@ -489,7 +489,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            user_data (:obj:`Dict`/:class:`ContextTypes.user_data`): \
+            data (:obj:`dict` | :class:`ContextTypes.user_data`): \
             The :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
 
@@ -500,7 +500,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            chat_data (:obj:`Dict`/:class:`ContextTypes.chat_data`): \
+            data (:obj:`dict` | :class:`ContextTypes.chat_data`): \
             The :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
 
@@ -510,7 +510,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         handled an update.
 
         Args:
-            bot_data (:obj:`Dict`/:class:`ContextTypes.bot_data`): \
+            data (:obj:`dict` | :class:`ContextTypes.bot_data`): \
             The :attr:`telegram.ext.Dispatcher.bot_data`.
         """
 
@@ -527,7 +527,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
-            user_data (:obj:`Dict`/:class:`ContextTypes.user_data`):
+            user_data (:obj:`dict` | :class:`ContextTypes.user_data`): \
             The ``user_data`` of a single user.
         """
 
@@ -544,7 +544,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
-            chat_data (:obj:`Dict`/:class:`ContextTypes.chat_data`):
+            chat_data (:obj:`dict` | :class:`ContextTypes.chat_data`): \
             The ``chat_data`` of a single chat.
         """
 
@@ -560,7 +560,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Args:
-            bot_data (:obj:`Dict`/:class:`ContextTypes.bot_data`): The ``bot_data``.
+            bot_data (:obj:`dict` | :class:`ContextTypes.bot_data`): The ``bot_data``.
         """
 
     @abstractmethod

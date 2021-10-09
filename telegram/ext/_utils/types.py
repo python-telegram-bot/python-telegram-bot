@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
 
 ConversationDict = Dict[Tuple[int, ...], Optional[object]]
-"""Dict[Tuple[:obj:`int`, ...], Optional[obj: `object`]]:
+"""Dict[Tuple[:obj:`int`, ...], Optional[:obj:`object`]]:
     Dicts as maintained by the :class:`telegram.ext.ConversationHandler`.
 
     .. versionadded:: 13.6

@@ -353,7 +353,7 @@ class DictPersistence(BasePersistence):
 
         Args:
             data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
-            Dict[:obj:`str`, :obj:`str`]]:): The relevant data to restore \
+            Dict[:obj:`str`, :obj:`str`]]): The relevant data to restore \
             :class:`telegram.ext.CallbackDataCache`.
         """
         if self._callback_data == data:
