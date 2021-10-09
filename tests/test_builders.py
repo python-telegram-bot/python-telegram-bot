@@ -63,7 +63,9 @@ class TestBuilder:
             pytest.skip(f'{builder.__class__} has no method called {method}')
 
         # First that e.g. `bot` can't be set if `request` was already set
-        getattr(builder, method)(1)
+        # We pass the private key since `private_key` is the only method that doesn't just save
+        # the passed value
+        getattr(builder, method)(Path('tests/data/private.key'))
         with pytest.raises(RuntimeError, match=f'`bot` may only be set, if no {description}'):
             builder.bot(None)
 
@@ -84,7 +86,9 @@ class TestBuilder:
             pytest.skip(f'{builder.__class__} has no method called {method}')
 
         # First that e.g. `dispatcher` can't be set if `bot` was already set
-        getattr(builder, method)(None)
+        # We pass the private key since `private_key` is the only method that doesn't just save
+        # the passed value
+        getattr(builder, method)(Path('tests/data/private.key'))
         with pytest.raises(
             RuntimeError, match=f'`dispatcher` may only be set, if no {description}'
         ):
@@ -102,7 +106,9 @@ class TestBuilder:
         builder = builder.__class__()
         builder.dispatcher(None)
         if method != 'dispatcher_class':
-            getattr(builder, method)(None)
+            # We pass the private key since `private_key` is the only method that doesn't just save
+            # the passed value
+            getattr(builder, method)(Path('tests/data/private.key'))
         else:
             with pytest.raises(
                 RuntimeError, match=f'`{method}` may only be set, if no Dispatcher instance'
