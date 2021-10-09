@@ -203,7 +203,8 @@ class DictPersistence(BasePersistence):
 
     @property
     def callback_data(self) -> Optional[CDCData]:
-        """:class:`telegram.ext._utils.types.CDCData`: The meta data on the stored callback data.
+        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
+        Dict[:obj:`str`, :obj:`str`]]: The meta data on the stored callback data.
 
         .. versionadded:: 13.6
         """
@@ -269,8 +270,9 @@ class DictPersistence(BasePersistence):
         .. versionadded:: 13.6
 
         Returns:
-            Optional[:class:`telegram.ext._utils.types.CDCData`]: The restored meta data or
-            :obj:`None`, if no data was stored.
+            Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
+            Dict[:obj:`str`, :obj:`str`]]: The restored meta data or :obj:`None`, \
+            if no data was stored.
         """
         if self.callback_data is None:
             self._callback_data = None
@@ -350,8 +352,9 @@ class DictPersistence(BasePersistence):
         .. versionadded:: 13.6
 
         Args:
-            data (:class:`telegram.ext._utils.types.CDCData`): The relevant data to restore
-                :class:`telegram.ext.CallbackDataCache`.
+            data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
+            Dict[:obj:`str`, :obj:`str`]]:): The relevant data to restore \
+            :class:`telegram.ext.CallbackDataCache`.
         """
         if self._callback_data == data:
             return

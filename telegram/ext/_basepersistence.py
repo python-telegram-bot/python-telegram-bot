@@ -398,30 +398,45 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def get_user_data(self) -> DefaultDict[int, UD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
-        :obj:`defaultdict(telegram.ext._utils.types.UD)` with integer keys.
+        :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
+        corresponding to one of the following:
+
+          * :obj:`Dict` from :class:`CallbackContext.user_data`
+          * Type from :class:`ContextTypes.user_data` if ContextTypes are used.
 
         Returns:
-            DefaultDict[:obj:`int`, :class:`telegram.ext._utils.types.UD`]: The restored user data.
+            DefaultDict[:obj:`int`, :obj:`Dict`/:class:`ContextTypes.chat_data`]: \
+            The restored user data.
         """
 
     @abstractmethod
     def get_chat_data(self) -> DefaultDict[int, CD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
-        :obj:`defaultdict(telegram.ext._utils.types.CD)` with integer keys.
+        :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
+        corresponding to one of the following:
+
+          * :obj:`Dict` from :class:`CallbackContext.chat_data`
+          * Type from :class:`ContextTypes.chat_data` if ContextTypes are used.
 
         Returns:
-            DefaultDict[:obj:`int`, :class:`telegram.ext._utils.types.CD`]: The restored chat data.
+            DefaultDict[:obj:`int`, :obj:`Dict`/:class:`ContextTypes.chat_data`]: \
+            The restored chat data.
         """
 
     @abstractmethod
     def get_bot_data(self) -> BD:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
-        :class:`telegram.ext._utils.types.BD`.
+        :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
+        corresponding to one of the following:
+
+          * :obj:`Dict` from :class:`CallbackContext.bot_data`
+          * Type from :class:`ContextTypes.bot_data` if ContextTypes are used.
 
         Returns:
-            :class:`telegram.ext._utils.types.BD`: The restored bot data.
+            DefaultDict[:obj:`int`, :obj:`Dict`/:class:`ContextTypes.bot_data`]: \
+            The restored bot data.
         """
 
     @abstractmethod
@@ -435,8 +450,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Returns:
-            Optional[:class:`telegram.ext._utils.types.CDCData`]: The restored meta data or
-            :obj:`None`, if no data was stored.
+            Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
+            Dict[:obj:`str`, :obj:`any`]]], Dict[:obj:`str`, :obj:`str`]]: \
+            The restored meta data or :obj:`None`, if no data was stored.
         """
 
     @abstractmethod
@@ -473,8 +489,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:class:`telegram.ext._utils.types.UD`): The
-                :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
+            user_data (:obj:`Dict`/:class:`ContextTypes.user_data`): \
+            The :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
 
     @abstractmethod
@@ -484,8 +500,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:class:`telegram.ext._utils.types.CD`): The
-                :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
+            chat_data (:obj:`Dict`/:class:`ContextTypes.chat_data`): \
+            The :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
 
     @abstractmethod
@@ -494,8 +510,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         handled an update.
 
         Args:
-            data (:class:`telegram.ext._utils.types.BD`): The
-                :attr:`telegram.ext.Dispatcher.bot_data`.
+            bot_data (:obj:`Dict`/:class:`ContextTypes.bot_data`): \
+            The :attr:`telegram.ext.Dispatcher.bot_data`.
         """
 
     @abstractmethod
@@ -511,7 +527,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
-            user_data (:class:`telegram.ext._utils.types.UD`): The ``user_data`` of a single user.
+            user_data (:obj:`Dict`/:class:`ContextTypes.user_data`):
+            The ``user_data`` of a single user.
         """
 
     @abstractmethod
@@ -527,7 +544,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
-            chat_data (:class:`telegram.ext._utils.types.CD`): The ``chat_data`` of a single chat.
+            chat_data (:obj:`Dict`/:class:`ContextTypes.chat_data`):
+            The ``chat_data`` of a single chat.
         """
 
     @abstractmethod
@@ -542,7 +560,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Args:
-            bot_data (:class:`telegram.ext._utils.types.BD`): The ``bot_data``.
+            bot_data (:obj:`Dict`/:class:`ContextTypes.bot_data`): The ``bot_data``.
         """
 
     @abstractmethod
@@ -556,8 +574,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Args:
-            data (:class:`telegram.ext._utils.types.CDCData`): The relevant data to restore
-                :class:`telegram.ext.CallbackDataCache`.
+            data (Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
+            Dict[:obj:`str`, :obj:`any`]]], Dict[:obj:`str`, :obj:`str`]]): \
+            The relevant data to restore :class:`telegram.ext.CallbackDataCache`.
         """
 
     @abstractmethod
