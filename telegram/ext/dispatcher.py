@@ -268,7 +268,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         .. versionadded:: 14.0
         """
         # Unfortunately this needs to be here due to cyclical imports
-        from telegram.ext import DispatcherBuilder  # pylint: disable=C0415
+        from telegram.ext import DispatcherBuilder  # pylint: disable=import-outside-toplevel
 
         return DispatcherBuilder()
 

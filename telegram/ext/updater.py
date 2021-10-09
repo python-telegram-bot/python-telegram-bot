@@ -150,7 +150,7 @@ class Updater(Generic[BT, DT]):
         .. versionadded:: 14.0
         """
         # Unfortunately this needs to be here due to cyclical imports
-        from telegram.ext import UpdaterBuilder  # pylint: disable=C0415
+        from telegram.ext import UpdaterBuilder  # pylint: disable=import-outside-toplevel
 
         return UpdaterBuilder()
 

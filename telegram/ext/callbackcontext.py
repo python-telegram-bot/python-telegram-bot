@@ -34,7 +34,7 @@ from typing import (
 
 from telegram import Update, CallbackQuery
 from telegram.ext import ExtBot
-from telegram.ext.utils.types import UD, CD, BD, BT, JQ, PT  # pylint: disable=W0611
+from telegram.ext.utils.types import UD, CD, BD, BT, JQ, PT  # pylint: disable=unused-import
 
 if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job, JobQueue

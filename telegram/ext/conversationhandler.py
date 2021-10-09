@@ -23,7 +23,7 @@ import logging
 import functools
 import datetime
 from threading import Lock
-from typing import (  # pylint: disable=W0611  # for the "Any" import
+from typing import (  # pylint: disable=unused-import  # for the "Any" import
     TYPE_CHECKING,
     Dict,
     List,

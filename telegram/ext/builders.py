@@ -67,7 +67,7 @@ CT = TypeVar('CT', bound=Callable[..., Any])
 
 if TYPE_CHECKING:
     DEF_CCT = CallbackContext.DEFAULT_TYPE  # type: ignore[misc]
-    InitBaseBuilder = _BaseBuilder[  # noqa: F821  # pylint: disable=E0601
+    InitBaseBuilder = _BaseBuilder[  # noqa: F821  # pylint: disable=used-before-assignment
         Dispatcher[ExtBot, DEF_CCT, Dict, Dict, Dict, JobQueue, None],
         ExtBot,
         DEF_CCT,
@@ -77,7 +77,7 @@ if TYPE_CHECKING:
         JobQueue,
         None,
     ]
-    InitUpdaterBuilder = UpdaterBuilder[  # noqa: F821  # pylint: disable=E0601
+    InitUpdaterBuilder = UpdaterBuilder[  # noqa: F821  # pylint: disable=used-before-assignment
         Dispatcher[ExtBot, DEF_CCT, Dict, Dict, Dict, JobQueue, None],
         ExtBot,
         DEF_CCT,
@@ -87,16 +87,18 @@ if TYPE_CHECKING:
         JobQueue,
         None,
     ]
-    InitDispatcherBuilder = DispatcherBuilder[  # noqa: F821  # pylint: disable=E0601
-        Dispatcher[ExtBot, DEF_CCT, Dict, Dict, Dict, JobQueue, None],
-        ExtBot,
-        DEF_CCT,
-        Dict,
-        Dict,
-        Dict,
-        JobQueue,
-        None,
-    ]
+    InitDispatcherBuilder = (
+        DispatcherBuilder[  # noqa: F821  # pylint: disable=used-before-assignment
+            Dispatcher[ExtBot, DEF_CCT, Dict, Dict, Dict, JobQueue, None],
+            ExtBot,
+            DEF_CCT,
+            Dict,
+            Dict,
+            Dict,
+            JobQueue,
+            None,
+        ]
+    )
 
 
 _BOT_CHECKS = [
@@ -130,7 +132,7 @@ _TWO_ARGS_REQ = "The parameter `{}` may only be set, if no {} was set."
 # the UpdaterBuilder has all method that the DispatcherBuilder has
 class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     # pylint reports false positives here:
-    # pylint: disable=W0238
+    # pylint: disable=unused-private-member
 
     __slots__ = (
         '_token',
@@ -200,11 +202,14 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             request = self._request
         else:
             request_kwargs = DefaultValue.get_value(self._request_kwargs)
-            if 'con_pool_size' not in request_kwargs:  # pylint: disable=E1135
-                request_kwargs[  # pylint: disable=E1137
+            if (
+                'con_pool_size'
+                not in request_kwargs  # pylint: disable=unsupported-membership-test
+            ):
+                request_kwargs[  # pylint: disable=unsupported-assignment-operation
                     'con_pool_size'
                 ] = self._get_connection_pool_size(self._workers)
-            request = Request(**request_kwargs)  # pylint: disable=E1134
+            request = Request(**request_kwargs)  # pylint: disable=not-a-mapping
 
         return ExtBot(
             token=self._token,
