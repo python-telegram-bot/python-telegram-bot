@@ -29,7 +29,13 @@ import pytest
 import pytz
 from apscheduler.schedulers import SchedulerNotRunningError
 from flaky import flaky
-from telegram.ext import JobQueue, Updater, Job, CallbackContext, Dispatcher, ContextTypes
+from telegram.ext import (
+    JobQueue,
+    Job,
+    CallbackContext,
+    ContextTypes,
+    DispatcherBuilder,
+)
 
 
 class CustomContext(CallbackContext):
@@ -54,11 +60,6 @@ class TestJobQueue:
     result = 0
     job_time = 0
     received_error = None
-
-    def test_slot_behaviour(self, job_queue, mro_slots, _dp):
-        for attr in job_queue.__slots__:
-            assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
     def reset(self):
@@ -99,6 +100,22 @@ class TestJobQueue:
 
     def error_handler_raise_error(self, *args):
         raise Exception('Failing bigly')
+
+    def test_slot_behaviour(self, job_queue, mro_slots, _dp):
+        for attr in job_queue.__slots__:
+            assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
+
+    def test_dispatcher_weakref(self, bot):
+        jq = JobQueue()
+        dispatcher = DispatcherBuilder().bot(bot).job_queue(None).build()
+        with pytest.raises(RuntimeError, match='No dispatcher was set'):
+            jq.dispatcher
+        jq.set_dispatcher(dispatcher)
+        assert jq.dispatcher is dispatcher
+        del dispatcher
+        with pytest.raises(RuntimeError, match='no longer alive'):
+            jq.dispatcher
 
     def test_run_once(self, job_queue):
         job_queue.run_once(self.job_run_once, 0.01)
@@ -228,19 +245,19 @@ class TestJobQueue:
         sleep(0.03)
         assert self.result == 1
 
-    def test_in_updater(self, bot):
-        u = Updater(bot=bot)
-        u.job_queue.start()
+    def test_in_dispatcher(self, bot):
+        dispatcher = DispatcherBuilder().bot(bot).build()
+        dispatcher.job_queue.start()
         try:
-            u.job_queue.run_repeating(self.job_run_once, 0.02)
+            dispatcher.job_queue.run_repeating(self.job_run_once, 0.02)
             sleep(0.03)
             assert self.result == 1
-            u.stop()
+            dispatcher.stop()
             sleep(1)
             assert self.result == 1
         finally:
             try:
-                u.stop()
+                dispatcher.stop()
             except SchedulerNotRunningError:
                 pass
 
@@ -479,12 +496,15 @@ class TestJobQueue:
         assert 'No error handlers are registered' in rec.getMessage()
 
     def test_custom_context(self, bot, job_queue):
-        dispatcher = Dispatcher(
-            bot,
-            Queue(),
-            context_types=ContextTypes(
-                context=CustomContext, bot_data=int, user_data=float, chat_data=complex
-            ),
+        dispatcher = (
+            DispatcherBuilder()
+            .bot(bot)
+            .context_types(
+                ContextTypes(
+                    context=CustomContext, bot_data=int, user_data=float, chat_data=complex
+                )
+            )
+            .build()
         )
         job_queue.set_dispatcher(dispatcher)
 

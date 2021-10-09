@@ -22,7 +22,7 @@ import uuid
 from pathlib import Path
 from threading import Lock
 
-from telegram.ext import PersistenceInput
+from telegram.ext import PersistenceInput, UpdaterBuilder
 from telegram.ext.callbackdatacache import CallbackDataCache
 
 try:
@@ -41,7 +41,6 @@ import pytest
 from telegram import Update, Message, User, Chat, MessageEntity, Bot
 from telegram.ext import (
     BasePersistence,
-    Updater,
     ConversationHandler,
     MessageHandler,
     Filters,
@@ -215,7 +214,7 @@ def conversations():
 @pytest.fixture(scope="function")
 def updater(bot, base_persistence):
     base_persistence.store_data = PersistenceInput(False, False, False, False)
-    u = Updater(bot=bot, persistence=base_persistence)
+    u = UpdaterBuilder().bot(bot).persistence(base_persistence).build()
     base_persistence.store_data = PersistenceInput()
     return u
 
@@ -304,34 +303,36 @@ class TestBasePersistence:
         base_persistence.get_callback_data = get_callback_data
 
         with pytest.raises(ValueError, match="user_data must be of type defaultdict"):
-            u = Updater(bot=bot, persistence=base_persistence)
+            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
         def get_user_data():
             return user_data
 
         base_persistence.get_user_data = get_user_data
         with pytest.raises(ValueError, match="chat_data must be of type defaultdict"):
-            Updater(bot=bot, persistence=base_persistence)
+            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
         def get_chat_data():
             return chat_data
 
         base_persistence.get_chat_data = get_chat_data
         with pytest.raises(ValueError, match="bot_data must be of type dict"):
-            Updater(bot=bot, persistence=base_persistence)
+            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
         def get_bot_data():
             return bot_data
 
         base_persistence.get_bot_data = get_bot_data
         with pytest.raises(ValueError, match="callback_data must be a 2-tuple"):
-            Updater(bot=bot, persistence=base_persistence)
+            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
         def get_callback_data():
             return callback_data
 
+        base_persistence.bot = None
         base_persistence.get_callback_data = get_callback_data
-        u = Updater(bot=bot, persistence=base_persistence)
+        u = UpdaterBuilder().bot(bot).persistence(base_persistence).build()
+        assert u.dispatcher.bot is base_persistence.bot
         assert u.dispatcher.bot_data == bot_data
         assert u.dispatcher.chat_data == chat_data
         assert u.dispatcher.user_data == user_data
@@ -373,7 +374,7 @@ class TestBasePersistence:
         base_persistence.refresh_bot_data = lambda x: x
         base_persistence.refresh_chat_data = lambda x, y: x
         base_persistence.refresh_user_data = lambda x, y: x
-        updater = Updater(bot=bot, persistence=base_persistence)
+        updater = UpdaterBuilder().bot(bot).persistence(base_persistence).build()
         dp = updater.dispatcher
 
         def callback_known_user(update, context):
@@ -1622,7 +1623,7 @@ class TestPicklePersistence:
         assert conversations_test['name1'] == conversation1
 
     def test_with_handler(self, bot, update, bot_data, pickle_persistence, good_pickle_files):
-        u = Updater(bot=bot, persistence=pickle_persistence)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence).build()
         dp = u.dispatcher
         bot.callback_data_cache.clear_callback_data()
         bot.callback_data_cache.clear_callback_queries()
@@ -1660,13 +1661,13 @@ class TestPicklePersistence:
             single_file=False,
             on_flush=False,
         )
-        u = Updater(bot=bot, persistence=pickle_persistence_2)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_2).build()
         dp = u.dispatcher
         dp.add_handler(h2)
         dp.process_update(update)
 
     def test_flush_on_stop(self, bot, update, pickle_persistence):
-        u = Updater(bot=bot, persistence=pickle_persistence)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -1686,7 +1687,7 @@ class TestPicklePersistence:
         assert data['test'] == 'Working4!'
 
     def test_flush_on_stop_only_bot(self, bot, update, pickle_persistence_only_bot):
-        u = Updater(bot=bot, persistence=pickle_persistence_only_bot)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_only_bot).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -1706,7 +1707,7 @@ class TestPicklePersistence:
         assert pickle_persistence_2.get_callback_data() is None
 
     def test_flush_on_stop_only_chat(self, bot, update, pickle_persistence_only_chat):
-        u = Updater(bot=bot, persistence=pickle_persistence_only_chat)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_only_chat).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -1726,7 +1727,7 @@ class TestPicklePersistence:
         assert pickle_persistence_2.get_callback_data() is None
 
     def test_flush_on_stop_only_user(self, bot, update, pickle_persistence_only_user):
-        u = Updater(bot=bot, persistence=pickle_persistence_only_user)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_only_user).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -1746,7 +1747,7 @@ class TestPicklePersistence:
         assert pickle_persistence_2.get_callback_data() is None
 
     def test_flush_on_stop_only_callback(self, bot, update, pickle_persistence_only_callback):
-        u = Updater(bot=bot, persistence=pickle_persistence_only_callback)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_only_callback).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -2194,7 +2195,7 @@ class TestDictPersistence:
 
     def test_with_handler(self, bot, update):
         dict_persistence = DictPersistence()
-        u = Updater(bot=bot, persistence=dict_persistence)
+        u = UpdaterBuilder().bot(bot).persistence(dict_persistence).build()
         dp = u.dispatcher
 
         def first(update, context):
@@ -2236,7 +2237,7 @@ class TestDictPersistence:
             callback_data_json=callback_data,
         )
 
-        u = Updater(bot=bot, persistence=dict_persistence_2)
+        u = UpdaterBuilder().bot(bot).persistence(dict_persistence_2).build()
         dp = u.dispatcher
         dp.add_handler(h2)
         dp.process_update(update)

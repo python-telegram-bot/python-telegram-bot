@@ -18,25 +18,25 @@ import logging
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     MessageHandler,
     Filters,
     ConversationHandler,
+    Updater,
     CallbackContext,
 )
+
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 GENDER, PHOTO, LOCATION, BIO = range(4)
 
 
-def start(update: Update, context: CallbackContext) -> int:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Starts the conversation and asks the user about their gender."""
     reply_keyboard = [['Boy', 'Girl', 'Other']]
 
@@ -52,7 +52,7 @@ def start(update: Update, context: CallbackContext) -> int:
     return GENDER
 
 
-def gender(update: Update, context: CallbackContext) -> int:
+def gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Stores the selected gender and asks for a photo."""
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
@@ -65,7 +65,7 @@ def gender(update: Update, context: CallbackContext) -> int:
     return PHOTO
 
 
-def photo(update: Update, context: CallbackContext) -> int:
+def photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Stores the photo and asks for a location."""
     user = update.message.from_user
     photo_file = update.message.photo[-1].get_file()
@@ -78,7 +78,7 @@ def photo(update: Update, context: CallbackContext) -> int:
     return LOCATION
 
 
-def skip_photo(update: Update, context: CallbackContext) -> int:
+def skip_photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Skips the photo and asks for a location."""
     user = update.message.from_user
     logger.info("User %s did not send a photo.", user.first_name)
@@ -89,7 +89,7 @@ def skip_photo(update: Update, context: CallbackContext) -> int:
     return LOCATION
 
 
-def location(update: Update, context: CallbackContext) -> int:
+def location(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Stores the location and asks for some info about the user."""
     user = update.message.from_user
     user_location = update.message.location
@@ -103,7 +103,7 @@ def location(update: Update, context: CallbackContext) -> int:
     return BIO
 
 
-def skip_location(update: Update, context: CallbackContext) -> int:
+def skip_location(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Skips the location and asks for info about the user."""
     user = update.message.from_user
     logger.info("User %s did not send a location.", user.first_name)
@@ -114,7 +114,7 @@ def skip_location(update: Update, context: CallbackContext) -> int:
     return BIO
 
 
-def bio(update: Update, context: CallbackContext) -> int:
+def bio(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Stores the info about the user and ends the conversation."""
     user = update.message.from_user
     logger.info("Bio of %s: %s", user.first_name, update.message.text)
@@ -123,7 +123,7 @@ def bio(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 
-def cancel(update: Update, context: CallbackContext) -> int:
+def cancel(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Cancels and ends the conversation."""
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
@@ -137,7 +137,7 @@ def cancel(update: Update, context: CallbackContext) -> int:
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

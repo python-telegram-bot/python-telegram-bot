@@ -158,22 +158,16 @@ class Bot(TelegramObject):
     def __init__(
         self,
         token: str,
-        base_url: str = None,
-        base_file_url: str = None,
+        base_url: str = 'https://api.telegram.org/bot',
+        base_file_url: str = 'https://api.telegram.org/file/bot',
         request: 'Request' = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
     ):
         self.token = self._validate_token(token)
 
-        if base_url is None:
-            base_url = 'https://api.telegram.org/bot'
-
-        if base_file_url is None:
-            base_file_url = 'https://api.telegram.org/file/bot'
-
-        self.base_url = str(base_url) + str(self.token)
-        self.base_file_url = str(base_file_url) + str(self.token)
+        self.base_url = base_url + self.token
+        self.base_file_url = base_file_url + self.token
         self._bot: Optional[User] = None
         self._request = request or Request()
         self.private_key = None
@@ -2796,8 +2790,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if the edited message is not an inline message
-            , the edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if edited message is not an inline message, the
+            edited Message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`

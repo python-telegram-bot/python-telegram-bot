@@ -8,24 +8,24 @@ import logging
 
 from telegram import LabeledPrice, ShippingOption, Update
 from telegram.ext import (
-    Updater,
     CommandHandler,
     MessageHandler,
     Filters,
     PreCheckoutQueryHandler,
     ShippingQueryHandler,
+    Updater,
     CallbackContext,
 )
+
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 
-def start_callback(update: Update, context: CallbackContext) -> None:
+def start_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Displays info on how to use the bot."""
     msg = (
         "Use /shipping to get an invoice for shipping-payment, or /noshipping for an "
@@ -35,7 +35,7 @@ def start_callback(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(msg)
 
 
-def start_with_shipping_callback(update: Update, context: CallbackContext) -> None:
+def start_with_shipping_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends an invoice with shipping-payment."""
     chat_id = update.message.chat_id
     title = "Payment Example"
@@ -69,7 +69,7 @@ def start_with_shipping_callback(update: Update, context: CallbackContext) -> No
     )
 
 
-def start_without_shipping_callback(update: Update, context: CallbackContext) -> None:
+def start_without_shipping_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends an invoice without shipping-payment."""
     chat_id = update.message.chat_id
     title = "Payment Example"
@@ -91,7 +91,7 @@ def start_without_shipping_callback(update: Update, context: CallbackContext) ->
     )
 
 
-def shipping_callback(update: Update, context: CallbackContext) -> None:
+def shipping_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Answers the ShippingQuery with ShippingOptions"""
     query = update.shipping_query
     # check the payload, is this from your bot?
@@ -109,7 +109,7 @@ def shipping_callback(update: Update, context: CallbackContext) -> None:
 
 
 # after (optional) shipping, it's the pre-checkout
-def precheckout_callback(update: Update, context: CallbackContext) -> None:
+def precheckout_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Answers the PreQecheckoutQuery"""
     query = update.pre_checkout_query
     # check the payload, is this from your bot?
@@ -121,7 +121,7 @@ def precheckout_callback(update: Update, context: CallbackContext) -> None:
 
 
 # finally, after contacting the payment provider...
-def successful_payment_callback(update: Update, context: CallbackContext) -> None:
+def successful_payment_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Confirms the successful payment."""
     # do something after successfully receiving payment?
     update.message.reply_text("Thank you for your payment!")
@@ -130,7 +130,7 @@ def successful_payment_callback(update: Update, context: CallbackContext) -> Non
 def main() -> None:
     """Run the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
