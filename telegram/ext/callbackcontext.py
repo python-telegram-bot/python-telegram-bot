@@ -34,15 +34,14 @@ from typing import (
 
 from telegram import Update, CallbackQuery
 from telegram.ext import ExtBot
-from telegram.ext.utils.types import UD, CD, BD
+from telegram.ext.utils.types import UD, CD, BD, BT, JQ, PT  # pylint: disable=unused-import
 
 if TYPE_CHECKING:
-    from telegram import Bot
     from telegram.ext import Dispatcher, Job, JobQueue
     from telegram.ext.utils.types import CCT
 
 
-class CallbackContext(Generic[UD, CD, BD]):
+class CallbackContext(Generic[BT, UD, CD, BD]):
     """
     This is a context object passed to the callback called by :class:`telegram.ext.Handler`
     or by the :class:`telegram.ext.Dispatcher` in an error handler added by
@@ -94,6 +93,26 @@ class CallbackContext(Generic[UD, CD, BD]):
 
     """
 
+    if TYPE_CHECKING:
+        DEFAULT_TYPE = CallbackContext[  # type: ignore[misc]  # noqa: F821
+            ExtBot, Dict, Dict, Dict
+        ]
+    else:
+        # Somewhat silly workaround so that accessing the attribute
+        # doesn't only work while type checking
+        DEFAULT_TYPE = 'CallbackContext[ExtBot, Dict, Dict, Dict]'  # pylint: disable-all
+        """Shortcut for the type annotation for the `context` argument that's correct for the
+        default settings, i.e. if :class:`telegram.ext.ContextTypes` is not used.
+
+        Example:
+            .. code:: python
+
+                def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
+                    ...
+
+        .. versionadded: 14.0
+        """
+
     __slots__ = (
         '_dispatcher',
         '_chat_id_and_data',
@@ -107,7 +126,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         '__dict__',
     )
 
-    def __init__(self: 'CCT', dispatcher: 'Dispatcher[CCT, UD, CD, BD]'):
+    def __init__(self: 'CCT', dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]'):
         """
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`):
@@ -123,7 +142,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         self.async_kwargs: Optional[Dict[str, object]] = None
 
     @property
-    def dispatcher(self) -> 'Dispatcher[CCT, UD, CD, BD]':
+    def dispatcher(self) -> 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]':
         """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
         return self._dispatcher
 
@@ -232,7 +251,7 @@ class CallbackContext(Generic[UD, CD, BD]):
         cls: Type['CCT'],
         update: object,
         error: Exception,
-        dispatcher: 'Dispatcher[CCT, UD, CD, BD]',
+        dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]',
         async_args: Union[List, Tuple] = None,
         async_kwargs: Dict[str, object] = None,
         job: 'Job' = None,
@@ -271,7 +290,7 @@ class CallbackContext(Generic[UD, CD, BD]):
 
     @classmethod
     def from_update(
-        cls: Type['CCT'], update: object, dispatcher: 'Dispatcher[CCT, UD, CD, BD]'
+        cls: Type['CCT'], update: object, dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]'
     ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
@@ -306,7 +325,9 @@ class CallbackContext(Generic[UD, CD, BD]):
         return self
 
     @classmethod
-    def from_job(cls: Type['CCT'], job: 'Job', dispatcher: 'Dispatcher[CCT, UD, CD, BD]') -> 'CCT':
+    def from_job(
+        cls: Type['CCT'], job: 'Job', dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]'
+    ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
         job callback.
@@ -335,7 +356,7 @@ class CallbackContext(Generic[UD, CD, BD]):
             setattr(self, key, value)
 
     @property
-    def bot(self) -> 'Bot':
+    def bot(self) -> BT:
         """:class:`telegram.Bot`: The bot associated with this context."""
         return self._dispatcher.bot
 

@@ -19,22 +19,24 @@ from telegram import (
     Update,
 )
 from telegram.ext import (
-    Updater,
     CommandHandler,
     PollAnswerHandler,
     PollHandler,
     MessageHandler,
     Filters,
+    Updater,
     CallbackContext,
 )
 
+
+# Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
 
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Inform user about what this bot can do"""
     update.message.reply_text(
         'Please select /poll to get a Poll, /quiz to get a Quiz or /preview'
@@ -42,7 +44,7 @@ def start(update: Update, context: CallbackContext) -> None:
     )
 
 
-def poll(update: Update, context: CallbackContext) -> None:
+def poll(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends a predefined poll"""
     questions = ["Good", "Really good", "Fantastic", "Great"]
     message = context.bot.send_poll(
@@ -64,7 +66,7 @@ def poll(update: Update, context: CallbackContext) -> None:
     context.bot_data.update(payload)
 
 
-def receive_poll_answer(update: Update, context: CallbackContext) -> None:
+def receive_poll_answer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Summarize a users poll vote"""
     answer = update.poll_answer
     poll_id = answer.poll_id
@@ -93,7 +95,7 @@ def receive_poll_answer(update: Update, context: CallbackContext) -> None:
         )
 
 
-def quiz(update: Update, context: CallbackContext) -> None:
+def quiz(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a predefined poll"""
     questions = ["1", "2", "4", "20"]
     message = update.effective_message.reply_poll(
@@ -106,7 +108,7 @@ def quiz(update: Update, context: CallbackContext) -> None:
     context.bot_data.update(payload)
 
 
-def receive_quiz_answer(update: Update, context: CallbackContext) -> None:
+def receive_quiz_answer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Close quiz after three participants took it"""
     # the bot can receive closed poll updates we don't care about
     if update.poll.is_closed:
@@ -120,7 +122,7 @@ def receive_quiz_answer(update: Update, context: CallbackContext) -> None:
         context.bot.stop_poll(quiz_data["chat_id"], quiz_data["message_id"])
 
 
-def preview(update: Update, context: CallbackContext) -> None:
+def preview(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Ask user to create a poll and display a preview of it"""
     # using this without a type lets the user chooses what he wants (quiz or poll)
     button = [[KeyboardButton("Press me!", request_poll=KeyboardButtonPollType())]]
@@ -131,7 +133,7 @@ def preview(update: Update, context: CallbackContext) -> None:
     )
 
 
-def receive_poll(update: Update, context: CallbackContext) -> None:
+def receive_poll(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """On receiving polls, reply to it by a closed poll copying the received poll"""
     actual_poll = update.effective_message.poll
     # Only need to set the question and options, since all other parameters don't matter for
@@ -145,7 +147,7 @@ def receive_poll(update: Update, context: CallbackContext) -> None:
     )
 
 
-def help_handler(update: Update, context: CallbackContext) -> None:
+def help_handler(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Display a help message"""
     update.message.reply_text("Use /quiz, /poll or /preview to test this bot.")
 
@@ -153,7 +155,7 @@ def help_handler(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Run bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater.builder().token("TOKEN").build()
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('poll', poll))

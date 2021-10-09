@@ -21,13 +21,12 @@ bot.
 import logging
 
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram.ext import CommandHandler, Updater, CallbackContext
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
 
@@ -37,18 +36,18 @@ logger = logging.getLogger(__name__)
 # since context is an unused local variable.
 # This being an example and not having context present confusing beginners,
 # we decided to have it present as context.
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends explanation on how to use the bot."""
     update.message.reply_text('Hi! Use /set <seconds> to set a timer')
 
 
-def alarm(context: CallbackContext) -> None:
+def alarm(context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
     job = context.job
     context.bot.send_message(job.context, text='Beep!')
 
 
-def remove_job_if_exists(name: str, context: CallbackContext) -> bool:
+def remove_job_if_exists(name: str, context: CallbackContext.DEFAULT_TYPE) -> bool:
     """Remove job with given name. Returns whether job was removed."""
     current_jobs = context.job_queue.get_jobs_by_name(name)
     if not current_jobs:
@@ -58,7 +57,7 @@ def remove_job_if_exists(name: str, context: CallbackContext) -> bool:
     return True
 
 
-def set_timer(update: Update, context: CallbackContext) -> None:
+def set_timer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Add a job to the queue."""
     chat_id = update.message.chat_id
     try:
@@ -80,7 +79,7 @@ def set_timer(update: Update, context: CallbackContext) -> None:
         update.message.reply_text('Usage: /set <seconds>')
 
 
-def unset(update: Update, context: CallbackContext) -> None:
+def unset(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
     job_removed = remove_job_if_exists(str(chat_id), context)
@@ -91,7 +90,7 @@ def unset(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Run bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

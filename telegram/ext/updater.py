@@ -17,42 +17,42 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Updater, which tries to make creating Telegram bots intuitive."""
-
+import inspect
 import logging
 import ssl
 import signal
+from pathlib import Path
 from queue import Queue
 from threading import Event, Lock, Thread, current_thread
 from time import sleep
 from typing import (
-    TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
     List,
     Optional,
     Tuple,
     Union,
     no_type_check,
     Generic,
-    overload,
+    TypeVar,
+    TYPE_CHECKING,
 )
 
-from telegram import Bot
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized, TelegramError
-from telegram.ext import Dispatcher, JobQueue, ContextTypes, ExtBot
-from telegram.warnings import PTBDeprecationWarning
-from telegram.request import Request
-from telegram.utils.defaultvalue import DEFAULT_FALSE, DefaultValue
-from telegram.utils.warnings import warn
-from telegram.ext.utils.types import CCT, UD, CD, BD
+from telegram.ext import Dispatcher
 from telegram.ext.utils.webhookhandler import WebhookAppClass, WebhookServer
+from .utils.stack import was_called_by
+from .utils.types import BT
+from ..utils.warnings import warn
 
 if TYPE_CHECKING:
-    from telegram.ext import BasePersistence, Defaults, CallbackContext
+    from .builders import InitUpdaterBuilder
 
 
-class Updater(Generic[CCT, UD, CD, BD]):
+DT = TypeVar('DT', bound=Union[None, Dispatcher])
+
+
+class Updater(Generic[BT, DT]):
     """
     This class, which employs the :class:`telegram.ext.Dispatcher`, provides a frontend to
     :class:`telegram.Bot` to the programmer, so they can focus on coding the bot. Its purpose is to
@@ -64,260 +64,95 @@ class Updater(Generic[CCT, UD, CD, BD]):
     WebhookHandler classes.
 
     Note:
-        * You must supply either a :attr:`bot` or a :attr:`token` argument.
-        * If you supply a :attr:`bot`, you will need to pass :attr:`arbitrary_callback_data`,
-          and :attr:`defaults` to the bot instead of the :class:`telegram.ext.Updater`. In this
-          case, you'll have to use the class :class:`telegram.ext.ExtBot`.
+         This class may not be initialized directly. Use :class:`telegram.ext.UpdaterBuilder` or
+         :meth:`builder` (for convenience).
 
-          .. versionchanged:: 13.6
-
-    Args:
-        token (:obj:`str`, optional): The bot's token given by the @BotFather.
-        base_url (:obj:`str`, optional): Base_url for the bot.
-        base_file_url (:obj:`str`, optional): Base_file_url for the bot.
-        workers (:obj:`int`, optional): Amount of threads in the thread pool for functions
-            decorated with ``@run_async`` (ignored if `dispatcher` argument is used).
-        bot (:class:`telegram.Bot`, optional): A pre-initialized bot instance (ignored if
-            `dispatcher` argument is used). If a pre-initialized bot is used, it is the user's
-            responsibility to create it using a `Request` instance with a large enough connection
-            pool.
-        dispatcher (:class:`telegram.ext.Dispatcher`, optional): A pre-initialized dispatcher
-            instance. If a pre-initialized dispatcher is used, it is the user's responsibility to
-            create it with proper arguments.
-        private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
-        private_key_password (:obj:`bytes`, optional): Password for above private key.
-        user_sig_handler (:obj:`function`, optional): Takes ``signum, frame`` as positional
-            arguments. This will be called when a signal is received, defaults are (SIGINT,
-            SIGTERM, SIGABRT) settable with :attr:`idle`.
-        request_kwargs (:obj:`dict`, optional): Keyword args to control the creation of a
-            `telegram.request.Request` object (ignored if `bot` or `dispatcher` argument is
-            used). The request_kwargs are very useful for the advanced users who would like to
-            control the default timeouts and/or control the proxy used for http communication.
-        persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence class to
-            store data that should be persistent over restarts (ignored if `dispatcher` argument is
-            used).
-        defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
-            be used if not set explicitly in the bot methods.
-        arbitrary_callback_data (:obj:`bool` | :obj:`int` | :obj:`None`, optional): Whether to
-            allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
-            Pass an integer to specify the maximum number of cached objects. For more details,
-            please see our wiki. Defaults to :obj:`False`.
-
-            .. versionadded:: 13.6
-        context_types (:class:`telegram.ext.ContextTypes`, optional): Pass an instance
-            of :class:`telegram.ext.ContextTypes` to customize the types used in the
-            ``context`` interface. If not passed, the defaults documented in
-            :class:`telegram.ext.ContextTypes` will be used.
-
-            .. versionadded:: 13.6
-
-    Raises:
-        ValueError: If both :attr:`token` and :attr:`bot` are passed or none of them.
-
+    .. versionchanged:: 14.0
+        * Initialization is now done through the :class:`telegram.ext.UpdaterBuilder`.
+        * Renamed ``user_sig_handler`` to :attr:`user_signal_handler`.
+        * Removed the attributes ``job_queue``, and ``persistence`` - use the corresponding
+          attributes of :attr:`dispatcher` instead.
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
-        user_sig_handler (:obj:`function`): Optional. Function to be called when a signal is
+        user_signal_handler (:obj:`function`): Optional. Function to be called when a signal is
             received.
+
+            .. versionchanged:: 14.0
+                Renamed ``user_sig_handler`` to ``user_signal_handler``.
         update_queue (:obj:`Queue`): Queue for the updates.
-        job_queue (:class:`telegram.ext.JobQueue`): Jobqueue for the updater.
-        dispatcher (:class:`telegram.ext.Dispatcher`): Dispatcher that handles the updates and
-            dispatches them to the handlers.
+        dispatcher (:class:`telegram.ext.Dispatcher`): Optional. Dispatcher that handles the
+            updates and dispatches them to the handlers.
         running (:obj:`bool`): Indicates if the updater is running.
-        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
-            store data that should be persistent over restarts.
+        exception_event (:class:`threading.Event`): When an unhandled exception happens while
+            fetching updates, this event will be set. If :attr:`dispatcher` is not :obj:`None`, it
+            is the same object as :attr:`telegram.ext.Dispatcher.exception_event`.
+
+            .. versionadded:: 14.0
 
     """
 
     __slots__ = (
-        'persistence',
         'dispatcher',
-        'user_sig_handler',
+        'user_signal_handler',
         'bot',
         'logger',
         'update_queue',
-        'job_queue',
-        '__exception_event',
+        'exception_event',
         'last_update_id',
         'running',
-        '_request',
         'is_idle',
         'httpd',
         '__lock',
         '__threads',
     )
 
-    @overload
     def __init__(
-        self: 'Updater[CallbackContext, dict, dict, dict]',
-        token: str = None,
-        base_url: str = None,
-        workers: int = 4,
-        bot: Bot = None,
-        private_key: bytes = None,
-        private_key_password: bytes = None,
-        user_sig_handler: Callable = None,
-        request_kwargs: Dict[str, Any] = None,
-        persistence: 'BasePersistence' = None,  # pylint: disable=used-before-assignment
-        defaults: 'Defaults' = None,
-        base_file_url: str = None,
-        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
+        self: 'Updater[BT, DT]',
+        *,
+        user_signal_handler: Callable[[int, object], Any] = None,
+        dispatcher: DT = None,
+        bot: BT = None,
+        update_queue: Queue = None,
+        exception_event: Event = None,
     ):
-        ...
-
-    @overload
-    def __init__(
-        self: 'Updater[CCT, UD, CD, BD]',
-        token: str = None,
-        base_url: str = None,
-        workers: int = 4,
-        bot: Bot = None,
-        private_key: bytes = None,
-        private_key_password: bytes = None,
-        user_sig_handler: Callable = None,
-        request_kwargs: Dict[str, Any] = None,
-        persistence: 'BasePersistence' = None,
-        defaults: 'Defaults' = None,
-        base_file_url: str = None,
-        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
-        context_types: ContextTypes[CCT, UD, CD, BD] = None,
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self: 'Updater[CCT, UD, CD, BD]',
-        user_sig_handler: Callable = None,
-        dispatcher: Dispatcher[CCT, UD, CD, BD] = None,
-    ):
-        ...
-
-    def __init__(  # type: ignore[no-untyped-def,misc]
-        self,
-        token: str = None,
-        base_url: str = None,
-        workers: int = 4,
-        bot: Bot = None,
-        private_key: bytes = None,
-        private_key_password: bytes = None,
-        user_sig_handler: Callable = None,
-        request_kwargs: Dict[str, Any] = None,
-        persistence: 'BasePersistence' = None,
-        defaults: 'Defaults' = None,
-        dispatcher=None,
-        base_file_url: str = None,
-        arbitrary_callback_data: Union[DefaultValue, bool, int, None] = DEFAULT_FALSE,
-        context_types: ContextTypes[CCT, UD, CD, BD] = None,
-    ):
-
-        if defaults and bot:
+        if not was_called_by(
+            inspect.currentframe(), Path(__file__).parent.resolve() / 'builders.py'
+        ):
             warn(
-                'Passing defaults to an Updater has no effect when a Bot is passed '
-                'as well. Pass them to the Bot instead.',
-                PTBDeprecationWarning,
-                stacklevel=2,
-            )
-        if arbitrary_callback_data is not DEFAULT_FALSE and bot:
-            warn(
-                'Passing arbitrary_callback_data to an Updater has no '
-                'effect when a Bot is passed as well. Pass them to the Bot instead.',
+                '`Updater` instances should be built via the `UpdaterBuilder`.',
                 stacklevel=2,
             )
 
-        if dispatcher is None:
-            if (token is None) and (bot is None):
-                raise ValueError('`token` or `bot` must be passed')
-            if (token is not None) and (bot is not None):
-                raise ValueError('`token` and `bot` are mutually exclusive')
-            if (private_key is not None) and (bot is not None):
-                raise ValueError('`bot` and `private_key` are mutually exclusive')
+        self.user_signal_handler = user_signal_handler
+        self.dispatcher = dispatcher
+        if self.dispatcher:
+            self.bot = self.dispatcher.bot
+            self.update_queue = self.dispatcher.update_queue
+            self.exception_event = self.dispatcher.exception_event
         else:
-            if bot is not None:
-                raise ValueError('`dispatcher` and `bot` are mutually exclusive')
-            if persistence is not None:
-                raise ValueError('`dispatcher` and `persistence` are mutually exclusive')
-            if context_types is not None:
-                raise ValueError('`dispatcher` and `context_types` are mutually exclusive')
-            if workers is not None:
-                raise ValueError('`dispatcher` and `workers` are mutually exclusive')
+            self.bot = bot
+            self.update_queue = update_queue
+            self.exception_event = exception_event
 
-        self.logger = logging.getLogger(__name__)
-        self._request = None
-
-        if dispatcher is None:
-            con_pool_size = workers + 4
-
-            if bot is not None:
-                self.bot = bot
-                if bot.request.con_pool_size < con_pool_size:
-                    warn(
-                        f'Connection pool of Request object is smaller than optimal value '
-                        f'{con_pool_size}',
-                        stacklevel=2,
-                    )
-            else:
-                # we need a connection pool the size of:
-                # * for each of the workers
-                # * 1 for Dispatcher
-                # * 1 for polling Updater (even if webhook is used, we can spare a connection)
-                # * 1 for JobQueue
-                # * 1 for main thread
-                if request_kwargs is None:
-                    request_kwargs = {}
-                if 'con_pool_size' not in request_kwargs:
-                    request_kwargs['con_pool_size'] = con_pool_size
-                self._request = Request(**request_kwargs)
-                self.bot = ExtBot(
-                    token,  # type: ignore[arg-type]
-                    base_url,
-                    base_file_url=base_file_url,
-                    request=self._request,
-                    private_key=private_key,
-                    private_key_password=private_key_password,
-                    defaults=defaults,
-                    arbitrary_callback_data=(
-                        False  # type: ignore[arg-type]
-                        if arbitrary_callback_data is DEFAULT_FALSE
-                        else arbitrary_callback_data
-                    ),
-                )
-            self.update_queue: Queue = Queue()
-            self.job_queue = JobQueue()
-            self.__exception_event = Event()
-            self.persistence = persistence
-            self.dispatcher = Dispatcher(
-                self.bot,
-                self.update_queue,
-                job_queue=self.job_queue,
-                workers=workers,
-                exception_event=self.__exception_event,
-                persistence=persistence,
-                context_types=context_types,
-            )
-            self.job_queue.set_dispatcher(self.dispatcher)
-        else:
-            con_pool_size = dispatcher.workers + 4
-
-            self.bot = dispatcher.bot
-            if self.bot.request.con_pool_size < con_pool_size:
-                warn(
-                    f'Connection pool of Request object is smaller than optimal value '
-                    f'{con_pool_size}',
-                    stacklevel=2,
-                )
-            self.update_queue = dispatcher.update_queue
-            self.__exception_event = dispatcher.exception_event
-            self.persistence = dispatcher.persistence
-            self.job_queue = dispatcher.job_queue
-            self.dispatcher = dispatcher
-
-        self.user_sig_handler = user_sig_handler
         self.last_update_id = 0
         self.running = False
         self.is_idle = False
         self.httpd = None
         self.__lock = Lock()
         self.__threads: List[Thread] = []
+        self.logger = logging.getLogger(__name__)
+
+    @staticmethod
+    def builder() -> 'InitUpdaterBuilder':
+        """Convenience method. Returns a new :class:`telegram.ext.UpdaterBuilder`.
+
+        .. versionadded:: 14.0
+        """
+        # Unfortunately this needs to be here due to cyclical imports
+        from telegram.ext import UpdaterBuilder  # pylint: disable=import-outside-toplevel
+
+        return UpdaterBuilder()
 
     def _init_thread(self, target: Callable, name: str, *args: object, **kwargs: object) -> None:
         thr = Thread(
@@ -335,7 +170,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         try:
             target(*args, **kwargs)
         except Exception:
-            self.__exception_event.set()
+            self.exception_event.set()
             self.logger.exception('unhandled exception in %s', thr_name)
             raise
         self.logger.debug('%s - ended', thr_name)
@@ -384,10 +219,11 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 self.running = True
 
                 # Create & start threads
-                self.job_queue.start()
                 dispatcher_ready = Event()
                 polling_ready = Event()
-                self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
+
+                if self.dispatcher:
+                    self._init_thread(self.dispatcher.start, "dispatcher", ready=dispatcher_ready)
                 self._init_thread(
                     self._start_polling,
                     "updater",
@@ -400,9 +236,11 @@ class Updater(Generic[CCT, UD, CD, BD]):
                     ready=polling_ready,
                 )
 
-                self.logger.debug('Waiting for Dispatcher and polling to start')
-                dispatcher_ready.wait()
+                self.logger.debug('Waiting for polling to start')
                 polling_ready.wait()
+                if self.dispatcher:
+                    self.logger.debug('Waiting for Dispatcher to start')
+                    dispatcher_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -478,8 +316,9 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 # Create & start threads
                 webhook_ready = Event()
                 dispatcher_ready = Event()
-                self.job_queue.start()
-                self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
+
+                if self.dispatcher:
+                    self._init_thread(self.dispatcher.start, "dispatcher", dispatcher_ready)
                 self._init_thread(
                     self._start_webhook,
                     "updater",
@@ -497,9 +336,11 @@ class Updater(Generic[CCT, UD, CD, BD]):
                     max_connections=max_connections,
                 )
 
-                self.logger.debug('Waiting for Dispatcher and Webhook to start')
+                self.logger.debug('Waiting for webhook to start')
                 webhook_ready.wait()
-                dispatcher_ready.wait()
+                if self.dispatcher:
+                    self.logger.debug('Waiting for Dispatcher to start')
+                    dispatcher_ready.wait()
 
                 # Return the update queue so the main thread can insert updates
                 return self.update_queue
@@ -661,18 +502,26 @@ class Updater(Generic[CCT, UD, CD, BD]):
             webhook_url = self._gen_webhook_url(listen, port, url_path)
 
         # We pass along the cert to the webhook if present.
-        cert_file = open(cert, 'rb') if cert is not None else None
-        self._bootstrap(
-            max_retries=bootstrap_retries,
-            drop_pending_updates=drop_pending_updates,
-            webhook_url=webhook_url,
-            allowed_updates=allowed_updates,
-            cert=cert_file,
-            ip_address=ip_address,
-            max_connections=max_connections,
-        )
-        if cert_file is not None:
-            cert_file.close()
+        if cert is not None:
+            with open(cert, 'rb') as cert_file:
+                self._bootstrap(
+                    cert=cert_file,
+                    max_retries=bootstrap_retries,
+                    drop_pending_updates=drop_pending_updates,
+                    webhook_url=webhook_url,
+                    allowed_updates=allowed_updates,
+                    ip_address=ip_address,
+                    max_connections=max_connections,
+                )
+        else:
+            self._bootstrap(
+                max_retries=bootstrap_retries,
+                drop_pending_updates=drop_pending_updates,
+                webhook_url=webhook_url,
+                allowed_updates=allowed_updates,
+                ip_address=ip_address,
+                max_connections=max_connections,
+            )
 
         self.httpd.serve_forever(ready=ready)
 
@@ -750,10 +599,11 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
     def stop(self) -> None:
         """Stops the polling/webhook thread, the dispatcher and the job queue."""
-        self.job_queue.stop()
         with self.__lock:
-            if self.running or self.dispatcher.has_running_threads:
-                self.logger.debug('Stopping Updater and Dispatcher...')
+            if self.running or (self.dispatcher and self.dispatcher.has_running_threads):
+                self.logger.debug(
+                    'Stopping Updater %s...', 'and Dispatcher ' if self.dispatcher else ''
+                )
 
                 self.running = False
 
@@ -761,9 +611,10 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 self._stop_dispatcher()
                 self._join_threads()
 
-                # Stop the Request instance only if it was created by the Updater
-                if self._request:
-                    self._request.stop()
+                # Clear the connection pool only if the bot is managed by the Updater
+                # Otherwise `dispatcher.stop()` already does that
+                if not self.dispatcher:
+                    self.bot.request.stop()
 
     @no_type_check
     def _stop_httpd(self) -> None:
@@ -778,8 +629,9 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
     @no_type_check
     def _stop_dispatcher(self) -> None:
-        self.logger.debug('Requesting Dispatcher to stop...')
-        self.dispatcher.stop()
+        if self.dispatcher:
+            self.logger.debug('Requesting Dispatcher to stop...')
+            self.dispatcher.stop()
 
     @no_type_check
     def _join_threads(self) -> None:
@@ -801,13 +653,9 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 # https://bugs.python.org/issue28206
                 signal.Signals(signum),  # pylint: disable=no-member
             )
-            if self.persistence:
-                # Update user_data, chat_data and bot_data before flushing
-                self.dispatcher.update_persistence()
-                self.persistence.flush()
             self.stop()
-            if self.user_sig_handler:
-                self.user_sig_handler(signum, frame)
+            if self.user_signal_handler:
+                self.user_signal_handler(signum, frame)
         else:
             self.logger.warning('Exiting immediately!')
             # pylint: disable=import-outside-toplevel, protected-access

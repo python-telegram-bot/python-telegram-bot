@@ -19,6 +19,7 @@
 """This module contains the classes JobQueue and Job."""
 
 import datetime
+import weakref
 from typing import TYPE_CHECKING, Callable, Optional, Tuple, Union, cast, overload
 
 import pytz
@@ -45,7 +46,7 @@ class JobQueue:
     __slots__ = ('_dispatcher', 'scheduler')
 
     def __init__(self) -> None:
-        self._dispatcher: 'Dispatcher' = None  # type: ignore[assignment]
+        self._dispatcher: 'Optional[weakref.ReferenceType[Dispatcher]]' = None
         self.scheduler = BackgroundScheduler(timezone=pytz.utc)
 
     def _tz_now(self) -> datetime.datetime:
@@ -93,9 +94,19 @@ class JobQueue:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
 
         """
-        self._dispatcher = dispatcher
+        self._dispatcher = weakref.ref(dispatcher)
         if isinstance(dispatcher.bot, ExtBot) and dispatcher.bot.defaults:
             self.scheduler.configure(timezone=dispatcher.bot.defaults.tzinfo or pytz.utc)
+
+    @property
+    def dispatcher(self) -> 'Dispatcher':
+        """The dispatcher this JobQueue is associated with."""
+        if self._dispatcher is None:
+            raise RuntimeError('No dispatcher was set for this JobQueue.')
+        dispatcher = self._dispatcher()
+        if dispatcher is not None:
+            return dispatcher
+        raise RuntimeError('The dispatcher instance is no longer alive.')
 
     def run_once(
         self,
@@ -151,7 +162,7 @@ class JobQueue:
             name=name,
             trigger='date',
             run_date=date_time,
-            args=(self._dispatcher,),
+            args=(self.dispatcher,),
             timezone=date_time.tzinfo or self.scheduler.timezone,
             **job_kwargs,
         )
@@ -241,7 +252,7 @@ class JobQueue:
         j = self.scheduler.add_job(
             job,
             trigger='interval',
-            args=(self._dispatcher,),
+            args=(self.dispatcher,),
             start_date=dt_first,
             end_date=dt_last,
             seconds=interval,
@@ -297,7 +308,7 @@ class JobQueue:
         j = self.scheduler.add_job(
             job,
             trigger='cron',
-            args=(self._dispatcher,),
+            args=(self.dispatcher,),
             name=name,
             day='last' if day == -1 else day,
             hour=when.hour,
@@ -354,7 +365,7 @@ class JobQueue:
         j = self.scheduler.add_job(
             job,
             name=name,
-            args=(self._dispatcher,),
+            args=(self.dispatcher,),
             trigger='cron',
             day_of_week=','.join([str(d) for d in days]),
             hour=time.hour,
@@ -394,7 +405,7 @@ class JobQueue:
         name = name or callback.__name__
         job = Job(callback, context, name)
 
-        j = self.scheduler.add_job(job, args=(self._dispatcher,), name=name, **job_kwargs)
+        j = self.scheduler.add_job(job, args=(self.dispatcher,), name=name, **job_kwargs)
 
         job.job = j
         return job
