@@ -20,7 +20,7 @@ import logging
 import pytest
 
 from telegram.error import TelegramError
-from telegram.ext.utils.promise import Promise
+from telegram.ext._utils.promise import Promise
 
 
 class TestPromise:

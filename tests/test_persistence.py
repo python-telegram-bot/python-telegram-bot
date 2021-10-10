@@ -22,8 +22,7 @@ import uuid
 from pathlib import Path
 from threading import Lock
 
-from telegram.ext import PersistenceInput, UpdaterBuilder
-from telegram.ext.callbackdatacache import CallbackDataCache
+from telegram.ext import PersistenceInput, UpdaterBuilder, CallbackDataCache
 
 try:
     import ujson as json
