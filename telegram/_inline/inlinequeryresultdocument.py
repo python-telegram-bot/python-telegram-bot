@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, Union, Tuple, List
 from telegram import InlineQueryResult, MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -61,7 +62,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'document'.
+        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.DOCUMENT`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`): Optional. Caption of the document to be sent,
@@ -120,7 +121,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('document', id)
+        super().__init__(InlineQueryResultType.DOCUMENT, id)
         self.document_url = document_url
         self.title = title
         self.mime_type = mime_type

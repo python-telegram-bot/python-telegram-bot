@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any, Union, Tuple, List
 from telegram import InlineQueryResult, MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -62,7 +63,7 @@ class InlineQueryResultGif(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'gif'.
+        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.GIF`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
         gif_width (:obj:`int`): Optional. Width of the GIF.
@@ -122,7 +123,7 @@ class InlineQueryResultGif(InlineQueryResult):
     ):
 
         # Required
-        super().__init__('gif', id)
+        super().__init__(InlineQueryResultType.GIF, id)
         self.gif_url = gif_url
         self.thumb_url = thumb_url
 

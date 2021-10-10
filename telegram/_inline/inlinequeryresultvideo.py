@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, Union, Tuple, List
 from telegram import InlineQueryResult, MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -67,7 +68,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'video'.
+        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.VIDEO`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
@@ -131,7 +132,7 @@ class InlineQueryResultVideo(InlineQueryResult):
     ):
 
         # Required
-        super().__init__('video', id)
+        super().__init__(InlineQueryResultType.VIDEO, id)
         self.video_url = video_url
         self.mime_type = mime_type
         self.thumb_url = thumb_url

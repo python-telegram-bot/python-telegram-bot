@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, Union, Tuple, List
 from telegram import InlineQueryResult, MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -56,7 +57,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'audio'.
+        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.AUDIO`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         audio_url (:obj:`str`): A valid URL for the audio file.
         title (:obj:`str`): Title.
@@ -106,7 +107,7 @@ class InlineQueryResultAudio(InlineQueryResult):
     ):
 
         # Required
-        super().__init__('audio', id)
+        super().__init__(InlineQueryResultType.AUDIO, id)
         self.audio_url = audio_url
         self.title = title
 

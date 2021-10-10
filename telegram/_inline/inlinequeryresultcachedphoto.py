@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any, Union, Tuple, List
 from telegram import InlineQueryResult, MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -57,7 +58,7 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'photo'.
+        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.PHOTO`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         photo_file_id (:obj:`str`): A valid file identifier of the photo.
         title (:obj:`str`): Optional. Title for the result.
@@ -103,7 +104,7 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('photo', id)
+        super().__init__(InlineQueryResultType.PHOTO, id)
         self.photo_file_id = photo_file_id
 
         # Optionals

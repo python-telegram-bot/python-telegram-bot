@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import InlineQueryResult
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -56,7 +57,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'location'.
+        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.LOCATION`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
@@ -112,7 +113,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('location', id)
+        super().__init__(InlineQueryResultType.LOCATION, id)
         self.latitude = float(latitude)
         self.longitude = float(longitude)
         self.title = title

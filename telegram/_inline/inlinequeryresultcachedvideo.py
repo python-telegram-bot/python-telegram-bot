@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, Union, Tuple, List
 from telegram import InlineQueryResult, MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -56,7 +57,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'video'.
+        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.VIDEO`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         video_file_id (:obj:`str`): A valid file identifier for the video file.
         title (:obj:`str`): Title for the result.
@@ -102,7 +103,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('video', id)
+        super().__init__(InlineQueryResultType.VIDEO, id)
         self.video_file_id = video_file_id
         self.title = title
 

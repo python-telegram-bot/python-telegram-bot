@@ -33,6 +33,7 @@ from telegram import (
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput
+from telegram.constants import InputMediaType
 
 
 class InputMedia(TelegramObject):
@@ -103,7 +104,7 @@ class InputMediaAnimation(InputMedia):
         duration (:obj:`int`, optional): Animation duration.
 
     Attributes:
-        type (:obj:`str`): ``animation``.
+        type (:obj:`str`): :attr:`telegram.constants.InputMediaType.ANIMATION`.
         media (:obj:`str` | :class:`telegram.InputFile`): Animation to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -140,7 +141,7 @@ class InputMediaAnimation(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'animation'
+        self.type = InputMediaType.ANIMATION
 
         if isinstance(media, Animation):
             self.media: Union[str, InputFile] = media.file_id
@@ -192,7 +193,7 @@ class InputMediaPhoto(InputMedia):
             entities that appear in the caption, which can be specified instead of parse_mode.
 
     Attributes:
-        type (:obj:`str`): ``photo``.
+        type (:obj:`str`): :attr:`telegram.constants.InputMediaType.PHOTO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -211,7 +212,7 @@ class InputMediaPhoto(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'photo'
+        self.type = InputMediaType.PHOTO
         self.media = parse_file_input(media, PhotoSize, attach=True, filename=filename)
 
         if caption:
@@ -269,7 +270,7 @@ class InputMediaVideo(InputMedia):
                Accept :obj:`bytes` as input.
 
     Attributes:
-        type (:obj:`str`): ``video``.
+        type (:obj:`str`): :attr:`telegram.constants.InputMediaType.VIDEO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Video file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -310,7 +311,7 @@ class InputMediaVideo(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'video'
+        self.type = InputMediaType.VIDEO
 
         if isinstance(media, Video):
             self.media: Union[str, InputFile] = media.file_id
@@ -383,7 +384,7 @@ class InputMediaAudio(InputMedia):
                Accept :obj:`bytes` as input.
 
     Attributes:
-        type (:obj:`str`): ``audio``.
+        type (:obj:`str`): :attr:`telegram.constants.InputMediaType.AUDIO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -421,7 +422,7 @@ class InputMediaAudio(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'audio'
+        self.type = InputMediaType.AUDIO
 
         if isinstance(media, Audio):
             self.media: Union[str, InputFile] = media.file_id
@@ -485,7 +486,7 @@ class InputMediaDocument(InputMedia):
             the document is sent as part of an album.
 
     Attributes:
-        type (:obj:`str`): ``document``.
+        type (:obj:`str`): :attr:`telegram.constants.InputMediaType.DOCUMENT`.
         media (:obj:`str` | :class:`telegram.InputFile`): File to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -518,7 +519,7 @@ class InputMediaDocument(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        self.type = 'document'
+        self.type = InputMediaType.DOCUMENT
         self.media = parse_file_input(media, Document, attach=True, filename=filename)
 
         if thumb:

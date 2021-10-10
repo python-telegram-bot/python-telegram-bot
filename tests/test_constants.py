@@ -16,30 +16,61 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import json
 from pathlib import Path
 
 import pytest
 from flaky import flaky
 
 from telegram import constants
-from telegram.constants import _StringEnum
+from telegram.constants import _StringEnum, _IntEnum
 from telegram.error import BadRequest
 
 
-class EnumTest(_StringEnum):
+class StrEnumTest(_StringEnum):
     FOO = 'foo'
     BAR = 'bar'
 
 
+class IntEnumTest(_IntEnum):
+    FOO = 1
+    BAR = 2
+
+
 class TestConstants:
+    def test_to_json(self):
+
+        assert json.dumps(StrEnumTest.FOO) == json.dumps('foo')
+        assert json.dumps(IntEnumTest.FOO) == json.dumps(1)
+
     def test_string_representation(self):
-        assert repr(EnumTest.FOO) == '<EnumTest.FOO>'
-        assert str(EnumTest.FOO) == 'EnumTest.FOO'
+        assert repr(StrEnumTest.FOO) == '<StrEnumTest.FOO>'
+        assert str(StrEnumTest.FOO) == 'StrEnumTest.FOO'
 
     def test_string_inheritance(self):
-        assert isinstance(EnumTest.FOO, str)
-        assert EnumTest.FOO + EnumTest.BAR == 'foobar'
-        assert EnumTest.FOO.replace('o', 'a') == 'faa'
+        assert isinstance(StrEnumTest.FOO, str)
+        assert StrEnumTest.FOO + StrEnumTest.BAR == 'foobar'
+        assert StrEnumTest.FOO.replace('o', 'a') == 'faa'
+
+        assert StrEnumTest.FOO == StrEnumTest.FOO
+        assert StrEnumTest.FOO == 'foo'
+        assert StrEnumTest.FOO != StrEnumTest.BAR
+        assert StrEnumTest.FOO != 'bar'
+        assert StrEnumTest.FOO != object()
+
+        assert hash(StrEnumTest.FOO) == hash('foo')
+
+    def test_int_inheritance(self):
+        assert isinstance(IntEnumTest.FOO, int)
+        assert IntEnumTest.FOO + IntEnumTest.BAR == 3
+
+        assert IntEnumTest.FOO == IntEnumTest.FOO
+        assert IntEnumTest.FOO == 1
+        assert IntEnumTest.FOO != IntEnumTest.BAR
+        assert IntEnumTest.FOO != 2
+        assert IntEnumTest.FOO != object()
+
+        assert hash(IntEnumTest.FOO) == hash(1)
 
     @flaky(3, 1)
     def test_max_message_length(self, bot, chat_id):

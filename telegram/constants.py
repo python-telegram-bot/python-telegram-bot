@@ -79,6 +79,30 @@ class _StringEnum(str, Enum):
     def __repr__(self) -> str:
         return f'<{self.__class__.__name__}.{self.name}>'
 
+    def __eq__(self, other: object) -> bool:
+        """Makes sure that the enum members can be compared to strings."""
+        if isinstance(other, str):
+            return other == self.value
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        return hash(self.value)
+
+
+class _IntEnum(IntEnum):
+    """Helper class for int enums that overrides the default __eq__"""
+
+    __slots__ = ()
+
+    def __eq__(self, other: object) -> bool:
+        """Makes sure that the enum members can be compared to strings."""
+        if isinstance(other, str):
+            return other == self.value
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        return hash(self.value)
+
 
 BOT_API_VERSION = '5.3'
 ANONYMOUS_ADMIN_ID = 1087968824
@@ -216,7 +240,7 @@ class DiceEmoji(_StringEnum):
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎳``."""
 
 
-class FileSizeLimit(IntEnum):
+class FileSizeLimit(_IntEnum):
     """This enum contains limitations regarding the upload and download of files. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
@@ -233,7 +257,7 @@ class FileSizeLimit(IntEnum):
     """:obj:`int`: Bots can upload photo files of up to 10MB in size."""
 
 
-class FloodLimit(IntEnum):
+class FloodLimit(_IntEnum):
     """This enum contains limitations regarding flood limits. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
@@ -257,7 +281,7 @@ class FloodLimit(IntEnum):
     """
 
 
-class InlineKeyboardMarkupLimit(IntEnum):
+class InlineKeyboardMarkupLimit(_IntEnum):
     """This enum contains limitations for :class:`telegram.InlineKeyboardMarkup`/
     :meth:`telegram.Bot.send_message` & friends. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -281,7 +305,28 @@ class InlineKeyboardMarkupLimit(IntEnum):
     """
 
 
-class InlineQueryLimit(IntEnum):
+class InputMediaType(_StringEnum):
+    """This enum contains the available types of :class:`telegram.InputMedia`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 14.0
+    """
+
+    __slots__ = ()
+
+    ANIMATION = 'animation'
+    """:obj:`str`: Type of :class:`telegram.InputMediaAnimation`."""
+    DOCUMENT = 'document'
+    """:obj:`str`: Type of :class:`telegram.InputMediaDocument`."""
+    AUDIO = 'audio'
+    """:obj:`str`: Type of :class:`telegram.InputMediaAudio`."""
+    PHOTO = 'photo'
+    """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
+    VIDEO = 'video'
+    """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
+
+
+class InlineQueryLimit(_IntEnum):
     """This enum contains limitations for :class:`telegram.InlineQuery`/
     :meth:`telegram.Bot.answer_inline_query`. The enum members of this enumeration are instances
     of :class:`int` and can be treated as such.
@@ -289,12 +334,65 @@ class InlineQueryLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
+    __slots__ = ()
+
     RESULTS = 50
     """:obj:`int`: Maximum number of results that can be passed to
     :meth:`Bot.answer_inline_query."""
     SWITCH_PM_TEXT_LENGTH = 64
     """:obj:`int`: Maximum number of characters for the ``switch_pm_text`` parameter of
     :meth:`Bot.answer_inline_query."""
+
+
+class InlineQueryResultType(_StringEnum):
+    """This enum contains the available types of :class:`telegram.InlineQueryResult`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 14.0
+    """
+
+    __slots__ = ()
+
+    AUDIO = 'audio'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultAudio` and
+    :class:`telegram.InlineQueryResultCachedAudio`.
+    """
+    DOCUMENT = 'document'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultDocument` and
+    :class:`telegram.InlineQueryResultCachedDocument`.
+    """
+    GIF = 'gif'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultGif` and
+    :class:`telegram.InlineQueryResultCachedGif`.
+    """
+    MPEG4GIF = 'mpeg4_gif'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultMpeg4Gif` and
+    :class:`telegram.InlineQueryResultCachedMpeg4Gif`.
+    """
+    PHOTO = 'photo'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultPhoto` and
+    :class:`telegram.InlineQueryResultCachedPhoto`.
+    """
+    STICKER = 'sticker'
+    """:obj:`str`: Type of and :class:`telegram.InlineQueryResultCachedSticker`."""
+    VIDEO = 'video'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultVideo` and
+    :class:`telegram.InlineQueryResultCachedVideo`.
+    """
+    VOICE = 'voice'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultVoice` and
+    :class:`telegram.InlineQueryResultCachedVoice`.
+    """
+    ARTICLE = 'article'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultArticle`."""
+    CONTACT = 'contact'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultContact`."""
+    GAME = 'game'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultGame`."""
+    LOCATION = 'location'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultLocation."""
+    VENUE = 'venue'
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultVenue`."""
 
 
 class MaskPosition(_StringEnum):
@@ -357,7 +455,7 @@ class MessageEntityType(_StringEnum):
     """:obj:`str`: Message entities representing strikethrough text."""
 
 
-class MessageLimit(IntEnum):
+class MessageLimit(_IntEnum):
     """This enum contains limitations for :class:`telegram.Message`/
     :meth:`telegram.Bot.send_message` & friends. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -403,7 +501,7 @@ class ParseMode(_StringEnum):
     """:obj:`str`: HTML parse mode."""
 
 
-class PollLimit(IntEnum):
+class PollLimit(_IntEnum):
     """This enum contains limitations for :class:`telegram.Poll`/
     :meth:`telegram.Bot.send_poll`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.

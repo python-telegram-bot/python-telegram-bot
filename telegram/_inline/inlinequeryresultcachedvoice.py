@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, Union, Tuple, List
 from telegram import InlineQueryResult, MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -54,7 +55,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'voice'.
+        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.VOICE`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.
         title (:obj:`str`): Voice message title.
@@ -97,7 +98,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('voice', id)
+        super().__init__(InlineQueryResultType.VOICE, id)
         self.voice_file_id = voice_file_id
         self.title = title
 

@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, Union, Tuple, List
 from telegram import InlineQueryResult, MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -61,7 +62,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'mpeg4_gif'.
+        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.MPEG4_GIF`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
         mpeg4_width (:obj:`int`): Optional. Video width.
@@ -121,7 +122,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     ):
 
         # Required
-        super().__init__('mpeg4_gif', id)
+        super().__init__(InlineQueryResultType.MPEG4GIF, id)
         self.mpeg4_url = mpeg4_url
         self.thumb_url = thumb_url
 
