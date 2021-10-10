@@ -482,7 +482,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
-            new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
+            new_state (:obj:`tuple` | :obj:`Any`): The new state for the given key.
         """
 
     @abstractmethod
@@ -579,7 +579,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             data (Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :obj:`any`]]], Dict[:obj:`str`, :obj:`str`]]):
+                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]):
                 The relevant data to restore :class:`telegram.ext.CallbackDataCache`.
         """
 

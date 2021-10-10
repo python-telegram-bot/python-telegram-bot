@@ -128,7 +128,7 @@ class CallbackDataCache:
             Defaults to 1024.
 
         persistent_data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-        Dict[:obj:`str`, :obj:`any`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
+        Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
         Data to initialize the cache with, as returned by \
         :meth:`telegram.ext.BasePersistence.get_callback_data`.
 
@@ -165,7 +165,7 @@ class CallbackDataCache:
 
     @property
     def persistence_data(self) -> CDCData:
-        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]],
+        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]],
         Dict[:obj:`str`, :obj:`str`]]: The data that needs to be persisted to allow
         caching callback data across bot reboots.
         """

@@ -203,7 +203,7 @@ class DictPersistence(BasePersistence):
 
     @property
     def callback_data(self) -> Optional[CDCData]:
-        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
+        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]], \
         Dict[:obj:`str`, :obj:`str`]]: The meta data on the stored callback data.
 
         .. versionadded:: 13.6
@@ -270,7 +270,7 @@ class DictPersistence(BasePersistence):
         .. versionadded:: 13.6
 
         Returns:
-            Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
+            Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]], \
                 Dict[:obj:`str`, :obj:`str`]]: The restored meta data or :obj:`None`, \
                 if no data was stored.
         """
@@ -298,7 +298,7 @@ class DictPersistence(BasePersistence):
         Args:
             name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
-            new_state (:obj:`tuple` | :obj:`any`): The new state for the given key.
+            new_state (:obj:`tuple` | :obj:`Any`): The new state for the given key.
         """
         if not self._conversations:
             self._conversations = {}
@@ -352,7 +352,7 @@ class DictPersistence(BasePersistence):
         .. versionadded:: 13.6
 
         Args:
-            data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`any`]]], \
+            data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]], \
                 Dict[:obj:`str`, :obj:`str`]]): The relevant data to restore
                 :class:`telegram.ext.CallbackDataCache`.
         """
