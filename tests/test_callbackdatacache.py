@@ -25,7 +25,7 @@ import pytest
 import pytz
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message, User
-from telegram.ext.callbackdatacache import (
+from telegram.ext._callbackdatacache import (
     CallbackDataCache,
     _KeyboardData,
     InvalidCallbackData,

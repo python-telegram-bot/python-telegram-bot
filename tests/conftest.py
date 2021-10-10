@@ -61,7 +61,7 @@ from telegram.ext import (
     UpdaterBuilder,
 )
 from telegram.error import BadRequest
-from telegram.utils.defaultvalue import DefaultValue, DEFAULT_NONE
+from telegram._utils.defaultvalue import DefaultValue, DEFAULT_NONE
 from telegram.request import Request
 from tests.bots import get_bot
 

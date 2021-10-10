@@ -49,7 +49,7 @@ def get_setup_kwargs(raw=False):
     raw_ext = "-raw" if raw else ""
     readme = Path(f'README{"_RAW" if raw else ""}.rst')
 
-    with Path('telegram/version.py').open() as fh:
+    with Path('telegram/_version.py').open() as fh:
         for line in fh.readlines():
             if line.startswith('__version__'):
                 exec(line)
@@ -76,7 +76,6 @@ def get_setup_kwargs(raw=False):
         long_description=readme.read_text(),
         long_description_content_type='text/x-rst',
         packages=packages,
-
         install_requires=requirements,
         extras_require={
             'json': 'ujson',
@@ -99,7 +98,7 @@ def get_setup_kwargs(raw=False):
             'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9',
         ],
-        python_requires='>=3.7'
+        python_requires='>=3.7',
     )
 
     return kwargs
