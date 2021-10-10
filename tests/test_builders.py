@@ -30,6 +30,7 @@ from .conftest import PRIVATE_KEY
 
 from telegram.ext import (
     UpdaterBuilder,
+    DispatcherBuilder,
     Defaults,
     JobQueue,
     PicklePersistence,
@@ -37,7 +38,7 @@ from telegram.ext import (
     Dispatcher,
     Updater,
 )
-from telegram.ext.builders import _BOT_CHECKS, _DISPATCHER_CHECKS, DispatcherBuilder, _BaseBuilder
+from telegram.ext._builders import _BOT_CHECKS, _DISPATCHER_CHECKS, _BaseBuilder
 
 
 @pytest.fixture(
