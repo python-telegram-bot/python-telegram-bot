@@ -90,7 +90,8 @@ class InputMediaAnimation(InputMedia):
 
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
-        caption (:obj:`str`, optional): Caption of the animation to be sent, 0-1024 characters
+        caption (:obj:`str`, optional): Caption of the animation to be sent,
+            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -181,7 +182,8 @@ class InputMediaPhoto(InputMedia):
             :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-        caption (:obj:`str`, optional ): Caption of the photo to be sent, 0-1024 characters after
+        caption (:obj:`str`, optional ): Caption of the photo to be sent,
+            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -243,7 +245,8 @@ class InputMediaVideo(InputMedia):
             :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-        caption (:obj:`str`, optional): Caption of the video to be sent, 0-1024 characters after
+        caption (:obj:`str`, optional): Caption of the video to be sent,
+            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -357,7 +360,8 @@ class InputMediaAudio(InputMedia):
             :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-        caption (:obj:`str`, optional): Caption of the audio to be sent, 0-1024 characters after
+        caption (:obj:`str`, optional): Caption of the audio to be sent,
+            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -459,7 +463,8 @@ class InputMediaDocument(InputMedia):
             :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-        caption (:obj:`str`, optional): Caption of the document to be sent, 0-1024 characters after
+        caption (:obj:`str`, optional): Caption of the document to be sent,
+            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants

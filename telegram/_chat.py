@@ -71,8 +71,8 @@ class Chat(TelegramObject):
             and some programming languages may have difficulty/silent defects in interpreting it.
             But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float
             type are safe for storing this identifier.
-        type (:obj:`str`): Type of chat, can be either 'private', 'group', 'supergroup' or
-            'channel'.
+        type (:obj:`str`): Type of chat, can be either :attr:`PRIVATE`, :attr:`GROUP`,
+            :attr:`SUPERGROUP` or :attr:`CHANNEL`.
         title (:obj:`str`, optional): Title, for supergroups, channels and group chats.
         username(:obj:`str`, optional): Username, for private chats, supergroups and channels if
             available.

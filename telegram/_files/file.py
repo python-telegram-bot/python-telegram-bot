@@ -41,7 +41,8 @@ class File(TelegramObject):
     considered equal, if their :attr:`file_unique_id` is equal.
 
     Note:
-        * Maximum file size to download is 20 MB.
+        * Maximum file size to download is
+            :attr:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD`.
         * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
           then it will automatically be decrypted as it downloads when you call :attr:`download()`.
 

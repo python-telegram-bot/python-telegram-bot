@@ -45,7 +45,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
             ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
         title (:obj:`str`, optional): Title for the result.
-        caption (:obj:`str`, optional): Caption of the MPEG-4 file to be sent, 0-1024 characters
+        caption (:obj:`str`, optional): Caption of the MPEG-4 file to be sent,
+            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -70,7 +71,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             the result.
         thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.
         title (:obj:`str`): Optional. Title for the result.
-        caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent, 0-1024 characters
+        caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent,
+            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants

@@ -110,7 +110,8 @@ class Message(TelegramObject):
             time. Converted to :class:`datetime.datetime`.
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
-        text (str, optional): For text messages, the actual UTF-8 text of the message, 0-4096
+        text (str, optional): For text messages, the actual UTF-8 text of the message,
+            0-:attr:`telegram.constants.MessageLimit.TEXT_LENGTH`
             characters. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
@@ -140,7 +141,7 @@ class Message(TelegramObject):
             the group or supergroup and information about them (the bot itself may be one of these
             members).
         caption (:obj:`str`, optional): Caption for the animation, audio, document, photo, video
-            or voice, 0-1024 characters.
+            or voice, 0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
             about the contact.
         location (:class:`telegram.Location`, optional): Message is a shared location, information
@@ -262,7 +263,8 @@ class Message(TelegramObject):
         video_note (:class:`telegram.VideoNote`): Optional. Information about the video message.
         new_chat_members (List[:class:`telegram.User`]): Optional. Information about new members to
             the chat. (the bot itself may be one of these members).
-        caption (:obj:`str`): Optional. Caption for the document, photo or video, 0-1024
+        caption (:obj:`str`): Optional. Caption for the document, photo or video,
+            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH`
             characters.
         contact (:class:`telegram.Contact`): Optional. Information about the contact.
         location (:class:`telegram.Location`): Optional. Information about the location.

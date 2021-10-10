@@ -34,9 +34,6 @@ Attributes:
 
         .. versionadded:: 13.2
 
-The following constant have been found by experimentation:
-
-Attributes:
     ANONYMOUS_ADMIN_ID (:obj:`int`): ``1087968824`` (User id in groups for anonymous admin)
     SERVICE_CHAT_ID (:obj:`int`): ``777000`` (Telegram service chat, that also acts as sender of
         channel posts forwarded to discussion groups)
@@ -286,7 +283,7 @@ class InlineKeyboardMarkupLimit(IntEnum):
 
 
 class MaskPosition(_StringEnum):
-    """This enum contains the available positions for :class:`telegram.MasPosition`. The enum
+    """This enum contains the available positions for :class:`telegram.MaskPosition`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
     .. versionadded:: 14.0
@@ -404,6 +401,8 @@ class PollLimit(IntEnum):
     QUESTION_LENGTH = 300
     """:obj:`str`: Maximum number of characters of the polls question."""
     OPTION_LENGTH = 100
+    """:obj:`str`: Maximum number of characters for each option for the poll."""
+    OPTION_NUMBER = 10
     """:obj:`str`: Maximum number of available options for the poll."""
 
 

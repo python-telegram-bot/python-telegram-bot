@@ -277,7 +277,8 @@ class Updater(Generic[BT, DT]):
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
-            port (:obj:`int`, optional): Port the bot should be listening on. Default ``80``.
+            port (:obj:`int`, optional): Port the bot should be listening on. Must be one of
+                :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS` Defaults to ``80``.
             url_path (:obj:`str`, optional): Path inside url.
             cert (:obj:`str`, optional): Path to the SSL certificate file.
             key (:obj:`str`, optional): Path to the SSL key file.

@@ -36,10 +36,12 @@ class MessageEntity(TelegramObject):
     considered equal, if their :attr:`type`, :attr:`offset` and :attr:`length` are equal.
 
     Args:
-        type (:obj:`str`): Type of the entity. Can be mention (@username), hashtag, bot_command,
-            url, email, phone_number, bold (bold text), italic (italic text), strikethrough,
-            code (monowidth string), pre (monowidth block), text_link (for clickable text URLs),
-            text_mention (for users without usernames).
+        type (:obj:`str`): Type of the entity. Can be :attr:`MENTION` (@username),
+            :attr:`HASHTAG`, :attr:`BOT_COMMAND`,
+            :attr:`URL`, :attr:`EMAIL`, :attr:`PHONE_NUMBER`, :attr:`BOLD` (bold text),
+            :attr:`ITALIC` (italic text), :attr:`STRIKETHROUGH`, :attr:`CODE` (monowidth string),
+            :attr:`PRE` (monowidth block), :attr:`TEXT_LINK` (for clickable text URLs),
+            :attr:`TEXT_MENTION` (for users without usernames).
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`, optional): For :attr:`TEXT_LINK` only, url that will be opened after
