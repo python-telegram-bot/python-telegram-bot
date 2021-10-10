@@ -232,7 +232,7 @@ class MaskPosition(TelegramObject):
 
     Attributes:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
-            One of ``'forehead'``, ``'eyes'``, ``'mouth'``, or ``'chin'``.
+            One of :attr:`FOREHEAD`, :attr:`EYES`, :attr:`MOUTH`, or :attr:`CHIN`.
         x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
             size, from left to right.
         y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
