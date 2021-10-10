@@ -180,7 +180,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         stack_level: int = 4,
     ):
         if not was_called_by(
-            inspect.currentframe(), Path(__file__).parent.resolve() / 'builders.py'
+            inspect.currentframe(), Path(__file__).parent.resolve() / '_builders.py'
         ):
             warn(
                 '`Dispatcher` instances should be built via the `DispatcherBuilder`.',

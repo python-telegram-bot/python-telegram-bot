@@ -117,7 +117,7 @@ class Updater(Generic[BT, DT]):
         exception_event: Event = None,
     ):
         if not was_called_by(
-            inspect.currentframe(), Path(__file__).parent.resolve() / 'builders.py'
+            inspect.currentframe(), Path(__file__).parent.resolve() / '_builders.py'
         ):
             warn(
                 '`Updater` instances should be built via the `UpdaterBuilder`.',
