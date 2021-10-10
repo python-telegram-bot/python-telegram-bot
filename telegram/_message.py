@@ -110,7 +110,7 @@ class Message(TelegramObject):
             time. Converted to :class:`datetime.datetime`.
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
-        text (str, optional): For text messages, the actual UTF-8 text of the message,
+        text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
             0-:attr:`telegram.constants.MessageLimit.TEXT_LENGTH`
             characters. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special

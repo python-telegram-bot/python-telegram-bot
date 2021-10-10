@@ -163,9 +163,13 @@ class InlineQuery(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    MAX_RESULTS: ClassVar[int] = constants.MAX_INLINE_QUERY_RESULTS
-    """
-    :const:`telegram.constants.MAX_INLINE_QUERY_RESULTS`
+    MAX_RESULTS: ClassVar[int] = constants.InlineQueryLimit.RESULTS
+    """:const:`telegram.constants.InlineQueryLimit.RESULTS`
 
     .. versionadded:: 13.2
+    """
+    MAX_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH
+    """:const:`telegram.constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH`
+
+    .. versionadded:: 14.0
     """

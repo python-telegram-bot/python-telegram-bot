@@ -113,8 +113,10 @@ class File(TelegramObject):
               local mode), this method will just return the path.
 
         .. versionchanged:: 14.0
+
             * ``custom_path`` parameter now also accepts :obj:`pathlib.Path` as argument.
-            * Returns :obj:`pathlib.Path` object in cases where previously returned `str` object.
+            * Returns :obj:`pathlib.Path` object in cases where previously a :obj:`str` was
+              returned.
 
         Args:
             custom_path (:obj:`pathlib.Path` | :obj:`str`, optional): Custom path.
@@ -126,8 +128,8 @@ class File(TelegramObject):
 
         Returns:
             :obj:`pathlib.Path` | :obj:`io.BufferedWriter`: The same object as :attr:`out` if
-                specified.
-            Otherwise, returns the filename downloaded to or the file path of the local file.
+                specified. Otherwise, returns the filename downloaded to or the file path of the
+                local file.
 
         Raises:
             ValueError: If both :attr:`custom_path` and :attr:`out` are passed.

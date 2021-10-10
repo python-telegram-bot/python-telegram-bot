@@ -127,12 +127,13 @@ class Bot(TelegramObject):
         passing files.
 
     .. versionchanged:: 14.0
+
         * Removed the deprecated methods ``kick_chat_member``, ``kickChatMember``,
           ``get_chat_members_count`` and ``getChatMembersCount``.
         * Removed the deprecated property ``commands``.
         * Removed the deprecated ``defaults`` parameter. If you want to use
-            :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
-            instead.
+          :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
+          instead.
 
     Args:
         token (:obj:`str`): Bot's unique authentication.
@@ -2100,7 +2101,8 @@ class Bot(TelegramObject):
                 specified text that switches the user to a private chat with the bot and sends the
                 bot a start message with the parameter ``switch_pm_parameter``.
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
-                message sent to the bot when user presses the switch button. 1-64 characters,
+                message sent to the bot when user presses the switch button.
+                1-:attr:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
                 only A-Z, a-z, 0-9, _ and - are allowed.
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
                 the inline query to answer. If passed, PTB will automatically take care of

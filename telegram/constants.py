@@ -29,7 +29,6 @@ Attributes:
 
         .. versionadded:: 13.4
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
-    MAX_INLINE_QUERY_RESULTS (:obj:`int`): 50
     MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH (:obj:`int`): 200
 
         .. versionadded:: 13.2
@@ -280,6 +279,22 @@ class InlineKeyboardMarkupLimit(IntEnum):
     Note:
         This value is undocumented and might be changed by Telegram.
     """
+
+
+class InlineQueryLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.InlineQuery`/
+    :meth:`telegram.Bot.answer_inline_query`. The enum members of this enumeration are instances
+    of :class:`int` and can be treated as such.
+
+    .. versionadded:: 14.0
+    """
+
+    RESULTS = 50
+    """:obj:`int`: Maximum number of results that can be passed to
+    :meth:`Bot.answer_inline_query."""
+    SWITCH_PM_TEXT_LENGTH = 64
+    """:obj:`int`: Maximum number of characters for the ``switch_pm_text`` parameter of
+    :meth:`Bot.answer_inline_query."""
 
 
 class MaskPosition(_StringEnum):
