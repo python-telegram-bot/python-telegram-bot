@@ -73,7 +73,7 @@ from telegram.error import (
     TimedOut,
     Unauthorized,
 )
-from telegram.utils.types import JSONDict, FilePathInput
+from telegram._utils.types import JSONDict, FilePathInput
 
 
 # pylint: disable=unused-argument
