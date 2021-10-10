@@ -417,7 +417,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
         corresponding to one of the following:
 
-          * :obj:`dtict`
+          * :obj:`dict`
           * The type from :attr:`telegram.ext.ContextTypes.chat_data`
             if :class:`telegram.ext.ContextTypes` are used.
 
