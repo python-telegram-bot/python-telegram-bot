@@ -130,7 +130,7 @@ class ResidentialAddress(TelegramObject):
         self.country_code = country_code
         self.post_code = post_code
 
-        self._bot = bot
+        self.set_bot(bot)
 
 
 class IdDocumentData(TelegramObject):

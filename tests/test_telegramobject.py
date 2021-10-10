@@ -21,8 +21,6 @@ import json as json_lib
 
 import pytest
 
-from telegram.bot import Bot
-
 try:
     import ujson
 except ImportError:
@@ -120,16 +118,16 @@ class TestTelegramObject:
         assert len(recwarn) == 0
 
     def test_bot_instance_none(self):
-        TG = TelegramObject()
+        tg_object = TelegramObject()
         with pytest.raises(RuntimeError):
-            TG.get_bot()
+            tg_object.get_bot()
 
-    @pytest.mark.parametrize('bot_inst', [Bot, None])
+    @pytest.mark.parametrize('bot_inst', ['bot', None])
     def test_bot_instance_states(self, bot_inst):
-        TG = TelegramObject()
-        TG.set_bot(bot_inst)
-        if bot_inst is Bot:
-            assert isinstance(TG.get_bot(), type(Bot))
+        tg_object = TelegramObject()
+        tg_object.set_bot('bot' if bot_inst == 'bot' else bot_inst)
+        if bot_inst == 'bot':
+            assert tg_object.get_bot() == 'bot'
         elif bot_inst is None:
             with pytest.raises(RuntimeError):
-                TG.get_bot()
+                tg_object.get_bot()
