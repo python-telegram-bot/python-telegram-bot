@@ -633,7 +633,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             private_key (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): The private key or the
                 file path of a file that contains the key. In the latter case, the file's content
                 will be read automatically.
-            password (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): Optional. The corresponding
+            password (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`, optional): The corresponding
                 password or the file path of a file that contains the password. In the latter case,
                 the file's content will be read automatically.
 
@@ -991,7 +991,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             private_key (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): The private key or the
                 file path of a file that contains the key. In the latter case, the file's content
                 will be read automatically.
-            password (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): Optional. The corresponding
+            password (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`, optional): The corresponding
                 password or the file path of a file that contains the password. In the latter case,
                 the file's content will be read automatically.
 
