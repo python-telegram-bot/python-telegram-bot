@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116,W0613
+# pylint: disable=missing-function-docstring, unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """Bot that explains Telegram's "Deep Linking Parameters" functionality.
@@ -23,10 +23,10 @@ import logging
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update, helpers
 from telegram.constants import ParseMode
 from telegram.ext import (
-    Updater,
     CommandHandler,
     CallbackQueryHandler,
     Filters,
+    Updater,
     CallbackContext,
 )
 
@@ -47,7 +47,7 @@ SO_COOL = "so-cool"
 KEYBOARD_CALLBACKDATA = "keyboard-callback-data"
 
 
-def start(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a deep-linked URL when the command /start is issued."""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, CHECK_THIS_OUT, group=True)
@@ -55,7 +55,7 @@ def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(text)
 
 
-def deep_linked_level_1(update: Update, context: CallbackContext) -> None:
+def deep_linked_level_1(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Reached through the CHECK_THIS_OUT payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, SO_COOL)
@@ -69,7 +69,7 @@ def deep_linked_level_1(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(text, reply_markup=keyboard)
 
 
-def deep_linked_level_2(update: Update, context: CallbackContext) -> None:
+def deep_linked_level_2(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Reached through the SO_COOL payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_ENTITIES)
@@ -77,7 +77,7 @@ def deep_linked_level_2(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 
-def deep_linked_level_3(update: Update, context: CallbackContext) -> None:
+def deep_linked_level_3(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Reached through the USING_ENTITIES payload"""
     update.message.reply_text(
         "It is also possible to make deep-linking using InlineKeyboardButtons.",
@@ -87,14 +87,14 @@ def deep_linked_level_3(update: Update, context: CallbackContext) -> None:
     )
 
 
-def deep_link_level_3_callback(update: Update, context: CallbackContext) -> None:
+def deep_link_level_3_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Answers CallbackQuery with deeplinking url."""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_KEYBOARD)
     update.callback_query.answer(url=url)
 
 
-def deep_linked_level_4(update: Update, context: CallbackContext) -> None:
+def deep_linked_level_4(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Reached through the USING_KEYBOARD payload"""
     payload = context.args
     update.message.reply_text(
@@ -105,7 +105,7 @@ def deep_linked_level_4(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("TOKEN")
+    updater = Updater.builder().token("TOKEN").build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
