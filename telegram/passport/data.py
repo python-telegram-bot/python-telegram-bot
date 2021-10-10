@@ -86,7 +86,7 @@ class PersonalDetails(TelegramObject):
         self.last_name_native = last_name_native
         self.middle_name_native = middle_name_native
 
-        self.set_bot(bot)  # type: ignore[arg-type]
+        self.set_bot(bot)
 
 
 class ResidentialAddress(TelegramObject):
