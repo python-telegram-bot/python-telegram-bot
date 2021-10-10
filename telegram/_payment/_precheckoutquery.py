@@ -80,7 +80,7 @@ class PreCheckoutQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         currency: str,
         total_amount: int,
@@ -90,7 +90,7 @@ class PreCheckoutQuery(TelegramObject):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
-        self.id = id  # pylint: disable=C0103
+        self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
         self.currency = currency
         self.total_amount = total_amount
@@ -115,7 +115,7 @@ class PreCheckoutQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(  # pylint: disable=C0103
+    def answer(  # pylint: disable=invalid-name
         self,
         ok: bool,
         error_message: str = None,

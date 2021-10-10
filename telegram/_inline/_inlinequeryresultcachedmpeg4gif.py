@@ -85,7 +85,7 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         mpeg4_file_id: str,
         title: str = None,
         caption: str = None,

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=W0622
+# pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
 from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple, ClassVar
 
@@ -105,7 +105,7 @@ class CallbackQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         chat_instance: str,
         message: Message = None,
@@ -116,7 +116,7 @@ class CallbackQuery(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.id = id  # pylint: disable=C0103
+        self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
         self.chat_instance = chat_instance
         # Optionals

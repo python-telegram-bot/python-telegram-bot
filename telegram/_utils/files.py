@@ -87,7 +87,7 @@ def parse_file_input(
         :attr:`file_input`, in case it's no valid file input.
     """
     # Importing on file-level yields cyclic Import Errors
-    from telegram import InputFile  # pylint: disable=C0415
+    from telegram import InputFile  # pylint: disable=import-outside-toplevel
 
     if isinstance(file_input, str) and file_input.startswith('file://'):
         return file_input

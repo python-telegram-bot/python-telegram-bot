@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=W0622
+# pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
 
 from typing import TYPE_CHECKING, Any, Union, Tuple, List
@@ -103,7 +103,7 @@ class InlineQueryResultGif(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         gif_url: str,
         thumb_url: str,
         gif_width: int = None,

@@ -16,14 +16,25 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=R0201
+# pylint: disable=no-self-use
 """This module contains the ConversationHandler."""
 
 import logging
 import functools
 import datetime
 from threading import Lock
-from typing import TYPE_CHECKING, Dict, List, NoReturn, Optional, Union, Tuple, cast, ClassVar
+from typing import (  # pylint: disable=unused-import  # for the "Any" import
+    TYPE_CHECKING,
+    Dict,
+    List,
+    NoReturn,
+    Optional,
+    Union,
+    Tuple,
+    cast,
+    ClassVar,
+    Any,
+)
 
 from telegram import Update
 from telegram.ext import (
@@ -41,7 +52,7 @@ from telegram.ext._utils.types import ConversationDict
 from telegram.ext._utils.types import CCT
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher, Job
+    from telegram.ext import Dispatcher, Job, JobQueue
 CheckUpdateType = Optional[Tuple[Tuple[int, ...], Handler, object]]
 
 
@@ -52,7 +63,7 @@ class _ConversationTimeoutContext:
         self,
         conversation_key: Tuple[int, ...],
         update: Update,
-        dispatcher: 'Dispatcher',
+        dispatcher: 'Dispatcher[Any, CCT, Any, Any, Any, JobQueue, Any]',
         callback_context: CallbackContext,
     ):
         self.conversation_key = conversation_key
@@ -212,7 +223,7 @@ class ConversationHandler(Handler[Update, CCT]):
     WAITING: ClassVar[int] = -3
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
     previous ``@run_sync`` decorated running handler to finish."""
-    # pylint: disable=W0231
+    # pylint: disable=super-init-not-called
     def __init__(
         self,
         entry_points: List[Handler[Update, CCT]],
@@ -489,7 +500,7 @@ class ConversationHandler(Handler[Update, CCT]):
     def _schedule_job(
         self,
         new_state: object,
-        dispatcher: 'Dispatcher',
+        dispatcher: 'Dispatcher[Any, CCT, Any, Any, Any, JobQueue, Any]',
         update: Update,
         context: CallbackContext,
         conversation_key: Tuple[int, ...],
@@ -498,7 +509,7 @@ class ConversationHandler(Handler[Update, CCT]):
             try:
                 # both job_queue & conversation_timeout are checked before calling _schedule_job
                 j_queue = dispatcher.job_queue
-                self.timeout_jobs[conversation_key] = j_queue.run_once(  # type: ignore[union-attr]
+                self.timeout_jobs[conversation_key] = j_queue.run_once(
                     self._trigger_timeout,
                     self.conversation_timeout,  # type: ignore[arg-type]
                     context=_ConversationTimeoutContext(
@@ -511,7 +522,8 @@ class ConversationHandler(Handler[Update, CCT]):
                 )
                 self.logger.exception("%s", exc)
 
-    def check_update(self, update: object) -> CheckUpdateType:  # pylint: disable=R0911
+    # pylint: disable=too-many-return-statements
+    def check_update(self, update: object) -> CheckUpdateType:
         """
         Determines whether an update should be handled by this conversationhandler, and if so in
         which state the conversation currently is.

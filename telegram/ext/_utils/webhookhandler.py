@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0114
+# pylint: disable=missing-module-docstring
 
 import logging
 from queue import Queue
@@ -88,7 +88,8 @@ class WebhookServer:
                 return
             self.loop.add_callback(self.loop.stop)  # type: ignore
 
-    def handle_error(self, request: object, client_address: str) -> None:  # pylint: disable=W0613
+    # pylint: disable=unused-argument
+    def handle_error(self, request: object, client_address: str) -> None:
         """Handle an error gracefully."""
         self.logger.debug(
             'Exception happened during processing of request from %s',
@@ -108,7 +109,7 @@ class WebhookAppClass(tornado.web.Application):
 
 
 # WebhookHandler, process webhook calls
-# pylint: disable=W0223
+# pylint: disable=abstract-method
 class WebhookHandler(tornado.web.RequestHandler):
     SUPPORTED_METHODS = ["POST"]  # type: ignore
 
@@ -122,7 +123,7 @@ class WebhookHandler(tornado.web.RequestHandler):
         self.logger = logging.getLogger(__name__)
 
     def initialize(self, bot: 'Bot', update_queue: Queue) -> None:
-        # pylint: disable=W0201
+        # pylint: disable=attribute-defined-outside-init
         self.bot = bot
         self.update_queue = update_queue
 

@@ -4,7 +4,9 @@ telegram.ext package
 .. toctree::
 
     telegram.ext.extbot
+    telegram.ext.updaterbuilder
     telegram.ext.updater
+    telegram.ext.dispatcherbuilder
     telegram.ext.dispatcher
     telegram.ext.dispatcherhandlerstop
     telegram.ext.callbackcontext

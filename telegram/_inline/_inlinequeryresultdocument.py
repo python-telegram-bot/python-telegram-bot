@@ -102,7 +102,7 @@ class InlineQueryResultDocument(InlineQueryResult):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=W0622
+        id: str,  # pylint: disable=redefined-builtin
         document_url: str,
         title: str,
         mime_type: str,
