@@ -19,7 +19,7 @@
 import inspect
 from pathlib import Path
 
-from telegram.ext.utils.stack import was_called_by
+from telegram.ext._utils.stack import was_called_by
 
 
 class TestStack:
