@@ -30,10 +30,10 @@ from typing import (
     DefaultDict,
 )
 
+from telegram.utils.types import FilePathInput
 from telegram.ext import BasePersistence, PersistenceInput
-from .utils.types import UD, CD, BD, ConversationDict, CDCData
-from .contexttypes import ContextTypes
-from ..utils.types import FilePathInput
+from telegram.ext.utils.types import UD, CD, BD, ConversationDict, CDCData
+from telegram.ext.contexttypes import ContextTypes
 
 
 class PicklePersistence(BasePersistence[UD, CD, BD]):

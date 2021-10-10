@@ -631,11 +631,11 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
         Args:
             private_key (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): The private key or the
-                file path of a file that contains the key. In the latter case, the files content
+                file path of a file that contains the key. In the latter case, the file's content
                 will be read automatically.
-            password (:obj:`bytes`): Optional. The corresponding password or the
-                file path of a file that contains the password. In the latter case, the files
-                content will be read automatically.
+            password (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): Optional. The corresponding
+                password or the file path of a file that contains the password. In the latter case,
+                the file's content will be read automatically.
 
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
@@ -989,11 +989,11 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
         Args:
             private_key (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): The private key or the
-                file path of a file that contains the key. In the latter case, the files content
+                file path of a file that contains the key. In the latter case, the file's content
                 will be read automatically.
-            password (:obj:`bytes`): Optional. The corresponding password or the
-                file path of a file that contains the password. In the latter case, the files
-                content will be read automatically.
+            password (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): Optional. The corresponding
+                password or the file path of a file that contains the password. In the latter case,
+                the file's content will be read automatically.
 
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
