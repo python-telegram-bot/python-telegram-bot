@@ -49,7 +49,7 @@ __all__ = [
     'XORFilter',
 ]
 
-from telegram.utils.types import SLT
+from telegram._utils.types import SLT
 
 DataDict = Dict[str, list]
 

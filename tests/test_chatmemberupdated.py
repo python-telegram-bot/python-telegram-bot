@@ -30,7 +30,7 @@ from telegram import (
     ChatMemberUpdated,
     ChatInviteLink,
 )
-from telegram.utils.datetime import to_timestamp
+from telegram._utils.datetime import to_timestamp
 
 
 @pytest.fixture(scope='class')
