@@ -31,13 +31,13 @@ Warning:
 from pathlib import Path
 from typing import Optional, Union, Type, Any, cast, IO, TYPE_CHECKING
 
-from telegram._utils.types import FileInput
+from telegram._utils.types import FileInput, FilePathInput
 
 if TYPE_CHECKING:
     from telegram import TelegramObject, InputFile
 
 
-def is_local_file(obj: Optional[Union[str, Path]]) -> bool:
+def is_local_file(obj: Optional[FilePathInput]) -> bool:
     """
     Checks if a given string is a file on local system.
 
