@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116,W0613
+# pylint: disable=missing-function-docstring, unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -15,13 +15,14 @@ from typing import DefaultDict, Optional, Set
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import (
-    Updater,
     CommandHandler,
     CallbackContext,
     ContextTypes,
     CallbackQueryHandler,
     TypeHandler,
     Dispatcher,
+    ExtBot,
+    Updater,
 )
 
 
@@ -32,8 +33,8 @@ class ChatData:
         self.clicks_per_message: DefaultDict[int, int] = defaultdict(int)
 
 
-# The [dict, ChatData, dict] is for type checkers like mypy
-class CustomContext(CallbackContext[dict, ChatData, dict]):
+# The [ExtBot, dict, ChatData, dict] is for type checkers like mypy
+class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
     """Custom class for context."""
 
     def __init__(self, dispatcher: Dispatcher):
@@ -66,7 +67,8 @@ class CustomContext(CallbackContext[dict, ChatData, dict]):
         context = super().from_update(update, dispatcher)
 
         if context.chat_data and isinstance(update, Update) and update.effective_message:
-            context._message_id = update.effective_message.message_id  # pylint: disable=W0212
+            # pylint: disable=protected-access
+            context._message_id = update.effective_message.message_id
 
         # Remember to return the object
         return context
@@ -112,7 +114,7 @@ def track_users(update: Update, context: CustomContext) -> None:
 def main() -> None:
     """Run the bot."""
     context_types = ContextTypes(context=CustomContext, chat_data=ChatData)
-    updater = Updater("TOKEN", context_types=context_types)
+    updater = Updater.builder().token("TOKEN").context_types(context_types).build()
 
     dispatcher = updater.dispatcher
     # run track_users in its own group to not interfere with the user handlers

@@ -21,7 +21,7 @@ from collections import defaultdict
 
 import pytest
 
-from telegram.utils.warnings import warn
+from telegram._utils.warnings import warn
 from telegram.warnings import PTBUserWarning, PTBRuntimeWarning, PTBDeprecationWarning
 from tests.conftest import PROJECT_ROOT_PATH
 
@@ -65,7 +65,7 @@ class TestWarnings:
         make_assertion(PTBUserWarning)
 
     def test_warn(self, recwarn):
-        expected_file = PROJECT_ROOT_PATH / 'telegram' / 'utils' / 'warnings.py'
+        expected_file = PROJECT_ROOT_PATH / 'telegram' / '_utils' / 'warnings.py'
 
         warn('test message')
         assert len(recwarn) == 1
