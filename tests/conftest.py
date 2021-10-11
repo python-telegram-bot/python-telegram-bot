@@ -221,7 +221,6 @@ def updater(bot):
 
 PROJECT_ROOT_PATH = Path(__file__).parent.parent.resolve()
 TEST_DATA_PATH = Path(__file__).parent.resolve() / "data"
-print(PROJECT_ROOT_PATH)
 
 
 def data_file(filename: str):
