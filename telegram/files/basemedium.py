@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects"""
-from __future__ import annotations
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
 
 from telegram import TelegramObject
 from telegram.utils.defaultvalue import DEFAULT_NONE
@@ -26,9 +25,6 @@ from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot, File
-
-
-MT = TypeVar('MT', bound='_BaseMedium', covariant=True)
 
 
 class _BaseMedium(TelegramObject):
@@ -42,17 +38,14 @@ class _BaseMedium(TelegramObject):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_name (:obj:`str`, optional): Original animation filename as defined by sender.
         file_size (:obj:`int`, optional): File size.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): File identifier.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
         file_size (:obj:`int`): Optional. File size.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
@@ -61,11 +54,7 @@ class _BaseMedium(TelegramObject):
     __slots__ = ('bot', 'file_id', 'file_size', 'file_unique_id')
 
     def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        file_size: int = None,
-        bot: Bot = None,
+        self, file_id: str, file_unique_id: str, file_size: int = None, bot: 'Bot' = None
     ):
         # Required
         self.file_id: str = str(file_id)
@@ -78,7 +67,7 @@ class _BaseMedium(TelegramObject):
 
     def get_file(
         self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> File:
+    ) -> 'File':
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.

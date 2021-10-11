@@ -165,12 +165,13 @@ class StickerSet(TelegramObject):
         thumb: PhotoSize = None,
         **_kwargs: Any,
     ):
-        self.title = title
-        self.thumb = thumb
         self.name = name
+        self.title = title
         self.is_animated = is_animated
         self.contains_masks = contains_masks
         self.stickers = stickers
+        # Optional
+        self.thumb = thumb
 
         self._id_attrs = (self.name,)
 

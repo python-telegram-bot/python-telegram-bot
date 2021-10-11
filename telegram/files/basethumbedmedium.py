@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects with thumbnails"""
-from __future__ import annotations
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, TypeVar, Type, Optional
 
 from telegram import PhotoSize
 from telegram.files.basemedium import _BaseMedium
@@ -43,20 +42,17 @@ class _BaseThumbedMedium(_BaseMedium):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_name (:obj:`str`, optional): Original animation filename as defined by sender.
         file_size (:obj:`int`, optional): File size.
-        thumb (:class:`telegram.PhotoSize`, optional): Animation thumbnail as defined by sender.
+        thumb (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): File identifier.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
         file_size (:obj:`int`): Optional. File size.
-        thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined by sender.
+        thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
@@ -69,7 +65,7 @@ class _BaseThumbedMedium(_BaseMedium):
         file_unique_id: str,
         file_size: int = None,
         thumb: PhotoSize = None,
-        bot: Bot = None,
+        bot: 'Bot' = None,
     ):
         super().__init__(
             file_id=file_id, file_unique_id=file_unique_id, file_size=file_size, bot=bot
@@ -77,7 +73,7 @@ class _BaseThumbedMedium(_BaseMedium):
         self.thumb = thumb
 
     @classmethod
-    def de_json(cls: type[ThumbedMT], data: JSONDict | None, bot: Bot) -> ThumbedMT | None:
+    def de_json(cls: Type[ThumbedMT], data: Optional[JSONDict], bot: 'Bot') -> Optional[ThumbedMT]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
