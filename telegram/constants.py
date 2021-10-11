@@ -79,30 +79,6 @@ class _StringEnum(str, Enum):
     def __repr__(self) -> str:
         return f'<{self.__class__.__name__}.{self.name}>'
 
-    def __eq__(self, other: object) -> bool:
-        """Makes sure that the enum members can be compared to strings."""
-        if isinstance(other, str):
-            return other == self.value
-        return super().__eq__(other)
-
-    def __hash__(self) -> int:
-        return hash(self.value)
-
-
-class _IntEnum(IntEnum):
-    """Helper class for int enums that overrides the default __eq__"""
-
-    __slots__ = ()
-
-    def __eq__(self, other: object) -> bool:
-        """Makes sure that the enum members can be compared to strings."""
-        if isinstance(other, str):
-            return other == self.value
-        return super().__eq__(other)
-
-    def __hash__(self) -> int:
-        return hash(self.value)
-
 
 BOT_API_VERSION = '5.3'
 ANONYMOUS_ADMIN_ID = 1087968824
@@ -240,7 +216,7 @@ class DiceEmoji(_StringEnum):
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎳``."""
 
 
-class FileSizeLimit(_IntEnum):
+class FileSizeLimit(IntEnum):
     """This enum contains limitations regarding the upload and download of files. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
@@ -257,7 +233,7 @@ class FileSizeLimit(_IntEnum):
     """:obj:`int`: Bots can upload photo files of up to 10MB in size."""
 
 
-class FloodLimit(_IntEnum):
+class FloodLimit(IntEnum):
     """This enum contains limitations regarding flood limits. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
@@ -281,7 +257,7 @@ class FloodLimit(_IntEnum):
     """
 
 
-class InlineKeyboardMarkupLimit(_IntEnum):
+class InlineKeyboardMarkupLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineKeyboardMarkup`/
     :meth:`telegram.Bot.send_message` & friends. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -326,7 +302,7 @@ class InputMediaType(_StringEnum):
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
 
 
-class InlineQueryLimit(_IntEnum):
+class InlineQueryLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.InlineQuery`/
     :meth:`telegram.Bot.answer_inline_query`. The enum members of this enumeration are instances
     of :class:`int` and can be treated as such.
@@ -455,7 +431,7 @@ class MessageEntityType(_StringEnum):
     """:obj:`str`: Message entities representing strikethrough text."""
 
 
-class MessageLimit(_IntEnum):
+class MessageLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.Message`/
     :meth:`telegram.Bot.send_message` & friends. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -501,7 +477,7 @@ class ParseMode(_StringEnum):
     """:obj:`str`: HTML parse mode."""
 
 
-class PollLimit(_IntEnum):
+class PollLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.Poll`/
     :meth:`telegram.Bot.send_poll`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
