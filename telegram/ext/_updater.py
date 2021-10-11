@@ -39,11 +39,11 @@ from typing import (
 )
 
 from telegram.error import InvalidToken, RetryAfter, TimedOut, Unauthorized, TelegramError
+from telegram._utils.warnings import warn
 from telegram.ext import Dispatcher
 from telegram.ext._utils.webhookhandler import WebhookAppClass, WebhookServer
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.types import BT
-from telegram._utils.warnings import warn
 
 if TYPE_CHECKING:
     from .builders import InitUpdaterBuilder
