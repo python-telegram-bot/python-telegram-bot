@@ -67,7 +67,7 @@ class TelegramObject:
         try:
             return getattr(self, item)
         except AttributeError:
-            raise KeyError
+            raise KeyError from None
 
     @staticmethod
     def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
