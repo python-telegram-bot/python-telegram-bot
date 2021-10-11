@@ -26,6 +26,7 @@ from typing import IO, TYPE_CHECKING, Any, Optional, Union
 from telegram import TelegramObject
 from telegram._passport.credentials import decrypt
 from telegram._utils.files import is_local_file
+from telegram._utils.types import FilePathInput
 
 if TYPE_CHECKING:
     from telegram import Bot, FileCredentials
@@ -96,7 +97,7 @@ class File(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     def download(
-        self, custom_path: Union[Path, str] = None, out: IO = None, timeout: int = None
+        self, custom_path: FilePathInput = None, out: IO = None, timeout: int = None
     ) -> Union[Path, IO]:
         """
         Download this file. By default, the file is saved in the current working directory with its
