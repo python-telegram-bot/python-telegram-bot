@@ -30,20 +30,21 @@ from tests.conftest import (
     check_shortcut_call,
     check_shortcut_signature,
     check_defaults_handling,
+    data_file,
 )
 
 
 @pytest.fixture(scope='function')
-def photo_file(data_file):
+def photo_file():
     f = data_file('telegram.jpg').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def _photo(bot, chat_id, class_data_file):
+def _photo(bot, chat_id):
     def func():
-        with class_data_file('telegram.jpg').open('rb') as f:
+        with data_file('telegram.jpg').open('rb') as f:
             return bot.send_photo(chat_id, photo=f, timeout=50).photo
 
     return expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
@@ -227,7 +228,7 @@ class TestPhoto:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_photo_local_files(self, monkeypatch, bot, chat_id, data_file):
+    def test_send_photo_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file('telegram.jpg')
@@ -337,7 +338,7 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    def test_send_file_unicode_filename(self, bot, chat_id, data_file):
+    def test_send_file_unicode_filename(self, bot, chat_id):
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
         """
@@ -353,7 +354,7 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    def test_send_bytesio_jpg_file(self, bot, chat_id, data_file):
+    def test_send_bytesio_jpg_file(self, bot, chat_id):
         filepath = data_file('telegram_no_standard_header.jpg')
 
         # raw image bytes

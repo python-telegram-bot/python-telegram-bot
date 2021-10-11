@@ -24,11 +24,12 @@ from io import BytesIO
 import pytest
 
 from telegram import InputFile
+from tests.conftest import data_file
 
 
 @pytest.fixture(scope='class')
-def png_file(class_data_file):
-    return class_data_file('game.png')
+def png_file():
+    return data_file('game.png')
 
 
 class TestInputFile:
@@ -55,7 +56,7 @@ class TestInputFile:
             # to kill it.
             pass
 
-    def test_mimetypes(self, caplog, data_file):
+    def test_mimetypes(self, caplog):
         # Only test a few to make sure logic works okay
         assert InputFile(data_file('telegram.jpg').open('rb')).mimetype == 'image/jpeg'
         assert InputFile(data_file('telegram.webp').open('rb')).mimetype == 'image/webp'
@@ -79,7 +80,7 @@ class TestInputFile:
             assert len(caplog.records) == 1
             assert caplog.records[0].getMessage().startswith('Could not parse file content')
 
-    def test_filenames(self, data_file):
+    def test_filenames(self):
         assert InputFile(data_file('telegram.jpg').open('rb')).filename == 'telegram.jpg'
         assert InputFile(data_file('telegram.jpg').open('rb'), filename='blah').filename == 'blah'
         assert (
@@ -121,7 +122,7 @@ class TestInputFile:
             == 'blah.jpg'
         )
 
-    def test_send_bytes(self, bot, chat_id, data_file):
+    def test_send_bytes(self, bot, chat_id):
         # We test this here and not at the respective test modules because it's not worth
         # duplicating the test for the different methods
         message = bot.send_document(chat_id, data_file('text_file.txt').read_bytes())

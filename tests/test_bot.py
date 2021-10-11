@@ -61,7 +61,13 @@ from telegram.ext.callbackdatacache import InvalidCallbackData
 from telegram.utils.datetime import from_timestamp, to_timestamp
 from telegram.helpers import escape_markdown
 from telegram.utils.defaultvalue import DefaultValue
-from tests.conftest import expect_bad_request, check_defaults_handling, GITHUB_ACTION, build_kwargs
+from tests.conftest import (
+    expect_bad_request,
+    check_defaults_handling,
+    GITHUB_ACTION,
+    build_kwargs,
+    data_file,
+)
 from tests.bots import FALLBACKS
 
 
@@ -98,8 +104,8 @@ def message(bot, chat_id):
 
 
 @pytest.fixture(scope='class')
-def media_message(bot, chat_id, class_data_file):
-    with class_data_file('telegram.ogg').open('rb') as f:
+def media_message(bot, chat_id):
+    with data_file('telegram.ogg').open('rb') as f:
         return bot.send_voice(chat_id, voice=f, caption='my caption', timeout=10)
 
 
@@ -1011,7 +1017,7 @@ class TestBot:
 
     # get_file is tested multiple times in the test_*media* modules.
     # Here we only test the behaviour for bot apis in local mode
-    def test_get_file_local_mode(self, bot, monkeypatch, data_file):
+    def test_get_file_local_mode(self, bot, monkeypatch):
         path = str(data_file('game.gif'))
 
         def _post(*args, **kwargs):
@@ -1791,14 +1797,14 @@ class TestBot:
         assert revoked_invite_link.is_revoked is True
 
     @flaky(3, 1)
-    def test_set_chat_photo(self, bot, channel_id, data_file):
+    def test_set_chat_photo(self, bot, channel_id):
         def func():
             assert bot.set_chat_photo(channel_id, f)
 
         with data_file('telegram_test_channel.jpg').open('rb') as f:
             expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
 
-    def test_set_chat_photo_local_files(self, monkeypatch, bot, chat_id, data_file):
+    def test_set_chat_photo_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file('telegram.jpg')
@@ -1859,7 +1865,7 @@ class TestBot:
     # set_sticker_position_in_set and delete_sticker_from_set are tested in the
     # test_sticker module.
 
-    def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id, data_file):
+    def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
 
         from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
 
@@ -1879,14 +1885,13 @@ class TestBot:
 
         # Test file uploading
         with pytest.raises(OkException):
-            path = data_file('telegram.jpg')
-            bot.send_photo(chat_id, path.open('rb'), timeout=TIMEOUT)
+            bot.send_photo(chat_id, data_file('telegram.jpg').open('rb'), timeout=TIMEOUT)
 
         # Test JSON submission
         with pytest.raises(OkException):
             bot.get_chat_administrators(chat_id, timeout=TIMEOUT)
 
-    def test_timeout_propagation_implicit(self, monkeypatch, bot, chat_id, data_file):
+    def test_timeout_propagation_implicit(self, monkeypatch, bot, chat_id):
 
         from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
 
@@ -1904,8 +1909,7 @@ class TestBot:
 
         # Test file uploading
         with pytest.raises(OkException):
-            path = data_file('telegram.jpg')
-            bot.send_photo(chat_id, path.open('rb'))
+            bot.send_photo(chat_id, data_file('telegram.jpg').open('rb'))
 
     @flaky(3, 1)
     def test_send_message_entities(self, bot, chat_id):

@@ -29,11 +29,12 @@ from tests.conftest import (
     check_shortcut_call,
     check_shortcut_signature,
     check_defaults_handling,
+    data_file,
 )
 
 
 @pytest.fixture(scope='function')
-def chatphoto_file(data_file):
+def chatphoto_file():
     f = data_file('telegram.jpg').open('rb')
     yield f
     f.close()

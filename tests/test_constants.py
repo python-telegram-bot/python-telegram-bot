@@ -21,6 +21,7 @@ from flaky import flaky
 
 from telegram import constants
 from telegram.error import BadRequest
+from tests.conftest import data_file
 
 
 class TestConstants:
@@ -35,7 +36,7 @@ class TestConstants:
             bot.send_message(chat_id=chat_id, text='a' * (constants.MAX_MESSAGE_LENGTH + 1))
 
     @flaky(3, 1)
-    def test_max_caption_length(self, bot, chat_id, data_file):
+    def test_max_caption_length(self, bot, chat_id):
         good_caption = 'a' * constants.MAX_CAPTION_LENGTH
         with data_file('telegram.png').open('rb') as f:
             good_msg = bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)

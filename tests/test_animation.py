@@ -25,20 +25,25 @@ from flaky import flaky
 from telegram import PhotoSize, Animation, Voice, MessageEntity, Bot
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
-from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
+from tests.conftest import (
+    check_shortcut_call,
+    check_shortcut_signature,
+    check_defaults_handling,
+    data_file,
+)
 
 
 @pytest.fixture(scope='function')
-def animation_file(data_file):
+def animation_file():
     f = data_file('game.gif').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def animation(bot, chat_id, class_data_file):
-    with class_data_file('game.gif').open('rb') as f:
-        thumb = class_data_file('thumb.jpg')
+def animation(bot, chat_id):
+    with data_file('game.gif').open('rb') as f:
+        thumb = data_file('thumb.jpg')
         return bot.send_animation(
             chat_id, animation=f, timeout=50, thumb=thumb.open('rb')
         ).animation
@@ -189,7 +194,7 @@ class TestAnimation:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_animation_local_files(self, monkeypatch, bot, chat_id, data_file):
+    def test_send_animation_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file('telegram.jpg')

@@ -25,20 +25,25 @@ from flaky import flaky
 from telegram import Audio, Voice, MessageEntity, Bot
 from telegram.error import TelegramError
 from telegram.helpers import escape_markdown
-from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
+from tests.conftest import (
+    check_shortcut_call,
+    check_shortcut_signature,
+    check_defaults_handling,
+    data_file,
+)
 
 
 @pytest.fixture(scope='function')
-def audio_file(data_file):
+def audio_file():
     f = data_file('telegram.mp3').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def audio(bot, chat_id, class_data_file):
-    with class_data_file('telegram.mp3').open('rb') as f:
-        thumb = class_data_file('thumb.jpg')
+def audio(bot, chat_id):
+    with data_file('telegram.mp3').open('rb') as f:
+        thumb = data_file('thumb.jpg')
         return bot.send_audio(chat_id, audio=f, timeout=50, thumb=thumb.open('rb')).audio
 
 
@@ -209,7 +214,7 @@ class TestAudio:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_audio_local_files(self, monkeypatch, bot, chat_id, data_file):
+    def test_send_audio_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file('telegram.jpg')

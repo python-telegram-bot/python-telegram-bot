@@ -25,19 +25,24 @@ from flaky import flaky
 from telegram import Document, PhotoSize, Voice, MessageEntity, Bot
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from tests.conftest import (
+    check_shortcut_signature,
+    check_shortcut_call,
+    check_defaults_handling,
+    data_file,
+)
 
 
 @pytest.fixture(scope='function')
-def document_file(data_file):
+def document_file():
     f = data_file('telegram.png').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def document(bot, chat_id, class_data_file):
-    with class_data_file('telegram.png').open('rb') as f:
+def document(bot, chat_id):
+    with data_file('telegram.png').open('rb') as f:
         return bot.send_document(chat_id, document=f, timeout=50).document
 
 
@@ -234,7 +239,7 @@ class TestDocument:
                     chat_id, document, reply_to_message_id=reply_to_message.message_id
                 )
 
-    def test_send_document_local_files(self, monkeypatch, bot, chat_id, data_file):
+    def test_send_document_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file('telegram.jpg')

@@ -220,41 +220,24 @@ def updater(bot):
         up.stop()
 
 
-@pytest.fixture(scope='function')
-def data_file():
-    def _make_file_path(filename: str):
-        return Path(__file__).parent.resolve() / "data" / filename
-
-    return _make_file_path
+PROJECT_ROOT_PATH = Path(__file__).parent.parent.resolve()
+TEST_DATA_PATH = Path(__file__).parent.resolve() / "data"
+print(PROJECT_ROOT_PATH)
 
 
-@pytest.fixture(scope='class')
-def class_data_file():
-    def _make_file_path(filename: str):
-        return Path(__file__).parent.resolve() / "data" / filename
-
-    return _make_file_path
+def data_file(filename: str):
+    return TEST_DATA_PATH / filename
 
 
 @pytest.fixture(scope='function')
-def telegram_file(data_file):
-    telegram_file = data_file('telegram')
-
-    def _with_extension(extension: str):
-        return telegram_file.with_suffix(extension)
-
-    return _with_extension
-
-
-@pytest.fixture(scope='function')
-def thumb_file(data_file):
+def thumb_file():
     f = data_file('thumb.jpg').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
-def class_thumb_file(data_file):
+def class_thumb_file():
     f = data_file('thumb.jpg').open('rb')
     yield f
     f.close()
