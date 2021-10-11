@@ -319,6 +319,7 @@ class TestMessage:
     def test_dict_approach(self, message):
         assert message['text'] == message.text
         assert message['chat_id'] == message.chat_id
+        assert message['from'] == message.from_user
         with pytest.raises(KeyError):
             message['no_key']
 
