@@ -20,7 +20,7 @@
 from typing import TYPE_CHECKING, TypeVar, Type, Optional
 
 from telegram import PhotoSize
-from telegram._files.basemedium import _BaseMedium
+from telegram._files._basemedium import _BaseMedium
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:

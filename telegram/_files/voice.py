@@ -20,7 +20,7 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram._files.basemedium import _BaseMedium
+from telegram._files._basemedium import _BaseMedium
 
 if TYPE_CHECKING:
     from telegram import Bot

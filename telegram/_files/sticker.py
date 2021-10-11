@@ -21,7 +21,7 @@
 from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
 
 from telegram import PhotoSize, TelegramObject, constants
-from telegram._files.basethumbedmedium import _BaseThumbedMedium
+from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
