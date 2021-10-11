@@ -24,9 +24,6 @@ from telegram._files._basethumbedmedium import _BaseThumbedMedium
 
 if TYPE_CHECKING:
     from telegram import Bot
-    import typing
-
-    print(typing)
 
 
 class Animation(_BaseThumbedMedium):
