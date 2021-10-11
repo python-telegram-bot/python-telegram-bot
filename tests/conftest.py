@@ -224,7 +224,7 @@ TEST_DATA_PATH = Path(__file__).parent.resolve() / "data"
 
 
 def data_file(filename: str):
-    return TEST_DATA_PATH / filename / "f"
+    return TEST_DATA_PATH / filename
 
 
 @pytest.fixture(scope='function')
