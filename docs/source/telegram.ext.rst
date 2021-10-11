@@ -4,7 +4,9 @@ telegram.ext package
 .. toctree::
 
     telegram.ext.extbot
+    telegram.ext.updaterbuilder
     telegram.ext.updater
+    telegram.ext.dispatcherbuilder
     telegram.ext.dispatcher
     telegram.ext.dispatcherhandlerstop
     telegram.ext.callbackcontext
@@ -53,11 +55,3 @@ Arbitrary Callback Data
 
     telegram.ext.callbackdatacache
     telegram.ext.invalidcallbackdata
-
-utils
------
-
-.. toctree::
-
-    telegram.ext.utils.promise
-    telegram.ext.utils.types
