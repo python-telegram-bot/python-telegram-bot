@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=W0603
+# pylint: disable=global-statement
 """Simple Bot to reply to Telegram messages.
 
 This is built on the API wrapper, see echobot.py to see the same example built
