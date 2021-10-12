@@ -21,7 +21,7 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, ClassVar, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, Tuple
 
 from telegram import (
     Animation,
@@ -54,10 +54,10 @@ from telegram import (
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
 )
-from telegram.constants import ParseMode
+from telegram.constants import ParseMode, MessageAttachmentType
 from telegram.helpers import escape_markdown
 from telegram._utils.datetime import from_timestamp, to_timestamp
-from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
+from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_20, DefaultValue
 from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput
 
 if TYPE_CHECKING:
@@ -390,46 +390,6 @@ class Message(TelegramObject):
         'voice_chat_scheduled',
     )
 
-    ATTACHMENT_TYPES: ClassVar[List[str]] = [
-        'audio',
-        'game',
-        'animation',
-        'document',
-        'photo',
-        'sticker',
-        'video',
-        'voice',
-        'video_note',
-        'contact',
-        'location',
-        'venue',
-        'invoice',
-        'successful_payment',
-    ]
-    MESSAGE_TYPES: ClassVar[List[str]] = [
-        'text',
-        'new_chat_members',
-        'left_chat_member',
-        'new_chat_title',
-        'new_chat_photo',
-        'delete_chat_photo',
-        'group_chat_created',
-        'supergroup_chat_created',
-        'channel_chat_created',
-        'message_auto_delete_timer_changed',
-        'migrate_to_chat_id',
-        'migrate_from_chat_id',
-        'pinned_message',
-        'poll',
-        'dice',
-        'passport_data',
-        'proximity_alert_triggered',
-        'voice_chat_scheduled',
-        'voice_chat_started',
-        'voice_chat_ended',
-        'voice_chat_participants_invited',
-    ] + ATTACHMENT_TYPES
-
     def __init__(
         self,
         message_id: int,
@@ -637,12 +597,15 @@ class Message(TelegramObject):
         self,
     ) -> Union[
         Contact,
+        Dice,
         Document,
         Animation,
         Game,
         Invoice,
         Location,
+        PassportData,
         List[PhotoSize],
+        Poll,
         Sticker,
         SuccessfulPayment,
         Venue,
@@ -651,35 +614,45 @@ class Message(TelegramObject):
         Voice,
         None,
     ]:
-        """
-        :class:`telegram.Audio`
-            or :class:`telegram.Contact`
-            or :class:`telegram.Document`
-            or :class:`telegram.Animation`
-            or :class:`telegram.Game`
-            or :class:`telegram.Invoice`
-            or :class:`telegram.Location`
-            or List[:class:`telegram.PhotoSize`]
-            or :class:`telegram.Sticker`
-            or :class:`telegram.SuccessfulPayment`
-            or :class:`telegram.Venue`
-            or :class:`telegram.Video`
-            or :class:`telegram.VideoNote`
-            or :class:`telegram.Voice`: The attachment that this message was sent with. May be
-            :obj:`None` if no attachment was sent.
+        """If this message is neither a plain text message nor a status update, this gives the
+        attachment that this message was sent with. This may be one of
+
+        * :class:`telegram.Audio`
+        * :class:`telegram.Dice`
+        * :class:`telegram.Contact`
+        * :class:`telegram.Document`
+        * :class:`telegram.Animation`
+        * :class:`telegram.Game`
+        * :class:`telegram.Invoice`
+        * :class:`telegram.Location`
+        * :class:`telegram.PassportData`
+        * List[:class:`telegram.PhotoSize`]
+        * :class:`telegram.Poll`
+        * :class:`telegram.Sticker`
+        * :class:`telegram.SuccessfulPayment`
+        * :class:`telegram.Venue`
+        * :class:`telegram.Video`
+        * :class:`telegram.VideoNote`
+        * :class:`telegram.Voice`
+
+         Otherwise :obj:`None` is returned.
+
+        .. versionchanged:: 14.0
+            :attr:`dice`, :attr:`passport_data` and :attr:`poll` are now also considered to be an
+            attachment.
 
         """
-        if self._effective_attachment is not DEFAULT_NONE:
-            return self._effective_attachment  # type: ignore
+        if not isinstance(self._effective_attachment, DefaultValue):
+            return self._effective_attachment
 
-        for i in Message.ATTACHMENT_TYPES:
-            if getattr(self, i, None):
-                self._effective_attachment = getattr(self, i)
+        for attachment_type in MessageAttachmentType:
+            if self[attachment_type]:
+                self._effective_attachment = self[attachment_type]
                 break
         else:
             self._effective_attachment = None
 
-        return self._effective_attachment  # type: ignore
+        return self._effective_attachment  # type: ignore[return-value]
 
     def __getitem__(self, item: str) -> Any:  # pylint: disable=inconsistent-return-statements
         return self.chat.id if item == 'chat_id' else super().__getitem__(item)

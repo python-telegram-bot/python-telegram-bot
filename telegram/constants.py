@@ -58,8 +58,10 @@ __all__ = [
     'MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH',
     'MAX_INLINE_QUERY_RESULTS',
     'MaskPosition',
+    'MessageAttachmentType',
     'MessageEntityType',
     'MessageLimit',
+    'MessageType',
     'ParseMode',
     'PollLimit',
     'PollType',
@@ -414,6 +416,55 @@ class MaskPosition(_StringEnum):
     """:obj:`str`: Mask position for a sticker on the chin."""
 
 
+class MessageAttachmentType(_StringEnum):
+    """This enum contains the available types of :class:`telegram.Message` that can bee seens
+    as attachment. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 14.0
+    """
+
+    __slots__ = ()
+
+    # Make sure that all constants here are also listed in the MessageType Enum!
+    # (Enums are not extendable)
+
+    ANIMATION = 'animation'
+    """:obj:`str`: Messages with :attr:`Message.animation`."""
+    AUDIO = 'audio'
+    """:obj:`str`: Messages with :attr:`Message.audio`."""
+    CONTACT = 'contact'
+    """:obj:`str`: Messages with :attr:`Message.contact`."""
+    DICE = 'dice'
+    """:obj:`str`: Messages with :attr:`Message.dice`."""
+    DOCUMENT = 'document'
+    """:obj:`str`: Messages with :attr:`Message.document`."""
+    GAME = 'game'
+    """:obj:`str`: Messages with :attr:`Message.game`."""
+    INVOICE = 'invoice'
+    """:obj:`str`: Messages with :attr:`Message.invoice`."""
+    LOCATION = 'location'
+    """:obj:`str`: Messages with :attr:`Message.location`."""
+    PASSPORT_DATA = 'passport_data'
+    """:obj:`str`: Messages with :attr:`Message.passport_data`."""
+    PHOTO = 'photo'
+    """:obj:`str`: Messages with :attr:`Message.photo`."""
+    POLL = 'poll'
+    """:obj:`str`: Messages with :attr:`Message.poll`."""
+    STICKER = 'sticker'
+    """:obj:`str`: Messages with :attr:`Message.sticker`."""
+    SUCCESSFUL_PAYMENT = 'successful_payment'
+    """:obj:`str`: Messages with :attr:`Message.successful_payment`."""
+    VIDEO = 'video'
+    """:obj:`str`: Messages with :attr:`Message.video`."""
+    VIDEO_NOTE = 'video_note'
+    """:obj:`str`: Messages with :attr:`Message.video_note`."""
+    VOICE = 'voice'
+    """:obj:`str`: Messages with :attr:`Message.voice`."""
+    VENUE = 'venue'
+    """:obj:`str`: Messages with :attr:`Message.venue`."""
+
+
 class MessageEntityType(_StringEnum):
     """This enum contains the available types of :class:`telegram.MessageEntity`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -477,6 +528,93 @@ class MessageLimit(_IntEnum):
     Note:
         This value is undocumented and might be changed by Telegram.
     """
+
+
+class MessageType(_StringEnum):
+    """This enum contains the available types of :class:`telegram.Message` that can bee seens
+    as attachment. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 14.0
+    """
+
+    __slots__ = ()
+
+    # Make sure that all attachment type constants are also listed in the
+    # MessageAttachmentType Enum! (Enums are not extendable)
+
+    # -------------------------------------------------- Attachment types
+    ANIMATION = 'animation'
+    """:obj:`str`: Messages with :attr:`Message.animation`."""
+    AUDIO = 'audio'
+    """:obj:`str`: Messages with :attr:`Message.audio`."""
+    CONTACT = 'contact'
+    """:obj:`str`: Messages with :attr:`Message.contact`."""
+    DICE = 'dice'
+    """:obj:`str`: Messages with :attr:`Message.dice`."""
+    DOCUMENT = 'document'
+    """:obj:`str`: Messages with :attr:`Message.document`."""
+    GAME = 'game'
+    """:obj:`str`: Messages with :attr:`Message.game`."""
+    INVOICE = 'invoice'
+    """:obj:`str`: Messages with :attr:`Message.invoice`."""
+    LOCATION = 'location'
+    """:obj:`str`: Messages with :attr:`Message.location`."""
+    PASSPORT_DATA = 'passport_data'
+    """:obj:`str`: Messages with :attr:`Message.passport_data`."""
+    PHOTO = 'photo'
+    """:obj:`str`: Messages with :attr:`Message.photo`."""
+    POLL = 'poll'
+    """:obj:`str`: Messages with :attr:`Message.poll`."""
+    STICKER = 'sticker'
+    """:obj:`str`: Messages with :attr:`Message.sticker`."""
+    SUCCESSFUL_PAYMENT = 'successful_payment'
+    """:obj:`str`: Messages with :attr:`Message.successful_payment`."""
+    VIDEO = 'video'
+    """:obj:`str`: Messages with :attr:`Message.video`."""
+    VIDEO_NOTE = 'video_note'
+    """:obj:`str`: Messages with :attr:`Message.video_note`."""
+    VOICE = 'voice'
+    """:obj:`str`: Messages with :attr:`Message.voice`."""
+    VENUE = 'venue'
+    """:obj:`str`: Messages with :attr:`Message.venue`."""
+    # -------------------------------------------------- Other types
+    TEXT = 'text'
+    """:obj:`str`: Messages with :attr:`Message.text`."""
+    NEW_CHAT_MEMBERS = 'new_chat_members'
+    """:obj:`str`: Messages with :attr:`Message.new_chat_members`."""
+    LEFT_CHAT_MEMBER = 'left_chat_member'
+    """:obj:`str`: Messages with :attr:`Message.left_chat_member`."""
+    NEW_CHAT_TITLE = 'new_chat_title'
+    """:obj:`str`: Messages with :attr:`Message.new_chat_title`."""
+    NEW_CHAT_PHOTO = 'new_chat_photo'
+    """:obj:`str`: Messages with :attr:`Message.new_chat_photo`."""
+    DELETE_CHAT_PHOTO = 'delete_chat_photo'
+    """:obj:`str`: Messages with :attr:`Message.delete_chat_photo`."""
+    GROUP_CHAT_CREATED = 'group_chat_created'
+    """:obj:`str`: Messages with :attr:`Message.group_chat_created`."""
+    SUPERGROUP_CHAT_CREATED = 'supergroup_chat_created'
+    """:obj:`str`: Messages with :attr:`Message.supergroup_chat_created`."""
+    CHANNEL_CHAT_CREATED = 'channel_chat_created'
+    """:obj:`str`: Messages with :attr:`Message.channel_chat_created`."""
+    MESSAGE_AUTO_DELETE_TIMER_CHANGED = 'message_auto_delete_timer_changed'
+    """:obj:`str`: Messages with :attr:`Message.message_auto_delete_timer_changed`."""
+    MIGRATE_TO_CHAT_ID = 'migrate_to_chat_id'
+    """:obj:`str`: Messages with :attr:`Message.migrate_to_chat_id`."""
+    MIGRATE_FROM_CHAT_ID = 'migrate_from_chat_id'
+    """:obj:`str`: Messages with :attr:`Message.migrate_from_chat_id`."""
+    PINNED_MESSAGE = 'pinned_message'
+    """:obj:`str`: Messages with :attr:`Message.pinned_message`."""
+    PROXIMITY_ALERT_TRIGGERED = 'proximity_alert_triggered'
+    """:obj:`str`: Messages with :attr:`Message.proximity_alert_triggered`."""
+    VOICE_CHAT_SCHEDULED = 'voice_chat_scheduled'
+    """:obj:`str`: Messages with :attr:`Message.voice_chat_scheduled`."""
+    VOICE_CHAT_STARTED = 'voice_chat_started'
+    """:obj:`str`: Messages with :attr:`Message.voice_chat_started`."""
+    VOICE_CHAT_ENDED = 'voice_chat_ended'
+    """:obj:`str`: Messages with :attr:`Message.voice_chat_ended`."""
+    VOICE_CHAT_PARTICIPANTS_INVITED = 'voice_chat_participants_invited'
+    """:obj:`str`: Messages with :attr:`Message.voice_chat_participants_invited`."""
 
 
 class ParseMode(_StringEnum):
