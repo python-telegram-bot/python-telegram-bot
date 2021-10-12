@@ -17,13 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import json
+from enum import IntEnum
 from pathlib import Path
 
 import pytest
 from flaky import flaky
 
 from telegram import constants
-from telegram.constants import _StringEnum, _IntEnum
+from telegram.constants import _StringEnum
 from telegram.error import BadRequest
 
 
@@ -32,7 +33,7 @@ class StrEnumTest(_StringEnum):
     BAR = 'bar'
 
 
-class IntEnumTest(_IntEnum):
+class IntEnumTest(IntEnum):
     FOO = 1
     BAR = 2
 
