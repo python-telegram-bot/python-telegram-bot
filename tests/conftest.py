@@ -23,6 +23,7 @@ import inspect
 import os
 import re
 from collections import defaultdict
+from pathlib import Path
 from queue import Queue
 from threading import Thread, Event
 from time import sleep
@@ -217,16 +218,24 @@ def updater(bot):
         up.stop()
 
 
+PROJECT_ROOT_PATH = Path(__file__).parent.parent.resolve()
+TEST_DATA_PATH = Path(__file__).parent.resolve() / "data"
+
+
+def data_file(filename: str):
+    return TEST_DATA_PATH / filename
+
+
 @pytest.fixture(scope='function')
 def thumb_file():
-    f = open('tests/data/thumb.jpg', 'rb')
+    f = data_file('thumb.jpg').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def class_thumb_file():
-    f = open('tests/data/thumb.jpg', 'rb')
+    f = data_file('thumb.jpg').open('rb')
     yield f
     f.close()
 
