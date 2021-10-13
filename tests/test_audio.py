@@ -25,22 +25,26 @@ from flaky import flaky
 from telegram import Audio, Voice, MessageEntity, Bot
 from telegram.error import TelegramError
 from telegram.helpers import escape_markdown
-from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
+from tests.conftest import (
+    check_shortcut_call,
+    check_shortcut_signature,
+    check_defaults_handling,
+    data_file,
+)
 
 
 @pytest.fixture(scope='function')
 def audio_file():
-    f = Path('tests/data/telegram.mp3').open('rb')
+    f = data_file('telegram.mp3').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def audio(bot, chat_id):
-    with Path('tests/data/telegram.mp3').open('rb') as f:
-        return bot.send_audio(
-            chat_id, audio=f, timeout=50, thumb=Path('tests/data/thumb.jpg').open('rb')
-        ).audio
+    with data_file('telegram.mp3').open('rb') as f:
+        thumb = data_file('thumb.jpg')
+        return bot.send_audio(chat_id, audio=f, timeout=50, thumb=thumb.open('rb')).audio
 
 
 class TestAudio:
@@ -215,8 +219,8 @@ class TestAudio:
     def test_send_audio_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
-        file = 'tests/data/telegram.jpg'
+        file = data_file('telegram.jpg')
+        expected = file.as_uri()
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
