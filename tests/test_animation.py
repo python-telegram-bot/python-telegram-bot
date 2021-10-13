@@ -25,21 +25,27 @@ from flaky import flaky
 from telegram import PhotoSize, Animation, Voice, MessageEntity, Bot
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
-from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
+from tests.conftest import (
+    check_shortcut_call,
+    check_shortcut_signature,
+    check_defaults_handling,
+    data_file,
+)
 
 
 @pytest.fixture(scope='function')
 def animation_file():
-    f = Path('tests/data/game.gif').open('rb')
+    f = data_file('game.gif').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def animation(bot, chat_id):
-    with Path('tests/data/game.gif').open('rb') as f:
+    with data_file('game.gif').open('rb') as f:
+        thumb = data_file('thumb.jpg')
         return bot.send_animation(
-            chat_id, animation=f, timeout=50, thumb=open('tests/data/thumb.jpg', 'rb')
+            chat_id, animation=f, timeout=50, thumb=thumb.open('rb')
         ).animation
 
 
@@ -193,8 +199,8 @@ class TestAnimation:
     def test_send_animation_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
-        file = 'tests/data/telegram.jpg'
+        file = data_file('telegram.jpg')
+        expected = file.as_uri()
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
