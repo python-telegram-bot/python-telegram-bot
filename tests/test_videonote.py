@@ -24,19 +24,24 @@ from flaky import flaky
 
 from telegram import VideoNote, Voice, PhotoSize, Bot
 from telegram.error import BadRequest, TelegramError
-from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
+from tests.conftest import (
+    check_shortcut_call,
+    check_shortcut_signature,
+    check_defaults_handling,
+    data_file,
+)
 
 
 @pytest.fixture(scope='function')
 def video_note_file():
-    f = open('tests/data/telegram2.mp4', 'rb')
+    f = data_file('telegram2.mp4').open('rb')
     yield f
     f.close()
 
 
 @pytest.fixture(scope='class')
 def video_note(bot, chat_id):
-    with Path('tests/data/telegram2.mp4').open('rb') as f:
+    with data_file('telegram2.mp4').open('rb') as f:
         return bot.send_video_note(chat_id, video_note=f, timeout=50).video_note
 
 
@@ -168,8 +173,8 @@ class TestVideoNote:
     def test_send_video_note_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
-        expected = (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
-        file = 'tests/data/telegram.jpg'
+        file = data_file('telegram.jpg')
+        expected = file.as_uri()
 
         def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag

@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from pathlib import Path
-
 import pytest
 from flaky import flaky
 
@@ -48,7 +46,7 @@ from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
 
 # noinspection PyUnresolvedReferences
 from .test_video import video, video_file  # noqa: F401
-from tests.conftest import expect_bad_request
+from tests.conftest import expect_bad_request, data_file
 
 
 @pytest.fixture(scope='class')
@@ -178,10 +176,10 @@ class TestInputMediaVideo:
 
     def test_with_local_files(self):
         input_media_video = InputMediaVideo(
-            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+            data_file('telegram.mp4'), thumb=data_file('telegram.jpg')
         )
-        assert input_media_video.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
-        assert input_media_video.thumb == (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
+        assert input_media_video.media == data_file('telegram.mp4').as_uri()
+        assert input_media_video.thumb == data_file('telegram.jpg').as_uri()
 
 
 class TestInputMediaPhoto:
@@ -229,8 +227,8 @@ class TestInputMediaPhoto:
         assert input_media_photo.caption == "test 2"
 
     def test_with_local_files(self):
-        input_media_photo = InputMediaPhoto('tests/data/telegram.mp4')
-        assert input_media_photo.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
+        input_media_photo = InputMediaPhoto(data_file('telegram.mp4'))
+        assert input_media_photo.media == data_file('telegram.mp4').as_uri()
 
 
 class TestInputMediaAnimation:
@@ -286,10 +284,10 @@ class TestInputMediaAnimation:
 
     def test_with_local_files(self):
         input_media_animation = InputMediaAnimation(
-            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+            data_file('telegram.mp4'), thumb=data_file('telegram.jpg')
         )
-        assert input_media_animation.media == (Path.cwd() / 'tests/data/telegram.mp4').as_uri()
-        assert input_media_animation.thumb == (Path.cwd() / 'tests/data/telegram.jpg').as_uri()
+        assert input_media_animation.media == data_file('telegram.mp4').as_uri()
+        assert input_media_animation.thumb == data_file('telegram.jpg').as_uri()
 
 
 class TestInputMediaAudio:
@@ -351,10 +349,10 @@ class TestInputMediaAudio:
 
     def test_with_local_files(self):
         input_media_audio = InputMediaAudio(
-            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+            data_file('telegram.mp4'), thumb=data_file('telegram.jpg')
         )
-        assert input_media_audio.media == (Path.cwd() / 'tests/data/telegram.mp4/').as_uri()
-        assert input_media_audio.thumb == (Path.cwd() / 'tests/data/telegram.jpg/').as_uri()
+        assert input_media_audio.media == data_file('telegram.mp4').as_uri()
+        assert input_media_audio.thumb == data_file('telegram.jpg').as_uri()
 
 
 class TestInputMediaDocument:
@@ -413,10 +411,10 @@ class TestInputMediaDocument:
 
     def test_with_local_files(self):
         input_media_document = InputMediaDocument(
-            'tests/data/telegram.mp4', thumb='tests/data/telegram.jpg'
+            data_file('telegram.mp4'), thumb=data_file('telegram.jpg')
         )
-        assert input_media_document.media == (Path.cwd() / 'tests/data/telegram.mp4').as_uri()
-        assert input_media_document.thumb == (Path.cwd() / 'tests/data/telegram.jpg').as_uri()
+        assert input_media_document.media == data_file('telegram.mp4').as_uri()
+        assert input_media_document.thumb == data_file('telegram.jpg').as_uri()
 
 
 @pytest.fixture(scope='function')  # noqa: F811
@@ -507,15 +505,20 @@ class TestSendMediaGroup:
 
     @flaky(3, 1)  # noqa: F811
     def test_send_media_group_new_files(
-        self, bot, chat_id, video_file, photo_file, animation_file  # noqa: F811
-    ):  # noqa: F811
+        self,
+        bot,
+        chat_id,
+        video_file,  # noqa: F811
+        photo_file,  # noqa: F811
+        animation_file,  # noqa: F811
+    ):
         def func():
             return bot.send_media_group(
                 chat_id,
                 [
                     InputMediaVideo(video_file),
                     InputMediaPhoto(photo_file),
-                    InputMediaPhoto(Path('tests/data/telegram.jpg').read_bytes()),
+                    InputMediaPhoto(data_file('telegram.jpg').read_bytes()),
                 ],
             )
 
