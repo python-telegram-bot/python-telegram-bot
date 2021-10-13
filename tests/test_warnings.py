@@ -16,13 +16,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import pathlib
+from pathlib import Path
 from collections import defaultdict
 
 import pytest
 
 from telegram._utils.warnings import warn
 from telegram.warnings import PTBUserWarning, PTBRuntimeWarning, PTBDeprecationWarning
+from tests.conftest import PROJECT_ROOT_PATH
 
 
 class TestWarnings:
@@ -64,25 +65,23 @@ class TestWarnings:
         make_assertion(PTBUserWarning)
 
     def test_warn(self, recwarn):
-        expected_file = (
-            pathlib.Path(__file__).parent.parent.resolve() / 'telegram' / '_utils' / 'warnings.py'
-        )
+        expected_file = PROJECT_ROOT_PATH / 'telegram' / '_utils' / 'warnings.py'
 
         warn('test message')
         assert len(recwarn) == 1
         assert recwarn[0].category is PTBUserWarning
         assert str(recwarn[0].message) == 'test message'
-        assert pathlib.Path(recwarn[0].filename) == expected_file, "incorrect stacklevel!"
+        assert Path(recwarn[0].filename) == expected_file, "incorrect stacklevel!"
 
         warn('test message 2', category=PTBRuntimeWarning)
         assert len(recwarn) == 2
         assert recwarn[1].category is PTBRuntimeWarning
         assert str(recwarn[1].message) == 'test message 2'
-        assert pathlib.Path(recwarn[1].filename) == expected_file, "incorrect stacklevel!"
+        assert Path(recwarn[1].filename) == expected_file, "incorrect stacklevel!"
 
         warn('test message 3', stacklevel=1, category=PTBDeprecationWarning)
-        expected_file = pathlib.Path(__file__)
+        expected_file = Path(__file__)
         assert len(recwarn) == 3
         assert recwarn[2].category is PTBDeprecationWarning
         assert str(recwarn[2].message) == 'test message 3'
-        assert pathlib.Path(recwarn[2].filename) == expected_file, "incorrect stacklevel!"
+        assert Path(recwarn[2].filename) == expected_file, "incorrect stacklevel!"

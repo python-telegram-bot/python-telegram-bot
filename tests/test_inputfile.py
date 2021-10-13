@@ -20,27 +20,32 @@ import logging
 import subprocess
 import sys
 from io import BytesIO
-from pathlib import Path
+
+import pytest
 
 from telegram import InputFile
+from tests.conftest import data_file
+
+
+@pytest.fixture(scope='class')
+def png_file():
+    return data_file('game.png')
 
 
 class TestInputFile:
-    png = Path('tests/data/game.png')
-
     def test_slot_behaviour(self, mro_slots):
         inst = InputFile(BytesIO(b'blah'), filename='tg.jpg')
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_subprocess_pipe(self):
+    def test_subprocess_pipe(self, png_file):
         cmd_str = 'type' if sys.platform == 'win32' else 'cat'
-        cmd = [cmd_str, str(self.png)]
+        cmd = [cmd_str, str(png_file)]
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=(sys.platform == 'win32'))
         in_file = InputFile(proc.stdout)
 
-        assert in_file.input_file_content == self.png.read_bytes()
+        assert in_file.input_file_content == png_file.read_bytes()
         assert in_file.mimetype == 'image/png'
         assert in_file.filename == 'image.png'
 
@@ -53,9 +58,9 @@ class TestInputFile:
 
     def test_mimetypes(self, caplog):
         # Only test a few to make sure logic works okay
-        assert InputFile(open('tests/data/telegram.jpg', 'rb')).mimetype == 'image/jpeg'
-        assert InputFile(open('tests/data/telegram.webp', 'rb')).mimetype == 'image/webp'
-        assert InputFile(open('tests/data/telegram.mp3', 'rb')).mimetype == 'audio/mpeg'
+        assert InputFile(data_file('telegram.jpg').open('rb')).mimetype == 'image/jpeg'
+        assert InputFile(data_file('telegram.webp').open('rb')).mimetype == 'image/webp'
+        assert InputFile(data_file('telegram.mp3').open('rb')).mimetype == 'audio/mpeg'
 
         # Test guess from file
         assert InputFile(BytesIO(b'blah'), filename='tg.jpg').mimetype == 'image/jpeg'
@@ -70,61 +75,61 @@ class TestInputFile:
 
         # Test string file
         with caplog.at_level(logging.DEBUG):
-            assert InputFile(open('tests/data/text_file.txt')).mimetype == 'text/plain'
+            assert InputFile(data_file('text_file.txt').open()).mimetype == 'text/plain'
 
             assert len(caplog.records) == 1
             assert caplog.records[0].getMessage().startswith('Could not parse file content')
 
     def test_filenames(self):
-        assert InputFile(open('tests/data/telegram.jpg', 'rb')).filename == 'telegram.jpg'
-        assert InputFile(open('tests/data/telegram.jpg', 'rb'), filename='blah').filename == 'blah'
+        assert InputFile(data_file('telegram.jpg').open('rb')).filename == 'telegram.jpg'
+        assert InputFile(data_file('telegram.jpg').open('rb'), filename='blah').filename == 'blah'
         assert (
-            InputFile(open('tests/data/telegram.jpg', 'rb'), filename='blah.jpg').filename
+            InputFile(data_file('telegram.jpg').open('rb'), filename='blah.jpg').filename
             == 'blah.jpg'
         )
-        assert InputFile(open('tests/data/telegram', 'rb')).filename == 'telegram'
-        assert InputFile(open('tests/data/telegram', 'rb'), filename='blah').filename == 'blah'
+        assert InputFile(data_file('telegram').open('rb')).filename == 'telegram'
+        assert InputFile(data_file('telegram').open('rb'), filename='blah').filename == 'blah'
         assert (
-            InputFile(open('tests/data/telegram', 'rb'), filename='blah.jpg').filename
-            == 'blah.jpg'
+            InputFile(data_file('telegram').open('rb'), filename='blah.jpg').filename == 'blah.jpg'
         )
 
         class MockedFileobject:
             # A open(?, 'rb') without a .name
             def __init__(self, f):
-                self.f = open(f, 'rb')
+                self.f = f.open('rb')
 
             def read(self):
                 return self.f.read()
 
-        assert InputFile(MockedFileobject('tests/data/telegram.jpg')).filename == 'image.jpeg'
+        assert InputFile(MockedFileobject(data_file('telegram.jpg'))).filename == 'image.jpeg'
         assert (
-            InputFile(MockedFileobject('tests/data/telegram.jpg'), filename='blah').filename
+            InputFile(MockedFileobject(data_file('telegram.jpg')), filename='blah').filename
             == 'blah'
         )
         assert (
-            InputFile(MockedFileobject('tests/data/telegram.jpg'), filename='blah.jpg').filename
+            InputFile(MockedFileobject(data_file('telegram.jpg')), filename='blah.jpg').filename
             == 'blah.jpg'
         )
         assert (
-            InputFile(MockedFileobject('tests/data/telegram')).filename
+            InputFile(MockedFileobject(data_file('telegram'))).filename
             == 'application.octet-stream'
         )
         assert (
-            InputFile(MockedFileobject('tests/data/telegram'), filename='blah').filename == 'blah'
+            InputFile(MockedFileobject(data_file('telegram')), filename='blah').filename == 'blah'
         )
         assert (
-            InputFile(MockedFileobject('tests/data/telegram'), filename='blah.jpg').filename
+            InputFile(MockedFileobject(data_file('telegram')), filename='blah.jpg').filename
             == 'blah.jpg'
         )
 
     def test_send_bytes(self, bot, chat_id):
         # We test this here and not at the respective test modules because it's not worth
         # duplicating the test for the different methods
-        with Path('tests/data/text_file.txt').open('rb') as file:
-            message = bot.send_document(chat_id, file.read())
-
+        message = bot.send_document(chat_id, data_file('text_file.txt').read_bytes())
         out = BytesIO()
+
         assert message.document.get_file().download(out=out)
+
         out.seek(0)
+
         assert out.read().decode('utf-8') == 'PTB Rocks!'
