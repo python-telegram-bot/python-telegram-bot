@@ -71,7 +71,7 @@ Here's how to make a one-off code change.
 
    - Your code should adhere to the `PEP 8 Style Guide`_, with the exception that we have a maximum line length of 99.
 
-   - Provide static typing with signature annotations. The documentation of `MyPy`_ will be a good start, the cheat sheet is `here`_. We also have some custom type aliases in ``telegram.utils.helpers.typing``.
+   - Provide static typing with signature annotations. The documentation of `MyPy`_ will be a good start, the cheat sheet is `here`_. We also have some custom type aliases in ``telegram._utils.types``.
 
    - Document your code. This step is pretty important to us, so it has its own `section`_.
 

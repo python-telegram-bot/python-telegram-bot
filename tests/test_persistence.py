@@ -19,10 +19,10 @@
 import gzip
 import signal
 import uuid
+from pathlib import Path
 from threading import Lock
 
-from telegram.ext import PersistenceInput
-from telegram.ext.callbackdatacache import CallbackDataCache
+from telegram.ext import PersistenceInput, UpdaterBuilder, CallbackDataCache
 
 try:
     import ujson as json
@@ -40,7 +40,6 @@ import pytest
 from telegram import Update, Message, User, Chat, MessageEntity, Bot
 from telegram.ext import (
     BasePersistence,
-    Updater,
     ConversationHandler,
     MessageHandler,
     Filters,
@@ -55,7 +54,7 @@ from telegram.ext import (
 
 @pytest.fixture(autouse=True)
 def change_directory(tmp_path):
-    orig_dir = os.getcwd()
+    orig_dir = Path.cwd()
     # Switch to a temporary directory so we don't have to worry about cleaning up files
     # (str() for py<3.6)
     os.chdir(str(tmp_path))
@@ -214,7 +213,7 @@ def conversations():
 @pytest.fixture(scope="function")
 def updater(bot, base_persistence):
     base_persistence.store_data = PersistenceInput(False, False, False, False)
-    u = Updater(bot=bot, persistence=base_persistence)
+    u = UpdaterBuilder().bot(bot).persistence(base_persistence).build()
     base_persistence.store_data = PersistenceInput()
     return u
 
@@ -303,34 +302,36 @@ class TestBasePersistence:
         base_persistence.get_callback_data = get_callback_data
 
         with pytest.raises(ValueError, match="user_data must be of type defaultdict"):
-            u = Updater(bot=bot, persistence=base_persistence)
+            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
         def get_user_data():
             return user_data
 
         base_persistence.get_user_data = get_user_data
         with pytest.raises(ValueError, match="chat_data must be of type defaultdict"):
-            Updater(bot=bot, persistence=base_persistence)
+            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
         def get_chat_data():
             return chat_data
 
         base_persistence.get_chat_data = get_chat_data
         with pytest.raises(ValueError, match="bot_data must be of type dict"):
-            Updater(bot=bot, persistence=base_persistence)
+            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
         def get_bot_data():
             return bot_data
 
         base_persistence.get_bot_data = get_bot_data
         with pytest.raises(ValueError, match="callback_data must be a 2-tuple"):
-            Updater(bot=bot, persistence=base_persistence)
+            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
         def get_callback_data():
             return callback_data
 
+        base_persistence.bot = None
         base_persistence.get_callback_data = get_callback_data
-        u = Updater(bot=bot, persistence=base_persistence)
+        u = UpdaterBuilder().bot(bot).persistence(base_persistence).build()
+        assert u.dispatcher.bot is base_persistence.bot
         assert u.dispatcher.bot_data == bot_data
         assert u.dispatcher.chat_data == chat_data
         assert u.dispatcher.user_data == user_data
@@ -372,7 +373,7 @@ class TestBasePersistence:
         base_persistence.refresh_bot_data = lambda x: x
         base_persistence.refresh_chat_data = lambda x, y: x
         base_persistence.refresh_user_data = lambda x, y: x
-        updater = Updater(bot=bot, persistence=base_persistence)
+        updater = UpdaterBuilder().bot(bot).persistence(base_persistence).build()
         dp = updater.dispatcher
 
         def callback_known_user(update, context):
@@ -871,7 +872,7 @@ class TestBasePersistence:
 @pytest.fixture(scope='function')
 def pickle_persistence():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         single_file=False,
         on_flush=False,
     )
@@ -880,7 +881,7 @@ def pickle_persistence():
 @pytest.fixture(scope='function')
 def pickle_persistence_only_bot():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         store_data=PersistenceInput(callback_data=False, user_data=False, chat_data=False),
         single_file=False,
         on_flush=False,
@@ -890,7 +891,7 @@ def pickle_persistence_only_bot():
 @pytest.fixture(scope='function')
 def pickle_persistence_only_chat():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         store_data=PersistenceInput(callback_data=False, user_data=False, bot_data=False),
         single_file=False,
         on_flush=False,
@@ -900,7 +901,7 @@ def pickle_persistence_only_chat():
 @pytest.fixture(scope='function')
 def pickle_persistence_only_user():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         store_data=PersistenceInput(callback_data=False, chat_data=False, bot_data=False),
         single_file=False,
         on_flush=False,
@@ -910,7 +911,7 @@ def pickle_persistence_only_user():
 @pytest.fixture(scope='function')
 def pickle_persistence_only_callback():
     return PicklePersistence(
-        filename='pickletest',
+        filepath='pickletest',
         store_data=PersistenceInput(user_data=False, chat_data=False, bot_data=False),
         single_file=False,
         on_flush=False,
@@ -927,8 +928,7 @@ def bad_pickle_files():
         'pickletest_conversations',
         'pickletest',
     ]:
-        with open(name, 'w') as f:
-            f.write('(())')
+        Path(name).write_text('(())')
     yield True
 
 
@@ -958,17 +958,17 @@ def good_pickle_files(user_data, chat_data, bot_data, callback_data, conversatio
         'callback_data': callback_data,
         'conversations': conversations,
     }
-    with open('pickletest_user_data', 'wb') as f:
+    with Path('pickletest_user_data').open('wb') as f:
         pickle.dump(user_data, f)
-    with open('pickletest_chat_data', 'wb') as f:
+    with Path('pickletest_chat_data').open('wb') as f:
         pickle.dump(chat_data, f)
-    with open('pickletest_bot_data', 'wb') as f:
+    with Path('pickletest_bot_data').open('wb') as f:
         pickle.dump(bot_data, f)
-    with open('pickletest_callback_data', 'wb') as f:
+    with Path('pickletest_callback_data').open('wb') as f:
         pickle.dump(callback_data, f)
-    with open('pickletest_conversations', 'wb') as f:
+    with Path('pickletest_conversations').open('wb') as f:
         pickle.dump(conversations, f)
-    with open('pickletest', 'wb') as f:
+    with Path('pickletest').open('wb') as f:
         pickle.dump(data, f)
     yield True
 
@@ -981,15 +981,15 @@ def pickle_files_wo_bot_data(user_data, chat_data, callback_data, conversations)
         'conversations': conversations,
         'callback_data': callback_data,
     }
-    with open('pickletest_user_data', 'wb') as f:
+    with Path('pickletest_user_data').open('wb') as f:
         pickle.dump(user_data, f)
-    with open('pickletest_chat_data', 'wb') as f:
+    with Path('pickletest_chat_data').open('wb') as f:
         pickle.dump(chat_data, f)
-    with open('pickletest_callback_data', 'wb') as f:
+    with Path('pickletest_callback_data').open('wb') as f:
         pickle.dump(callback_data, f)
-    with open('pickletest_conversations', 'wb') as f:
+    with Path('pickletest_conversations').open('wb') as f:
         pickle.dump(conversations, f)
-    with open('pickletest', 'wb') as f:
+    with Path('pickletest').open('wb') as f:
         pickle.dump(data, f)
     yield True
 
@@ -1002,15 +1002,15 @@ def pickle_files_wo_callback_data(user_data, chat_data, bot_data, conversations)
         'bot_data': bot_data,
         'conversations': conversations,
     }
-    with open('pickletest_user_data', 'wb') as f:
+    with Path('pickletest_user_data').open('wb') as f:
         pickle.dump(user_data, f)
-    with open('pickletest_chat_data', 'wb') as f:
+    with Path('pickletest_chat_data').open('wb') as f:
         pickle.dump(chat_data, f)
-    with open('pickletest_bot_data', 'wb') as f:
+    with Path('pickletest_bot_data').open('wb') as f:
         pickle.dump(bot_data, f)
-    with open('pickletest_conversations', 'wb') as f:
+    with Path('pickletest_conversations').open('wb') as f:
         pickle.dump(conversations, f)
-    with open('pickletest', 'wb') as f:
+    with Path('pickletest').open('wb') as f:
         pickle.dump(data, f)
     yield True
 
@@ -1339,7 +1339,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.user_data == user_data
         pickle_persistence.update_user_data(12345, user_data[12345])
         assert pickle_persistence.user_data == user_data
-        with open('pickletest_user_data', 'rb') as f:
+        with Path('pickletest_user_data').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f))
         assert user_data_test == user_data
 
@@ -1351,7 +1351,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.chat_data == chat_data
         pickle_persistence.update_chat_data(-12345, chat_data[-12345])
         assert pickle_persistence.chat_data == chat_data
-        with open('pickletest_chat_data', 'rb') as f:
+        with Path('pickletest_chat_data').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f))
         assert chat_data_test == chat_data
 
@@ -1363,7 +1363,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.bot_data == bot_data
         pickle_persistence.update_bot_data(bot_data)
         assert pickle_persistence.bot_data == bot_data
-        with open('pickletest_bot_data', 'rb') as f:
+        with Path('pickletest_bot_data').open('rb') as f:
             bot_data_test = pickle.load(f)
         assert bot_data_test == bot_data
 
@@ -1375,7 +1375,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.callback_data == callback_data
         pickle_persistence.update_callback_data(callback_data)
         assert pickle_persistence.callback_data == callback_data
-        with open('pickletest_callback_data', 'rb') as f:
+        with Path('pickletest_callback_data').open('rb') as f:
             callback_data_test = pickle.load(f)
         assert callback_data_test == callback_data
 
@@ -1385,7 +1385,7 @@ class TestPicklePersistence:
         pickle_persistence.update_conversation('name1', (123, 123), 5)
         assert pickle_persistence.conversations['name1'] == conversation1
         assert pickle_persistence.get_conversations('name1') == conversation1
-        with open('pickletest_conversations', 'rb') as f:
+        with Path('pickletest_conversations').open('rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f))
         assert conversations_test['name1'] == conversation1
 
@@ -1405,7 +1405,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.user_data == user_data
         pickle_persistence.update_user_data(12345, user_data[12345])
         assert pickle_persistence.user_data == user_data
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f)['user_data'])
         assert user_data_test == user_data
 
@@ -1417,7 +1417,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.chat_data == chat_data
         pickle_persistence.update_chat_data(-12345, chat_data[-12345])
         assert pickle_persistence.chat_data == chat_data
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f)['chat_data'])
         assert chat_data_test == chat_data
 
@@ -1429,7 +1429,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.bot_data == bot_data
         pickle_persistence.update_bot_data(bot_data)
         assert pickle_persistence.bot_data == bot_data
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             bot_data_test = pickle.load(f)['bot_data']
         assert bot_data_test == bot_data
 
@@ -1441,7 +1441,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.callback_data == callback_data
         pickle_persistence.update_callback_data(callback_data)
         assert pickle_persistence.callback_data == callback_data
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             callback_data_test = pickle.load(f)['callback_data']
         assert callback_data_test == callback_data
 
@@ -1451,7 +1451,7 @@ class TestPicklePersistence:
         pickle_persistence.update_conversation('name1', (123, 123), 5)
         assert pickle_persistence.conversations['name1'] == conversation1
         assert pickle_persistence.get_conversations('name1') == conversation1
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f)['conversations'])
         assert conversations_test['name1'] == conversation1
 
@@ -1487,7 +1487,7 @@ class TestPicklePersistence:
         pickle_persistence.update_user_data(54321, user_data[54321])
         assert pickle_persistence.user_data == user_data
 
-        with open('pickletest_user_data', 'rb') as f:
+        with Path('pickletest_user_data').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f))
         assert not user_data_test == user_data
 
@@ -1498,7 +1498,7 @@ class TestPicklePersistence:
         pickle_persistence.update_chat_data(54321, chat_data[54321])
         assert pickle_persistence.chat_data == chat_data
 
-        with open('pickletest_chat_data', 'rb') as f:
+        with Path('pickletest_chat_data').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f))
         assert not chat_data_test == chat_data
 
@@ -1509,7 +1509,7 @@ class TestPicklePersistence:
         pickle_persistence.update_bot_data(bot_data)
         assert pickle_persistence.bot_data == bot_data
 
-        with open('pickletest_bot_data', 'rb') as f:
+        with Path('pickletest_bot_data').open('rb') as f:
             bot_data_test = pickle.load(f)
         assert not bot_data_test == bot_data
 
@@ -1520,7 +1520,7 @@ class TestPicklePersistence:
         pickle_persistence.update_callback_data(callback_data)
         assert pickle_persistence.callback_data == callback_data
 
-        with open('pickletest_callback_data', 'rb') as f:
+        with Path('pickletest_callback_data').open('rb') as f:
             callback_data_test = pickle.load(f)
         assert not callback_data_test == callback_data
 
@@ -1531,24 +1531,24 @@ class TestPicklePersistence:
         pickle_persistence.update_conversation('name1', (123, 123), 5)
         assert pickle_persistence.conversations['name1'] == conversation1
 
-        with open('pickletest_conversations', 'rb') as f:
+        with Path('pickletest_conversations').open('rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f))
         assert not conversations_test['name1'] == conversation1
 
         pickle_persistence.flush()
-        with open('pickletest_user_data', 'rb') as f:
+        with Path('pickletest_user_data').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f))
         assert user_data_test == user_data
 
-        with open('pickletest_chat_data', 'rb') as f:
+        with Path('pickletest_chat_data').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f))
         assert chat_data_test == chat_data
 
-        with open('pickletest_bot_data', 'rb') as f:
+        with Path('pickletest_bot_data').open('rb') as f:
             bot_data_test = pickle.load(f)
         assert bot_data_test == bot_data
 
-        with open('pickletest_conversations', 'rb') as f:
+        with Path('pickletest_conversations').open('rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f))
         assert conversations_test['name1'] == conversation1
 
@@ -1564,7 +1564,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.user_data == user_data
         pickle_persistence.update_user_data(54321, user_data[54321])
         assert pickle_persistence.user_data == user_data
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f)['user_data'])
         assert not user_data_test == user_data
 
@@ -1573,7 +1573,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.chat_data == chat_data
         pickle_persistence.update_chat_data(54321, chat_data[54321])
         assert pickle_persistence.chat_data == chat_data
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f)['chat_data'])
         assert not chat_data_test == chat_data
 
@@ -1582,7 +1582,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.bot_data == bot_data
         pickle_persistence.update_bot_data(bot_data)
         assert pickle_persistence.bot_data == bot_data
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             bot_data_test = pickle.load(f)['bot_data']
         assert not bot_data_test == bot_data
 
@@ -1591,7 +1591,7 @@ class TestPicklePersistence:
         assert not pickle_persistence.callback_data == callback_data
         pickle_persistence.update_callback_data(callback_data)
         assert pickle_persistence.callback_data == callback_data
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             callback_data_test = pickle.load(f)['callback_data']
         assert not callback_data_test == callback_data
 
@@ -1600,29 +1600,29 @@ class TestPicklePersistence:
         assert not pickle_persistence.conversations['name1'] == conversation1
         pickle_persistence.update_conversation('name1', (123, 123), 5)
         assert pickle_persistence.conversations['name1'] == conversation1
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f)['conversations'])
         assert not conversations_test['name1'] == conversation1
 
         pickle_persistence.flush()
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f)['user_data'])
         assert user_data_test == user_data
 
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f)['chat_data'])
         assert chat_data_test == chat_data
 
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             bot_data_test = pickle.load(f)['bot_data']
         assert bot_data_test == bot_data
 
-        with open('pickletest', 'rb') as f:
+        with Path('pickletest').open('rb') as f:
             conversations_test = defaultdict(dict, pickle.load(f)['conversations'])
         assert conversations_test['name1'] == conversation1
 
     def test_with_handler(self, bot, update, bot_data, pickle_persistence, good_pickle_files):
-        u = Updater(bot=bot, persistence=pickle_persistence)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence).build()
         dp = u.dispatcher
         bot.callback_data_cache.clear_callback_data()
         bot.callback_data_cache.clear_callback_queries()
@@ -1656,17 +1656,17 @@ class TestPicklePersistence:
         dp.add_handler(h1)
         dp.process_update(update)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             single_file=False,
             on_flush=False,
         )
-        u = Updater(bot=bot, persistence=pickle_persistence_2)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_2).build()
         dp = u.dispatcher
         dp.add_handler(h2)
         dp.process_update(update)
 
     def test_flush_on_stop(self, bot, update, pickle_persistence):
-        u = Updater(bot=bot, persistence=pickle_persistence)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -1675,7 +1675,7 @@ class TestPicklePersistence:
         dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             single_file=False,
             on_flush=False,
         )
@@ -1686,7 +1686,7 @@ class TestPicklePersistence:
         assert data['test'] == 'Working4!'
 
     def test_flush_on_stop_only_bot(self, bot, update, pickle_persistence_only_bot):
-        u = Updater(bot=bot, persistence=pickle_persistence_only_bot)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_only_bot).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -1695,7 +1695,7 @@ class TestPicklePersistence:
         dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             store_data=PersistenceInput(callback_data=False, chat_data=False, user_data=False),
             single_file=False,
             on_flush=False,
@@ -1706,7 +1706,7 @@ class TestPicklePersistence:
         assert pickle_persistence_2.get_callback_data() is None
 
     def test_flush_on_stop_only_chat(self, bot, update, pickle_persistence_only_chat):
-        u = Updater(bot=bot, persistence=pickle_persistence_only_chat)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_only_chat).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -1715,7 +1715,7 @@ class TestPicklePersistence:
         dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             store_data=PersistenceInput(callback_data=False, user_data=False, bot_data=False),
             single_file=False,
             on_flush=False,
@@ -1726,7 +1726,7 @@ class TestPicklePersistence:
         assert pickle_persistence_2.get_callback_data() is None
 
     def test_flush_on_stop_only_user(self, bot, update, pickle_persistence_only_user):
-        u = Updater(bot=bot, persistence=pickle_persistence_only_user)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_only_user).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -1735,7 +1735,7 @@ class TestPicklePersistence:
         dp.bot.callback_data_cache._callback_queries['test'] = 'Working4!'
         u._signal_handler(signal.SIGINT, None)
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             store_data=PersistenceInput(callback_data=False, chat_data=False, bot_data=False),
             single_file=False,
             on_flush=False,
@@ -1746,7 +1746,7 @@ class TestPicklePersistence:
         assert pickle_persistence_2.get_callback_data() is None
 
     def test_flush_on_stop_only_callback(self, bot, update, pickle_persistence_only_callback):
-        u = Updater(bot=bot, persistence=pickle_persistence_only_callback)
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_only_callback).build()
         dp = u.dispatcher
         u.running = True
         dp.user_data[4242424242]['my_test'] = 'Working!'
@@ -1758,7 +1758,7 @@ class TestPicklePersistence:
         del u
         del pickle_persistence_only_callback
         pickle_persistence_2 = PicklePersistence(
-            filename='pickletest',
+            filepath='pickletest',
             store_data=PersistenceInput(user_data=False, chat_data=False, bot_data=False),
             single_file=False,
             on_flush=False,
@@ -1851,6 +1851,21 @@ class TestPicklePersistence:
         assert ch.conversations == pickle_persistence.conversations['name2']
         assert nested_ch.conversations[nested_ch._get_key(update)] == 1
         assert nested_ch.conversations == pickle_persistence.conversations['name3']
+
+    @pytest.mark.parametrize(
+        'filepath',
+        ['pickletest', Path('pickletest')],
+        ids=['str filepath', 'pathlib.Path filepath'],
+    )
+    def test_filepath_argument_types(self, filepath):
+        pick_persist = PicklePersistence(
+            filepath=filepath,
+            on_flush=False,
+        )
+        pick_persist.update_user_data(1, 1)
+
+        assert pick_persist.get_user_data()[1] == 1
+        assert Path(filepath).is_file()
 
     def test_with_job(self, job_queue, dp, pickle_persistence):
         dp.bot.arbitrary_callback_data = True
@@ -2179,7 +2194,7 @@ class TestDictPersistence:
 
     def test_with_handler(self, bot, update):
         dict_persistence = DictPersistence()
-        u = Updater(bot=bot, persistence=dict_persistence)
+        u = UpdaterBuilder().bot(bot).persistence(dict_persistence).build()
         dp = u.dispatcher
 
         def first(update, context):
@@ -2221,7 +2236,7 @@ class TestDictPersistence:
             callback_data_json=callback_data,
         )
 
-        u = Updater(bot=bot, persistence=dict_persistence_2)
+        u = UpdaterBuilder().bot(bot).persistence(dict_persistence_2).build()
         dp = u.dispatcher
         dp.add_handler(h2)
         dp.process_update(update)

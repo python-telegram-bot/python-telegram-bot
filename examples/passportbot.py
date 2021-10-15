@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=C0116,W0613
+# pylint: disable=missing-function-docstring, unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -11,11 +11,13 @@ See https://git.io/fAvYd for how to use Telegram Passport properly with python-t
 
 """
 import logging
+from pathlib import Path
 
 from telegram import Update
-from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
+from telegram.ext import MessageHandler, Filters, Updater, CallbackContext
 
 # Enable logging
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
 )
@@ -23,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def msg(update: Update, context: CallbackContext) -> None:
+def msg(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Downloads and prints the received passport data."""
     # Retrieve passport data
     passport_data = update.message.passport_data
@@ -101,8 +103,8 @@ def msg(update: Update, context: CallbackContext) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Updater and pass it your token and private key
-    with open('private.key', 'rb') as private_key:
-        updater = Updater("TOKEN", private_key=private_key.read())
+    private_key = Path('private.key')
+    updater = Updater.builder().token("TOKEN").private_key(private_key.read_bytes()).build()
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher

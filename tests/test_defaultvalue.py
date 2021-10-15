@@ -19,7 +19,7 @@
 import pytest
 
 from telegram import User
-from telegram.utils.defaultvalue import DefaultValue
+from telegram._utils.defaultvalue import DefaultValue
 
 
 class TestDefaultValue:

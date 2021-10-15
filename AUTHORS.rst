@@ -43,6 +43,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `DonalDuck004 <https://github.com/DonalDuck004>`_
 - `Eana Hufwe <https://github.com/blueset>`_
 - `Ehsan Online <https://github.com/ehsanonline>`_
+- `Eldad Carin <https://github.com/eldbud>`_
 - `Eli Gao <https://github.com/eligao>`_
 - `Emilio Molinari <https://github.com/xates>`_
 - `ErgoZ Riftbit Vaper <https://github.com/ergoz>`_
@@ -67,6 +68,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Joscha Götzer <https://github.com/Rostgnom>`_
 - `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
+- `kennethcheo <https://github.com/kennethcheo>`_
 - `Kirill Vasin <https://github.com/vasinkd>`_
 - `Kjwon15 <https://github.com/kjwon15>`_
 - `Li-aung Yip <https://github.com/LiaungYip>`_
@@ -90,6 +92,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Patrick Hofmann <https://github.com/PH89>`_
 - `Paul Larsen <https://github.com/PaulSonOfLars>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
+- `Piraty <https://github.com/piraty>`_
 - `Poolitzer <https://github.com/Poolitzer>`_
 - `Pranjalya Tiwari <https://github.com/Pranjalya>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_

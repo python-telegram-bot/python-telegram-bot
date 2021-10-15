@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0115
 """This module contains an classes that represent Telegram errors."""
 from typing import Tuple, Union
 

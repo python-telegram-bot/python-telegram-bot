@@ -24,6 +24,7 @@ import os
 import socket
 import sys
 import warnings
+from pathlib import Path
 
 try:
     import ujson as json
@@ -35,15 +36,15 @@ from typing import Any, Union
 import certifi
 
 try:
-    import telegram.vendor.ptb_urllib3.urllib3 as urllib3
-    import telegram.vendor.ptb_urllib3.urllib3.contrib.appengine as appengine
+    from telegram.vendor.ptb_urllib3 import urllib3
+    from telegram.vendor.ptb_urllib3.urllib3.contrib import appengine
     from telegram.vendor.ptb_urllib3.urllib3.connection import HTTPConnection
     from telegram.vendor.ptb_urllib3.urllib3.fields import RequestField
     from telegram.vendor.ptb_urllib3.urllib3.util.timeout import Timeout
 except ImportError:  # pragma: no cover
     try:
         import urllib3  # type: ignore[no-redef]
-        import urllib3.contrib.appengine as appengine  # type: ignore[no-redef]
+        from urllib3.contrib import appengine  # type: ignore[no-redef]
         from urllib3.connection import HTTPConnection  # type: ignore[no-redef]
         from urllib3.fields import RequestField  # type: ignore[no-redef]
         from urllib3.util.timeout import Timeout  # type: ignore[no-redef]
@@ -59,7 +60,7 @@ except ImportError:  # pragma: no cover
         )
         raise
 
-# pylint: disable=C0412
+# pylint: disable=ungrouped-imports
 from telegram import InputFile
 from telegram.error import (
     TelegramError,
@@ -72,21 +73,23 @@ from telegram.error import (
     TimedOut,
     Unauthorized,
 )
-from telegram.utils.types import JSONDict
+from telegram._utils.types import JSONDict, FilePathInput
 
 
-def _render_part(self: RequestField, name: str, value: str) -> str:  # pylint: disable=W0613
+# pylint: disable=unused-argument
+def _render_part(self: RequestField, name: str, value: str) -> str:
     r"""
     Monkey patch urllib3.urllib3.fields.RequestField to make it *not* support RFC2231 compliant
     Content-Disposition headers since telegram servers don't understand it. Instead just escape
     \\ and " and replace any \n and \r with a space.
+
     """
     value = value.replace('\\', '\\\\').replace('"', '\\"')
     value = value.replace('\r', ' ').replace('\n', ' ')
     return f'{name}="{value}"'
 
 
-RequestField._render_part = _render_part  # type: ignore  # pylint: disable=W0212
+RequestField._render_part = _render_part  # type: ignore  # pylint: disable=protected-access
 
 logging.getLogger('telegram.vendor.ptb_urllib3.urllib3').setLevel(logging.WARNING)
 
@@ -179,7 +182,7 @@ class Request:
             kwargs.update(urllib3_proxy_kwargs)
             if proxy_url.startswith('socks'):
                 try:
-                    # pylint: disable=C0415
+                    # pylint: disable=import-outside-toplevel
                     from telegram.vendor.ptb_urllib3.urllib3.contrib.socks import SOCKSProxyManager
                 except ImportError as exc:
                     raise RuntimeError('PySocks is missing') from exc
@@ -313,7 +316,7 @@ class Request:
         # Are we uploading files?
         files = False
 
-        # pylint: disable=R1702
+        # pylint: disable=too-many-nested-blocks
         for key, val in data.copy().items():
             if isinstance(val, InputFile):
                 # Convert the InputFile to urllib3 field format
@@ -382,17 +385,18 @@ class Request:
 
         return self._request_wrapper('GET', url, **urlopen_kwargs)
 
-    def download(self, url: str, filename: str, timeout: float = None) -> None:
+    def download(self, url: str, filepath: FilePathInput, timeout: float = None) -> None:
         """Download a file by its URL.
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
+            filepath (:obj:`pathlib.Path` | :obj:`str`): The filepath to download the file to.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
-            filename (:obj:`str`): The filename within the path to download the file.
+
+        .. versionchanged:: 14.0
+            The ``filepath`` parameter now also accepts :obj:`pathlib.Path` objects as argument.
 
         """
-        buf = self.retrieve(url, timeout=timeout)
-        with open(filename, 'wb') as fobj:
-            fobj.write(buf)
+        Path(filepath).write_bytes(self.retrieve(url, timeout))
