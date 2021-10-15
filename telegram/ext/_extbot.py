@@ -159,10 +159,8 @@ class ExtBot(Bot):
                 )
 
             # 3)
-            elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:  # type: ignore
-                val.parse_mode = (  # type: ignore[attr-defined]
-                    self.defaults.parse_mode if self.defaults else None
-                )
+            elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
+                val.parse_mode = self.defaults.parse_mode if self.defaults else None
             elif key == 'media' and isinstance(val, list):
                 for media in val:
                     if media.parse_mode is DEFAULT_NONE:
