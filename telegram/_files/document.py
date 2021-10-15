@@ -18,17 +18,16 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Document."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
-from telegram import PhotoSize, TelegramObject
-from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram import PhotoSize
+from telegram._files._basethumbedmedium import _BaseThumbedMedium
 
 if TYPE_CHECKING:
-    from telegram import Bot, File
+    from telegram import Bot
 
 
-class Document(TelegramObject):
+class Document(_BaseThumbedMedium):
     """This object represents a general file
     (as opposed to photos, voice messages and audio files).
 
@@ -60,15 +59,7 @@ class Document(TelegramObject):
 
     """
 
-    __slots__ = (
-        'bot',
-        'file_id',
-        'file_size',
-        'file_name',
-        'thumb',
-        'mime_type',
-        'file_unique_id',
-    )
+    __slots__ = ('file_name', 'mime_type')
 
     def __init__(
         self,
@@ -81,42 +72,13 @@ class Document(TelegramObject):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
-        # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
-        # Optionals
-        self.thumb = thumb
-        self.file_name = file_name
+        super().__init__(
+            file_id=file_id,
+            file_unique_id=file_unique_id,
+            file_size=file_size,
+            thumb=thumb,
+            bot=bot,
+        )
+        # Optional
         self.mime_type = mime_type
-        self.file_size = file_size
-        self.bot = bot
-
-        self._id_attrs = (self.file_unique_id,)
-
-    @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Document']:
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if not data:
-            return None
-
-        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
-
-        return cls(bot=bot, **data)
-
-    def get_file(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
-        """Convenience wrapper over :attr:`telegram.Bot.get_file`
-
-        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
-
-        Returns:
-            :class:`telegram.File`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
-        """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        self.file_name = file_name

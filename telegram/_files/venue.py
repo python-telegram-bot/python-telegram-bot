@@ -61,13 +61,13 @@ class Venue(TelegramObject):
     """
 
     __slots__ = (
-        'google_place_type',
-        'location',
-        'title',
         'address',
-        'foursquare_type',
+        'location',
         'foursquare_id',
+        'foursquare_type',
         'google_place_id',
+        'google_place_type',
+        'title',
     )
 
     def __init__(
