@@ -40,7 +40,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.
         title (:obj:`str`): Voice message title.
         caption (:obj:`str`, optional): Caption,
-            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -55,12 +55,12 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.VOICE`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VOICE`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.
         title (:obj:`str`): Voice message title.
         caption (:obj:`str`): Optional. Caption,
-            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants

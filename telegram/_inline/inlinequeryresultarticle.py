@@ -47,7 +47,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.ARTICLE`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.ARTICLE`.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
         title (:obj:`str`): Title of the result.
         input_message_content (:class:`telegram.InputMessageContent`): Content of the message to

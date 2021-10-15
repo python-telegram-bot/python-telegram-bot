@@ -57,7 +57,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.LOCATION`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.LOCATION`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.

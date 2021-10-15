@@ -45,7 +45,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         title (:obj:`str`, optional): Title for the result.
         description (:obj:`str`, optional): Short description of the result.
         caption (:obj:`str`, optional): Caption of the photo to be sent,
-            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -60,7 +60,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.PHOTO`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.PHOTO`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in jpeg format. Photo size
             must not exceed 5MB.
@@ -70,7 +70,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         title (:obj:`str`): Optional. Title for the result.
         description (:obj:`str`): Optional. Short description of the result.
         caption (:obj:`str`): Optional. Caption of the photo to be sent,
-            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants

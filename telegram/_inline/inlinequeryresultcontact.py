@@ -50,7 +50,7 @@ class InlineQueryResultContact(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.CONTACT`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.CONTACT`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         phone_number (:obj:`str`): Contact's phone number.
         first_name (:obj:`str`): Contact's first name.

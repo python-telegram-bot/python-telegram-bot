@@ -191,8 +191,9 @@ class User(TelegramObject):
     def mention_markdown(self, name: str = None) -> str:
         """
         Note:
-            :attr:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by Telegram
-            for backward compatibility. You should use :meth:`mention_markdown_v2` instead.
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`mention_markdown_v2`
+            instead.
 
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.

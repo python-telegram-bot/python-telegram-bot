@@ -29,10 +29,6 @@ Attributes:
 
         .. versionadded:: 13.4
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
-    MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH (:obj:`int`): 200
-
-        .. versionadded:: 13.2
-
     ANONYMOUS_ADMIN_ID (:obj:`int`): ``1087968824`` (User id in groups for anonymous admin)
     SERVICE_CHAT_ID (:obj:`int`): ``777000`` (Telegram service chat, that also acts as sender of
         channel posts forwarded to discussion groups)
@@ -48,6 +44,7 @@ __all__ = [
     'ANONYMOUS_ADMIN_ID',
     'BOT_API_VERSION',
     'BotCommandScopeType',
+    'CallbackQueryLimit',
     'ChatAction',
     'ChatMemberStatus',
     'ChatType',
@@ -55,8 +52,9 @@ __all__ = [
     'FileSizeLimit',
     'FloodLimit',
     'InlineKeyboardMarkupLimit',
-    'MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH',
-    'MAX_INLINE_QUERY_RESULTS',
+    'InlineQueryLimit',
+    'InlineQueryResultType',
+    'InputMediaType',
     'MaskPosition',
     'MessageAttachmentType',
     'MessageEntityType',
@@ -89,8 +87,6 @@ SERVICE_CHAT_ID = 777000
 # constants above this line are tested
 
 SUPPORTED_WEBHOOK_PORTS: List[int] = [443, 80, 88, 8443]
-MAX_INLINE_QUERY_RESULTS = 50
-MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH = 200
 
 
 class BotCommandScopeType(_StringEnum):
@@ -116,6 +112,21 @@ class BotCommandScopeType(_StringEnum):
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeChatAdministrators`."""
     CHAT_MEMBER = 'chat_member'
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeChatMember`."""
+
+
+class CallbackQueryLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.CallbackQuery`/
+    :meth:`telegram.Bot.answer_callback_query`. The enum members of this enumeration are instances
+    of :class:`int` and can be treated as such.
+
+    .. versionadded:: 14.0
+    """
+
+    __slots__ = ()
+
+    ANSWER_CALLBACK_QUERY_TEXT_LENGTH = 200
+    """:obj:`int`: Maximum number of characters for the ``text`` parameter of
+    :meth:`Bot.answer_callback_query`."""
 
 
 class ChatAction(_StringEnum):
@@ -316,10 +327,10 @@ class InlineQueryLimit(IntEnum):
 
     RESULTS = 50
     """:obj:`int`: Maximum number of results that can be passed to
-    :meth:`Bot.answer_inline_query."""
+    :meth:`Bot.answer_inline_query`."""
     SWITCH_PM_TEXT_LENGTH = 64
     """:obj:`int`: Maximum number of characters for the ``switch_pm_text`` parameter of
-    :meth:`Bot.answer_inline_query."""
+    :meth:`Bot.answer_inline_query`."""
 
 
 class InlineQueryResultType(_StringEnum):
@@ -368,7 +379,7 @@ class InlineQueryResultType(_StringEnum):
     GAME = 'game'
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultGame`."""
     LOCATION = 'location'
-    """:obj:`str`: Type of :class:`telegram.InlineQueryResultLocation."""
+    """:obj:`str`: Type of :class:`telegram.InlineQueryResultLocation`."""
     VENUE = 'venue'
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultVenue`."""
 

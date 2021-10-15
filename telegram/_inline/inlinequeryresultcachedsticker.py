@@ -43,7 +43,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.STICKER`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.STICKER`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         sticker_file_id (:obj:`str`): A valid file identifier of the sticker.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached

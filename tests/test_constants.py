@@ -39,8 +39,22 @@ class IntEnumTest(IntEnum):
 
 
 class TestConstants:
-    def test_to_json(self):
+    def test__all__(self):
+        expected = {
+            key
+            for key, member in constants.__dict__.items()
+            if (
+                not key.startswith('_')
+                # exclude imported stuff
+                and getattr(member, '__module__', 'telegram.constants') == 'telegram.constants'
+            )
+        }
+        actual = set(constants.__all__)
+        assert (
+            actual == expected
+        ), f"Members {expected - actual} were not listed in constants.__all__"
 
+    def test_to_json(self):
         assert json.dumps(StrEnumTest.FOO) == json.dumps('foo')
         assert json.dumps(IntEnumTest.FOO) == json.dumps(1)
 

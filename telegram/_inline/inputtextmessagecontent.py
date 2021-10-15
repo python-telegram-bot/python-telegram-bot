@@ -34,8 +34,8 @@ class InputTextMessageContent(InputMessageContent):
 
     Args:
         message_text (:obj:`str`): Text of the message to be sent,
-            1-:attr:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
-            parsing. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
+            1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
+            parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
             in :class:`telegram.constants.ParseMode` for the available modes.
@@ -48,7 +48,7 @@ class InputTextMessageContent(InputMessageContent):
 
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent,
-            1-:attr:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
+            1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message. See the constants

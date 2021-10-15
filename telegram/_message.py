@@ -111,8 +111,8 @@ class Message(TelegramObject):
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
-            0-:attr:`telegram.constants.MessageLimit.TEXT_LENGTH`
-            characters. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
+            0-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH`
+            characters.
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
@@ -141,7 +141,7 @@ class Message(TelegramObject):
             the group or supergroup and information about them (the bot itself may be one of these
             members).
         caption (:obj:`str`, optional): Caption for the animation, audio, document, photo, video
-            or voice, 0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
+            or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
         contact (:class:`telegram.Contact`, optional): Message is a shared contact, information
             about the contact.
         location (:class:`telegram.Location`, optional): Message is a shared location, information
@@ -264,7 +264,7 @@ class Message(TelegramObject):
         new_chat_members (List[:class:`telegram.User`]): Optional. Information about new members to
             the chat. (the bot itself may be one of these members).
         caption (:obj:`str`): Optional. Caption for the document, photo or video,
-            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH`
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
             characters.
         contact (:class:`telegram.Contact`): Optional. Information about the contact.
         location (:class:`telegram.Location`): Optional. Information about the location.
@@ -774,8 +774,8 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
         Note:
-            :attr:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by Telegram
-            for backward compatibility. You should use :meth:`reply_markdown_v2` instead.
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`reply_markdown_v2` instead.
 
         Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
@@ -2736,8 +2736,8 @@ class Message(TelegramObject):
         in the same way the original message was formatted.
 
         Note:
-            :attr:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram
-            for backward compatibility. You should use :meth:`text_markdown_v2` instead.
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`text_markdown_v2` instead.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -2768,8 +2768,9 @@ class Message(TelegramObject):
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         Note:
-            :attr:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram
-            for backward compatibility. You should use :meth:`text_markdown_v2_urled` instead.
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
+            instead.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -2800,8 +2801,9 @@ class Message(TelegramObject):
         Markdown in the same way the original message was formatted.
 
         Note:
-            :attr:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram
-            for backward compatibility. You should use :meth:`caption_markdown_v2` instead.
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
+            instead.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -2834,8 +2836,9 @@ class Message(TelegramObject):
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         Note:
-            :attr:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by Telegram
-            for backward compatibility. You should use :meth:`caption_markdown_v2_urled` instead.
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`caption_markdown_v2_urled`
+            instead.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.

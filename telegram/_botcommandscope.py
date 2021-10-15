@@ -120,7 +120,7 @@ class BotCommandScopeDefault(BotCommandScope):
     .. versionadded:: 13.7
 
     Attributes:
-        type (:obj:`str`): Scope type :attr:`telegram.BotCommandScope.DEFAULT`.
+        type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.DEFAULT`.
     """
 
     __slots__ = ()
@@ -135,7 +135,7 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
     .. versionadded:: 13.7
 
     Attributes:
-        type (:obj:`str`): Scope type :attr:`telegram.BotCommandScope.ALL_PRIVATE_CHATS`.
+        type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_PRIVATE_CHATS`.
     """
 
     __slots__ = ()
@@ -150,7 +150,7 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
     .. versionadded:: 13.7
 
     Attributes:
-        type (:obj:`str`): Scope type :attr:`telegram.BotCommandScope.ALL_GROUP_CHATS`.
+        type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_GROUP_CHATS`.
     """
 
     __slots__ = ()
@@ -165,7 +165,7 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
     .. versionadded:: 13.7
 
     Attributes:
-        type (:obj:`str`): Scope type :attr:`telegram.BotCommandScope.ALL_CHAT_ADMINISTRATORS`.
+        type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_CHAT_ADMINISTRATORS`.
     """
 
     __slots__ = ()
@@ -187,7 +187,7 @@ class BotCommandScopeChat(BotCommandScope):
             target supergroup (in the format ``@supergroupusername``)
 
     Attributes:
-        type (:obj:`str`): Scope type :attr:`telegram.BotCommandScope.CHAT`.
+        type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT`.
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
             target supergroup (in the format ``@supergroupusername``)
     """
@@ -216,7 +216,7 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
             target supergroup (in the format ``@supergroupusername``)
 
     Attributes:
-        type (:obj:`str`): Scope type :attr:`telegram.BotCommandScope.CHAT_ADMINISTRATORS`.
+        type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT_ADMINISTRATORS`.
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
             target supergroup (in the format ``@supergroupusername``)
     """
@@ -246,7 +246,7 @@ class BotCommandScopeChatMember(BotCommandScope):
         user_id (:obj:`int`): Unique identifier of the target user.
 
     Attributes:
-        type (:obj:`str`): Scope type :attr:`telegram.BotCommandScope.CHAT_MEMBER`.
+        type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT_MEMBER`.
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
             target supergroup (in the format ``@supergroupusername``)
         user_id (:obj:`int`): Unique identifier of the target user.

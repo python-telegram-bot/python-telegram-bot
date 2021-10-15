@@ -47,7 +47,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`, optional): Caption,
-            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -68,14 +68,14 @@ class InlineQueryResultVideo(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.VIDEO`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VIDEO`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (jpeg only) for the video.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`): Optional. Caption of the video to be sent,
-            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants

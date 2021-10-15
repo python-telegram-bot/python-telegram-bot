@@ -48,7 +48,7 @@ class InlineQueryResultGif(InlineQueryResult):
             ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
         title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the GIF file to be sent,
-            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
@@ -63,7 +63,7 @@ class InlineQueryResultGif(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): :attr:`telegram.constants.InlineQueryResultType.GIF`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GIF`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
         gif_width (:obj:`int`): Optional. Width of the GIF.
@@ -74,7 +74,7 @@ class InlineQueryResultGif(InlineQueryResult):
         thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption of the GIF file to be sent,
-            0-:attr:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
