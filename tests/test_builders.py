@@ -20,6 +20,7 @@
 """
 We mainly test on UpdaterBuilder because it has all methods that DispatcherBuilder already has
 """
+from pathlib import Path
 from random import randint
 from threading import Event
 
@@ -63,7 +64,9 @@ class TestBuilder:
             pytest.skip(f'{builder.__class__} has no method called {method}')
 
         # First that e.g. `bot` can't be set if `request` was already set
-        getattr(builder, method)(1)
+        # We pass the private key since `private_key` is the only method that doesn't just save
+        # the passed value
+        getattr(builder, method)(Path('tests/data/private.key'))
         with pytest.raises(RuntimeError, match=f'`bot` may only be set, if no {description}'):
             builder.bot(None)
 
@@ -84,7 +87,9 @@ class TestBuilder:
             pytest.skip(f'{builder.__class__} has no method called {method}')
 
         # First that e.g. `dispatcher` can't be set if `bot` was already set
-        getattr(builder, method)(None)
+        # We pass the private key since `private_key` is the only method that doesn't just save
+        # the passed value
+        getattr(builder, method)(Path('tests/data/private.key'))
         with pytest.raises(
             RuntimeError, match=f'`dispatcher` may only be set, if no {description}'
         ):
@@ -102,7 +107,9 @@ class TestBuilder:
         builder = builder.__class__()
         builder.dispatcher(None)
         if method != 'dispatcher_class':
-            getattr(builder, method)(None)
+            # We pass the private key since `private_key` is the only method that doesn't just save
+            # the passed value
+            getattr(builder, method)(Path('tests/data/private.key'))
         else:
             with pytest.raises(
                 RuntimeError, match=f'`{method}` may only be set, if no Dispatcher instance'
@@ -251,3 +258,22 @@ class TestBuilder:
         else:
             assert isinstance(obj, CustomDispatcher)
             assert obj.arg == 2
+
+    @pytest.mark.parametrize('input_type', ('bytes', 'str', 'Path'))
+    def test_all_private_key_input_types(self, builder, bot, input_type):
+        private_key = Path('tests/data/private.key')
+        password = Path('tests/data/private_key.password')
+
+        if input_type == 'bytes':
+            private_key = private_key.read_bytes()
+            password = password.read_bytes()
+        if input_type == 'str':
+            private_key = str(private_key)
+            password = str(password)
+
+        builder.token(bot.token).private_key(
+            private_key=private_key,
+            password=password,
+        )
+        bot = builder.build().bot
+        assert bot.private_key

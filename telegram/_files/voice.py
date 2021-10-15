@@ -20,15 +20,13 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import TelegramObject
-from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._files._basemedium import _BaseMedium
 
 if TYPE_CHECKING:
-    from telegram import Bot, File
+    from telegram import Bot
 
 
-class Voice(TelegramObject):
+class Voice(_BaseMedium):
     """This object represents a voice note.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -58,14 +56,7 @@ class Voice(TelegramObject):
 
     """
 
-    __slots__ = (
-        'bot',
-        'file_id',
-        'file_size',
-        'duration',
-        'mime_type',
-        'file_unique_id',
-    )
+    __slots__ = ('duration', 'mime_type')
 
     def __init__(
         self,
@@ -77,29 +68,13 @@ class Voice(TelegramObject):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
+        super().__init__(
+            file_id=file_id,
+            file_unique_id=file_unique_id,
+            file_size=file_size,
+            bot=bot,
+        )
         # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
         self.duration = int(duration)
-        # Optionals
+        # Optional
         self.mime_type = mime_type
-        self.file_size = file_size
-        self.bot = bot
-
-        self._id_attrs = (self.file_unique_id,)
-
-    def get_file(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
-        """Convenience wrapper over :attr:`telegram.Bot.get_file`
-
-        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
-
-        Returns:
-            :class:`telegram.File`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
-        """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)

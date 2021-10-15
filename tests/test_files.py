@@ -16,25 +16,25 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from pathlib import Path
 
 import pytest
 
 import telegram._utils.datetime
 import telegram._utils.files
 from telegram import InputFile, Animation, MessageEntity
+from tests.conftest import TEST_DATA_PATH, data_file
 
 
 class TestFiles:
     @pytest.mark.parametrize(
         'string,expected',
         [
-            ('tests/data/game.gif', True),
-            ('tests/data', False),
-            (str(Path.cwd() / 'tests' / 'data' / 'game.gif'), True),
-            (str(Path.cwd() / 'tests' / 'data'), False),
-            (Path.cwd() / 'tests' / 'data' / 'game.gif', True),
-            (Path.cwd() / 'tests' / 'data', False),
+            (str(data_file('game.gif')), True),
+            (str(TEST_DATA_PATH), False),
+            (str(data_file('game.gif')), True),
+            (str(TEST_DATA_PATH), False),
+            (data_file('game.gif'), True),
+            (TEST_DATA_PATH, False),
             ('https:/api.org/file/botTOKEN/document/file_3', False),
             (None, False),
         ],
@@ -45,19 +45,13 @@ class TestFiles:
     @pytest.mark.parametrize(
         'string,expected',
         [
-            ('tests/data/game.gif', (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri()),
-            ('tests/data', 'tests/data'),
+            (data_file('game.gif'), data_file('game.gif').as_uri()),
+            (TEST_DATA_PATH, TEST_DATA_PATH),
             ('file://foobar', 'file://foobar'),
-            (
-                str(Path.cwd() / 'tests' / 'data' / 'game.gif'),
-                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
-            ),
-            (str(Path.cwd() / 'tests' / 'data'), str(Path.cwd() / 'tests' / 'data')),
-            (
-                Path.cwd() / 'tests' / 'data' / 'game.gif',
-                (Path.cwd() / 'tests' / 'data' / 'game.gif').as_uri(),
-            ),
-            (Path.cwd() / 'tests' / 'data', Path.cwd() / 'tests' / 'data'),
+            (str(data_file('game.gif')), data_file('game.gif').as_uri()),
+            (str(TEST_DATA_PATH), str(TEST_DATA_PATH)),
+            (data_file('game.gif'), data_file('game.gif').as_uri()),
+            (TEST_DATA_PATH, TEST_DATA_PATH),
             (
                 'https:/api.org/file/botTOKEN/document/file_3',
                 'https:/api.org/file/botTOKEN/document/file_3',
@@ -68,7 +62,7 @@ class TestFiles:
         assert telegram._utils.files.parse_file_input(string) == expected
 
     def test_parse_file_input_file_like(self):
-        source_file = Path('tests/data/game.gif')
+        source_file = data_file('game.gif')
         with source_file.open('rb') as file:
             parsed = telegram._utils.files.parse_file_input(file)
 
@@ -86,7 +80,7 @@ class TestFiles:
         assert parsed.filename == 'test_file'
 
     def test_parse_file_input_bytes(self):
-        source_file = Path('tests/data/text_file.txt')
+        source_file = data_file('text_file.txt')
         parsed = telegram._utils.files.parse_file_input(source_file.read_bytes())
 
         assert isinstance(parsed, InputFile)

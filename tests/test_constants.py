@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import json
 from enum import IntEnum
-from pathlib import Path
 
 import pytest
 from flaky import flaky
@@ -26,6 +25,7 @@ from flaky import flaky
 from telegram import constants
 from telegram.constants import _StringEnum
 from telegram.error import BadRequest
+from tests.conftest import data_file
 
 
 class StrEnumTest(_StringEnum):
@@ -100,13 +100,11 @@ class TestConstants:
     @flaky(3, 1)
     def test_max_caption_length(self, bot, chat_id):
         good_caption = 'a' * constants.MessageLimit.CAPTION_LENGTH
-        with Path('tests/data/telegram.png').open('rb') as f:
+        with data_file('telegram.png').open('rb') as f:
             good_msg = bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
         assert good_msg.caption == good_caption
 
         bad_caption = good_caption + 'Z'
-        with pytest.raises(
-            BadRequest,
-            match="Media_caption_too_long",
-        ), open('tests/data/telegram.png', 'rb') as f:
+        match = "Media_caption_too_long"
+        with pytest.raises(BadRequest, match=match), data_file('telegram.png').open('rb') as f:
             bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)

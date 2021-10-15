@@ -22,6 +22,7 @@ import pytest
 
 from telegram.error import TelegramError
 from telegram.request import Request
+from tests.conftest import data_file
 
 
 def test_slot_behaviour(mro_slots):
@@ -58,7 +59,7 @@ def test_parse_illegal_json():
     ids=['str destination_path', 'pathlib.Path destination_path'],
 )
 def test_download(destination_path_type):
-    destination_filepath = Path.cwd() / 'tests' / 'data' / 'downloaded_request.txt'
+    destination_filepath = data_file('downloaded_request.txt')
     request = Request()
     request.download("http://google.com", destination_path_type(destination_filepath))
     assert destination_filepath.is_file()
