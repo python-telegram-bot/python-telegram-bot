@@ -164,6 +164,8 @@ def check_object(h4):
         ignored |= {'credentials'}
     elif name == 'PassportElementError':
         ignored |= {'message', 'type', 'source'}
+    elif name == 'InputMedia':
+        ignored |= {'caption', 'caption_entities', 'media', 'media_type', 'parse_mode'}
     elif name.startswith('InputMedia'):
         ignored |= {'filename'}  # Convenience parameter
 

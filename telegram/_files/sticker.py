@@ -21,14 +21,14 @@
 from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
 
 from telegram import PhotoSize, TelegramObject, constants
-from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, File
+    from telegram import Bot
 
 
-class Sticker(TelegramObject):
+class Sticker(_BaseThumbedMedium):
     """This object represents a sticker.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -85,18 +85,13 @@ class Sticker(TelegramObject):
     """
 
     __slots__ = (
-        'bot',
-        'width',
-        'file_id',
+        'emoji',
+        'height',
         'is_animated',
         'is_video',
-        'file_size',
-        'thumb',
-        'set_name',
         'mask_position',
-        'height',
-        'file_unique_id',
-        'emoji',
+        'set_name',
+        'width',
     )
 
     def __init__(
@@ -115,22 +110,22 @@ class Sticker(TelegramObject):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
+        super().__init__(
+            file_id=file_id,
+            file_unique_id=file_unique_id,
+            file_size=file_size,
+            thumb=thumb,
+            bot=bot,
+        )
         # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
         self.width = int(width)
         self.height = int(height)
         self.is_animated = is_animated
         self.is_video = is_video
-        # Optionals
-        self.thumb = thumb
+        # Optional
         self.emoji = emoji
-        self.file_size = file_size
         self.set_name = set_name
         self.mask_position = mask_position
-        self.bot = bot
-
-        self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Sticker']:
@@ -144,22 +139,6 @@ class Sticker(TelegramObject):
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
 
         return cls(bot=bot, **data)
-
-    def get_file(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
-        """Convenience wrapper over :attr:`telegram.Bot.get_file`
-
-        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
-
-        Returns:
-            :class:`telegram.File`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
-        """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
 
 
 class StickerSet(TelegramObject):
@@ -200,13 +179,13 @@ class StickerSet(TelegramObject):
     """
 
     __slots__ = (
+        'contains_masks',
         'is_animated',
         'is_video',
-        'contains_masks',
+        'name',
+        'stickers',
         'thumb',
         'title',
-        'stickers',
-        'name',
     )
 
     def __init__(
@@ -226,7 +205,7 @@ class StickerSet(TelegramObject):
         self.is_video = is_video
         self.contains_masks = contains_masks
         self.stickers = stickers
-        # Optionals
+        # Optional
         self.thumb = thumb
 
         self._id_attrs = (self.name,)
