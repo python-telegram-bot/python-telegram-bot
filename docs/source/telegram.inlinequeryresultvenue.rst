@@ -1,4 +1,4 @@
-:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/inline/inlinequeryresultvenue.py
+:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/_inline/inlinequeryresultvenue.py
 
 telegram.InlineQueryResultVenue
 ===============================

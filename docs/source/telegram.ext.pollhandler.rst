@@ -1,4 +1,4 @@
-:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/ext/pollhandler.py
+:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/ext/_pollhandler.py
 
 telegram.ext.PollHandler
 ========================
