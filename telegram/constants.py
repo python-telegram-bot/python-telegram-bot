@@ -507,7 +507,7 @@ class MessageLimit(IntEnum):
 
 
 class MessageType(_StringEnum):
-    """This enum contains the available types of :class:`telegram.Message` that can bee seens
+    """This enum contains the available types of :class:`telegram.Message` that can be seen
     as attachment. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
