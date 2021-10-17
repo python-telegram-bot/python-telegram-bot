@@ -1,4 +1,4 @@
-:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/files/videonote.py
+:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/_files/videonote.py
 
 telegram.VideoNote
 ==================
