@@ -55,6 +55,7 @@ __all__ = [
     'InlineQueryLimit',
     'InlineQueryResultType',
     'InputMediaType',
+    'LocationLimit',
     'MaskPosition',
     'MessageAttachmentType',
     'MessageEntityType',
@@ -382,6 +383,29 @@ class InlineQueryResultType(_StringEnum):
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultLocation`."""
     VENUE = 'venue'
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultVenue`."""
+
+
+class LocationLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.Location`/
+    :meth:`telegram.Bot.send_location`. The enum members of this enumeration are instances
+    of :class:`int` and can be treated as such.
+
+    .. versionadded:: 14.0
+    """
+
+    __slots__ = ()
+
+    HORIZONTAL_ACCURACY = 1500
+    """:obj:`int`: Maximum radius of uncertainty for the location, measured in meters."""
+
+    HEADING = 360
+    """:obj:`int`: Maximum value allowed for the direction in which the user is moving,
+    in degrees.
+    """
+    PROXIMITY_ALERT_RADIUS = 100000
+    """:obj:`int`: Maximum distance for proximity alerts about approaching another chat member, in
+    meters.
+    """
 
 
 class MaskPosition(_StringEnum):
