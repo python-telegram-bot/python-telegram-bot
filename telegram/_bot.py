@@ -223,9 +223,7 @@ class Bot(TelegramObject):
         for key, val in data.items():
             # 1)
             if isinstance(val, InputMedia):
-                val.parse_mode = DefaultValue.get_value(  # type: ignore[attr-defined]
-                    val.parse_mode  # type: ignore[attr-defined]
-                )
+                val.parse_mode = DefaultValue.get_value(val.parse_mode)
             elif key == 'media' and isinstance(val, list):
                 for media in val:
                     media.parse_mode = DefaultValue.get_value(media.parse_mode)

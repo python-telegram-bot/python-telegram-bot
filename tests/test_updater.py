@@ -23,6 +23,7 @@ import signal
 import sys
 import threading
 from contextlib import contextmanager
+from pathlib import Path
 
 from flaky import flaky
 from functools import partial
@@ -366,8 +367,8 @@ class TestUpdater:
                 ip,
                 port,
                 url_path='TOKEN',
-                cert='./tests/test_updater.py',
-                key='./tests/test_updater.py',
+                cert=Path(__file__).as_posix(),
+                key=Path(__file__).as_posix(),
                 bootstrap_retries=0,
                 drop_pending_updates=False,
                 webhook_url=None,
@@ -420,7 +421,7 @@ class TestUpdater:
 
         ip = '127.0.0.1'
         port = randrange(1024, 49152)  # Select random port
-        updater.start_webhook(ip, port, webhook_url=None, cert='./tests/test_updater.py')
+        updater.start_webhook(ip, port, webhook_url=None, cert=Path(__file__).as_posix())
         sleep(0.2)
 
         # Now, we send an update to the server via urlopen

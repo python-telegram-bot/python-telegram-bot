@@ -21,6 +21,7 @@
 # flake8: noqa: E501
 # pylint: disable=line-too-long
 """This module contains the Builder classes for the telegram.ext module."""
+from pathlib import Path
 from queue import Queue
 from threading import Event
 from typing import (
@@ -38,7 +39,7 @@ from typing import (
 
 from telegram import Bot
 from telegram.request import Request
-from telegram._utils.types import ODVInput, DVInput
+from telegram._utils.types import ODVInput, DVInput, FilePathInput
 from telegram._utils.warnings import warn
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_FALSE
 from telegram.ext import Dispatcher, JobQueue, Updater, ExtBot, ContextTypes, CallbackContext
@@ -349,14 +350,23 @@ class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         return self
 
     def _set_private_key(
-        self: BuilderType, private_key: bytes, password: bytes = None
+        self: BuilderType,
+        private_key: Union[bytes, FilePathInput],
+        password: Union[bytes, FilePathInput] = None,
     ) -> BuilderType:
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format('private_key', 'bot instance'))
         if self._dispatcher_check:
             raise RuntimeError(_TWO_ARGS_REQ.format('private_key', 'Dispatcher instance'))
-        self._private_key = private_key
-        self._private_key_password = password
+
+        self._private_key = (
+            private_key if isinstance(private_key, bytes) else Path(private_key).read_bytes()
+        )
+        if password is None or isinstance(password, bytes):
+            self._private_key_password = password
+        else:
+            self._private_key_password = Path(password).read_bytes()
+
         return self
 
     def _set_defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
@@ -608,7 +618,11 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         """
         return self._set_request(request)
 
-    def private_key(self: BuilderType, private_key: bytes, password: bytes = None) -> BuilderType:
+    def private_key(
+        self: BuilderType,
+        private_key: Union[bytes, FilePathInput],
+        password: Union[bytes, FilePathInput] = None,
+    ) -> BuilderType:
         """Sets the private key and corresponding password for decryption of telegram passport data
         to be used for :attr:`telegram.ext.Dispatcher.bot`.
 
@@ -616,8 +630,12 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
 
         Args:
-            private_key (:obj:`bytes`): The private key.
-            password (:obj:`bytes`): Optional. The corresponding password.
+            private_key (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): The private key or the
+                file path of a file that contains the key. In the latter case, the file's content
+                will be read automatically.
+            password (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`, optional): The corresponding
+                password or the file path of a file that contains the password. In the latter case,
+                the file's content will be read automatically.
 
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
@@ -958,7 +976,11 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         """
         return self._set_request(request)
 
-    def private_key(self: BuilderType, private_key: bytes, password: bytes = None) -> BuilderType:
+    def private_key(
+        self: BuilderType,
+        private_key: Union[bytes, FilePathInput],
+        password: Union[bytes, FilePathInput] = None,
+    ) -> BuilderType:
         """Sets the private key and corresponding password for decryption of telegram passport data
         to be used for :attr:`telegram.ext.Updater.bot`.
 
@@ -966,8 +988,12 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://git.io/fAvYd>`_
 
         Args:
-            private_key (:obj:`bytes`): The private key.
-            password (:obj:`bytes`): Optional. The corresponding password.
+            private_key (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): The private key or the
+                file path of a file that contains the key. In the latter case, the file's content
+                will be read automatically.
+            password (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`, optional): The corresponding
+                password or the file path of a file that contains the password. In the latter case,
+                the file's content will be read automatically.
 
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
