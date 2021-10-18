@@ -206,5 +206,6 @@ class File(TelegramObject):
 
         Args:
             credentials (:class:`telegram.FileCredentials`): The credentials.
+
         """
         self._credentials = credentials

@@ -32,6 +32,10 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon'
 ]
+
+# Use intersphinx to reference the python-telegram-bot docs
+# intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
+
 # Don't show type hints in the signature - that just makes it hardly readable
 # and we document the types anyway
 autodoc_typehints = 'none'
