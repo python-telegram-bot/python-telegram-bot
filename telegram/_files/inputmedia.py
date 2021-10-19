@@ -62,7 +62,7 @@ class InputMedia(TelegramObject):
             entities that appear in the caption, which can be specified instead of parse_mode.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
 
     Attributes:
         type (:obj:`str`): Type of the input media.
