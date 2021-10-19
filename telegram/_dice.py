@@ -72,21 +72,21 @@ class Dice(TelegramObject):
 
         self._id_attrs = (self.value, self.emoji)
 
-    DICE: ClassVar[str] = constants.DICE_DICE  # skipcq: PTC-W0052
-    """:const:`telegram.constants.DICE_DICE`"""
-    DARTS: ClassVar[str] = constants.DICE_DARTS
-    """:const:`telegram.constants.DICE_DARTS`"""
-    BASKETBALL: ClassVar[str] = constants.DICE_BASKETBALL
-    """:const:`telegram.constants.DICE_BASKETBALL`"""
-    FOOTBALL: ClassVar[str] = constants.DICE_FOOTBALL
-    """:const:`telegram.constants.DICE_FOOTBALL`"""
-    SLOT_MACHINE: ClassVar[str] = constants.DICE_SLOT_MACHINE
-    """:const:`telegram.constants.DICE_SLOT_MACHINE`"""
-    BOWLING: ClassVar[str] = constants.DICE_BOWLING
+    DICE: ClassVar[str] = constants.DiceEmoji.DICE  # skipcq: PTC-W0052
+    """:const:`telegram.constants.DiceEmoji.DICE`"""
+    DARTS: ClassVar[str] = constants.DiceEmoji.DARTS
+    """:const:`telegram.constants.DiceEmoji.DARTS`"""
+    BASKETBALL: ClassVar[str] = constants.DiceEmoji.BASKETBALL
+    """:const:`telegram.constants.DiceEmoji.BASKETBALL`"""
+    FOOTBALL: ClassVar[str] = constants.DiceEmoji.FOOTBALL
+    """:const:`telegram.constants.DiceEmoji.FOOTBALL`"""
+    SLOT_MACHINE: ClassVar[str] = constants.DiceEmoji.SLOT_MACHINE
+    """:const:`telegram.constants.DiceEmoji.SLOT_MACHINE`"""
+    BOWLING: ClassVar[str] = constants.DiceEmoji.BOWLING
     """
-    :const:`telegram.constants.DICE_BOWLING`
+    :const:`telegram.constants.DiceEmoji.BOWLING`
 
     .. versionadded:: 13.4
     """
-    ALL_EMOJI: ClassVar[List[str]] = constants.DICE_ALL_EMOJI
-    """:const:`telegram.constants.DICE_ALL_EMOJI`"""
+    ALL_EMOJI: ClassVar[List[str]] = list(constants.DiceEmoji)
+    """List[:obj:`str`]: A list of all available dice emoji."""

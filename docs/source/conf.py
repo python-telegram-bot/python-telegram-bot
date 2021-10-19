@@ -13,11 +13,18 @@
 # serve to show the default.
 import sys
 import os
-# import telegram
+from enum import Enum
+from typing import Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
+from docutils.nodes import Element
+from sphinx.application import Sphinx
+from sphinx.domains.python import PyXRefRole
+from sphinx.environment import BuildEnvironment
+from sphinx.util import logging
+
 sys.path.insert(0, os.path.abspath('../..'))
 
 # -- General configuration ------------------------------------------------
@@ -45,7 +52,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+# source_encoding = 'utf-8-sig'
 
 # The master toctree document.
 master_doc = 'index'
@@ -299,11 +306,62 @@ napoleon_use_admonition_for_examples = True
 
 # -- script stuff --------------------------------------------------------
 
+# get the sphinx(!) logger
+# Makes sure logs render in red and also plays nicely with e.g. the `nitpicky` option.
+sphinx_logger = logging.getLogger(__name__)
+
+CONSTANTS_ROLE = 'tg-const'
+import telegram  # We need this so that the `eval` below works
+
+
+class TGConstXRefRole(PyXRefRole):
+    """This is a bit of Sphinx magic. We add a new role type called tg-const that allows us to
+    reference values from the `telegram.constants.module` while using the actual value as title
+    of the link.
+
+    Example:
+
+        :tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` renders as `4096` but links to the
+        constant.
+    """
+    def process_link(self, env: BuildEnvironment, refnode: Element,
+                     has_explicit_title: bool, title: str, target: str) -> Tuple[str, str]:
+        title, target = super().process_link(env, refnode, has_explicit_title, title, target)
+        try:
+            # We use `eval` to get the value of the expression. Maybe there are better ways to
+            # do this via importlib or so, but it does the job for now
+            value = eval(target)
+            # Maybe we need a better check if the target is actually from tg.constants
+            # for now checking if it's an Enum suffices since those are used nowhere else in PTB
+            if isinstance(value, Enum):
+                # Special casing for file size limits
+                if isinstance(value, telegram.constants.FileSizeLimit):
+                    return f'{int(value.value / 1e6)} MB', target
+                return repr(value.value), target
+            sphinx_logger.warning(
+                f'%s:%d: WARNING: Did not convert reference %s. :{CONSTANTS_ROLE}: is not supposed'
+                ' to be used with this type of target.',
+                refnode.source,
+                refnode.line,
+                refnode.rawsource,
+            )
+            return title, target
+        except Exception as exc:
+            sphinx_logger.exception(
+                f'%s:%d: WARNING: Did not convert reference %s due to an exception.',
+                refnode.source,
+                refnode.line,
+                refnode.rawsource,
+                exc_info=exc
+            )
+            return title, target
+
 
 def autodoc_skip_member(app, what, name, obj, skip, options):
     pass
 
 
-def setup(app):
+def setup(app: Sphinx):
     app.add_css_file("dark.css")
     app.connect('autodoc-skip-member', autodoc_skip_member)
+    app.add_role_to_domain('py', CONSTANTS_ROLE, TGConstXRefRole())

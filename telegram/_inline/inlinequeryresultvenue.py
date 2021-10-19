@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import InlineQueryResult
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -59,7 +60,7 @@ class InlineQueryResultVenue(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'venue'.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VENUE`.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
         latitude (:obj:`float`): Latitude of the venue location in degrees.
         longitude (:obj:`float`): Longitude of the venue location in degrees.
@@ -115,7 +116,7 @@ class InlineQueryResultVenue(InlineQueryResult):
     ):
 
         # Required
-        super().__init__('venue', id)
+        super().__init__(InlineQueryResultType.VENUE, id)
         self.latitude = latitude
         self.longitude = longitude
         self.title = title

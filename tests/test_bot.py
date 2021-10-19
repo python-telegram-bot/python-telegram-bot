@@ -30,7 +30,6 @@ from flaky import flaky
 from telegram import (
     Bot,
     Update,
-    ChatAction,
     User,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -44,7 +43,6 @@ from telegram import (
     InlineQueryResultDocument,
     Dice,
     MessageEntity,
-    ParseMode,
     CallbackQuery,
     Message,
     Chat,
@@ -54,7 +52,7 @@ from telegram import (
     File,
     InputMedia,
 )
-from telegram.constants import MAX_INLINE_QUERY_RESULTS
+from telegram.constants import ChatAction, ParseMode, InlineQueryLimit
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TelegramError
 from telegram._utils.datetime import from_timestamp, to_timestamp
@@ -954,8 +952,8 @@ class TestBot:
     @pytest.mark.parametrize(
         'current_offset,num_results,id_offset,expected_next_offset',
         [
-            ('', MAX_INLINE_QUERY_RESULTS, 1, 1),
-            (1, MAX_INLINE_QUERY_RESULTS, 51, 2),
+            ('', InlineQueryLimit.RESULTS, 1, 1),
+            (1, InlineQueryLimit.RESULTS, 51, 2),
             (5, 3, 251, ''),
         ],
     )
@@ -985,7 +983,7 @@ class TestBot:
         # For now just test that our internals pass the correct data
         def make_assertion(url, data, *args, **kwargs):
             results = data['results']
-            length_matches = len(results) == MAX_INLINE_QUERY_RESULTS
+            length_matches = len(results) == InlineQueryLimit.RESULTS
             ids_match = all(int(res['id']) == 1 + i for i, res in enumerate(results))
             next_offset_matches = data['next_offset'] == '1'
             return length_matches and ids_match and next_offset_matches

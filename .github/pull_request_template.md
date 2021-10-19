@@ -26,6 +26,8 @@ Hey! You're PRing? Cool! Please have a look at the below checklist. It's here to
 * If relevant:
 
     - [ ] Added new constants at `telegram.constants` and shortcuts to them as class variables
+    - [ ] Link new and existing constants in docstrings instead of hard coded number and strings
+    - [ ] Add new message types to `Message.effective_attachment`
     - [ ] Added new handlers for new update types
     - [ ] Added new filters for new message (sub)types
     - [ ] Added or updated documentation for the changed class(es) and/or method(s)

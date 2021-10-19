@@ -192,8 +192,9 @@ class User(TelegramObject):
     def mention_markdown(self, name: str = None) -> str:
         """
         Note:
-            :attr:`telegram.ParseMode.MARKDOWN` is a legacy mode, retained by Telegram for
-            backward compatibility. You should use :meth:`mention_markdown_v2` instead.
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`mention_markdown_v2`
+            instead.
 
         Args:
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
@@ -1061,8 +1062,8 @@ class User(TelegramObject):
         question: str,
         options: List[str],
         is_anonymous: bool = True,
-        # We use constant.POLL_REGULAR instead of Poll.REGULAR here to avoid circular imports
-        type: str = constants.POLL_REGULAR,  # pylint: disable=redefined-builtin
+        # We use constant.PollType.REGULAR instead of Poll.REGULAR here to avoid circular imports
+        type: str = constants.PollType.REGULAR,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool = False,
         correct_option_id: int = None,
         is_closed: bool = None,

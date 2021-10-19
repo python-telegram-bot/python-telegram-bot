@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import InlineQueryResult
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -49,7 +50,7 @@ class InlineQueryResultContact(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'contact'.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.CONTACT`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         phone_number (:obj:`str`): Contact's phone number.
         first_name (:obj:`str`): Contact's first name.
@@ -93,7 +94,7 @@ class InlineQueryResultContact(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('contact', id)
+        super().__init__(InlineQueryResultType.CONTACT, id)
         self.phone_number = phone_number
         self.first_name = first_name
 
