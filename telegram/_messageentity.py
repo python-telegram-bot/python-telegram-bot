@@ -36,11 +36,12 @@ class MessageEntity(TelegramObject):
     considered equal, if their :attr:`type`, :attr:`offset` and :attr:`length` are equal.
 
     Args:
-        type (:obj:`str`): Type of the entity. Currently, can be mention (@username), hashtag,
-            bot_command, url, email, phone_number, bold (bold text), italic (italic text),
-            strikethrough, spoiler (spoiler message), code (monowidth string), pre
-            (monowidth block), text_link (for clickable text URLs), text_mention
-            (for users without usernames).
+        type (:obj:`str`): Type of the entity. Can be :attr:`MENTION` (@username),
+            :attr:`HASHTAG`, :attr:`BOT_COMMAND`,
+            :attr:`URL`, :attr:`EMAIL`, :attr:`PHONE_NUMBER`, :attr:`BOLD` (bold text),
+            :attr:`ITALIC` (italic text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
+            :attr:`CODE` (monowidth string), :attr:`PRE` (monowidth block), :attr:`TEXT_LINK` (for
+            clickable text URLs), :attr:`TEXT_MENTION` (for users without usernames).
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`, optional): For :attr:`TEXT_LINK` only, url that will be opened after
@@ -95,41 +96,40 @@ class MessageEntity(TelegramObject):
 
         return cls(**data)
 
-    MENTION: ClassVar[str] = constants.MESSAGEENTITY_MENTION
-    """:const:`telegram.constants.MESSAGEENTITY_MENTION`"""
-    HASHTAG: ClassVar[str] = constants.MESSAGEENTITY_HASHTAG
-    """:const:`telegram.constants.MESSAGEENTITY_HASHTAG`"""
-    CASHTAG: ClassVar[str] = constants.MESSAGEENTITY_CASHTAG
-    """:const:`telegram.constants.MESSAGEENTITY_CASHTAG`"""
-    PHONE_NUMBER: ClassVar[str] = constants.MESSAGEENTITY_PHONE_NUMBER
-    """:const:`telegram.constants.MESSAGEENTITY_PHONE_NUMBER`"""
-    BOT_COMMAND: ClassVar[str] = constants.MESSAGEENTITY_BOT_COMMAND
-    """:const:`telegram.constants.MESSAGEENTITY_BOT_COMMAND`"""
-    URL: ClassVar[str] = constants.MESSAGEENTITY_URL
-    """:const:`telegram.constants.MESSAGEENTITY_URL`"""
-    EMAIL: ClassVar[str] = constants.MESSAGEENTITY_EMAIL
-    """:const:`telegram.constants.MESSAGEENTITY_EMAIL`"""
-    BOLD: ClassVar[str] = constants.MESSAGEENTITY_BOLD
-    """:const:`telegram.constants.MESSAGEENTITY_BOLD`"""
-    ITALIC: ClassVar[str] = constants.MESSAGEENTITY_ITALIC
-    """:const:`telegram.constants.MESSAGEENTITY_ITALIC`"""
-    CODE: ClassVar[str] = constants.MESSAGEENTITY_CODE
-    """:const:`telegram.constants.MESSAGEENTITY_CODE`"""
-    PRE: ClassVar[str] = constants.MESSAGEENTITY_PRE
-    """:const:`telegram.constants.MESSAGEENTITY_PRE`"""
-    TEXT_LINK: ClassVar[str] = constants.MESSAGEENTITY_TEXT_LINK
-    """:const:`telegram.constants.MESSAGEENTITY_TEXT_LINK`"""
-    TEXT_MENTION: ClassVar[str] = constants.MESSAGEENTITY_TEXT_MENTION
-    """:const:`telegram.constants.MESSAGEENTITY_TEXT_MENTION`"""
-    UNDERLINE: ClassVar[str] = constants.MESSAGEENTITY_UNDERLINE
-    """:const:`telegram.constants.MESSAGEENTITY_UNDERLINE`"""
-    STRIKETHROUGH: ClassVar[str] = constants.MESSAGEENTITY_STRIKETHROUGH
-    """:const:`telegram.constants.MESSAGEENTITY_STRIKETHROUGH`"""
-    SPOILER: ClassVar[str] = constants.MESSAGEENTITY_SPOILER
-    """:const:`telegram.constants.MESSAGEENTITY_SPOILER`
+    MENTION: ClassVar[str] = constants.MessageEntityType.MENTION
+    """:const:`telegram.constants.MessageEntityType.MENTION`"""
+    HASHTAG: ClassVar[str] = constants.MessageEntityType.HASHTAG
+    """:const:`telegram.constants.MessageEntityType.HASHTAG`"""
+    CASHTAG: ClassVar[str] = constants.MessageEntityType.CASHTAG
+    """:const:`telegram.constants.MessageEntityType.CASHTAG`"""
+    PHONE_NUMBER: ClassVar[str] = constants.MessageEntityType.PHONE_NUMBER
+    """:const:`telegram.constants.MessageEntityType.PHONE_NUMBER`"""
+    BOT_COMMAND: ClassVar[str] = constants.MessageEntityType.BOT_COMMAND
+    """:const:`telegram.constants.MessageEntityType.BOT_COMMAND`"""
+    URL: ClassVar[str] = constants.MessageEntityType.URL
+    """:const:`telegram.constants.MessageEntityType.URL`"""
+    EMAIL: ClassVar[str] = constants.MessageEntityType.EMAIL
+    """:const:`telegram.constants.MessageEntityType.EMAIL`"""
+    BOLD: ClassVar[str] = constants.MessageEntityType.BOLD
+    """:const:`telegram.constants.MessageEntityType.BOLD`"""
+    ITALIC: ClassVar[str] = constants.MessageEntityType.ITALIC
+    """:const:`telegram.constants.MessageEntityType.ITALIC`"""
+    CODE: ClassVar[str] = constants.MessageEntityType.CODE
+    """:const:`telegram.constants.MessageEntityType.CODE`"""
+    PRE: ClassVar[str] = constants.MessageEntityType.PRE
+    """:const:`telegram.constants.MessageEntityType.PRE`"""
+    TEXT_LINK: ClassVar[str] = constants.MessageEntityType.TEXT_LINK
+    """:const:`telegram.constants.MessageEntityType.TEXT_LINK`"""
+    TEXT_MENTION: ClassVar[str] = constants.MessageEntityType.TEXT_MENTION
+    """:const:`telegram.constants.MessageEntityType.TEXT_MENTION`"""
+    UNDERLINE: ClassVar[str] = constants.MessageEntityType.UNDERLINE
+    """:const:`telegram.constants.MessageEntityType.UNDERLINE`"""
+    STRIKETHROUGH: ClassVar[str] = constants.MessageEntityType.STRIKETHROUGH
+    """:const:`telegram.constants.MessageEntityType.STRIKETHROUGH`"""
+    SPOILER: ClassVar[str] = constants.MessageEntityType.SPOILER
+    """:const:`telegram.constants.MessageEntityType.SPOILER`
 
     .. versionadded:: 13.10
     """
-    ALL_TYPES: ClassVar[List[str]] = constants.MESSAGEENTITY_ALL_TYPES
-    """:const:`telegram.constants.MESSAGEENTITY_ALL_TYPES`\n
-    List of all the types"""
+    ALL_TYPES: ClassVar[List[str]] = list(constants.MessageEntityType)
+    """List[:obj:`str`]: A list of all available message entity types."""

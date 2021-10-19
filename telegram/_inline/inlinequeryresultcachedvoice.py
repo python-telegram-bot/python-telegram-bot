@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, Union, Tuple, List
 from telegram import InlineQueryResult, MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -38,10 +39,12 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.
         title (:obj:`str`): Voice message title.
-        caption (:obj:`str`, optional): Caption, 0-1024 characters after entities parsing.
+        caption (:obj:`str`, optional): Caption,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
+            parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of
             :attr:`parse_mode`.
@@ -52,14 +55,16 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'voice'.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VOICE`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.
         title (:obj:`str`): Voice message title.
-        caption (:obj:`str`): Optional. Caption, 0-1024 characters after entities parsing.
+        caption (:obj:`str`): Optional. Caption,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
+            parsing.
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption, which can be specified instead of
             :attr:`parse_mode`.
@@ -93,7 +98,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('voice', id)
+        super().__init__(InlineQueryResultType.VOICE, id)
         self.voice_file_id = voice_file_id
         self.title = title
 

@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import InlineQueryResult
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -46,7 +47,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'article'.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.ARTICLE`.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
         title (:obj:`str`): Title of the result.
         input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
@@ -91,7 +92,7 @@ class InlineQueryResultArticle(InlineQueryResult):
     ):
 
         # Required
-        super().__init__('article', id)
+        super().__init__(InlineQueryResultType.ARTICLE, id)
         self.title = title
         self.input_message_content = input_message_content
 

@@ -237,22 +237,9 @@ class MaskPosition(TelegramObject):
     considered equal, if their :attr:`point`, :attr:`x_shift`, :attr:`y_shift` and, :attr:`scale`
     are equal.
 
-    Attributes:
-        point (:obj:`str`): The part of the face relative to which the mask should be placed.
-            One of ``'forehead'``, ``'eyes'``, ``'mouth'``, or ``'chin'``.
-        x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
-            size, from left to right.
-        y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
-            size, from top to bottom.
-        scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
-
-    Note:
-        :attr:`type` should be one of the following: `forehead`, `eyes`, `mouth` or `chin`. You can
-        use the class constants for those.
-
     Args:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
-            One of ``'forehead'``, ``'eyes'``, ``'mouth'``, or ``'chin'``.
+            One of :attr:`FOREHEAD`, :attr:`EYES`, :attr:`MOUTH`, or :attr:`CHIN`.
         x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
             size, from left to right. For example, choosing -1.0 will place mask just to the left
             of the default mask position.
@@ -261,18 +248,27 @@ class MaskPosition(TelegramObject):
             mask position.
         scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
 
+    Attributes:
+        point (:obj:`str`): The part of the face relative to which the mask should be placed.
+            One of :attr:`FOREHEAD`, :attr:`EYES`, :attr:`MOUTH`, or :attr:`CHIN`.
+        x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
+            size, from left to right.
+        y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
+            size, from top to bottom.
+        scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
+
     """
 
     __slots__ = ('point', 'scale', 'x_shift', 'y_shift')
 
-    FOREHEAD: ClassVar[str] = constants.STICKER_FOREHEAD
-    """:const:`telegram.constants.STICKER_FOREHEAD`"""
-    EYES: ClassVar[str] = constants.STICKER_EYES
-    """:const:`telegram.constants.STICKER_EYES`"""
-    MOUTH: ClassVar[str] = constants.STICKER_MOUTH
-    """:const:`telegram.constants.STICKER_MOUTH`"""
-    CHIN: ClassVar[str] = constants.STICKER_CHIN
-    """:const:`telegram.constants.STICKER_CHIN`"""
+    FOREHEAD: ClassVar[str] = constants.MaskPosition.FOREHEAD
+    """:const:`telegram.constants.MaskPosition.FOREHEAD`"""
+    EYES: ClassVar[str] = constants.MaskPosition.EYES
+    """:const:`telegram.constants.MaskPosition.EYES`"""
+    MOUTH: ClassVar[str] = constants.MaskPosition.MOUTH
+    """:const:`telegram.constants.MaskPosition.MOUTH`"""
+    CHIN: ClassVar[str] = constants.MaskPosition.CHIN
+    """:const:`telegram.constants.MaskPosition.CHIN`"""
 
     def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **_kwargs: Any):
         self.point = point

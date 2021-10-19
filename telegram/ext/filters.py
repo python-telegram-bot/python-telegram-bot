@@ -50,6 +50,7 @@ __all__ = [
 ]
 
 from telegram._utils.types import SLT
+from telegram.constants import DiceEmoji
 
 DataDict = Dict[str, list]
 
@@ -2100,12 +2101,12 @@ officedocument.wordprocessingml.document")``.
 
     class _Dice(_DiceEmoji):
         __slots__ = ()
-        dice = _DiceEmoji('🎲', 'dice')
-        darts = _DiceEmoji('🎯', 'darts')
-        basketball = _DiceEmoji('🏀', 'basketball')
-        football = _DiceEmoji('⚽')
-        slot_machine = _DiceEmoji('🎰')
-        bowling = _DiceEmoji('🎳', 'bowling')
+        dice = _DiceEmoji(DiceEmoji.DICE, DiceEmoji.DICE.name.lower())
+        darts = _DiceEmoji(DiceEmoji.DARTS, DiceEmoji.DARTS.name.lower())
+        basketball = _DiceEmoji(DiceEmoji.BASKETBALL, DiceEmoji.BASKETBALL.name.lower())
+        football = _DiceEmoji(DiceEmoji.FOOTBALL, DiceEmoji.FOOTBALL.name.lower())
+        slot_machine = _DiceEmoji(DiceEmoji.SLOT_MACHINE, DiceEmoji.SLOT_MACHINE.name.lower())
+        bowling = _DiceEmoji(DiceEmoji.BOWLING, DiceEmoji.BOWLING.name.lower())
 
     dice = _Dice()
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only

@@ -33,6 +33,7 @@ from telegram import (
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput
+from telegram.constants import InputMediaType
 
 MediaType = Union[Animation, Audio, Document, PhotoSize, Video]
 
@@ -61,7 +62,7 @@ class InputMedia(TelegramObject):
             entities that appear in the caption, which can be specified instead of parse_mode.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
 
     Attributes:
         type (:obj:`str`): Type of the input media.
@@ -135,11 +136,12 @@ class InputMediaAnimation(InputMedia):
 
             .. versionchanged:: 13.2
                Accept :obj:`bytes` as input.
-        caption (:obj:`str`, optional): Caption of the animation to be sent, 0-1024 characters
+        caption (:obj:`str`, optional): Caption of the animation to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
         width (:obj:`int`, optional): Animation width.
@@ -147,7 +149,7 @@ class InputMediaAnimation(InputMedia):
         duration (:obj:`int`, optional): Animation duration.
 
     Attributes:
-        type (:obj:`str`): ``'animation'``.
+        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
         media (:obj:`str` | :class:`telegram.InputFile`): Animation to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -182,7 +184,7 @@ class InputMediaAnimation(InputMedia):
         else:
             media = parse_file_input(media, attach=True, filename=filename)
 
-        super().__init__('animation', media, caption, caption_entities, parse_mode)
+        super().__init__(InputMediaType.ANIMATION, media, caption, caption_entities, parse_mode)
         self.thumb = self._parse_thumb_input(thumb)
         self.width = width
         self.height = height
@@ -206,16 +208,17 @@ class InputMediaPhoto(InputMedia):
             :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-        caption (:obj:`str`, optional ): Caption of the photo to be sent, 0-1024 characters after
+        caption (:obj:`str`, optional ): Caption of the photo to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
 
     Attributes:
-        type (:obj:`str`): ``'photo'``.
+        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -235,7 +238,7 @@ class InputMediaPhoto(InputMedia):
         filename: str = None,
     ):
         media = parse_file_input(media, PhotoSize, attach=True, filename=filename)
-        super().__init__('photo', media, caption, caption_entities, parse_mode)
+        super().__init__(InputMediaType.PHOTO, media, caption, caption_entities, parse_mode)
 
 
 class InputMediaVideo(InputMedia):
@@ -263,11 +266,12 @@ class InputMediaVideo(InputMedia):
             :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-        caption (:obj:`str`, optional): Caption of the video to be sent, 0-1024 characters after
+        caption (:obj:`str`, optional): Caption of the video to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
         width (:obj:`int`, optional): Video width.
@@ -286,7 +290,7 @@ class InputMediaVideo(InputMedia):
                Accept :obj:`bytes` as input.
 
     Attributes:
-        type (:obj:`str`): ``'video'``.
+        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.VIDEO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Video file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -325,7 +329,7 @@ class InputMediaVideo(InputMedia):
         else:
             media = parse_file_input(media, attach=True, filename=filename)
 
-        super().__init__('video', media, caption, caption_entities, parse_mode)
+        super().__init__(InputMediaType.VIDEO, media, caption, caption_entities, parse_mode)
         self.width = width
         self.height = height
         self.duration = duration
@@ -356,11 +360,12 @@ class InputMediaAudio(InputMedia):
             :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-        caption (:obj:`str`, optional): Caption of the audio to be sent, 0-1024 characters after
+        caption (:obj:`str`, optional): Caption of the audio to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
@@ -378,7 +383,7 @@ class InputMediaAudio(InputMedia):
                Accept :obj:`bytes` as input.
 
     Attributes:
-        type (:obj:`str`): ``'audio'``.
+        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.AUDIO`.
         media (:obj:`str` | :class:`telegram.InputFile`): Audio file to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -414,7 +419,7 @@ class InputMediaAudio(InputMedia):
         else:
             media = parse_file_input(media, attach=True, filename=filename)
 
-        super().__init__('audio', media, caption, caption_entities, parse_mode)
+        super().__init__(InputMediaType.AUDIO, media, caption, caption_entities, parse_mode)
         self.thumb = self._parse_thumb_input(thumb)
         self.duration = duration
         self.title = title
@@ -438,11 +443,12 @@ class InputMediaDocument(InputMedia):
             :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-        caption (:obj:`str`, optional): Caption of the document to be sent, 0-1024 characters after
+        caption (:obj:`str`, optional): Caption of the document to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.ParseMode` for the available modes.
+            in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
         thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
@@ -459,7 +465,7 @@ class InputMediaDocument(InputMedia):
             the document is sent as part of an album.
 
     Attributes:
-        type (:obj:`str`): ``'document'``.
+        type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.DOCUMENT`.
         media (:obj:`str` | :class:`telegram.InputFile`): File to send.
         caption (:obj:`str`): Optional. Caption of the document to be sent.
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
@@ -485,6 +491,6 @@ class InputMediaDocument(InputMedia):
         filename: str = None,
     ):
         media = parse_file_input(media, Document, attach=True, filename=filename)
-        super().__init__('document', media, caption, caption_entities, parse_mode)
+        super().__init__(InputMediaType.DOCUMENT, media, caption, caption_entities, parse_mode)
         self.thumb = self._parse_thumb_input(thumb)
         self.disable_content_type_detection = disable_content_type_detection

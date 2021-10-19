@@ -63,18 +63,18 @@ class ChatMember(TelegramObject):
 
     __slots__ = ('user', 'status')
 
-    ADMINISTRATOR: ClassVar[str] = constants.CHATMEMBER_ADMINISTRATOR
-    """:const:`telegram.constants.CHATMEMBER_ADMINISTRATOR`"""
-    CREATOR: ClassVar[str] = constants.CHATMEMBER_CREATOR
-    """:const:`telegram.constants.CHATMEMBER_CREATOR`"""
-    KICKED: ClassVar[str] = constants.CHATMEMBER_KICKED
-    """:const:`telegram.constants.CHATMEMBER_KICKED`"""
-    LEFT: ClassVar[str] = constants.CHATMEMBER_LEFT
-    """:const:`telegram.constants.CHATMEMBER_LEFT`"""
-    MEMBER: ClassVar[str] = constants.CHATMEMBER_MEMBER
-    """:const:`telegram.constants.CHATMEMBER_MEMBER`"""
-    RESTRICTED: ClassVar[str] = constants.CHATMEMBER_RESTRICTED
-    """:const:`telegram.constants.CHATMEMBER_RESTRICTED`"""
+    ADMINISTRATOR: ClassVar[str] = constants.ChatMemberStatus.ADMINISTRATOR
+    """:const:`telegram.constants.ChatMemberStatus.ADMINISTRATOR`"""
+    CREATOR: ClassVar[str] = constants.ChatMemberStatus.CREATOR
+    """:const:`telegram.constants.ChatMemberStatus.CREATOR`"""
+    KICKED: ClassVar[str] = constants.ChatMemberStatus.KICKED
+    """:const:`telegram.constants.ChatMemberStatus.KICKED`"""
+    LEFT: ClassVar[str] = constants.ChatMemberStatus.LEFT
+    """:const:`telegram.constants.ChatMemberStatus.LEFT`"""
+    MEMBER: ClassVar[str] = constants.ChatMemberStatus.MEMBER
+    """:const:`telegram.constants.ChatMemberStatus.MEMBER`"""
+    RESTRICTED: ClassVar[str] = constants.ChatMemberStatus.RESTRICTED
+    """:const:`telegram.constants.ChatMemberStatus.RESTRICTED`"""
 
     def __init__(self, user: User, status: str, **_kwargs: object):
         # Required by all subclasses
@@ -132,7 +132,7 @@ class ChatMemberOwner(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always :attr:`telegram.ChatMember.CREATOR`.
+            always :tg-const:`telegram.ChatMember.CREATOR`.
         user (:class:`telegram.User`): Information about the user.
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's
             presence in the chat is hidden.
@@ -195,7 +195,7 @@ class ChatMemberAdministrator(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always :attr:`telegram.ChatMember.ADMINISTRATOR`.
+            always :tg-const:`telegram.ChatMember.ADMINISTRATOR`.
         user (:class:`telegram.User`): Information about the user.
         can_be_edited (:obj:`bool`): :obj:`True`, if the bot
             is allowed to edit administrator privileges of that user.
@@ -291,7 +291,7 @@ class ChatMemberMember(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always :attr:`telegram.ChatMember.MEMBER`.
+            always :tg-const:`telegram.ChatMember.MEMBER`.
         user (:class:`telegram.User`): Information about the user.
 
     """
@@ -334,7 +334,7 @@ class ChatMemberRestricted(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always :attr:`telegram.ChatMember.RESTRICTED`.
+            always :tg-const:`telegram.ChatMember.RESTRICTED`.
         user (:class:`telegram.User`): Information about the user.
         is_member (:obj:`bool`): :obj:`True`, if the user is a
             member of the chat at the moment of the request.
@@ -412,7 +412,7 @@ class ChatMemberLeft(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always :attr:`telegram.ChatMember.LEFT`.
+            always :tg-const:`telegram.ChatMember.LEFT`.
         user (:class:`telegram.User`): Information about the user.
     """
 
@@ -436,7 +436,7 @@ class ChatMemberBanned(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always :attr:`telegram.ChatMember.KICKED`.
+            always :tg-const:`telegram.ChatMember.KICKED`.
         user (:class:`telegram.User`): Information about the user.
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.

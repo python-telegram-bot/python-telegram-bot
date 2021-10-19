@@ -41,19 +41,18 @@ from telegram import (
     Invoice,
     SuccessfulPayment,
     PassportData,
-    ParseMode,
     Poll,
     PollOption,
     ProximityAlertTriggered,
     Dice,
     Bot,
-    ChatAction,
     VoiceChatStarted,
     VoiceChatEnded,
     VoiceChatParticipantsInvited,
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
 )
+from telegram.constants import ParseMode, ChatAction
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 from tests.test_passport import RAW_PASSPORT_DATA
@@ -648,28 +647,40 @@ class TestMessage:
         assert message.link is None
 
     def test_effective_attachment(self, message_params):
-        for i in (
-            'audio',
-            'game',
-            'document',
+        # This list is hard coded on purpose because just using constants.MessageAttachmentType
+        # (which is used in Message.effective_message) wouldn't find any mistakes
+        expected_attachment_types = [
             'animation',
-            'photo',
-            'sticker',
-            'video',
-            'voice',
-            'video_note',
+            'audio',
             'contact',
-            'location',
-            'venue',
+            'dice',
+            'document',
+            'game',
             'invoice',
+            'location',
+            'passport_data',
+            'photo',
+            'poll',
+            'sticker',
             'successful_payment',
-        ):
-            item = getattr(message_params, i, None)
-            if item:
-                break
+            'video',
+            'video_note',
+            'voice',
+            'venue',
+        ]
+
+        attachment = message_params.effective_attachment
+        if attachment:
+            condition = any(
+                message_params[message_type] is attachment
+                for message_type in expected_attachment_types
+            )
+            assert condition, 'Got effective_attachment for unexpected type'
         else:
-            item = None
-        assert message_params.effective_attachment == item
+            condition = any(
+                message_params[message_type] for message_type in expected_attachment_types
+            )
+            assert not condition, 'effective_attachment was None even though it should not be'
 
     def test_reply_text(self, monkeypatch, message):
         def make_assertion(*_, **kwargs):

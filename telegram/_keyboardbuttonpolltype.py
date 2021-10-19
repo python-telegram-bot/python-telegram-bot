@@ -31,8 +31,8 @@ class KeyboardButtonPollType(TelegramObject):
     considered equal, if their :attr:`type` is equal.
 
     Attributes:
-        type (:obj:`str`): Optional. If :attr:`telegram.Poll.QUIZ` is passed, the user will be
-            allowed to create only polls in the quiz mode. If :attr:`telegram.Poll.REGULAR` is
+        type (:obj:`str`): Optional. If :tg-const:`telegram.Poll.QUIZ` is passed, the user will be
+            allowed to create only polls in the quiz mode. If :tg-const:`telegram.Poll.REGULAR` is
             passed, only regular polls will be allowed. Otherwise, the user will be allowed to
             create a poll of any type.
     """

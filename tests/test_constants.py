@@ -16,28 +16,90 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import json
+from enum import IntEnum
+
 import pytest
 from flaky import flaky
 
 from telegram import constants
+from telegram.constants import _StringEnum
 from telegram.error import BadRequest
 from tests.conftest import data_file
 
 
+class StrEnumTest(_StringEnum):
+    FOO = 'foo'
+    BAR = 'bar'
+
+
+class IntEnumTest(IntEnum):
+    FOO = 1
+    BAR = 2
+
+
 class TestConstants:
+    def test__all__(self):
+        expected = {
+            key
+            for key, member in constants.__dict__.items()
+            if (
+                not key.startswith('_')
+                # exclude imported stuff
+                and getattr(member, '__module__', 'telegram.constants') == 'telegram.constants'
+            )
+        }
+        actual = set(constants.__all__)
+        assert (
+            actual == expected
+        ), f"Members {expected - actual} were not listed in constants.__all__"
+
+    def test_to_json(self):
+        assert json.dumps(StrEnumTest.FOO) == json.dumps('foo')
+        assert json.dumps(IntEnumTest.FOO) == json.dumps(1)
+
+    def test_string_representation(self):
+        assert repr(StrEnumTest.FOO) == '<StrEnumTest.FOO>'
+        assert str(StrEnumTest.FOO) == 'StrEnumTest.FOO'
+
+    def test_string_inheritance(self):
+        assert isinstance(StrEnumTest.FOO, str)
+        assert StrEnumTest.FOO + StrEnumTest.BAR == 'foobar'
+        assert StrEnumTest.FOO.replace('o', 'a') == 'faa'
+
+        assert StrEnumTest.FOO == StrEnumTest.FOO
+        assert StrEnumTest.FOO == 'foo'
+        assert StrEnumTest.FOO != StrEnumTest.BAR
+        assert StrEnumTest.FOO != 'bar'
+        assert StrEnumTest.FOO != object()
+
+        assert hash(StrEnumTest.FOO) == hash('foo')
+
+    def test_int_inheritance(self):
+        assert isinstance(IntEnumTest.FOO, int)
+        assert IntEnumTest.FOO + IntEnumTest.BAR == 3
+
+        assert IntEnumTest.FOO == IntEnumTest.FOO
+        assert IntEnumTest.FOO == 1
+        assert IntEnumTest.FOO != IntEnumTest.BAR
+        assert IntEnumTest.FOO != 2
+        assert IntEnumTest.FOO != object()
+
+        assert hash(IntEnumTest.FOO) == hash(1)
+
     @flaky(3, 1)
     def test_max_message_length(self, bot, chat_id):
-        bot.send_message(chat_id=chat_id, text='a' * constants.MAX_MESSAGE_LENGTH)
+        bot.send_message(chat_id=chat_id, text='a' * constants.MessageLimit.TEXT_LENGTH)
 
         with pytest.raises(
             BadRequest,
             match='Message is too long',
         ):
-            bot.send_message(chat_id=chat_id, text='a' * (constants.MAX_MESSAGE_LENGTH + 1))
+            bot.send_message(chat_id=chat_id, text='a' * (constants.MessageLimit.TEXT_LENGTH + 1))
 
     @flaky(3, 1)
     def test_max_caption_length(self, bot, chat_id):
-        good_caption = 'a' * constants.MAX_CAPTION_LENGTH
+        good_caption = 'a' * constants.MessageLimit.CAPTION_LENGTH
         with data_file('telegram.png').open('rb') as f:
             good_msg = bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
         assert good_msg.caption == good_caption
