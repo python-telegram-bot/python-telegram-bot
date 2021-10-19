@@ -28,8 +28,8 @@ from telegram import (
     InputMediaAudio,
     InputMediaDocument,
     MessageEntity,
-    ParseMode,
 )
+from telegram.constants import ParseMode
 
 # noinspection PyUnresolvedReferences
 from telegram.error import BadRequest
