@@ -2619,8 +2619,8 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :class:`telegram.Message`: On success, if edited message is not an inline message, the
-            edited Message is returned, otherwise :obj:`True` is returned.
+            :class:`telegram.Message`: On success, if the edited message is not an inline message
+            , the edited Message is returned, otherwise :obj:`True` is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`
