@@ -17,7 +17,6 @@ telegram package
     telegram.botcommandscopechatmember
     telegram.callbackquery
     telegram.chat
-    telegram.chataction
     telegram.chatinvitelink
     telegram.chatlocation
     telegram.chatmember
@@ -52,7 +51,6 @@ telegram package
     telegram.messageautodeletetimerchanged
     telegram.messageid
     telegram.messageentity
-    telegram.parsemode
     telegram.photosize
     telegram.poll
     telegram.pollanswer
