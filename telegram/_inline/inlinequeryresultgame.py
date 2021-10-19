@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import InlineQueryResult
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import ReplyMarkup
@@ -37,7 +38,7 @@ class InlineQueryResultGame(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'game'.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GAME`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         game_short_name (:obj:`str`): Short name of the game.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
@@ -55,7 +56,7 @@ class InlineQueryResultGame(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('game', id)
+        super().__init__(InlineQueryResultType.GAME, id)
         self.id = id  # pylint: disable=redefined-builtin
         self.game_short_name = game_short_name
 

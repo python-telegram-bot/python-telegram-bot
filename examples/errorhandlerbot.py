@@ -8,7 +8,8 @@ import json
 import logging
 import traceback
 
-from telegram import Update, ParseMode
+from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import CommandHandler, Updater, CallbackContext
 
 # Enable logging
