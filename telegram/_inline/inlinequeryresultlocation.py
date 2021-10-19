@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import InlineQueryResult
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -38,14 +39,15 @@ class InlineQueryResultLocation(InlineQueryResult):
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.
         horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
-            measured in meters; 0-1500.
+            measured in meters; 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
         live_period (:obj:`int`, optional): Period in seconds for which the location can be
             updated, should be between 60 and 86400.
         heading (:obj:`int`, optional): For live locations, a direction in which the user is
-            moving, in degrees. Must be between 1 and 360 if specified.
+            moving, in degrees. Must be between 1 and
+            :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
         proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance for
             proximity alerts about approaching another chat member, in meters. Must be between 1
-            and 100000 if specified.
+            and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -56,7 +58,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'location'.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.LOCATION`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
@@ -112,7 +114,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('location', id)
+        super().__init__(InlineQueryResultType.LOCATION, id)
         self.latitude = float(latitude)
         self.longitude = float(longitude)
         self.title = title

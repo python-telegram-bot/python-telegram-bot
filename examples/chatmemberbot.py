@@ -14,7 +14,8 @@ bot.
 import logging
 from typing import Tuple, Optional
 
-from telegram import Update, Chat, ChatMember, ParseMode, ChatMemberUpdated
+from telegram import Update, Chat, ChatMember, ChatMemberUpdated
+from telegram.constants import ParseMode
 from telegram.ext import (
     CommandHandler,
     ChatMemberHandler,

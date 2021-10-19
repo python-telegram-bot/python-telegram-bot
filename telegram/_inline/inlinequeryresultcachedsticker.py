@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING, Any
 
 from telegram import InlineQueryResult
+from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent, ReplyMarkup
@@ -42,7 +43,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        type (:obj:`str`): 'sticker`.
+        type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.STICKER`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         sticker_file_id (:obj:`str`): A valid file identifier of the sticker.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
@@ -63,7 +64,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         **_kwargs: Any,
     ):
         # Required
-        super().__init__('sticker', id)
+        super().__init__(InlineQueryResultType.STICKER, id)
         self.sticker_file_id = sticker_file_id
 
         # Optionals
