@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import InputTextMessageContent, ParseMode, MessageEntity
+from telegram import InputTextMessageContent, MessageEntity
+from telegram.constants import ParseMode
 
 
 @pytest.fixture(scope='class')

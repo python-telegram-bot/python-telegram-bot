@@ -20,7 +20,8 @@ bot.
 
 import logging
 
-from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, Update, helpers
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update, helpers
+from telegram.constants import ParseMode
 from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,

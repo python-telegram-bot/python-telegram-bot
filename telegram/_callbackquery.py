@@ -649,9 +649,11 @@ class CallbackQuery(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    MAX_ANSWER_TEXT_LENGTH: ClassVar[int] = constants.MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH
+    MAX_ANSWER_TEXT_LENGTH: ClassVar[
+        int
+    ] = constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH
     """
-    :const:`telegram.constants.MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH`
+    :const:`telegram.constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH`
 
     .. versionadded:: 13.2
     """
