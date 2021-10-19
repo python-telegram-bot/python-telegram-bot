@@ -332,7 +332,7 @@ class TGConstXRefRole(PyXRefRole):
             # do this via importlib or so, but it does the job for now
             value = eval(target)
             # Maybe we need a better check if the target is actually from tg.constants
-            # for new checking if it's an Enum suffices since those are used nowhere else in PTB
+            # for now checking if it's an Enum suffices since those are used nowhere else in PTB
             if isinstance(value, Enum):
                 # Special casing for file size limits
                 if isinstance(value, telegram.constants.FileSizeLimit):
