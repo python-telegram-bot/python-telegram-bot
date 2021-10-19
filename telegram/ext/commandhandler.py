@@ -160,7 +160,7 @@ class CommandHandler(Handler[Update, CCT]):
             self.command = [x.lower() for x in command]
         for comm in self.command:
             if not re.match(r'^[\da-z_]{1,32}$', comm):
-                raise ValueError(f'`{command}` is not a valid bot command')
+                raise ValueError(f'`{comm}` is not a valid bot command')
 
         if filters:
             self.filters = Filters.update.messages & filters
