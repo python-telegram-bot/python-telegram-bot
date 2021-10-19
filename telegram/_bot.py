@@ -91,8 +91,8 @@ from telegram import (
     InlineKeyboardMarkup,
     ChatInviteLink,
 )
-from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
+from telegram.constants import InlineQueryLimit
 from telegram.request import Request
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
 from telegram._utils.datetime import to_timestamp
@@ -127,12 +127,13 @@ class Bot(TelegramObject):
         passing files.
 
     .. versionchanged:: 14.0
+
         * Removed the deprecated methods ``kick_chat_member``, ``kickChatMember``,
           ``get_chat_members_count`` and ``getChatMembersCount``.
         * Removed the deprecated property ``commands``.
         * Removed the deprecated ``defaults`` parameter. If you want to use
-            :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
-            instead.
+          :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
+          instead.
 
     Args:
         token (:obj:`str`): Bot's unique authentication.
@@ -420,11 +421,12 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            text (:obj:`str`): Text of the message to be sent. Max 4096 characters after entities
-                parsing. Also found as :attr:`telegram.constants.MAX_MESSAGE_LENGTH`.
+            text (:obj:`str`): Text of the message to be sent. Max
+                :tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
+                parsing.
             parse_mode (:obj:`str`): Send Markdown or HTML, if you want Telegram apps to show bold,
                 italic, fixed-width text or inline URLs in your bot's message. See the constants in
-                :class:`telegram.ParseMode` for the available modes.
+                :class:`telegram.constants.ParseMode` for the available modes.
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of :attr:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
@@ -628,10 +630,11 @@ class Bot(TelegramObject):
 
                 .. versionadded:: 13.1
             caption (:obj:`str`, optional): Photo caption (may also be used when resending photos
-                by file_id), 0-1024 characters after entities parsing.
+                by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
+                characters after entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -709,8 +712,9 @@ class Bot(TelegramObject):
         Use this method to send audio files, if you want Telegram clients to display them in the
         music player. Your audio must be in the .mp3 or .m4a format.
 
-        Bots can currently send audio files of up to 50 MB in size, this limit may be changed in
-        the future.
+        Bots can currently send audio files of up to
+        :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD` in size, this limit may be
+        changed in the future.
 
         For sending voice messages, use the :meth:`send_voice` method instead.
 
@@ -735,11 +739,12 @@ class Bot(TelegramObject):
                 :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-            caption (:obj:`str`, optional): Audio caption, 0-1024 characters after entities
-                parsing.
+            caption (:obj:`str`, optional): Audio caption,
+                0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
+                entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -834,7 +839,8 @@ class Bot(TelegramObject):
         """
         Use this method to send general files.
 
-        Bots can currently send files of any type of up to 50 MB in size, this limit may be
+        Bots can currently send files of any type of up to
+        :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD` in size, this limit may be
         changed in the future.
 
         Note:
@@ -857,12 +863,13 @@ class Bot(TelegramObject):
                 new file. Convenience parameter, useful e.g. when sending files generated by the
                 :obj:`tempfile` module.
             caption (:obj:`str`, optional): Document caption (may also be used when resending
-                documents by file_id), 0-1024 characters after entities parsing.
+                documents by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
+                characters after entities parsing.
             disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
                 content type detection for files uploaded using multipart/form-data.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -1025,8 +1032,9 @@ class Bot(TelegramObject):
         Use this method to send video files, Telegram clients support mp4 videos
         (other formats may be sent as Document).
 
-        Bots can currently send video files of up to 50 MB in size, this limit may be changed in
-        the future.
+        Bots can currently send video files of up to
+        :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD` in size, this limit may be
+        changed in the future.
 
         Note:
             * The video argument can be either a file_id, an URL or a file from disk
@@ -1056,10 +1064,11 @@ class Bot(TelegramObject):
             width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
             caption (:obj:`str`, optional): Video caption (may also be used when resending videos
-                by file_id), 0-1024 characters after entities parsing.
+                by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
+                characters after entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -1261,8 +1270,9 @@ class Bot(TelegramObject):
     ) -> Message:
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
-        Bots can currently send animation files of up to 50 MB in size, this limit may be changed
-        in the future.
+        Bots can currently send animation files of up to
+        :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD` in size, this limit may be
+        changed in the future.
 
         Note:
             ``thumb`` will be ignored for small files, for which Telegram can easily
@@ -1299,10 +1309,12 @@ class Bot(TelegramObject):
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
-                animations by file_id), 0-1024 characters after entities parsing.
+                animations by file_id),
+                0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
+                entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -1384,7 +1396,8 @@ class Bot(TelegramObject):
         Use this method to send audio files, if you want Telegram clients to display the file
         as a playable voice message. For this to work, your audio must be in an .ogg file
         encoded with OPUS (other formats may be sent as Audio or Document). Bots can currently
-        send voice messages of up to 50 MB in size, this limit may be changed in the future.
+        send voice messages of up to :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD`
+        in size, this limit may be changed in the future.
 
         Note:
             The voice argument can be either a file_id, an URL or a file from disk
@@ -1407,11 +1420,12 @@ class Bot(TelegramObject):
                 :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-            caption (:obj:`str`, optional): Voice message caption, 0-1024 characters after entities
-                parsing.
+            caption (:obj:`str`, optional): Voice message caption,
+                0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
+                entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -1558,14 +1572,16 @@ class Bot(TelegramObject):
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
             horizontal_accuracy (:obj:`int`, optional): The radius of uncertainty for the location,
-                measured in meters; 0-1500.
+                measured in meters;
+                0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
                 updated, should be between 60 and 86400.
             heading (:obj:`int`, optional): For live locations, a direction in which the user is
-                moving, in degrees. Must be between 1 and 360 if specified.
+                moving, in degrees. Must be between 1 and
+                :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
             proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
                 for proximity alerts about approaching another chat member, in meters. Must be
-                between 1 and 100000 if specified.
+                between 1 and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -1665,12 +1681,13 @@ class Bot(TelegramObject):
             longitude (:obj:`float`, optional): Longitude of location.
             location (:class:`telegram.Location`, optional): The location to send.
             horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the
-                location, measured in meters; 0-1500.
+                location, measured in meters;
+                0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
             heading (:obj:`int`, optional): Direction in which the user is moving, in degrees. Must
-                be between 1 and 360 if specified.
+                be between 1 and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
             proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts
-                about approaching another chat member, in meters. Must be between 1 and 100000 if
-                specified.
+                about approaching another chat member, in meters. Must be between 1 and
+                :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
                 object for a new inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -2058,9 +2075,9 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            action(:class:`telegram.ChatAction` | :obj:`str`): Type of action to broadcast. Choose
-                one, depending on what the user is about to receive. For convenience look at the
-                constants in :class:`telegram.ChatAction`
+            action(:obj:`str`): Type of action to broadcast. Choose one, depending on what the user
+                is about to receive. For convenience look at the constants in
+                :class:`telegram.constants.ChatAction`.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2120,17 +2137,17 @@ class Bot(TelegramObject):
                     # the page count
                     next_offset = str(current_offset_int + 1)
             else:
-                if len(results) > (current_offset_int + 1) * MAX_INLINE_QUERY_RESULTS:
+                if len(results) > (current_offset_int + 1) * InlineQueryLimit.RESULTS:
                     # we expect more results for the next page
                     next_offset_int = current_offset_int + 1
                     next_offset = str(next_offset_int)
                     effective_results = results[
                         current_offset_int
-                        * MAX_INLINE_QUERY_RESULTS : next_offset_int
-                        * MAX_INLINE_QUERY_RESULTS
+                        * InlineQueryLimit.RESULTS : next_offset_int
+                        * InlineQueryLimit.RESULTS
                     ]
                 else:
-                    effective_results = results[current_offset_int * MAX_INLINE_QUERY_RESULTS :]
+                    effective_results = results[current_offset_int * InlineQueryLimit.RESULTS :]
         else:
             effective_results = results  # type: ignore[assignment]
 
@@ -2175,8 +2192,8 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
-        Use this method to send answers to an inline query. No more than 50 results per query are
-        allowed.
+        Use this method to send answers to an inline query. No more than
+        :tg-const:`telegram.InlineQuery.MAX_RESULTS` results per query are allowed.
 
         Warning:
             In most use cases :attr:`current_offset` should not be passed manually. Instead of
@@ -2203,7 +2220,8 @@ class Bot(TelegramObject):
                 specified text that switches the user to a private chat with the bot and sends the
                 bot a start message with the parameter ``switch_pm_parameter``.
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
-                message sent to the bot when user presses the switch button. 1-64 characters,
+                message sent to the bot when user presses the switch button.
+                1-:tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
                 only A-Z, a-z, 0-9, _ and - are allowed.
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
                 the inline query to answer. If passed, PTB will automatically take care of
@@ -2313,7 +2331,9 @@ class Bot(TelegramObject):
     ) -> File:
         """
         Use this method to get basic info about a file and prepare it for downloading. For the
-        moment, bots can download files of up to 20MB in size. The file can then be downloaded
+        moment, bots can download files of up to
+        :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD` in size. The file can then
+        be downloaded
         with :meth:`telegram.File.download`. It is guaranteed that the link will be
         valid for at least 1 hour. When the link expires, a new one can be requested by
         calling get_file again.
@@ -2564,7 +2584,8 @@ class Bot(TelegramObject):
         Args:
             callback_query_id (:obj:`str`): Unique identifier for the query to be answered.
             text (:obj:`str`, optional): Text of the notification. If not specified, nothing will
-                be shown to the user, 0-200 characters.
+                be shown to the user, 0-:tg-const:`telegram.CallbackQuery.MAX_ANSWER_TEXT_LENGTH`
+                characters.
             show_alert (:obj:`bool`, optional): If :obj:`True`, an alert will be shown by the
                 client instead of a notification at the top of the chat screen. Defaults to
                 :obj:`False`.
@@ -2629,10 +2650,12 @@ class Bot(TelegramObject):
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            text (:obj:`str`): New text of the message, 1-4096 characters after entities parsing.
+            text (:obj:`str`): New text of the message,
+                1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
+                parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in your bot's message. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of :attr:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
@@ -2700,11 +2723,12 @@ class Bot(TelegramObject):
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            caption (:obj:`str`, optional): New caption of the message, 0-1024 characters after
+            caption (:obj:`str`, optional): New caption of the message,
+                0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
             parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
                 show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.ParseMode` for the available modes.
+                constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -3022,7 +3046,8 @@ class Bot(TelegramObject):
             2. To use a self-signed certificate, you need to upload your public key certificate
                using certificate parameter. Please upload as InputFile, sending a String will not
                work.
-            3. Ports currently supported for Webhooks: ``443``, ``80``, ``88``, ``8443``.
+            3. Ports currently supported for Webhooks:
+                :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
 
             If you're having any trouble setting up webhooks, please check out this `guide to
             Webhooks`_.
@@ -5032,12 +5057,15 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            question (:obj:`str`): Poll question, 1-300 characters.
-            options (List[:obj:`str`]): List of answer options, 2-10 strings 1-100 characters each.
+            question (:obj:`str`): Poll question, 1-:tg-const:`telegram.Poll.MAX_QUESTION_LENGTH`
+                characters.
+            options (List[:obj:`str`]): List of answer options,
+                2-:tg-const:`telegram.Poll.MAX_OPTION_NUMBER` strings
+                1-:tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters each.
             is_anonymous (:obj:`bool`, optional): :obj:`True`, if the poll needs to be anonymous,
                 defaults to :obj:`True`.
-            type (:obj:`str`, optional): Poll type, :attr:`telegram.Poll.QUIZ` or
-                :attr:`telegram.Poll.REGULAR`, defaults to :attr:`telegram.Poll.REGULAR`.
+            type (:obj:`str`, optional): Poll type, :tg-const:`telegram.Poll.QUIZ` or
+                :tg-const:`telegram.Poll.REGULAR`, defaults to :tg-const:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): :obj:`True`, if the poll allows
                 multiple answers, ignored for polls in quiz mode, defaults to :obj:`False`.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
@@ -5046,8 +5074,8 @@ class Bot(TelegramObject):
                 answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most
                 2 line feeds after entities parsing.
             explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
-                explanation. See the constants in :class:`telegram.ParseMode` for the available
-                modes.
+                explanation. See the constants in :class:`telegram.constants.ParseMode` for the
+                available modes.
             explanation_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
@@ -5191,12 +5219,17 @@ class Bot(TelegramObject):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
-                Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, "🎳", or “🎰”. Dice can have
-                values 1-6 for “🎲”, “🎯” and "🎳", values 1-5 for “🏀” and “⚽”, and values 1-64
-                for “🎰”. Defaults to “🎲”.
+                Currently, must be one of :class:`telegram.constants.DiceEmoji`. Dice can have
+                values 1-6 for :tg-const:`telegram.constants.DiceEmoji.DICE`,
+                :tg-const:`telegram.constants.DiceEmoji.DARTS` and
+                :tg-const:`telegram.constants.DiceEmoji.BOWLING`, values 1-5 for
+                :tg-const:`telegram.constants.DiceEmoji.BASKETBALL` and
+                :tg-const:`telegram.constants.DiceEmoji.FOOTBALL`, and values 1-64
+                for :tg-const:`telegram.constants.DiceEmoji.SLOT_MACHINE`. Defaults to
+                :tg-const:`telegram.constants.DiceEmoji.DICE`.
 
                 .. versionchanged:: 13.4
-                   Added the "🎳" emoji.
+                   Added the :tg-const:`telegram.constants.DiceEmoji.BOWLING` emoji.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -5465,10 +5498,11 @@ class Bot(TelegramObject):
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
             message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
-            caption (:obj:`str`, optional): New caption for media, 0-1024 characters after
+            caption (:obj:`str`, optional): New caption for media,
+                0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing. If not specified, the original caption is kept.
             parse_mode (:obj:`str`, optional): Mode for parsing entities in the new caption. See
-                the constants in :class:`telegram.ParseMode` for the available modes.
+                the constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in the new caption, which can be specified instead
                 of parse_mode.

@@ -15,7 +15,8 @@ bot.
 import logging
 from uuid import uuid4
 
-from telegram import InlineQueryResultArticle, ParseMode, InputTextMessageContent, Update
+from telegram import InlineQueryResultArticle, InputTextMessageContent, Update
+from telegram.constants import ParseMode
 from telegram.helpers import escape_markdown
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler, CallbackContext
 

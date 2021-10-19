@@ -71,8 +71,8 @@ class Chat(TelegramObject):
             and some programming languages may have difficulty/silent defects in interpreting it.
             But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float
             type are safe for storing this identifier.
-        type (:obj:`str`): Type of chat, can be either 'private', 'group', 'supergroup' or
-            'channel'.
+        type (:obj:`str`): Type of chat, can be either :attr:`PRIVATE`, :attr:`GROUP`,
+            :attr:`SUPERGROUP` or :attr:`CHANNEL`.
         title (:obj:`str`, optional): Title, for supergroups, channels and group chats.
         username(:obj:`str`, optional): Username, for private chats, supergroups and channels if
             available.
@@ -189,19 +189,19 @@ class Chat(TelegramObject):
         'has_private_forwards',
     )
 
-    SENDER: ClassVar[str] = constants.CHAT_SENDER
-    """:const:`telegram.constants.CHAT_SENDER`
+    SENDER: ClassVar[str] = constants.ChatType.SENDER
+    """:const:`telegram.constants.ChatType.SENDER`
 
     .. versionadded:: 13.5
     """
-    PRIVATE: ClassVar[str] = constants.CHAT_PRIVATE
-    """:const:`telegram.constants.CHAT_PRIVATE`"""
-    GROUP: ClassVar[str] = constants.CHAT_GROUP
-    """:const:`telegram.constants.CHAT_GROUP`"""
-    SUPERGROUP: ClassVar[str] = constants.CHAT_SUPERGROUP
-    """:const:`telegram.constants.CHAT_SUPERGROUP`"""
-    CHANNEL: ClassVar[str] = constants.CHAT_CHANNEL
-    """:const:`telegram.constants.CHAT_CHANNEL`"""
+    PRIVATE: ClassVar[str] = constants.ChatType.PRIVATE
+    """:const:`telegram.constants.ChatType.PRIVATE`"""
+    GROUP: ClassVar[str] = constants.ChatType.GROUP
+    """:const:`telegram.constants.ChatType.GROUP`"""
+    SUPERGROUP: ClassVar[str] = constants.ChatType.SUPERGROUP
+    """:const:`telegram.constants.ChatType.SUPERGROUP`"""
+    CHANNEL: ClassVar[str] = constants.ChatType.CHANNEL
+    """:const:`telegram.constants.ChatType.CHANNEL`"""
 
     def __init__(
         self,
@@ -1471,8 +1471,8 @@ class Chat(TelegramObject):
         question: str,
         options: List[str],
         is_anonymous: bool = True,
-        # We use constant.POLL_REGULAR instead of Poll.REGULAR here to avoid circular imports
-        type: str = constants.POLL_REGULAR,  # pylint: disable=redefined-builtin
+        # We use constant.PollType.REGULAR instead of Poll.REGULAR here to avoid circular imports
+        type: str = constants.PollType.REGULAR,  # pylint: disable=redefined-builtin
         allows_multiple_answers: bool = False,
         correct_option_id: int = None,
         is_closed: bool = None,

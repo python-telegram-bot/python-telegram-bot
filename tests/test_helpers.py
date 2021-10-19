@@ -20,8 +20,9 @@ import re
 
 import pytest
 
-from telegram import Sticker, Update, User, MessageEntity, Message
+from telegram import Update, MessageEntity, Message
 from telegram import helpers
+from telegram.constants import MessageType
 
 
 class TestHelpers:
@@ -92,8 +93,10 @@ class TestHelpers:
         with pytest.raises(ValueError):  # too short username (4 is minimum)
             helpers.create_deep_linked_url("abc", None)
 
-    def test_effective_message_type(self):
-        def build_test_message(**kwargs):
+    @pytest.mark.parametrize('message_type', list(MessageType))
+    @pytest.mark.parametrize('entity_type', [Update, Message])
+    def test_effective_message_type(self, message_type, entity_type):
+        def build_test_message(kwargs):
             config = dict(
                 message_id=1,
                 from_user=None,
@@ -103,26 +106,9 @@ class TestHelpers:
             config.update(**kwargs)
             return Message(**config)
 
-        test_message = build_test_message(text='Test')
-        assert helpers.effective_message_type(test_message) == 'text'
-        test_message.text = None
-
-        test_message = build_test_message(
-            sticker=Sticker('sticker_id', 'unique_id', 50, 50, False, False)
-        )
-        assert helpers.effective_message_type(test_message) == 'sticker'
-        test_message.sticker = None
-
-        test_message = build_test_message(new_chat_members=[User(55, 'new_user', False)])
-        assert helpers.effective_message_type(test_message) == 'new_chat_members'
-
-        test_message = build_test_message(left_chat_member=[User(55, 'new_user', False)])
-        assert helpers.effective_message_type(test_message) == 'left_chat_member'
-
-        test_update = Update(1)
-        test_message = build_test_message(text='Test')
-        test_update.message = test_message
-        assert helpers.effective_message_type(test_update) == 'text'
+        message = build_test_message({message_type: True})
+        entity = message if entity_type is Message else Update(1, message=message)
+        assert helpers.effective_message_type(entity) == message_type
 
         empty_update = Update(2)
         assert helpers.effective_message_type(empty_update) is None
@@ -130,7 +116,7 @@ class TestHelpers:
     def test_effective_message_type_wrong_type(self):
         entity = dict()
         with pytest.raises(
-            TypeError, match=re.escape(f'not Message or Update (got: {type(entity)})')
+            TypeError, match=re.escape(f'neither Message nor Update (got: {type(entity)})')
         ):
             helpers.effective_message_type(entity)
 
