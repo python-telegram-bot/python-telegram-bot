@@ -501,12 +501,13 @@ class Job:
         """Executes the callback function independently of the jobs schedule. Also calls
         :meth:`telegram.ext.Dispatcher.update_persistence`.
 
-        .. versionchaged:: 14.0
+        .. versionchanged:: 14.0
             Calls :meth:`telegram.ext.Dispatcher.update_persistence`.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher this job is associated
                 with.
+
         """
         try:
             self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
