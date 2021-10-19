@@ -11,13 +11,13 @@ import logging
 
 from telegram import (
     Poll,
-    ParseMode,
     KeyboardButton,
     KeyboardButtonPollType,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
     Update,
 )
+from telegram.constants import ParseMode
 from telegram.ext import (
     CommandHandler,
     PollAnswerHandler,
