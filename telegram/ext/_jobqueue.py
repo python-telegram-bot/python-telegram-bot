@@ -450,6 +450,9 @@ class Job:
         * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
           this :class:`telegram.ext.Job` to be useful.
 
+    .. versionchanged:: 14.0
+        Removed argument and attribute :attr:`job_queue`.
+
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
             Callback signature: ``def callback(update: Update, context: CallbackContext)``
