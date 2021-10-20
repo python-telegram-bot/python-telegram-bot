@@ -19,8 +19,8 @@
 
 import pytest
 
-from telegram import Chat, ChatAction, ChatPermissions, ChatLocation, Location, Bot
-from telegram import User
+from telegram import Chat, ChatPermissions, ChatLocation, Location, Bot, User
+from telegram.constants import ChatAction
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 

@@ -56,8 +56,8 @@ class PollOption(TelegramObject):
 
         self._id_attrs = (self.text, self.voter_count)
 
-    MAX_LENGTH: ClassVar[int] = constants.MAX_POLL_OPTION_LENGTH
-    """:const:`telegram.constants.MAX_POLL_OPTION_LENGTH`"""
+    MAX_LENGTH: ClassVar[int] = constants.PollLimit.OPTION_LENGTH
+    """:const:`telegram.constants.PollLimit.OPTION_LENGTH`"""
 
 
 class PollAnswer(TelegramObject):
@@ -284,11 +284,16 @@ class Poll(TelegramObject):
             if entity.type in types
         }
 
-    REGULAR: ClassVar[str] = constants.POLL_REGULAR
-    """:const:`telegram.constants.POLL_REGULAR`"""
-    QUIZ: ClassVar[str] = constants.POLL_QUIZ
-    """:const:`telegram.constants.POLL_QUIZ`"""
-    MAX_QUESTION_LENGTH: ClassVar[int] = constants.MAX_POLL_QUESTION_LENGTH
-    """:const:`telegram.constants.MAX_POLL_QUESTION_LENGTH`"""
-    MAX_OPTION_LENGTH: ClassVar[int] = constants.MAX_POLL_OPTION_LENGTH
-    """:const:`telegram.constants.MAX_POLL_OPTION_LENGTH`"""
+    REGULAR: ClassVar[str] = constants.PollType.REGULAR
+    """:const:`telegram.constants.PollType.REGULAR`"""
+    QUIZ: ClassVar[str] = constants.PollType.QUIZ
+    """:const:`telegram.constants.PollType.QUIZ`"""
+    MAX_QUESTION_LENGTH: ClassVar[int] = constants.PollLimit.QUESTION_LENGTH
+    """:const:`telegram.constants.PollLimit.QUESTION_LENGTH`"""
+    MAX_OPTION_LENGTH: ClassVar[int] = constants.PollLimit.OPTION_LENGTH
+    """:const:`telegram.constants.PollLimit.OPTION_LENGTH`"""
+    MAX_OPTION_NUMBER: ClassVar[int] = constants.PollLimit.OPTION_NUMBER
+    """:const:`telegram.constants.PollLimit.OPTION_NUMBER`
+
+    .. versionadded:: 14.0
+    """

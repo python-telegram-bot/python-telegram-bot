@@ -33,6 +33,8 @@ from typing import (
     Union,
 )
 
+from telegram.constants import MessageType
+
 if TYPE_CHECKING:
     from telegram import Message, Update
 
@@ -100,7 +102,8 @@ def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
             ``message`` to extract from.
 
     Returns:
-        :obj:`str`: One of ``Message.MESSAGE_TYPES``
+        :obj:`str` | :obj:`None`: One of :class:`telegram.constants.MessageType` if the entity
+            contains a message that matches one of those types. :obj:`None` otherwise.
 
     """
     # Importing on file-level yields cyclic Import Errors
@@ -109,13 +112,15 @@ def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
     if isinstance(entity, Message):
         message = entity
     elif isinstance(entity, Update):
-        message = entity.effective_message  # type: ignore[assignment]
+        if not entity.effective_message:
+            return None
+        message = entity.effective_message
     else:
-        raise TypeError(f"entity is not Message or Update (got: {type(entity)})")
+        raise TypeError(f"The entity is neither Message nor Update (got: {type(entity)})")
 
-    for i in Message.MESSAGE_TYPES:
-        if getattr(message, i, None):
-            return i
+    for message_type in MessageType:
+        if message[message_type]:
+            return message_type
 
     return None
 

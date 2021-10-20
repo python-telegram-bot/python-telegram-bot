@@ -26,6 +26,7 @@ from typing import IO, TYPE_CHECKING, Any, Optional, Union
 from telegram import TelegramObject
 from telegram._passport.credentials import decrypt
 from telegram._utils.files import is_local_file
+from telegram._utils.types import FilePathInput
 
 if TYPE_CHECKING:
     from telegram import Bot, FileCredentials
@@ -41,7 +42,8 @@ class File(TelegramObject):
     considered equal, if their :attr:`file_unique_id` is equal.
 
     Note:
-        * Maximum file size to download is 20 MB.
+        * Maximum file size to download is
+            :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD`.
         * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
           then it will automatically be decrypted as it downloads when you call :attr:`download()`.
 
@@ -95,7 +97,7 @@ class File(TelegramObject):
         self._id_attrs = (self.file_unique_id,)
 
     def download(
-        self, custom_path: Union[Path, str] = None, out: IO = None, timeout: int = None
+        self, custom_path: FilePathInput = None, out: IO = None, timeout: int = None
     ) -> Union[Path, IO]:
         """
         Download this file. By default, the file is saved in the current working directory with its
@@ -111,8 +113,10 @@ class File(TelegramObject):
               local mode), this method will just return the path.
 
         .. versionchanged:: 14.0
+
             * ``custom_path`` parameter now also accepts :obj:`pathlib.Path` as argument.
-            * Returns :obj:`pathlib.Path` object in cases where previously returned `str` object.
+            * Returns :obj:`pathlib.Path` object in cases where previously a :obj:`str` was
+              returned.
 
         Args:
             custom_path (:obj:`pathlib.Path` | :obj:`str`, optional): Custom path.
@@ -124,8 +128,8 @@ class File(TelegramObject):
 
         Returns:
             :obj:`pathlib.Path` | :obj:`io.BufferedWriter`: The same object as :attr:`out` if
-                specified.
-            Otherwise, returns the filename downloaded to or the file path of the local file.
+                specified. Otherwise, returns the filename downloaded to or the file path of the
+                local file.
 
         Raises:
             ValueError: If both :attr:`custom_path` and :attr:`out` are passed.

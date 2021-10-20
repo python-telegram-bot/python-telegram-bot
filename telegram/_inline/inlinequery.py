@@ -46,11 +46,11 @@ class InlineQuery(TelegramObject):
         query (:obj:`str`): Text of the query (up to 256 characters).
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
         chat_type (:obj:`str`, optional): Type of the chat, from which the inline query was sent.
-            Can be either :attr:`telegram.Chat.SENDER` for a private chat with the inline query
-            sender, :attr:`telegram.Chat.PRIVATE`, :attr:`telegram.Chat.GROUP`,
-            :attr:`telegram.Chat.SUPERGROUP` or :attr:`telegram.Chat.CHANNEL`. The chat type should
-            be always known for requests sent from official clients and most third-party clients,
-            unless the request was sent from a secret chat.
+            Can be either :tg-const:`telegram.Chat.SENDER` for a private chat with the inline query
+            sender, :tg-const:`telegram.Chat.PRIVATE`, :tg-const:`telegram.Chat.GROUP`,
+            :tg-const:`telegram.Chat.SUPERGROUP` or :tg-const:`telegram.Chat.CHANNEL`. The chat
+            type should be always known for requests sent from official clients and most
+            third-party clients, unless the request was sent from a secret chat.
 
             .. versionadded:: 13.5
         location (:class:`telegram.Location`, optional): Sender location, only for bots that
@@ -163,9 +163,13 @@ class InlineQuery(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    MAX_RESULTS: ClassVar[int] = constants.MAX_INLINE_QUERY_RESULTS
-    """
-    :const:`telegram.constants.MAX_INLINE_QUERY_RESULTS`
+    MAX_RESULTS: ClassVar[int] = constants.InlineQueryLimit.RESULTS
+    """:const:`telegram.constants.InlineQueryLimit.RESULTS`
 
     .. versionadded:: 13.2
+    """
+    MAX_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH
+    """:const:`telegram.constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH`
+
+    .. versionadded:: 14.0
     """

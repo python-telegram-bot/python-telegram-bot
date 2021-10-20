@@ -25,6 +25,7 @@ from flaky import flaky
 
 from telegram import File, Voice
 from telegram.error import TelegramError
+from tests.conftest import data_file
 
 
 @pytest.fixture(scope='class')
@@ -43,7 +44,7 @@ def local_file(bot):
     return File(
         TestFile.file_id,
         TestFile.file_unique_id,
-        file_path=str(Path.cwd() / 'tests' / 'data' / 'local_file.txt'),
+        file_path=str(data_file('local_file.txt')),
         file_size=TestFile.file_size,
         bot=bot,
     )

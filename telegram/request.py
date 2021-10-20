@@ -73,7 +73,7 @@ from telegram.error import (
     TimedOut,
     Unauthorized,
 )
-from telegram._utils.types import JSONDict
+from telegram._utils.types import JSONDict, FilePathInput
 
 
 # pylint: disable=unused-argument
@@ -385,7 +385,7 @@ class Request:
 
         return self._request_wrapper('GET', url, **urlopen_kwargs)
 
-    def download(self, url: str, filepath: Union[Path, str], timeout: float = None) -> None:
+    def download(self, url: str, filepath: FilePathInput, timeout: float = None) -> None:
         """Download a file by its URL.
 
         Args:

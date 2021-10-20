@@ -21,14 +21,14 @@
 from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
 
 from telegram import PhotoSize, TelegramObject, constants
-from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, File
+    from telegram import Bot
 
 
-class Sticker(TelegramObject):
+class Sticker(_BaseThumbedMedium):
     """This object represents a sticker.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -73,18 +73,7 @@ class Sticker(TelegramObject):
 
     """
 
-    __slots__ = (
-        'width',
-        'file_id',
-        'is_animated',
-        'file_size',
-        'thumb',
-        'set_name',
-        'mask_position',
-        'height',
-        'file_unique_id',
-        'emoji',
-    )
+    __slots__ = ('emoji', 'height', 'is_animated', 'mask_position', 'set_name', 'width')
 
     def __init__(
         self,
@@ -101,21 +90,21 @@ class Sticker(TelegramObject):
         bot: 'Bot' = None,
         **_kwargs: Any,
     ):
+        super().__init__(
+            file_id=file_id,
+            file_unique_id=file_unique_id,
+            file_size=file_size,
+            thumb=thumb,
+            bot=bot,
+        )
         # Required
-        self.file_id = str(file_id)
-        self.file_unique_id = str(file_unique_id)
         self.width = int(width)
         self.height = int(height)
         self.is_animated = is_animated
-        # Optionals
-        self.thumb = thumb
+        # Optional
         self.emoji = emoji
-        self.file_size = file_size
         self.set_name = set_name
         self.mask_position = mask_position
-        self.set_bot(bot)
-
-        self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Sticker']:
@@ -129,24 +118,6 @@ class Sticker(TelegramObject):
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
 
         return cls(bot=bot, **data)
-
-    def get_file(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
-    ) -> 'File':
-        """Convenience wrapper over :attr:`telegram.Bot.get_file`
-
-        For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.
-
-        Returns:
-            :class:`telegram.File`
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
-        """
-        return self.get_bot().get_file(
-            file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs
-        )
 
 
 class StickerSet(TelegramObject):
@@ -176,12 +147,12 @@ class StickerSet(TelegramObject):
     """
 
     __slots__ = (
-        'is_animated',
         'contains_masks',
+        'is_animated',
+        'name',
+        'stickers',
         'thumb',
         'title',
-        'stickers',
-        'name',
     )
 
     def __init__(
@@ -199,7 +170,7 @@ class StickerSet(TelegramObject):
         self.is_animated = is_animated
         self.contains_masks = contains_masks
         self.stickers = stickers
-        # Optionals
+        # Optional
         self.thumb = thumb
 
         self._id_attrs = (self.name,)
@@ -231,22 +202,9 @@ class MaskPosition(TelegramObject):
     considered equal, if their :attr:`point`, :attr:`x_shift`, :attr:`y_shift` and, :attr:`scale`
     are equal.
 
-    Attributes:
-        point (:obj:`str`): The part of the face relative to which the mask should be placed.
-            One of ``'forehead'``, ``'eyes'``, ``'mouth'``, or ``'chin'``.
-        x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
-            size, from left to right.
-        y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
-            size, from top to bottom.
-        scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
-
-    Note:
-        :attr:`type` should be one of the following: `forehead`, `eyes`, `mouth` or `chin`. You can
-        use the class constants for those.
-
     Args:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
-            One of ``'forehead'``, ``'eyes'``, ``'mouth'``, or ``'chin'``.
+            One of :attr:`FOREHEAD`, :attr:`EYES`, :attr:`MOUTH`, or :attr:`CHIN`.
         x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
             size, from left to right. For example, choosing -1.0 will place mask just to the left
             of the default mask position.
@@ -255,18 +213,27 @@ class MaskPosition(TelegramObject):
             mask position.
         scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
 
+    Attributes:
+        point (:obj:`str`): The part of the face relative to which the mask should be placed.
+            One of :attr:`FOREHEAD`, :attr:`EYES`, :attr:`MOUTH`, or :attr:`CHIN`.
+        x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
+            size, from left to right.
+        y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
+            size, from top to bottom.
+        scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
+
     """
 
     __slots__ = ('point', 'scale', 'x_shift', 'y_shift')
 
-    FOREHEAD: ClassVar[str] = constants.STICKER_FOREHEAD
-    """:const:`telegram.constants.STICKER_FOREHEAD`"""
-    EYES: ClassVar[str] = constants.STICKER_EYES
-    """:const:`telegram.constants.STICKER_EYES`"""
-    MOUTH: ClassVar[str] = constants.STICKER_MOUTH
-    """:const:`telegram.constants.STICKER_MOUTH`"""
-    CHIN: ClassVar[str] = constants.STICKER_CHIN
-    """:const:`telegram.constants.STICKER_CHIN`"""
+    FOREHEAD: ClassVar[str] = constants.MaskPosition.FOREHEAD
+    """:const:`telegram.constants.MaskPosition.FOREHEAD`"""
+    EYES: ClassVar[str] = constants.MaskPosition.EYES
+    """:const:`telegram.constants.MaskPosition.EYES`"""
+    MOUTH: ClassVar[str] = constants.MaskPosition.MOUTH
+    """:const:`telegram.constants.MaskPosition.MOUTH`"""
+    CHIN: ClassVar[str] = constants.MaskPosition.CHIN
+    """:const:`telegram.constants.MaskPosition.CHIN`"""
 
     def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **_kwargs: Any):
         self.point = point
