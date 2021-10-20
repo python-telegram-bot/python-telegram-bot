@@ -148,4 +148,4 @@ class IdDocumentData(TelegramObject):
         self.document_no = document_no
         self.expiry_date = expiry_date
 
-        self._bot = bot
+        self.set_bot(bot)
