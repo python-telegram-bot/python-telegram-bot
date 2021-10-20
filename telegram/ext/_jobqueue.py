@@ -154,7 +154,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
         date_time = self._parse_time_input(when, shift_day=True)
 
         j = self.scheduler.add_job(
@@ -238,7 +238,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
 
         dt_first = self._parse_time_input(first)
         dt_last = self._parse_time_input(last)
@@ -303,7 +303,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
 
         j = self.scheduler.add_job(
             job,
@@ -360,7 +360,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
 
         j = self.scheduler.add_job(
             job,
@@ -403,7 +403,7 @@ class JobQueue:
 
         """
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
 
         j = self.scheduler.add_job(job, args=(self.dispatcher,), name=name, **job_kwargs)
 
