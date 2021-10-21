@@ -55,7 +55,6 @@ class PersonalDetails(TelegramObject):
         'last_name',
         'country_code',
         'gender',
-        'bot',
         'middle_name_native',
         'birth_date',
     )
@@ -87,7 +86,7 @@ class PersonalDetails(TelegramObject):
         self.last_name_native = last_name_native
         self.middle_name_native = middle_name_native
 
-        self.bot = bot
+        self.set_bot(bot)
 
 
 class ResidentialAddress(TelegramObject):
@@ -109,7 +108,6 @@ class ResidentialAddress(TelegramObject):
         'country_code',
         'street_line2',
         'street_line1',
-        'bot',
         'state',
     )
 
@@ -132,7 +130,7 @@ class ResidentialAddress(TelegramObject):
         self.country_code = country_code
         self.post_code = post_code
 
-        self.bot = bot
+        self.set_bot(bot)
 
 
 class IdDocumentData(TelegramObject):
@@ -144,10 +142,10 @@ class IdDocumentData(TelegramObject):
         expiry_date (:obj:`str`): Optional. Date of expiry, in DD.MM.YYYY format.
     """
 
-    __slots__ = ('document_no', 'bot', 'expiry_date')
+    __slots__ = ('document_no', 'expiry_date')
 
     def __init__(self, document_no: str, expiry_date: str, bot: 'Bot' = None, **_kwargs: Any):
         self.document_no = document_no
         self.expiry_date = expiry_date
 
-        self.bot = bot
+        self.set_bot(bot)

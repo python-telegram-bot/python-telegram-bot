@@ -67,10 +67,10 @@ class TestPassportFile:
             return File(file_id=result, file_unique_id=result)
 
         assert check_shortcut_signature(PassportFile.get_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(passport_file.get_file, passport_file.bot, 'get_file')
-        assert check_defaults_handling(passport_file.get_file, passport_file.bot)
+        assert check_shortcut_call(passport_file.get_file, passport_file.get_bot(), 'get_file')
+        assert check_defaults_handling(passport_file.get_file, passport_file.get_bot())
 
-        monkeypatch.setattr(passport_file.bot, 'get_file', make_assertion)
+        monkeypatch.setattr(passport_file.get_bot(), 'get_file', make_assertion)
         assert passport_file.get_file().file_id == 'True'
 
     def test_equality(self):

@@ -85,10 +85,12 @@ class TestInlineQuery:
         assert check_shortcut_signature(
             InlineQuery.answer, Bot.answer_inline_query, ['inline_query_id'], ['auto_pagination']
         )
-        assert check_shortcut_call(inline_query.answer, inline_query.bot, 'answer_inline_query')
-        assert check_defaults_handling(inline_query.answer, inline_query.bot)
+        assert check_shortcut_call(
+            inline_query.answer, inline_query.get_bot(), 'answer_inline_query'
+        )
+        assert check_defaults_handling(inline_query.answer, inline_query.get_bot())
 
-        monkeypatch.setattr(inline_query.bot, 'answer_inline_query', make_assertion)
+        monkeypatch.setattr(inline_query.get_bot(), 'answer_inline_query', make_assertion)
         assert inline_query.answer(results=[])
 
     def test_answer_error(self, inline_query):
@@ -101,7 +103,7 @@ class TestInlineQuery:
             offset_matches = kwargs.get('current_offset') == inline_query.offset
             return offset_matches and inline_query_id_matches
 
-        monkeypatch.setattr(inline_query.bot, 'answer_inline_query', make_assertion)
+        monkeypatch.setattr(inline_query.get_bot(), 'answer_inline_query', make_assertion)
         assert inline_query.answer(results=[], auto_pagination=True)
 
     def test_equality(self):

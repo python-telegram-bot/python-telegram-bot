@@ -67,7 +67,6 @@ class ChatPhoto(TelegramObject):
 
     __slots__ = (
         'big_file_unique_id',
-        'bot',
         'small_file_id',
         'small_file_unique_id',
         'big_file_id',
@@ -87,7 +86,7 @@ class ChatPhoto(TelegramObject):
         self.big_file_id = big_file_id
         self.big_file_unique_id = big_file_unique_id
 
-        self.bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (
             self.small_file_unique_id,
@@ -109,7 +108,7 @@ class ChatPhoto(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self.bot.get_file(
+        return self.get_bot().get_file(
             file_id=self.small_file_id, timeout=timeout, api_kwargs=api_kwargs
         )
 
@@ -128,4 +127,6 @@ class ChatPhoto(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self.bot.get_file(file_id=self.big_file_id, timeout=timeout, api_kwargs=api_kwargs)
+        return self.get_bot().get_file(
+            file_id=self.big_file_id, timeout=timeout, api_kwargs=api_kwargs
+        )
