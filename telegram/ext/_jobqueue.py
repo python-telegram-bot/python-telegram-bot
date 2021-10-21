@@ -154,7 +154,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
         date_time = self._parse_time_input(when, shift_day=True)
 
         j = self.scheduler.add_job(
@@ -238,7 +238,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
 
         dt_first = self._parse_time_input(first)
         dt_last = self._parse_time_input(last)
@@ -303,7 +303,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
 
         j = self.scheduler.add_job(
             job,
@@ -360,7 +360,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
 
         j = self.scheduler.add_job(
             job,
@@ -403,7 +403,7 @@ class JobQueue:
 
         """
         name = name or callback.__name__
-        job = Job(callback, context, name, self)
+        job = Job(callback, context, name)
 
         j = self.scheduler.add_job(job, args=(self.dispatcher,), name=name, **job_kwargs)
 
@@ -450,21 +450,21 @@ class Job:
         * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
           this :class:`telegram.ext.Job` to be useful.
 
+    .. versionchanged:: 14.0
+        Removed argument and attribute :attr:`job_queue`.
+
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
             Callback signature: ``def callback(update: Update, context: CallbackContext)``
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
             accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
-        job_queue (:class:`telegram.ext.JobQueue`, optional): The ``JobQueue`` this job belongs to.
-            Only optional for backward compatibility with ``JobQueue.put()``.
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
 
     Attributes:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
         context (:obj:`object`): Optional. Additional data needed for the callback function.
         name (:obj:`str`): Optional. The name of the new job.
-        job_queue (:class:`telegram.ext.JobQueue`): Optional. The ``JobQueue`` this job belongs to.
         job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
     """
 
@@ -472,7 +472,6 @@ class Job:
         'callback',
         'context',
         'name',
-        'job_queue',
         '_removed',
         '_enabled',
         'job',
@@ -483,14 +482,12 @@ class Job:
         callback: Callable[['CallbackContext'], None],
         context: object = None,
         name: str = None,
-        job_queue: JobQueue = None,
         job: APSJob = None,
     ):
 
         self.callback = callback
         self.context = context
         self.name = name or callback.__name__
-        self.job_queue = job_queue
 
         self._removed = False
         self._enabled = False

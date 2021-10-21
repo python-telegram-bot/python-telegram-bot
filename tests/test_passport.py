@@ -462,7 +462,7 @@ class TestPassport:
         def get_file(*_, **kwargs):
             return File(kwargs['file_id'], selfie.file_unique_id)
 
-        monkeypatch.setattr(passport_data.bot, 'get_file', get_file)
+        monkeypatch.setattr(passport_data.get_bot(), 'get_file', get_file)
         file = selfie.get_file()
         assert file.file_id == selfie.file_id
         assert file.file_unique_id == selfie.file_unique_id
