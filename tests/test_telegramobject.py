@@ -116,3 +116,18 @@ class TestTelegramObject:
         assert len(recwarn) == 0
         assert b == a
         assert len(recwarn) == 0
+
+    def test_bot_instance_none(self):
+        tg_object = TelegramObject()
+        with pytest.raises(RuntimeError):
+            tg_object.get_bot()
+
+    @pytest.mark.parametrize('bot_inst', ['bot', None])
+    def test_bot_instance_states(self, bot_inst):
+        tg_object = TelegramObject()
+        tg_object.set_bot('bot' if bot_inst == 'bot' else bot_inst)
+        if bot_inst == 'bot':
+            assert tg_object.get_bot() == 'bot'
+        elif bot_inst is None:
+            with pytest.raises(RuntimeError):
+                tg_object.get_bot()

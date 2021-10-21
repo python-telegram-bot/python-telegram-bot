@@ -151,7 +151,6 @@ class Chat(TelegramObject):
         'id',
         'type',
         'last_name',
-        'bot',
         'sticker_set_name',
         'slow_mode_delay',
         'location',
@@ -231,7 +230,7 @@ class Chat(TelegramObject):
         self.linked_chat_id = linked_chat_id
         self.location = location
 
-        self.bot = bot
+        self.set_bot(bot)
         self._id_attrs = (self.id,)
 
     @property
@@ -289,7 +288,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.leave_chat(
+        return self.get_bot().leave_chat(
             chat_id=self.id,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -312,7 +311,7 @@ class Chat(TelegramObject):
             and no administrators were appointed, only the creator will be returned.
 
         """
-        return self.bot.get_chat_administrators(
+        return self.get_bot().get_chat_administrators(
             chat_id=self.id,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -331,7 +330,7 @@ class Chat(TelegramObject):
         Returns:
             :obj:`int`
         """
-        return self.bot.get_chat_member_count(
+        return self.get_bot().get_chat_member_count(
             chat_id=self.id,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -353,7 +352,7 @@ class Chat(TelegramObject):
             :class:`telegram.ChatMember`
 
         """
-        return self.bot.get_chat_member(
+        return self.get_bot().get_chat_member(
             chat_id=self.id,
             user_id=user_id,
             timeout=timeout,
@@ -378,7 +377,7 @@ class Chat(TelegramObject):
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
         """
-        return self.bot.ban_chat_member(
+        return self.get_bot().ban_chat_member(
             chat_id=self.id,
             user_id=user_id,
             timeout=timeout,
@@ -404,7 +403,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.unban_chat_member(
+        return self.get_bot().unban_chat_member(
             chat_id=self.id,
             user_id=user_id,
             timeout=timeout,
@@ -442,7 +441,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.promote_chat_member(
+        return self.get_bot().promote_chat_member(
             chat_id=self.id,
             user_id=user_id,
             can_change_info=can_change_info,
@@ -481,7 +480,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.restrict_chat_member(
+        return self.get_bot().restrict_chat_member(
             chat_id=self.id,
             user_id=user_id,
             permissions=permissions,
@@ -507,7 +506,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.set_chat_permissions(
+        return self.get_bot().set_chat_permissions(
             chat_id=self.id,
             permissions=permissions,
             timeout=timeout,
@@ -532,7 +531,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.set_chat_administrator_custom_title(
+        return self.get_bot().set_chat_administrator_custom_title(
             chat_id=self.id,
             user_id=user_id,
             custom_title=custom_title,
@@ -560,7 +559,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.pin_chat_message(
+        return self.get_bot().pin_chat_message(
             chat_id=self.id,
             message_id=message_id,
             disable_notification=disable_notification,
@@ -587,7 +586,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.unpin_chat_message(
+        return self.get_bot().unpin_chat_message(
             chat_id=self.id,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -612,7 +611,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.unpin_all_chat_messages(
+        return self.get_bot().unpin_all_chat_messages(
             chat_id=self.id,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -641,7 +640,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_message(
+        return self.get_bot().send_message(
             chat_id=self.id,
             text=text,
             parse_mode=parse_mode,
@@ -676,7 +675,7 @@ class Chat(TelegramObject):
             List[:class:`telegram.Message`]: On success, instance representing the message posted.
 
         """
-        return self.bot.send_media_group(
+        return self.get_bot().send_media_group(
             chat_id=self.id,
             media=media,
             disable_notification=disable_notification,
@@ -702,7 +701,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.send_chat_action(
+        return self.get_bot().send_chat_action(
             chat_id=self.id,
             action=action,
             timeout=timeout,
@@ -736,7 +735,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_photo(
+        return self.get_bot().send_photo(
             chat_id=self.id,
             photo=photo,
             caption=caption,
@@ -775,7 +774,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_contact(
+        return self.get_bot().send_contact(
             chat_id=self.id,
             phone_number=phone_number,
             first_name=first_name,
@@ -818,7 +817,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_audio(
+        return self.get_bot().send_audio(
             chat_id=self.id,
             audio=audio,
             duration=duration,
@@ -863,7 +862,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_document(
+        return self.get_bot().send_document(
             chat_id=self.id,
             document=document,
             filename=filename,
@@ -900,7 +899,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_dice(
+        return self.get_bot().send_dice(
             chat_id=self.id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -931,7 +930,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_game(
+        return self.get_bot().send_game(
             chat_id=self.id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
@@ -990,7 +989,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_invoice(
+        return self.get_bot().send_invoice(
             chat_id=self.id,
             title=title,
             description=description,
@@ -1047,7 +1046,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_location(
+        return self.get_bot().send_location(
             chat_id=self.id,
             latitude=latitude,
             longitude=longitude,
@@ -1092,7 +1091,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_animation(
+        return self.get_bot().send_animation(
             chat_id=self.id,
             animation=animation,
             duration=duration,
@@ -1131,7 +1130,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_sticker(
+        return self.get_bot().send_sticker(
             chat_id=self.id,
             sticker=sticker,
             disable_notification=disable_notification,
@@ -1170,7 +1169,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_venue(
+        return self.get_bot().send_venue(
             chat_id=self.id,
             latitude=latitude,
             longitude=longitude,
@@ -1218,7 +1217,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video(
+        return self.get_bot().send_video(
             chat_id=self.id,
             video=video,
             duration=duration,
@@ -1262,7 +1261,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video_note(
+        return self.get_bot().send_video_note(
             chat_id=self.id,
             video_note=video_note,
             duration=duration,
@@ -1302,7 +1301,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_voice(
+        return self.get_bot().send_voice(
             chat_id=self.id,
             voice=voice,
             duration=duration,
@@ -1350,7 +1349,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_poll(
+        return self.get_bot().send_poll(
             chat_id=self.id,
             question=question,
             options=options,
@@ -1396,7 +1395,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.copy_message(
+        return self.get_bot().copy_message(
             chat_id=self.id,
             from_chat_id=from_chat_id,
             message_id=message_id,
@@ -1435,7 +1434,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.copy_message(
+        return self.get_bot().copy_message(
             from_chat_id=self.id,
             chat_id=chat_id,
             message_id=message_id,
@@ -1468,7 +1467,7 @@ class Chat(TelegramObject):
             :obj:`str`: New invite link on success.
 
         """
-        return self.bot.export_chat_invite_link(
+        return self.get_bot().export_chat_invite_link(
             chat_id=self.id, timeout=timeout, api_kwargs=api_kwargs
         )
 
@@ -1498,7 +1497,7 @@ class Chat(TelegramObject):
             :class:`telegram.ChatInviteLink`
 
         """
-        return self.bot.create_chat_invite_link(
+        return self.get_bot().create_chat_invite_link(
             chat_id=self.id,
             expire_date=expire_date,
             member_limit=member_limit,
@@ -1534,7 +1533,7 @@ class Chat(TelegramObject):
             :class:`telegram.ChatInviteLink`
 
         """
-        return self.bot.edit_chat_invite_link(
+        return self.get_bot().edit_chat_invite_link(
             chat_id=self.id,
             invite_link=invite_link,
             expire_date=expire_date,
@@ -1564,7 +1563,7 @@ class Chat(TelegramObject):
             :class:`telegram.ChatInviteLink`
 
         """
-        return self.bot.revoke_chat_invite_link(
+        return self.get_bot().revoke_chat_invite_link(
             chat_id=self.id, invite_link=invite_link, timeout=timeout, api_kwargs=api_kwargs
         )
 
@@ -1587,7 +1586,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.approve_chat_join_request(
+        return self.get_bot().approve_chat_join_request(
             chat_id=self.id, user_id=user_id, timeout=timeout, api_kwargs=api_kwargs
         )
 
@@ -1610,6 +1609,6 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.decline_chat_join_request(
+        return self.get_bot().decline_chat_join_request(
             chat_id=self.id, user_id=user_id, timeout=timeout, api_kwargs=api_kwargs
         )

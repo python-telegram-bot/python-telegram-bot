@@ -61,7 +61,7 @@ class _BaseMedium(TelegramObject):
         self.file_unique_id = str(file_unique_id)
         # Optionals
         self.file_size = file_size
-        self.bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.file_unique_id,)
 
@@ -79,4 +79,6 @@ class _BaseMedium(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        return self.get_bot().get_file(
+            file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs
+        )
