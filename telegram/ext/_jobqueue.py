@@ -543,7 +543,7 @@ class Job:
 
     def schedule_removal(self) -> None:
         """
-        Schedules this job for removal from the :classL`JobQueue`. It will be removed without
+        Schedules this job for removal from the :class:`JobQueue`. It will be removed without
         executing its callback function again.
         """
         self.job.remove()
