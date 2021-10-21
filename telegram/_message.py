@@ -469,7 +469,7 @@ class Message(TelegramObject):
         self.audio = audio
         self.game = game
         self.document = document
-        self.photo = photo or []
+        self.photo = photo or None
         self.sticker = sticker
         self.video = video
         self.voice = voice
