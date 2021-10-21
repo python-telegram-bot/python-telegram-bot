@@ -116,7 +116,7 @@ class JobQueue:
         name: str = None,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
-        """Creates a new ``Job`` that runs once and adds it to the queue.
+        """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
@@ -147,7 +147,7 @@ class JobQueue:
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -181,7 +181,8 @@ class JobQueue:
         name: str = None,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
-        """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
+        """Creates a new :class:`Job` instance that runs at specified intervals and adds it to the
+            queue.
 
         Note:
             For a note about DST, please see the documentation of `APScheduler`_.
@@ -232,7 +233,7 @@ class JobQueue:
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -274,7 +275,7 @@ class JobQueue:
         name: str = None,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
-        """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
+        """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
 
         .. versionchanged:: 14.0
             The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
@@ -298,7 +299,7 @@ class JobQueue:
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -332,7 +333,7 @@ class JobQueue:
         name: str = None,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
-        """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
+        """Creates a new :class:`Job` that runs on a daily basis and adds it to the queue.
 
         Note:
             For a note about DST, please see the documentation of `APScheduler`_.
@@ -356,7 +357,7 @@ class JobQueue:
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -403,7 +404,7 @@ class JobQueue:
                 ``callback.__name__``.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -426,7 +427,7 @@ class JobQueue:
             self.scheduler.shutdown()
 
     def jobs(self) -> Tuple['Job', ...]:
-        """Returns a tuple of all *scheduled* jobs that are currently in the ``JobQueue``."""
+        """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`."""
         return tuple(
             Job._from_aps_job(job)  # pylint: disable=protected-access
             for job in self.scheduler.get_jobs()
@@ -434,7 +435,7 @@ class JobQueue:
 
     def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
-        in the ``JobQueue``.
+        in the :class:`JobQueue`.
         """
         return tuple(job for job in self.jobs() if job.name == name)
 
@@ -451,7 +452,7 @@ class Job:
         * All attributes and instance methods of :attr:`job` are also directly available as
           attributes/methods of the corresponding :class:`telegram.ext.Job` object.
         * Two instances of :class:`telegram.ext.Job` are considered equal, if their corresponding
-          ``job`` attributes have the same ``id``.
+          :attr:`job` attributes have the same ``id``.
         * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
           this :class:`telegram.ext.Job` to be useful.
 
@@ -542,8 +543,8 @@ class Job:
 
     def schedule_removal(self) -> None:
         """
-        Schedules this job for removal from the ``JobQueue``. It will be removed without executing
-        its callback function again.
+        Schedules this job for removal from the :classL`JobQueue`. It will be removed without
+        executing its callback function again.
         """
         self.job.remove()
         self._removed = True
