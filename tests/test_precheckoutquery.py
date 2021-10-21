@@ -63,7 +63,7 @@ class TestPreCheckoutQuery:
         }
         pre_checkout_query = PreCheckoutQuery.de_json(json_dict, bot)
 
-        assert pre_checkout_query.bot is bot
+        assert pre_checkout_query.get_bot() is bot
         assert pre_checkout_query.id == self.id_
         assert pre_checkout_query.invoice_payload == self.invoice_payload
         assert pre_checkout_query.shipping_option_id == self.shipping_option_id
@@ -93,12 +93,14 @@ class TestPreCheckoutQuery:
         )
         assert check_shortcut_call(
             pre_checkout_query.answer,
-            pre_checkout_query.bot,
+            pre_checkout_query.get_bot(),
             'answer_pre_checkout_query',
         )
-        assert check_defaults_handling(pre_checkout_query.answer, pre_checkout_query.bot)
+        assert check_defaults_handling(pre_checkout_query.answer, pre_checkout_query.get_bot())
 
-        monkeypatch.setattr(pre_checkout_query.bot, 'answer_pre_checkout_query', make_assertion)
+        monkeypatch.setattr(
+            pre_checkout_query.get_bot(), 'answer_pre_checkout_query', make_assertion
+        )
         assert pre_checkout_query.answer(ok=True)
 
     def test_equality(self):

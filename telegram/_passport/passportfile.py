@@ -60,7 +60,6 @@ class PassportFile(TelegramObject):
 
     __slots__ = (
         'file_date',
-        'bot',
         'file_id',
         'file_size',
         '_credentials',
@@ -83,7 +82,7 @@ class PassportFile(TelegramObject):
         self.file_size = file_size
         self.file_date = file_date
         # Optionals
-        self.bot = bot
+        self.set_bot(bot)
         self._credentials = credentials
 
         self._id_attrs = (self.file_unique_id,)
@@ -154,6 +153,8 @@ class PassportFile(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        file = self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
+        file = self.get_bot().get_file(
+            file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs
+        )
         file.set_credentials(self._credentials)
         return file
