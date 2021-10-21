@@ -367,7 +367,6 @@ class Message(TelegramObject):
         'media_group_id',
         'caption',
         'video',
-        'bot',
         'entities',
         'via_bot',
         'new_chat_members',
@@ -535,7 +534,7 @@ class Message(TelegramObject):
         self.voice_chat_ended = voice_chat_ended
         self.voice_chat_participants_invited = voice_chat_participants_invited
         self.reply_markup = reply_markup
-        self.bot = bot
+        self.set_bot(bot)
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -719,8 +718,10 @@ class Message(TelegramObject):
         else:
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
             # logic into ExtBot
-            if hasattr(self.bot, 'defaults') and self.bot.defaults:  # type: ignore[union-attr]
-                default_quote = self.bot.defaults.quote  # type: ignore[union-attr]
+            if hasattr(self.get_bot(), 'defaults') and self.get_bot().defaults:  # type: ignore
+                default_quote = (
+                    self.get_bot().defaults.quote  # type: ignore[union-attr, attr-defined]
+                )
             else:
                 default_quote = None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
@@ -760,7 +761,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_message(
+        return self.get_bot().send_message(
             chat_id=self.chat_id,
             text=text,
             parse_mode=parse_mode,
@@ -816,7 +817,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_message(
+        return self.get_bot().send_message(
             chat_id=self.chat_id,
             text=text,
             parse_mode=ParseMode.MARKDOWN,
@@ -868,7 +869,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_message(
+        return self.get_bot().send_message(
             chat_id=self.chat_id,
             text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
@@ -920,7 +921,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_message(
+        return self.get_bot().send_message(
             chat_id=self.chat_id,
             text=text,
             parse_mode=ParseMode.HTML,
@@ -967,7 +968,7 @@ class Message(TelegramObject):
             :class:`telegram.error.TelegramError`
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_media_group(
+        return self.get_bot().send_media_group(
             chat_id=self.chat_id,
             media=media,
             disable_notification=disable_notification,
@@ -1011,7 +1012,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_photo(
+        return self.get_bot().send_photo(
             chat_id=self.chat_id,
             photo=photo,
             caption=caption,
@@ -1064,7 +1065,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_audio(
+        return self.get_bot().send_audio(
             chat_id=self.chat_id,
             audio=audio,
             duration=duration,
@@ -1119,7 +1120,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_document(
+        return self.get_bot().send_document(
             chat_id=self.chat_id,
             document=document,
             filename=filename,
@@ -1174,7 +1175,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_animation(
+        return self.get_bot().send_animation(
             chat_id=self.chat_id,
             animation=animation,
             duration=duration,
@@ -1223,7 +1224,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_sticker(
+        return self.get_bot().send_sticker(
             chat_id=self.chat_id,
             sticker=sticker,
             disable_notification=disable_notification,
@@ -1273,7 +1274,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_video(
+        return self.get_bot().send_video(
             chat_id=self.chat_id,
             video=video,
             duration=duration,
@@ -1327,7 +1328,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_video_note(
+        return self.get_bot().send_video_note(
             chat_id=self.chat_id,
             video_note=video_note,
             duration=duration,
@@ -1377,7 +1378,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_voice(
+        return self.get_bot().send_voice(
             chat_id=self.chat_id,
             voice=voice,
             duration=duration,
@@ -1429,7 +1430,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_location(
+        return self.get_bot().send_location(
             chat_id=self.chat_id,
             latitude=latitude,
             longitude=longitude,
@@ -1484,7 +1485,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_venue(
+        return self.get_bot().send_venue(
             chat_id=self.chat_id,
             latitude=latitude,
             longitude=longitude,
@@ -1537,7 +1538,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_contact(
+        return self.get_bot().send_contact(
             chat_id=self.chat_id,
             phone_number=phone_number,
             first_name=first_name,
@@ -1593,7 +1594,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_poll(
+        return self.get_bot().send_poll(
             chat_id=self.chat_id,
             question=question,
             options=options,
@@ -1645,7 +1646,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_dice(
+        return self.get_bot().send_dice(
             chat_id=self.chat_id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -1675,7 +1676,7 @@ class Message(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.send_chat_action(
+        return self.get_bot().send_chat_action(
             chat_id=self.chat_id,
             action=action,
             timeout=timeout,
@@ -1713,7 +1714,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_game(
+        return self.get_bot().send_game(
             chat_id=self.chat_id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
@@ -1784,7 +1785,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.send_invoice(
+        return self.get_bot().send_invoice(
             chat_id=self.chat_id,
             title=title,
             description=description,
@@ -1846,7 +1847,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message forwarded.
 
         """
-        return self.bot.forward_message(
+        return self.get_bot().forward_message(
             chat_id=chat_id,
             from_chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1884,7 +1885,7 @@ class Message(TelegramObject):
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
         """
-        return self.bot.copy_message(
+        return self.get_bot().copy_message(
             chat_id=chat_id,
             from_chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1939,7 +1940,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.bot.copy_message(
+        return self.get_bot().copy_message(
             chat_id=self.chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
@@ -1984,7 +1985,7 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
 
         """
-        return self.bot.edit_message_text(
+        return self.get_bot().edit_message_text(
             chat_id=self.chat_id,
             message_id=self.message_id,
             text=text,
@@ -2026,7 +2027,7 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
 
         """
-        return self.bot.edit_message_caption(
+        return self.get_bot().edit_message_caption(
             chat_id=self.chat_id,
             message_id=self.message_id,
             caption=caption,
@@ -2065,7 +2066,7 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
 
         """
-        return self.bot.edit_message_media(
+        return self.get_bot().edit_message_media(
             media=media,
             chat_id=self.chat_id,
             message_id=self.message_id,
@@ -2100,7 +2101,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise ``True`` is returned.
         """
-        return self.bot.edit_message_reply_markup(
+        return self.get_bot().edit_message_reply_markup(
             chat_id=self.chat_id,
             message_id=self.message_id,
             reply_markup=reply_markup,
@@ -2140,7 +2141,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
         """
-        return self.bot.edit_message_live_location(
+        return self.get_bot().edit_message_live_location(
             chat_id=self.chat_id,
             message_id=self.message_id,
             latitude=latitude,
@@ -2180,7 +2181,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
         """
-        return self.bot.stop_message_live_location(
+        return self.get_bot().stop_message_live_location(
             chat_id=self.chat_id,
             message_id=self.message_id,
             reply_markup=reply_markup,
@@ -2216,7 +2217,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
         """
-        return self.bot.set_game_score(
+        return self.get_bot().set_game_score(
             chat_id=self.chat_id,
             message_id=self.message_id,
             user_id=user_id,
@@ -2252,7 +2253,7 @@ class Message(TelegramObject):
         Returns:
             List[:class:`telegram.GameHighScore`]
         """
-        return self.bot.get_game_high_scores(
+        return self.get_bot().get_game_high_scores(
             chat_id=self.chat_id,
             message_id=self.message_id,
             user_id=user_id,
@@ -2279,7 +2280,7 @@ class Message(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.delete_message(
+        return self.get_bot().delete_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
             timeout=timeout,
@@ -2306,7 +2307,7 @@ class Message(TelegramObject):
             returned.
 
         """
-        return self.bot.stop_poll(
+        return self.get_bot().stop_poll(
             chat_id=self.chat_id,
             message_id=self.message_id,
             reply_markup=reply_markup,
@@ -2333,7 +2334,7 @@ class Message(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.pin_chat_message(
+        return self.get_bot().pin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
             disable_notification=disable_notification,
@@ -2359,7 +2360,7 @@ class Message(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.unpin_chat_message(
+        return self.get_bot().unpin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
             timeout=timeout,

@@ -68,7 +68,6 @@ class PreCheckoutQuery(TelegramObject):
     """
 
     __slots__ = (
-        'bot',
         'invoice_payload',
         'shipping_option_id',
         'currency',
@@ -98,7 +97,7 @@ class PreCheckoutQuery(TelegramObject):
         self.shipping_option_id = shipping_option_id
         self.order_info = order_info
 
-        self.bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 
@@ -130,7 +129,7 @@ class PreCheckoutQuery(TelegramObject):
         :meth:`telegram.Bot.answer_pre_checkout_query`.
 
         """
-        return self.bot.answer_pre_checkout_query(
+        return self.get_bot().answer_pre_checkout_query(
             pre_checkout_query_id=self.id,
             ok=ok,
             error_message=error_message,

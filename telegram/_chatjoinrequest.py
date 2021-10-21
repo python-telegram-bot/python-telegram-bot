@@ -68,7 +68,6 @@ class ChatJoinRequest(TelegramObject):
         'date',
         'bio',
         'invite_link',
-        'bot',
     )
 
     def __init__(
@@ -90,7 +89,7 @@ class ChatJoinRequest(TelegramObject):
         self.bio = bio
         self.invite_link = invite_link
 
-        self.bot = bot
+        self.set_bot(bot)
         self._id_attrs = (self.chat, self.from_user, self.date)
 
     @classmethod
@@ -133,7 +132,7 @@ class ChatJoinRequest(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.approve_chat_join_request(
+        return self.get_bot().approve_chat_join_request(
             chat_id=self.chat.id, user_id=self.from_user.id, timeout=timeout, api_kwargs=api_kwargs
         )
 
@@ -154,6 +153,6 @@ class ChatJoinRequest(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.decline_chat_join_request(
+        return self.get_bot().decline_chat_join_request(
             chat_id=self.chat.id, user_id=self.from_user.id, timeout=timeout, api_kwargs=api_kwargs
         )

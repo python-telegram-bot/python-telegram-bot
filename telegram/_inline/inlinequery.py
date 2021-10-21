@@ -71,7 +71,7 @@ class InlineQuery(TelegramObject):
 
     """
 
-    __slots__ = ('bot', 'location', 'chat_type', 'id', 'offset', 'from_user', 'query')
+    __slots__ = ('location', 'chat_type', 'id', 'offset', 'from_user', 'query')
 
     def __init__(
         self,
@@ -94,7 +94,7 @@ class InlineQuery(TelegramObject):
         self.location = location
         self.chat_type = chat_type
 
-        self.bot = bot
+        self.set_bot(bot)
         self._id_attrs = (self.id,)
 
     @classmethod
@@ -150,7 +150,7 @@ class InlineQuery(TelegramObject):
         """
         if current_offset and auto_pagination:
             raise ValueError('current_offset and auto_pagination are mutually exclusive!')
-        return self.bot.answer_inline_query(
+        return self.get_bot().answer_inline_query(
             inline_query_id=self.id,
             current_offset=self.offset if auto_pagination else current_offset,
             results=results,

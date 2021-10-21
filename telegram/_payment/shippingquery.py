@@ -54,7 +54,7 @@ class ShippingQuery(TelegramObject):
 
     """
 
-    __slots__ = ('bot', 'invoice_payload', 'shipping_address', 'id', 'from_user')
+    __slots__ = ('invoice_payload', 'shipping_address', 'id', 'from_user')
 
     def __init__(
         self,
@@ -70,7 +70,7 @@ class ShippingQuery(TelegramObject):
         self.invoice_payload = invoice_payload
         self.shipping_address = shipping_address
 
-        self.bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 
@@ -103,7 +103,7 @@ class ShippingQuery(TelegramObject):
         :meth:`telegram.Bot.answer_shipping_query`.
 
         """
-        return self.bot.answer_shipping_query(
+        return self.get_bot().answer_shipping_query(
             shipping_query_id=self.id,
             ok=ok,
             shipping_options=shipping_options,
