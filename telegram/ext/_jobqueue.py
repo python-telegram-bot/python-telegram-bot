@@ -389,7 +389,7 @@ class JobQueue:
         context: object = None,
         name: str = None,
     ) -> 'Job':
-        """Creates a new custom defined ``Job``.
+        """Creates a new custom defined :class:`Job`.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
