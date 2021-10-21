@@ -105,7 +105,6 @@ class User(TelegramObject):
         'can_join_groups',
         'supports_inline_queries',
         'id',
-        'bot',
         'language_code',
     )
 
@@ -134,7 +133,7 @@ class User(TelegramObject):
         self.can_join_groups = can_join_groups
         self.can_read_all_group_messages = can_read_all_group_messages
         self.supports_inline_queries = supports_inline_queries
-        self.bot = bot
+        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 
@@ -181,7 +180,7 @@ class User(TelegramObject):
         :meth:`telegram.Bot.get_user_profile_photos`.
 
         """
-        return self.bot.get_user_profile_photos(
+        return self.get_bot().get_user_profile_photos(
             user_id=self.id,
             offset=offset,
             limit=limit,
@@ -268,7 +267,7 @@ class User(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.pin_chat_message(
+        return self.get_bot().pin_chat_message(
             chat_id=self.id,
             message_id=message_id,
             disable_notification=disable_notification,
@@ -294,7 +293,7 @@ class User(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.unpin_chat_message(
+        return self.get_bot().unpin_chat_message(
             chat_id=self.id,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -319,7 +318,7 @@ class User(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.unpin_all_chat_messages(
+        return self.get_bot().unpin_all_chat_messages(
             chat_id=self.id,
             timeout=timeout,
             api_kwargs=api_kwargs,
@@ -349,7 +348,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_message(
+        return self.get_bot().send_message(
             chat_id=self.id,
             text=text,
             parse_mode=parse_mode,
@@ -389,7 +388,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_photo(
+        return self.get_bot().send_photo(
             chat_id=self.id,
             photo=photo,
             caption=caption,
@@ -427,7 +426,7 @@ class User(TelegramObject):
             List[:class:`telegram.Message`:] On success, instance representing the message posted.
 
         """
-        return self.bot.send_media_group(
+        return self.get_bot().send_media_group(
             chat_id=self.id,
             media=media,
             disable_notification=disable_notification,
@@ -467,7 +466,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_audio(
+        return self.get_bot().send_audio(
             chat_id=self.id,
             audio=audio,
             duration=duration,
@@ -503,7 +502,7 @@ class User(TelegramObject):
             :obj:`True`: On success.
 
         """
-        return self.bot.send_chat_action(
+        return self.get_bot().send_chat_action(
             chat_id=self.id,
             action=action,
             timeout=timeout,
@@ -538,7 +537,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_contact(
+        return self.get_bot().send_contact(
             chat_id=self.id,
             phone_number=phone_number,
             first_name=first_name,
@@ -575,7 +574,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_dice(
+        return self.get_bot().send_dice(
             chat_id=self.id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
@@ -614,7 +613,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_document(
+        return self.get_bot().send_document(
             chat_id=self.id,
             document=document,
             filename=filename,
@@ -653,7 +652,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_game(
+        return self.get_bot().send_game(
             chat_id=self.id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
@@ -714,7 +713,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_invoice(
+        return self.get_bot().send_invoice(
             chat_id=self.id,
             title=title,
             description=description,
@@ -773,7 +772,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_location(
+        return self.get_bot().send_location(
             chat_id=self.id,
             latitude=latitude,
             longitude=longitude,
@@ -820,7 +819,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_animation(
+        return self.get_bot().send_animation(
             chat_id=self.id,
             animation=animation,
             duration=duration,
@@ -861,7 +860,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_sticker(
+        return self.get_bot().send_sticker(
             chat_id=self.id,
             sticker=sticker,
             disable_notification=disable_notification,
@@ -903,7 +902,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video(
+        return self.get_bot().send_video(
             chat_id=self.id,
             video=video,
             duration=duration,
@@ -953,7 +952,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_venue(
+        return self.get_bot().send_venue(
             chat_id=self.id,
             latitude=latitude,
             longitude=longitude,
@@ -998,7 +997,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_video_note(
+        return self.get_bot().send_video_note(
             chat_id=self.id,
             video_note=video_note,
             duration=duration,
@@ -1040,7 +1039,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_voice(
+        return self.get_bot().send_voice(
             chat_id=self.id,
             voice=voice,
             duration=duration,
@@ -1090,7 +1089,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.send_poll(
+        return self.get_bot().send_poll(
             chat_id=self.id,
             question=question,
             options=options,
@@ -1138,7 +1137,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.copy_message(
+        return self.get_bot().copy_message(
             chat_id=self.id,
             from_chat_id=from_chat_id,
             message_id=message_id,
@@ -1179,7 +1178,7 @@ class User(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.bot.copy_message(
+        return self.get_bot().copy_message(
             from_chat_id=self.id,
             chat_id=chat_id,
             message_id=message_id,
@@ -1214,7 +1213,7 @@ class User(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.approve_chat_join_request(
+        return self.get_bot().approve_chat_join_request(
             user_id=self.id, chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs
         )
 
@@ -1237,6 +1236,6 @@ class User(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.bot.decline_chat_join_request(
+        return self.get_bot().decline_chat_join_request(
             user_id=self.id, chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs
         )

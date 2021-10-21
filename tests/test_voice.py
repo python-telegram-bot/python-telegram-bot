@@ -288,10 +288,10 @@ class TestVoice:
             return kwargs['file_id'] == voice.file_id
 
         assert check_shortcut_signature(Voice.get_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(voice.get_file, voice.bot, 'get_file')
-        assert check_defaults_handling(voice.get_file, voice.bot)
+        assert check_shortcut_call(voice.get_file, voice.get_bot(), 'get_file')
+        assert check_defaults_handling(voice.get_file, voice.get_bot())
 
-        monkeypatch.setattr(voice.bot, 'get_file', make_assertion)
+        monkeypatch.setattr(voice.get_bot(), 'get_file', make_assertion)
         assert voice.get_file()
 
     def test_equality(self, voice):

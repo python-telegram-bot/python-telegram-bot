@@ -114,5 +114,6 @@ The following wonderful people contributed directly or indirectly to this projec
 - `wjt <https://github.com/wjt>`_
 - `zeroone2numeral2 <https://github.com/zeroone2numeral2>`_
 - `zeshuaro <https://github.com/zeshuaro>`_
+- `zpavloudis <https://github.com/zpavloudis>`_
 
 Please add yourself here alphabetically when you submit your first pull request.
