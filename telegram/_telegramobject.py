@@ -41,9 +41,13 @@ class TelegramObject:
     # https://www.python.org/dev/peps/pep-0526/#class-and-instance-variable-annotations
     if TYPE_CHECKING:
         _id_attrs: Tuple[object, ...]
+        _bot: Optional['Bot']
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
-    __slots__ = ('_id_attrs',)
+    __slots__ = (
+        '_id_attrs',
+        '_bot',
+    )
 
     # pylint: disable=unused-argument
     def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':
@@ -51,6 +55,7 @@ class TelegramObject:
         # w/o calling __init__ in all of the subclasses. This is what we also do in BaseFilter.
         instance = super().__new__(cls)
         instance._id_attrs = ()
+        instance._bot = None
         return instance
 
     def __str__(self) -> str:
@@ -136,6 +141,35 @@ class TelegramObject:
         if data.get('from_user'):
             data['from'] = data.pop('from_user', None)
         return data
+
+    def get_bot(self) -> 'Bot':
+        """Returns the :class:`telegram.Bot` instance associated with this object.
+
+        .. seealso:: :meth: `set_bot`
+
+        .. versionadded: 14.0
+
+        Raises:
+            RuntimeError: If no :class:`telegram.Bot` instance was set for this object.
+        """
+        if self._bot is None:
+            raise RuntimeError(
+                'This object has no bot associated with it. \
+                Shortcuts cannot be used.'
+            )
+        return self._bot
+
+    def set_bot(self, bot: Optional['Bot']) -> None:
+        """Sets the :class:`telegram.Bot` instance associated with this object.
+
+        .. seealso:: :meth: `get_bot`
+
+        .. versionadded: 14.0
+
+        Arguments:
+            bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.
+        """
+        self._bot = bot
 
     def __eq__(self, other: object) -> bool:
         # pylint: disable=no-member

@@ -238,10 +238,10 @@ class TestVideoNote:
             return kwargs['file_id'] == video_note.file_id
 
         assert check_shortcut_signature(VideoNote.get_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(video_note.get_file, video_note.bot, 'get_file')
-        assert check_defaults_handling(video_note.get_file, video_note.bot)
+        assert check_shortcut_call(video_note.get_file, video_note.get_bot(), 'get_file')
+        assert check_defaults_handling(video_note.get_file, video_note.get_bot())
 
-        monkeypatch.setattr(video_note.bot, 'get_file', make_assertion)
+        monkeypatch.setattr(video_note.get_bot(), 'get_file', make_assertion)
         assert video_note.get_file()
 
     def test_equality(self, video_note):

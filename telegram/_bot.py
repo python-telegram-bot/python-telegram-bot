@@ -151,7 +151,7 @@ class Bot(TelegramObject):
         'base_url',
         'base_file_url',
         'private_key',
-        '_bot',
+        '_bot_user',
         '_request',
         'logger',
     )
@@ -169,7 +169,7 @@ class Bot(TelegramObject):
 
         self.base_url = base_url + self.token
         self.base_file_url = base_file_url + self.token
-        self._bot: Optional[User] = None
+        self._bot_user: Optional[User] = None
         self._request = request or Request()
         self.private_key = None
         self.logger = logging.getLogger(__name__)
@@ -326,9 +326,9 @@ class Bot(TelegramObject):
     @property
     def bot(self) -> User:
         """:class:`telegram.User`: User instance for the bot as returned by :meth:`get_me`."""
-        if self._bot is None:
-            self._bot = self.get_me()
-        return self._bot
+        if self._bot_user is None:
+            self._bot_user = self.get_me()
+        return self._bot_user
 
     @property
     def id(self) -> int:  # pylint: disable=invalid-name
@@ -396,9 +396,9 @@ class Bot(TelegramObject):
         """
         result = self._post('getMe', timeout=timeout, api_kwargs=api_kwargs)
 
-        self._bot = User.de_json(result, self)  # type: ignore[return-value, arg-type]
+        self._bot_user = User.de_json(result, self)  # type: ignore[return-value, arg-type]
 
-        return self._bot  # type: ignore[return-value]
+        return self._bot_user  # type: ignore[return-value]
 
     @_log
     def send_message(

@@ -126,7 +126,6 @@ class EncryptedPassportElement(TelegramObject):
         'email',
         'hash',
         'phone_number',
-        'bot',
         'reverse_side',
         'front_side',
         'data',
@@ -172,7 +171,7 @@ class EncryptedPassportElement(TelegramObject):
             self.selfie,
         )
 
-        self.bot = bot
+        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['EncryptedPassportElement']:

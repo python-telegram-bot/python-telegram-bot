@@ -69,7 +69,6 @@ class File(TelegramObject):
     """
 
     __slots__ = (
-        'bot',
         'file_id',
         'file_size',
         'file_unique_id',
@@ -92,7 +91,7 @@ class File(TelegramObject):
         # Optionals
         self.file_size = file_size
         self.file_path = file_path
-        self.bot = bot
+        self.set_bot(bot)
         self._credentials: Optional['FileCredentials'] = None
 
         self._id_attrs = (self.file_unique_id,)
@@ -147,7 +146,7 @@ class File(TelegramObject):
             if local_file:
                 buf = path.read_bytes()
             else:
-                buf = self.bot.request.retrieve(url)
+                buf = self.get_bot().request.retrieve(url)
                 if self._credentials:
                     buf = decrypt(
                         b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
@@ -168,7 +167,7 @@ class File(TelegramObject):
         else:
             filename = Path.cwd() / self.file_id
 
-        buf = self.bot.request.retrieve(url, timeout=timeout)
+        buf = self.get_bot().request.retrieve(url, timeout=timeout)
         if self._credentials:
             buf = decrypt(
                 b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
@@ -201,7 +200,7 @@ class File(TelegramObject):
         if is_local_file(self.file_path):
             buf.extend(Path(self.file_path).read_bytes())
         else:
-            buf.extend(self.bot.request.retrieve(self._get_encoded_url()))
+            buf.extend(self.get_bot().request.retrieve(self._get_encoded_url()))
         return buf
 
     def set_credentials(self, credentials: 'FileCredentials') -> None:

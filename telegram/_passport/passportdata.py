@@ -51,7 +51,7 @@ class PassportData(TelegramObject):
 
     """
 
-    __slots__ = ('bot', 'credentials', 'data', '_decrypted_data')
+    __slots__ = ('credentials', 'data', '_decrypted_data')
 
     def __init__(
         self,
@@ -63,7 +63,7 @@ class PassportData(TelegramObject):
         self.data = data
         self.credentials = credentials
 
-        self.bot = bot
+        self.set_bot(bot)
         self._decrypted_data: Optional[List[EncryptedPassportElement]] = None
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
@@ -101,7 +101,7 @@ class PassportData(TelegramObject):
         if self._decrypted_data is None:
             self._decrypted_data = [
                 EncryptedPassportElement.de_json_decrypted(
-                    element.to_dict(), self.bot, self.decrypted_credentials
+                    element.to_dict(), self.get_bot(), self.decrypted_credentials
                 )
                 for element in self.data
             ]

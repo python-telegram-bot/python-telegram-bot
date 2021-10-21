@@ -58,7 +58,7 @@ class TestShippingQuery:
         assert shipping_query.invoice_payload == self.invoice_payload
         assert shipping_query.from_user == self.from_user
         assert shipping_query.shipping_address == self.shipping_address
-        assert shipping_query.bot is bot
+        assert shipping_query.get_bot() is bot
 
     def test_to_dict(self, shipping_query):
         shipping_query_dict = shipping_query.to_dict()
@@ -77,11 +77,11 @@ class TestShippingQuery:
             ShippingQuery.answer, Bot.answer_shipping_query, ['shipping_query_id'], []
         )
         assert check_shortcut_call(
-            shipping_query.answer, shipping_query.bot, 'answer_shipping_query'
+            shipping_query.answer, shipping_query._bot, 'answer_shipping_query'
         )
-        assert check_defaults_handling(shipping_query.answer, shipping_query.bot)
+        assert check_defaults_handling(shipping_query.answer, shipping_query._bot)
 
-        monkeypatch.setattr(shipping_query.bot, 'answer_shipping_query', make_assertion)
+        monkeypatch.setattr(shipping_query._bot, 'answer_shipping_query', make_assertion)
         assert shipping_query.answer(ok=True)
 
     def test_equality(self):

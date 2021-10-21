@@ -130,11 +130,13 @@ class TestChatJoinRequest:
             ChatJoinRequest.approve, Bot.approve_chat_join_request, ['chat_id', 'user_id'], []
         )
         assert check_shortcut_call(
-            chat_join_request.approve, chat_join_request.bot, 'approve_chat_join_request'
+            chat_join_request.approve, chat_join_request.get_bot(), 'approve_chat_join_request'
         )
-        assert check_defaults_handling(chat_join_request.approve, chat_join_request.bot)
+        assert check_defaults_handling(chat_join_request.approve, chat_join_request.get_bot())
 
-        monkeypatch.setattr(chat_join_request.bot, 'approve_chat_join_request', make_assertion)
+        monkeypatch.setattr(
+            chat_join_request.get_bot(), 'approve_chat_join_request', make_assertion
+        )
         assert chat_join_request.approve()
 
     def test_decline(self, monkeypatch, chat_join_request):
@@ -148,9 +150,11 @@ class TestChatJoinRequest:
             ChatJoinRequest.decline, Bot.decline_chat_join_request, ['chat_id', 'user_id'], []
         )
         assert check_shortcut_call(
-            chat_join_request.decline, chat_join_request.bot, 'decline_chat_join_request'
+            chat_join_request.decline, chat_join_request.get_bot(), 'decline_chat_join_request'
         )
-        assert check_defaults_handling(chat_join_request.decline, chat_join_request.bot)
+        assert check_defaults_handling(chat_join_request.decline, chat_join_request.get_bot())
 
-        monkeypatch.setattr(chat_join_request.bot, 'decline_chat_join_request', make_assertion)
+        monkeypatch.setattr(
+            chat_join_request.get_bot(), 'decline_chat_join_request', make_assertion
+        )
         assert chat_join_request.decline()
