@@ -136,7 +136,6 @@ class EncryptedCredentials(TelegramObject):
     __slots__ = (
         'hash',
         'secret',
-        'bot',
         'data',
         '_decrypted_secret',
         '_decrypted_data',
@@ -150,7 +149,7 @@ class EncryptedCredentials(TelegramObject):
 
         self._id_attrs = (self.data, self.hash, self.secret)
 
-        self.bot = bot
+        self.set_bot(bot)
         self._decrypted_secret = None
         self._decrypted_data: Optional['Credentials'] = None
 
@@ -176,7 +175,7 @@ class EncryptedCredentials(TelegramObject):
             # is the default for OAEP, the algorithm is the default for PHP which is what
             # Telegram's backend servers run.
             try:
-                self._decrypted_secret = self.bot.private_key.decrypt(
+                self._decrypted_secret = self.get_bot().private_key.decrypt(
                     b64decode(self.secret),
                     OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),  # skipcq
                 )
@@ -199,7 +198,7 @@ class EncryptedCredentials(TelegramObject):
         if self._decrypted_data is None:
             self._decrypted_data = Credentials.de_json(
                 decrypt_json(self.decrypted_secret, b64decode(self.hash), b64decode(self.data)),
-                self.bot,
+                self.get_bot(),
             )
         return self._decrypted_data
 
