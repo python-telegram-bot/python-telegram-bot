@@ -38,8 +38,16 @@ needs_sphinx = '4.2.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'sphinx.ext.intersphinx'
 ]
+
+# Use intersphinx to reference the python builtin library docs
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'APScheduler': ('https://apscheduler.readthedocs.io/en/3.x/', None)
+}
+
 # Don't show type hints in the signature - that just makes it hardly readable
 # and we document the types anyway
 autodoc_typehints = 'none'
