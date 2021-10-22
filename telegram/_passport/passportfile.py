@@ -42,7 +42,7 @@ class PassportFile(TelegramObject):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`int`): File size.
+        file_size (:obj:`int`): File size in bytes.
         file_date (:obj:`int`): Unix time when the file was uploaded.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -52,7 +52,7 @@ class PassportFile(TelegramObject):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`int`): File size.
+        file_size (:obj:`int`): File size in bytes.
         file_date (:obj:`int`): Unix time when the file was uploaded.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
