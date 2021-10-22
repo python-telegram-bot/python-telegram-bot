@@ -38,7 +38,7 @@ class ChatMemberUpdated(TelegramObject):
     .. versionadded:: 13.4
 
     Note:
-        In Python ``from`` is a reserved word, use ``from_user`` instead.
+        In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
 
     Args:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
