@@ -110,6 +110,10 @@ class DictBot(Bot):
     pass
 
 
+class DictDispatcher(Dispatcher):
+    pass
+
+
 @pytest.fixture(scope='session')
 def bot(bot_info):
     return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest(8))
@@ -170,7 +174,7 @@ def provider_token(bot_info):
 def create_dp(bot):
     # Dispatcher is heavy to init (due to many threads and such) so we have a single session
     # scoped one here, but before each test, reset it (dp fixture below)
-    dispatcher = DispatcherBuilder().bot(bot).workers(2).build()
+    dispatcher = DispatcherBuilder().bot(bot).workers(2).dispatcher_class(DictDispatcher).build()
     thr = Thread(target=dispatcher.start)
     thr.start()
     sleep(2)
@@ -199,16 +203,11 @@ def dp(_dp):
     _dp.groups = []
     _dp.error_handlers = {}
     _dp.exception_event = Event()
-    # For some reason if we setattr with the name mangled, then some tests(like async) run forever,
-    # due to threads not acquiring, (blocking). This adds these attributes to the __dict__.
-    object.__setattr__(_dp, '__stop_event', Event())
-    object.__setattr__(_dp, '__async_queue', Queue())
-    object.__setattr__(_dp, '__async_threads', set())
+    _dp.__stop_event = Event()
+    _dp.__async_queue = Queue()
+    _dp.__async_threads = set()
     _dp.persistence = None
-    if _dp._Dispatcher__singleton_semaphore.acquire(blocking=0):
-        Dispatcher._set_singleton(_dp)
     yield _dp
-    Dispatcher._Dispatcher__singleton_semaphore.release()
 
 
 @pytest.fixture(scope='function')
