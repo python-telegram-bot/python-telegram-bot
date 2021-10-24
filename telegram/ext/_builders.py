@@ -823,7 +823,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     Example:
         .. code:: python
 
-            dispatcher = UpdaterBuilder().token('TOKEN').build()
+            updater = UpdaterBuilder().token('TOKEN').build()
 
     Please see the description of the individual methods for information on which arguments can be
     set and what the defaults are when not called. When no default is mentioned, the argument will
