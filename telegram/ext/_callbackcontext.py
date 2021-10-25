@@ -24,7 +24,6 @@ from typing import (
     Dict,
     List,
     Match,
-    NoReturn,
     Optional,
     Tuple,
     Union,
@@ -153,12 +152,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         """
         return self.dispatcher.bot_data
 
-    @bot_data.setter
-    def bot_data(self, value: object) -> NoReturn:
-        raise AttributeError(
-            "You can not assign a new value to bot_data, see https://git.io/Jt6ic"
-        )
-
     @property
     def chat_data(self) -> Optional[CD]:
         """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
@@ -174,12 +167,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             return self._chat_id_and_data[1]
         return None
 
-    @chat_data.setter
-    def chat_data(self, value: object) -> NoReturn:
-        raise AttributeError(
-            "You can not assign a new value to chat_data, see https://git.io/Jt6ic"
-        )
-
     @property
     def user_data(self) -> Optional[UD]:
         """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
@@ -188,12 +175,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         if self._user_id_and_data:
             return self._user_id_and_data[1]
         return None
-
-    @user_data.setter
-    def user_data(self, value: object) -> NoReturn:
-        raise AttributeError(
-            "You can not assign a new value to user_data, see https://git.io/Jt6ic"
-        )
 
     def refresh_data(self) -> None:
         """If :attr:`dispatcher` uses persistence, calls

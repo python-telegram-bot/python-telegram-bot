@@ -27,7 +27,6 @@ from typing import (  # pylint: disable=unused-import  # for the "Any" import
     TYPE_CHECKING,
     Dict,
     List,
-    NoReturn,
     Optional,
     Union,
     Tuple,
@@ -335,10 +334,6 @@ class ConversationHandler(Handler[Update, CCT]):
         """
         return self._entry_points
 
-    @entry_points.setter
-    def entry_points(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to entry_points after initialization.')
-
     @property
     def states(self) -> Dict[object, List[Handler]]:
         """Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]: A :obj:`dict` that
@@ -346,10 +341,6 @@ class ConversationHandler(Handler[Update, CCT]):
         associated ``Handler`` objects that should be used in that state.
         """
         return self._states
-
-    @states.setter
-    def states(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to states after initialization.')
 
     @property
     def fallbacks(self) -> List[Handler]:
@@ -359,45 +350,25 @@ class ConversationHandler(Handler[Update, CCT]):
         """
         return self._fallbacks
 
-    @fallbacks.setter
-    def fallbacks(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to fallbacks after initialization.')
-
     @property
     def allow_reentry(self) -> bool:
         """:obj:`bool`: Determines if a user can restart a conversation with an entry point."""
         return self._allow_reentry
-
-    @allow_reentry.setter
-    def allow_reentry(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to allow_reentry after initialization.')
 
     @property
     def per_user(self) -> bool:
         """:obj:`bool`: If the conversation key should contain the User's ID."""
         return self._per_user
 
-    @per_user.setter
-    def per_user(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to per_user after initialization.')
-
     @property
     def per_chat(self) -> bool:
         """:obj:`bool`: If the conversation key should contain the Chat's ID."""
         return self._per_chat
 
-    @per_chat.setter
-    def per_chat(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to per_chat after initialization.')
-
     @property
     def per_message(self) -> bool:
         """:obj:`bool`: If the conversation key should contain the message's ID."""
         return self._per_message
-
-    @per_message.setter
-    def per_message(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to per_message after initialization.')
 
     @property
     def conversation_timeout(
@@ -409,20 +380,10 @@ class ConversationHandler(Handler[Update, CCT]):
         """
         return self._conversation_timeout
 
-    @conversation_timeout.setter
-    def conversation_timeout(self, value: object) -> NoReturn:
-        raise ValueError(
-            'You can not assign a new value to conversation_timeout after initialization.'
-        )
-
     @property
     def name(self) -> Optional[str]:
         """:obj:`str`: Optional. The name for this :class:`ConversationHandler`."""
         return self._name
-
-    @name.setter
-    def name(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to name after initialization.')
 
     @property
     def map_to_parent(self) -> Optional[Dict[object, object]]:
@@ -431,10 +392,6 @@ class ConversationHandler(Handler[Update, CCT]):
         its parent :class:`ConversationHandler` in place of a specified nested state.
         """
         return self._map_to_parent
-
-    @map_to_parent.setter
-    def map_to_parent(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to map_to_parent after initialization.')
 
     @property
     def persistence(self) -> Optional[BasePersistence]:
