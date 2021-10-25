@@ -155,20 +155,6 @@ class TestCallbackContext:
 
         assert callback_context.match == 'test'
 
-    def test_data_assignment(self, dp):
-        update = Update(
-            0, message=Message(0, None, Chat(1, 'chat'), from_user=User(1, 'user', False))
-        )
-
-        callback_context = CallbackContext.from_update(update, dp)
-
-        with pytest.raises(AttributeError):
-            callback_context.bot_data = {"test": 123}
-        with pytest.raises(AttributeError):
-            callback_context.user_data = {}
-        with pytest.raises(AttributeError):
-            callback_context.chat_data = "test"
-
     def test_dispatcher_attribute(self, dp):
         callback_context = CallbackContext(dp)
         assert callback_context.dispatcher == dp
