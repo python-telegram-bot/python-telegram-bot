@@ -119,10 +119,7 @@ class Defaults:
 
     @parse_mode.setter
     def parse_mode(self, value: object) -> NoReturn:
-        raise AttributeError(
-            "You can not assign a new value to defaults after because it would "
-            "not have any effect."
-        )
+        raise AttributeError("You can not assign a new value to parse_mode after initialization.")
 
     @property
     def explanation_parse_mode(self) -> Optional[str]:
@@ -134,8 +131,7 @@ class Defaults:
     @explanation_parse_mode.setter
     def explanation_parse_mode(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to defaults after because it would "
-            "not have any effect."
+            "You can not assign a new value to explanation_parse_mode after initialization."
         )
 
     @property
@@ -148,8 +144,7 @@ class Defaults:
     @disable_notification.setter
     def disable_notification(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to defaults after because it would "
-            "not have any effect."
+            "You can not assign a new value to disable_notification after initialization."
         )
 
     @property
@@ -162,8 +157,7 @@ class Defaults:
     @disable_web_page_preview.setter
     def disable_web_page_preview(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to defaults after because it would "
-            "not have any effect."
+            "You can not assign a new value to disable_web_page_preview after initialization."
         )
 
     @property
@@ -176,8 +170,7 @@ class Defaults:
     @allow_sending_without_reply.setter
     def allow_sending_without_reply(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to defaults after because it would "
-            "not have any effect."
+            "You can not assign a new value to allow_sending_without_reply after initialization."
         )
 
     @property
@@ -190,10 +183,7 @@ class Defaults:
 
     @timeout.setter
     def timeout(self, value: object) -> NoReturn:
-        raise AttributeError(
-            "You can not assign a new value to defaults after because it would "
-            "not have any effect."
-        )
+        raise AttributeError("You can not assign a new value to timeout after initialization.")
 
     @property
     def quote(self) -> Optional[bool]:
@@ -205,10 +195,7 @@ class Defaults:
 
     @quote.setter
     def quote(self, value: object) -> NoReturn:
-        raise AttributeError(
-            "You can not assign a new value to defaults after because it would "
-            "not have any effect."
-        )
+        raise AttributeError("You can not assign a new value to quote after initialization.")
 
     @property
     def tzinfo(self) -> pytz.BaseTzInfo:
@@ -219,10 +206,7 @@ class Defaults:
 
     @tzinfo.setter
     def tzinfo(self, value: object) -> NoReturn:
-        raise AttributeError(
-            "You can not assign a new value to defaults after because it would "
-            "not have any effect."
-        )
+        raise AttributeError("You can not assign a new value to tzinfo after initialization.")
 
     @property
     def run_async(self) -> bool:
@@ -234,10 +218,7 @@ class Defaults:
 
     @run_async.setter
     def run_async(self, value: object) -> NoReturn:
-        raise AttributeError(
-            "You can not assign a new value to defaults after because it would "
-            "not have any effect."
-        )
+        raise AttributeError("You can not assign a new value to run_async after initialization.")
 
     def __hash__(self) -> int:
         return hash(
