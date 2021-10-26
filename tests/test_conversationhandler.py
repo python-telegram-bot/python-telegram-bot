@@ -282,7 +282,7 @@ class TestConversationHandler:
             assert list(value.keys())[0] == attr
         else:
             assert getattr(ch, attr) == attr
-        with pytest.raises(ValueError, match=f'You can not assign a new value to {attr}'):
+        with pytest.raises(AttributeError, match=f'You can not assign a new value to {attr}'):
             setattr(ch, attr, True)
 
     def test_immutable_per_message(self):
@@ -299,7 +299,7 @@ class TestConversationHandler:
             map_to_parent='map_to_parent',
         )
         assert ch.per_message is False
-        with pytest.raises(ValueError, match='You can not assign a new value to per_message'):
+        with pytest.raises(AttributeError, match='You can not assign a new value to per_message'):
             ch.per_message = True
 
     def test_per_all_false(self):
