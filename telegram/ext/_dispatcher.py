@@ -157,7 +157,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         '__async_queue',
         '__async_threads',
         'bot',
-        '__dict__',
         '__weakref__',
         'context_types',
     )

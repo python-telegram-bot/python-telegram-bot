@@ -101,11 +101,12 @@ class TestDispatcher:
         ):
             self.received = context.error.message
 
-    def test_slot_behaviour(self, dp2, mro_slots):
-        for at in dp2.__slots__:
+    def test_slot_behaviour(self, bot, mro_slots):
+        dp = DispatcherBuilder().bot(bot).build()
+        for at in dp.__slots__:
             at = f"_Dispatcher{at}" if at.startswith('__') and not at.endswith('__') else at
-            assert getattr(dp2, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert len(mro_slots(dp2)) == len(set(mro_slots(dp2))), "duplicate slot"
+            assert getattr(dp, at, 'err') != 'err', f"got extra slot '{at}'"
+        assert len(mro_slots(dp)) == len(set(mro_slots(dp))), "duplicate slot"
 
     def test_manual_init_warning(self, recwarn):
         Dispatcher(

@@ -337,7 +337,9 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @entry_points.setter
     def entry_points(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to entry_points after initialization.')
+        raise AttributeError(
+            "You can not assign a new value to entry_points after initialization."
+        )
 
     @property
     def states(self) -> Dict[object, List[Handler]]:
@@ -349,7 +351,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @states.setter
     def states(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to states after initialization.')
+        raise AttributeError("You can not assign a new value to states after initialization.")
 
     @property
     def fallbacks(self) -> List[Handler]:
@@ -361,7 +363,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @fallbacks.setter
     def fallbacks(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to fallbacks after initialization.')
+        raise AttributeError("You can not assign a new value to fallbacks after initialization.")
 
     @property
     def allow_reentry(self) -> bool:
@@ -370,7 +372,9 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @allow_reentry.setter
     def allow_reentry(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to allow_reentry after initialization.')
+        raise AttributeError(
+            "You can not assign a new value to allow_reentry after initialization."
+        )
 
     @property
     def per_user(self) -> bool:
@@ -379,7 +383,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @per_user.setter
     def per_user(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to per_user after initialization.')
+        raise AttributeError("You can not assign a new value to per_user after initialization.")
 
     @property
     def per_chat(self) -> bool:
@@ -388,7 +392,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @per_chat.setter
     def per_chat(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to per_chat after initialization.')
+        raise AttributeError("You can not assign a new value to per_chat after initialization.")
 
     @property
     def per_message(self) -> bool:
@@ -397,7 +401,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @per_message.setter
     def per_message(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to per_message after initialization.')
+        raise AttributeError("You can not assign a new value to per_message after initialization.")
 
     @property
     def conversation_timeout(
@@ -411,8 +415,8 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @conversation_timeout.setter
     def conversation_timeout(self, value: object) -> NoReturn:
-        raise ValueError(
-            'You can not assign a new value to conversation_timeout after initialization.'
+        raise AttributeError(
+            "You can not assign a new value to conversation_timeout after initialization."
         )
 
     @property
@@ -422,7 +426,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @name.setter
     def name(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to name after initialization.')
+        raise AttributeError("You can not assign a new value to name after initialization.")
 
     @property
     def map_to_parent(self) -> Optional[Dict[object, object]]:
@@ -434,7 +438,9 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @map_to_parent.setter
     def map_to_parent(self, value: object) -> NoReturn:
-        raise ValueError('You can not assign a new value to map_to_parent after initialization.')
+        raise AttributeError(
+            "You can not assign a new value to map_to_parent after initialization."
+        )
 
     @property
     def persistence(self) -> Optional[BasePersistence]:
