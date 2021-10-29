@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import logging
 from time import sleep
+from warnings import filterwarnings
 
 import pytest
 from flaky import flaky
@@ -45,7 +46,15 @@ from telegram.ext import (
     DispatcherHandlerStop,
     TypeHandler,
     JobQueue,
+    StringCommandHandler,
+    StringRegexHandler,
+    PollHandler,
+    ShippingQueryHandler,
+    ChosenInlineResultHandler,
+    PreCheckoutQueryHandler,
+    PollAnswerHandler,
 )
+from telegram.warnings import PTBUserWarning
 
 
 @pytest.fixture(scope='class')
@@ -1325,57 +1334,96 @@ class TestConversationHandler:
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
 
-    def test_conversation_timeout_warning_only_shown_once(self, recwarn):
-        ConversationHandler(
-            entry_points=self.entry_points,
-            states={
-                self.THIRSTY: [
-                    ConversationHandler(
-                        entry_points=self.entry_points,
-                        states={
-                            self.BREWING: [CommandHandler('pourCoffee', self.drink)],
-                        },
-                        fallbacks=self.fallbacks,
-                    )
-                ],
-                self.DRINKING: [
-                    ConversationHandler(
-                        entry_points=self.entry_points,
-                        states={
-                            self.CODING: [CommandHandler('startCoding', self.code)],
-                        },
-                        fallbacks=self.fallbacks,
-                    )
-                ],
-            },
-            fallbacks=self.fallbacks,
-            conversation_timeout=100,
-        )
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == (
-            "Using `conversation_timeout` with nested conversations is currently not "
-            "supported. You can still try to use it, but it will likely behave "
-            "differently from what you expect."
-        )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
+    @pytest.mark.dev
+    def test_handlers_generate_warning(self, recwarn):
+        # this function tests all handler + per_* setting combinations.
 
-    def test_per_message_warning_is_only_shown_once(self, recwarn):
+        # the warning message action needs to be set to always,
+        # otherwise only the first occurrence will be issued
+        filterwarnings(action="always", category=PTBUserWarning)
+
+        # this conversation handler has the string, string_regex, and Pollhandler which should all
+        # generate a warning no matter the per_* setting.
         ConversationHandler(
-            entry_points=self.entry_points,
+            entry_points=[StringCommandHandler("code", self.code)],
             states={
-                self.THIRSTY: [CommandHandler('pourCoffee', self.drink)],
-                self.BREWING: [CommandHandler('startCoding', self.code)],
+                self.BREWING: [StringRegexHandler("code", self.code), PollHandler(self.code)],
             },
-            fallbacks=self.fallbacks,
+            fallbacks=[],
+        )
+
+        # these handlers should all raise a warning when per_chat is True
+        ConversationHandler(
+            entry_points=[ShippingQueryHandler(self.code)],
+            states={
+                self.BREWING: [
+                    InlineQueryHandler(self.code),
+                    PreCheckoutQueryHandler(self.code),
+                    PollAnswerHandler(self.code),
+                ],
+            },
+            fallbacks=[ChosenInlineResultHandler(self.code)],
+            per_chat=True,
+        )
+
+        # the CallbackQueryHandler should *not* raise when per_message is True,
+        # but any other one should
+        ConversationHandler(
+            entry_points=[CallbackQueryHandler(self.code)],
+            states={
+                self.BREWING: [CommandHandler("code", self.code)],
+            },
+            fallbacks=[CallbackQueryHandler(self.code)],
             per_message=True,
         )
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == (
-            "If 'per_message=True', all entry points, state handlers, and fallbacks"
-            " must be 'CallbackQueryHandler', since no other handlers"
-            " have a message context."
+
+        # the CallbackQueryHandler should raise when per_message is False
+        ConversationHandler(
+            entry_points=[CommandHandler("code", self.code)],
+            states={
+                self.BREWING: [CommandHandler("code", self.code)],
+            },
+            fallbacks=[CallbackQueryHandler(self.code)],
+            per_message=False,
         )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
+
+        # the overall handlers raising an error is 10
+        assert len(recwarn) == 10
+        # now we test the messages, they are raised in the order they are inserted
+        # into the conversation handler
+        assert str(recwarn[0].message) and str(recwarn[1].message) == (
+            "The ConversationHandler does not work with non Telegram.Update type updates, "
+            "and you shouldn't use this handler for Telegram Update types."
+        )
+        assert str(recwarn[2].message) == (
+            "PollHandler will never trigger in a conversation since it has no information "
+            "about the chat or the user who voted in it. Do you mean the "
+            "'PollAnswerHandler'?"
+        )
+
+        per_faq_link = (
+            " Read this FAQ entry to learn more about the per_* settings https://git.io/JtcyU."
+        )
+        assert (
+            str(recwarn[3].message)
+            and str(recwarn[4].message)
+            and str(recwarn[5].message)
+            and str(recwarn[6].message)
+            and str(recwarn[7].message)
+            == (
+                "This Handler only has information about the user, so it wont ever be triggered "
+                "if 'per_chat=True'." + per_faq_link
+            )
+        )
+        assert str(recwarn[8].message) == (
+            "If 'per_message=True', all entry points, state handlers, and fallbacks must be "
+            "'CallbackQueryHandler', since no other handlers have a message context."
+            + per_faq_link
+        )
+        assert str(recwarn[9].message) == (
+            "If 'per_message=False', 'CallbackQueryHandler' will not be tracked for "
+            "every message." + per_faq_link
+        )
 
     def test_per_message_but_not_per_chat_warning(self, recwarn):
         ConversationHandler(
@@ -1391,46 +1439,6 @@ class TestConversationHandler:
         assert str(recwarn[0].message) == (
             "If 'per_message=True' is used, 'per_chat=True' should also be used, "
             "since message IDs are not globally unique."
-        )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
-
-    def test_per_message_false_warning_is_only_shown_once(self, recwarn):
-        ConversationHandler(
-            entry_points=self.entry_points,
-            states={
-                self.THIRSTY: [CallbackQueryHandler(self.drink)],
-                self.BREWING: [CallbackQueryHandler(self.code)],
-            },
-            fallbacks=self.fallbacks,
-            per_message=False,
-        )
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == (
-            "If 'per_message=False', 'CallbackQueryHandler' will not be "
-            "tracked for every message."
-        )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
-
-    def test_warnings_per_chat_is_only_shown_once(self, recwarn):
-        def hello(update, context):
-            return self.BREWING
-
-        def bye(update, context):
-            return ConversationHandler.END
-
-        ConversationHandler(
-            entry_points=self.entry_points,
-            states={
-                self.THIRSTY: [InlineQueryHandler(hello)],
-                self.BREWING: [InlineQueryHandler(bye)],
-            },
-            fallbacks=self.fallbacks,
-            per_chat=True,
-        )
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == (
-            "If 'per_chat=True', 'InlineQueryHandler' can not be used,"
-            " since inline queries have no chat context."
         )
         assert recwarn[0].filename == __file__, "incorrect stacklevel!"
 

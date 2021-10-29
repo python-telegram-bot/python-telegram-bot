@@ -310,7 +310,7 @@ class ConversationHandler(Handler[Update, CCT]):
                 )
             if isinstance(handler, PollHandler):
                 warn(
-                    "PollHandler will never trigger in a Conversation since it has no information "
+                    "PollHandler will never trigger in a conversation since it has no information "
                     "about the chat or the user who voted in it. Do you mean the "
                     "'PollAnswerHandler'?",
                     stacklevel=2,
@@ -362,7 +362,6 @@ class ConversationHandler(Handler[Update, CCT]):
                         "differently from what you expect.",
                         stacklevel=2,
                     )
-                    break
 
         if self.run_async:
             for handler in all_handlers:
