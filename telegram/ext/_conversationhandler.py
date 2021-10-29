@@ -45,6 +45,12 @@ from telegram.ext import (
     DispatcherHandlerStop,
     Handler,
     InlineQueryHandler,
+    StringCommandHandler,
+    StringRegexHandler,
+    ShippingQueryHandler,
+    PreCheckoutQueryHandler,
+    PollHandler,
+    PollAnswerHandler,
 )
 from telegram._utils.warnings import warn
 from telegram.ext._utils.promise import Promise
@@ -283,8 +289,45 @@ class ConversationHandler(Handler[Update, CCT]):
         for state_handlers in states.values():
             all_handlers.extend(state_handlers)
 
-        if self.per_message:
-            for handler in all_handlers:
+        # this loop is going to warn the user about handlers which can work unexpected
+        # in conversations
+        for handler in all_handlers:
+            if isinstance(handler, (StringCommandHandler, StringRegexHandler)):
+                warn(
+                    "The ConversationHandler does not work with non Telegram.Update type updates, "
+                    "and you shouldn't use this handler for Telegram Update types.",
+                    stacklevel=2,
+                )
+            if isinstance(handler, PollHandler):
+                warn(
+                    "PollHandler will never trigger in a Conversation since it has no information "
+                    "about the chat or the user who voted in it. Do you mean the "
+                    "'PollAnswerHandler'?",
+                    stacklevel=2,
+                )
+            # we can assume per_user is set. If its not, per_message has to be set, otherwise the
+            # user would have faced the ValueError that all per_* settings cant be false. If
+            # per_message is set, the user will get a warning later.
+            if (
+                isinstance(
+                    handler,
+                    (
+                        ShippingQueryHandler,
+                        InlineQueryHandler,
+                        ChosenInlineResultHandler,
+                        PreCheckoutQueryHandler,
+                        PollAnswerHandler,
+                    ),
+                )
+                and self.per_chat
+            ):
+                warn(
+                    "This Handler only has information about the user, so it wont ever be"
+                    " triggered if 'per_chat=True'.",
+                    stacklevel=2,
+                )
+
+            if self.per_message:
                 if not isinstance(handler, CallbackQueryHandler):
                     warn(
                         "If 'per_message=True', all entry points, state handlers, and fallbacks"
@@ -292,26 +335,13 @@ class ConversationHandler(Handler[Update, CCT]):
                         "have a message context.",
                         stacklevel=2,
                     )
-                    break
-        else:
-            for handler in all_handlers:
+            else:
                 if isinstance(handler, CallbackQueryHandler):
                     warn(
                         "If 'per_message=False', 'CallbackQueryHandler' will not be "
                         "tracked for every message.",
                         stacklevel=2,
                     )
-                    break
-
-        if self.per_chat:
-            for handler in all_handlers:
-                if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
-                    warn(
-                        "If 'per_chat=True', 'InlineQueryHandler' can not be used, "
-                        "since inline queries have no chat context.",
-                        stacklevel=2,
-                    )
-                    break
 
         if self.conversation_timeout:
             for handler in all_handlers:
