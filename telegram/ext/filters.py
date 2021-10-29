@@ -22,6 +22,7 @@
 import re
 
 from abc import ABC, abstractmethod
+from functools import partial
 from threading import Lock
 from typing import (
     Dict,
@@ -49,7 +50,7 @@ __all__ = [
 ]
 
 from telegram._utils.types import SLT
-from telegram.constants import DiceEmoji
+from telegram.constants import DiceEmoji as DE
 
 DataDict = Dict[str, list]
 
@@ -306,7 +307,7 @@ class MergedFilter(UpdateFilter):
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
         if self.and_filter:
-            # And filter needs to short circuit if base is falsey
+            # And filter needs to short circuit if base is falsy
             if base_output:
                 comp_output = self.and_filter(update)
                 if comp_output:
@@ -316,7 +317,7 @@ class MergedFilter(UpdateFilter):
                             return merged
                     return True
         elif self.or_filter:
-            # Or filter needs to short circuit if base is truthey
+            # Or filter needs to short circuit if base is truthy
             if base_output:
                 if self.data_filter:
                     return base_output
@@ -373,43 +374,20 @@ class XORFilter(UpdateFilter):
 class _DiceEmoji(MessageFilter):
     __slots__ = ('emoji',)
 
-    def __init__(self, emoji: str = None, name: str = None):
-        self.name = f'Filters.dice.{name}' if name else 'Filters.dice'
+    def __init__(self, values: SLT[int] = None, emoji: str = None):
+        # self.name = f'Filters.dice.{name}' if name else 'Filters.dice'
         self.emoji = emoji
-
-    class _DiceValues(MessageFilter):
-        __slots__ = ('values', 'emoji')
-
-        def __init__(
-            self,
-            values: SLT[int],
-            name: str,
-            emoji: str = None,
-        ):
-            self.values = [values] if isinstance(values, int) else values
-            self.emoji = emoji
-            self.name = f'{name}({values})'
-
-        def filter(self, message: Message) -> bool:
-            if message.dice and message.dice.value in self.values:
-                if self.emoji:
-                    return message.dice.emoji == self.emoji
-                return True
-            return False
-
-    def __call__(  # type: ignore[override]
-        self, update: Union[Update, List[int], Tuple[int]]
-    ) -> Union[bool, '_DiceValues']:
-        if isinstance(update, Update):
-            return self.filter(update.effective_message)
-        return self._DiceValues(update, self.name, emoji=self.emoji)
+        self.values = [values] if isinstance(values, int) else values
 
     def filter(self, message: Message) -> bool:
-        if bool(message.dice):
-            if self.emoji:
-                return message.dice.emoji == self.emoji
-            return True
-        return False
+        if not message.dice:
+            return False
+
+        if self.emoji:
+            if self.values:
+                return True if message.dice.value in self.values else False
+            return message.dice.emoji == self.emoji
+        return True
 
 
 class _All(MessageFilter):
@@ -424,32 +402,17 @@ ALL = _All()
 """All Messages."""
 
 
-# TODO: Update this to remove __call__ and add a __init__
 class Text(MessageFilter):
-    __slots__ = ()
-    name = 'Filters.text'
+    __slots__ = ('strings',)
 
-    class _TextStrings(MessageFilter):
-        __slots__ = ('strings',)
-
-        def __init__(self, strings: Union[List[str], Tuple[str]]):
-            self.strings = strings
-            self.name = f'Filters.text({strings})'
-
-        def filter(self, message: Message) -> bool:
-            if message.text:
-                return message.text in self.strings
-            return False
-
-    def __call__(  # type: ignore[override]
-        self, update: Union[Update, List[str], Tuple[str]]
-    ) -> Union[bool, '_TextStrings']:
-        if isinstance(update, Update):
-            return self.filter(update.effective_message)
-        return self._TextStrings(update)
+    def __init__(self, strings: Union[List[str], Tuple[str]] = None):
+        self.strings = strings
+        self.name = f'Filters.text({strings})'
 
     def filter(self, message: Message) -> bool:
-        return bool(message.text)
+        if self.strings is None:
+            return bool(message.text)
+        return message.text in self.strings if message.text else False
 
 
 TEXT = Text()
@@ -481,32 +444,17 @@ Args:
 """
 
 
-# TODO: Do same refactoring as Text
 class Caption(MessageFilter):
-    __slots__ = ()
-    name = 'Filters.caption'
+    __slots__ = ('strings',)
 
-    class _CaptionStrings(MessageFilter):
-        __slots__ = ('strings',)
-
-        def __init__(self, strings: Union[List[str], Tuple[str]]):
-            self.strings = strings
-            self.name = f'Filters.caption({strings})'
-
-        def filter(self, message: Message) -> bool:
-            if message.caption:
-                return message.caption in self.strings
-            return False
-
-    def __call__(  # type: ignore[override]
-        self, update: Union[Update, List[str], Tuple[str]]
-    ) -> Union[bool, '_CaptionStrings']:
-        if isinstance(update, Update):
-            return self.filter(update.effective_message)
-        return self._CaptionStrings(update)
+    def __init__(self, strings: Union[List[str], Tuple[str]] = None):
+        self.strings = strings
+        self.name = f'Filters.caption({strings})'
 
     def filter(self, message: Message) -> bool:
-        return bool(message.caption)
+        if self.strings is None:
+            return bool(message.caption)
+        return message.caption in self.strings if message.caption else False
 
 
 CAPTION = Caption()
@@ -523,37 +471,22 @@ Args:
 """
 
 
-# TODO: same refactoring as above
 class Command(MessageFilter):
-    __slots__ = ()
-    name = 'Filters.command'
+    __slots__ = ('only_start',)
 
-    class _CommandOnlyStart(MessageFilter):
-        __slots__ = ('only_start',)
-
-        def __init__(self, only_start: bool):
-            self.only_start = only_start
-            self.name = f'Filters.command({only_start})'
-
-        def filter(self, message: Message) -> bool:
-            return bool(
-                message.entities
-                and any(e.type == MessageEntity.BOT_COMMAND for e in message.entities)
-            )
-
-    def __call__(  # type: ignore[override]
-        self, update: Union[bool, Update]
-    ) -> Union[bool, '_CommandOnlyStart']:
-        if isinstance(update, Update):
-            return self.filter(update.effective_message)
-        return self._CommandOnlyStart(update)
+    def __init__(self, only_start: bool = None):
+        self.only_start = only_start
+        self.name = f'Filters.command({only_start})'
 
     def filter(self, message: Message) -> bool:
-        return bool(
-            message.entities
-            and message.entities[0].type == MessageEntity.BOT_COMMAND
-            and message.entities[0].offset == 0
-        )
+        if not message.entities:
+            return False
+
+        first = message.entities[0]
+
+        if self.only_start:
+            return bool(first.type == MessageEntity.BOT_COMMAND and first.offset == 0)
+        return bool(any(e.type == MessageEntity.BOT_COMMAND for e in message.entities))
 
 
 COMMAND = Command()
@@ -1024,7 +957,7 @@ VENUE = _Venue()
 """Messages that contain :class:`telegram.Venue`."""
 
 
-# TODO: Test if filters.STATUS_UPDATE.CHAT_CREATED and filters.StatusUpdate.CHAT_CREATED
+# TODO: Test if filters.STATUS_UPDATE.CHAT_CREATED == filters.StatusUpdate.CHAT_CREATED
 class StatusUpdate(UpdateFilter):
     """Subset for messages containing a status update.
 
@@ -1359,6 +1292,7 @@ class CHAT_TYPE:  # A convenience namespace for Chat types.
         GROUPS: Updates from group *or* supergroup.
         PRIVATE: Updates sent in private chat.
     """
+
     __slots__ = ()
     name = 'Filters.chat_type'
 
@@ -2118,13 +2052,24 @@ POLL = _Poll()
 
 class _Dice(_DiceEmoji):
     __slots__ = ()
-    # TODO: Use a partial here, update attribute docs below too-
-    DICE = _DiceEmoji(DiceEmoji.DICE, DiceEmoji.DICE.name.lower())
-    DARTS = _DiceEmoji(DiceEmoji.DARTS, DiceEmoji.DARTS.name.lower())
-    BASKETBALL = _DiceEmoji(DiceEmoji.BASKETBALL, DiceEmoji.BASKETBALL.name.lower())
-    FOOTBALL = _DiceEmoji(DiceEmoji.FOOTBALL, DiceEmoji.FOOTBALL.name.lower())
-    SLOT_MACHINE = _DiceEmoji(DiceEmoji.SLOT_MACHINE, DiceEmoji.SLOT_MACHINE.name.lower())
-    BOWLING = _DiceEmoji(DiceEmoji.BOWLING, DiceEmoji.BOWLING.name.lower())
+    # Partials so its easier for users to pass dice values without worrying about anything else.
+    DICE = _DiceEmoji(DE.DICE)
+    Dice = partial(_DiceEmoji, emoji=DE.DICE)
+
+    DARTS = _DiceEmoji(DE.DARTS)
+    Darts = partial(_DiceEmoji, emoji=DE.DARTS)
+
+    BASKETBALL = _DiceEmoji(DE.BASKETBALL)
+    Basketball = partial(_DiceEmoji, emoji=DE.BASKETBALL)
+
+    FOOTBALL = _DiceEmoji(DE.FOOTBALL)
+    Football = partial(_DiceEmoji, emoji=DE.FOOTBALL)
+
+    SLOT_MACHINE = _DiceEmoji(DE.SLOT_MACHINE)
+    SlotMachine = partial(_DiceEmoji, emoji=DE.SLOT_MACHINE)
+
+    BOWLING = _DiceEmoji(DE.BOWLING)
+    Bowling = partial(_DiceEmoji, emoji=DE.BOWLING)
 
 
 DICE = _Dice()
@@ -2149,25 +2094,24 @@ Note:
     ``filters.TEXT | filters.DICE``.
 
 Args:
-    update (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-        Which values to allow. If not specified, will allow any dice message.
+    values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+        Which values to allow. If not specified, will allow the specified dice message.
 
 Attributes:
-    DICE: Dice messages with the emoji 🎲. Passing a list of integers is supported just as for
-        :attr:`Filters.dice`.
-    DARTS: Dice messages with the emoji 🎯. Passing a list of integers is supported just as for
-        :attr:`Filters.dice`.
-    BASKETBALL: Dice messages with the emoji 🏀. Passing a list of integers is supported just
-        as for :attr:`Filters.dice`.
-    FOOTBALL: Dice messages with the emoji ⚽. Passing a list of integers is supported just
-        as for :attr:`Filters.dice`.
-    SLOT_MACHINE: Dice messages with the emoji 🎰. Passing a list of integers is supported just
-        as for :attr:`Filters.dice`.
-    BOWLING: Dice messages with the emoji 🎳. Passing a list of integers is supported just
-        as for :attr:`Filters.dice`.
+    DICE: Dice messages with the emoji 🎲. Matches any dice value.
+    Dice: Dice messages with the emoji 🎲. Supports passing a list of integers.
+    DARTS: Dice messages with the emoji 🎯. Matches any dice value.
+    Darts: Dice messages with the emoji 🎯. Supports passing a list of integers.
+    BASKETBALL: Dice messages with the emoji 🏀. Matches any dice value.
+    Basketball: Dice messages with the emoji 🏀. Supports passing a list of integers.
+    FOOTBALL: Dice messages with the emoji ⚽. Matches any dice value.
+    Football: Dice messages with the emoji ⚽. Supports passing a list of integers.
+    SLOT_MACHINE: Dice messages with the emoji 🎰. Matches any dice value.
+    SlotMachine: Dice messages with the emoji 🎰. Supports passing a list of integers.
+    BOWLING: Dice messages with the emoji 🎳. Matches any dice value.
+    Bowling: Dice messages with the emoji 🎳. Supports passing a list of integers.
 
-        .. versionadded:: 13.4
-
+    .. versionadded:: 13.4
 """
 
 
