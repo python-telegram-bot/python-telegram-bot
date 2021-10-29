@@ -47,10 +47,6 @@ from telegram.ext import (
     InlineQueryHandler,
     StringCommandHandler,
     StringRegexHandler,
-    ShippingQueryHandler,
-    PreCheckoutQueryHandler,
-    PollHandler,
-    PollAnswerHandler,
 )
 from telegram._utils.warnings import warn
 from telegram.ext._utils.promise import Promise
@@ -245,6 +241,14 @@ class ConversationHandler(Handler[Update, CCT]):
         map_to_parent: Dict[object, object] = None,
         run_async: bool = False,
     ):
+        # these imports need to be here because of circular import error otherwise
+        from telegram.ext import (  # pylint: disable=import-outside-toplevel
+            ShippingQueryHandler,
+            PreCheckoutQueryHandler,
+            PollHandler,
+            PollAnswerHandler,
+        )
+
         self.run_async = run_async
 
         self._entry_points = entry_points
@@ -291,6 +295,12 @@ class ConversationHandler(Handler[Update, CCT]):
 
         # this loop is going to warn the user about handlers which can work unexpected
         # in conversations
+
+        # this link will be added to all warnings tied to per_* setting
+        per_faq_link = (
+            " Read this FAQ entry to learn more about the per_* settings https://git.io/JtcyU."
+        )
+
         for handler in all_handlers:
             if isinstance(handler, (StringCommandHandler, StringRegexHandler)):
                 warn(
@@ -323,7 +333,7 @@ class ConversationHandler(Handler[Update, CCT]):
             ):
                 warn(
                     "This Handler only has information about the user, so it wont ever be"
-                    " triggered if 'per_chat=True'.",
+                    " triggered if 'per_chat=True'." + per_faq_link,
                     stacklevel=2,
                 )
 
@@ -332,14 +342,14 @@ class ConversationHandler(Handler[Update, CCT]):
                     warn(
                         "If 'per_message=True', all entry points, state handlers, and fallbacks"
                         " must be 'CallbackQueryHandler', since no other handlers "
-                        "have a message context.",
+                        "have a message context." + per_faq_link,
                         stacklevel=2,
                     )
             else:
                 if isinstance(handler, CallbackQueryHandler):
                     warn(
                         "If 'per_message=False', 'CallbackQueryHandler' will not be "
-                        "tracked for every message.",
+                        "tracked for every message." + per_faq_link,
                         stacklevel=2,
                     )
 
