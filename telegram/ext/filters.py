@@ -19,6 +19,7 @@
 # pylint: disable=empty-docstring,  invalid-name,  arguments-differ
 """This module contains the Filters for use with the MessageHandler class."""
 
+import mimetypes
 import re
 
 from abc import ABC, abstractmethod
@@ -684,23 +685,22 @@ class Document(MessageFilter):
                 return message.document.mime_type == self.mimetype
             return False
 
-    # TODO: Change this to mimetypes.types_map
     APK = MimeType('application/vnd.android.package-archive')
-    DOC = MimeType('application/msword')
+    DOC = MimeType(mimetypes.types_map.get('.doc'))
     DOCX = MimeType('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-    EXE = MimeType('application/x-ms-dos-executable')
-    MP4 = MimeType('video/mp4')
-    GIF = MimeType('image/gif')
-    JPG = MimeType('image/jpeg')
-    MP3 = MimeType('audio/mpeg')
-    PDF = MimeType('application/pdf')
-    PY = MimeType('text/x-python')
-    SVG = MimeType('image/svg+xml')
-    TXT = MimeType('text/plain')
+    EXE = MimeType(mimetypes.types_map.get('.exe'))
+    MP4 = MimeType(mimetypes.types_map.get('.mp4'))
+    GIF = MimeType(mimetypes.types_map.get('.gif'))
+    JPG = MimeType(mimetypes.types_map.get('.jpg'))
+    MP3 = MimeType(mimetypes.types_map.get('.mp3'))
+    PDF = MimeType(mimetypes.types_map.get('.pdf'))
+    PY = MimeType(mimetypes.types_map.get('.py'))
+    SVG = MimeType(mimetypes.types_map.get('.svg'))
+    TXT = MimeType(mimetypes.types_map.get('.txt'))
     TARGZ = MimeType('application/x-compressed-tar')
-    WAV = MimeType('audio/x-wav')
-    XML = MimeType('application/xml')
-    ZIP = MimeType('application/zip')
+    WAV = MimeType(mimetypes.types_map.get('.wav'))
+    XML = MimeType(mimetypes.types_map.get('.xml'))
+    ZIP = MimeType(mimetypes.types_map.get('.zip'))
 
     class FileExtension(MessageFilter):
         """This filter filters documents by their file ending/extension.
