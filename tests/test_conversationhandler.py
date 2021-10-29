@@ -1334,7 +1334,6 @@ class TestConversationHandler:
         assert handler.conversations.get((self.group.id, user1.id)) is None
         assert self.is_timeout
 
-    @pytest.mark.dev
     def test_handlers_generate_warning(self, recwarn):
         # this function tests all handler + per_* setting combinations.
 
