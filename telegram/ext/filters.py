@@ -1592,6 +1592,10 @@ class User(_ChatUserBaseFilter):
         return super().remove_chat_ids(user_id)
 
 
+USER = User(allow_empty=True)
+"""Shortcut for :class:`filters.User(allow_empty=True)`."""
+
+
 class ViaBot(_ChatUserBaseFilter):
     # pylint: disable=useless-super-delegation
     """Filters messages to allow only those which are from specified via_bot ID(s) or
@@ -1694,6 +1698,10 @@ class ViaBot(_ChatUserBaseFilter):
         return super().remove_chat_ids(bot_id)
 
 
+VIA_BOT = ViaBot(allow_empty=True)
+"""Shortcut for :class:`filters.ViaBot(allow_empty=True)`."""
+
+
 class Chat(_ChatUserBaseFilter):
     # pylint: disable=useless-super-delegation
     """Filters messages to allow only those which are from a specified chat ID or username.
@@ -1776,6 +1784,10 @@ class Chat(_ChatUserBaseFilter):
                 Which chat ID(s) to disallow through.
         """
         return super().remove_chat_ids(chat_id)
+
+
+CHAT = Chat(allow_empty=True)
+"""Shortcut for :class:`filters.Chat(allow_empty=True)`."""
 
 
 class ForwardedFrom(_ChatUserBaseFilter):
@@ -1872,7 +1884,10 @@ class ForwardedFrom(_ChatUserBaseFilter):
         return super().remove_chat_ids(chat_id)
 
 
-# TODO: Add SENDER_CHAT as shortcut for SenderChat(allow_empty=True) and for other subclasses
+FORWARDED_FROM = ForwardedFrom(allow_empty=True)
+"""Shortcut for :class:`filters.ForwardedFrom(allow_empty=True)`"""
+
+
 class SenderChat(_ChatUserBaseFilter):
     # pylint: disable=useless-super-delegation
     """Filters messages to allow only those which are from a specified sender chats chat ID or
@@ -1998,6 +2013,10 @@ class SenderChat(_ChatUserBaseFilter):
 
     SUPERGROUP = _SUPERGROUP()
     CHANNEL = _CHANNEL()
+
+
+SENDER_CHAT = SenderChat(allow_empty=True)
+"""Shortcut for :class:`filters.SenderChat(allow_empty=True)`"""
 
 
 class _Invoice(MessageFilter):
