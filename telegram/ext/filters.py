@@ -124,7 +124,7 @@ class BaseFilter(ABC):
         return instance
 
     @abstractmethod
-    def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
         ...
 
     def __and__(self, other: 'BaseFilter') -> 'BaseFilter':
@@ -164,7 +164,7 @@ class BaseFilter(ABC):
 
 class MessageFilter(BaseFilter):
     """Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
-    to :meth:`filter` is ``update.effective_message``.
+    to :meth:`filter` is :obj:`telegram.Update.effective_message`.
 
     Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
     filters.
@@ -180,7 +180,7 @@ class MessageFilter(BaseFilter):
 
     __slots__ = ()
 
-    def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
         return self.filter(update.effective_message)
 
     @abstractmethod
@@ -198,7 +198,7 @@ class MessageFilter(BaseFilter):
 
 class UpdateFilter(BaseFilter):
     """Base class for all Update Filters. In contrast to :class:`MessageFilter`, the object
-    passed to :meth:`filter` is ``update``, which allows to create filters like
+    passed to :meth:`filter` is :class`telegram.Update`, which allows to create filters like
     :attr:`filters.UpdateType.EDITED_MESSAGE`.
 
     Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
@@ -215,7 +215,7 @@ class UpdateFilter(BaseFilter):
 
     __slots__ = ()
 
-    def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
         return self.filter(update)
 
     @abstractmethod
@@ -245,7 +245,7 @@ class InvertedFilter(UpdateFilter):
         self.f = f
 
     def filter(self, update: Update) -> bool:
-        return not bool(self.f(update))
+        return not bool(self.f.check_update(update))
 
     @property
     def name(self) -> str:
@@ -304,13 +304,13 @@ class MergedFilter(UpdateFilter):
 
     # pylint: disable=too-many-return-statements
     def filter(self, update: Update) -> Union[bool, DataDict]:
-        base_output = self.base_filter(update)
+        base_output = self.base_filter.check_update(update)
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
         if self.and_filter:
             # And filter needs to short circuit if base is falsy
             if base_output:
-                comp_output = self.and_filter(update)
+                comp_output = self.and_filter.check_update(update)
                 if comp_output:
                     if self.data_filter:
                         merged = self._merge(base_output, comp_output)
@@ -324,7 +324,7 @@ class MergedFilter(UpdateFilter):
                     return base_output
                 return True
 
-            comp_output = self.or_filter(update)
+            comp_output = self.or_filter.check_update(update)
             if comp_output:
                 if self.data_filter:
                     return comp_output
@@ -361,7 +361,7 @@ class XORFilter(UpdateFilter):
         self.merged_filter = (base_filter & ~xor_filter) | (~base_filter & xor_filter)
 
     def filter(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        return self.merged_filter(update)
+        return self.merged_filter.check_update(update)
 
     @property
     def name(self) -> str:
@@ -380,8 +380,7 @@ class _DiceEmoji(MessageFilter):
         self.emoji = emoji
         self.values = [values] if isinstance(values, int) else values
         if self.values:
-            name = name.title().replace('_', '')  # Convert CAPS_SNAKE to CamelCase
-            self.name = f"{name}({self.values})"
+            self.name = f"{name.title().replace('_', '')}({self.values})"  # CAP_SNAKE -> CamelCase
 
     def filter(self, message: Message) -> bool:
         if not message.dice:
@@ -1129,21 +1128,21 @@ class StatusUpdate(UpdateFilter):
 
     def filter(self, update: Update) -> bool:
         return bool(
-            self.NEW_CHAT_MEMBERS(update)
-            or self.LEFT_CHAT_MEMBER(update)
-            or self.NEW_CHAT_TITLE(update)
-            or self.NEW_CHAT_PHOTO(update)
-            or self.DELETE_CHAT_PHOTO(update)
-            or self.CHAT_CREATED(update)
-            or self.MESSAGE_AUTO_DELETE_TIMER_CHANGED(update)
-            or self.MIGRATE(update)
-            or self.PINNED_MESSAGE(update)
-            or self.CONNECTED_WEBSITE(update)
-            or self.PROXIMITY_ALERT_TRIGGERED(update)
-            or self.VOICE_CHAT_SCHEDULED(update)
-            or self.VOICE_CHAT_STARTED(update)
-            or self.VOICE_CHAT_ENDED(update)
-            or self.VOICE_CHAT_PARTICIPANTS_INVITED(update)
+            self.NEW_CHAT_MEMBERS.check_update(update)
+            or self.LEFT_CHAT_MEMBER.check_update(update)
+            or self.NEW_CHAT_TITLE.check_update(update)
+            or self.NEW_CHAT_PHOTO.check_update(update)
+            or self.DELETE_CHAT_PHOTO.check_update(update)
+            or self.CHAT_CREATED.check_update(update)
+            or self.MESSAGE_AUTO_DELETE_TIMER_CHANGED.check_update(update)
+            or self.MIGRATE.check_update(update)
+            or self.PINNED_MESSAGE.check_update(update)
+            or self.CONNECTED_WEBSITE.check_update(update)
+            or self.PROXIMITY_ALERT_TRIGGERED.check_update(update)
+            or self.VOICE_CHAT_SCHEDULED.check_update(update)
+            or self.VOICE_CHAT_STARTED.check_update(update)
+            or self.VOICE_CHAT_ENDED.check_update(update)
+            or self.VOICE_CHAT_PARTICIPANTS_INVITED.check_update(update)
         )
 
 
@@ -2070,22 +2069,22 @@ POLL = _Poll()
 class _Dice(_DiceEmoji):
     __slots__ = ()
     # Partials so its easier for users to pass dice values without worrying about anything else.
-    DICE = _DiceEmoji(DE.DICE)
+    DICE = _DiceEmoji(emoji=DE.DICE)
     Dice = partial(_DiceEmoji, emoji=DE.DICE)
 
-    DARTS = _DiceEmoji(DE.DARTS)
+    DARTS = _DiceEmoji(emoji=DE.DARTS)
     Darts = partial(_DiceEmoji, emoji=DE.DARTS)
 
-    BASKETBALL = _DiceEmoji(DE.BASKETBALL)
+    BASKETBALL = _DiceEmoji(emoji=DE.BASKETBALL)
     Basketball = partial(_DiceEmoji, emoji=DE.BASKETBALL)
 
-    FOOTBALL = _DiceEmoji(DE.FOOTBALL)
+    FOOTBALL = _DiceEmoji(emoji=DE.FOOTBALL)
     Football = partial(_DiceEmoji, emoji=DE.FOOTBALL)
 
-    SLOT_MACHINE = _DiceEmoji(DE.SLOT_MACHINE)
+    SLOT_MACHINE = _DiceEmoji(emoji=DE.SLOT_MACHINE)
     SlotMachine = partial(_DiceEmoji, emoji=DE.SLOT_MACHINE)
 
-    BOWLING = _DiceEmoji(DE.BOWLING)
+    BOWLING = _DiceEmoji(emoji=DE.BOWLING)
     Bowling = partial(_DiceEmoji, emoji=DE.BOWLING)
 
 
@@ -2252,7 +2251,7 @@ class UpdateType(UpdateFilter):
     CHANNEL_POSTS = _ChannelPosts()
 
     def filter(self, update: Update) -> bool:
-        return bool(self.MESSAGES(update) or self.CHANNEL_POSTS(update))
+        return bool(self.MESSAGES.check_update(update) or self.CHANNEL_POSTS.check_update(update))
 
 
 UPDATE = UpdateType()
