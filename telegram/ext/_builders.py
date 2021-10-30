@@ -133,7 +133,6 @@ _TWO_ARGS_REQ = "The parameter `{}` may only be set, if no {} was set."
 # the UpdaterBuilder has all method that the DispatcherBuilder has
 class _BaseBuilder(Generic[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     # pylint reports false positives here:
-    # pylint: disable=unused-private-member
 
     __slots__ = (
         '_token',
