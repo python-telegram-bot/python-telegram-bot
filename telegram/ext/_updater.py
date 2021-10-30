@@ -46,7 +46,7 @@ from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.types import BT
 
 if TYPE_CHECKING:
-    from .builders import InitUpdaterBuilder
+    from telegram.ext._builders import InitUpdaterBuilder
 
 
 DT = TypeVar('DT', bound=Union[None, Dispatcher])
