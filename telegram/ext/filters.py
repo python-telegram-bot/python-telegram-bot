@@ -93,11 +93,10 @@ class BaseFilter(ABC):
 
 
     If you want to create your own filters create a class inheriting from either
-    :class:`MessageFilter` or :class:`UpdateFilter` and implement a :meth:`filter` method that
-    returns a boolean: :obj:`True` if the message should be
+    :class:`MessageFilter` or :class:`UpdateFilter` and implement a ``filter()``
+    method that returns a boolean: :obj:`True` if the message should be
     handled, :obj:`False` otherwise.
-    Note that the filters work only as class instances, not
-    actual class objects (so remember to
+    Note that the filters work only as class instances, not actual class objects (so remember to
     initialize your filter classes).
 
     By default the filters name (what will get printed when converted to a string for display)
@@ -198,7 +197,7 @@ class MessageFilter(BaseFilter):
 
 class UpdateFilter(BaseFilter):
     """Base class for all Update Filters. In contrast to :class:`MessageFilter`, the object
-    passed to :meth:`filter` is :class`telegram.Update`, which allows to create filters like
+    passed to :meth:`filter` is :class:`telegram.Update`, which allows to create filters like
     :attr:`filters.UpdateType.EDITED_MESSAGE`.
 
     Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
@@ -373,7 +372,7 @@ class XORFilter(UpdateFilter):
 
 
 class _DiceEmoji(MessageFilter):
-    __slots__ = ('emoji',)
+    __slots__ = ('emoji', 'values')
 
     def __init__(self, values: SLT[int] = None, emoji: str = None):
         name = f'filters.DICE.{emoji.name}' if emoji else 'filters.DICE'
