@@ -68,7 +68,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     Attributes:
         matches (List[:obj:`re match object`]): Optional. If the associated update originated from
-            a regex-supported handler or had a :class:`Filters.regex`, this will contain a list of
+            a regex-supported handler or had a :class:`filters.Regex`, this will contain a list of
             match objects for every pattern where ``re.search(pattern, string)`` returned a match.
             Note that filters short circuit, so combined regex filters will not always
             be evaluated.

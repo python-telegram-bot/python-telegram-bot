@@ -31,7 +31,8 @@ from ._updater import Updater
 from ._callbackqueryhandler import CallbackQueryHandler
 from ._choseninlineresulthandler import ChosenInlineResultHandler
 from ._inlinequeryhandler import InlineQueryHandler
-from .filters import BaseFilter, MessageFilter, UpdateFilter, Filters
+from .filters import BaseFilter, MessageFilter, UpdateFilter
+from . import filters
 from ._messagehandler import MessageHandler
 from ._commandhandler import CommandHandler, PrefixHandler
 from ._stringcommandhandler import StringCommandHandler
@@ -64,7 +65,7 @@ __all__ = (
     'DispatcherBuilder',
     'DispatcherHandlerStop',
     'ExtBot',
-    'Filters',
+    'filters',
     'Handler',
     'InlineQueryHandler',
     'InvalidCallbackData',

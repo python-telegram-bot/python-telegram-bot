@@ -20,7 +20,7 @@
 from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union
 
 from telegram import Update
-from telegram.ext import BaseFilter, Filters, Handler
+from telegram.ext import BaseFilter, filters as ptbfilters, Handler
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 from telegram.ext._utils.types import CCT
@@ -41,11 +41,12 @@ class MessageHandler(Handler[Update, CCT]):
     Args:
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
-            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
+            :class:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not). Default is
-            :attr:`telegram.ext.filters.Filters.update`. This defaults to all message_type updates
-            being: ``message``, ``edited_message``, ``channel_post`` and ``edited_channel_post``.
-            If you don't want or need any of those pass ``~Filters.update.*`` in the filter
+            :attr:`telegram.ext.filters.UPDATE`. This defaults to all message_type updates
+            being: :attr:`Update.message`, :attr:`Update.edited_message`,
+            :attr:`Update.channel_post` and :attr:`Update.edited_channel_post`.
+            If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
             argument.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
@@ -81,9 +82,9 @@ class MessageHandler(Handler[Update, CCT]):
             run_async=run_async,
         )
         if filters is not None:
-            self.filters = Filters.update & filters
+            self.filters = ptbfilters.UPDATE & filters
         else:
-            self.filters = Filters.update
+            self.filters = ptbfilters.UPDATE
 
     def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -96,7 +97,7 @@ class MessageHandler(Handler[Update, CCT]):
 
         """
         if isinstance(update, Update):
-            return self.filters(update)
+            return self.filters.check_update(update)
         return None
 
     def collect_additional_context(
