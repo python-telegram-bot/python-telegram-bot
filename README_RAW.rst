@@ -169,7 +169,7 @@ This library uses the ``logging`` module. To set up logging to standard output, 
 
 at the beginning of your script.
 
-You can also use logs in your application by calling ``logging.getLogger()`` and setting the log level you want:
+You can also use logs in your application by calling ``logging.getLogger()`` and set the log level you want:
 
 .. code:: python
 
