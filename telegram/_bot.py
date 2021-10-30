@@ -2376,9 +2376,7 @@ class Bot(TelegramObject):
         if result.get('file_path') and not is_local_file(  # type: ignore[union-attr]
             result['file_path']  # type: ignore[index]
         ):
-            result['file_path'] = '{}/{}'.format(  # type: ignore[index]
-                self.base_file_url, result['file_path']  # type: ignore[index]
-            )
+            result['file_path'] = f"{self.base_file_url}/{result['file_path']}"  # type: ignore
 
         return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
