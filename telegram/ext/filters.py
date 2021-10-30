@@ -378,7 +378,7 @@ class _DiceEmoji(MessageFilter):
 
         if self.emoji:
             if self.values:
-                return True if message.dice.value in self.values else False  # emoji and value
+                return message.dice.value in self.values  # emoji and value
             return message.dice.emoji == self.emoji  # emoji, no value
         return message.dice.value in self.values if self.values else True  # no emoji, only value
 
@@ -984,7 +984,7 @@ class StatusUpdate(UpdateFilter):
 
     MESSAGE_AUTO_DELETE_TIMER_CHANGED = _MessageAutoDeleteTimerChanged()
     """Messages that contain :attr:`telegram.Message.message_auto_delete_timer_changed`
-    
+
     .. versionadded:: 13.4
     """
 
@@ -1051,7 +1051,7 @@ class StatusUpdate(UpdateFilter):
 
     VOICE_CHAT_STARTED = _VoiceChatStarted()
     """Messages that contain :attr:`telegram.Message.voice_chat_started`.
- 
+
     .. versionadded:: 13.4
     """
 
@@ -1064,7 +1064,7 @@ class StatusUpdate(UpdateFilter):
 
     VOICE_CHAT_ENDED = _VoiceChatEnded()
     """Messages that contain :attr:`telegram.Message.voice_chat_ended`.
- 
+
     .. versionadded:: 13.4
     """
 
@@ -2114,7 +2114,7 @@ class UpdateType(UpdateFilter):
             return update.message is not None or update.edited_message is not None
 
     MESSAGES = _Messages()
-    """Updates with either :attr:`telegram.Update.message` or 
+    """Updates with either :attr:`telegram.Update.message` or
     :attr:`telegram.Update.edited_message`."""
 
     class _ChannelPost(UpdateFilter):
@@ -2145,7 +2145,7 @@ class UpdateType(UpdateFilter):
             return update.edited_message is not None or update.edited_channel_post is not None
 
     EDITED = _Edited()
-    """Updates with either :attr:`telegram.Update.edited_message` or 
+    """Updates with either :attr:`telegram.Update.edited_message` or
     :attr:`telegram.Update.edited_channel_post`."""
 
     class _ChannelPosts(UpdateFilter):
@@ -2156,7 +2156,7 @@ class UpdateType(UpdateFilter):
             return update.channel_post is not None or update.edited_channel_post is not None
 
     CHANNEL_POSTS = _ChannelPosts()
-    """Updates with either :attr:`telegram.Update.channel_post` or 
+    """Updates with either :attr:`telegram.Update.channel_post` or
     :attr:`telegram.Update.edited_channel_post`."""
 
     def filter(self, update: Update) -> bool:

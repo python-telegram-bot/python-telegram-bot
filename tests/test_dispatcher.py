@@ -28,7 +28,7 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
     JobQueue,
-    Filters,
+    filters,
     Defaults,
     CallbackContext,
     ContextTypes,
@@ -164,7 +164,7 @@ class TestDispatcher:
                 if hasattr(context, 'my_flag'):
                     pytest.fail()
 
-        dp.add_handler(MessageHandler(Filters.regex('test'), one), group=1)
+        dp.add_handler(MessageHandler(filters.Regex('test'), one), group=1)
         dp.add_handler(MessageHandler(None, two), group=2)
         u = Update(1, Message(1, None, None, None, text='test'))
         dp.process_update(u)
@@ -207,8 +207,8 @@ class TestDispatcher:
         """
         Make sure that errors raised in error handlers don't break the main loop of the dispatcher
         """
-        handler_raise_error = MessageHandler(Filters.all, self.callback_raise_error)
-        handler_increase_count = MessageHandler(Filters.all, self.callback_increase_count)
+        handler_raise_error = MessageHandler(filters.ALL, self.callback_raise_error)
+        handler_increase_count = MessageHandler(filters.ALL, self.callback_increase_count)
         error = TelegramError('Unauthorized.')
 
         dp.add_error_handler(self.error_handler_raise_error)
@@ -235,7 +235,7 @@ class TestDispatcher:
         # set defaults value to dp.bot
         dp.bot._defaults = Defaults(run_async=run_async)
         try:
-            dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
+            dp.add_handler(MessageHandler(filters.ALL, self.callback_raise_error))
             dp.add_error_handler(self.error_handler_context)
 
             monkeypatch.setattr(dp, 'run_async', mock_async_err_handler)
@@ -257,7 +257,7 @@ class TestDispatcher:
         # set defaults value to dp.bot
         dp.bot._defaults = Defaults(run_async=run_async)
         try:
-            dp.add_handler(MessageHandler(Filters.all, lambda u, c: None))
+            dp.add_handler(MessageHandler(filters.ALL, lambda u, c: None))
             monkeypatch.setattr(dp, 'run_async', mock_run_async)
             dp.process_update(self.message_update)
             assert self.received == expected_output
@@ -287,7 +287,7 @@ class TestDispatcher:
         def callback(update, context):
             raise DispatcherHandlerStop()
 
-        dp.add_handler(MessageHandler(Filters.all, callback, run_async=True))
+        dp.add_handler(MessageHandler(filters.ALL, callback, run_async=True))
 
         dp.update_queue.put(self.message_update)
         sleep(0.1)
@@ -299,7 +299,7 @@ class TestDispatcher:
     def test_add_async_handler(self, dp):
         dp.add_handler(
             MessageHandler(
-                Filters.all,
+                filters.ALL,
                 self.callback_received,
                 run_async=True,
             )
@@ -320,7 +320,7 @@ class TestDispatcher:
             assert caplog.records[-1].getMessage().startswith('No error handlers are registered')
 
     def test_async_handler_async_error_handler_context(self, dp):
-        dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error, run_async=True))
+        dp.add_handler(MessageHandler(filters.ALL, self.callback_raise_error, run_async=True))
         dp.add_error_handler(self.error_handler_context, run_async=True)
 
         dp.update_queue.put(self.message_update)
@@ -328,7 +328,7 @@ class TestDispatcher:
         assert self.received == self.message_update.message.text
 
     def test_async_handler_error_handler_that_raises_error(self, dp, caplog):
-        handler = MessageHandler(Filters.all, self.callback_raise_error, run_async=True)
+        handler = MessageHandler(filters.ALL, self.callback_raise_error, run_async=True)
         dp.add_handler(handler)
         dp.add_error_handler(self.error_handler_raise_error, run_async=False)
 
@@ -342,13 +342,13 @@ class TestDispatcher:
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
-        dp.add_handler(MessageHandler(Filters.all, self.callback_increase_count, run_async=True))
+        dp.add_handler(MessageHandler(filters.ALL, self.callback_increase_count, run_async=True))
         dp.update_queue.put(self.message_update)
         sleep(0.1)
         assert self.count == 1
 
     def test_async_handler_async_error_handler_that_raises_error(self, dp, caplog):
-        handler = MessageHandler(Filters.all, self.callback_raise_error, run_async=True)
+        handler = MessageHandler(filters.ALL, self.callback_raise_error, run_async=True)
         dp.add_handler(handler)
         dp.add_error_handler(self.error_handler_raise_error, run_async=True)
 
@@ -362,13 +362,13 @@ class TestDispatcher:
 
         # Make sure that the main loop still runs
         dp.remove_handler(handler)
-        dp.add_handler(MessageHandler(Filters.all, self.callback_increase_count, run_async=True))
+        dp.add_handler(MessageHandler(filters.ALL, self.callback_increase_count, run_async=True))
         dp.update_queue.put(self.message_update)
         sleep(0.1)
         assert self.count == 1
 
     def test_error_in_handler(self, dp):
-        dp.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
+        dp.add_handler(MessageHandler(filters.ALL, self.callback_raise_error))
         dp.add_error_handler(self.error_handler_context)
 
         dp.update_queue.put(self.message_update)
@@ -376,7 +376,7 @@ class TestDispatcher:
         assert self.received == self.message_update.message.text
 
     def test_add_remove_handler(self, dp):
-        handler = MessageHandler(Filters.all, self.callback_increase_count)
+        handler = MessageHandler(filters.ALL, self.callback_increase_count)
         dp.add_handler(handler)
         dp.update_queue.put(self.message_update)
         sleep(0.1)
@@ -386,7 +386,7 @@ class TestDispatcher:
         assert self.count == 1
 
     def test_add_remove_handler_non_default_group(self, dp):
-        handler = MessageHandler(Filters.all, self.callback_increase_count)
+        handler = MessageHandler(filters.ALL, self.callback_increase_count)
         dp.add_handler(handler, group=2)
         with pytest.raises(KeyError):
             dp.remove_handler(handler)
@@ -397,17 +397,17 @@ class TestDispatcher:
         dp.start()
 
     def test_handler_order_in_group(self, dp):
-        dp.add_handler(MessageHandler(Filters.photo, self.callback_set_count(1)))
-        dp.add_handler(MessageHandler(Filters.all, self.callback_set_count(2)))
-        dp.add_handler(MessageHandler(Filters.text, self.callback_set_count(3)))
+        dp.add_handler(MessageHandler(filters.PHOTO, self.callback_set_count(1)))
+        dp.add_handler(MessageHandler(filters.ALL, self.callback_set_count(2)))
+        dp.add_handler(MessageHandler(filters.TEXT, self.callback_set_count(3)))
         dp.update_queue.put(self.message_update)
         sleep(0.1)
         assert self.count == 2
 
     def test_groups(self, dp):
-        dp.add_handler(MessageHandler(Filters.all, self.callback_increase_count))
-        dp.add_handler(MessageHandler(Filters.all, self.callback_increase_count), group=2)
-        dp.add_handler(MessageHandler(Filters.all, self.callback_increase_count), group=-1)
+        dp.add_handler(MessageHandler(filters.ALL, self.callback_increase_count))
+        dp.add_handler(MessageHandler(filters.ALL, self.callback_increase_count), group=2)
+        dp.add_handler(MessageHandler(filters.ALL, self.callback_increase_count), group=-1)
 
         dp.update_queue.put(self.message_update)
         sleep(0.1)
@@ -418,7 +418,7 @@ class TestDispatcher:
         with pytest.raises(TypeError, match='handler is not an instance of'):
             dp.add_handler(handler)
 
-        handler = MessageHandler(Filters.photo, self.callback_set_count(1))
+        handler = MessageHandler(filters.PHOTO, self.callback_set_count(1))
         with pytest.raises(TypeError, match='group is not int'):
             dp.add_handler(handler, 'one')
 
@@ -733,7 +733,7 @@ class TestDispatcher:
         update = Update(
             1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
         )
-        handler = MessageHandler(Filters.all, callback)
+        handler = MessageHandler(filters.ALL, callback)
         dp.add_handler(handler)
         dp.add_error_handler(error)
 
@@ -801,7 +801,7 @@ class TestDispatcher:
         def callback(update, context):
             pass
 
-        handler = MessageHandler(Filters.all, callback)
+        handler = MessageHandler(filters.ALL, callback)
         dp.add_handler(handler)
         dp.persistence = OwnPersistence()
 
@@ -832,7 +832,7 @@ class TestDispatcher:
         monkeypatch.setattr(dp, 'update_persistence', update_persistence)
 
         for group in range(5):
-            dp.add_handler(MessageHandler(Filters.text, dummy_callback), group=group)
+            dp.add_handler(MessageHandler(filters.TEXT, dummy_callback), group=group)
 
         update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text=None))
         dp.process_update(update)
@@ -854,7 +854,7 @@ class TestDispatcher:
 
         for group in range(5):
             dp.add_handler(
-                MessageHandler(Filters.text, dummy_callback, run_async=True), group=group
+                MessageHandler(filters.TEXT, dummy_callback, run_async=True), group=group
             )
 
         update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
@@ -864,7 +864,7 @@ class TestDispatcher:
         dp.bot._defaults = Defaults(run_async=True)
         try:
             for group in range(5):
-                dp.add_handler(MessageHandler(Filters.text, dummy_callback), group=group)
+                dp.add_handler(MessageHandler(filters.TEXT, dummy_callback), group=group)
 
             update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
             dp.process_update(update)
@@ -885,9 +885,9 @@ class TestDispatcher:
 
         for group in range(5):
             dp.add_handler(
-                MessageHandler(Filters.text, dummy_callback, run_async=True), group=group
+                MessageHandler(filters.TEXT, dummy_callback, run_async=True), group=group
             )
-        dp.add_handler(MessageHandler(Filters.text, dummy_callback, run_async=run_async), group=5)
+        dp.add_handler(MessageHandler(filters.TEXT, dummy_callback, run_async=run_async), group=5)
 
         update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
         dp.process_update(update)
@@ -907,7 +907,7 @@ class TestDispatcher:
 
         try:
             for group in range(5):
-                dp.add_handler(MessageHandler(Filters.text, dummy_callback), group=group)
+                dp.add_handler(MessageHandler(filters.TEXT, dummy_callback), group=group)
 
             update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
             dp.process_update(update)
@@ -949,7 +949,7 @@ class TestDispatcher:
             .build()
         )
         dispatcher.add_error_handler(error_handler)
-        dispatcher.add_handler(MessageHandler(Filters.all, self.callback_raise_error))
+        dispatcher.add_handler(MessageHandler(filters.ALL, self.callback_raise_error))
 
         dispatcher.process_update(self.message_update)
         sleep(0.1)
@@ -974,7 +974,7 @@ class TestDispatcher:
             )
             .build()
         )
-        dispatcher.add_handler(MessageHandler(Filters.all, callback))
+        dispatcher.add_handler(MessageHandler(filters.ALL, callback))
 
         dispatcher.process_update(self.message_update)
         sleep(0.1)
