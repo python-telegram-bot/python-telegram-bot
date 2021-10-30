@@ -62,7 +62,7 @@ class CommandHandler(Handler[Update, CCT]):
             :class:`telegram.ext.ConversationHandler`.
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
-            :class:`telegram.ext.filters`. Filters can be combined using bitwise
+            :mod:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
@@ -216,7 +216,7 @@ class PrefixHandler(CommandHandler):
             :class:`telegram.ext.ConversationHandler`.
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
-            :class:`telegram.ext.filters`. Filters can be combined using bitwise
+            :mod:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.

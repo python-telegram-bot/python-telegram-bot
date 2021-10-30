@@ -41,7 +41,7 @@ class MessageHandler(Handler[Update, CCT]):
     Args:
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
-            :class:`telegram.ext.filters`. Filters can be combined using bitwise
+            :mod:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not). Default is
             :attr:`telegram.ext.filters.UPDATE`. This defaults to all message_type updates
             being: :attr:`Update.message`, :attr:`Update.edited_message`,
