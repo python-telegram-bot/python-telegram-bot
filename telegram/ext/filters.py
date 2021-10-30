@@ -366,21 +366,21 @@ class _DiceEmoji(MessageFilter):
     __slots__ = ('emoji', 'values')
 
     def __init__(self, values: SLT[int] = None, emoji: str = None):
-        name = f'filters.DICE.{emoji.name}' if emoji else 'filters.DICE'
+        name = f"filters.DICE.{getattr(emoji, 'name', '')}" if emoji else 'filters.DICE'
         self.emoji = emoji
         self.values = [values] if isinstance(values, int) else values
         if self.values:
             self.name = f"{name.title().replace('_', '')}({self.values})"  # CAP_SNAKE -> CamelCase
 
     def filter(self, message: Message) -> bool:
-        if not message.dice:
+        if not message.dice:  # no dice
             return False
 
         if self.emoji:
             if self.values:
-                return True if message.dice.value in self.values else False
-            return message.dice.emoji == self.emoji
-        return True
+                return True if message.dice.value in self.values else False  # emoji and value
+            return message.dice.emoji == self.emoji  # emoji, no value
+        return message.dice.value in self.values if self.values else True  # no emoji, only value
 
 
 class _All(MessageFilter):
@@ -425,7 +425,7 @@ class Text(MessageFilter):
 
     __slots__ = ('strings',)
 
-    def __init__(self, strings: Union[List[str], Tuple[str]] = None):
+    def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
         self.strings = strings
         self.name = f'filters.Text({strings})' if strings else 'filters.TEXT'
 
@@ -454,7 +454,7 @@ class Caption(MessageFilter):
 
     __slots__ = ('strings',)
 
-    def __init__(self, strings: Union[List[str], Tuple[str]] = None):
+    def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
         self.strings = strings
         self.name = f'filters.Caption({strings})' if strings else 'filters.CAPTION'
 
@@ -768,7 +768,7 @@ class Document(MessageFilter):
                 )
             else:
                 self._file_extension = f".{file_extension}".lower()
-                self.name = f"filters.Document.FileExtension({self._file_extension!r})"
+                self.name = f"filters.Document.FileExtension({file_extension.lower()!r})"
 
         def filter(self, message: Message) -> bool:
             if message.document is None:
@@ -1896,7 +1896,7 @@ class SenderChat(_ChatUserBaseFilter):
                 return message.sender_chat.type == TGChat.CHANNEL
             return False
 
-    SUPERGROUP = _SUPERGROUP()
+    SUPER_GROUP = _SUPERGROUP()
     """Messages whose sender chat is a super group."""
     CHANNEL = _CHANNEL()
     """Messages whose sender chat is a channel."""
@@ -1963,6 +1963,9 @@ class Dice(_DiceEmoji):
     Examples:
         To allow any dice message, simply use
         ``MessageHandler(filters.DICE, callback_method)``.
+
+        To allow any dice message, but with value 3 `or` 4, use
+        ``MessageHandler(filters.Dice([3, 4]), callback_method)``
 
         To allow only dice messages with the emoji 🎲, but any value, use
         ``MessageHandler(filters.Dice.DICE, callback_method)``.
