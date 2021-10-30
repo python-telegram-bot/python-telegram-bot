@@ -41,15 +41,6 @@ from typing import (
 
 from telegram import Chat as TGChat, Message, MessageEntity, Update, User as TGUser
 
-__all__ = [
-    'BaseFilter',
-    'MessageFilter',
-    'UpdateFilter',
-    'InvertedFilter',
-    'MergedFilter',
-    'XORFilter',
-]
-
 from telegram._utils.types import SLT
 from telegram.constants import DiceEmoji as DE
 
@@ -405,6 +396,33 @@ ALL = _All()
 
 
 class Text(MessageFilter):
+    """Text Messages. If a list of strings is passed, it filters messages to only allow those
+    whose text is appearing in the given list.
+
+    Examples:
+        To allow any text message, simply use
+        ``MessageHandler(filters.TEXT, callback_method)``.
+
+        A simple use case for passing a list is to allow only messages that were sent by a
+        custom :class:`telegram.ReplyKeyboardMarkup`::
+
+            buttons = ['Start', 'Settings', 'Back']
+            markup = ReplyKeyboardMarkup.from_column(buttons)
+            ...
+            MessageHandler(filters.Text(buttons), callback_method)
+
+    Note:
+        * Dice messages don't have text. If you want to filter either text or dice messages, use
+          ``filters.TEXT | filters.DICE``.
+        * Messages containing a command are accepted by this filter. Use
+          ``filters.TEXT & (~filters.COMMAND)``, if you want to filter only text messages without
+          commands.
+
+    Args:
+        strings (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
+            exact matches are allowed. If not specified, will allow any text message.
+    """
+
     __slots__ = ('strings',)
 
     def __init__(self, strings: Union[List[str], Tuple[str]] = None):
@@ -418,35 +436,22 @@ class Text(MessageFilter):
 
 
 TEXT = Text()
-"""Text Messages. If a list of strings is passed, it filters messages to only allow those
-whose text is appearing in the given list.
-
-Examples:
-    To allow any text message, simply use
-    ``MessageHandler(filters.TEXT, callback_method)``.
-
-    A simple use case for passing a list is to allow only messages that were sent by a
-    custom :class:`telegram.ReplyKeyboardMarkup`::
-
-        buttons = ['Start', 'Settings', 'Back']
-        markup = ReplyKeyboardMarkup.from_column(buttons)
-        ...
-        MessageHandler(filters.Text(buttons), callback_method)
-
-Note:
-    * Dice messages don't have text. If you want to filter either text or dice messages, use
-      ``filters.TEXT | filters.DICE``.
-    * Messages containing a command are accepted by this filter. Use
-      ``filters.TEXT & (~filters.COMMAND)``, if you want to filter only text messages without
-      commands.
-
-Args:
-    update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
-        exact matches are allowed. If not specified, will allow any text message.
-"""
+"""Shortcut for :class:`telegram.ext.filters.Text()`."""
 
 
 class Caption(MessageFilter):
+    """Messages with a caption. If a list of strings is passed, it filters messages to only
+    allow those whose caption is appearing in the given list.
+
+    Examples:
+        ``MessageHandler(filters.CAPTION, callback_method)``
+        ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB'], callback_method_2)``
+
+    Args:
+        strings (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which captions to allow. Only
+            exact matches are allowed. If not specified, will allow any message with a caption.
+    """
+
     __slots__ = ('strings',)
 
     def __init__(self, strings: Union[List[str], Tuple[str]] = None):
@@ -460,20 +465,28 @@ class Caption(MessageFilter):
 
 
 CAPTION = Caption()
-"""Messages with a caption. If a list of strings is passed, it filters messages to only
-allow those whose caption is appearing in the given list.
-
-Examples:
-    ``MessageHandler(filters.CAPTION, callback_method)``
-    ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB'], callback_method_2)``
-
-Args:
-    update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which captions to allow. Only
-        exact matches are allowed. If not specified, will allow any message with a caption.
-"""
+"""Shortcut for :class:`telegram.ext.filters.Caption()`."""
 
 
 class Command(MessageFilter):
+    """
+    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
+    messages `starting` with a bot command. Pass :obj:`False` to also allow messages that contain a
+    bot command `anywhere` in the text.
+
+    Examples::
+
+        MessageHandler(filters.COMMAND, command_at_start_callback)
+        MessageHandler(filters.Command(False), command_anywhere_callback)
+
+    Note:
+        :attr:`telegram.ext.filters.TEXT` also accepts messages containing a command.
+
+    Args:
+        only_start (:obj:`bool`, optional): Whether to only allow messages that `start` with a bot
+            command. Defaults to :obj:`True`.
+    """
+
     __slots__ = ('only_start',)
 
     def __init__(self, only_start: bool = True):
@@ -492,23 +505,7 @@ class Command(MessageFilter):
 
 
 COMMAND = Command()
-"""
-Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
-messages `starting` with a bot command. Pass :obj:`False` to also allow messages that contain a
-bot command `anywhere` in the text.
-
-Examples::
-
-    MessageHandler(filters.COMMAND, command_at_start_callback)
-    MessageHandler(filters.Command(False), command_anywhere_callback)
-
-Note:
-    ``filters.TEXT`` also accepts messages containing a command.
-
-Args:
-    update (:obj:`bool`, optional): Whether to only allow messages that `start` with a bot
-        command. Defaults to :obj:`True`.
-"""
+"""Shortcut for :class:`telegram.ext.filters.Command()`."""
 
 
 class Regex(MessageFilter):
@@ -550,7 +547,6 @@ class Regex(MessageFilter):
         self.name = f'filters.Regex({self.pattern})'
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
-        """"""  # remove method from docs
         if message.text:
             match = self.pattern.search(message.text)
             if match:
@@ -586,7 +582,6 @@ class CaptionRegex(MessageFilter):
         self.name = f'filters.CaptionRegex({self.pattern})'
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
-        """"""  # remove method from docs
         if message.caption:
             match = self.pattern.search(message.caption)
             if match:
@@ -619,90 +614,132 @@ AUDIO = _Audio()
 
 
 class Document(MessageFilter):
+    """
+    Subset for messages containing a document/file.
+
+    Examples:
+        Use these filters like: ``filters.Document.MP3``,
+        ``filters.Document.MimeType("text/plain")`` etc. Or use just
+        ``filters.DOCUMENT`` for all document messages.
+    """
+
     __slots__ = ()
     name = 'filters.DOCUMENT'
 
     class Category(MessageFilter):
         """Filters documents by their category in the mime-type attribute.
 
-        Note:
-            This Filter only filters by the mime_type of the document,
-                it doesn't check the validity of the document.
-            The user can manipulate the mime-type of a message and
-                send media with wrong types that don't fit to this handler.
+        Args:
+            category (:obj:`str`): Category of the media you want to filter.
 
         Example:
             ``filters.Document.Category('audio/')`` returns :obj:`True` for all types
             of audio sent as a file, for example ``'audio/mpeg'`` or ``'audio/x-wav'``.
+
+        Note:
+            This Filter only filters by the mime_type of the document, it doesn't check the
+            validity of the document. The user can manipulate the mime-type of a message and
+            send media with wrong types that don't fit to this handler.
         """
 
         __slots__ = ('_category',)
 
-        def __init__(self, category: Optional[str]):
-            """Initialize the category you want to filter
-
-            Args:
-                category (str, optional): category of the media you want to filter
-            """
+        def __init__(self, category: str):
             self._category = category
             self.name = f"filters.Document.Category('{self._category}')"
 
         def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
             if message.document:
                 return message.document.mime_type.startswith(self._category)
             return False
 
     APPLICATION = Category('application/')
+    """Use as ``filters.Document.APPLICATION``."""
     AUDIO = Category('audio/')
+    """Use as ``filters.Document.AUDIO``."""
     IMAGE = Category('image/')
+    """Use as ``filters.Document.IMAGE``."""
     VIDEO = Category('video/')
+    """Use as ``filters.Document.VIDEO``."""
     TEXT = Category('text/')
+    """Use as ``filters.Document.TEXT``."""
 
     class MimeType(MessageFilter):
-        """This Filter filters documents by their mime-type attribute
+        """This Filter filters documents by their mime-type attribute.
 
-        Note:
-            This Filter only filters by the mime_type of the document,
-                it doesn't check the validity of document.
-            The user can manipulate the mime-type of a message and
-                send media with wrong types that don't fit to this handler.
+        Args:
+            mimetype (:obj:`str`): The mimetype to filter.
 
         Example:
-            ``filters.Document.MimeType('audio/mpeg')`` filters all audio in mp3 format.
+            ``filters.Document.MimeType('audio/mpeg')`` filters all audio in `.mp3` format.
+
+        Note:
+            This Filter only filters by the mime_type of the document, it doesn't check the
+            validity of document. The user can manipulate the mime-type of a message and
+            send media with wrong types that don't fit to this handler.
         """
 
         __slots__ = ('mimetype',)
 
-        def __init__(self, mimetype: Optional[str]):
+        def __init__(self, mimetype: str):
             self.mimetype = mimetype
             self.name = f"filters.Document.MimeType('{self.mimetype}')"
 
         def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
             if message.document:
                 return message.document.mime_type == self.mimetype
             return False
 
     APK = MimeType('application/vnd.android.package-archive')
+    """Use as ``filters.Document.APK``."""
     DOC = MimeType(mimetypes.types_map.get('.doc'))
+    """Use as ``filters.Document.DOC``."""
     DOCX = MimeType('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    """Use as ``filters.Document.DOCX``."""
     EXE = MimeType(mimetypes.types_map.get('.exe'))
+    """Use as ``filters.Document.EXE``."""
     MP4 = MimeType(mimetypes.types_map.get('.mp4'))
+    """Use as ``filters.Document.MP4``."""
     GIF = MimeType(mimetypes.types_map.get('.gif'))
+    """Use as ``filters.Document.GIF``."""
     JPG = MimeType(mimetypes.types_map.get('.jpg'))
+    """Use as ``filters.Document.JPG``."""
     MP3 = MimeType(mimetypes.types_map.get('.mp3'))
+    """Use as ``filters.Document.MP3``."""
     PDF = MimeType(mimetypes.types_map.get('.pdf'))
+    """Use as ``filters.Document.PDF``."""
     PY = MimeType(mimetypes.types_map.get('.py'))
+    """Use as ``filters.Document.PY``."""
     SVG = MimeType(mimetypes.types_map.get('.svg'))
+    """Use as ``filters.Document.SVG``."""
     TXT = MimeType(mimetypes.types_map.get('.txt'))
+    """Use as ``filters.Document.TXT``."""
     TARGZ = MimeType('application/x-compressed-tar')
+    """Use as ``filters.Document.TARGZ``."""
     WAV = MimeType(mimetypes.types_map.get('.wav'))
+    """Use as ``filters.Document.WAV``."""
     XML = MimeType(mimetypes.types_map.get('.xml'))
+    """Use as ``filters.Document.XML``."""
     ZIP = MimeType(mimetypes.types_map.get('.zip'))
+    """Use as ``filters.Document.ZIP``."""
 
     class FileExtension(MessageFilter):
         """This filter filters documents by their file ending/extension.
+
+        Args:
+            file_extension (:obj:`str` | :obj:`None`): Media file extension you want to filter.
+            case_sensitive (:obj:`bool`, optional): Pass :obj:`True` to make the filter case
+                sensitive. Default: :obj:`False`.
+
+        Example:
+            * ``filters.Document.FileExtension("jpg")``
+              filters files with extension ``".jpg"``.
+            * ``filters.Document.FileExtension(".jpg")``
+              filters files with extension ``"..jpg"``.
+            * ``filters.Document.FileExtension("Dockerfile", case_sensitive=True)``
+              filters files with extension ``".Dockerfile"`` minding the case.
+            * ``filters.Document.FileExtension(None)``
+              filters files without a dot in the filename.
 
         Note:
             * This Filter only filters by the file ending/extension of the document,
@@ -715,28 +752,11 @@ class Document(MessageFilter):
               unless it's a part of the extension.
             * Pass :obj:`None` to filter files with no extension,
               i.e. without a dot in the filename.
-
-        Example:
-            * ``filters.Document.FileExtension("jpg")``
-              filters files with extension ``".jpg"``.
-            * ``filters.Document.FileExtension(".jpg")``
-              filters files with extension ``"..jpg"``.
-            * ``filters.Document.FileExtension("Dockerfile", case_sensitive=True)``
-              filters files with extension ``".Dockerfile"`` minding the case.
-            * ``filters.Document.FileExtension(None)``
-              filters files without a dot in the filename.
         """
 
         __slots__ = ('_file_extension', 'is_case_sensitive')
 
         def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
-            """Initialize the extension you want to filter.
-
-            Args:
-                file_extension (:obj:`str` | :obj:`None`): Media file extension you want to filter.
-                case_sensitive (:obj:bool, optional): Pass :obj:`True` to make the filter case
-                    sensitive. Default: :obj:`False`.
-            """
             self.is_case_sensitive = case_sensitive
             if file_extension is None:
                 self._file_extension = None
@@ -751,7 +771,6 @@ class Document(MessageFilter):
                 self.name = f"filters.Document.FileExtension({self._file_extension!r})"
 
         def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
             if message.document is None:
                 return False
             if self._file_extension is None:
@@ -766,84 +785,8 @@ class Document(MessageFilter):
         return bool(message.document)
 
 
-DOCUMENT = Document
-"""
-    Subset for messages containing a document/file.
-
-    Examples:
-        Use these filters like: ``filters.Document.MP3``,
-        ``filters.Document.MimeType("text/plain")`` etc. Or use just
-        ``filters.DOCUMENT`` for all document messages.
-
-    Attributes:
-        Category: Filters documents by their category in the mime-type attribute
-
-            Note:
-                This Filter only filters by the mime_type of the document,
-                it doesn't check the validity of the document.
-                The user can manipulate the mime-type of a message and
-                send media with wrong types that don't fit to this handler.
-
-            Example:
-                ``filters.Document.Category('audio/')`` filters all types
-                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
-        APPLICATION: Same as ``filters.Document.Category("application")``.
-        AUDIO: Same as ``filters.Document.Category("audio")``.
-        IMAGE: Same as ``filters.Document.Category("image")``.
-        VIDEO: Same as ``filters.Document.Category("video")``.
-        TEXT: Same as ``filters.Document.Category("text")``.
-        MimeType: Filters documents by their mime-type attribute
-
-            Note:
-                This Filter only filters by the mime_type of the document,
-                it doesn't check the validity of document.
-
-                The user can manipulate the mime-type of a message and
-                send media with wrong types that don't fit to this handler.
-
-            Example:
-                ``filters.Document.MimeType('audio/mpeg')`` filters all audio in mp3 format.
-        APK: Same as ``filters.Document.MimeType("application/vnd.android.package-archive")``.
-        DOC: Same as ``filters.Document.MimeType("application/msword")``.
-        DOCX: Same as ``filters.Document.MimeType("application/vnd.openxmlformats-\
-    officedocument.wordprocessingml.document")``.
-        EXE: Same as ``filters.Document.MimeType("application/x-ms-dos-executable")``.
-        GIF: Same as ``filters.Document.MimeType("image/gif")``.
-        MP4: Same as ``filters.Document.MimeType("video/mp4")``.
-        JPG: Same as ``filters.Document.MimeType("image/jpeg")``.
-        MP3: Same as ``filters.Document.MimeType("audio/mpeg")``.
-        PDF: Same as ``filters.Document.MimeType("application/pdf")``.
-        PY: Same as ``filters.Document.MimeType("text/x-python")``.
-        SVG: Same as ``filters.Document.MimeType("image/svg+xml")``.
-        TXT: Same as ``filters.Document.MimeType("text/plain")``.
-        TARGZ: Same as ``filters.Document.MimeType("application/x-compressed-tar")``.
-        WAV: Same as ``filters.Document.MimeType("audio/x-wav")``.
-        XML: Same as ``filters.Document.MimeType("application/xml")``.
-        ZIP: Same as ``filters.Document.MimeType("application/zip")``.
-        FileExtension: This filter filters documents by their file ending/extension.
-
-            Note:
-                * This Filter only filters by the file ending/extension of the document,
-                  it doesn't check the validity of document.
-                * The user can manipulate the file extension of a document and
-                  send media with wrong types that don't fit to this handler.
-                * Case insensitive by default,
-                  you may change this with the flag ``case_sensitive=True``.
-                * Extension should be passed without leading dot
-                  unless it's a part of the extension.
-                * Pass :obj:`None` to filter files with no extension,
-                  i.e. without a dot in the filename.
-
-            Example:
-                * ``filters.Document.FileExtension("jpg")``
-                  filters files with extension ``".jpg"``.
-                * ``filters.Document.FileExtension(".jpg")``
-                  filters files with extension ``"..jpg"``.
-                * ``filters.Document.FileExtension("Dockerfile", case_sensitive=True)``
-                  filters files with extension ``".Dockerfile"`` minding the case.
-                * ``filters.Document.FileExtension(None)``
-                  filters files without a dot in the filename.
-"""
+DOCUMENT = Document()
+"""Shortcut for :class:`telegram.ext.filters.Document()`."""
 
 
 class _Animation(MessageFilter):
@@ -968,7 +911,7 @@ class StatusUpdate(UpdateFilter):
 
     class _NewChatMembers(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.NEW_CHAT_MEMBERS'
+        name = 'filters.StatusUpdate.NEW_CHAT_MEMBERS'
 
         def filter(self, message: Message) -> bool:
             return bool(message.new_chat_members)
@@ -978,7 +921,7 @@ class StatusUpdate(UpdateFilter):
 
     class _LeftChatMember(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.LEFT_CHAT_MEMBER'
+        name = 'filters.StatusUpdate.LEFT_CHAT_MEMBER'
 
         def filter(self, message: Message) -> bool:
             return bool(message.left_chat_member)
@@ -988,7 +931,7 @@ class StatusUpdate(UpdateFilter):
 
     class _NewChatTitle(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.NEW_CHAT_TITLE'
+        name = 'filters.StatusUpdate.NEW_CHAT_TITLE'
 
         def filter(self, message: Message) -> bool:
             return bool(message.new_chat_title)
@@ -998,7 +941,7 @@ class StatusUpdate(UpdateFilter):
 
     class _NewChatPhoto(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.NEW_CHAT_PHOTO'
+        name = 'filters.StatusUpdate.NEW_CHAT_PHOTO'
 
         def filter(self, message: Message) -> bool:
             return bool(message.new_chat_photo)
@@ -1008,7 +951,7 @@ class StatusUpdate(UpdateFilter):
 
     class _DeleteChatPhoto(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.DELETE_CHAT_PHOTO'
+        name = 'filters.StatusUpdate.DELETE_CHAT_PHOTO'
 
         def filter(self, message: Message) -> bool:
             return bool(message.delete_chat_photo)
@@ -1018,7 +961,7 @@ class StatusUpdate(UpdateFilter):
 
     class _ChatCreated(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.CHAT_CREATED'
+        name = 'filters.StatusUpdate.CHAT_CREATED'
 
         def filter(self, message: Message) -> bool:
             return bool(
@@ -1034,17 +977,20 @@ class StatusUpdate(UpdateFilter):
 
     class _MessageAutoDeleteTimerChanged(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.MESSAGE_AUTO_DELETE_TIMER_CHANGED'
+        name = 'filters.StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.message_auto_delete_timer_changed)
 
     MESSAGE_AUTO_DELETE_TIMER_CHANGED = _MessageAutoDeleteTimerChanged()
-    """Messages that contain :attr:`telegram.Message.message_auto_delete_timer_changed`"""
+    """Messages that contain :attr:`telegram.Message.message_auto_delete_timer_changed`
+    
+    .. versionadded:: 13.4
+    """
 
     class _Migrate(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.MIGRATE'
+        name = 'filters.StatusUpdate.MIGRATE'
 
         def filter(self, message: Message) -> bool:
             return bool(message.migrate_from_chat_id or message.migrate_to_chat_id)
@@ -1055,7 +1001,7 @@ class StatusUpdate(UpdateFilter):
 
     class _PinnedMessage(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.PINNED_MESSAGE'
+        name = 'filters.StatusUpdate.PINNED_MESSAGE'
 
         def filter(self, message: Message) -> bool:
             return bool(message.pinned_message)
@@ -1065,7 +1011,7 @@ class StatusUpdate(UpdateFilter):
 
     class _ConnectedWebsite(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.CONNECTED_WEBSITE'
+        name = 'filters.StatusUpdate.CONNECTED_WEBSITE'
 
         def filter(self, message: Message) -> bool:
             return bool(message.connected_website)
@@ -1075,7 +1021,7 @@ class StatusUpdate(UpdateFilter):
 
     class _ProximityAlertTriggered(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.PROXIMITY_ALERT_TRIGGERED'
+        name = 'filters.StatusUpdate.PROXIMITY_ALERT_TRIGGERED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.proximity_alert_triggered)
@@ -1085,43 +1031,55 @@ class StatusUpdate(UpdateFilter):
 
     class _VoiceChatScheduled(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.VOICE_CHAT_SCHEDULED'
+        name = 'filters.StatusUpdate.VOICE_CHAT_SCHEDULED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.voice_chat_scheduled)
 
     VOICE_CHAT_SCHEDULED = _VoiceChatScheduled()
-    """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`."""
+    """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`.
+
+    .. versionadded:: 13.5
+    """
 
     class _VoiceChatStarted(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.VOICE_CHAT_STARTED'
+        name = 'filters.StatusUpdate.VOICE_CHAT_STARTED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.voice_chat_started)
 
     VOICE_CHAT_STARTED = _VoiceChatStarted()
-    """Messages that contain :attr:`telegram.Message.voice_chat_started`."""
+    """Messages that contain :attr:`telegram.Message.voice_chat_started`.
+ 
+    .. versionadded:: 13.4
+    """
 
     class _VoiceChatEnded(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.VOICE_CHAT_ENDED'
+        name = 'filters.StatusUpdate.VOICE_CHAT_ENDED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.voice_chat_ended)
 
     VOICE_CHAT_ENDED = _VoiceChatEnded()
-    """Messages that contain :attr:`telegram.Message.voice_chat_ended`."""
+    """Messages that contain :attr:`telegram.Message.voice_chat_ended`.
+ 
+    .. versionadded:: 13.4
+    """
 
     class _VoiceChatParticipantsInvited(MessageFilter):
         __slots__ = ()
-        name = 'filters.STATUS_UPDATE.VOICE_CHAT_PARTICIPANTS_INVITED'
+        name = 'filters.StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.voice_chat_participants_invited)
 
     VOICE_CHAT_PARTICIPANTS_INVITED = _VoiceChatParticipantsInvited()
-    """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`."""
+    """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`.
+
+    .. versionadded:: 13.4
+    """
 
     name = 'filters.STATUS_UPDATE'
 
@@ -1146,58 +1104,7 @@ class StatusUpdate(UpdateFilter):
 
 
 STATUS_UPDATE = StatusUpdate()
-"""Subset for messages containing a status update.
-
-Examples:
-    Use these filters like: ``filters.StatusUpdate.NEW_CHAT_MEMBERS`` etc. Or use just
-    ``filters.STATUS_UPDATE`` for all status update messages.
-
-Attributes:
-    CHAT_CREATED: Messages that contain
-        :attr:`telegram.Message.group_chat_created`,
-        :attr:`telegram.Message.supergroup_chat_created` or
-        :attr:`telegram.Message.channel_chat_created`.
-    CONNECTED_WEBSITE: Messages that contain
-        :attr:`telegram.Message.connected_website`.
-    DELETE_CHAT_PHOTO: Messages that contain
-        :attr:`telegram.Message.delete_chat_photo`.
-    LEFT_CHAT_MEMBER: Messages that contain
-        :attr:`telegram.Message.left_chat_member`.
-    MIGRATE: Messages that contain
-        :attr:`telegram.Message.migrate_to_chat_id` or
-        :attr:`telegram.Message.migrate_from_chat_id`.
-    NEW_CHAT_MEMBERS: Messages that contain
-        :attr:`telegram.Message.new_chat_members`.
-    NEW_CHAT_PHOTO: Messages that contain
-        :attr:`telegram.Message.new_chat_photo`.
-    NEW_CHAT_TITLE: Messages that contain
-        :attr:`telegram.Message.new_chat_title`.
-    MESSAGE_AUTO_DELETE_TIMER_CHANGED: Messages that contain
-        :attr:`message_auto_delete_timer_changed`.
-
-        .. versionadded:: 13.4
-    PINNED_MESSAGE: Messages that contain
-        :attr:`telegram.Message.pinned_message`.
-    PROXIMITY_ALERT_TRIGGERED: Messages that contain
-        :attr:`telegram.Message.proximity_alert_triggered`.
-    VOICE_CHAT_SCHEDULED: Messages that contain
-        :attr:`telegram.Message.voice_chat_scheduled`.
-
-        .. versionadded:: 13.5
-    VOICE_CHAT_STARTED: Messages that contain
-        :attr:`telegram.Message.voice_chat_started`.
-
-        .. versionadded:: 13.4
-    VOICE_CHAT_ENDED: Messages that contain
-        :attr:`telegram.Message.voice_chat_ended`.
-
-        .. versionadded:: 13.4
-    VOICE_CHAT_PARTICIPANTS_INVITED: Messages that contain
-        :attr:`telegram.Message.voice_chat_participants_invited`.
-
-        .. versionadded:: 13.4
-
-"""
+"""Shortcut for :class:`telegram.ext.filters.StatusUpdate()`."""
 
 
 class _Forwarded(MessageFilter):
@@ -1230,7 +1137,7 @@ class Entity(MessageFilter):
     where their :class:`~telegram.MessageEntity.type` matches `entity_type`.
 
     Examples:
-        Example ``MessageHandler(filters.Entity("hashtag"), callback_method)``
+        ``MessageHandler(filters.Entity("hashtag"), callback_method)``
 
     Args:
         entity_type (:obj:`str`): Entity type to check for. All types can be found as constants
@@ -1245,7 +1152,6 @@ class Entity(MessageFilter):
         self.name = f'filters.Entity({self.entity_type})'
 
     def filter(self, message: Message) -> bool:
-        """"""  # remove method from docs
         return any(entity.type == self.entity_type for entity in message.entities)
 
 
@@ -1255,7 +1161,7 @@ class CaptionEntity(MessageFilter):
     where their :class:`~telegram.MessageEntity.type` matches `entity_type`.
 
     Examples:
-        Example ``MessageHandler(filters.CaptionEntity("hashtag"), callback_method)``
+        ``MessageHandler(filters.CaptionEntity("hashtag"), callback_method)``
 
     Args:
         entity_type (:obj:`str`): Caption Entity type to check for. All types can be found as
@@ -1270,72 +1176,69 @@ class CaptionEntity(MessageFilter):
         self.name = f'filters.CaptionEntity({self.entity_type})'
 
     def filter(self, message: Message) -> bool:
-        """"""  # remove method from docs
         return any(entity.type == self.entity_type for entity in message.caption_entities)
 
 
-class CHAT_TYPE:  # A convenience namespace for Chat types.
+class ChatType:  # A convenience namespace for Chat types.
     """Subset for filtering the type of chat.
 
     Examples:
-        Use these filters like: ``filters.CHAT_TYPE.CHANNEL`` or
-        ``filters.CHAT_TYPE.SUPERGROUP`` etc.
-
-    Attributes:
-        CHANNEL: Updates from channel.
-        GROUP: Updates from group.
-        SUPERGROUP: Updates from supergroup.
-        GROUPS: Updates from group *or* supergroup.
-        PRIVATE: Updates sent in private chat.
+        Use these filters like: ``filters.ChatType.CHANNEL`` or
+        ``filters.ChatType.SUPERGROUP`` etc. Note that ``filters.ChatType`` does NOT work by itself
     """
 
     __slots__ = ()
-    name = 'filters.CHAT_TYPE'
+    name = 'filters.ChatType'
 
     class _Channel(MessageFilter):
         __slots__ = ()
-        name = 'filters.CHAT_TYPE.CHANNEL'
+        name = 'filters.ChatType.CHANNEL'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type == TGChat.CHANNEL
 
     CHANNEL = _Channel()
+    """Updates from channel."""
 
     class _Group(MessageFilter):
         __slots__ = ()
-        name = 'filters.CHAT_TYPE.GROUP'
+        name = 'filters.ChatType.GROUP'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type == TGChat.GROUP
 
     GROUP = _Group()
+    """Updates from group."""
 
     class _SuperGroup(MessageFilter):
         __slots__ = ()
-        name = 'filters.CHAT_TYPE.SUPERGROUP'
+        name = 'filters.ChatType.SUPERGROUP'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type == TGChat.SUPERGROUP
 
     SUPERGROUP = _SuperGroup()
+    """Updates from supergroup."""
 
     class _Groups(MessageFilter):
         __slots__ = ()
-        name = 'filters.CHAT_TYPE.GROUPS'
+        name = 'filters.ChatType.GROUPS'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type in [TGChat.GROUP, TGChat.SUPERGROUP]
 
     GROUPS = _Groups()
+    """Update from group *or* supergroup."""
 
     class _Private(MessageFilter):
         __slots__ = ()
-        name = 'filters.CHAT_TYPE.PRIVATE'
+        name = 'filters.ChatType.PRIVATE'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type == TGChat.PRIVATE
 
     PRIVATE = _Private()
+    """Update from private chats."""
 
 
 class _ChatUserBaseFilter(MessageFilter, ABC):
@@ -1466,7 +1369,6 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
             self._chat_ids -= parsed_chat_id
 
     def filter(self, message: Message) -> bool:
-        """"""  # remove method from docs
         chat_or_user = self.get_chat_or_user(message)
         if chat_or_user:
             if self.chat_ids:
@@ -1511,18 +1413,16 @@ class User(_ChatUserBaseFilter):
             Which username(s) to allow through. Leading ``'@'`` s in usernames will be
             discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
-            is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`
-
-    Raises:
-        RuntimeError: If user_id and username are both present.
+            is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`.
 
     Attributes:
-        user_ids(set(:obj:`int`), optional): Which user ID(s) to allow through.
-        usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
-            allow through.
-        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
+        user_ids (set(:obj:`int`)): Which user ID(s) to allow through.
+        usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no user
             is specified in :attr:`user_ids` and :attr:`usernames`.
 
+    Raises:
+        RuntimeError: If ``user_id`` and ``username`` are both present.
     """
 
     __slots__ = ()
@@ -1617,18 +1517,16 @@ class ViaBot(_ChatUserBaseFilter):
             Which username(s) to allow through. Leading ``'@'`` s in usernames will be
             discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
-            is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`
-
-    Raises:
-        RuntimeError: If bot_id and username are both present.
+            is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`.
 
     Attributes:
-        bot_ids(set(:obj:`int`), optional): Which bot ID(s) to allow through.
-        usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
-            allow through.
-        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no bot
+        bot_ids (set(:obj:`int`)): Which bot ID(s) to allow through.
+        usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no bot
             is specified in :attr:`bot_ids` and :attr:`usernames`.
 
+    Raises:
+        RuntimeError: If ``bot_id`` and ``username`` are both present.
     """
 
     __slots__ = ()
@@ -1722,18 +1620,16 @@ class Chat(_ChatUserBaseFilter):
             Which username(s) to allow through.
             Leading ``'@'`` s in usernames will be discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
-            is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`
-
-    Raises:
-        RuntimeError: If chat_id and username are both present.
+            is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`.
 
     Attributes:
-        chat_ids(set(:obj:`int`), optional): Which chat ID(s) to allow through.
-        usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
-            allow through.
-        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+        chat_ids (set(:obj:`int`)): Which chat ID(s) to allow through.
+        usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no chat
             is specified in :attr:`chat_ids` and :attr:`usernames`.
 
+    Raises:
+        RuntimeError: If ``chat_id`` and ``username`` are both present.
     """
 
     __slots__ = ()
@@ -1823,15 +1719,14 @@ class ForwardedFrom(_ChatUserBaseFilter):
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
             is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`.
 
-    Raises:
-        RuntimeError: If both chat_id and username are present.
-
     Attributes:
-        chat_ids(set(:obj:`int`), optional): Which chat/user ID(s) to allow through.
-        usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
-            allow through.
-        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+        chat_ids (set(:obj:`int`)): Which chat/user ID(s) to allow through.
+        usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no chat
             is specified in :attr:`chat_ids` and :attr:`usernames`.
+
+    Raises:
+        RuntimeError: If both ``chat_id`` and ``username`` are present.
     """
 
     __slots__ = ()
@@ -1898,9 +1793,9 @@ class SenderChat(_ChatUserBaseFilter):
           ``@anonymous``, use
           ``MessageHandler(filters.SenderChat(username='anonymous'), callback_method)``.
         * To filter for messages forwarded to a discussion group from *any* channel, use
-          ``MessageHandler(filters.SENDER_CHAT.CHANNEL, callback_method)``.
+          ``MessageHandler(filters.SenderChat.CHANNEL, callback_method)``.
         * To filter for messages of anonymous admins in *any* super group, use
-          ``MessageHandler(filters.SENDER_CHAT.SUPERGROUP, callback_method)``.
+          ``MessageHandler(filters.SenderChat.SUPERGROUP, callback_method)``.
 
     Note:
         Remember, ``sender_chat`` is also set for messages in a channel as the channel itself,
@@ -1923,27 +1818,17 @@ class SenderChat(_ChatUserBaseFilter):
             Which sender chat username(s) to allow through.
             Leading ``'@'`` s in usernames will be discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
-            chat is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to
-            :obj:`False`
-
-    Raises:
-        RuntimeError: If both chat_id and username are present.
+            chat is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`.
 
     Attributes:
-        chat_ids(set(:obj:`int`), optional): Which sender chat chat ID(s) to allow through.
-        usernames(set(:obj:`str`), optional): Which sender chat username(s) (without leading
-            ``'@'``) to allow through.
-        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
+        chat_ids (set(:obj:`int`)): Which sender chat chat ID(s) to allow through.
+        usernames (set(:obj:`str`)): Which sender chat username(s) (without leading ``'@'``) to
+            allow through.
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no sender
             chat is specified in :attr:`chat_ids` and :attr:`usernames`.
-        SUPERGROUP: Messages whose sender chat is a super group.
 
-            Examples:
-                ``filters.SENDER_CHAT.SUPERGROUP``
-        CHANNEL: Messages whose sender chat is a channel.
-
-            Examples:
-                ``filters.SENDER_CHAT.CHANNEL``
-
+    Raises:
+        RuntimeError: If both ``chat_id`` and ``username`` are present.
     """
 
     __slots__ = ()
@@ -1995,6 +1880,7 @@ class SenderChat(_ChatUserBaseFilter):
 
     class _SUPERGROUP(MessageFilter):
         __slots__ = ()
+        name = "filters.ChatType.SUPERGROUP"
 
         def filter(self, message: Message) -> bool:
             if message.sender_chat:
@@ -2003,6 +1889,7 @@ class SenderChat(_ChatUserBaseFilter):
 
     class _CHANNEL(MessageFilter):
         __slots__ = ()
+        name = "filters.SenderChat.CHANNEL"
 
         def filter(self, message: Message) -> bool:
             if message.sender_chat:
@@ -2010,7 +1897,9 @@ class SenderChat(_ChatUserBaseFilter):
             return False
 
     SUPERGROUP = _SUPERGROUP()
+    """Messages whose sender chat is a super group."""
     CHANNEL = _CHANNEL()
+    """Messages whose sender chat is a channel."""
 
 
 SENDER_CHAT = SenderChat(allow_empty=True)
@@ -2065,7 +1954,48 @@ POLL = _Poll()
 """Messages that contain a :class:`telegram.Poll`."""
 
 
-class _Dice(_DiceEmoji):
+class Dice(_DiceEmoji):
+    """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
+    allow those whose dice value is appearing in the given list.
+
+    .. versionadded:: 13.4
+
+    Examples:
+        To allow any dice message, simply use
+        ``MessageHandler(filters.DICE, callback_method)``.
+
+        To allow only dice messages with the emoji 🎲, but any value, use
+        ``MessageHandler(filters.Dice.DICE, callback_method)``.
+
+        To allow only dice messages with the emoji 🎯 and with value 6, use
+        ``MessageHandler(filters.Dice.Darts(6), callback_method)``.
+
+        To allow only dice messages with the emoji ⚽ and with value 5 `or` 6, use
+        ``MessageHandler(filters.Dice.Football([5, 6]), callback_method)``.
+
+    Note:
+        Dice messages don't have text. If you want to filter either text or dice messages, use
+        ``filters.TEXT | filters.DICE``.
+
+    Args:
+        values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+            Which values to allow. If not specified, will allow the specified dice message.
+
+    Attributes:
+        DICE: Dice messages with the emoji 🎲. Matches any dice value.
+        Dice: Dice messages with the emoji 🎲. Supports passing a list of integers.
+        DARTS: Dice messages with the emoji 🎯. Matches any dice value.
+        Darts: Dice messages with the emoji 🎯. Supports passing a list of integers.
+        BASKETBALL: Dice messages with the emoji 🏀. Matches any dice value.
+        Basketball: Dice messages with the emoji 🏀. Supports passing a list of integers.
+        FOOTBALL: Dice messages with the emoji ⚽. Matches any dice value.
+        Football: Dice messages with the emoji ⚽. Supports passing a list of integers.
+        SLOT_MACHINE: Dice messages with the emoji 🎰. Matches any dice value.
+        SlotMachine: Dice messages with the emoji 🎰. Supports passing a list of integers.
+        BOWLING: Dice messages with the emoji 🎳. Matches any dice value.
+        Bowling: Dice messages with the emoji 🎳. Supports passing a list of integers.
+    """
+
     __slots__ = ()
     # Partials so its easier for users to pass dice values without worrying about anything else.
     DICE = _DiceEmoji(emoji=DE.DICE)
@@ -2087,47 +2017,8 @@ class _Dice(_DiceEmoji):
     Bowling = partial(_DiceEmoji, emoji=DE.BOWLING)
 
 
-DICE = _Dice()
-"""Dice Messages. If an integer or a list of integers is passed, it filters messages to only
-allow those whose dice value is appearing in the given list.
-
-Examples:
-    To allow any dice message, simply use
-    ``MessageHandler(filters.DICE, callback_method)``.
-
-    To allow only dice messages with the emoji 🎲, but any value, use
-    ``MessageHandler(filters.DICE.DICE, callback_method)``.
-
-    To allow only dice messages with the emoji 🎯 and with value 6, use
-    ``MessageHandler(filters.DICE.Darts(6), callback_method)``.
-
-    To allow only dice messages with the emoji ⚽ and with value 5 `or` 6, use
-    ``MessageHandler(filters.DICE.Football([5, 6]), callback_method)``.
-
-Note:
-    Dice messages don't have text. If you want to filter either text or dice messages, use
-    ``filters.TEXT | filters.DICE``.
-
-Args:
-    values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-        Which values to allow. If not specified, will allow the specified dice message.
-
-Attributes:
-    DICE: Dice messages with the emoji 🎲. Matches any dice value.
-    Dice: Dice messages with the emoji 🎲. Supports passing a list of integers.
-    DARTS: Dice messages with the emoji 🎯. Matches any dice value.
-    Darts: Dice messages with the emoji 🎯. Supports passing a list of integers.
-    BASKETBALL: Dice messages with the emoji 🏀. Matches any dice value.
-    Basketball: Dice messages with the emoji 🏀. Supports passing a list of integers.
-    FOOTBALL: Dice messages with the emoji ⚽. Matches any dice value.
-    Football: Dice messages with the emoji ⚽. Supports passing a list of integers.
-    SLOT_MACHINE: Dice messages with the emoji 🎰. Matches any dice value.
-    SlotMachine: Dice messages with the emoji 🎰. Supports passing a list of integers.
-    BOWLING: Dice messages with the emoji 🎳. Matches any dice value.
-    Bowling: Dice messages with the emoji 🎳. Supports passing a list of integers.
-
-    .. versionadded:: 13.4
-"""
+DICE = Dice()
+"""Shortcut for :class:`telegram.ext.filters.Dice()`."""
 
 
 class Language(MessageFilter):
@@ -2160,7 +2051,6 @@ class Language(MessageFilter):
         self.name = f'filters.Language({self.lang})'
 
     def filter(self, message: Message) -> bool:
-        """"""  # remove method from docs
         return bool(
             message.from_user.language_code
             and any(message.from_user.language_code.startswith(x) for x in self.lang)
@@ -2183,6 +2073,13 @@ ATTACHMENT = _Attachment()
 
 
 class UpdateType(UpdateFilter):
+    """Subset for filtering the type of update.
+
+    Examples:
+        Use these filters like: ``filters.UpdateType.MESSAGE`` or
+        ``filters.UpdateType.CHANNEL_POSTS`` etc. Or use just ``filters.UPDATE`` for all
+        types."""
+
     __slots__ = ()
     name = 'filters.UPDATE'
 
@@ -2194,6 +2091,7 @@ class UpdateType(UpdateFilter):
             return update.message is not None
 
     MESSAGE = _Message()
+    """Updates with :attr:`telegram.Update.message`."""
 
     class _EditedMessage(UpdateFilter):
         __slots__ = ()
@@ -2203,6 +2101,7 @@ class UpdateType(UpdateFilter):
             return update.edited_message is not None
 
     EDITED_MESSAGE = _EditedMessage()
+    """Updates with :attr:`telegram.Update.edited_message`."""
 
     class _Messages(UpdateFilter):
         __slots__ = ()
@@ -2212,6 +2111,8 @@ class UpdateType(UpdateFilter):
             return update.message is not None or update.edited_message is not None
 
     MESSAGES = _Messages()
+    """Updates with either :attr:`telegram.Update.message` or 
+    :attr:`telegram.Update.edited_message`."""
 
     class _ChannelPost(UpdateFilter):
         __slots__ = ()
@@ -2221,6 +2122,7 @@ class UpdateType(UpdateFilter):
             return update.channel_post is not None
 
     CHANNEL_POST = _ChannelPost()
+    """Updates with :attr:`telegram.Update.channel_post`."""
 
     class _EditedChannelPost(UpdateFilter):
         __slots__ = ()
@@ -2230,6 +2132,7 @@ class UpdateType(UpdateFilter):
             return update.edited_channel_post is not None
 
     EDITED_CHANNEL_POST = _EditedChannelPost()
+    """Updates with :attr:`telegram.Update.edited_channel_post`."""
 
     class _Edited(UpdateFilter):
         __slots__ = ()
@@ -2239,6 +2142,8 @@ class UpdateType(UpdateFilter):
             return update.edited_message is not None or update.edited_channel_post is not None
 
     EDITED = _Edited()
+    """Updates with either :attr:`telegram.Update.edited_message` or 
+    :attr:`telegram.Update.edited_channel_post`."""
 
     class _ChannelPosts(UpdateFilter):
         __slots__ = ()
@@ -2248,29 +2153,12 @@ class UpdateType(UpdateFilter):
             return update.channel_post is not None or update.edited_channel_post is not None
 
     CHANNEL_POSTS = _ChannelPosts()
+    """Updates with either :attr:`telegram.Update.channel_post` or 
+    :attr:`telegram.Update.edited_channel_post`."""
 
     def filter(self, update: Update) -> bool:
         return bool(self.MESSAGES.check_update(update) or self.CHANNEL_POSTS.check_update(update))
 
 
 UPDATE = UpdateType()
-"""Subset for filtering the type of update.
-
-Examples:
-    Use these filters like: ``filters.UpdateType.MESSAGE`` or
-    ``filters.UpdateType.CHANNEL_POSTS`` etc. Or use just ``filters.UPDATE`` for all
-    types.
-
-Attributes:
-    MESSAGE: Updates with :attr:`telegram.Update.message`
-    EDITED_MESSAGE: Updates with :attr:`telegram.Update.edited_message`
-    MESSAGES: Updates with either :attr:`telegram.Update.message` or
-        :attr:`telegram.Update.edited_message`
-    CHANNEL_POST: Updates with :attr:`telegram.Update.channel_post`
-    EDITED_CHANNEL_POST: Updates with
-        :attr:`telegram.Update.edited_channel_post`
-    CHANNEL_POSTS: Updates with either :attr:`telegram.Update.channel_post` or
-        :attr:`telegram.Update.edited_channel_post`
-    EDITED: Updates with either :attr:`telegram.Update.edited_message` or
-        :attr:`telegram.Update.edited_channel_post`
-"""
+"""Shortcut for :class:`telegram.ext.filters.UpdateType()`."""

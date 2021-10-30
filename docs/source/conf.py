@@ -358,7 +358,13 @@ class TGConstXRefRole(PyXRefRole):
 
 
 def autodoc_skip_member(app, what, name, obj, skip, options):
-    pass
+    """We use this to undoc the filter() of filters, but show the filter() of the bases.
+    See https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#skipping-members"""
+    if name == 'filter':  # Only the filter() method
+        included = {'MessageFilter', 'UpdateFilter', 'InvertedFilter', 'MergedFilter', 'XORFilter'}
+        obj_rep = repr(obj)
+        if not any(inc in obj_rep for inc in included):  # Don't document filter() than those above
+            return True  # return True to exclude from docs.
 
 
 def setup(app: Sphinx):

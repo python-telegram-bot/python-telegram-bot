@@ -129,7 +129,7 @@ class CommandHandler(Handler[Update, CCT]):
                 and message.text
                 and message.get_bot()
             ):
-                command = message.text[1: message.entities[0].length]
+                command = message.text[1 : message.entities[0].length]
                 args = message.text.split()[1:]
                 command_parts = command.split('@')
                 command_parts.append(message.get_bot().username)
