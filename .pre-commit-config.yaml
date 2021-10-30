@@ -3,18 +3,18 @@
 #   * the additional_dependencies here match requirements.txt
 repos:
 -   repo: https://github.com/psf/black
-    rev: 20.8b1
+    rev: 21.9b0
     hooks:
     -   id: black
         args:
         - --diff
         - --check
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+    rev: 4.0.1
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: v2.10.2
+    rev: v2.11.1
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
@@ -56,7 +56,7 @@ repos:
           - cachetools==4.2.2
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.24.0
+    rev: v2.29.0
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests)/.*\.py$

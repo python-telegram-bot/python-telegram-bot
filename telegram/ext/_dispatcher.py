@@ -51,8 +51,8 @@ from telegram.ext._utils.types import CCT, UD, CD, BD, BT, JQ, PT
 from telegram.ext._utils.stack import was_called_by
 
 if TYPE_CHECKING:
-    from .jobqueue import Job
-    from .builders import InitDispatcherBuilder
+    from telegram.ext._jobqueue import Job
+    from telegram.ext._builders import InitDispatcherBuilder
 
 DEFAULT_GROUP: int = 0
 
