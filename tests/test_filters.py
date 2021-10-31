@@ -1299,6 +1299,7 @@ class TestFilters:
     def test_filters_forwarded_from_id(self, update):
         # Test with User id-
         assert not filters.ForwardedFrom(chat_id=1).check_update(update)
+        assert filters.FORWARDED_FROM.check_update(update)
         update.message.forward_from.id = 1
         assert filters.ForwardedFrom(chat_id=1).check_update(update)
         update.message.forward_from.id = 2
@@ -1315,11 +1316,14 @@ class TestFilters:
         update.message.forward_from_chat.id = 2
         assert not filters.ForwardedFrom(chat_id=[3, 4]).check_update(update)
         assert filters.ForwardedFrom(chat_id=2).check_update(update)
+        update.message.forward_from_chat = None
+        assert not filters.FORWARDED_FROM.check_update(update)
 
     def test_filters_forwarded_from_username(self, update):
         # For User username
         assert not filters.ForwardedFrom(username='chat').check_update(update)
         assert not filters.ForwardedFrom(username='Testchat').check_update(update)
+        assert filters.FORWARDED_FROM.check_update(update)
         update.message.forward_from.username = 'chat@'
         assert filters.ForwardedFrom(username='@chat@').check_update(update)
         assert filters.ForwardedFrom(username='chat@').check_update(update)
@@ -1553,8 +1557,10 @@ class TestFilters:
         update.message.sender_chat.id = 2
         assert filters.SenderChat(chat_id=[1, 2]).check_update(update)
         assert not filters.SenderChat(chat_id=[3, 4]).check_update(update)
+        assert filters.SENDER_CHAT.check_update(update)
         update.message.sender_chat = None
         assert not filters.SenderChat(chat_id=[3, 4]).check_update(update)
+        assert not filters.SENDER_CHAT.check_update(update)
 
     def test_filters_sender_chat_username(self, update):
         assert not filters.SenderChat(username='chat').check_update(update)
@@ -1564,8 +1570,10 @@ class TestFilters:
         assert filters.SenderChat(username='chat@').check_update(update)
         assert filters.SenderChat(username=['chat1', 'chat@', 'chat2']).check_update(update)
         assert not filters.SenderChat(username=['@username', '@chat_2']).check_update(update)
+        assert filters.SENDER_CHAT.check_update(update)
         update.message.sender_chat = None
         assert not filters.SenderChat(username=['@username', '@chat_2']).check_update(update)
+        assert not filters.SENDER_CHAT.check_update(update)
 
     def test_filters_sender_chat_change_id(self, update):
         f = filters.SenderChat(chat_id=1)
@@ -1684,12 +1692,15 @@ class TestFilters:
     def test_filters_sender_chat_super_group(self, update):
         update.message.sender_chat.type = Chat.PRIVATE
         assert not filters.SenderChat.SUPER_GROUP.check_update(update)
+        assert filters.SENDER_CHAT.check_update(update)
         update.message.sender_chat.type = Chat.CHANNEL
         assert not filters.SenderChat.SUPER_GROUP.check_update(update)
         update.message.sender_chat.type = Chat.SUPERGROUP
         assert filters.SenderChat.SUPER_GROUP.check_update(update)
+        assert filters.SENDER_CHAT.check_update(update)
         update.message.sender_chat = None
         assert not filters.SenderChat.SUPER_GROUP.check_update(update)
+        assert not filters.SENDER_CHAT.check_update(update)
 
     def test_filters_sender_chat_channel(self, update):
         update.message.sender_chat.type = Chat.PRIVATE

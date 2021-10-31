@@ -682,7 +682,7 @@ class Document(MessageFilter):
         __slots__ = ('mimetype',)
 
         def __init__(self, mimetype: str):
-            self.mimetype = mimetype
+            self.mimetype = mimetype  # skipcq: PTC-W0052
             self.name = f"filters.Document.MimeType('{self.mimetype}')"
 
         def filter(self, message: Message) -> bool:
@@ -2001,8 +2001,8 @@ class Dice(_DiceEmoji):
 
     __slots__ = ()
     # Partials so its easier for users to pass dice values without worrying about anything else.
-    DICE = _DiceEmoji(emoji=DE.DICE)
-    Dice = partial(_DiceEmoji, emoji=DE.DICE)
+    DICE = _DiceEmoji(emoji=DE.DICE)  # skipcq: PTC-W0052
+    Dice = partial(_DiceEmoji, emoji=DE.DICE)  # skipcq: PTC-W0052
 
     DARTS = _DiceEmoji(emoji=DE.DARTS)
     Darts = partial(_DiceEmoji, emoji=DE.DARTS)
@@ -2076,12 +2076,14 @@ ATTACHMENT = _Attachment()
 
 
 class UpdateType(UpdateFilter):
-    """Subset for filtering the type of update.
+    """
+    Subset for filtering the type of update.
 
     Examples:
         Use these filters like: ``filters.UpdateType.MESSAGE`` or
         ``filters.UpdateType.CHANNEL_POSTS`` etc. Or use just ``filters.UPDATE`` for all
-        types."""
+        types.
+    """
 
     __slots__ = ()
     name = 'filters.UPDATE'
