@@ -54,13 +54,12 @@ from telegram import (
 )
 from telegram.ext import (
     Dispatcher,
-    MessageFilter,
     Defaults,
-    UpdateFilter,
     ExtBot,
     DispatcherBuilder,
     UpdaterBuilder,
 )
+from telegram.ext.filters import UpdateFilter, MessageFilter
 from telegram.error import BadRequest
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_NONE
 from telegram.request import Request

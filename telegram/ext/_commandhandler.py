@@ -21,7 +21,7 @@ import re
 from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
-from telegram.ext import BaseFilter, filters as ptbfilters, Handler
+from telegram.ext import filters as filters_module, Handler
 from telegram._utils.types import SLT
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.ext._utils.types import CCT
@@ -86,7 +86,7 @@ class CommandHandler(Handler[Update, CCT]):
         self,
         command: SLT[str],
         callback: Callable[[Update, CCT], RT],
-        filters: BaseFilter = None,
+        filters: filters_module.BaseFilter = None,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         super().__init__(
@@ -103,9 +103,9 @@ class CommandHandler(Handler[Update, CCT]):
                 raise ValueError('Command is not a valid bot command')
 
         if filters:
-            self.filters = ptbfilters.UpdateType.MESSAGES & filters
+            self.filters = filters_module.UpdateType.MESSAGES & filters
         else:
-            self.filters = ptbfilters.UpdateType.MESSAGES
+            self.filters = filters_module.UpdateType.MESSAGES
 
     def check_update(
         self, update: object
@@ -237,7 +237,7 @@ class PrefixHandler(CommandHandler):
         prefix: SLT[str],
         command: SLT[str],
         callback: Callable[[Update, CCT], RT],
-        filters: BaseFilter = None,
+        filters: filters_module.BaseFilter = None,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 

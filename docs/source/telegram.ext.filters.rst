@@ -3,6 +3,7 @@
 telegram.ext.filters Module
 ===========================
 
+.. bysource since e.g filters.CHAT is much above filters.Chat() in the docs when it shouldn't
 .. automodule:: telegram.ext.filters
     :members:
     :show-inheritance:

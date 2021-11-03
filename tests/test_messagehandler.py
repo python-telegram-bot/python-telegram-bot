@@ -33,7 +33,7 @@ from telegram import (
     ShippingQuery,
     PreCheckoutQuery,
 )
-from telegram.ext import filters, MessageHandler, CallbackContext, JobQueue, UpdateFilter
+from telegram.ext import filters, MessageHandler, CallbackContext, JobQueue
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
@@ -129,7 +129,7 @@ class TestMessageHandler:
         assert not handler.check_update(Update(0, message))
 
     def test_callback_query_with_filter(self, message):
-        class TestFilter(UpdateFilter):
+        class TestFilter(filters.UpdateFilter):
             flag = False
 
             def filter(self, u):

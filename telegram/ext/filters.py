@@ -42,7 +42,7 @@ from typing import (
 from telegram import Chat as TGChat, Message, MessageEntity, Update, User as TGUser
 
 from telegram._utils.types import SLT
-from telegram.constants import DiceEmoji as DE
+from telegram.constants import DiceEmoji as DiceEmojiEnum
 
 DataDict = Dict[str, list]
 
@@ -118,16 +118,16 @@ class BaseFilter(ABC):
         ...
 
     def __and__(self, other: 'BaseFilter') -> 'BaseFilter':
-        return MergedFilter(self, and_filter=other)
+        return _MergedFilter(self, and_filter=other)
 
     def __or__(self, other: 'BaseFilter') -> 'BaseFilter':
-        return MergedFilter(self, or_filter=other)
+        return _MergedFilter(self, or_filter=other)
 
     def __xor__(self, other: 'BaseFilter') -> 'BaseFilter':
-        return XORFilter(self, other)
+        return _XORFilter(self, other)
 
     def __invert__(self) -> 'BaseFilter':
-        return InvertedFilter(self)
+        return _InvertedFilter(self)
 
     @property
     def data_filter(self) -> bool:
@@ -188,8 +188,8 @@ class MessageFilter(BaseFilter):
 
 class UpdateFilter(BaseFilter):
     """Base class for all Update Filters. In contrast to :class:`MessageFilter`, the object
-    passed to :meth:`filter` is :class:`telegram.Update`, which allows to create filters like
-    :attr:`filters.UpdateType.EDITED_MESSAGE`.
+    passed to :meth:`filter` is an instance of :class:`telegram.Update`, which allows to create
+    filters like :attr:`filters.UpdateType.EDITED_MESSAGE`.
 
     Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
     filters.
@@ -221,7 +221,7 @@ class UpdateFilter(BaseFilter):
         """
 
 
-class InvertedFilter(UpdateFilter):
+class _InvertedFilter(UpdateFilter):
     """Represents a filter that has been inverted.
 
     Args:
@@ -243,10 +243,10 @@ class InvertedFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError('Cannot set name for InvertedFilter')
+        raise RuntimeError(f'Cannot set name for {self.__class__.__name__!r}')
 
 
-class MergedFilter(UpdateFilter):
+class _MergedFilter(UpdateFilter):
     """Represents a filter consisting of two other filters.
 
     Args:
@@ -330,10 +330,10 @@ class MergedFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError('Cannot set name for MergedFilter')
+        raise RuntimeError(f'Cannot set name for {self.__class__.__name__!r}')
 
 
-class XORFilter(UpdateFilter):
+class _XORFilter(UpdateFilter):
     """Convenience filter acting as wrapper for :class:`MergedFilter` representing the an XOR gate
     for two filters.
 
@@ -359,27 +359,28 @@ class XORFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError('Cannot set name for XORFilter')
+        raise RuntimeError(f'Cannot set name for {self.__class__.__name__!r}')
 
 
 class _DiceEmoji(MessageFilter):
     __slots__ = ('emoji', 'values')
 
-    def __init__(self, values: SLT[int] = None, emoji: str = None):
-        name = f"filters.DICE.{getattr(emoji, 'name', '')}" if emoji else 'filters.DICE'
+    def __init__(self, values: SLT[int] = None, emoji: DiceEmojiEnum = None):
+        self.name = f"filters.DICE.{getattr(emoji, 'name', '')}" if emoji else 'filters.DICE'
         self.emoji = emoji
         self.values = [values] if isinstance(values, int) else values
-        if self.values:
-            self.name = f"{name.title().replace('_', '')}({self.values})"  # CAP_SNAKE -> CamelCase
+        if self.values:  # Converts for e.g. SLOT_MACHINE -> SlotMachine
+            self.name = f"{self.name.title().replace('_', '')}({self.values})"
 
     def filter(self, message: Message) -> bool:
         if not message.dice:  # no dice
             return False
 
         if self.emoji:
+            emoji_match = message.dice.emoji == self.emoji
             if self.values:
-                return message.dice.value in self.values  # emoji and value
-            return message.dice.emoji == self.emoji  # emoji, no value
+                return message.dice.value in self.values and emoji_match  # emoji and value
+            return emoji_match  # emoji, no value
         return message.dice.value in self.values if self.values else True  # no emoji, only value
 
 
@@ -400,9 +401,6 @@ class Text(MessageFilter):
     whose text is appearing in the given list.
 
     Examples:
-        To allow any text message, simply use
-        ``MessageHandler(filters.TEXT, callback_method)``.
-
         A simple use case for passing a list is to allow only messages that were sent by a
         custom :class:`telegram.ReplyKeyboardMarkup`::
 
@@ -410,6 +408,10 @@ class Text(MessageFilter):
             markup = ReplyKeyboardMarkup.from_column(buttons)
             ...
             MessageHandler(filters.Text(buttons), callback_method)
+
+    .. seealso::
+        :attr:`telegram.ext.filters.TEXT`
+
 
     Note:
         * Dice messages don't have text. If you want to filter either text or dice messages, use
@@ -436,7 +438,12 @@ class Text(MessageFilter):
 
 
 TEXT = Text()
-"""Shortcut for :class:`telegram.ext.filters.Text()`."""
+"""
+Shortcut for :class:`telegram.ext.filters.Text()`.
+
+Examples:
+    To allow any text message, simply use ``MessageHandler(filters.TEXT, callback_method)``.
+"""
 
 
 class Caption(MessageFilter):
@@ -444,8 +451,10 @@ class Caption(MessageFilter):
     allow those whose caption is appearing in the given list.
 
     Examples:
-        ``MessageHandler(filters.CAPTION, callback_method)``
         ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB'], callback_method_2)``
+
+    .. seealso::
+        :attr:`telegram.ext.filters.CAPTION`
 
     Args:
         strings (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which captions to allow. Only
@@ -465,7 +474,11 @@ class Caption(MessageFilter):
 
 
 CAPTION = Caption()
-"""Shortcut for :class:`telegram.ext.filters.Caption()`."""
+"""Shortcut for :class:`telegram.ext.filters.Caption()`.
+
+Examples:
+    To allow any caption, simply use ``MessageHandler(filters.CAPTION, callback_method)``.
+"""
 
 
 class Command(MessageFilter):
@@ -474,10 +487,11 @@ class Command(MessageFilter):
     messages `starting` with a bot command. Pass :obj:`False` to also allow messages that contain a
     bot command `anywhere` in the text.
 
-    Examples::
+    Examples:
+        ``MessageHandler(filters.Command(False), command_anywhere_callback)``
 
-        MessageHandler(filters.COMMAND, command_at_start_callback)
-        MessageHandler(filters.Command(False), command_anywhere_callback)
+    .. seealso::
+        :attr:`telegram.ext.filters.COMMAND`.
 
     Note:
         :attr:`telegram.ext.filters.TEXT` also accepts messages containing a command.
@@ -505,7 +519,12 @@ class Command(MessageFilter):
 
 
 COMMAND = Command()
-"""Shortcut for :class:`telegram.ext.filters.Command()`."""
+"""Shortcut for :class:`telegram.ext.filters.Command()`.
+
+Examples:
+    To allow messages starting with a command use
+    ``MessageHandler(filters.COMMAND, command_at_start_callback)``.
+"""
 
 
 class Regex(MessageFilter):
@@ -619,8 +638,8 @@ class Document(MessageFilter):
 
     Examples:
         Use these filters like: ``filters.Document.MP3``,
-        ``filters.Document.MimeType("text/plain")`` etc. Or use just
-        ``filters.DOCUMENT`` for all document messages.
+        ``filters.Document.MimeType("text/plain")`` etc. Or use just ``filters.DOCUMENT`` for all
+        document messages.
     """
 
     __slots__ = ()
@@ -897,17 +916,16 @@ VENUE = _Venue()
 """Messages that contain :class:`telegram.Venue`."""
 
 
-# TODO: Test if filters.STATUS_UPDATE.CHAT_CREATED == filters.StatusUpdate.CHAT_CREATED
-class StatusUpdate(UpdateFilter):
+class StatusUpdate:
     """Subset for messages containing a status update.
 
     Examples:
         Use these filters like: ``filters.StatusUpdate.NEW_CHAT_MEMBERS`` etc. Or use just
-        ``filters.STATUS_UPDATE`` for all status update messages.
-
+        ``filters.StatusUpdate.ALL`` for all status update messages.
     """
 
     __slots__ = ()
+    name = 'filters.StatusUpdate'
 
     class _NewChatMembers(MessageFilter):
         __slots__ = ()
@@ -1081,30 +1099,31 @@ class StatusUpdate(UpdateFilter):
     .. versionadded:: 13.4
     """
 
-    name = 'filters.STATUS_UPDATE'
+    class _All(UpdateFilter):
+        __slots__ = ()
+        name = "filters.StatusUpdate.ALL"
 
-    def filter(self, update: Update) -> bool:
-        return bool(
-            self.NEW_CHAT_MEMBERS.check_update(update)
-            or self.LEFT_CHAT_MEMBER.check_update(update)
-            or self.NEW_CHAT_TITLE.check_update(update)
-            or self.NEW_CHAT_PHOTO.check_update(update)
-            or self.DELETE_CHAT_PHOTO.check_update(update)
-            or self.CHAT_CREATED.check_update(update)
-            or self.MESSAGE_AUTO_DELETE_TIMER_CHANGED.check_update(update)
-            or self.MIGRATE.check_update(update)
-            or self.PINNED_MESSAGE.check_update(update)
-            or self.CONNECTED_WEBSITE.check_update(update)
-            or self.PROXIMITY_ALERT_TRIGGERED.check_update(update)
-            or self.VOICE_CHAT_SCHEDULED.check_update(update)
-            or self.VOICE_CHAT_STARTED.check_update(update)
-            or self.VOICE_CHAT_ENDED.check_update(update)
-            or self.VOICE_CHAT_PARTICIPANTS_INVITED.check_update(update)
-        )
+        def filter(self, update: Update) -> bool:
+            return bool(
+                StatusUpdate.NEW_CHAT_MEMBERS.check_update(update)
+                or StatusUpdate.LEFT_CHAT_MEMBER.check_update(update)
+                or StatusUpdate.NEW_CHAT_TITLE.check_update(update)
+                or StatusUpdate.NEW_CHAT_PHOTO.check_update(update)
+                or StatusUpdate.DELETE_CHAT_PHOTO.check_update(update)
+                or StatusUpdate.CHAT_CREATED.check_update(update)
+                or StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED.check_update(update)
+                or StatusUpdate.MIGRATE.check_update(update)
+                or StatusUpdate.PINNED_MESSAGE.check_update(update)
+                or StatusUpdate.CONNECTED_WEBSITE.check_update(update)
+                or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
+                or StatusUpdate.VOICE_CHAT_SCHEDULED.check_update(update)
+                or StatusUpdate.VOICE_CHAT_STARTED.check_update(update)
+                or StatusUpdate.VOICE_CHAT_ENDED.check_update(update)
+                or StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED.check_update(update)
+            )
 
-
-STATUS_UPDATE = StatusUpdate()
-"""Shortcut for :class:`telegram.ext.filters.StatusUpdate()`."""
+    ALL = _All()
+    """Messages that contain any of the above."""
 
 
 class _Forwarded(MessageFilter):
@@ -1184,7 +1203,10 @@ class ChatType:  # A convenience namespace for Chat types.
 
     Examples:
         Use these filters like: ``filters.ChatType.CHANNEL`` or
-        ``filters.ChatType.SUPERGROUP`` etc. Note that ``filters.ChatType`` does NOT work by itself
+        ``filters.ChatType.SUPERGROUP`` etc.
+
+    Note:
+        ``filters.ChatType`` itself is *not* a filter.
     """
 
     __slots__ = ()
@@ -1243,8 +1265,8 @@ class ChatType:  # A convenience namespace for Chat types.
 
 class _ChatUserBaseFilter(MessageFilter, ABC):
     __slots__ = (
-        'chat_id_name',
-        'username_name',
+        '_chat_id_name',
+        '_username_name',
         'allow_empty',
         '__lock',
         '_chat_ids',
@@ -1257,8 +1279,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         username: SLT[str] = None,
         allow_empty: bool = False,
     ):
-        self.chat_id_name = 'chat_id'
-        self.username_name = 'username'
+        self._chat_id_name = 'chat_id'
+        self._username_name = 'username'
         self.allow_empty = allow_empty
         self.__lock = Lock()
 
@@ -1292,8 +1314,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         with self.__lock:
             if chat_id and self._usernames:
                 raise RuntimeError(
-                    f"Can't set {self.chat_id_name} in conjunction with (already set) "
-                    f"{self.username_name}s."
+                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                    f"{self._username_name}s."
                 )
             self._chat_ids = self._parse_chat_id(chat_id)
 
@@ -1301,8 +1323,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         with self.__lock:
             if username and self._chat_ids:
                 raise RuntimeError(
-                    f"Can't set {self.username_name} in conjunction with (already set) "
-                    f"{self.chat_id_name}s."
+                    f"Can't set {self._username_name} in conjunction with (already set) "
+                    f"{self._chat_id_name}s."
                 )
             self._usernames = self._parse_username(username)
 
@@ -1324,46 +1346,46 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
     def usernames(self, username: SLT[str]) -> None:
         self._set_usernames(username)
 
-    def add_usernames(self, username: SLT[str]) -> None:
+    def _add_usernames(self, username: SLT[str]) -> None:
         with self.__lock:
             if self._chat_ids:
                 raise RuntimeError(
-                    f"Can't set {self.username_name} in conjunction with (already set) "
-                    f"{self.chat_id_name}s."
+                    f"Can't set {self._username_name} in conjunction with (already set) "
+                    f"{self._chat_id_name}s."
                 )
 
             parsed_username = self._parse_username(username)
             self._usernames |= parsed_username
 
-    def add_chat_ids(self, chat_id: SLT[int]) -> None:
+    def _add_chat_ids(self, chat_id: SLT[int]) -> None:
         with self.__lock:
             if self._usernames:
                 raise RuntimeError(
-                    f"Can't set {self.chat_id_name} in conjunction with (already set) "
-                    f"{self.username_name}s."
+                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                    f"{self._username_name}s."
                 )
 
             parsed_chat_id = self._parse_chat_id(chat_id)
 
             self._chat_ids |= parsed_chat_id
 
-    def remove_usernames(self, username: SLT[str]) -> None:
+    def _remove_usernames(self, username: SLT[str]) -> None:
         with self.__lock:
             if self._chat_ids:
                 raise RuntimeError(
-                    f"Can't set {self.username_name} in conjunction with (already set) "
-                    f"{self.chat_id_name}s."
+                    f"Can't set {self._username_name} in conjunction with (already set) "
+                    f"{self._chat_id_name}s."
                 )
 
             parsed_username = self._parse_username(username)
             self._usernames -= parsed_username
 
-    def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+    def _remove_chat_ids(self, chat_id: SLT[int]) -> None:
         with self.__lock:
             if self._usernames:
                 raise RuntimeError(
-                    f"Can't set {self.chat_id_name} in conjunction with (already set) "
-                    f"{self.username_name}s."
+                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                    f"{self._username_name}s."
                 )
             parsed_chat_id = self._parse_chat_id(chat_id)
             self._chat_ids -= parsed_chat_id
@@ -1391,20 +1413,11 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
 
 
 class User(_ChatUserBaseFilter):
-    # pylint: disable=useless-super-delegation
     """Filters messages to allow only those which are from specified user ID(s) or
     username(s).
 
     Examples:
         ``MessageHandler(filters.User(1234), callback_method)``
-
-    Warning:
-        :attr:`user_ids` will give a *copy* of the saved user ids as :class:`frozenset`. This
-        is to ensure thread safety. To add/remove a user, you should use :meth:`add_usernames`,
-        :meth:`add_user_ids`, :meth:`remove_usernames` and :meth:`remove_user_ids`. Only update
-        the entire set by ``filter.user_ids/usernames = new_set``, if you are entirely sure
-        that it is not causing race conditions, as this will complete replace the current set
-        of allowed users.
 
     Args:
         user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
@@ -1416,7 +1429,6 @@ class User(_ChatUserBaseFilter):
             is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`.
 
     Attributes:
-        user_ids (set(:obj:`int`)): Which user ID(s) to allow through.
         usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
         allow_empty (:obj:`bool`): Whether updates should be processed, if no user
             is specified in :attr:`user_ids` and :attr:`usernames`.
@@ -1434,13 +1446,27 @@ class User(_ChatUserBaseFilter):
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=user_id, username=username, allow_empty=allow_empty)
-        self.chat_id_name = 'user_id'
+        self._chat_id_name = 'user_id'
 
     def get_chat_or_user(self, message: Message) -> Optional[TGUser]:
         return message.from_user
 
     @property
     def user_ids(self) -> FrozenSet[int]:
+        """
+        Which user ID(s) to allow through.
+
+        Warning:
+            :attr:`user_ids` will give a *copy* of the saved user ids as :class:`frozenset`. This
+            is to ensure thread safety. To add/remove a user, you should use :meth:`add_usernames`,
+            :meth:`add_user_ids`, :meth:`remove_usernames` and :meth:`remove_user_ids`. Only update
+            the entire set by ``filter.user_ids/usernames = new_set``, if you are entirely sure
+            that it is not causing race conditions, as this will complete replace the current set
+            of allowed users.
+
+        Returns:
+            set(:obj:`int`)
+        """
         return self.chat_ids
 
     @user_ids.setter
@@ -1456,7 +1482,7 @@ class User(_ChatUserBaseFilter):
                 Which username(s) to allow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().add_usernames(username)
+        return super()._add_usernames(username)
 
     def add_user_ids(self, user_id: SLT[int]) -> None:
         """
@@ -1466,7 +1492,7 @@ class User(_ChatUserBaseFilter):
             user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which user ID(s) to allow through.
         """
-        return super().add_chat_ids(user_id)
+        return super()._add_chat_ids(user_id)
 
     def remove_usernames(self, username: SLT[str]) -> None:
         """
@@ -1477,7 +1503,7 @@ class User(_ChatUserBaseFilter):
                 Which username(s) to disallow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().remove_usernames(username)
+        return super()._remove_usernames(username)
 
     def remove_user_ids(self, user_id: SLT[int]) -> None:
         """
@@ -1487,28 +1513,22 @@ class User(_ChatUserBaseFilter):
             user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which user ID(s) to disallow through.
         """
-        return super().remove_chat_ids(user_id)
+        return super()._remove_chat_ids(user_id)
 
 
 USER = User(allow_empty=True)
-"""Shortcut for :class:`filters.User(allow_empty=True)`."""
+"""
+Shortcut for :class:`filters.User(allow_empty=True)`. This allows to filter *any* message that
+was sent from a user.
+"""
 
 
 class ViaBot(_ChatUserBaseFilter):
-    # pylint: disable=useless-super-delegation
     """Filters messages to allow only those which are from specified via_bot ID(s) or
     username(s).
 
     Examples:
         ``MessageHandler(filters.ViaBot(1234), callback_method)``
-
-    Warning:
-        :attr:`bot_ids` will give a *copy* of the saved bot ids as :class:`frozenset`. This
-        is to ensure thread safety. To add/remove a bot, you should use :meth:`add_usernames`,
-        :meth:`add_bot_ids`, :meth:`remove_usernames` and :meth:`remove_bot_ids`. Only update
-        the entire set by ``filter.bot_ids/usernames = new_set``, if you are entirely sure
-        that it is not causing race conditions, as this will complete replace the current set
-        of allowed bots.
 
     Args:
         bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
@@ -1520,7 +1540,6 @@ class ViaBot(_ChatUserBaseFilter):
             is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`.
 
     Attributes:
-        bot_ids (set(:obj:`int`)): Which bot ID(s) to allow through.
         usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
         allow_empty (:obj:`bool`): Whether updates should be processed, if no bot
             is specified in :attr:`bot_ids` and :attr:`usernames`.
@@ -1538,13 +1557,27 @@ class ViaBot(_ChatUserBaseFilter):
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=bot_id, username=username, allow_empty=allow_empty)
-        self.chat_id_name = 'bot_id'
+        self._chat_id_name = 'bot_id'
 
     def get_chat_or_user(self, message: Message) -> Optional[TGUser]:
         return message.via_bot
 
     @property
     def bot_ids(self) -> FrozenSet[int]:
+        """
+        Which bot ID(s) to allow through.
+
+        Warning:
+            :attr:`bot_ids` will give a *copy* of the saved bot ids as :class:`frozenset`. This
+            is to ensure thread safety. To add/remove a bot, you should use :meth:`add_usernames`,
+            :meth:`add_bot_ids`, :meth:`remove_usernames` and :meth:`remove_bot_ids`. Only update
+            the entire set by ``filter.bot_ids/usernames = new_set``, if you are entirely sure
+            that it is not causing race conditions, as this will complete replace the current set
+            of allowed bots.
+
+        Returns:
+            set(:obj:`int`)
+        """
         return self.chat_ids
 
     @bot_ids.setter
@@ -1560,7 +1593,7 @@ class ViaBot(_ChatUserBaseFilter):
                 Which username(s) to allow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().add_usernames(username)
+        return super()._add_usernames(username)
 
     def add_bot_ids(self, bot_id: SLT[int]) -> None:
         """
@@ -1570,7 +1603,7 @@ class ViaBot(_ChatUserBaseFilter):
             bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which bot ID(s) to allow through.
         """
-        return super().add_chat_ids(bot_id)
+        return super()._add_chat_ids(bot_id)
 
     def remove_usernames(self, username: SLT[str]) -> None:
         """
@@ -1581,7 +1614,7 @@ class ViaBot(_ChatUserBaseFilter):
                 Which username(s) to disallow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().remove_usernames(username)
+        return super()._remove_usernames(username)
 
     def remove_bot_ids(self, bot_id: SLT[int]) -> None:
         """
@@ -1591,15 +1624,17 @@ class ViaBot(_ChatUserBaseFilter):
             bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which bot ID(s) to disallow through.
         """
-        return super().remove_chat_ids(bot_id)
+        return super()._remove_chat_ids(bot_id)
 
 
 VIA_BOT = ViaBot(allow_empty=True)
-"""Shortcut for :class:`filters.ViaBot(allow_empty=True)`."""
+"""
+Shortcut for :class:`filters.ViaBot(allow_empty=True)`. This allows to filter *any* message that
+was sent via a bot.
+"""
 
 
 class Chat(_ChatUserBaseFilter):
-    # pylint: disable=useless-super-delegation
     """Filters messages to allow only those which are from a specified chat ID or username.
 
     Examples:
@@ -1646,7 +1681,7 @@ class Chat(_ChatUserBaseFilter):
                 Which username(s) to allow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().add_usernames(username)
+        return super()._add_usernames(username)
 
     def add_chat_ids(self, chat_id: SLT[int]) -> None:
         """
@@ -1656,7 +1691,7 @@ class Chat(_ChatUserBaseFilter):
             chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which chat ID(s) to allow through.
         """
-        return super().add_chat_ids(chat_id)
+        return super()._add_chat_ids(chat_id)
 
     def remove_usernames(self, username: SLT[str]) -> None:
         """
@@ -1667,7 +1702,7 @@ class Chat(_ChatUserBaseFilter):
                 Which username(s) to disallow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().remove_usernames(username)
+        return super()._remove_usernames(username)
 
     def remove_chat_ids(self, chat_id: SLT[int]) -> None:
         """
@@ -1677,15 +1712,17 @@ class Chat(_ChatUserBaseFilter):
             chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which chat ID(s) to disallow through.
         """
-        return super().remove_chat_ids(chat_id)
+        return super()._remove_chat_ids(chat_id)
 
 
 CHAT = Chat(allow_empty=True)
-"""Shortcut for :class:`filters.Chat(allow_empty=True)`."""
+"""
+Shortcut for :class:`filters.Chat(allow_empty=True)`. This allows to filter for *any* message
+that was sent from any chat.
+"""
 
 
 class ForwardedFrom(_ChatUserBaseFilter):
-    # pylint: disable=useless-super-delegation
     """Filters messages to allow only those which are forwarded from the specified chat ID(s)
     or username(s) based on :attr:`telegram.Message.forward_from` and
     :attr:`telegram.Message.forward_from_chat`.
@@ -1743,7 +1780,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
                 Which username(s) to allow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().add_usernames(username)
+        return super()._add_usernames(username)
 
     def add_chat_ids(self, chat_id: SLT[int]) -> None:
         """
@@ -1753,7 +1790,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
             chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which chat/user ID(s) to allow through.
         """
-        return super().add_chat_ids(chat_id)
+        return super()._add_chat_ids(chat_id)
 
     def remove_usernames(self, username: SLT[str]) -> None:
         """
@@ -1764,7 +1801,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
                 Which username(s) to disallow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().remove_usernames(username)
+        return super()._remove_usernames(username)
 
     def remove_chat_ids(self, chat_id: SLT[int]) -> None:
         """
@@ -1774,15 +1811,10 @@ class ForwardedFrom(_ChatUserBaseFilter):
             chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which chat/user ID(s) to disallow through.
         """
-        return super().remove_chat_ids(chat_id)
-
-
-FORWARDED_FROM = ForwardedFrom(allow_empty=True)
-"""Shortcut for :class:`filters.ForwardedFrom(allow_empty=True)`"""
+        return super()._remove_chat_ids(chat_id)
 
 
 class SenderChat(_ChatUserBaseFilter):
-    # pylint: disable=useless-super-delegation
     """Filters messages to allow only those which are from a specified sender chats chat ID or
     username.
 
@@ -1845,7 +1877,7 @@ class SenderChat(_ChatUserBaseFilter):
                 Which sender chat username(s) to allow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().add_usernames(username)
+        return super()._add_usernames(username)
 
     def add_chat_ids(self, chat_id: SLT[int]) -> None:
         """
@@ -1855,7 +1887,7 @@ class SenderChat(_ChatUserBaseFilter):
             chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which sender chat ID(s) to allow through.
         """
-        return super().add_chat_ids(chat_id)
+        return super()._add_chat_ids(chat_id)
 
     def remove_usernames(self, username: SLT[str]) -> None:
         """
@@ -1866,7 +1898,7 @@ class SenderChat(_ChatUserBaseFilter):
                 Which sender chat username(s) to disallow through.
                 Leading ``'@'`` s in usernames will be discarded.
         """
-        return super().remove_usernames(username)
+        return super()._remove_usernames(username)
 
     def remove_chat_ids(self, chat_id: SLT[int]) -> None:
         """
@@ -1876,11 +1908,11 @@ class SenderChat(_ChatUserBaseFilter):
             chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
                 Which sender chat ID(s) to disallow through.
         """
-        return super().remove_chat_ids(chat_id)
+        return super()._remove_chat_ids(chat_id)
 
     class _SUPERGROUP(MessageFilter):
         __slots__ = ()
-        name = "filters.ChatType.SUPERGROUP"
+        name = "filters.SenderChat.SUPERGROUP"
 
         def filter(self, message: Message) -> bool:
             if message.sender_chat:
@@ -2001,23 +2033,23 @@ class Dice(_DiceEmoji):
 
     __slots__ = ()
     # Partials so its easier for users to pass dice values without worrying about anything else.
-    DICE = _DiceEmoji(emoji=DE.DICE)  # skipcq: PTC-W0052
-    Dice = partial(_DiceEmoji, emoji=DE.DICE)  # skipcq: PTC-W0052
+    DICE = _DiceEmoji(emoji=DiceEmojiEnum.DICE)  # skipcq: PTC-W0052
+    Dice = partial(_DiceEmoji, emoji=DiceEmojiEnum.DICE)  # skipcq: PTC-W0052
 
-    DARTS = _DiceEmoji(emoji=DE.DARTS)
-    Darts = partial(_DiceEmoji, emoji=DE.DARTS)
+    DARTS = _DiceEmoji(emoji=DiceEmojiEnum.DARTS)
+    Darts = partial(_DiceEmoji, emoji=DiceEmojiEnum.DARTS)
 
-    BASKETBALL = _DiceEmoji(emoji=DE.BASKETBALL)
-    Basketball = partial(_DiceEmoji, emoji=DE.BASKETBALL)
+    BASKETBALL = _DiceEmoji(emoji=DiceEmojiEnum.BASKETBALL)
+    Basketball = partial(_DiceEmoji, emoji=DiceEmojiEnum.BASKETBALL)
 
-    FOOTBALL = _DiceEmoji(emoji=DE.FOOTBALL)
-    Football = partial(_DiceEmoji, emoji=DE.FOOTBALL)
+    FOOTBALL = _DiceEmoji(emoji=DiceEmojiEnum.FOOTBALL)
+    Football = partial(_DiceEmoji, emoji=DiceEmojiEnum.FOOTBALL)
 
-    SLOT_MACHINE = _DiceEmoji(emoji=DE.SLOT_MACHINE)
-    SlotMachine = partial(_DiceEmoji, emoji=DE.SLOT_MACHINE)
+    SLOT_MACHINE = _DiceEmoji(emoji=DiceEmojiEnum.SLOT_MACHINE)
+    SlotMachine = partial(_DiceEmoji, emoji=DiceEmojiEnum.SLOT_MACHINE)
 
-    BOWLING = _DiceEmoji(emoji=DE.BOWLING)
-    Bowling = partial(_DiceEmoji, emoji=DE.BOWLING)
+    BOWLING = _DiceEmoji(emoji=DiceEmojiEnum.BOWLING)
+    Bowling = partial(_DiceEmoji, emoji=DiceEmojiEnum.BOWLING)
 
 
 DICE = Dice()
@@ -2075,7 +2107,7 @@ ATTACHMENT = _Attachment()
 .. versionadded:: 13.6"""
 
 
-class UpdateType(UpdateFilter):
+class UpdateType:
     """
     Subset for filtering the type of update.
 
@@ -2083,6 +2115,9 @@ class UpdateType(UpdateFilter):
         Use these filters like: ``filters.UpdateType.MESSAGE`` or
         ``filters.UpdateType.CHANNEL_POSTS`` etc. Or use just ``filters.UPDATE`` for all
         types.
+
+    Note:
+        ``filters.UpdateType`` itself is *not* a filter.
     """
 
     __slots__ = ()
@@ -2161,9 +2196,13 @@ class UpdateType(UpdateFilter):
     """Updates with either :attr:`telegram.Update.channel_post` or
     :attr:`telegram.Update.edited_channel_post`."""
 
-    def filter(self, update: Update) -> bool:
-        return bool(self.MESSAGES.check_update(update) or self.CHANNEL_POSTS.check_update(update))
+    class _All(UpdateFilter):
+        __slots__ = ()
+        name = 'filters.UpdateType.ALL'
 
+        def filter(self, update: Update) -> bool:
+            return UpdateType.MESSAGES.check_update(update) \
+                   or UpdateType.CHANNEL_POSTS.check_update(update)
 
-UPDATE = UpdateType()
-"""Shortcut for :class:`telegram.ext.filters.UpdateType()`."""
+    ALL = _All()
+    """All updates which contain a message."""

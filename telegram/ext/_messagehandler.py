@@ -20,7 +20,7 @@
 from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union
 
 from telegram import Update
-from telegram.ext import BaseFilter, filters as ptbfilters, Handler
+from telegram.ext import filters as filters_module, Handler
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 from telegram.ext._utils.types import CCT
@@ -72,19 +72,16 @@ class MessageHandler(Handler[Update, CCT]):
 
     def __init__(
         self,
-        filters: BaseFilter,
+        filters: filters_module.BaseFilter,
         callback: Callable[[Update, CCT], RT],
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
-        super().__init__(
-            callback,
-            run_async=run_async,
-        )
+        super().__init__(callback, run_async=run_async)
         if filters is not None:
-            self.filters = ptbfilters.UPDATE & filters
+            self.filters = filters_module.UpdateType.ALL & filters
         else:
-            self.filters = ptbfilters.UPDATE
+            self.filters = filters_module.UpdateType.ALL
 
     def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
