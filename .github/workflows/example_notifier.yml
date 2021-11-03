@@ -1,10 +1,10 @@
 name: Warning maintainers
 on:
-  pull_request_target:
-    paths: examples/**
   pull_request:
     branches-ignore:
       - V14
+  pull_request_target:
+    paths: examples/**
 jobs:
   job:
     runs-on: ubuntu-latest
