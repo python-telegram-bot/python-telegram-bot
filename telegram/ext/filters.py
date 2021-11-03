@@ -16,8 +16,24 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=empty-docstring,  invalid-name,  arguments-differ
-"""This module contains the Filters for use with the MessageHandler class."""
+"""
+This module contains filters for use with :class:`telegram.ext.MessageHandler` or
+:class:`telegram.ext.CommandHandler`.
+
+.. versionchanged:: 14.0
+
+    #. Filters are no longer callable, if you're using a custom filter and are calling an existing
+       filter, then switch to the new syntax: ``filters.{filter}.check_update(update)``.
+    #. Removed the ``Filters`` class. You should now call filters directly from the module itself.
+    #. The names of all filters has been updated:
+
+        * Filters which are ready for use, e.g ``Filters.all`` are now capitalized, e.g
+          ``filters.ALL``.
+        * Filters which need to be initialized are now in CamelCase. E.g. ``filters.User(...)``.
+        * Filters which do both (like ``Filters.text``) are now split as capitalized version
+          ``filters.TEXT`` and CamelCase version ``filters.Text(...)``.
+
+"""
 
 import mimetypes
 import re
@@ -78,7 +94,7 @@ class BaseFilter(ABC):
 
             >>> filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
 
-        With ``message.text == x``, will only ever return the matches for the first filter,
+        With ``message.text == 'x'``, will only ever return the matches for the first filter,
         since the second one is never evaluated.
 
 
@@ -155,8 +171,7 @@ class MessageFilter(BaseFilter):
     """Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
     to :meth:`filter` is :obj:`telegram.Update.effective_message`.
 
-    Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
-    filters.
+    Please see :class:`BaseFilter` for details on how to create custom filters.
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
@@ -228,17 +243,17 @@ class _InvertedFilter(UpdateFilter):
 
     """
 
-    __slots__ = ('f',)
+    __slots__ = ('inv_filter',)
 
     def __init__(self, f: BaseFilter):
-        self.f = f
+        self.inv_filter = f
 
     def filter(self, update: Update) -> bool:
-        return not bool(self.f.check_update(update))
+        return not bool(self.inv_filter.check_update(update))
 
     @property
     def name(self) -> str:
-        return f"<inverted {self.f}>"
+        return f"<inverted {self.inv_filter}>"
 
     @name.setter
     def name(self, name: str) -> NoReturn:
@@ -576,7 +591,7 @@ class CaptionRegex(MessageFilter):
     """
     Filters updates by searching for an occurrence of ``pattern`` in the message caption.
 
-    This filter works similarly to :class:`filters.Regex`, with the only exception being that
+    This filter works similarly to :class:`Regex`, with the only exception being that
     it applies to the message caption instead of the text.
 
     Examples:
@@ -1517,8 +1532,8 @@ class User(_ChatUserBaseFilter):
 
 USER = User(allow_empty=True)
 """
-Shortcut for :class:`filters.User(allow_empty=True)`. This allows to filter *any* message that
-was sent from a user.
+Shortcut for :class:`telegram.ext.filters.User(allow_empty=True)`. This allows to filter *any*
+message that was sent from a user.
 """
 
 
@@ -1628,8 +1643,8 @@ class ViaBot(_ChatUserBaseFilter):
 
 VIA_BOT = ViaBot(allow_empty=True)
 """
-Shortcut for :class:`filters.ViaBot(allow_empty=True)`. This allows to filter *any* message that
-was sent via a bot.
+Shortcut for :class:`telegram.ext.filters.ViaBot(allow_empty=True)`. This allows to filter *any*
+message that was sent via a bot.
 """
 
 
@@ -1716,8 +1731,8 @@ class Chat(_ChatUserBaseFilter):
 
 CHAT = Chat(allow_empty=True)
 """
-Shortcut for :class:`filters.Chat(allow_empty=True)`. This allows to filter for *any* message
-that was sent from any chat.
+Shortcut for :class:`telegram.ext.filters.Chat(allow_empty=True)`. This allows to filter for *any*
+message that was sent from any chat.
 """
 
 
@@ -1934,7 +1949,8 @@ class SenderChat(_ChatUserBaseFilter):
 
 
 SENDER_CHAT = SenderChat(allow_empty=True)
-"""Shortcut for :class:`filters.SenderChat(allow_empty=True)`"""
+"""Shortcut for :class:`telegram.ext.filters.SenderChat(allow_empty=True)`. This allows to filter
+for *any* message that was sent by a supergroup or a channel."""
 
 
 class _Invoice(MessageFilter):
