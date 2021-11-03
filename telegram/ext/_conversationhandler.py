@@ -304,15 +304,15 @@ class ConversationHandler(Handler[Update, CCT]):
         for handler in all_handlers:
             if isinstance(handler, (StringCommandHandler, StringRegexHandler)):
                 warn(
-                    "The ConversationHandler does not work with non Telegram.Update type updates, "
-                    "and you shouldn't use this handler for Telegram Update types.",
+                    "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+                    f"{handler.__class__.__name__} handles updates of type `str`.",
                     stacklevel=2,
                 )
             if isinstance(handler, PollHandler):
                 warn(
                     "PollHandler will never trigger in a conversation since it has no information "
                     "about the chat or the user who voted in it. Do you mean the "
-                    "'PollAnswerHandler'?",
+                    "`PollAnswerHandler`?",
                     stacklevel=2,
                 )
             # we can assume per_user is set. If its not, per_message has to be set, otherwise the
@@ -332,8 +332,8 @@ class ConversationHandler(Handler[Update, CCT]):
                 and self.per_chat
             ):
                 warn(
-                    "This Handler only has information about the user, so it wont ever be"
-                    " triggered if 'per_chat=True'." + per_faq_link,
+                    f"Updates handled by {handler.__class__.__name__} only have information about the user, so this handler wont ever be"
+                    " triggered if `per_chat=True`." + per_faq_link,
                     stacklevel=2,
                 )
 
