@@ -380,11 +380,17 @@ class _Dice(MessageFilter):
     __slots__ = ('emoji', 'values')
 
     def __init__(self, values: SLT[int] = None, emoji: DiceEmojiEnum = None):
-        self.name = f"filters.Dice.{getattr(emoji, 'name', '')}" if emoji else 'filters.Dice.ALL'
         self.emoji = emoji
         self.values = [values] if isinstance(values, int) else values
-        if self.values:  # Converts for e.g. SLOT_MACHINE -> SlotMachine
-            self.name = f"{self.name.title().replace('_', '')}({self.values})"
+        emoji_name = getattr(emoji, 'name', '')  # Can be e.g. BASKETBALL (see emoji enums)
+        if emoji:  # for filters.Dice.BASKETBALL
+            self.name = f"filters.Dice.{emoji_name}"
+        elif values:  # for filters.Dice(4)
+            self.name = f"filters.Dice({self.values})"
+        else:
+            self.name = "filters.Dice.ALL"
+        if self.values and emoji:  # for filters.Dice.Dice(4)  SLOT_MACHINE -> SlotMachine
+            self.name = f"filters.Dice.{emoji_name.title().replace('_', '')}({self.values})"
 
     def filter(self, message: Message) -> bool:
         if not message.dice:  # no dice

@@ -1732,6 +1732,11 @@ class TestFilters:
     def test_filters_dice(self, update, emoji):
         update.message.dice = Dice(4, emoji)
         assert filters.Dice.ALL.check_update(update) and filters.Dice().check_update(update)
+
+        to_camel = emoji.name.title().replace('_', '')
+        assert repr(filters.Dice.ALL) == "filters.Dice.ALL"
+        assert repr(getattr(filters.Dice, to_camel)(4)) == f"filters.Dice.{to_camel}([4])"
+
         update.message.dice = None
         assert not filters.Dice.ALL.check_update(update)
 
@@ -1742,6 +1747,7 @@ class TestFilters:
 
         update.message.dice = Dice(5, emoji)
         assert filters.Dice(5).check_update(update)
+        assert repr(filters.Dice(5)) == "filters.Dice([5])"
         assert filters.Dice({5, 6}).check_update(update)
         assert not filters.Dice(1).check_update(update)
         assert not filters.Dice([2, 3]).check_update(update)
@@ -1749,6 +1755,7 @@ class TestFilters:
     def test_filters_dice_type(self, update):
         update.message.dice = Dice(5, '🎲')
         assert filters.Dice.DICE.check_update(update)
+        assert repr(filters.Dice.DICE) == "filters.Dice.DICE"
         assert filters.Dice.Dice([4, 5]).check_update(update)
         assert not filters.Dice.Darts(5).check_update(update)
         assert not filters.Dice.BASKETBALL.check_update(update)
