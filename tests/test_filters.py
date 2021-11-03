@@ -1731,9 +1731,9 @@ class TestFilters:
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI)
     def test_filters_dice(self, update, emoji):
         update.message.dice = Dice(4, emoji)
-        assert filters.DICE.check_update(update) and filters.Dice().check_update(update)
+        assert filters.Dice.ALL.check_update(update) and filters.Dice().check_update(update)
         update.message.dice = None
-        assert not filters.DICE.check_update(update)
+        assert not filters.Dice.ALL.check_update(update)
 
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI)
     def test_filters_dice_list(self, update, emoji):

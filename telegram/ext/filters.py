@@ -23,7 +23,6 @@ import mimetypes
 import re
 
 from abc import ABC, abstractmethod
-from functools import partial
 from threading import Lock
 from typing import (
     Dict,
@@ -362,11 +361,11 @@ class _XORFilter(UpdateFilter):
         raise RuntimeError(f'Cannot set name for {self.__class__.__name__!r}')
 
 
-class _DiceEmoji(MessageFilter):
+class _Dice(MessageFilter):
     __slots__ = ('emoji', 'values')
 
     def __init__(self, values: SLT[int] = None, emoji: DiceEmojiEnum = None):
-        self.name = f"filters.DICE.{getattr(emoji, 'name', '')}" if emoji else 'filters.DICE'
+        self.name = f"filters.Dice.{getattr(emoji, 'name', '')}" if emoji else 'filters.Dice.ALL'
         self.emoji = emoji
         self.values = [values] if isinstance(values, int) else values
         if self.values:  # Converts for e.g. SLOT_MACHINE -> SlotMachine
@@ -415,7 +414,7 @@ class Text(MessageFilter):
 
     Note:
         * Dice messages don't have text. If you want to filter either text or dice messages, use
-          ``filters.TEXT | filters.DICE``.
+          ``filters.TEXT | filters.Dice.ALL``.
         * Messages containing a command are accepted by this filter. Use
           ``filters.TEXT & (~filters.COMMAND)``, if you want to filter only text messages without
           commands.
@@ -1986,7 +1985,7 @@ POLL = _Poll()
 """Messages that contain a :class:`telegram.Poll`."""
 
 
-class Dice(_DiceEmoji):
+class Dice(_Dice):
     """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
     allow those whose dice value is appearing in the given list.
 
@@ -1994,7 +1993,7 @@ class Dice(_DiceEmoji):
 
     Examples:
         To allow any dice message, simply use
-        ``MessageHandler(filters.DICE, callback_method)``.
+        ``MessageHandler(filters.Dice.ALL, callback_method)``.
 
         To allow any dice message, but with value 3 `or` 4, use
         ``MessageHandler(filters.Dice([3, 4]), callback_method)``
@@ -2010,50 +2009,86 @@ class Dice(_DiceEmoji):
 
     Note:
         Dice messages don't have text. If you want to filter either text or dice messages, use
-        ``filters.TEXT | filters.DICE``.
+        ``filters.TEXT | filters.Dice.ALL``.
 
     Args:
         values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
             Which values to allow. If not specified, will allow the specified dice message.
-
-    Attributes:
-        DICE: Dice messages with the emoji 🎲. Matches any dice value.
-        Dice: Dice messages with the emoji 🎲. Supports passing a list of integers.
-        DARTS: Dice messages with the emoji 🎯. Matches any dice value.
-        Darts: Dice messages with the emoji 🎯. Supports passing a list of integers.
-        BASKETBALL: Dice messages with the emoji 🏀. Matches any dice value.
-        Basketball: Dice messages with the emoji 🏀. Supports passing a list of integers.
-        FOOTBALL: Dice messages with the emoji ⚽. Matches any dice value.
-        Football: Dice messages with the emoji ⚽. Supports passing a list of integers.
-        SLOT_MACHINE: Dice messages with the emoji 🎰. Matches any dice value.
-        SlotMachine: Dice messages with the emoji 🎰. Supports passing a list of integers.
-        BOWLING: Dice messages with the emoji 🎳. Matches any dice value.
-        Bowling: Dice messages with the emoji 🎳. Supports passing a list of integers.
     """
 
     __slots__ = ()
-    # Partials so its easier for users to pass dice values without worrying about anything else.
-    DICE = _DiceEmoji(emoji=DiceEmojiEnum.DICE)  # skipcq: PTC-W0052
-    Dice = partial(_DiceEmoji, emoji=DiceEmojiEnum.DICE)  # skipcq: PTC-W0052
 
-    DARTS = _DiceEmoji(emoji=DiceEmojiEnum.DARTS)
-    Darts = partial(_DiceEmoji, emoji=DiceEmojiEnum.DARTS)
+    class Dice(_Dice):
+        """Dice messages with the emoji 🎲. Supports passing a list of integers."""
 
-    BASKETBALL = _DiceEmoji(emoji=DiceEmojiEnum.BASKETBALL)
-    Basketball = partial(_DiceEmoji, emoji=DiceEmojiEnum.BASKETBALL)
+        __slots__ = ()
 
-    FOOTBALL = _DiceEmoji(emoji=DiceEmojiEnum.FOOTBALL)
-    Football = partial(_DiceEmoji, emoji=DiceEmojiEnum.FOOTBALL)
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.DICE)
 
-    SLOT_MACHINE = _DiceEmoji(emoji=DiceEmojiEnum.SLOT_MACHINE)
-    SlotMachine = partial(_DiceEmoji, emoji=DiceEmojiEnum.SLOT_MACHINE)
+    DICE = _Dice(emoji=DiceEmojiEnum.DICE)  # skipcq: PTC-W0052
+    """Dice messages with the emoji 🎲. Matches any dice value."""
 
-    BOWLING = _DiceEmoji(emoji=DiceEmojiEnum.BOWLING)
-    Bowling = partial(_DiceEmoji, emoji=DiceEmojiEnum.BOWLING)
+    class Darts(_Dice):
+        """Dice messages with the emoji 🎯. Supports passing a list of integers."""
 
+        __slots__ = ()
 
-DICE = Dice()
-"""Shortcut for :class:`telegram.ext.filters.Dice()`."""
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.DARTS)
+
+    DARTS = _Dice(emoji=DiceEmojiEnum.DARTS)
+    """Dice messages with the emoji 🎯. Matches any dice value."""
+
+    class Basketball(_Dice):
+        """Dice messages with the emoji 🏀. Supports passing a list of integers."""
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.BASKETBALL)
+
+    BASKETBALL = _Dice(emoji=DiceEmojiEnum.BASKETBALL)
+    """Dice messages with the emoji 🏀. Matches any dice value."""
+
+    class Football(_Dice):
+        """Dice messages with the emoji ⚽. Supports passing a list of integers."""
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.FOOTBALL)
+
+    FOOTBALL = _Dice(emoji=DiceEmojiEnum.FOOTBALL)
+    """Dice messages with the emoji ⚽. Matches any dice value."""
+
+    class SlotMachine(_Dice):
+        """Dice messages with the emoji 🎰. Supports passing a list of integers."""
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.SLOT_MACHINE)
+
+    SLOT_MACHINE = _Dice(emoji=DiceEmojiEnum.SLOT_MACHINE)
+    """Dice messages with the emoji 🎰. Matches any dice value."""
+
+    class Bowling(_Dice):
+        """Dice messages with the emoji 🎳. Supports passing a list of integers."""
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.BOWLING)
+
+    BOWLING = _Dice(emoji=DiceEmojiEnum.BOWLING)
+    """Dice messages with the emoji 🎳. Matches any dice value."""
+
+    class _All(_Dice):
+        __slots__ = ()
+
+    ALL = _All()
+    """Dice messages with any value and any emoji."""
 
 
 class Language(MessageFilter):
@@ -2201,8 +2236,10 @@ class UpdateType:
         name = 'filters.UpdateType.ALL'
 
         def filter(self, update: Update) -> bool:
-            return UpdateType.MESSAGES.check_update(update) \
-                   or UpdateType.CHANNEL_POSTS.check_update(update)
+            return bool(
+                UpdateType.MESSAGES.check_update(update)
+                or UpdateType.CHANNEL_POSTS.check_update(update)
+            )
 
     ALL = _All()
     """All updates which contain a message."""
