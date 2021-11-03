@@ -47,6 +47,7 @@ from telegram.ext import (
     InlineQueryHandler,
     StringCommandHandler,
     StringRegexHandler,
+    TypeHandler,
 )
 from telegram._utils.warnings import warn
 from telegram.ext._utils.promise import Promise
@@ -308,6 +309,12 @@ class ConversationHandler(Handler[Update, CCT]):
                     f"{handler.__class__.__name__} handles updates of type `str`.",
                     stacklevel=2,
                 )
+            if isinstance(handler, TypeHandler) and handler.type is not Update:
+                warn(
+                    "The `ConversationHandler` only handles updates of type `telegram.Update`."
+                    f" The TypeHandler is set to handle {handler.type.__name__}.",
+                    stacklevel=2,
+                )
             if isinstance(handler, PollHandler):
                 warn(
                     "PollHandler will never trigger in a conversation since it has no information "
@@ -315,25 +322,27 @@ class ConversationHandler(Handler[Update, CCT]):
                     "`PollAnswerHandler`?",
                     stacklevel=2,
                 )
-            # we can assume per_user is set. If its not, per_message has to be set, otherwise the
-            # user would have faced the ValueError that all per_* settings cant be false. If
-            # per_message is set, the user will get a warning later.
+
             if (
-                isinstance(
-                    handler,
-                    (
-                        ShippingQueryHandler,
-                        InlineQueryHandler,
-                        ChosenInlineResultHandler,
-                        PreCheckoutQueryHandler,
-                        PollAnswerHandler,
-                    ),
+                self.per_chat
+                and self.per_user
+                and (
+                    isinstance(
+                        handler,
+                        (
+                            ShippingQueryHandler,
+                            InlineQueryHandler,
+                            ChosenInlineResultHandler,
+                            PreCheckoutQueryHandler,
+                            PollAnswerHandler,
+                        ),
+                    )
                 )
-                and self.per_chat
             ):
                 warn(
-                    f"Updates handled by {handler.__class__.__name__} only have information about the user, so this handler wont ever be"
-                    " triggered if `per_chat=True`." + per_faq_link,
+                    f"Updates handled by {handler.__class__.__name__} only have information about "
+                    f"the user, so this handler wont ever be triggered if `per_chat=True`."
+                    + per_faq_link,
                     stacklevel=2,
                 )
 

@@ -1341,14 +1341,23 @@ class TestConversationHandler:
         # otherwise only the first occurrence will be issued
         filterwarnings(action="always", category=PTBUserWarning)
 
-        # this conversation handler has the string, string_regex, and Pollhandler which should all
-        # generate a warning no matter the per_* setting.
+        # this class doesn't do anything, its just not the Update class
+        class NotUpdate:
+            pass
+
+        # this conversation handler has the string, string_regex, Pollhandler and TypeHandler
+        # which should all generate a warning no matter the per_* setting. TypeHandler should
+        # not when the class is Update
         ConversationHandler(
             entry_points=[StringCommandHandler("code", self.code)],
             states={
-                self.BREWING: [StringRegexHandler("code", self.code), PollHandler(self.code)],
+                self.BREWING: [
+                    StringRegexHandler("code", self.code),
+                    PollHandler(self.code),
+                    TypeHandler(NotUpdate, self.code),
+                ],
             },
-            fallbacks=[],
+            fallbacks=[TypeHandler(Update, self.code)],
         )
 
         # these handlers should all raise a warning when per_chat is True
@@ -1386,40 +1395,58 @@ class TestConversationHandler:
             per_message=False,
         )
 
-        # the overall handlers raising an error is 10
-        assert len(recwarn) == 10
+        # the overall handlers raising an error is 11
+        assert len(recwarn) == 11
         # now we test the messages, they are raised in the order they are inserted
         # into the conversation handler
-        assert str(recwarn[0].message) and str(recwarn[1].message) == (
-            "The ConversationHandler does not work with non Telegram.Update type updates, "
-            "and you shouldn't use this handler for Telegram Update types."
+        assert str(recwarn[0].message) == (
+            "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+            "StringCommandHandler handles updates of type `str`."
+        )
+        assert str(recwarn[1].message) == (
+            "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+            "StringRegexHandler handles updates of type `str`."
         )
         assert str(recwarn[2].message) == (
             "PollHandler will never trigger in a conversation since it has no information "
             "about the chat or the user who voted in it. Do you mean the "
-            "'PollAnswerHandler'?"
+            "`PollAnswerHandler`?"
+        )
+        assert str(recwarn[3].message) == (
+            "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+            "The TypeHandler is set to handle NotUpdate."
         )
 
         per_faq_link = (
             " Read this FAQ entry to learn more about the per_* settings https://git.io/JtcyU."
         )
-        assert (
-            str(recwarn[3].message)
-            and str(recwarn[4].message)
-            and str(recwarn[5].message)
-            and str(recwarn[6].message)
-            and str(recwarn[7].message)
-            == (
-                "This Handler only has information about the user, so it wont ever be triggered "
-                "if 'per_chat=True'." + per_faq_link
-            )
+
+        assert str(recwarn[4].message) == (
+            "Updates handled by ShippingQueryHandler only have information about the user,"
+            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
+        )
+        assert str(recwarn[5].message) == (
+            "Updates handled by ChosenInlineResultHandler only have information about the user,"
+            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
+        )
+        assert str(recwarn[6].message) == (
+            "Updates handled by InlineQueryHandler only have information about the user,"
+            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
+        )
+        assert str(recwarn[7].message) == (
+            "Updates handled by PreCheckoutQueryHandler only have information about the user,"
+            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
         )
         assert str(recwarn[8].message) == (
+            "Updates handled by PollAnswerHandler only have information about the user,"
+            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
+        )
+        assert str(recwarn[9].message) == (
             "If 'per_message=True', all entry points, state handlers, and fallbacks must be "
             "'CallbackQueryHandler', since no other handlers have a message context."
             + per_faq_link
         )
-        assert str(recwarn[9].message) == (
+        assert str(recwarn[10].message) == (
             "If 'per_message=False', 'CallbackQueryHandler' will not be tracked for "
             "every message." + per_faq_link
         )
