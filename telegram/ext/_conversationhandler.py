@@ -338,7 +338,7 @@ class ConversationHandler(Handler[Update, CCT]):
                 warn(
                     f"Updates handled by {handler.__class__.__name__} only have information about "
                     f"the user, so this handler won't ever be triggered if `per_chat=True`."
-                    + per_faq_link,
+                    f"{per_faq_link}",
                     stacklevel=2,
                 )
 
@@ -349,10 +349,10 @@ class ConversationHandler(Handler[Update, CCT]):
                     f"have a message context.{per_faq_link}",
                     stacklevel=2,
                 )
-            elif isinstance(handler, CallbackQueryHandler):
+            elif not self.per_message and isinstance(handler, CallbackQueryHandler):
                 warn(
                     "If 'per_message=False', 'CallbackQueryHandler' will not be "
-                    "tracked for every message." + per_faq_link,
+                    f"tracked for every message.{per_faq_link}",
                     stacklevel=2,
                 )
 

@@ -1420,28 +1420,28 @@ class TestConversationHandler:
         )
 
         per_faq_link = (
-            " Read this FAQ entry to learn more about the per_* settings https://git.io/JtcyU."
+            " Read this FAQ entry to learn more about the per_* settings: https://git.io/JtcyU."
         )
 
         assert str(recwarn[4].message) == (
             "Updates handled by ShippingQueryHandler only have information about the user,"
-            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
         )
         assert str(recwarn[5].message) == (
             "Updates handled by ChosenInlineResultHandler only have information about the user,"
-            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
         )
         assert str(recwarn[6].message) == (
             "Updates handled by InlineQueryHandler only have information about the user,"
-            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
         )
         assert str(recwarn[7].message) == (
             "Updates handled by PreCheckoutQueryHandler only have information about the user,"
-            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
         )
         assert str(recwarn[8].message) == (
             "Updates handled by PollAnswerHandler only have information about the user,"
-            " so this handler wont ever be triggered if `per_chat=True`." + per_faq_link
+            " so this handler won't ever be triggered if `per_chat=True`." + per_faq_link
         )
         assert str(recwarn[9].message) == (
             "If 'per_message=True', all entry points, state handlers, and fallbacks must be "
