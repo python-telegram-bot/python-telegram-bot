@@ -299,7 +299,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
         # this link will be added to all warnings tied to per_* setting
         per_faq_link = (
-            " Read this FAQ entry to learn more about the per_* settings https://git.io/JtcyU."
+            " Read this FAQ entry to learn more about the per_* settings: https://git.io/JtcyU."
         )
 
         for handler in all_handlers:
@@ -309,7 +309,7 @@ class ConversationHandler(Handler[Update, CCT]):
                     f"{handler.__class__.__name__} handles updates of type `str`.",
                     stacklevel=2,
                 )
-            if isinstance(handler, TypeHandler) and handler.type is not Update:
+            if isinstance(handler, TypeHandler) and not issubclass(handler.type, Update):
                 warn(
                     "The `ConversationHandler` only handles updates of type `telegram.Update`."
                     f" The TypeHandler is set to handle {handler.type.__name__}.",
@@ -341,7 +341,7 @@ class ConversationHandler(Handler[Update, CCT]):
             ):
                 warn(
                     f"Updates handled by {handler.__class__.__name__} only have information about "
-                    f"the user, so this handler wont ever be triggered if `per_chat=True`."
+                    f"the user, so this handler won't ever be triggered if `per_chat=True`."
                     + per_faq_link,
                     stacklevel=2,
                 )
@@ -351,7 +351,7 @@ class ConversationHandler(Handler[Update, CCT]):
                     warn(
                         "If 'per_message=True', all entry points, state handlers, and fallbacks"
                         " must be 'CallbackQueryHandler', since no other handlers "
-                        "have a message context." + per_faq_link,
+                        f"have a message context.{per_faq_link}",
                         stacklevel=2,
                     )
             else:
