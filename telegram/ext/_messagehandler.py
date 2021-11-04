@@ -61,8 +61,8 @@ class MessageHandler(Handler[Update, CCT]):
         ValueError
 
     Attributes:
-        filters (:obj:`Filter`): Only allow updates with these Filters. See
-            :mod:`telegram.ext.filters` for a full list of all available filters.
+        filters (:class:`telegram.ext.filters.BaseFilter`): Only allow updates with these Filters.
+            See :mod:`telegram.ext.filters` for a full list of all available filters.
         callback (:obj:`callable`): The callback function for this handler.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 

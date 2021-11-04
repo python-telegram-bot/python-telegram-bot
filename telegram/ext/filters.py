@@ -119,14 +119,9 @@ class BaseFilter(ABC):
 
     __slots__ = ('_name', '_data_filter')
 
-    # pylint: disable=unused-argument
-    def __new__(cls, *args: object, **kwargs: object) -> 'BaseFilter':
-        # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
-        instance = super().__new__(cls)
-        instance._name = None
-        instance._data_filter = False
-
-        return instance
+    def __init__(self, name: str = None, data_filter: bool = False):
+        self._name = name
+        self._data_filter = data_filter
 
     @abstractmethod
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
@@ -158,7 +153,7 @@ class BaseFilter(ABC):
 
     @name.setter
     def name(self, name: Optional[str]) -> None:
-        self._name = name  # pylint: disable=assigning-non-slot
+        self._name = name
 
     def __repr__(self) -> str:
         # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
@@ -203,7 +198,7 @@ class MessageFilter(BaseFilter):
 class UpdateFilter(BaseFilter):
     """Base class for all Update Filters. In contrast to :class:`MessageFilter`, the object
     passed to :meth:`filter` is an instance of :class:`telegram.Update`, which allows to create
-    filters like :attr:`filters.UpdateType.EDITED_MESSAGE`.
+    filters like :attr:`telegram.ext.filters.UpdateType.EDITED_MESSAGE`.
 
     Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
     filters.
@@ -246,6 +241,7 @@ class _InvertedFilter(UpdateFilter):
     __slots__ = ('inv_filter',)
 
     def __init__(self, f: BaseFilter):
+        super().__init__()
         self.inv_filter = f
 
     def filter(self, update: Update) -> bool:
@@ -275,6 +271,7 @@ class _MergedFilter(UpdateFilter):
     def __init__(
         self, base_filter: BaseFilter, and_filter: BaseFilter = None, or_filter: BaseFilter = None
     ):
+        super().__init__()
         self.base_filter = base_filter
         if self.base_filter.data_filter:
             self.data_filter = True
@@ -360,6 +357,7 @@ class _XORFilter(UpdateFilter):
     __slots__ = ('base_filter', 'xor_filter', 'merged_filter')
 
     def __init__(self, base_filter: BaseFilter, xor_filter: BaseFilter):
+        super().__init__()
         self.base_filter = base_filter
         self.xor_filter = xor_filter
         self.merged_filter = (base_filter & ~xor_filter) | (~base_filter & xor_filter)
@@ -380,6 +378,7 @@ class _Dice(MessageFilter):
     __slots__ = ('emoji', 'values')
 
     def __init__(self, values: SLT[int] = None, emoji: DiceEmojiEnum = None):
+        super().__init__()
         self.emoji = emoji
         self.values = [values] if isinstance(values, int) else values
         emoji_name = getattr(emoji, 'name', '')  # Can be e.g. BASKETBALL (see emoji enums)
@@ -406,13 +405,12 @@ class _Dice(MessageFilter):
 
 class _All(MessageFilter):
     __slots__ = ()
-    name = 'filters.ALL'
 
     def filter(self, message: Message) -> bool:
         return True
 
 
-ALL = _All()
+ALL = _All(name="filters.ALL")
 """All Messages."""
 
 
@@ -449,7 +447,7 @@ class Text(MessageFilter):
 
     def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
         self.strings = strings
-        self.name = f'filters.Text({strings})' if strings else 'filters.TEXT'
+        super().__init__(name=f'filters.Text({strings})' if strings else 'filters.TEXT')
 
     def filter(self, message: Message) -> bool:
         if self.strings is None:
@@ -485,7 +483,7 @@ class Caption(MessageFilter):
 
     def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
         self.strings = strings
-        self.name = f'filters.Caption({strings})' if strings else 'filters.CAPTION'
+        super().__init__(name=f'filters.Caption({strings})' if strings else 'filters.CAPTION')
 
     def filter(self, message: Message) -> bool:
         if self.strings is None:
@@ -525,7 +523,7 @@ class Command(MessageFilter):
 
     def __init__(self, only_start: bool = True):
         self.only_start = only_start
-        self.name = f'filters.Command({only_start})' if not only_start else 'filters.COMMAND'
+        super().__init__(f'filters.Command({only_start})' if not only_start else 'filters.COMMAND')
 
     def filter(self, message: Message) -> bool:
         if not message.entities:
@@ -577,13 +575,12 @@ class Regex(MessageFilter):
     """
 
     __slots__ = ('pattern',)
-    data_filter = True
 
     def __init__(self, pattern: Union[str, Pattern]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
         self.pattern: Pattern = pattern
-        self.name = f'filters.Regex({self.pattern})'
+        super().__init__(name=f'filters.Regex({self.pattern})', data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
         if message.text:
@@ -612,13 +609,12 @@ class CaptionRegex(MessageFilter):
     """
 
     __slots__ = ('pattern',)
-    data_filter = True
 
     def __init__(self, pattern: Union[str, Pattern]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
         self.pattern: Pattern = pattern
-        self.name = f'filters.CaptionRegex({self.pattern})'
+        super().__init__(name=f'filters.CaptionRegex({self.pattern})', data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
         if message.caption:
@@ -630,25 +626,23 @@ class CaptionRegex(MessageFilter):
 
 class _Reply(MessageFilter):
     __slots__ = ()
-    name = 'filters.REPLY'
 
     def filter(self, message: Message) -> bool:
         return bool(message.reply_to_message)
 
 
-REPLY = _Reply()
+REPLY = _Reply(name="filters.REPLY")
 """Messages that are a reply to another message."""
 
 
 class _Audio(MessageFilter):
     __slots__ = ()
-    name = 'filters.AUDIO'
 
     def filter(self, message: Message) -> bool:
         return bool(message.audio)
 
 
-AUDIO = _Audio()
+AUDIO = _Audio(name="filters.AUDIO")
 """Messages that contain :class:`telegram.Audio`."""
 
 
@@ -663,7 +657,6 @@ class Document(MessageFilter):
     """
 
     __slots__ = ()
-    name = 'filters.DOCUMENT'
 
     class Category(MessageFilter):
         """Filters documents by their category in the mime-type attribute.
@@ -685,7 +678,7 @@ class Document(MessageFilter):
 
         def __init__(self, category: str):
             self._category = category
-            self.name = f"filters.Document.Category('{self._category}')"
+            super().__init__(name=f"filters.Document.Category('{self._category}')")
 
         def filter(self, message: Message) -> bool:
             if message.document:
@@ -722,7 +715,7 @@ class Document(MessageFilter):
 
         def __init__(self, mimetype: str):
             self.mimetype = mimetype  # skipcq: PTC-W0052
-            self.name = f"filters.Document.MimeType('{self.mimetype}')"
+            super().__init__(name=f"filters.Document.MimeType('{self.mimetype}')")
 
         def filter(self, message: Message) -> bool:
             if message.document:
@@ -796,6 +789,7 @@ class Document(MessageFilter):
         __slots__ = ('_file_extension', 'is_case_sensitive')
 
         def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
+            super().__init__()
             self.is_case_sensitive = case_sensitive
             if file_extension is None:
                 self._file_extension = None
@@ -824,115 +818,106 @@ class Document(MessageFilter):
         return bool(message.document)
 
 
-DOCUMENT = Document()
+DOCUMENT = Document(name="filters.DOCUMENT")
 """Shortcut for :class:`telegram.ext.filters.Document()`."""
 
 
 class _Animation(MessageFilter):
     __slots__ = ()
-    name = 'filters.ANIMATION'
 
     def filter(self, message: Message) -> bool:
         return bool(message.animation)
 
 
-ANIMATION = _Animation()
+ANIMATION = _Animation(name="filters.ANIMATION")
 """Messages that contain :class:`telegram.Animation`."""
 
 
 class _Photo(MessageFilter):
     __slots__ = ()
-    name = 'filters.PHOTO'
 
     def filter(self, message: Message) -> bool:
         return bool(message.photo)
 
 
-PHOTO = _Photo()
+PHOTO = _Photo("filters.PHOTO")
 """Messages that contain :class:`telegram.PhotoSize`."""
 
 
 class _Sticker(MessageFilter):
     __slots__ = ()
-    name = 'filters.STICKER'
 
     def filter(self, message: Message) -> bool:
         return bool(message.sticker)
 
 
-STICKER = _Sticker()
+STICKER = _Sticker(name="filters.STICKER")
 """Messages that contain :class:`telegram.Sticker`."""
 
 
 class _Video(MessageFilter):
     __slots__ = ()
-    name = 'filters.VIDEO'
 
     def filter(self, message: Message) -> bool:
         return bool(message.video)
 
 
-VIDEO = _Video()
+VIDEO = _Video(name="filters.VIDEO")
 """Messages that contain :class:`telegram.Video`."""
 
 
 class _Voice(MessageFilter):
     __slots__ = ()
-    name = 'filters.VOICE'
 
     def filter(self, message: Message) -> bool:
         return bool(message.voice)
 
 
-VOICE = _Voice()
+VOICE = _Voice("filters.VOICE")
 """Messages that contain :class:`telegram.Voice`."""
 
 
 class _VideoNote(MessageFilter):
     __slots__ = ()
-    name = 'filters.VIDEO_NOTE'
 
     def filter(self, message: Message) -> bool:
         return bool(message.video_note)
 
 
-VIDEO_NOTE = _VideoNote()
+VIDEO_NOTE = _VideoNote(name="filters.VIDEO_NOTE")
 """Messages that contain :class:`telegram.VideoNote`."""
 
 
 class _Contact(MessageFilter):
     __slots__ = ()
-    name = 'filters.CONTACT'
 
     def filter(self, message: Message) -> bool:
         return bool(message.contact)
 
 
-CONTACT = _Contact()
+CONTACT = _Contact(name="filters.CONTACT")
 """Messages that contain :class:`telegram.Contact`."""
 
 
 class _Location(MessageFilter):
     __slots__ = ()
-    name = 'filters.LOCATION'
 
     def filter(self, message: Message) -> bool:
         return bool(message.location)
 
 
-LOCATION = _Location()
+LOCATION = _Location(name="filters.LOCATION")
 """Messages that contain :class:`telegram.Location`."""
 
 
 class _Venue(MessageFilter):
     __slots__ = ()
-    name = 'filters.VENUE'
 
     def filter(self, message: Message) -> bool:
         return bool(message.venue)
 
 
-VENUE = _Venue()
+VENUE = _Venue(name="filters.VENUE")
 """Messages that contain :class:`telegram.Venue`."""
 
 
@@ -945,61 +930,54 @@ class StatusUpdate:
     """
 
     __slots__ = ()
-    name = 'filters.StatusUpdate'
 
     class _NewChatMembers(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.NEW_CHAT_MEMBERS'
 
         def filter(self, message: Message) -> bool:
             return bool(message.new_chat_members)
 
-    NEW_CHAT_MEMBERS = _NewChatMembers()
+    NEW_CHAT_MEMBERS = _NewChatMembers(name="filters.StatusUpdate.NEW_CHAT_MEMBERS")
     """Messages that contain :attr:`telegram.Message.new_chat_members`."""
 
     class _LeftChatMember(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.LEFT_CHAT_MEMBER'
 
         def filter(self, message: Message) -> bool:
             return bool(message.left_chat_member)
 
-    LEFT_CHAT_MEMBER = _LeftChatMember()
+    LEFT_CHAT_MEMBER = _LeftChatMember(name="filters.StatusUpdate.LEFT_CHAT_MEMBER")
     """Messages that contain :attr:`telegram.Message.left_chat_member`."""
 
     class _NewChatTitle(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.NEW_CHAT_TITLE'
 
         def filter(self, message: Message) -> bool:
             return bool(message.new_chat_title)
 
-    NEW_CHAT_TITLE = _NewChatTitle()
+    NEW_CHAT_TITLE = _NewChatTitle(name="filters.StatusUpdate.NEW_CHAT_TITLE")
     """Messages that contain :attr:`telegram.Message.new_chat_title`."""
 
     class _NewChatPhoto(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.NEW_CHAT_PHOTO'
 
         def filter(self, message: Message) -> bool:
             return bool(message.new_chat_photo)
 
-    NEW_CHAT_PHOTO = _NewChatPhoto()
+    NEW_CHAT_PHOTO = _NewChatPhoto(name="filters.StatusUpdate.NEW_CHAT_PHOTO")
     """Messages that contain :attr:`telegram.Message.new_chat_photo`."""
 
     class _DeleteChatPhoto(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.DELETE_CHAT_PHOTO'
 
         def filter(self, message: Message) -> bool:
             return bool(message.delete_chat_photo)
 
-    DELETE_CHAT_PHOTO = _DeleteChatPhoto()
+    DELETE_CHAT_PHOTO = _DeleteChatPhoto(name="filters.StatusUpdate.DELETE_CHAT_PHOTO")
     """Messages that contain :attr:`telegram.Message.delete_chat_photo`."""
 
     class _ChatCreated(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.CHAT_CREATED'
 
         def filter(self, message: Message) -> bool:
             return bool(
@@ -1008,19 +986,20 @@ class StatusUpdate:
                 or message.channel_chat_created
             )
 
-    CHAT_CREATED = _ChatCreated()
+    CHAT_CREATED = _ChatCreated(name="filters.StatusUpdate.CHAT_CREATED")
     """Messages that contain :attr:`telegram.Message.group_chat_created`,
         :attr:`telegram.Message.supergroup_chat_created` or
         :attr:`telegram.Message.channel_chat_created`."""
 
     class _MessageAutoDeleteTimerChanged(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.message_auto_delete_timer_changed)
 
-    MESSAGE_AUTO_DELETE_TIMER_CHANGED = _MessageAutoDeleteTimerChanged()
+    MESSAGE_AUTO_DELETE_TIMER_CHANGED = _MessageAutoDeleteTimerChanged(
+        "filters.StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED"
+    )
     """Messages that contain :attr:`telegram.Message.message_auto_delete_timer_changed`
 
     .. versionadded:: 13.4
@@ -1028,53 +1007,50 @@ class StatusUpdate:
 
     class _Migrate(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.MIGRATE'
 
         def filter(self, message: Message) -> bool:
             return bool(message.migrate_from_chat_id or message.migrate_to_chat_id)
 
-    MIGRATE = _Migrate()
+    MIGRATE = _Migrate(name="filters.StatusUpdate.MIGRATE")
     """Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
         :attr:`telegram.Message.migrate_to_chat_id`."""
 
     class _PinnedMessage(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.PINNED_MESSAGE'
 
         def filter(self, message: Message) -> bool:
             return bool(message.pinned_message)
 
-    PINNED_MESSAGE = _PinnedMessage()
+    PINNED_MESSAGE = _PinnedMessage(name="filters.StatusUpdate.PINNED_MESSAGE")
     """Messages that contain :attr:`telegram.Message.pinned_message`."""
 
     class _ConnectedWebsite(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.CONNECTED_WEBSITE'
 
         def filter(self, message: Message) -> bool:
             return bool(message.connected_website)
 
-    CONNECTED_WEBSITE = _ConnectedWebsite()
+    CONNECTED_WEBSITE = _ConnectedWebsite(name="filters.StatusUpdate.CONNECTED_WEBSITE")
     """Messages that contain :attr:`telegram.Message.connected_website`."""
 
     class _ProximityAlertTriggered(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.PROXIMITY_ALERT_TRIGGERED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.proximity_alert_triggered)
 
-    PROXIMITY_ALERT_TRIGGERED = _ProximityAlertTriggered()
+    PROXIMITY_ALERT_TRIGGERED = _ProximityAlertTriggered(
+        "filters.StatusUpdate.PROXIMITY_ALERT_TRIGGERED"
+    )
     """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
     class _VoiceChatScheduled(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.VOICE_CHAT_SCHEDULED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.voice_chat_scheduled)
 
-    VOICE_CHAT_SCHEDULED = _VoiceChatScheduled()
+    VOICE_CHAT_SCHEDULED = _VoiceChatScheduled(name="filters.StatusUpdate.VOICE_CHAT_SCHEDULED")
     """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`.
 
     .. versionadded:: 13.5
@@ -1082,12 +1058,11 @@ class StatusUpdate:
 
     class _VoiceChatStarted(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.VOICE_CHAT_STARTED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.voice_chat_started)
 
-    VOICE_CHAT_STARTED = _VoiceChatStarted()
+    VOICE_CHAT_STARTED = _VoiceChatStarted(name="filters.StatusUpdate.VOICE_CHAT_STARTED")
     """Messages that contain :attr:`telegram.Message.voice_chat_started`.
 
     .. versionadded:: 13.4
@@ -1095,12 +1070,11 @@ class StatusUpdate:
 
     class _VoiceChatEnded(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.VOICE_CHAT_ENDED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.voice_chat_ended)
 
-    VOICE_CHAT_ENDED = _VoiceChatEnded()
+    VOICE_CHAT_ENDED = _VoiceChatEnded(name="filters.StatusUpdate.VOICE_CHAT_ENDED")
     """Messages that contain :attr:`telegram.Message.voice_chat_ended`.
 
     .. versionadded:: 13.4
@@ -1108,12 +1082,13 @@ class StatusUpdate:
 
     class _VoiceChatParticipantsInvited(MessageFilter):
         __slots__ = ()
-        name = 'filters.StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED'
 
         def filter(self, message: Message) -> bool:
             return bool(message.voice_chat_participants_invited)
 
-    VOICE_CHAT_PARTICIPANTS_INVITED = _VoiceChatParticipantsInvited()
+    VOICE_CHAT_PARTICIPANTS_INVITED = _VoiceChatParticipantsInvited(
+        "filters.StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED"
+    )
     """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`.
 
     .. versionadded:: 13.4
@@ -1121,7 +1096,6 @@ class StatusUpdate:
 
     class _All(UpdateFilter):
         __slots__ = ()
-        name = "filters.StatusUpdate.ALL"
 
         def filter(self, update: Update) -> bool:
             return bool(
@@ -1142,31 +1116,29 @@ class StatusUpdate:
                 or StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED.check_update(update)
             )
 
-    ALL = _All()
+    ALL = _All(name="filters.StatusUpdate.ALL")
     """Messages that contain any of the above."""
 
 
 class _Forwarded(MessageFilter):
     __slots__ = ()
-    name = 'filters.FORWARDED'
 
     def filter(self, message: Message) -> bool:
         return bool(message.forward_date)
 
 
-FORWARDED = _Forwarded()
+FORWARDED = _Forwarded(name="filters.FORWARDED")
 """Messages that are forwarded."""
 
 
 class _Game(MessageFilter):
     __slots__ = ()
-    name = 'filters.GAME'
 
     def filter(self, message: Message) -> bool:
         return bool(message.game)
 
 
-GAME = _Game()
+GAME = _Game(name="filters.GAME")
 """Messages that contain :class:`telegram.Game`."""
 
 
@@ -1188,7 +1160,7 @@ class Entity(MessageFilter):
 
     def __init__(self, entity_type: str):
         self.entity_type = entity_type
-        self.name = f'filters.Entity({self.entity_type})'
+        super().__init__(name=f'filters.Entity({self.entity_type})')
 
     def filter(self, message: Message) -> bool:
         return any(entity.type == self.entity_type for entity in message.entities)
@@ -1212,7 +1184,7 @@ class CaptionEntity(MessageFilter):
 
     def __init__(self, entity_type: str):
         self.entity_type = entity_type
-        self.name = f'filters.CaptionEntity({self.entity_type})'
+        super().__init__(name=f'filters.CaptionEntity({self.entity_type})')
 
     def filter(self, message: Message) -> bool:
         return any(entity.type == self.entity_type for entity in message.caption_entities)
@@ -1230,56 +1202,50 @@ class ChatType:  # A convenience namespace for Chat types.
     """
 
     __slots__ = ()
-    name = 'filters.ChatType'
 
     class _Channel(MessageFilter):
         __slots__ = ()
-        name = 'filters.ChatType.CHANNEL'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type == TGChat.CHANNEL
 
-    CHANNEL = _Channel()
+    CHANNEL = _Channel(name="filters.ChatType.CHANNEL")
     """Updates from channel."""
 
     class _Group(MessageFilter):
         __slots__ = ()
-        name = 'filters.ChatType.GROUP'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type == TGChat.GROUP
 
-    GROUP = _Group()
+    GROUP = _Group(name="filters.ChatType.GROUP")
     """Updates from group."""
 
     class _SuperGroup(MessageFilter):
         __slots__ = ()
-        name = 'filters.ChatType.SUPERGROUP'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type == TGChat.SUPERGROUP
 
-    SUPERGROUP = _SuperGroup()
+    SUPERGROUP = _SuperGroup(name="filters.ChatType.SUPERGROUP")
     """Updates from supergroup."""
 
     class _Groups(MessageFilter):
         __slots__ = ()
-        name = 'filters.ChatType.GROUPS'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type in [TGChat.GROUP, TGChat.SUPERGROUP]
 
-    GROUPS = _Groups()
+    GROUPS = _Groups(name="filters.ChatType.GROUPS")
     """Update from group *or* supergroup."""
 
     class _Private(MessageFilter):
         __slots__ = ()
-        name = 'filters.ChatType.PRIVATE'
 
         def filter(self, message: Message) -> bool:
             return message.chat.type == TGChat.PRIVATE
 
-    PRIVATE = _Private()
+    PRIVATE = _Private(name="filters.ChatType.PRIVATE")
     """Update from private chats."""
 
 
@@ -1299,6 +1265,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         username: SLT[str] = None,
         allow_empty: bool = False,
     ):
+        super().__init__()
         self._chat_id_name = 'chat_id'
         self._username_name = 'username'
         self.allow_empty = allow_empty
@@ -1538,13 +1505,12 @@ class User(_ChatUserBaseFilter):
 
 class _User(MessageFilter):
     __slots__ = ()
-    name = "filters.USER"
 
     def filter(self, message: Message) -> bool:
         return bool(message.from_user)
 
 
-USER = _User()
+USER = _User(name="filters.USER")
 """This filter filters *any* message that was sent from a user."""
 
 
@@ -1654,13 +1620,12 @@ class ViaBot(_ChatUserBaseFilter):
 
 class _ViaBot(MessageFilter):
     __slots__ = ()
-    name = "filters.VIA_BOT"
 
     def filter(self, message: Message) -> bool:
         return bool(message.via_bot)
 
 
-VIA_BOT = _ViaBot()
+VIA_BOT = _ViaBot(name="filters.VIA_BOT")
 """This filter filters *any* message that was sent via a bot."""
 
 
@@ -1747,13 +1712,12 @@ class Chat(_ChatUserBaseFilter):
 
 class _Chat(MessageFilter):
     __slots__ = ()
-    name = "filters.CHAT"
 
     def filter(self, message: Message) -> bool:
         return bool(message.chat)
 
 
-CHAT = _Chat()
+CHAT = _Chat(name="filters.CHAT")
 """This filter filters *any* message that was sent from any chat."""
 
 
@@ -1851,7 +1815,6 @@ class ForwardedFrom(_ChatUserBaseFilter):
 
 class _SenderChat(MessageFilter):
     __slots__ = ()
-    name = "filters.SenderChat.ALL"
 
     def filter(self, message: Message) -> bool:
         return bool(message.sender_chat)
@@ -1957,7 +1920,6 @@ class SenderChat(_ChatUserBaseFilter):
 
     class _SUPERGROUP(MessageFilter):
         __slots__ = ()
-        name = "filters.SenderChat.SUPERGROUP"
 
         def filter(self, message: Message) -> bool:
             if message.sender_chat:
@@ -1966,66 +1928,61 @@ class SenderChat(_ChatUserBaseFilter):
 
     class _CHANNEL(MessageFilter):
         __slots__ = ()
-        name = "filters.SenderChat.CHANNEL"
 
         def filter(self, message: Message) -> bool:
             if message.sender_chat:
                 return message.sender_chat.type == TGChat.CHANNEL
             return False
 
-    SUPER_GROUP = _SUPERGROUP()
+    SUPER_GROUP = _SUPERGROUP(name="filters.SenderChat.SUPER_GROUP")
     """Messages whose sender chat is a super group."""
-    CHANNEL = _CHANNEL()
+    CHANNEL = _CHANNEL(name="filters.SenderChat.CHANNEL")
     """Messages whose sender chat is a channel."""
-    ALL = _SenderChat()
+    ALL = _SenderChat(name="filters.SenderChat.ALL")
     """Messages whose sender chat is either a supergroup or a channel."""
 
 
 class _Invoice(MessageFilter):
     __slots__ = ()
-    name = 'filters.INVOICE'
 
     def filter(self, message: Message) -> bool:
         return bool(message.invoice)
 
 
-INVOICE = _Invoice()
+INVOICE = _Invoice(name="filters.INVOICE")
 """Messages that contain :class:`telegram.Invoice`."""
 
 
 class _SuccessfulPayment(MessageFilter):
     __slots__ = ()
-    name = 'filters.SUCCESSFUL_PAYMENT'
 
     def filter(self, message: Message) -> bool:
         return bool(message.successful_payment)
 
 
-SUCCESSFUL_PAYMENT = _SuccessfulPayment()
+SUCCESSFUL_PAYMENT = _SuccessfulPayment(name="filters.SUCCESSFUL_PAYMENT")
 """Messages that confirm a :class:`telegram.SuccessfulPayment`."""
 
 
 class _PassportData(MessageFilter):
     __slots__ = ()
-    name = 'filters.PASSPORT_DATA'
 
     def filter(self, message: Message) -> bool:
         return bool(message.passport_data)
 
 
-PASSPORT_DATA = _PassportData()
+PASSPORT_DATA = _PassportData(name="filters.PASSPORT_DATA")
 """Messages that contain a :class:`telegram.PassportData`"""
 
 
 class _Poll(MessageFilter):
     __slots__ = ()
-    name = 'filters.POLL'
 
     def filter(self, message: Message) -> bool:
         return bool(message.poll)
 
 
-POLL = _Poll()
+POLL = _Poll(name="filters.POLL")
 """Messages that contain a :class:`telegram.Poll`."""
 
 
@@ -2162,7 +2119,7 @@ class Language(MessageFilter):
         else:
             lang = cast(List[str], lang)
             self.lang = lang
-        self.name = f'filters.Language({self.lang})'
+        super().__init__(name=f"filters.Language({self.lang})")
 
     def filter(self, message: Message) -> bool:
         return bool(
@@ -2174,13 +2131,11 @@ class Language(MessageFilter):
 class _Attachment(MessageFilter):
     __slots__ = ()
 
-    name = 'filters.ATTACHMENT'
-
     def filter(self, message: Message) -> bool:
         return bool(message.effective_attachment)
 
 
-ATTACHMENT = _Attachment()
+ATTACHMENT = _Attachment(name="filters.ATTACHMENT")
 """Messages that contain :meth:`telegram.Message.effective_attachment`.
 
 .. versionadded:: 13.6"""
@@ -2192,7 +2147,7 @@ class UpdateType:
 
     Examples:
         Use these filters like: ``filters.UpdateType.MESSAGE`` or
-        ``filters.UpdateType.CHANNEL_POSTS`` etc. Or use just ``filters.UPDATE`` for all
+        ``filters.UpdateType.CHANNEL_POSTS`` etc. Or use just ``filters.UpdateType.ALL`` for all
         types.
 
     Note:
@@ -2200,84 +2155,75 @@ class UpdateType:
     """
 
     __slots__ = ()
-    name = 'filters.UPDATE'
 
     class _Message(UpdateFilter):
         __slots__ = ()
-        name = 'filters.UpdateType.MESSAGE'
 
         def filter(self, update: Update) -> bool:
             return update.message is not None
 
-    MESSAGE = _Message()
+    MESSAGE = _Message(name="filters.UpdateType.MESSAGE")
     """Updates with :attr:`telegram.Update.message`."""
 
     class _EditedMessage(UpdateFilter):
         __slots__ = ()
-        name = 'filters.UpdateType.EDITED_MESSAGE'
 
         def filter(self, update: Update) -> bool:
             return update.edited_message is not None
 
-    EDITED_MESSAGE = _EditedMessage()
+    EDITED_MESSAGE = _EditedMessage(name="filters.UpdateType.EDITED_MESSAGE")
     """Updates with :attr:`telegram.Update.edited_message`."""
 
     class _Messages(UpdateFilter):
         __slots__ = ()
-        name = 'filters.UpdateType.MESSAGES'
 
         def filter(self, update: Update) -> bool:
             return update.message is not None or update.edited_message is not None
 
-    MESSAGES = _Messages()
+    MESSAGES = _Messages(name="filters.UpdateType.MESSAGES")
     """Updates with either :attr:`telegram.Update.message` or
     :attr:`telegram.Update.edited_message`."""
 
     class _ChannelPost(UpdateFilter):
         __slots__ = ()
-        name = 'filters.UpdateType.CHANNEL_POST'
 
         def filter(self, update: Update) -> bool:
             return update.channel_post is not None
 
-    CHANNEL_POST = _ChannelPost()
+    CHANNEL_POST = _ChannelPost(name="filters.UpdateType.CHANNEL_POST")
     """Updates with :attr:`telegram.Update.channel_post`."""
 
     class _EditedChannelPost(UpdateFilter):
         __slots__ = ()
-        name = 'filters.UpdateType.EDITED_CHANNEL_POST'
 
         def filter(self, update: Update) -> bool:
             return update.edited_channel_post is not None
 
-    EDITED_CHANNEL_POST = _EditedChannelPost()
+    EDITED_CHANNEL_POST = _EditedChannelPost(name="filters.UpdateType.EDITED_CHANNEL_POST")
     """Updates with :attr:`telegram.Update.edited_channel_post`."""
 
     class _Edited(UpdateFilter):
         __slots__ = ()
-        name = 'filters.UpdateType.EDITED'
 
         def filter(self, update: Update) -> bool:
             return update.edited_message is not None or update.edited_channel_post is not None
 
-    EDITED = _Edited()
+    EDITED = _Edited(name="filters.UpdateType.EDITED")
     """Updates with either :attr:`telegram.Update.edited_message` or
     :attr:`telegram.Update.edited_channel_post`."""
 
     class _ChannelPosts(UpdateFilter):
         __slots__ = ()
-        name = 'filters.UpdateType.CHANNEL_POSTS'
 
         def filter(self, update: Update) -> bool:
             return update.channel_post is not None or update.edited_channel_post is not None
 
-    CHANNEL_POSTS = _ChannelPosts()
+    CHANNEL_POSTS = _ChannelPosts(name="filters.UpdateType.CHANNEL_POSTS")
     """Updates with either :attr:`telegram.Update.channel_post` or
     :attr:`telegram.Update.edited_channel_post`."""
 
     class _All(UpdateFilter):
         __slots__ = ()
-        name = 'filters.UpdateType.ALL'
 
         def filter(self, update: Update) -> bool:
             return bool(
@@ -2285,5 +2231,5 @@ class UpdateType:
                 or UpdateType.CHANNEL_POSTS.check_update(update)
             )
 
-    ALL = _All()
+    ALL = _All(name="filters.UpdateType.ALL")
     """All updates which contain a message."""

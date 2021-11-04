@@ -334,6 +334,7 @@ def make_command_update(message, edited=False, **kwargs):
 def mock_filter(request):
     class MockFilter(request.param['class']):
         def __init__(self):
+            super().__init__()
             self.tested = False
 
         def filter(self, _):
