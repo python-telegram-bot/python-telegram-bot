@@ -309,13 +309,13 @@ class ConversationHandler(Handler[Update, CCT]):
                     f"{handler.__class__.__name__} handles updates of type `str`.",
                     stacklevel=2,
                 )
-            if isinstance(handler, TypeHandler) and not issubclass(handler.type, Update):
+            elif isinstance(handler, TypeHandler) and not issubclass(handler.type, Update):
                 warn(
                     "The `ConversationHandler` only handles updates of type `telegram.Update`."
                     f" The TypeHandler is set to handle {handler.type.__name__}.",
                     stacklevel=2,
                 )
-            if isinstance(handler, PollHandler):
+            elif isinstance(handler, PollHandler):
                 warn(
                     "PollHandler will never trigger in a conversation since it has no information "
                     "about the chat or the user who voted in it. Do you mean the "
@@ -323,20 +323,16 @@ class ConversationHandler(Handler[Update, CCT]):
                     stacklevel=2,
                 )
 
-            if (
-                self.per_chat
-                and self.per_user
-                and (
-                    isinstance(
-                        handler,
-                        (
-                            ShippingQueryHandler,
-                            InlineQueryHandler,
-                            ChosenInlineResultHandler,
-                            PreCheckoutQueryHandler,
-                            PollAnswerHandler,
-                        ),
-                    )
+            elif self.per_chat and (
+                isinstance(
+                    handler,
+                    (
+                        ShippingQueryHandler,
+                        InlineQueryHandler,
+                        ChosenInlineResultHandler,
+                        PreCheckoutQueryHandler,
+                        PollAnswerHandler,
+                    ),
                 )
             ):
                 warn(
@@ -346,21 +342,19 @@ class ConversationHandler(Handler[Update, CCT]):
                     stacklevel=2,
                 )
 
-            if self.per_message:
-                if not isinstance(handler, CallbackQueryHandler):
-                    warn(
-                        "If 'per_message=True', all entry points, state handlers, and fallbacks"
-                        " must be 'CallbackQueryHandler', since no other handlers "
-                        f"have a message context.{per_faq_link}",
-                        stacklevel=2,
-                    )
-            else:
-                if isinstance(handler, CallbackQueryHandler):
-                    warn(
-                        "If 'per_message=False', 'CallbackQueryHandler' will not be "
-                        "tracked for every message." + per_faq_link,
-                        stacklevel=2,
-                    )
+            elif self.per_message and not isinstance(handler, CallbackQueryHandler):
+                warn(
+                    "If 'per_message=True', all entry points, state handlers, and fallbacks"
+                    " must be 'CallbackQueryHandler', since no other handlers "
+                    f"have a message context.{per_faq_link}",
+                    stacklevel=2,
+                )
+            elif isinstance(handler, CallbackQueryHandler):
+                warn(
+                    "If 'per_message=False', 'CallbackQueryHandler' will not be "
+                    "tracked for every message." + per_faq_link,
+                    stacklevel=2,
+                )
 
         if self.conversation_timeout:
             for handler in all_handlers:

@@ -1335,7 +1335,9 @@ class TestConversationHandler:
         assert self.is_timeout
 
     def test_handlers_generate_warning(self, recwarn):
-        # this function tests all handler + per_* setting combinations.
+        """
+        this function tests all handler + per_* setting combinations.
+        """
 
         # the warning message action needs to be set to always,
         # otherwise only the first occurrence will be issued
