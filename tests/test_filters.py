@@ -1006,16 +1006,17 @@ class TestFilters:
     def test_filters_user_allow_empty(self, update):
         assert not filters.User().check_update(update)
         assert filters.User(allow_empty=True).check_update(update)
-        assert filters.USER.check_update(update)
 
     def test_filters_user_id(self, update):
         assert not filters.User(user_id=1).check_update(update)
         update.message.from_user.id = 1
         assert filters.User(user_id=1).check_update(update)
+        assert filters.USER.check_update(update)
         update.message.from_user.id = 2
         assert filters.User(user_id=[1, 2]).check_update(update)
         assert not filters.User(user_id=[3, 4]).check_update(update)
         update.message.from_user = None
+        assert not filters.USER.check_update(update)
         assert not filters.User(user_id=[3, 4]).check_update(update)
 
     def test_filters_username(self, update):
@@ -1150,16 +1151,18 @@ class TestFilters:
     def test_filters_chat_allow_empty(self, update):
         assert not filters.Chat().check_update(update)
         assert filters.Chat(allow_empty=True).check_update(update)
-        assert filters.CHAT.check_update(update)
 
     def test_filters_chat_id(self, update):
         assert not filters.Chat(chat_id=1).check_update(update)
+        assert filters.CHAT.check_update(update)
         update.message.chat.id = 1
         assert filters.Chat(chat_id=1).check_update(update)
+        assert filters.CHAT.check_update(update)
         update.message.chat.id = 2
         assert filters.Chat(chat_id=[1, 2]).check_update(update)
         assert not filters.Chat(chat_id=[3, 4]).check_update(update)
         update.message.chat = None
+        assert not filters.CHAT.check_update(update)
         assert not filters.Chat(chat_id=[3, 4]).check_update(update)
 
     def test_filters_chat_username(self, update):
@@ -1544,7 +1547,6 @@ class TestFilters:
     def test_filters_sender_chat_allow_empty(self, update):
         assert not filters.SenderChat().check_update(update)
         assert filters.SenderChat(allow_empty=True).check_update(update)
-        assert filters.SENDER_CHAT.check_update(update)
 
     def test_filters_sender_chat_id(self, update):
         assert not filters.SenderChat(chat_id=1).check_update(update)
@@ -1553,10 +1555,10 @@ class TestFilters:
         update.message.sender_chat.id = 2
         assert filters.SenderChat(chat_id=[1, 2]).check_update(update)
         assert not filters.SenderChat(chat_id=[3, 4]).check_update(update)
-        assert filters.SENDER_CHAT.check_update(update)
+        assert filters.SenderChat.ALL.check_update(update)
         update.message.sender_chat = None
         assert not filters.SenderChat(chat_id=[3, 4]).check_update(update)
-        assert not filters.SENDER_CHAT.check_update(update)
+        assert not filters.SenderChat.ALL.check_update(update)
 
     def test_filters_sender_chat_username(self, update):
         assert not filters.SenderChat(username='chat').check_update(update)
@@ -1566,10 +1568,10 @@ class TestFilters:
         assert filters.SenderChat(username='chat@').check_update(update)
         assert filters.SenderChat(username=['chat1', 'chat@', 'chat2']).check_update(update)
         assert not filters.SenderChat(username=['@username', '@chat_2']).check_update(update)
-        assert filters.SENDER_CHAT.check_update(update)
+        assert filters.SenderChat.ALL.check_update(update)
         update.message.sender_chat = None
         assert not filters.SenderChat(username=['@username', '@chat_2']).check_update(update)
-        assert not filters.SENDER_CHAT.check_update(update)
+        assert not filters.SenderChat.ALL.check_update(update)
 
     def test_filters_sender_chat_change_id(self, update):
         f = filters.SenderChat(chat_id=1)
@@ -1688,15 +1690,15 @@ class TestFilters:
     def test_filters_sender_chat_super_group(self, update):
         update.message.sender_chat.type = Chat.PRIVATE
         assert not filters.SenderChat.SUPER_GROUP.check_update(update)
-        assert filters.SENDER_CHAT.check_update(update)
+        assert filters.SenderChat.ALL.check_update(update)
         update.message.sender_chat.type = Chat.CHANNEL
         assert not filters.SenderChat.SUPER_GROUP.check_update(update)
         update.message.sender_chat.type = Chat.SUPERGROUP
         assert filters.SenderChat.SUPER_GROUP.check_update(update)
-        assert filters.SENDER_CHAT.check_update(update)
+        assert filters.SenderChat.ALL.check_update(update)
         update.message.sender_chat = None
         assert not filters.SenderChat.SUPER_GROUP.check_update(update)
-        assert not filters.SENDER_CHAT.check_update(update)
+        assert not filters.SenderChat.ALL.check_update(update)
 
     def test_filters_sender_chat_channel(self, update):
         update.message.sender_chat.type = Chat.PRIVATE
@@ -2104,7 +2106,6 @@ class TestFilters:
     def test_filters_via_bot_allow_empty(self, update):
         assert not filters.ViaBot().check_update(update)
         assert filters.ViaBot(allow_empty=True).check_update(update)
-        assert filters.VIA_BOT.check_update(update)
 
     def test_filters_via_bot_id(self, update):
         assert not filters.ViaBot(bot_id=1).check_update(update)

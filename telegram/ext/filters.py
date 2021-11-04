@@ -1536,11 +1536,16 @@ class User(_ChatUserBaseFilter):
         return super()._remove_chat_ids(user_id)
 
 
-USER = User(allow_empty=True)
-"""
-Shortcut for :class:`telegram.ext.filters.User(allow_empty=True)`. This allows to filter *any*
-message that was sent from a user.
-"""
+class _User(MessageFilter):
+    __slots__ = ()
+    name = "filters.USER"
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.from_user)
+
+
+USER = _User()
+"""This filter filters *any* message that was sent from a user."""
 
 
 class ViaBot(_ChatUserBaseFilter):
@@ -1647,11 +1652,16 @@ class ViaBot(_ChatUserBaseFilter):
         return super()._remove_chat_ids(bot_id)
 
 
-VIA_BOT = ViaBot(allow_empty=True)
-"""
-Shortcut for :class:`telegram.ext.filters.ViaBot(allow_empty=True)`. This allows to filter *any*
-message that was sent via a bot.
-"""
+class _ViaBot(MessageFilter):
+    __slots__ = ()
+    name = "filters.VIA_BOT"
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.via_bot)
+
+
+VIA_BOT = _ViaBot()
+"""This filter filters *any* message that was sent via a bot."""
 
 
 class Chat(_ChatUserBaseFilter):
@@ -1735,11 +1745,16 @@ class Chat(_ChatUserBaseFilter):
         return super()._remove_chat_ids(chat_id)
 
 
-CHAT = Chat(allow_empty=True)
-"""
-Shortcut for :class:`telegram.ext.filters.Chat(allow_empty=True)`. This allows to filter for *any*
-message that was sent from any chat.
-"""
+class _Chat(MessageFilter):
+    __slots__ = ()
+    name = "filters.CHAT"
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.chat)
+
+
+CHAT = _Chat()
+"""This filter filters *any* message that was sent from any chat."""
 
 
 class ForwardedFrom(_ChatUserBaseFilter):
@@ -1834,6 +1849,14 @@ class ForwardedFrom(_ChatUserBaseFilter):
         return super()._remove_chat_ids(chat_id)
 
 
+class _SenderChat(MessageFilter):
+    __slots__ = ()
+    name = "filters.SenderChat.ALL"
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.sender_chat)
+
+
 class SenderChat(_ChatUserBaseFilter):
     """Filters messages to allow only those which are from a specified sender chats chat ID or
     username.
@@ -1848,6 +1871,8 @@ class SenderChat(_ChatUserBaseFilter):
           ``MessageHandler(filters.SenderChat.CHANNEL, callback_method)``.
         * To filter for messages of anonymous admins in *any* super group, use
           ``MessageHandler(filters.SenderChat.SUPERGROUP, callback_method)``.
+        * To filter for messages forwarded to a discussion group from *any* channel or of anonymous
+          admins in *any* super group, use ``MessageHandler(filters.SenderChat.ALL, callback)``
 
     Note:
         Remember, ``sender_chat`` is also set for messages in a channel as the channel itself,
@@ -1952,11 +1977,8 @@ class SenderChat(_ChatUserBaseFilter):
     """Messages whose sender chat is a super group."""
     CHANNEL = _CHANNEL()
     """Messages whose sender chat is a channel."""
-
-
-SENDER_CHAT = SenderChat(allow_empty=True)
-"""Shortcut for :class:`telegram.ext.filters.SenderChat(allow_empty=True)`. This allows to filter
-for *any* message that was sent by a supergroup or a channel."""
+    ALL = _SenderChat()
+    """Messages whose sender chat is either a supergroup or a channel."""
 
 
 class _Invoice(MessageFilter):
