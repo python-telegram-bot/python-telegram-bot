@@ -632,7 +632,7 @@ class _Reply(MessageFilter):
 
 
 REPLY = _Reply(name="filters.REPLY")
-"""Messages that are a reply to another message."""
+"""Messages that contain :attr:`telegram.Message.reply_to_message`."""
 
 
 class _Audio(MessageFilter):
@@ -643,7 +643,7 @@ class _Audio(MessageFilter):
 
 
 AUDIO = _Audio(name="filters.AUDIO")
-"""Messages that contain :class:`telegram.Audio`."""
+"""Messages that contain :attr:`telegram.Message.audio`."""
 
 
 class Document(MessageFilter):
@@ -830,7 +830,7 @@ class _Animation(MessageFilter):
 
 
 ANIMATION = _Animation(name="filters.ANIMATION")
-"""Messages that contain :class:`telegram.Animation`."""
+"""Messages that contain :attr:`telegram.Message.animation`."""
 
 
 class _Photo(MessageFilter):
@@ -841,7 +841,7 @@ class _Photo(MessageFilter):
 
 
 PHOTO = _Photo("filters.PHOTO")
-"""Messages that contain :class:`telegram.PhotoSize`."""
+"""Messages that contain :attr:`telegram.Message.photo`."""
 
 
 class _Sticker(MessageFilter):
@@ -852,7 +852,7 @@ class _Sticker(MessageFilter):
 
 
 STICKER = _Sticker(name="filters.STICKER")
-"""Messages that contain :class:`telegram.Sticker`."""
+"""Messages that contain :attr:`telegram.Message.sticker`."""
 
 
 class _Video(MessageFilter):
@@ -863,7 +863,7 @@ class _Video(MessageFilter):
 
 
 VIDEO = _Video(name="filters.VIDEO")
-"""Messages that contain :class:`telegram.Video`."""
+"""Messages that contain :attr:`telegram.Message.video`."""
 
 
 class _Voice(MessageFilter):
@@ -874,7 +874,7 @@ class _Voice(MessageFilter):
 
 
 VOICE = _Voice("filters.VOICE")
-"""Messages that contain :class:`telegram.Voice`."""
+"""Messages that contain :attr:`telegram.Message.voice`."""
 
 
 class _VideoNote(MessageFilter):
@@ -885,7 +885,7 @@ class _VideoNote(MessageFilter):
 
 
 VIDEO_NOTE = _VideoNote(name="filters.VIDEO_NOTE")
-"""Messages that contain :class:`telegram.VideoNote`."""
+"""Messages that contain :attr:`telegram.Message.video_note`."""
 
 
 class _Contact(MessageFilter):
@@ -896,7 +896,7 @@ class _Contact(MessageFilter):
 
 
 CONTACT = _Contact(name="filters.CONTACT")
-"""Messages that contain :class:`telegram.Contact`."""
+"""Messages that contain :attr:`telegram.Message.contact`."""
 
 
 class _Location(MessageFilter):
@@ -907,7 +907,7 @@ class _Location(MessageFilter):
 
 
 LOCATION = _Location(name="filters.LOCATION")
-"""Messages that contain :class:`telegram.Location`."""
+"""Messages that contain :attr:`telegram.Message.location`."""
 
 
 class _Venue(MessageFilter):
@@ -918,7 +918,7 @@ class _Venue(MessageFilter):
 
 
 VENUE = _Venue(name="filters.VENUE")
-"""Messages that contain :class:`telegram.Venue`."""
+"""Messages that contain :attr:`telegram.Message.venue`."""
 
 
 class StatusUpdate:
@@ -1128,7 +1128,7 @@ class _Forwarded(MessageFilter):
 
 
 FORWARDED = _Forwarded(name="filters.FORWARDED")
-"""Messages that are forwarded."""
+"""Messages that contain :attr:`telegram.Message.forward_date`."""
 
 
 class _Game(MessageFilter):
@@ -1139,7 +1139,7 @@ class _Game(MessageFilter):
 
 
 GAME = _Game(name="filters.GAME")
-"""Messages that contain :class:`telegram.Game`."""
+"""Messages that contain :attr:`telegram.Message.game`."""
 
 
 class Entity(MessageFilter):
@@ -1950,7 +1950,7 @@ class _Invoice(MessageFilter):
 
 
 INVOICE = _Invoice(name="filters.INVOICE")
-"""Messages that contain :class:`telegram.Invoice`."""
+"""Messages that contain :attr:`telegram.Message.invoice`."""
 
 
 class _SuccessfulPayment(MessageFilter):
@@ -1961,7 +1961,7 @@ class _SuccessfulPayment(MessageFilter):
 
 
 SUCCESSFUL_PAYMENT = _SuccessfulPayment(name="filters.SUCCESSFUL_PAYMENT")
-"""Messages that confirm a :class:`telegram.SuccessfulPayment`."""
+"""Messages that contain :attr:`telegram.Message.successful_payment`."""
 
 
 class _PassportData(MessageFilter):
@@ -1972,7 +1972,7 @@ class _PassportData(MessageFilter):
 
 
 PASSPORT_DATA = _PassportData(name="filters.PASSPORT_DATA")
-"""Messages that contain a :class:`telegram.PassportData`"""
+"""Messages that contain :attr:`telegram.Message.passport_data`."""
 
 
 class _Poll(MessageFilter):
@@ -1983,7 +1983,7 @@ class _Poll(MessageFilter):
 
 
 POLL = _Poll(name="filters.POLL")
-"""Messages that contain a :class:`telegram.Poll`."""
+"""Messages that contain :attr:`telegram.Message.poll`."""
 
 
 class Dice(_Dice):
