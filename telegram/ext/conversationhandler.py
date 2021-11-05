@@ -218,9 +218,9 @@ class ConversationHandler(Handler[Update, CCT]):
     def __init__(
         self,
         entry_points: List[Handler[Update, CCT]],
-        prefallbacks: List[Handler[Update, CCT]],
         states: Dict[object, List[Handler[Update, CCT]]],
         fallbacks: List[Handler[Update, CCT]],
+        prefallbacks: List[Handler[Update, CCT]] = List(),
         allow_reentry: bool = False,
         per_chat: bool = True,
         per_user: bool = True,
