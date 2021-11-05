@@ -25,6 +25,7 @@ from .files.chatphoto import ChatPhoto
 from .chat import Chat
 from .chatlocation import ChatLocation
 from .chatinvitelink import ChatInviteLink
+from .chatjoinrequest import ChatJoinRequest
 from .chatmember import (
     ChatMember,
     ChatMemberOwner,
@@ -194,6 +195,7 @@ __all__ = (  # Keep this alphabetically ordered
     'Chat',
     'ChatAction',
     'ChatInviteLink',
+    'ChatJoinRequest',
     'ChatLocation',
     'ChatMember',
     'ChatMemberOwner',

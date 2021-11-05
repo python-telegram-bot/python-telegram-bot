@@ -31,6 +31,7 @@ from telegram import (
     TelegramObject,
     ChatMemberUpdated,
     constants,
+    ChatJoinRequest,
 )
 from telegram.poll import PollAnswer
 from telegram.utils.types import JSONDict
@@ -89,6 +90,11 @@ class Update(TelegramObject):
             :meth:`telegram.ext.Updater.start_webhook`).
 
             .. versionadded:: 13.4
+        chat_join_request (:class:`telegram.ChatJoinRequest`, optional): A request to join the
+            chat has been sent. The bot must have the can_invite_users administrator right in
+            the chat to receive these updates.
+
+            .. versionadded:: 13.8
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -122,6 +128,11 @@ class Update(TelegramObject):
             :meth:`telegram.ext.Updater.start_webhook`).
 
             .. versionadded:: 13.4
+        chat_join_request (:class:`telegram.ChatJoinRequest`): Optional. A request to join the
+            chat has been sent. The bot must have the ``'can_invite_users'`` administrator
+            right in the chat to receive these updates.
+
+            .. versionadded:: 13.8
 
     """
 
@@ -143,6 +154,7 @@ class Update(TelegramObject):
         '_effective_message',
         'my_chat_member',
         'chat_member',
+        'chat_join_request',
         '_id_attrs',
     )
 
@@ -198,6 +210,10 @@ class Update(TelegramObject):
     """:const:`telegram.constants.UPDATE_CHAT_MEMBER`
 
     .. versionadded:: 13.5"""
+    CHAT_JOIN_REQUEST = constants.UPDATE_CHAT_JOIN_REQUEST
+    """:const:`telegram.constants.UPDATE_CHAT_JOIN_REQUEST`
+
+    .. versionadded:: 13.8"""
     ALL_TYPES = constants.UPDATE_ALL_TYPES
     """:const:`telegram.constants.UPDATE_ALL_TYPES`
 
@@ -219,6 +235,7 @@ class Update(TelegramObject):
         poll_answer: PollAnswer = None,
         my_chat_member: ChatMemberUpdated = None,
         chat_member: ChatMemberUpdated = None,
+        chat_join_request: ChatJoinRequest = None,
         **_kwargs: Any,
     ):
         # Required
@@ -237,6 +254,7 @@ class Update(TelegramObject):
         self.poll_answer = poll_answer
         self.my_chat_member = my_chat_member
         self.chat_member = chat_member
+        self.chat_join_request = chat_join_request
 
         self._effective_user: Optional['User'] = None
         self._effective_chat: Optional['Chat'] = None
@@ -384,5 +402,6 @@ class Update(TelegramObject):
         data['poll_answer'] = PollAnswer.de_json(data.get('poll_answer'), bot)
         data['my_chat_member'] = ChatMemberUpdated.de_json(data.get('my_chat_member'), bot)
         data['chat_member'] = ChatMemberUpdated.de_json(data.get('chat_member'), bot)
+        data['chat_join_request'] = ChatJoinRequest.de_json(data.get('chat_join_request'), bot)
 
         return cls(**data)

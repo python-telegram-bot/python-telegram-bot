@@ -46,6 +46,17 @@ class ChatInviteLink(TelegramObject):
             has been expired.
         member_limit (:obj:`int`, optional): Maximum number of users that can be members of the
             chat simultaneously after joining the chat via this invite link; 1-99999.
+        name (:obj:`str`, optional): Invite link name.
+
+            .. versionadded:: 13.8
+        creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat via
+            the link need to be approved by chat administrators.
+
+            .. versionadded:: 13.8
+        pending_join_request_count (:obj:`int`, optional): Number of pending join requests
+            created using this link.
+
+            .. versionadded:: 13.8
 
     Attributes:
         invite_link (:obj:`str`): The invite link. If the link was created by another chat
@@ -57,6 +68,17 @@ class ChatInviteLink(TelegramObject):
             has been expired.
         member_limit (:obj:`int`): Optional. Maximum number of users that can be members
             of the chat simultaneously after joining the chat via this invite link; 1-99999.
+        name (:obj:`str`): Optional. Invite link name.
+
+            .. versionadded:: 13.8
+        creates_join_request (:obj:`bool`): Optional. :obj:`True`, if users joining the chat via
+            the link need to be approved by chat administrators.
+
+            .. versionadded:: 13.8
+        pending_join_request_count (:obj:`int`): Optional. Number of pending join requests
+            created using this link.
+
+            .. versionadded:: 13.8
 
     """
 
@@ -67,6 +89,9 @@ class ChatInviteLink(TelegramObject):
         'is_revoked',
         'expire_date',
         'member_limit',
+        'name',
+        'creates_join_request',
+        'pending_join_request_count',
         '_id_attrs',
     )
 
@@ -78,6 +103,9 @@ class ChatInviteLink(TelegramObject):
         is_revoked: bool,
         expire_date: datetime.datetime = None,
         member_limit: int = None,
+        name: str = None,
+        creates_join_request: bool = None,
+        pending_join_request_count: int = None,
         **_kwargs: Any,
     ):
         # Required
@@ -89,7 +117,11 @@ class ChatInviteLink(TelegramObject):
         # Optionals
         self.expire_date = expire_date
         self.member_limit = int(member_limit) if member_limit is not None else None
-
+        self.name = name
+        self.creates_join_request = creates_join_request
+        self.pending_join_request_count = (
+            int(pending_join_request_count) if pending_join_request_count is not None else None
+        )
         self._id_attrs = (self.invite_link, self.creator, self.is_primary, self.is_revoked)
 
     @classmethod

@@ -3985,6 +3985,8 @@ class Bot(TelegramObject):
         member_limit: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        name: str = None,
+        creates_join_request: bool = None,
     ) -> ChatInviteLink:
         """
         Use this method to create an additional invite link for a chat. The bot must be an
@@ -4007,6 +4009,14 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            name (:obj:`str`, optional): Invite link name; 0-32 characters.
+
+                .. versionadded:: 13.8
+            creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
+                via the link need to be approved by chat administrators.
+                If :obj:`True`, `member_limit` can't be specified.
+
+                .. versionadded:: 13.8
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -4029,6 +4039,12 @@ class Bot(TelegramObject):
         if member_limit is not None:
             data['member_limit'] = member_limit
 
+        if name is not None:
+            data['name'] = name
+
+        if creates_join_request is not None:
+            data['creates_join_request'] = creates_join_request
+
         result = self._post('createChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
@@ -4042,6 +4058,8 @@ class Bot(TelegramObject):
         member_limit: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        name: str = None,
+        creates_join_request: bool = None,
     ) -> ChatInviteLink:
         """
         Use this method to edit a non-primary invite link created by the bot. The bot must be an
@@ -4064,6 +4082,14 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            name (:obj:`str`, optional): Invite link name; 0-32 characters.
+
+                .. versionadded:: 13.8
+            creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
+                via the link need to be approved by chat administrators.
+                If :obj:`True`, `member_limit` can't be specified.
+
+                .. versionadded:: 13.8
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -4083,6 +4109,12 @@ class Bot(TelegramObject):
 
         if member_limit is not None:
             data['member_limit'] = member_limit
+
+        if name is not None:
+            data['name'] = name
+
+        if creates_join_request is not None:
+            data['creates_join_request'] = creates_join_request
 
         result = self._post('editChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -4125,6 +4157,76 @@ class Bot(TelegramObject):
         result = self._post('revokeChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return ChatInviteLink.de_json(result, self)  # type: ignore[return-value, arg-type]
+
+    @log
+    def approve_chat_join_request(
+        self,
+        chat_id: Union[str, int],
+        user_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Use this method to approve a chat join request.
+
+        The bot must be an administrator in the chat for this to work and must have the
+        `can_invite_users` administrator right.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format ``@channelusername``).
+            user_id (:obj:`int`): Unique identifier of the target user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
+
+        result = self._post('approveChatJoinRequest', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        return result  # type: ignore[return-value]
+
+    @log
+    def decline_chat_join_request(
+        self,
+        chat_id: Union[str, int],
+        user_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Use this method to decline  a chat join request.
+
+        The bot must be an administrator in the chat for this to work and must have the
+        `can_invite_users` administrator right.
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format ``@channelusername``).
+            user_id (:obj:`int`): Unique identifier of the target user.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
+
+        result = self._post('declineChatJoinRequest', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        return result  # type: ignore[return-value]
 
     @log
     def set_chat_photo(
@@ -5441,6 +5543,10 @@ class Bot(TelegramObject):
     """Alias for :attr:`edit_chat_invite_link`"""
     revokeChatInviteLink = revoke_chat_invite_link
     """Alias for :attr:`revoke_chat_invite_link`"""
+    approveChatJoinRequest = approve_chat_join_request
+    """Alias for :attr:`approve_chat_join_request`"""
+    declineChatJoinRequest = decline_chat_join_request
+    """Alias for :attr:`decline_chat_join_request`"""
     setChatPhoto = set_chat_photo
     """Alias for :meth:`set_chat_photo`"""
     deleteChatPhoto = delete_chat_photo
