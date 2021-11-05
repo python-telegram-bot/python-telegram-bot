@@ -21,8 +21,8 @@ import datetime
 from typing import TYPE_CHECKING, Any, Optional
 
 from telegram import TelegramObject, User, Chat, ChatInviteLink
-from telegram.utils.helpers import from_timestamp, to_timestamp
-from telegram.utils.types import JSONDict
+from telegram.utils.helpers import from_timestamp, to_timestamp, DEFAULT_NONE
+from telegram.utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -43,6 +43,7 @@ class ChatJoinRequest(TelegramObject):
         bio (:obj:`str`, optional): Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link that was used
             by the user to send the join request.
+        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
@@ -60,6 +61,7 @@ class ChatJoinRequest(TelegramObject):
         'date',
         'bio',
         'invite_link',
+        'bot',
         '_id_attrs',
     )
 
@@ -70,6 +72,7 @@ class ChatJoinRequest(TelegramObject):
         date: datetime.datetime,
         bio: str = None,
         invite_link: ChatInviteLink = None,
+        bot: 'Bot' = None,
         **_kwargs: Any,
     ):
         # Required
@@ -80,6 +83,8 @@ class ChatJoinRequest(TelegramObject):
         # Optionals
         self.bio = bio
         self.invite_link = invite_link
+
+        self.bot = bot
         self._id_attrs = (self.chat, self.from_user, self.date)
 
     @classmethod
@@ -95,7 +100,7 @@ class ChatJoinRequest(TelegramObject):
         data['date'] = from_timestamp(data.get('date', None))
         data['invite_link'] = ChatInviteLink.de_json(data.get('invite_link'), bot)
 
-        return cls(**data)
+        return cls(bot=bot, **data)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -104,3 +109,45 @@ class ChatJoinRequest(TelegramObject):
         data['date'] = to_timestamp(self.date)
 
         return data
+
+    def approve(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.approve_chat_join_request(chat_id=update.effective_chat.id,
+            user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.approve_chat_join_request`.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.approve_chat_join_request(
+            chat_id=self.chat.id, user_id=self.from_user.id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def decline(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.decline_chat_join_request(chat_id=update.effective_chat.id,
+            user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.decline_chat_join_request`.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.decline_chat_join_request(
+            chat_id=self.chat.id, user_id=self.from_user.id, timeout=timeout, api_kwargs=api_kwargs
+        )

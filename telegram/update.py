@@ -304,6 +304,9 @@ class Update(TelegramObject):
         elif self.chat_member:
             user = self.chat_member.from_user
 
+        elif self.chat_join_request:
+            user = self.chat_join_request.from_user
+
         self._effective_user = user
         return user
 
@@ -342,6 +345,9 @@ class Update(TelegramObject):
 
         elif self.chat_member:
             chat = self.chat_member.chat
+
+        elif self.chat_join_request:
+            chat = self.chat_join_request.chat
 
         self._effective_chat = chat
         return chat
