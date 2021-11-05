@@ -190,6 +190,7 @@ class ConversationHandler(Handler[Update, CCT]):
         '_entry_points',
         '_states',
         '_fallbacks',
+        '_prefallbacks',
         '_allow_reentry',
         '_per_user',
         '_per_chat',
@@ -217,6 +218,7 @@ class ConversationHandler(Handler[Update, CCT]):
     def __init__(
         self,
         entry_points: List[Handler[Update, CCT]],
+        prefallbacks: List[Handler[Update, CCT]],
         states: Dict[object, List[Handler[Update, CCT]]],
         fallbacks: List[Handler[Update, CCT]],
         allow_reentry: bool = False,
@@ -232,6 +234,7 @@ class ConversationHandler(Handler[Update, CCT]):
         self.run_async = run_async
 
         self._entry_points = entry_points
+        self._prefallbacks = prefallbacks
         self._states = states
         self._fallbacks = fallbacks
 
@@ -267,6 +270,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
         all_handlers: List[Handler] = []
         all_handlers.extend(entry_points)
+        all_handlers.extend(prefallbacks)
         all_handlers.extend(fallbacks)
 
         for state_handlers in states.values():
@@ -323,6 +327,18 @@ class ConversationHandler(Handler[Update, CCT]):
     @entry_points.setter
     def entry_points(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to entry_points after initialization.')
+        
+    @property
+    def prefallbacks(self) -> List[Handler]:
+        """List[:class:`telegram.ext.Handler`]: A list of handlers that might be used if
+        the user is in a conversation. This list of handlers will be processed before all the others handlers.
+        This list helps to reduce usage of "and not" filters.
+        """
+        return self._prefallbacks
+
+    @prefallbacks.setter
+    def prefallbacks(self, value: object) -> NoReturn:
+        raise ValueError('You can not assign a new value to prefallbacks after initialization.')
 
     @property
     def states(self) -> Dict[object, List[Handler]]:
