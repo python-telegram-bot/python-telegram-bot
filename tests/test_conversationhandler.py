@@ -1453,6 +1453,9 @@ class TestConversationHandler:
             "every message." + per_faq_link
         )
 
+        for warning in recwarn:
+            assert warning.filename == __file__, "incorrect stacklevel!"
+
     def test_per_message_but_not_per_chat_warning(self, recwarn):
         ConversationHandler(
             entry_points=[CallbackQueryHandler(self.code, "code")],
