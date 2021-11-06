@@ -29,6 +29,7 @@ Hey! You're PRing? Cool! Please have a look at the below checklist. It's here to
     - [ ] Link new and existing constants in docstrings instead of hard coded number and strings
     - [ ] Add new message types to `Message.effective_attachment`
     - [ ] Added new handlers for new update types
+      - [ ] Add the handlers to the warning loop in the `ConversationHandler`
     - [ ] Added new filters for new message (sub)types
     - [ ] Added or updated documentation for the changed class(es) and/or method(s)
     - [ ] Updated the Bot API version number in all places: `README.rst` and `README_RAW.rst` (including the badge), as well as `telegram.constants.BOT_API_VERSION`
