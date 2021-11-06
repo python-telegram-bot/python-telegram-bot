@@ -45,6 +45,9 @@ from telegram.ext import (
     DispatcherHandlerStop,
     Handler,
     InlineQueryHandler,
+    StringCommandHandler,
+    StringRegexHandler,
+    TypeHandler,
 )
 from telegram._utils.warnings import warn
 from telegram.ext._utils.promise import Promise
@@ -239,6 +242,14 @@ class ConversationHandler(Handler[Update, CCT]):
         map_to_parent: Dict[object, object] = None,
         run_async: bool = False,
     ):
+        # these imports need to be here because of circular import error otherwise
+        from telegram.ext import (  # pylint: disable=import-outside-toplevel
+            ShippingQueryHandler,
+            PreCheckoutQueryHandler,
+            PollHandler,
+            PollAnswerHandler,
+        )
+
         self.run_async = run_async
 
         self._entry_points = entry_points
@@ -283,49 +294,77 @@ class ConversationHandler(Handler[Update, CCT]):
         for state_handlers in states.values():
             all_handlers.extend(state_handlers)
 
-        if self.per_message:
-            for handler in all_handlers:
-                if not isinstance(handler, CallbackQueryHandler):
-                    warn(
-                        "If 'per_message=True', all entry points, state handlers, and fallbacks"
-                        " must be 'CallbackQueryHandler', since no other handlers "
-                        "have a message context.",
-                        stacklevel=2,
-                    )
-                    break
-        else:
-            for handler in all_handlers:
-                if isinstance(handler, CallbackQueryHandler):
-                    warn(
-                        "If 'per_message=False', 'CallbackQueryHandler' will not be "
-                        "tracked for every message.",
-                        stacklevel=2,
-                    )
-                    break
+        # this loop is going to warn the user about handlers which can work unexpected
+        # in conversations
 
-        if self.per_chat:
-            for handler in all_handlers:
-                if isinstance(handler, (InlineQueryHandler, ChosenInlineResultHandler)):
-                    warn(
-                        "If 'per_chat=True', 'InlineQueryHandler' can not be used, "
-                        "since inline queries have no chat context.",
-                        stacklevel=2,
-                    )
-                    break
+        # this link will be added to all warnings tied to per_* setting
+        per_faq_link = (
+            " Read this FAQ entry to learn more about the per_* settings: https://git.io/JtcyU."
+        )
 
-        if self.conversation_timeout:
-            for handler in all_handlers:
-                if isinstance(handler, self.__class__):
-                    warn(
-                        "Using `conversation_timeout` with nested conversations is currently not "
-                        "supported. You can still try to use it, but it will likely behave "
-                        "differently from what you expect.",
-                        stacklevel=2,
-                    )
-                    break
+        for handler in all_handlers:
+            if isinstance(handler, (StringCommandHandler, StringRegexHandler)):
+                warn(
+                    "The `ConversationHandler` only handles updates of type `telegram.Update`. "
+                    f"{handler.__class__.__name__} handles updates of type `str`.",
+                    stacklevel=2,
+                )
+            elif isinstance(handler, TypeHandler) and not issubclass(handler.type, Update):
+                warn(
+                    "The `ConversationHandler` only handles updates of type `telegram.Update`."
+                    f" The TypeHandler is set to handle {handler.type.__name__}.",
+                    stacklevel=2,
+                )
+            elif isinstance(handler, PollHandler):
+                warn(
+                    "PollHandler will never trigger in a conversation since it has no information "
+                    "about the chat or the user who voted in it. Do you mean the "
+                    "`PollAnswerHandler`?",
+                    stacklevel=2,
+                )
 
-        if self.run_async:
-            for handler in all_handlers:
+            elif self.per_chat and (
+                isinstance(
+                    handler,
+                    (
+                        ShippingQueryHandler,
+                        InlineQueryHandler,
+                        ChosenInlineResultHandler,
+                        PreCheckoutQueryHandler,
+                        PollAnswerHandler,
+                    ),
+                )
+            ):
+                warn(
+                    f"Updates handled by {handler.__class__.__name__} only have information about "
+                    f"the user, so this handler won't ever be triggered if `per_chat=True`."
+                    f"{per_faq_link}",
+                    stacklevel=2,
+                )
+
+            elif self.per_message and not isinstance(handler, CallbackQueryHandler):
+                warn(
+                    "If 'per_message=True', all entry points, state handlers, and fallbacks"
+                    " must be 'CallbackQueryHandler', since no other handlers "
+                    f"have a message context.{per_faq_link}",
+                    stacklevel=2,
+                )
+            elif not self.per_message and isinstance(handler, CallbackQueryHandler):
+                warn(
+                    "If 'per_message=False', 'CallbackQueryHandler' will not be "
+                    f"tracked for every message.{per_faq_link}",
+                    stacklevel=2,
+                )
+
+            if self.conversation_timeout and isinstance(handler, self.__class__):
+                warn(
+                    "Using `conversation_timeout` with nested conversations is currently not "
+                    "supported. You can still try to use it, but it will likely behave "
+                    "differently from what you expect.",
+                    stacklevel=2,
+                )
+
+            if self.run_async:
                 handler.run_async = True
 
     @property
