@@ -17,21 +17,22 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """
-This module contains filters for use with :class:`telegram.ext.MessageHandler` or
-:class:`telegram.ext.CommandHandler`.
+This module contains filters for use with :class:`telegram.ext.MessageHandler`,
+:class:`telegram.ext.CommandHandler`, or :class:`telegram.ext.PrefixHandler`.
 
 .. versionchanged:: 14.0
 
     #. Filters are no longer callable, if you're using a custom filter and are calling an existing
        filter, then switch to the new syntax: ``filters.{filter}.check_update(update)``.
-    #. Removed the ``Filters`` class. You should now call filters directly from the module itself.
+    #. Removed the ``Filters`` class. The filters are now directly attributes/classes of the
+       :mod:`filters` module.
     #. The names of all filters has been updated:
 
-        * Filters which are ready for use, e.g ``Filters.all`` are now capitalized, e.g
+        * Filter classes which are ready for use, e.g ``Filters.all`` are now capitalized, e.g
           ``filters.ALL``.
         * Filters which need to be initialized are now in CamelCase. E.g. ``filters.User(...)``.
-        * Filters which do both (like ``Filters.text``) are now split as capitalized version
-          ``filters.TEXT`` and CamelCase version ``filters.Text(...)``.
+        * Filters which do both (like ``Filters.text``) are now split as ready-to-use version
+          ``filters.TEXT`` and class version ``filters.Text(...)``.
 
 """
 
@@ -109,18 +110,25 @@ class BaseFilter(ABC):
     will be the class name. If you want to overwrite this assign a better name to the :attr:`name`
     class variable.
 
-    Attributes:
+    .. versionadded:: 14.0
+        Added the arguments :attr:`name` and :attr:`data_filter`.
+
+    Args:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
         data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
             return a dict with lists. The dict will be merged with
             :class:`telegram.ext.CallbackContext`'s internal dict in most cases
             (depends on the handler).
+
+    Attributes:
+        name (:obj:`str`): Name for this filter.
+        data_filter (:obj:`bool`): Whether this filter is a data filter.
     """
 
     __slots__ = ('_name', '_data_filter')
 
     def __init__(self, name: str = None, data_filter: bool = False):
-        self._name = name
+        self._name = self.__class__.__name__ if name is None else name
         self._data_filter = data_filter
 
     @abstractmethod
@@ -148,17 +156,14 @@ class BaseFilter(ABC):
         self._data_filter = value
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str:
         return self._name
 
     @name.setter
-    def name(self, name: Optional[str]) -> None:
+    def name(self, name: str) -> None:
         self._name = name
 
     def __repr__(self) -> str:
-        # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
-        if self.name is None:
-            self.name = self.__class__.__name__
         return self.name
 
 
@@ -253,7 +258,7 @@ class _InvertedFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError(f'Cannot set name for {self.__class__.__name__!r}')
+        raise RuntimeError('Cannot set name for combined filters.')
 
 
 class _MergedFilter(UpdateFilter):
@@ -341,7 +346,7 @@ class _MergedFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError(f'Cannot set name for {self.__class__.__name__!r}')
+        raise RuntimeError('Cannot set name for combined filters.')
 
 
 class _XORFilter(UpdateFilter):
@@ -371,7 +376,7 @@ class _XORFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError(f'Cannot set name for {self.__class__.__name__!r}')
+        raise RuntimeError('Cannot set name for combined filters.')
 
 
 class _Dice(MessageFilter):
@@ -927,6 +932,9 @@ class StatusUpdate:
     Examples:
         Use these filters like: ``filters.StatusUpdate.NEW_CHAT_MEMBERS`` etc. Or use just
         ``filters.StatusUpdate.ALL`` for all status update messages.
+
+    Note:
+        ``filters.StatusUpdate`` itself is *not* a filter, but just a convenience namespace.
     """
 
     __slots__ = ()
@@ -1198,7 +1206,7 @@ class ChatType:  # A convenience namespace for Chat types.
         ``filters.ChatType.SUPERGROUP`` etc.
 
     Note:
-        ``filters.ChatType`` itself is *not* a filter.
+        ``filters.ChatType`` itself is *not* a filter, but just a convenience namespace.
     """
 
     __slots__ = ()
@@ -1326,6 +1334,18 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
 
     @property
     def usernames(self) -> FrozenSet[str]:
+        """Which username(s) to allow through.
+
+        Warning:
+            :attr:`usernames` will give a *copy* of the saved usernames as :obj:`frozenset`. This
+            is to ensure thread safety. To add/remove a user, you should use :meth:`add_usernames`,
+            and :meth:`remove_usernames`. Only update the entire set by
+            ``filter.usernames = new_set``, if you are entirely sure that it is not causing race
+            conditions, as this will complete replace the current set of allowed users.
+
+        Returns:
+            frozenset(:obj:`str`)
+        """
         with self.__lock:
             return frozenset(self._usernames)
 
@@ -1333,7 +1353,14 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
     def usernames(self, username: SLT[str]) -> None:
         self._set_usernames(username)
 
-    def _add_usernames(self, username: SLT[str]) -> None:
+    def add_usernames(self, username: SLT[str]) -> None:
+        """
+        Add one or more chats to the allowed usernames.
+
+        Args:
+            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
+                allow through. Leading ``'@'`` s in usernames will be discarded.
+        """
         with self.__lock:
             if self._chat_ids:
                 raise RuntimeError(
@@ -1356,7 +1383,14 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
 
             self._chat_ids |= parsed_chat_id
 
-    def _remove_usernames(self, username: SLT[str]) -> None:
+    def remove_usernames(self, username: SLT[str]) -> None:
+        """
+        Remove one or more chats from allowed usernames.
+
+        Args:
+            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
+                disallow through. Leading ``'@'`` s in usernames will be discarded.
+        """
         with self.__lock:
             if self._chat_ids:
                 raise RuntimeError(
@@ -1407,21 +1441,19 @@ class User(_ChatUserBaseFilter):
         ``MessageHandler(filters.User(1234), callback_method)``
 
     Args:
-        user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-            Which user ID(s) to allow through.
+        user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional): Which user ID(s) to
+            allow through.
         username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-            Which username(s) to allow through. Leading ``'@'`` s in usernames will be
-            discarded.
-        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
-            is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`.
-
-    Attributes:
-        usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
-        allow_empty (:obj:`bool`): Whether updates should be processed, if no user
-            is specified in :attr:`user_ids` and :attr:`usernames`.
+            Which username(s) to allow through. Leading ``'@'`` s in usernames will be discarded.
+        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user is
+            specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`.
 
     Raises:
         RuntimeError: If ``user_id`` and ``username`` are both present.
+
+    Attributes:
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no user is specified in
+            :attr:`user_ids` and :attr:`usernames`.
     """
 
     __slots__ = ()
@@ -1444,15 +1476,14 @@ class User(_ChatUserBaseFilter):
         Which user ID(s) to allow through.
 
         Warning:
-            :attr:`user_ids` will give a *copy* of the saved user ids as :class:`frozenset`. This
-            is to ensure thread safety. To add/remove a user, you should use :meth:`add_usernames`,
-            :meth:`add_user_ids`, :meth:`remove_usernames` and :meth:`remove_user_ids`. Only update
-            the entire set by ``filter.user_ids/usernames = new_set``, if you are entirely sure
-            that it is not causing race conditions, as this will complete replace the current set
-            of allowed users.
+            :attr:`user_ids` will give a *copy* of the saved user ids as :obj:`frozenset`. This
+            is to ensure thread safety. To add/remove a user, you should use :meth:`add_user_ids`,
+            and :meth:`remove_user_ids`. Only update the entire set by
+            ``filter.user_ids = new_set``, if you are entirely sure that it is not causing race
+            conditions, as this will complete replace the current set of allowed users.
 
         Returns:
-            set(:obj:`int`)
+            frozenset(:obj:`int`)
         """
         return self.chat_ids
 
@@ -1460,45 +1491,23 @@ class User(_ChatUserBaseFilter):
     def user_ids(self, user_id: SLT[int]) -> None:
         self.chat_ids = user_id  # type: ignore[assignment]
 
-    def add_usernames(self, username: SLT[str]) -> None:
-        """
-        Add one or more users to the allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to allow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._add_usernames(username)
-
     def add_user_ids(self, user_id: SLT[int]) -> None:
         """
         Add one or more users to the allowed user ids.
 
         Args:
-            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which user ID(s) to allow through.
+            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which user ID(s) to allow
+                through.
         """
         return super()._add_chat_ids(user_id)
-
-    def remove_usernames(self, username: SLT[str]) -> None:
-        """
-        Remove one or more users from allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to disallow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._remove_usernames(username)
 
     def remove_user_ids(self, user_id: SLT[int]) -> None:
         """
         Remove one or more users from allowed user ids.
 
         Args:
-            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which user ID(s) to disallow through.
+            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which user ID(s) to
+                disallow through.
         """
         return super()._remove_chat_ids(user_id)
 
@@ -1511,32 +1520,30 @@ class _User(MessageFilter):
 
 
 USER = _User(name="filters.USER")
-"""This filter filters *any* message that was sent from a user."""
+"""This filter filters *any* message that has a :attr:`telegram.Message.from_user`."""
 
 
 class ViaBot(_ChatUserBaseFilter):
-    """Filters messages to allow only those which are from specified via_bot ID(s) or
-    username(s).
+    """Filters messages to allow only those which are from specified via_bot ID(s) or username(s).
 
     Examples:
         ``MessageHandler(filters.ViaBot(1234), callback_method)``
 
     Args:
-        bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-            Which bot ID(s) to allow through.
+        bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional): Which bot ID(s) to
+            allow through.
         username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
             Which username(s) to allow through. Leading ``'@'`` s in usernames will be
             discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
             is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`.
 
-    Attributes:
-        usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
-        allow_empty (:obj:`bool`): Whether updates should be processed, if no bot
-            is specified in :attr:`bot_ids` and :attr:`usernames`.
-
     Raises:
         RuntimeError: If ``bot_id`` and ``username`` are both present.
+
+    Attributes:
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no bot is specified in
+            :attr:`bot_ids` and :attr:`usernames`.
     """
 
     __slots__ = ()
@@ -1559,15 +1566,14 @@ class ViaBot(_ChatUserBaseFilter):
         Which bot ID(s) to allow through.
 
         Warning:
-            :attr:`bot_ids` will give a *copy* of the saved bot ids as :class:`frozenset`. This
-            is to ensure thread safety. To add/remove a bot, you should use :meth:`add_usernames`,
-            :meth:`add_bot_ids`, :meth:`remove_usernames` and :meth:`remove_bot_ids`. Only update
-            the entire set by ``filter.bot_ids/usernames = new_set``, if you are entirely sure
-            that it is not causing race conditions, as this will complete replace the current set
-            of allowed bots.
+            :attr:`bot_ids` will give a *copy* of the saved bot ids as :obj:`frozenset`. This
+            is to ensure thread safety. To add/remove a bot, you should use :meth:`add_bot_ids`,
+            and :meth:`remove_bot_ids`. Only update the entire set by ``filter.bot_ids = new_set``,
+            if you are entirely sure that it is not causing race conditions, as this will complete
+            replace the current set of allowed bots.
 
         Returns:
-            set(:obj:`int`)
+            frozenset(:obj:`int`)
         """
         return self.chat_ids
 
@@ -1575,45 +1581,23 @@ class ViaBot(_ChatUserBaseFilter):
     def bot_ids(self, bot_id: SLT[int]) -> None:
         self.chat_ids = bot_id  # type: ignore[assignment]
 
-    def add_usernames(self, username: SLT[str]) -> None:
-        """
-        Add one or more users to the allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to allow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._add_usernames(username)
-
     def add_bot_ids(self, bot_id: SLT[int]) -> None:
         """
-        Add one or more users to the allowed user ids.
+        Add one or more bots to the allowed bot ids.
 
         Args:
-            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which bot ID(s) to allow through.
+            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which bot ID(s) to allow
+                through.
         """
         return super()._add_chat_ids(bot_id)
 
-    def remove_usernames(self, username: SLT[str]) -> None:
-        """
-        Remove one or more users from allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to disallow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._remove_usernames(username)
-
     def remove_bot_ids(self, bot_id: SLT[int]) -> None:
         """
-        Remove one or more users from allowed user ids.
+        Remove one or more bots from allowed bot ids.
 
         Args:
-            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which bot ID(s) to disallow through.
+            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional): Which bot ID(s) to
+                disallow through.
         """
         return super()._remove_chat_ids(bot_id)
 
@@ -1626,7 +1610,7 @@ class _ViaBot(MessageFilter):
 
 
 VIA_BOT = _ViaBot(name="filters.VIA_BOT")
-"""This filter filters *any* message that was sent via a bot."""
+"""This filter filters for message that were sent via *any* bot."""
 
 
 class Chat(_ChatUserBaseFilter):
@@ -1637,11 +1621,10 @@ class Chat(_ChatUserBaseFilter):
 
     Warning:
         :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
-        is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
-        :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
-        the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
-        that it is not causing race conditions, as this will complete replace the current set
-        of allowed chats.
+        is to ensure thread safety. To add/remove a chat, you should use :meth:`add_chat_ids`, and
+        :meth:`remove_chat_ids`. Only update the entire set by ``filter.chat_ids = new_set``,
+        if you are entirely sure that it is not causing race conditions, as this will complete
+        replace the current set of allowed chats.
 
     Args:
         chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
@@ -1654,7 +1637,6 @@ class Chat(_ChatUserBaseFilter):
 
     Attributes:
         chat_ids (set(:obj:`int`)): Which chat ID(s) to allow through.
-        usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
         allow_empty (:obj:`bool`): Whether updates should be processed, if no chat
             is specified in :attr:`chat_ids` and :attr:`usernames`.
 
@@ -1667,45 +1649,23 @@ class Chat(_ChatUserBaseFilter):
     def get_chat_or_user(self, message: Message) -> Optional[TGChat]:
         return message.chat
 
-    def add_usernames(self, username: SLT[str]) -> None:
-        """
-        Add one or more chats to the allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to allow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._add_usernames(username)
-
     def add_chat_ids(self, chat_id: SLT[int]) -> None:
         """
         Add one or more chats to the allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which chat ID(s) to allow through.
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat ID(s) to allow
+                through.
         """
         return super()._add_chat_ids(chat_id)
-
-    def remove_usernames(self, username: SLT[str]) -> None:
-        """
-        Remove one or more chats from allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to disallow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._remove_usernames(username)
 
     def remove_chat_ids(self, chat_id: SLT[int]) -> None:
         """
         Remove one or more chats from allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which chat ID(s) to disallow through.
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat ID(s) to
+                disallow through.
         """
         return super()._remove_chat_ids(chat_id)
 
@@ -1718,7 +1678,7 @@ class _Chat(MessageFilter):
 
 
 CHAT = _Chat(name="filters.CHAT")
-"""This filter filters *any* message that was sent from any chat."""
+"""This filter filters *any* message that has a :attr:`telegram.Message.chat`."""
 
 
 class ForwardedFrom(_ChatUserBaseFilter):
@@ -1740,11 +1700,10 @@ class ForwardedFrom(_ChatUserBaseFilter):
 
     Warning:
         :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
-        is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
-        :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
-        the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
-        that it is not causing race conditions, as this will complete replace the current set
-        of allowed chats.
+        is to ensure thread safety. To add/remove a chat, you should use :meth:`add_chat_ids`, and
+        :meth:`remove_chat_ids`. Only update the entire set by ``filter.chat_ids = new_set``, if
+        you are entirely sure that it is not causing race conditions, as this will complete replace
+        the current set of allowed chats.
 
     Args:
         chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
@@ -1757,7 +1716,6 @@ class ForwardedFrom(_ChatUserBaseFilter):
 
     Attributes:
         chat_ids (set(:obj:`int`)): Which chat/user ID(s) to allow through.
-        usernames (set(:obj:`str`)): Which username(s) (without leading ``'@'``) to allow through.
         allow_empty (:obj:`bool`): Whether updates should be processed, if no chat
             is specified in :attr:`chat_ids` and :attr:`usernames`.
 
@@ -1770,45 +1728,23 @@ class ForwardedFrom(_ChatUserBaseFilter):
     def get_chat_or_user(self, message: Message) -> Union[TGUser, TGChat, None]:
         return message.forward_from or message.forward_from_chat
 
-    def add_usernames(self, username: SLT[str]) -> None:
-        """
-        Add one or more chats to the allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to allow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._add_usernames(username)
-
     def add_chat_ids(self, chat_id: SLT[int]) -> None:
         """
         Add one or more chats to the allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which chat/user ID(s) to allow through.
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat/user ID(s) to
+                allow through.
         """
         return super()._add_chat_ids(chat_id)
-
-    def remove_usernames(self, username: SLT[str]) -> None:
-        """
-        Remove one or more chats from allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to disallow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._remove_usernames(username)
 
     def remove_chat_ids(self, chat_id: SLT[int]) -> None:
         """
         Remove one or more chats from allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which chat/user ID(s) to disallow through.
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat/user ID(s) to
+                disallow through.
         """
         return super()._remove_chat_ids(chat_id)
 
@@ -1844,12 +1780,11 @@ class SenderChat(_ChatUserBaseFilter):
         group).
 
     Warning:
-        :attr:`chat_ids` will return a *copy* of the saved chat ids as :class:`frozenset`. This
-        is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
-        :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
-        the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
-        that it is not causing race conditions, as this will complete replace the current set
-        of allowed chats.
+        :attr:`chat_ids` will return a *copy* of the saved chat ids as :obj:`frozenset`. This
+        is to ensure thread safety. To add/remove a chat, you should use :meth:`add_chat_ids`, and
+        :meth:`remove_chat_ids`. Only update the entire set by ``filter.chat_ids = new_set``, if
+        you are entirely sure that it is not causing race conditions, as this will complete replace
+        the current set of allowed chats.
 
     Args:
         chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
@@ -1862,10 +1797,8 @@ class SenderChat(_ChatUserBaseFilter):
 
     Attributes:
         chat_ids (set(:obj:`int`)): Which sender chat chat ID(s) to allow through.
-        usernames (set(:obj:`str`)): Which sender chat username(s) (without leading ``'@'``) to
-            allow through.
-        allow_empty (:obj:`bool`): Whether updates should be processed, if no sender
-            chat is specified in :attr:`chat_ids` and :attr:`usernames`.
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no sender chat is
+            specified in :attr:`chat_ids` and :attr:`usernames`.
 
     Raises:
         RuntimeError: If both ``chat_id`` and ``username`` are present.
@@ -1876,45 +1809,23 @@ class SenderChat(_ChatUserBaseFilter):
     def get_chat_or_user(self, message: Message) -> Optional[TGChat]:
         return message.sender_chat
 
-    def add_usernames(self, username: SLT[str]) -> None:
-        """
-        Add one or more sender chats to the allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which sender chat username(s) to allow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._add_usernames(username)
-
     def add_chat_ids(self, chat_id: SLT[int]) -> None:
         """
         Add one or more sender chats to the allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which sender chat ID(s) to allow through.
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which sender chat ID(s) to
+                allow through.
         """
         return super()._add_chat_ids(chat_id)
-
-    def remove_usernames(self, username: SLT[str]) -> None:
-        """
-        Remove one or more sender chats from allowed usernames.
-
-        Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which sender chat username(s) to disallow through.
-                Leading ``'@'`` s in usernames will be discarded.
-        """
-        return super()._remove_usernames(username)
 
     def remove_chat_ids(self, chat_id: SLT[int]) -> None:
         """
         Remove one or more sender chats from allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which sender chat ID(s) to disallow through.
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which sender chat ID(s) to
+                disallow through.
         """
         return super()._remove_chat_ids(chat_id)
 
@@ -1939,7 +1850,7 @@ class SenderChat(_ChatUserBaseFilter):
     CHANNEL = _CHANNEL(name="filters.SenderChat.CHANNEL")
     """Messages whose sender chat is a channel."""
     ALL = _SenderChat(name="filters.SenderChat.ALL")
-    """Messages whose sender chat is either a supergroup or a channel."""
+    """All messages with a :attr:`telegram.Message.sender_chat`."""
 
 
 class _Invoice(MessageFilter):
@@ -2020,7 +1931,11 @@ class Dice(_Dice):
     __slots__ = ()
 
     class Dice(_Dice):
-        """Dice messages with the emoji 🎲. Supports passing a list of integers."""
+        """Dice messages with the emoji 🎲. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
 
         __slots__ = ()
 
@@ -2031,7 +1946,11 @@ class Dice(_Dice):
     """Dice messages with the emoji 🎲. Matches any dice value."""
 
     class Darts(_Dice):
-        """Dice messages with the emoji 🎯. Supports passing a list of integers."""
+        """Dice messages with the emoji 🎯. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
 
         __slots__ = ()
 
@@ -2042,7 +1961,11 @@ class Dice(_Dice):
     """Dice messages with the emoji 🎯. Matches any dice value."""
 
     class Basketball(_Dice):
-        """Dice messages with the emoji 🏀. Supports passing a list of integers."""
+        """Dice messages with the emoji 🏀. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
 
         __slots__ = ()
 
@@ -2053,7 +1976,11 @@ class Dice(_Dice):
     """Dice messages with the emoji 🏀. Matches any dice value."""
 
     class Football(_Dice):
-        """Dice messages with the emoji ⚽. Supports passing a list of integers."""
+        """Dice messages with the emoji ⚽. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
 
         __slots__ = ()
 
@@ -2064,7 +1991,11 @@ class Dice(_Dice):
     """Dice messages with the emoji ⚽. Matches any dice value."""
 
     class SlotMachine(_Dice):
-        """Dice messages with the emoji 🎰. Supports passing a list of integers."""
+        """Dice messages with the emoji 🎰. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
 
         __slots__ = ()
 
@@ -2075,7 +2006,11 @@ class Dice(_Dice):
     """Dice messages with the emoji 🎰. Matches any dice value."""
 
     class Bowling(_Dice):
-        """Dice messages with the emoji 🎳. Supports passing a list of integers."""
+        """Dice messages with the emoji 🎳. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
 
         __slots__ = ()
 
@@ -2085,10 +2020,7 @@ class Dice(_Dice):
     BOWLING = _Dice(emoji=DiceEmojiEnum.BOWLING)
     """Dice messages with the emoji 🎳. Matches any dice value."""
 
-    class _All(_Dice):
-        __slots__ = ()
-
-    ALL = _All()
+    ALL = _Dice()
     """Dice messages with any value and any emoji."""
 
 
@@ -2151,7 +2083,7 @@ class UpdateType:
         types.
 
     Note:
-        ``filters.UpdateType`` itself is *not* a filter.
+        ``filters.UpdateType`` itself is *not* a filter, but just a convenience namespace.
     """
 
     __slots__ = ()
