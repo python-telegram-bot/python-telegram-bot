@@ -356,7 +356,7 @@ class ConversationHandler(Handler[Update, CCT]):
                     stacklevel=2,
                 )
 
-            elif self.conversation_timeout:
+            if self.conversation_timeout:
                 if isinstance(handler, self.__class__):
                     warn(
                         "Using `conversation_timeout` with nested conversations is currently not "
@@ -365,7 +365,7 @@ class ConversationHandler(Handler[Update, CCT]):
                         stacklevel=2,
                     )
 
-            elif self.run_async:
+            if self.run_async:
                 handler.run_async = True
 
     @property

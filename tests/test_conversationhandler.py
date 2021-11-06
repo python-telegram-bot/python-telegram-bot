@@ -1397,8 +1397,26 @@ class TestConversationHandler:
             per_message=False,
         )
 
-        # the overall handlers raising an error is 11
-        assert len(recwarn) == 11
+        # adding a nested conv to a conversation with timeout should warn
+        child = ConversationHandler(
+            entry_points=[CommandHandler("code", self.code)],
+            states={
+                self.BREWING: [CommandHandler("code", self.code)],
+            },
+            fallbacks=[CommandHandler("code", self.code)],
+        )
+
+        ConversationHandler(
+            entry_points=[CommandHandler("code", self.code)],
+            states={
+                self.BREWING: [child],
+            },
+            fallbacks=[CommandHandler("code", self.code)],
+            conversation_timeout=42,
+        )
+
+        # the overall handlers raising an error is 12
+        assert len(recwarn) == 12
         # now we test the messages, they are raised in the order they are inserted
         # into the conversation handler
         assert str(recwarn[0].message) == (
@@ -1452,7 +1470,13 @@ class TestConversationHandler:
             "If 'per_message=False', 'CallbackQueryHandler' will not be tracked for "
             "every message." + per_faq_link
         )
+        assert str(recwarn[11].message) == (
+            "Using `conversation_timeout` with nested conversations is currently not "
+            "supported. You can still try to use it, but it will likely behave differently"
+            " from what you expect."
+        )
 
+        # this for loop checks if the correct stacklevel is used when generating the warning
         for warning in recwarn:
             assert warning.filename == __file__, "incorrect stacklevel!"
 
