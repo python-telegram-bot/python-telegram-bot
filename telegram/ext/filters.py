@@ -386,15 +386,15 @@ class _Dice(MessageFilter):
         super().__init__()
         self.emoji = emoji
         self.values = [values] if isinstance(values, int) else values
-        emoji_name = getattr(emoji, 'name', '')  # Can be e.g. BASKETBALL (see emoji enums)
+
         if emoji:  # for filters.Dice.BASKETBALL
-            self.name = f"filters.Dice.{emoji_name}"
+            self.name = f"filters.Dice.{emoji.name}"
+            if self.values and emoji:  # for filters.Dice.Dice(4)  SLOT_MACHINE -> SlotMachine
+                self.name = f"filters.Dice.{emoji.name.title().replace('_', '')}({self.values})"
         elif values:  # for filters.Dice(4)
             self.name = f"filters.Dice({self.values})"
         else:
             self.name = "filters.Dice.ALL"
-        if self.values and emoji:  # for filters.Dice.Dice(4)  SLOT_MACHINE -> SlotMachine
-            self.name = f"filters.Dice.{emoji_name.title().replace('_', '')}({self.values})"
 
     def filter(self, message: Message) -> bool:
         if not message.dice:  # no dice
@@ -572,8 +572,8 @@ class Regex(MessageFilter):
 
             >>> filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
 
-        With a message.text of `x`, will only ever return the matches for the first filter,
-        since the second one is never evaluated.
+        With a :attr:`telegram.Message.text` of `x`, will only ever return the matches for the
+        first filter, since the second one is never evaluated.
 
     Args:
         pattern (:obj:`str` | :obj:`re.Pattern`): The regex pattern.
