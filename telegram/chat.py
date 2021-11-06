@@ -1524,6 +1524,8 @@ class Chat(TelegramObject):
         member_limit: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        name: str = None,
+        creates_join_request: bool = None,
     ) -> 'ChatInviteLink':
         """Shortcut for::
 
@@ -1533,6 +1535,10 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.create_chat_invite_link`.
 
         .. versionadded:: 13.4
+
+        .. versionchanged:: 13.8
+           Edited signature according to the changes of
+           :meth:`telegram.Bot.create_chat_invite_link`.
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -1544,6 +1550,8 @@ class Chat(TelegramObject):
             member_limit=member_limit,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            name=name,
+            creates_join_request=creates_join_request,
         )
 
     def edit_invite_link(
@@ -1553,6 +1561,8 @@ class Chat(TelegramObject):
         member_limit: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        name: str = None,
+        creates_join_request: bool = None,
     ) -> 'ChatInviteLink':
         """Shortcut for::
 
@@ -1562,6 +1572,9 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.edit_chat_invite_link`.
 
         .. versionadded:: 13.4
+
+        .. versionchanged:: 13.8
+           Edited signature according to the changes of :meth:`telegram.Bot.edit_chat_invite_link`.
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -1574,6 +1587,8 @@ class Chat(TelegramObject):
             member_limit=member_limit,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            name=name,
+            creates_join_request=creates_join_request,
         )
 
     def revoke_invite_link(
