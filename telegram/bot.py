@@ -4014,7 +4014,7 @@ class Bot(TelegramObject):
                 .. versionadded:: 13.8
             creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
                 via the link need to be approved by chat administrators.
-                If :obj:`True`, `member_limit` can't be specified.
+                If :obj:`True`, ``member_limit`` can't be specified.
 
                 .. versionadded:: 13.8
 
@@ -4087,7 +4087,7 @@ class Bot(TelegramObject):
                 .. versionadded:: 13.8
             creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
                 via the link need to be approved by chat administrators.
-                If :obj:`True`, `member_limit` can't be specified.
+                If :obj:`True`, ``member_limit`` can't be specified.
 
                 .. versionadded:: 13.8
 

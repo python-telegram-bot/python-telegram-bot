@@ -1143,7 +1143,7 @@ class User(TelegramObject):
 
     def approve_join_request(
         self,
-        chat_id: int,
+        chat_id: Union[int, str],
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
@@ -1166,7 +1166,7 @@ class User(TelegramObject):
 
     def decline_join_request(
         self,
-        chat_id: int,
+        chat_id: Union[int, str],
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:

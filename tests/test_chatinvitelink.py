@@ -38,6 +38,8 @@ def invite_link(creator):
         TestChatInviteLink.revoked,
         expire_date=TestChatInviteLink.expire_date,
         member_limit=TestChatInviteLink.member_limit,
+        name=TestChatInviteLink.name,
+        pending_join_request_count=TestChatInviteLink.pending_join_request_count,
     )
 
 
@@ -48,6 +50,8 @@ class TestChatInviteLink:
     revoked = False
     expire_date = datetime.datetime.utcnow()
     member_limit = 42
+    name = 'LinkName'
+    pending_join_request_count = 42
 
     def test_slot_behaviour(self, recwarn, mro_slots, invite_link):
         for attr in invite_link.__slots__:
@@ -79,7 +83,9 @@ class TestChatInviteLink:
             'is_primary': self.primary,
             'is_revoked': self.revoked,
             'expire_date': to_timestamp(self.expire_date),
-            'member_limit': self.member_limit,
+            'member_limit': str(self.member_limit),
+            'name': self.name,
+            'pending_join_request_count': str(self.pending_join_request_count),
         }
 
         invite_link = ChatInviteLink.de_json(json_dict, bot)
@@ -91,6 +97,8 @@ class TestChatInviteLink:
         assert pytest.approx(invite_link.expire_date == self.expire_date)
         assert to_timestamp(invite_link.expire_date) == to_timestamp(self.expire_date)
         assert invite_link.member_limit == self.member_limit
+        assert invite_link.name == self.name
+        assert invite_link.pending_join_request_count == self.pending_join_request_count
 
     def test_to_dict(self, invite_link):
         invite_link_dict = invite_link.to_dict()
@@ -101,6 +109,8 @@ class TestChatInviteLink:
         assert invite_link_dict['is_revoked'] == self.revoked
         assert invite_link_dict['expire_date'] == to_timestamp(self.expire_date)
         assert invite_link_dict['member_limit'] == self.member_limit
+        assert invite_link_dict['name'] == self.name
+        assert invite_link_dict['pending_join_request_count'] == self.pending_join_request_count
 
     def test_equality(self):
         a = ChatInviteLink("link", User(1, '', False), True, True)
