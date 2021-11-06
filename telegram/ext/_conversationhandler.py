@@ -356,14 +356,13 @@ class ConversationHandler(Handler[Update, CCT]):
                     stacklevel=2,
                 )
 
-            if self.conversation_timeout:
-                if isinstance(handler, self.__class__):
-                    warn(
-                        "Using `conversation_timeout` with nested conversations is currently not "
-                        "supported. You can still try to use it, but it will likely behave "
-                        "differently from what you expect.",
-                        stacklevel=2,
-                    )
+            if self.conversation_timeout and isinstance(handler, self.__class__):
+                warn(
+                    "Using `conversation_timeout` with nested conversations is currently not "
+                    "supported. You can still try to use it, but it will likely behave "
+                    "differently from what you expect.",
+                    stacklevel=2,
+                )
 
             if self.run_async:
                 handler.run_async = True
