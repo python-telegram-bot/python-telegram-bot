@@ -25,7 +25,7 @@ from .handler import Handler
 from .utils.types import CCT
 
 
-class ChatJoinRequest(Handler[Update, CCT]):
+class ChatJoinRequestHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a chat join request.
 
     Note:
