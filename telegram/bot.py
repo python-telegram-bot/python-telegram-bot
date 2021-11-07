@@ -4181,6 +4181,8 @@ class Bot(TelegramObject):
         The bot must be an administrator in the chat for this to work and must have the
         :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
 
+        .. versionadded:: 13.8
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -4215,6 +4217,8 @@ class Bot(TelegramObject):
 
         The bot must be an administrator in the chat for this to work and must have the
         :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
+
+        .. versionadded:: 13.8
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
