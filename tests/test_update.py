@@ -113,9 +113,6 @@ class TestUpdate:
 
     @pytest.mark.parametrize('paramdict', argvalues=params, ids=ids)
     def test_de_json(self, bot, paramdict):
-        if 'chat_join_request' not in paramdict:
-            return
-
         json_dict = {'update_id': TestUpdate.update_id}
         # Convert the single update 'item' to a dict of that item and apply it to the json_dict
         json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
@@ -128,10 +125,6 @@ class TestUpdate:
         for _type in all_types:
             if getattr(update, _type) is not None:
                 i += 1
-                print()
-                print(update)
-                print(type(getattr(update, _type)), getattr(update, _type))
-                print(type(paramdict[_type]), paramdict[_type])
                 assert getattr(update, _type) == paramdict[_type]
         assert i == 1
 

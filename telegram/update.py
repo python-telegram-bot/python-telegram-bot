@@ -91,8 +91,9 @@ class Update(TelegramObject):
 
             .. versionadded:: 13.4
         chat_join_request (:class:`telegram.ChatJoinRequest`, optional): A request to join the
-            chat has been sent. The bot must have the can_invite_users administrator right in
-            the chat to receive these updates.
+            chat has been sent. The bot must have the
+            :attr:`telegram.ChatPermissions.can_invite_users` administrator right in the chat to
+            receive these updates.
 
             .. versionadded:: 13.8
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -359,7 +360,9 @@ class Update(TelegramObject):
             update this is. Will be :obj:`None` for :attr:`inline_query`,
             :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
             :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll`,
-            :attr:`poll_answer`, :attr:`my_chat_member` and :attr:`chat_member`.
+            :attr:`poll_answer`, :attr:`my_chat_member`, :attr:`chat_member` as well as
+            :attr:`chat_join_request` in case the bot is missing the
+            :attr:`telegram.ChatPermissions.can_invite_users` administrator right in the chat.
 
         """
         if self._effective_message:

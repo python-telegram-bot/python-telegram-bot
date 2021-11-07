@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the ChatJoinRequest class."""
+"""This module contains the ChatJoinRequestHandler class."""
 
 
 from telegram import Update
@@ -40,6 +40,8 @@ class ChatJoinRequestHandler(Handler[Update, CCT]):
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
+
+        .. versionadded:: 13.8
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when

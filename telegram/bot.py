@@ -4025,6 +4025,11 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
+        if creates_join_request and member_limit:
+            raise ValueError(
+                "If `creates_join_request` is `True`, `member_limit` can't be specified."
+            )
+
         data: JSONDict = {
             'chat_id': chat_id,
         }
@@ -4098,6 +4103,11 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
+        if creates_join_request and member_limit:
+            raise ValueError(
+                "If `creates_join_request` is `True`, `member_limit` can't be specified."
+            )
+
         data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
 
         if expire_date is not None:
@@ -4169,7 +4179,7 @@ class Bot(TelegramObject):
         """Use this method to approve a chat join request.
 
         The bot must be an administrator in the chat for this to work and must have the
-        ``can_invite_users`` administrator right.
+        :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4201,10 +4211,10 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
-        """Use this method to decline  a chat join request.
+        """Use this method to decline a chat join request.
 
         The bot must be an administrator in the chat for this to work and must have the
-        ``can_invite_users`` administrator right.
+        :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -5538,15 +5548,15 @@ class Bot(TelegramObject):
     exportChatInviteLink = export_chat_invite_link
     """Alias for :meth:`export_chat_invite_link`"""
     createChatInviteLink = create_chat_invite_link
-    """Alias for :attr:`create_chat_invite_link`"""
+    """Alias for :meth:`create_chat_invite_link`"""
     editChatInviteLink = edit_chat_invite_link
-    """Alias for :attr:`edit_chat_invite_link`"""
+    """Alias for :meth:`edit_chat_invite_link`"""
     revokeChatInviteLink = revoke_chat_invite_link
-    """Alias for :attr:`revoke_chat_invite_link`"""
+    """Alias for :meth:`revoke_chat_invite_link`"""
     approveChatJoinRequest = approve_chat_join_request
-    """Alias for :attr:`approve_chat_join_request`"""
+    """Alias for :meth:`approve_chat_join_request`"""
     declineChatJoinRequest = decline_chat_join_request
-    """Alias for :attr:`decline_chat_join_request`"""
+    """Alias for :meth:`decline_chat_join_request`"""
     setChatPhoto = set_chat_photo
     """Alias for :meth:`set_chat_photo`"""
     deleteChatPhoto = delete_chat_photo
