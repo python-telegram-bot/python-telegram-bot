@@ -4070,6 +4070,12 @@ class Bot(TelegramObject):
         Use this method to edit a non-primary invite link created by the bot. The bot must be an
         administrator in the chat for this to work and must have the appropriate admin rights.
 
+        Note:
+            Though not stated explicitly in the official docs, Telegram changes not only the
+            optional parameters that are explicitly passed, but also replaces all other optional
+            parameters to the default values. However, since not documented, this behaviour may
+            change unbeknown to PTB.
+
         .. versionadded:: 13.4
 
         Args:
