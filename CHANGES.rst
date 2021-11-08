@@ -2,6 +2,18 @@
 Changelog
 =========
 
+Version 13.8.1
+==============
+*Released 2021-11-08*
+
+This is the technical changelog for version 13.8.1. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+**Doc fixes:**
+
+- Add ``ChatJoinRequest(Handler)`` to Docs (`#2771`_)
+
+.. _`#2771`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2771
+
 Version 13.8
 ============
 *Released 2021-11-08*
