@@ -2072,6 +2072,7 @@ officedocument.wordprocessingml.document")``.
 
     class _Dice(_DiceEmoji):
         __slots__ = ()
+        # pylint: disable=no-member
         dice = _DiceEmoji(DiceEmoji.DICE, DiceEmoji.DICE.name.lower())
         darts = _DiceEmoji(DiceEmoji.DARTS, DiceEmoji.DARTS.name.lower())
         basketball = _DiceEmoji(DiceEmoji.BASKETBALL, DiceEmoji.BASKETBALL.name.lower())
