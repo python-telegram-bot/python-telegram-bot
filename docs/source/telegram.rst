@@ -19,6 +19,7 @@ telegram package
     telegram.chat
     telegram.chataction
     telegram.chatinvitelink
+    telegram.chatjoinrequest
     telegram.chatlocation
     telegram.chatmember
     telegram.chatmemberowner
