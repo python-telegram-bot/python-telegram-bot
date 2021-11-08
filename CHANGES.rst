@@ -2,6 +2,31 @@
 Changelog
 =========
 
+Version 13.8
+============
+*Released 2021-11-08*
+
+This is the technical changelog for version 13.8. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+**Major Changes:**
+
+- Full support for API 5.4 (`#2767`_)
+
+**Minor changes, CI improvements, Doc fixes and Type hinting:**
+
+- Create Issue Template Forms (`#2689`_)
+- Fix ``camelCase`` Functions in ``ExtBot`` (`#2659`_)
+- Fix Empty Captions not Being Passed by ``Bot.copy_message`` (`#2651`_)
+- Fix Setting Thumbs When Uploading A Single File (`#2583`_)
+- Fix Bug in ``BasePersistence.insert``/``replace_bot`` for Objects with ``__dict__`` not in ``__slots__`` (`#2603`_)
+
+.. _`#2767`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2767
+.. _`#2689`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2689
+.. _`#2659`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2659
+.. _`#2651`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2651
+.. _`#2583`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2583
+.. _`#2603`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2603
+
 Version 13.7
 ============
 *Released 2021-07-01*
