@@ -59,6 +59,10 @@ class ChatAction:
     """
     UPLOAD_DOCUMENT: ClassVar[str] = constants.CHATACTION_UPLOAD_DOCUMENT
     """:const:`telegram.constants.CHATACTION_UPLOAD_DOCUMENT`"""
+    CHOOSE_STICKER: ClassVar[str] = constants.CHATACTION_CHOOSE_STICKER
+    """:const:`telegram.constants.CHOOSE_STICKER`
+
+        .. versionadded:: 13.8"""
     UPLOAD_PHOTO: ClassVar[str] = constants.CHATACTION_UPLOAD_PHOTO
     """:const:`telegram.constants.CHATACTION_UPLOAD_PHOTO`"""
     UPLOAD_VIDEO: ClassVar[str] = constants.CHATACTION_UPLOAD_VIDEO

@@ -636,6 +636,36 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'revoke_chat_invite_link', make_assertion)
         assert chat.revoke_invite_link(invite_link=link)
 
+    def test_approve_join_request(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['user_id'] == 42
+
+        assert check_shortcut_signature(
+            Chat.approve_join_request, Bot.approve_chat_join_request, ['chat_id'], []
+        )
+        assert check_shortcut_call(
+            chat.approve_join_request, chat.bot, 'approve_chat_join_request'
+        )
+        assert check_defaults_handling(chat.approve_join_request, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'approve_chat_join_request', make_assertion)
+        assert chat.approve_join_request(user_id=42)
+
+    def test_decline_join_request(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['user_id'] == 42
+
+        assert check_shortcut_signature(
+            Chat.decline_join_request, Bot.decline_chat_join_request, ['chat_id'], []
+        )
+        assert check_shortcut_call(
+            chat.decline_join_request, chat.bot, 'decline_chat_join_request'
+        )
+        assert check_defaults_handling(chat.decline_join_request, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'decline_chat_join_request', make_assertion)
+        assert chat.decline_join_request(user_id=42)
+
     def test_equality(self):
         a = Chat(self.id_, self.title, self.type_)
         b = Chat(self.id_, self.title, self.type_)

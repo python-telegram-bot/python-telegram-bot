@@ -1524,6 +1524,8 @@ class Chat(TelegramObject):
         member_limit: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        name: str = None,
+        creates_join_request: bool = None,
     ) -> 'ChatInviteLink':
         """Shortcut for::
 
@@ -1533,6 +1535,10 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.create_chat_invite_link`.
 
         .. versionadded:: 13.4
+
+        .. versionchanged:: 13.8
+           Edited signature according to the changes of
+           :meth:`telegram.Bot.create_chat_invite_link`.
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -1544,6 +1550,8 @@ class Chat(TelegramObject):
             member_limit=member_limit,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            name=name,
+            creates_join_request=creates_join_request,
         )
 
     def edit_invite_link(
@@ -1553,6 +1561,8 @@ class Chat(TelegramObject):
         member_limit: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        name: str = None,
+        creates_join_request: bool = None,
     ) -> 'ChatInviteLink':
         """Shortcut for::
 
@@ -1562,6 +1572,9 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.edit_chat_invite_link`.
 
         .. versionadded:: 13.4
+
+        .. versionchanged:: 13.8
+           Edited signature according to the changes of :meth:`telegram.Bot.edit_chat_invite_link`.
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -1574,6 +1587,8 @@ class Chat(TelegramObject):
             member_limit=member_limit,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            name=name,
+            creates_join_request=creates_join_request,
         )
 
     def revoke_invite_link(
@@ -1597,4 +1612,50 @@ class Chat(TelegramObject):
         """
         return self.bot.revoke_chat_invite_link(
             chat_id=self.id, invite_link=invite_link, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def approve_join_request(
+        self,
+        user_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.approve_chat_join_request(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.approve_chat_join_request`.
+
+        .. versionadded:: 13.8
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.approve_chat_join_request(
+            chat_id=self.id, user_id=user_id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def decline_join_request(
+        self,
+        user_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.decline_chat_join_request(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.decline_chat_join_request`.
+
+        .. versionadded:: 13.8
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.decline_chat_join_request(
+            chat_id=self.id, user_id=user_id, timeout=timeout, api_kwargs=api_kwargs
         )

@@ -1140,3 +1140,49 @@ class User(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
         )
+
+    def approve_join_request(
+        self,
+        chat_id: Union[int, str],
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.approve_chat_join_request(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.approve_chat_join_request`.
+
+        .. versionadded:: 13.8
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.approve_chat_join_request(
+            user_id=self.id, chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def decline_join_request(
+        self,
+        chat_id: Union[int, str],
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.decline_chat_join_request(user_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.decline_chat_join_request`.
+
+        .. versionadded:: 13.8
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.decline_chat_join_request(
+            user_id=self.id, chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs
+        )

@@ -34,6 +34,7 @@ from telegram import (
     PollOption,
     ChatMemberUpdated,
     ChatMember,
+    ChatJoinRequest,
 )
 from telegram.poll import PollAnswer
 from telegram.utils.helpers import from_timestamp
@@ -47,6 +48,14 @@ chat_member_updated = ChatMemberUpdated(
     ChatMember(User(1, '', False), ChatMember.CREATOR),
 )
 
+
+chat_join_request = ChatJoinRequest(
+    chat=Chat(1, Chat.SUPERGROUP),
+    from_user=User(1, 'first_name', False),
+    date=from_timestamp(int(time.time())),
+    bio='bio',
+)
+
 params = [
     {'message': message},
     {'edited_message': message},
@@ -57,11 +66,13 @@ params = [
     {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
     {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
     {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
     {'poll': Poll('id', '?', [PollOption('.', 1)], False, False, False, Poll.REGULAR, True)},
     {'poll_answer': PollAnswer("id", User(1, '', False), [1])},
     {'my_chat_member': chat_member_updated},
     {'chat_member': chat_member_updated},
+    {'chat_join_request': chat_join_request},
+    # Must be last to conform with `ids` below!
+    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
 ]
 
 all_types = (
@@ -78,6 +89,7 @@ all_types = (
     'poll_answer',
     'my_chat_member',
     'chat_member',
+    'chat_join_request',
 )
 
 ids = all_types + ('callback_query_without_message',)
@@ -171,6 +183,7 @@ class TestUpdate:
             or update.poll_answer is not None
             or update.my_chat_member is not None
             or update.chat_member is not None
+            or update.chat_join_request is not None
         ):
             assert eff_message.message_id == message.message_id
         else:

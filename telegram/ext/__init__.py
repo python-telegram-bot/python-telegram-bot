@@ -59,6 +59,7 @@ from .messagequeue import DelayQueue
 from .pollanswerhandler import PollAnswerHandler
 from .pollhandler import PollHandler
 from .chatmemberhandler import ChatMemberHandler
+from .chatjoinrequesthandler import ChatJoinRequestHandler
 from .defaults import Defaults
 from .callbackdatacache import CallbackDataCache, InvalidCallbackData
 
@@ -68,6 +69,7 @@ __all__ = (
     'CallbackContext',
     'CallbackDataCache',
     'CallbackQueryHandler',
+    'ChatJoinRequestHandler',
     'ChatMemberHandler',
     'ChosenInlineResultHandler',
     'CommandHandler',

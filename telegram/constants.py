@@ -86,6 +86,9 @@ Attributes:
 
         .. versionadded:: 13.5
     CHATACTION_UPLOAD_DOCUMENT (:obj:`str`): ``'upload_document'``
+    CHATACTION_CHOOSE_STICKER (:obj:`str`): ``'choose_sticker'``
+
+        .. versionadded:: 13.8
     CHATACTION_UPLOAD_PHOTO (:obj:`str`): ``'upload_photo'``
     CHATACTION_UPLOAD_VIDEO (:obj:`str`): ``'upload_video'``
     CHATACTION_UPLOAD_VIDEO_NOTE (:obj:`str`): ``'upload_video_note'``
@@ -201,9 +204,13 @@ Attributes:
     UPDATE_CHAT_MEMBER (:obj:`str`): ``'chat_member'``
 
         .. versionadded:: 13.5
+    UPDATE_CHAT_JOIN_REQUEST (:obj:`str`): ``'chat_join_request'``
+
+        .. versionadded:: 13.8
     UPDATE_ALL_TYPES (List[:obj:`str`]): List of all update types.
 
         .. versionadded:: 13.5
+        .. versionchanged:: 13.8
 
 :class:`telegram.BotCommandScope`:
 
@@ -233,7 +240,7 @@ Attributes:
 """
 from typing import List
 
-BOT_API_VERSION: str = '5.3'
+BOT_API_VERSION: str = '5.4'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
@@ -267,6 +274,7 @@ CHATACTION_TYPING: str = 'typing'
 CHATACTION_UPLOAD_AUDIO: str = 'upload_audio'
 CHATACTION_UPLOAD_VOICE: str = 'upload_voice'
 CHATACTION_UPLOAD_DOCUMENT: str = 'upload_document'
+CHATACTION_CHOOSE_STICKER: str = 'choose_sticker'
 CHATACTION_UPLOAD_PHOTO: str = 'upload_photo'
 CHATACTION_UPLOAD_VIDEO: str = 'upload_video'
 CHATACTION_UPLOAD_VIDEO_NOTE: str = 'upload_video_note'
@@ -353,6 +361,7 @@ UPDATE_POLL = 'poll'
 UPDATE_POLL_ANSWER = 'poll_answer'
 UPDATE_MY_CHAT_MEMBER = 'my_chat_member'
 UPDATE_CHAT_MEMBER = 'chat_member'
+UPDATE_CHAT_JOIN_REQUEST = 'chat_join_request'
 UPDATE_ALL_TYPES = [
     UPDATE_MESSAGE,
     UPDATE_EDITED_MESSAGE,
@@ -367,6 +376,7 @@ UPDATE_ALL_TYPES = [
     UPDATE_POLL_ANSWER,
     UPDATE_MY_CHAT_MEMBER,
     UPDATE_CHAT_MEMBER,
+    UPDATE_CHAT_JOIN_REQUEST,
 ]
 
 BOT_COMMAND_SCOPE_DEFAULT = 'default'
