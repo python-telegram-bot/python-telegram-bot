@@ -41,7 +41,7 @@ class ChatJoinRequestHandler(Handler[Update, CCT]):
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-        .. versionadded:: 13.8
+    .. versionadded:: 13.8
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when

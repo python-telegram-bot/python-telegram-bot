@@ -7,6 +7,7 @@ Hey! You're PRing? Cool! Please have a look at the below checklist. It's here to
 - [ ] Added `.. versionadded:: version`, `.. versionchanged:: version` or `.. deprecated:: version` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
 - [ ] Created new or adapted existing unit tests
 - [ ] Added myself alphabetically to `AUTHORS.rst` (optional)
+- [ ] Added new classes & modules to the docs
 
 
 ### If the PR contains API changes (otherwise, you can delete this passage)
