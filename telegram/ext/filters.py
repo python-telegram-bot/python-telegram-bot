@@ -185,6 +185,9 @@ class MessageFilter(BaseFilter):
     __slots__ = ()
 
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+        if update.callback_query and update.callback_query.message:
+            return None  # Messages from callback queries should be handled by CallbackQueryHandler
+
         return self.filter(update.effective_message)
 
     @abstractmethod
@@ -220,6 +223,9 @@ class UpdateFilter(BaseFilter):
     __slots__ = ()
 
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+        if update.callback_query and update.callback_query.message:
+            return None  # Messages from callback queries should be handled by CallbackQueryHandler
+
         return self.filter(update)
 
     @abstractmethod

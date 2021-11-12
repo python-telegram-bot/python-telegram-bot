@@ -39,11 +39,11 @@ class MessageHandler(Handler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
+        filters (:class:`telegram.ext.BaseFilter`): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :mod:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not). Default is
-            :attr:`telegram.ext.filters.UPDATE`. This defaults to all message_type updates
+            :attr:`telegram.ext.filters.UpdateType.ALL`. This defaults to all message_type updates
             being: :attr:`Update.message`, :attr:`Update.edited_message`,
             :attr:`Update.channel_post` and :attr:`Update.edited_channel_post`.
             If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
@@ -78,10 +78,7 @@ class MessageHandler(Handler[Update, CCT]):
     ):
 
         super().__init__(callback, run_async=run_async)
-        if filters is not None:
-            self.filters = filters_module.UpdateType.ALL & filters
-        else:
-            self.filters = filters_module.UpdateType.ALL
+        self.filters = filters if filters is not None else filters_module.UpdateType.ALL
 
     def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.

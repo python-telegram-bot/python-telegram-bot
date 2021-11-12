@@ -89,10 +89,7 @@ class CommandHandler(Handler[Update, CCT]):
         filters: filters_module.BaseFilter = None,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
-        super().__init__(
-            callback,
-            run_async=run_async,
-        )
+        super().__init__(callback, run_async=run_async)
 
         if isinstance(command, str):
             self.command = [command.lower()]
@@ -102,10 +99,7 @@ class CommandHandler(Handler[Update, CCT]):
             if not re.match(r'^[\da-z_]{1,32}$', comm):
                 raise ValueError('Command is not a valid bot command')
 
-        if filters:
-            self.filters = filters_module.UpdateType.MESSAGES & filters
-        else:
-            self.filters = filters_module.UpdateType.MESSAGES
+        self.filters = filters if filters is not None else filters_module.UpdateType.MESSAGES
 
     def check_update(
         self, update: object
