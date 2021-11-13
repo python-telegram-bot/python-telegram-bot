@@ -192,7 +192,7 @@ class MessageFilter(BaseFilter):
 
     __slots__ = ()
 
-    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:  # type: ignore
         return self.filter(update.effective_message) if super().check_update(update) else False
 
     @abstractmethod
@@ -227,7 +227,7 @@ class UpdateFilter(BaseFilter):
 
     __slots__ = ()
 
-    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:  # type: ignore
         return self.filter(update) if super().check_update(update) else False
 
     @abstractmethod
