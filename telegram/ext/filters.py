@@ -133,7 +133,14 @@ class BaseFilter(ABC):
 
     @abstractmethod
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        ...
+        if (  # Only message updates should be handled.
+            update.channel_post
+            or update.message
+            or update.edited_channel_post
+            or update.edited_message
+        ):
+            return True
+        return False
 
     def __and__(self, other: 'BaseFilter') -> 'BaseFilter':
         return _MergedFilter(self, and_filter=other)
@@ -185,10 +192,7 @@ class MessageFilter(BaseFilter):
     __slots__ = ()
 
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        if update.callback_query and update.callback_query.message:
-            return None  # Messages from callback queries should be handled by CallbackQueryHandler
-
-        return self.filter(update.effective_message)
+        return self.filter(update.effective_message) if super().check_update(update) else False
 
     @abstractmethod
     def filter(self, message: Message) -> Optional[Union[bool, DataDict]]:
@@ -223,10 +227,7 @@ class UpdateFilter(BaseFilter):
     __slots__ = ()
 
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        if update.callback_query and update.callback_query.message:
-            return None  # Messages from callback queries should be handled by CallbackQueryHandler
-
-        return self.filter(update)
+        return self.filter(update) if super().check_update(update) else False
 
     @abstractmethod
     def filter(self, update: Update) -> Optional[Union[bool, DataDict]]:
@@ -2085,8 +2086,7 @@ class UpdateType:
 
     Examples:
         Use these filters like: ``filters.UpdateType.MESSAGE`` or
-        ``filters.UpdateType.CHANNEL_POSTS`` etc. Or use just ``filters.UpdateType.ALL`` for all
-        types.
+        ``filters.UpdateType.CHANNEL_POSTS`` etc.
 
     Note:
         ``filters.UpdateType`` itself is *not* a filter, but just a convenience namespace.
@@ -2159,15 +2159,3 @@ class UpdateType:
     CHANNEL_POSTS = _ChannelPosts(name="filters.UpdateType.CHANNEL_POSTS")
     """Updates with either :attr:`telegram.Update.channel_post` or
     :attr:`telegram.Update.edited_channel_post`."""
-
-    class _All(UpdateFilter):
-        __slots__ = ()
-
-        def filter(self, update: Update) -> bool:
-            return bool(
-                UpdateType.MESSAGES.check_update(update)
-                or UpdateType.CHANNEL_POSTS.check_update(update)
-            )
-
-    ALL = _All(name="filters.UpdateType.ALL")
-    """All updates which contain a message."""
