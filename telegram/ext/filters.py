@@ -63,7 +63,7 @@ from telegram.constants import DiceEmoji as DiceEmojiEnum
 DataDict = Dict[str, list]
 
 
-class BaseFilter(ABC):
+class BaseFilter:
     """Base class for all Filters.
 
     Filters subclassing from this class can combined using bitwise operators:
@@ -131,8 +131,9 @@ class BaseFilter(ABC):
         self._name = self.__class__.__name__ if name is None else name
         self._data_filter = data_filter
 
-    @abstractmethod
-    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    @staticmethod
+    def check_update(update: Update) -> Optional[Union[bool, DataDict]]:
+        """Checks if the specified update is a message."""
         if (  # Only message updates should be handled.
             update.channel_post
             or update.message

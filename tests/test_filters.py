@@ -20,7 +20,7 @@ import datetime
 
 import pytest
 
-from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice
+from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice, CallbackQuery
 from telegram.ext import filters
 
 import inspect
@@ -1952,12 +1952,20 @@ class TestFilters:
         assert not (filters.FORWARDED & ~filters.COMMAND).check_update(update)
         assert (~(filters.FORWARDED & filters.COMMAND)).check_update(update)
 
-    def test_faulty_custom_filter(self, update):
-        class _CustomFilter(filters.BaseFilter):
-            pass
+    def test_indirect_message(self, update):
+        class _CustomFilter(filters.MessageFilter):
+            test_flag = False
 
-        with pytest.raises(TypeError, match="Can't instantiate abstract class _CustomFilter"):
-            _CustomFilter()
+            def filter(self, message: Message):
+                self.test_flag = True
+                return self.test_flag
+
+        c = _CustomFilter()
+        u = Update(0, callback_query=CallbackQuery('0', update.effective_user, '', update.message))
+        assert not c.check_update(u)
+        assert not c.test_flag
+        assert c.check_update(update)
+        assert c.test_flag
 
     def test_custom_unnamed_filter(self, update, base_class):
         class Unnamed(base_class):
