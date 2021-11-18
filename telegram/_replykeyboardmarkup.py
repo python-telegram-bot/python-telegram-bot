@@ -114,8 +114,9 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         self.one_time_keyboard = bool(one_time_keyboard)
         self.selective = bool(selective)
         self.input_field_placeholder = input_field_placeholder
-
-        self._id_attrs = (self.keyboard,)
+        # ensure keyboard is notnull before assigning
+        if self.keyboard:
+            self._id_attrs = (self.keyboard,)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

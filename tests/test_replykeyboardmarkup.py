@@ -101,6 +101,8 @@ class TestReplyKeyboardMarkup:
         assert reply_keyboard_markup.one_time_keyboard == self.one_time_keyboard
         assert reply_keyboard_markup.selective == self.selective
         assert reply_keyboard_markup.input_field_placeholder == self.input_field_placeholder
+        assert reply_keyboard_markup.keyboard == self.keyboard
+
 
     def test_wrong_keyboard_inputs(self):
         with pytest.raises(ValueError):

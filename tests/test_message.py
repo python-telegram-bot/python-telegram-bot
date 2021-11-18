@@ -1548,3 +1548,15 @@ class TestMessage:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    def test_photo_not_empty(self):
+        # needn't set the
+        a = Message(
+            id_,
+            self.date,
+            self.chat,
+            from_user=self.from_user,
+        )
+        expected_photo = None
+        actual_photo = a.photo
+        assert expected_photo == actual_photo
