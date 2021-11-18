@@ -1551,6 +1551,7 @@ class TestMessage:
 
     def test_photo_not_empty(self):
         # needn't set the
+        id_ = 1
         a = Message(
             id_,
             self.date,
