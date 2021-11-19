@@ -1386,7 +1386,6 @@ class TestConversationHandler:
             fallbacks=[CallbackQueryHandler(self.code)],
             per_message=True,
         )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
 
         # the CallbackQueryHandler should raise when per_message is False
         ConversationHandler(
@@ -1404,33 +1403,8 @@ class TestConversationHandler:
             states={
                 self.BREWING: [CommandHandler("code", self.code)],
             },
-            fallbacks=self.fallbacks,
-            per_message=True,
+            fallbacks=[CommandHandler("code", self.code)],
         )
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == (
-            "If 'per_message=True', all entry points, state handlers, and fallbacks"
-            " must be 'CallbackQueryHandler', since no other handlers"
-            " have a message context."
-        )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
-
-    def test_per_message_but_not_per_chat_warning(self, recwarn):
-        ConversationHandler(
-            entry_points=[CallbackQueryHandler(self.code, "code")],
-            states={
-                self.BREWING: [CallbackQueryHandler(self.code, "code")],
-            },
-            fallbacks=[CallbackQueryHandler(self.code, "code")],
-            per_message=True,
-            per_chat=False,
-        )
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == (
-            "If 'per_message=True' is used, 'per_chat=True' should also be used, "
-            "since message IDs are not globally unique."
-        )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
 
         ConversationHandler(
             entry_points=[CommandHandler("code", self.code)],
@@ -1462,7 +1436,6 @@ class TestConversationHandler:
             "The `ConversationHandler` only handles updates of type `telegram.Update`. "
             "The TypeHandler is set to handle NotUpdate."
         )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
 
         per_faq_link = (
             " Read this FAQ entry to learn more about the per_* settings: https://git.io/JtcyU."

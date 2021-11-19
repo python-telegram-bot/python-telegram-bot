@@ -25,7 +25,6 @@ from telegram.ext import (
     MessageHandler,
     filters,
     Updater,
-    Updater,
     CallbackContext,
 )
 

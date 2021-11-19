@@ -14,7 +14,7 @@ import logging
 from pathlib import Path
 
 from telegram import Update
-from telegram.ext import MessageHandler, filters, Updater, Updater, CallbackContext
+from telegram.ext import MessageHandler, filters, Updater, CallbackContext
 
 # Enable logging
 
