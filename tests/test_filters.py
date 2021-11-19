@@ -22,7 +22,6 @@ import pytest
 
 from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice, CallbackQuery
 from telegram.ext import filters
-
 import inspect
 import re
 
@@ -110,6 +109,8 @@ class TestFilters:
                 inst = cls('1')
             else:
                 inst = cls(*['blah'])
+
+            assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
 
             assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
 

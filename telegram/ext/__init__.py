@@ -43,6 +43,7 @@ from ._shippingqueryhandler import ShippingQueryHandler
 from ._pollanswerhandler import PollAnswerHandler
 from ._pollhandler import PollHandler
 from ._chatmemberhandler import ChatMemberHandler
+from ._chatjoinrequesthandler import ChatJoinRequestHandler
 from ._defaults import Defaults
 from ._callbackdatacache import CallbackDataCache, InvalidCallbackData
 from ._builders import DispatcherBuilder, UpdaterBuilder
@@ -52,6 +53,7 @@ __all__ = (
     'CallbackContext',
     'CallbackDataCache',
     'CallbackQueryHandler',
+    'ChatJoinRequestHandler',
     'ChatMemberHandler',
     'ChosenInlineResultHandler',
     'CommandHandler',

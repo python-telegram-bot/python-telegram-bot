@@ -139,26 +139,28 @@ class ChatAction(_StringEnum):
 
     __slots__ = ()
 
+    CHOOSE_STICKER = 'choose_sticker'
+    """:obj:`str`: Chat action indicating that the bot is selecting a sticker."""
     FIND_LOCATION = 'find_location'
-    """:obj:`str`: A chat indicating the bot is selecting a location."""
+    """:obj:`str`: Chat action indicating that the bot is selecting a location."""
     RECORD_VOICE = 'record_voice'
-    """:obj:`str`: A chat indicating the bot is recording a voice message."""
+    """:obj:`str`: Chat action indicating that the bot is recording a voice message."""
     RECORD_VIDEO = 'record_video'
-    """:obj:`str`: A chat indicating the bot is recording a video."""
+    """:obj:`str`: Chat action indicating that the bot is recording a video."""
     RECORD_VIDEO_NOTE = 'record_video_note'
-    """:obj:`str`: A chat indicating the bot is recording a video note."""
+    """:obj:`str`: Chat action indicating that the bot is recording a video note."""
     TYPING = 'typing'
     """:obj:`str`: A chat indicating the bot is typing."""
     UPLOAD_VOICE = 'upload_voice'
-    """:obj:`str`: A chat indicating the bot is uploading a voice message."""
+    """:obj:`str`: Chat action indicating that the bot is uploading a voice message."""
     UPLOAD_DOCUMENT = 'upload_document'
-    """:obj:`str`: A chat indicating the bot is uploading a document."""
+    """:obj:`str`: Chat action indicating that the bot is uploading a document."""
     UPLOAD_PHOTO = 'upload_photo'
-    """:obj:`str`: A chat indicating the bot is uploading a photo."""
+    """:obj:`str`: Chat action indicating that the bot is uploading a photo."""
     UPLOAD_VIDEO = 'upload_video'
-    """:obj:`str`: A chat indicating the bot is uploading a video."""
+    """:obj:`str`: Chat action indicating that the bot is uploading a video."""
     UPLOAD_VIDEO_NOTE = 'upload_video_note'
-    """:obj:`str`: A chat indicating the bot is uploading a video note."""
+    """:obj:`str`: Chat action indicating that the bot is uploading a video note."""
 
 
 class ChatMemberStatus(_StringEnum):
@@ -719,3 +721,5 @@ class UpdateType(_StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.my_chat_member`."""
     CHAT_MEMBER = 'chat_member'
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_member`."""
+    CHAT_JOIN_REQUEST = 'chat_join_request'
+    """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""

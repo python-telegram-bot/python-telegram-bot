@@ -72,7 +72,7 @@ def time():
 
 @pytest.fixture(scope='class')
 def invite_link(user):
-    return ChatInviteLink('link', user, True, True)
+    return ChatInviteLink('link', user, False, True, True)
 
 
 @pytest.fixture(scope='class')

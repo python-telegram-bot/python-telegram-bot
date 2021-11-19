@@ -22,8 +22,9 @@ Handlers
 
     telegram.ext.handler
     telegram.ext.callbackqueryhandler
-    telegram.ext.choseninlineresulthandler
+    telegram.ext.chatjoinrequesthandler
     telegram.ext.chatmemberhandler
+    telegram.ext.choseninlineresulthandler
     telegram.ext.commandhandler
     telegram.ext.conversationhandler
     telegram.ext.inlinequeryhandler
