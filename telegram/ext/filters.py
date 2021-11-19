@@ -131,8 +131,8 @@ class BaseFilter:
         self._name = self.__class__.__name__ if name is None else name
         self._data_filter = data_filter
 
-    @staticmethod
-    def check_update(update: Update) -> Optional[Union[bool, DataDict]]:
+    # pylint: disable=no-self-use
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
         """Checks if the specified update is a message."""
         if (  # Only message updates should be handled.
             update.channel_post
@@ -192,7 +192,7 @@ class MessageFilter(BaseFilter):
 
     __slots__ = ()
 
-    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:  # type: ignore
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
         return self.filter(update.effective_message) if super().check_update(update) else False
 
     @abstractmethod
@@ -227,7 +227,7 @@ class UpdateFilter(BaseFilter):
 
     __slots__ = ()
 
-    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:  # type: ignore
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
         return self.filter(update) if super().check_update(update) else False
 
     @abstractmethod
