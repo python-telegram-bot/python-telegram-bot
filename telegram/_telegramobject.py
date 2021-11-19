@@ -66,8 +66,11 @@ class TelegramObject:
             item = 'from_user'
         try:
             return getattr(self, item)
-        except AttributeError:
-            raise KeyError from None
+        except AttributeError as exc:
+            raise KeyError(
+                f"Objects of type {self.__class__.__name__} don't have an attribute called "
+                f"`{item}`."
+            ) from exc
 
     @staticmethod
     def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:

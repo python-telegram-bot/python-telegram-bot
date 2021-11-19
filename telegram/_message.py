@@ -646,7 +646,7 @@ class Message(TelegramObject):
 
         for attachment_type in MessageAttachmentType:
             if self[attachment_type]:
-                self._effective_attachment = self[attachment_type]
+                self._effective_attachment = self[attachment_type]  # type: ignore[assignment]
                 break
         else:
             self._effective_attachment = None
