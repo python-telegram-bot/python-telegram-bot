@@ -34,7 +34,16 @@ TO = TypeVar('TO', bound='TelegramObject', covariant=True)
 
 
 class TelegramObject:
-    """Base class for most Telegram objects."""
+    """Base class for most Telegram objects.
+
+    Objects of this type a subscriptable with strings, where ``telegram_object[attribute_name]`` is
+    equivalent to ``telegram_object.attribute_name``. If the object does not have an attribute with
+    the appropriate name, a :class:`KeyError` will be raised.
+
+    Note:
+        ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
+        special cases like :attr:`Message.from_user` that deviate from the official Bot API.
+    """
 
     # type hints in __new__ are not read by mypy (https://github.com/python/mypy/issues/1021). As a
     # workaround we can type hint instance variables in __new__ using a syntax defined in PEP 526 -
