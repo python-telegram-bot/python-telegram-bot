@@ -68,10 +68,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     Attributes:
         matches (List[:obj:`re match object`]): Optional. If the associated update originated from
-            a regex-supported handler or had a :class:`Filters.regex`, this will contain a list of
-            match objects for every pattern where ``re.search(pattern, string)`` returned a match.
-            Note that filters short circuit, so combined regex filters will not always
-            be evaluated.
+            a :class:`filters.Regex`, this will contain a list of match objects for every pattern
+            where ``re.search(pattern, string)`` returned a match. Note that filters short circuit,
+            so combined regex filters will not always be evaluated.
         args (List[:obj:`str`]): Optional. Arguments passed to a command if the associated update
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the

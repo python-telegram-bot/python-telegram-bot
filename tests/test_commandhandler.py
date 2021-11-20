@@ -22,7 +22,7 @@ from queue import Queue
 import pytest
 
 from telegram import Message, Update, Chat, Bot
-from telegram.ext import CommandHandler, Filters, CallbackContext, JobQueue, PrefixHandler
+from telegram.ext import CommandHandler, filters, CallbackContext, JobQueue, PrefixHandler
 from tests.conftest import (
     make_command_message,
     make_command_update,
@@ -186,7 +186,7 @@ class TestCommandHandler(BaseTest):
     def test_edited(self, command_message):
         """Test that a CH responds to an edited message if its filters allow it"""
         handler_edited = self.make_default_handler()
-        handler_no_edited = self.make_default_handler(filters=~Filters.update.edited_message)
+        handler_no_edited = self.make_default_handler(filters=~filters.UpdateType.EDITED_MESSAGE)
         self._test_edited(command_message, handler_edited, handler_no_edited)
 
     def test_directed_commands(self, bot, command):
@@ -197,7 +197,7 @@ class TestCommandHandler(BaseTest):
 
     def test_with_filter(self, command):
         """Test that a CH with a (generic) filter responds if its filters match"""
-        handler = self.make_default_handler(filters=Filters.chat_type.group)
+        handler = self.make_default_handler(filters=filters.ChatType.GROUP)
         assert is_match(handler, make_command_update(command, chat=Chat(-23, Chat.GROUP)))
         assert not is_match(handler, make_command_update(command, chat=Chat(23, Chat.PRIVATE)))
 
@@ -234,14 +234,14 @@ class TestCommandHandler(BaseTest):
     def test_context_regex(self, dp, command):
         """Test CHs with context-based callbacks and a single filter"""
         handler = self.make_default_handler(
-            self.callback_context_regex1, filters=Filters.regex('one two')
+            self.callback_context_regex1, filters=filters.Regex('one two')
         )
         self._test_context_args_or_regex(dp, handler, command)
 
     def test_context_multiple_regex(self, dp, command):
         """Test CHs with context-based callbacks and filters combined"""
         handler = self.make_default_handler(
-            self.callback_context_regex2, filters=Filters.regex('one') & Filters.regex('two')
+            self.callback_context_regex2, filters=filters.Regex('one') & filters.Regex('two')
         )
         self._test_context_args_or_regex(dp, handler, command)
 
@@ -317,11 +317,11 @@ class TestPrefixHandler(BaseTest):
 
     def test_edited(self, prefix_message):
         handler_edited = self.make_default_handler()
-        handler_no_edited = self.make_default_handler(filters=~Filters.update.edited_message)
+        handler_no_edited = self.make_default_handler(filters=~filters.UpdateType.EDITED_MESSAGE)
         self._test_edited(prefix_message, handler_edited, handler_no_edited)
 
     def test_with_filter(self, prefix_message_text):
-        handler = self.make_default_handler(filters=Filters.chat_type.group)
+        handler = self.make_default_handler(filters=filters.ChatType.GROUP)
         text = prefix_message_text
         assert is_match(handler, make_message_update(text, chat=Chat(-23, Chat.GROUP)))
         assert not is_match(handler, make_message_update(text, chat=Chat(23, Chat.PRIVATE)))
@@ -370,12 +370,12 @@ class TestPrefixHandler(BaseTest):
 
     def test_context_regex(self, dp, prefix_message_text):
         handler = self.make_default_handler(
-            self.callback_context_regex1, filters=Filters.regex('one two')
+            self.callback_context_regex1, filters=filters.Regex('one two')
         )
         self._test_context_args_or_regex(dp, handler, prefix_message_text)
 
     def test_context_multiple_regex(self, dp, prefix_message_text):
         handler = self.make_default_handler(
-            self.callback_context_regex2, filters=Filters.regex('one') & Filters.regex('two')
+            self.callback_context_regex2, filters=filters.Regex('one') & filters.Regex('two')
         )
         self._test_context_args_or_regex(dp, handler, prefix_message_text)
