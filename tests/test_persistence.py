@@ -42,7 +42,7 @@ from telegram.ext import (
     BasePersistence,
     ConversationHandler,
     MessageHandler,
-    Filters,
+    filters,
     PicklePersistence,
     CommandHandler,
     DictPersistence,
@@ -401,15 +401,15 @@ class TestBasePersistence:
             context.bot.callback_data_cache.put('test0')
 
         known_user = MessageHandler(
-            Filters.user(user_id=12345),
+            filters.User(user_id=12345),
             callback_known_user,
         )
         known_chat = MessageHandler(
-            Filters.chat(chat_id=-67890),
+            filters.Chat(chat_id=-67890),
             callback_known_chat,
         )
         unknown = MessageHandler(
-            Filters.all,
+            filters.ALL,
             callback_unknown_user_or_chat,
         )
         dp.add_handler(known_user)
@@ -530,12 +530,12 @@ class TestBasePersistence:
                     self.test_flag = 'bot_data was wrongly refreshed'
 
         with_user_and_chat = MessageHandler(
-            Filters.user(user_id=12345),
+            filters.User(user_id=12345),
             callback_with_user_and_chat,
             run_async=run_async,
         )
         without_user_and_chat = MessageHandler(
-            Filters.all,
+            filters.ALL,
             callback_without_user_and_chat,
             run_async=run_async,
         )
@@ -2221,8 +2221,8 @@ class TestDictPersistence:
             if not context.bot.callback_data_cache.persistence_data == ([], {'test1': 'test0'}):
                 pytest.fail()
 
-        h1 = MessageHandler(Filters.all, first)
-        h2 = MessageHandler(Filters.all, second)
+        h1 = MessageHandler(filters.ALL, first)
+        h2 = MessageHandler(filters.ALL, second)
         dp.add_handler(h1)
         dp.process_update(update)
         user_data = dict_persistence.user_data_json
