@@ -54,13 +54,12 @@ from telegram import (
 )
 from telegram.ext import (
     Dispatcher,
-    MessageFilter,
     Defaults,
-    UpdateFilter,
     ExtBot,
     DispatcherBuilder,
     UpdaterBuilder,
 )
+from telegram.ext.filters import UpdateFilter, MessageFilter
 from telegram.error import BadRequest
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_NONE
 from telegram.request import Request
@@ -335,6 +334,7 @@ def make_command_update(message, edited=False, **kwargs):
 def mock_filter(request):
     class MockFilter(request.param['class']):
         def __init__(self):
+            super().__init__()
             self.tested = False
 
         def filter(self, _):

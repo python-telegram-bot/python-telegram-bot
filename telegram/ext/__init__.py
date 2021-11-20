@@ -31,7 +31,7 @@ from ._updater import Updater
 from ._callbackqueryhandler import CallbackQueryHandler
 from ._choseninlineresulthandler import ChosenInlineResultHandler
 from ._inlinequeryhandler import InlineQueryHandler
-from .filters import BaseFilter, MessageFilter, UpdateFilter, Filters
+from . import filters
 from ._messagehandler import MessageHandler
 from ._commandhandler import CommandHandler, PrefixHandler
 from ._stringcommandhandler import StringCommandHandler
@@ -49,7 +49,6 @@ from ._callbackdatacache import CallbackDataCache, InvalidCallbackData
 from ._builders import DispatcherBuilder, UpdaterBuilder
 
 __all__ = (
-    'BaseFilter',
     'BasePersistence',
     'CallbackContext',
     'CallbackDataCache',
@@ -66,13 +65,12 @@ __all__ = (
     'DispatcherBuilder',
     'DispatcherHandlerStop',
     'ExtBot',
-    'Filters',
+    'filters',
     'Handler',
     'InlineQueryHandler',
     'InvalidCallbackData',
     'Job',
     'JobQueue',
-    'MessageFilter',
     'MessageHandler',
     'PersistenceInput',
     'PicklePersistence',
@@ -84,7 +82,6 @@ __all__ = (
     'StringCommandHandler',
     'StringRegexHandler',
     'TypeHandler',
-    'UpdateFilter',
     'Updater',
     'UpdaterBuilder',
 )

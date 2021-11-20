@@ -40,7 +40,7 @@ from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
     MessageHandler,
-    Filters,
+    filters,
     InlineQueryHandler,
     CallbackContext,
     DispatcherHandlerStop,
@@ -770,7 +770,7 @@ class TestConversationHandler:
 
     def test_channel_message_without_chat(self, bot):
         handler = ConversationHandler(
-            entry_points=[MessageHandler(Filters.all, self.start_end)], states={}, fallbacks=[]
+            entry_points=[MessageHandler(filters.ALL, self.start_end)], states={}, fallbacks=[]
         )
         message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, 'Misses Test'), bot=bot)
 
@@ -885,7 +885,7 @@ class TestConversationHandler:
 
         handler = ConversationHandler(
             entry_points=[CommandHandler("start", conv_entry)],
-            states={1: [MessageHandler(Filters.all, raise_error)]},
+            states={1: [MessageHandler(filters.ALL, raise_error)]},
             fallbacks=self.fallbacks,
             run_async=True,
         )
@@ -1168,7 +1168,7 @@ class TestConversationHandler:
             {
                 ConversationHandler.TIMEOUT: [
                     CommandHandler('brew', self.passout),
-                    MessageHandler(~Filters.regex('oding'), self.passout2),
+                    MessageHandler(~filters.Regex('oding'), self.passout2),
                 ]
             }
         )
@@ -1228,7 +1228,7 @@ class TestConversationHandler:
             {
                 ConversationHandler.TIMEOUT: [
                     CommandHandler('brew', self.passout_context),
-                    MessageHandler(~Filters.regex('oding'), self.passout2_context),
+                    MessageHandler(~filters.Regex('oding'), self.passout2_context),
                 ]
             }
         )

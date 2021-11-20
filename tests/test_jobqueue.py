@@ -350,7 +350,7 @@ class TestJobQueue:
         sleep(delta + 0.1)
         assert self.result == 1
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
-        assert scheduled_time == pytest.approx(expected_reschedule_time)
+        assert scheduled_time == pytest.approx(expected_reschedule_time, rel=1e-3)
 
     def test_run_monthly_non_strict_day(self, job_queue, timezone):
         delta, now = 1, dtm.datetime.now(timezone)

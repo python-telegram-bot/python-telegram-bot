@@ -20,7 +20,7 @@ from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     CommandHandler,
     MessageHandler,
-    Filters,
+    filters,
     ConversationHandler,
     Updater,
     CallbackContext,
@@ -146,13 +146,13 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            GENDER: [MessageHandler(Filters.regex('^(Boy|Girl|Other)$'), gender)],
-            PHOTO: [MessageHandler(Filters.photo, photo), CommandHandler('skip', skip_photo)],
+            GENDER: [MessageHandler(filters.Regex('^(Boy|Girl|Other)$'), gender)],
+            PHOTO: [MessageHandler(filters.PHOTO, photo), CommandHandler('skip', skip_photo)],
             LOCATION: [
-                MessageHandler(Filters.location, location),
+                MessageHandler(filters.LOCATION, location),
                 CommandHandler('skip', skip_location),
             ],
-            BIO: [MessageHandler(Filters.text & ~Filters.command, bio)],
+            BIO: [MessageHandler(filters.TEXT & ~filters.COMMAND, bio)],
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )
