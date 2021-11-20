@@ -25,7 +25,7 @@ from telegram.constants import ParseMode
 from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
-    Filters,
+    filters,
     Updater,
     CallbackContext,
 )
@@ -115,20 +115,20 @@ def main() -> None:
 
     # Register a deep-linking handler
     dispatcher.add_handler(
-        CommandHandler("start", deep_linked_level_1, Filters.regex(CHECK_THIS_OUT))
+        CommandHandler("start", deep_linked_level_1, filters.Regex(CHECK_THIS_OUT))
     )
 
     # This one works with a textual link instead of an URL
-    dispatcher.add_handler(CommandHandler("start", deep_linked_level_2, Filters.regex(SO_COOL)))
+    dispatcher.add_handler(CommandHandler("start", deep_linked_level_2, filters.Regex(SO_COOL)))
 
     # We can also pass on the deep-linking payload
     dispatcher.add_handler(
-        CommandHandler("start", deep_linked_level_3, Filters.regex(USING_ENTITIES))
+        CommandHandler("start", deep_linked_level_3, filters.Regex(USING_ENTITIES))
     )
 
     # Possible with inline keyboard buttons as well
     dispatcher.add_handler(
-        CommandHandler("start", deep_linked_level_4, Filters.regex(USING_KEYBOARD))
+        CommandHandler("start", deep_linked_level_4, filters.Regex(USING_KEYBOARD))
     )
 
     # register callback handler for inline keyboard button

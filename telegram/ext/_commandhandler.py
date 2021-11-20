@@ -21,7 +21,7 @@ import re
 from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
-from telegram.ext import BaseFilter, Filters, Handler
+from telegram.ext import filters as filters_module, Handler
 from telegram._utils.types import SLT
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.ext._utils.types import CCT
@@ -41,7 +41,7 @@ class CommandHandler(Handler[Update, CCT]):
     which is the text following the command split on single or consecutive whitespace characters.
 
     By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~Filters.update.edited_message`` in the filter argument.
+    use ``~filters.UpdateType.EDITED_MESSAGE`` in the filter argument.
 
     Note:
         * :class:`CommandHandler` does *not* handle (edited) channel posts.
@@ -62,7 +62,7 @@ class CommandHandler(Handler[Update, CCT]):
             :class:`telegram.ext.ConversationHandler`.
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
-            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
+            :mod:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
@@ -86,13 +86,10 @@ class CommandHandler(Handler[Update, CCT]):
         self,
         command: SLT[str],
         callback: Callable[[Update, CCT], RT],
-        filters: BaseFilter = None,
+        filters: filters_module.BaseFilter = None,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
-        super().__init__(
-            callback,
-            run_async=run_async,
-        )
+        super().__init__(callback, run_async=run_async)
 
         if isinstance(command, str):
             self.command = [command.lower()]
@@ -102,10 +99,7 @@ class CommandHandler(Handler[Update, CCT]):
             if not re.match(r'^[\da-z_]{1,32}$', comm):
                 raise ValueError('Command is not a valid bot command')
 
-        if filters:
-            self.filters = Filters.update.messages & filters
-        else:
-            self.filters = Filters.update.messages
+        self.filters = filters if filters is not None else filters_module.UpdateType.MESSAGES
 
     def check_update(
         self, update: object
@@ -140,7 +134,7 @@ class CommandHandler(Handler[Update, CCT]):
                 ):
                     return None
 
-                filter_result = self.filters(update)
+                filter_result = self.filters.check_update(update)
                 if filter_result:
                     return args, filter_result
                 return False
@@ -167,7 +161,7 @@ class PrefixHandler(CommandHandler):
 
     This is a intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
     It supports configurable commands with the same options as CommandHandler. It will respond to
-    every combination of :attr:`prefix` and :attr:`command`. It will add a ``list`` to the
+    every combination of :attr:`prefix` and :attr:`command`. It will add a :obj:`list` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
     which is the text following the command split on single or consecutive whitespace characters.
 
@@ -194,7 +188,7 @@ class PrefixHandler(CommandHandler):
 
 
     By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~Filters.update.edited_message``.
+    use ``~filters.UpdateType.EDITED_MESSAGE``.
 
     Note:
         * :class:`PrefixHandler` does *not* handle (edited) channel posts.
@@ -216,7 +210,7 @@ class PrefixHandler(CommandHandler):
             :class:`telegram.ext.ConversationHandler`.
         filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
-            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
+            :mod:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
@@ -237,7 +231,7 @@ class PrefixHandler(CommandHandler):
         prefix: SLT[str],
         command: SLT[str],
         callback: Callable[[Update, CCT], RT],
-        filters: BaseFilter = None,
+        filters: filters_module.BaseFilter = None,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
@@ -314,7 +308,7 @@ class PrefixHandler(CommandHandler):
                 text_list = message.text.split()
                 if text_list[0].lower() not in self._commands:
                     return None
-                filter_result = self.filters(update)
+                filter_result = self.filters.check_update(update)
                 if filter_result:
                     return text_list[1:], filter_result
                 return False

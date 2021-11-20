@@ -21,7 +21,7 @@ from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
 from telegram.ext import (
     CommandHandler,
     MessageHandler,
-    Filters,
+    filters,
     ConversationHandler,
     PicklePersistence,
     Updater,
@@ -144,23 +144,23 @@ def main() -> None:
         states={
             CHOOSING: [
                 MessageHandler(
-                    Filters.regex('^(Age|Favourite colour|Number of siblings)$'), regular_choice
+                    filters.Regex('^(Age|Favourite colour|Number of siblings)$'), regular_choice
                 ),
-                MessageHandler(Filters.regex('^Something else...$'), custom_choice),
+                MessageHandler(filters.Regex('^Something else...$'), custom_choice),
             ],
             TYPING_CHOICE: [
                 MessageHandler(
-                    Filters.text & ~(Filters.command | Filters.regex('^Done$')), regular_choice
+                    filters.TEXT & ~(filters.COMMAND | filters.Regex('^Done$')), regular_choice
                 )
             ],
             TYPING_REPLY: [
                 MessageHandler(
-                    Filters.text & ~(Filters.command | Filters.regex('^Done$')),
+                    filters.TEXT & ~(filters.COMMAND | filters.Regex('^Done$')),
                     received_information,
                 )
             ],
         },
-        fallbacks=[MessageHandler(Filters.regex('^Done$'), done)],
+        fallbacks=[MessageHandler(filters.Regex('^Done$'), done)],
         name="my_conversation",
         persistent=True,
     )
