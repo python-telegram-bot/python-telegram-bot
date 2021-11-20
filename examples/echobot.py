@@ -21,7 +21,7 @@ from telegram import Update, ForceReply
 from telegram.ext import (
     CommandHandler,
     MessageHandler,
-    Filters,
+    filters,
     Updater,
     CallbackContext,
 )
@@ -68,7 +68,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("help", help_command))
 
     # on non command i.e message - echo the message on Telegram
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    dispatcher.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
     # Start the Bot
     updater.start_polling()
