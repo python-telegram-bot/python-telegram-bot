@@ -1415,8 +1415,18 @@ class TestConversationHandler:
             conversation_timeout=42,
         )
 
-        # the overall handlers raising an error is 12
-        assert len(recwarn) == 12
+        ConversationHandler(
+            entry_points=[CallbackQueryHandler(self.code, "code")],
+            states={
+                self.BREWING: [CallbackQueryHandler(self.code, "code")],
+            },
+            fallbacks=[CallbackQueryHandler(self.code, "code")],
+            per_message=True,
+            per_chat=False,
+        )
+
+        # the overall handlers raising an error is 13
+        assert len(recwarn) == 13
         # now we test the messages, they are raised in the order they are inserted
         # into the conversation handler
         assert str(recwarn[0].message) == (
@@ -1476,26 +1486,14 @@ class TestConversationHandler:
             " from what you expect."
         )
 
-        # this for loop checks if the correct stacklevel is used when generating the warning
-        for warning in recwarn:
-            assert warning.filename == __file__, "incorrect stacklevel!"
-
-    def test_per_message_but_not_per_chat_warning(self, recwarn):
-        ConversationHandler(
-            entry_points=[CallbackQueryHandler(self.code, "code")],
-            states={
-                self.BREWING: [CallbackQueryHandler(self.code, "code")],
-            },
-            fallbacks=[CallbackQueryHandler(self.code, "code")],
-            per_message=True,
-            per_chat=False,
-        )
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == (
+        assert str(recwarn[12].message) == (
             "If 'per_message=True' is used, 'per_chat=True' should also be used, "
             "since message IDs are not globally unique."
         )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
+
+        # this for loop checks if the correct stacklevel is used when generating the warning
+        for warning in recwarn:
+            assert warning.filename == __file__, "incorrect stacklevel!"
 
     def test_nested_conversation_handler(self, dp, bot, user1, user2):
         self.nested_states[self.DRINKING] = [
