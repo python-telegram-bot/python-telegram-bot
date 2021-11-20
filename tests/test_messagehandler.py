@@ -33,7 +33,7 @@ from telegram import (
     ShippingQuery,
     PreCheckoutQuery,
 )
-from telegram.ext import Filters, MessageHandler, CallbackContext, JobQueue, UpdateFilter
+from telegram.ext import filters, MessageHandler, CallbackContext, JobQueue
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
@@ -71,7 +71,7 @@ class TestMessageHandler:
     SRE_TYPE = type(re.match("", ""))
 
     def test_slot_behaviour(self, mro_slots):
-        handler = MessageHandler(Filters.all, self.callback_context)
+        handler = MessageHandler(filters.ALL, self.callback_context)
         for attr in handler.__slots__:
             assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
@@ -120,7 +120,7 @@ class TestMessageHandler:
             self.test_flag = types and num
 
     def test_with_filter(self, message):
-        handler = MessageHandler(Filters.chat_type.group, self.callback_context)
+        handler = MessageHandler(filters.ChatType.GROUP, self.callback_context)
 
         message.chat.type = 'group'
         assert handler.check_update(Update(0, message))
@@ -129,7 +129,7 @@ class TestMessageHandler:
         assert not handler.check_update(Update(0, message))
 
     def test_callback_query_with_filter(self, message):
-        class TestFilter(UpdateFilter):
+        class TestFilter(filters.UpdateFilter):
             flag = False
 
             def filter(self, u):
@@ -146,9 +146,9 @@ class TestMessageHandler:
 
     def test_specific_filters(self, message):
         f = (
-            ~Filters.update.messages
-            & ~Filters.update.channel_post
-            & Filters.update.edited_channel_post
+            ~filters.UpdateType.MESSAGES
+            & ~filters.UpdateType.CHANNEL_POST
+            & filters.UpdateType.EDITED_CHANNEL_POST
         )
         handler = MessageHandler(f, self.callback_context)
 
@@ -184,7 +184,7 @@ class TestMessageHandler:
         assert self.test_flag
 
     def test_context_regex(self, dp, message):
-        handler = MessageHandler(Filters.regex('one two'), self.callback_context_regex1)
+        handler = MessageHandler(filters.Regex('one two'), self.callback_context_regex1)
         dp.add_handler(handler)
 
         message.text = 'not it'
@@ -197,7 +197,7 @@ class TestMessageHandler:
 
     def test_context_multiple_regex(self, dp, message):
         handler = MessageHandler(
-            Filters.regex('one') & Filters.regex('two'), self.callback_context_regex2
+            filters.Regex('one') & filters.Regex('two'), self.callback_context_regex2
         )
         dp.add_handler(handler)
 

@@ -16,9 +16,27 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=empty-docstring,  invalid-name,  arguments-differ
-"""This module contains the Filters for use with the MessageHandler class."""
+"""
+This module contains filters for use with :class:`telegram.ext.MessageHandler`,
+:class:`telegram.ext.CommandHandler`, or :class:`telegram.ext.PrefixHandler`.
 
+.. versionchanged:: 14.0
+
+    #. Filters are no longer callable, if you're using a custom filter and are calling an existing
+       filter, then switch to the new syntax: ``filters.{filter}.check_update(update)``.
+    #. Removed the ``Filters`` class. The filters are now directly attributes/classes of the
+       :mod:`filters` module.
+    #. The names of all filters has been updated:
+
+        * Filter classes which are ready for use, e.g ``Filters.all`` are now capitalized, e.g
+          ``filters.ALL``.
+        * Filters which need to be initialized are now in CamelCase. E.g. ``filters.User(...)``.
+        * Filters which do both (like ``Filters.text``) are now split as ready-to-use version
+          ``filters.TEXT`` and class version ``filters.Text(...)``.
+
+"""
+
+import mimetypes
 import re
 
 from abc import ABC, abstractmethod
@@ -37,106 +55,105 @@ from typing import (
     NoReturn,
 )
 
-from telegram import Chat, Message, MessageEntity, Update, User
-
-__all__ = [
-    'Filters',
-    'BaseFilter',
-    'MessageFilter',
-    'UpdateFilter',
-    'InvertedFilter',
-    'MergedFilter',
-    'XORFilter',
-]
+from telegram import Chat as TGChat, Message, MessageEntity, Update, User as TGUser
 
 from telegram._utils.types import SLT
-from telegram.constants import DiceEmoji
+from telegram.constants import DiceEmoji as DiceEmojiEnum
 
 DataDict = Dict[str, list]
 
 
-class BaseFilter(ABC):
+class BaseFilter:
     """Base class for all Filters.
 
     Filters subclassing from this class can combined using bitwise operators:
 
     And:
 
-        >>> (Filters.text & Filters.entity(MENTION))
+        >>> (filters.TEXT & filters.Entity(MENTION))
 
     Or:
 
-        >>> (Filters.audio | Filters.video)
+        >>> (filters.AUDIO | filters.VIDEO)
 
     Exclusive Or:
 
-        >>> (Filters.regex('To Be') ^ Filters.regex('Not 2B'))
+        >>> (filters.Regex('To Be') ^ filters.Regex('Not 2B'))
 
     Not:
 
-        >>> ~ Filters.command
+        >>> ~ filters.COMMAND
 
     Also works with more than two filters:
 
-        >>> (Filters.text & (Filters.entity(URL) | Filters.entity(TEXT_LINK)))
-        >>> Filters.text & (~ Filters.forwarded)
+        >>> (filters.TEXT & (filters.Entity(URL) | filters.Entity(TEXT_LINK)))
+        >>> filters.TEXT & (~ filters.FORWARDED)
 
     Note:
         Filters use the same short circuiting logic as python's `and`, `or` and `not`.
         This means that for example:
 
-            >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
+            >>> filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
 
-        With ``message.text == x``, will only ever return the matches for the first filter,
+        With ``message.text == 'x'``, will only ever return the matches for the first filter,
         since the second one is never evaluated.
 
 
     If you want to create your own filters create a class inheriting from either
-    :class:`MessageFilter` or :class:`UpdateFilter` and implement a :meth:`filter` method that
-    returns a boolean: :obj:`True` if the message should be
+    :class:`MessageFilter` or :class:`UpdateFilter` and implement a ``filter()``
+    method that returns a boolean: :obj:`True` if the message should be
     handled, :obj:`False` otherwise.
-    Note that the filters work only as class instances, not
-    actual class objects (so remember to
+    Note that the filters work only as class instances, not actual class objects (so remember to
     initialize your filter classes).
 
     By default the filters name (what will get printed when converted to a string for display)
     will be the class name. If you want to overwrite this assign a better name to the :attr:`name`
     class variable.
 
-    Attributes:
+    .. versionadded:: 14.0
+        Added the arguments :attr:`name` and :attr:`data_filter`.
+
+    Args:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
         data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
             return a dict with lists. The dict will be merged with
             :class:`telegram.ext.CallbackContext`'s internal dict in most cases
             (depends on the handler).
+
+    Attributes:
+        name (:obj:`str`): Name for this filter.
+        data_filter (:obj:`bool`): Whether this filter is a data filter.
     """
 
     __slots__ = ('_name', '_data_filter')
 
-    # pylint: disable=unused-argument
-    def __new__(cls, *args: object, **kwargs: object) -> 'BaseFilter':
-        # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
-        instance = super().__new__(cls)
-        instance._name = None
-        instance._data_filter = False
+    def __init__(self, name: str = None, data_filter: bool = False):
+        self._name = self.__class__.__name__ if name is None else name
+        self._data_filter = data_filter
 
-        return instance
-
-    @abstractmethod
-    def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        ...
+    # pylint: disable=no-self-use
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+        """Checks if the specified update is a message."""
+        if (  # Only message updates should be handled.
+            update.channel_post
+            or update.message
+            or update.edited_channel_post
+            or update.edited_message
+        ):
+            return True
+        return False
 
     def __and__(self, other: 'BaseFilter') -> 'BaseFilter':
-        return MergedFilter(self, and_filter=other)
+        return _MergedFilter(self, and_filter=other)
 
     def __or__(self, other: 'BaseFilter') -> 'BaseFilter':
-        return MergedFilter(self, or_filter=other)
+        return _MergedFilter(self, or_filter=other)
 
     def __xor__(self, other: 'BaseFilter') -> 'BaseFilter':
-        return XORFilter(self, other)
+        return _XORFilter(self, other)
 
     def __invert__(self) -> 'BaseFilter':
-        return InvertedFilter(self)
+        return _InvertedFilter(self)
 
     @property
     def data_filter(self) -> bool:
@@ -147,26 +164,22 @@ class BaseFilter(ABC):
         self._data_filter = value
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str:
         return self._name
 
     @name.setter
-    def name(self, name: Optional[str]) -> None:
-        self._name = name  # pylint: disable=assigning-non-slot
+    def name(self, name: str) -> None:
+        self._name = name
 
     def __repr__(self) -> str:
-        # We do this here instead of in a __init__ so filter don't have to call __init__ or super()
-        if self.name is None:
-            self.name = self.__class__.__name__
         return self.name
 
 
 class MessageFilter(BaseFilter):
     """Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
-    to :meth:`filter` is ``update.effective_message``.
+    to :meth:`filter` is :obj:`telegram.Update.effective_message`.
 
-    Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
-    filters.
+    Please see :class:`BaseFilter` for details on how to create custom filters.
 
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
@@ -179,8 +192,8 @@ class MessageFilter(BaseFilter):
 
     __slots__ = ()
 
-    def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        return self.filter(update.effective_message)
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+        return self.filter(update.effective_message) if super().check_update(update) else False
 
     @abstractmethod
     def filter(self, message: Message) -> Optional[Union[bool, DataDict]]:
@@ -197,8 +210,8 @@ class MessageFilter(BaseFilter):
 
 class UpdateFilter(BaseFilter):
     """Base class for all Update Filters. In contrast to :class:`MessageFilter`, the object
-    passed to :meth:`filter` is ``update``, which allows to create filters like
-    :attr:`Filters.update.edited_message`.
+    passed to :meth:`filter` is an instance of :class:`telegram.Update`, which allows to create
+    filters like :attr:`telegram.ext.filters.UpdateType.EDITED_MESSAGE`.
 
     Please see :class:`telegram.ext.filters.BaseFilter` for details on how to create custom
     filters.
@@ -214,8 +227,8 @@ class UpdateFilter(BaseFilter):
 
     __slots__ = ()
 
-    def __call__(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        return self.filter(update)
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+        return self.filter(update) if super().check_update(update) else False
 
     @abstractmethod
     def filter(self, update: Update) -> Optional[Union[bool, DataDict]]:
@@ -230,7 +243,7 @@ class UpdateFilter(BaseFilter):
         """
 
 
-class InvertedFilter(UpdateFilter):
+class _InvertedFilter(UpdateFilter):
     """Represents a filter that has been inverted.
 
     Args:
@@ -238,24 +251,25 @@ class InvertedFilter(UpdateFilter):
 
     """
 
-    __slots__ = ('f',)
+    __slots__ = ('inv_filter',)
 
     def __init__(self, f: BaseFilter):
-        self.f = f
+        super().__init__()
+        self.inv_filter = f
 
     def filter(self, update: Update) -> bool:
-        return not bool(self.f(update))
+        return not bool(self.inv_filter.check_update(update))
 
     @property
     def name(self) -> str:
-        return f"<inverted {self.f}>"
+        return f"<inverted {self.inv_filter}>"
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError('Cannot set name for InvertedFilter')
+        raise RuntimeError('Cannot set name for combined filters.')
 
 
-class MergedFilter(UpdateFilter):
+class _MergedFilter(UpdateFilter):
     """Represents a filter consisting of two other filters.
 
     Args:
@@ -270,6 +284,7 @@ class MergedFilter(UpdateFilter):
     def __init__(
         self, base_filter: BaseFilter, and_filter: BaseFilter = None, or_filter: BaseFilter = None
     ):
+        super().__init__()
         self.base_filter = base_filter
         if self.base_filter.data_filter:
             self.data_filter = True
@@ -303,13 +318,13 @@ class MergedFilter(UpdateFilter):
 
     # pylint: disable=too-many-return-statements
     def filter(self, update: Update) -> Union[bool, DataDict]:
-        base_output = self.base_filter(update)
+        base_output = self.base_filter.check_update(update)
         # We need to check if the filters are data filters and if so return the merged data.
         # If it's not a data filter or an or_filter but no matches return bool
         if self.and_filter:
-            # And filter needs to short circuit if base is falsey
+            # And filter needs to short circuit if base is falsy
             if base_output:
-                comp_output = self.and_filter(update)
+                comp_output = self.and_filter.check_update(update)
                 if comp_output:
                     if self.data_filter:
                         merged = self._merge(base_output, comp_output)
@@ -317,13 +332,13 @@ class MergedFilter(UpdateFilter):
                             return merged
                     return True
         elif self.or_filter:
-            # Or filter needs to short circuit if base is truthey
+            # Or filter needs to short circuit if base is truthy
             if base_output:
                 if self.data_filter:
                     return base_output
                 return True
 
-            comp_output = self.or_filter(update)
+            comp_output = self.or_filter.check_update(update)
             if comp_output:
                 if self.data_filter:
                     return comp_output
@@ -339,10 +354,10 @@ class MergedFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError('Cannot set name for MergedFilter')
+        raise RuntimeError('Cannot set name for combined filters.')
 
 
-class XORFilter(UpdateFilter):
+class _XORFilter(UpdateFilter):
     """Convenience filter acting as wrapper for :class:`MergedFilter` representing the an XOR gate
     for two filters.
 
@@ -355,12 +370,13 @@ class XORFilter(UpdateFilter):
     __slots__ = ('base_filter', 'xor_filter', 'merged_filter')
 
     def __init__(self, base_filter: BaseFilter, xor_filter: BaseFilter):
+        super().__init__()
         self.base_filter = base_filter
         self.xor_filter = xor_filter
         self.merged_filter = (base_filter & ~xor_filter) | (~base_filter & xor_filter)
 
     def filter(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        return self.merged_filter(update)
+        return self.merged_filter.check_update(update)
 
     @property
     def name(self) -> str:
@@ -368,1928 +384,1810 @@ class XORFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError('Cannot set name for XORFilter')
+        raise RuntimeError('Cannot set name for combined filters.')
 
 
-class _DiceEmoji(MessageFilter):
-    __slots__ = ('emoji',)
-
-    def __init__(self, emoji: str = None, name: str = None):
-        self.name = f'Filters.dice.{name}' if name else 'Filters.dice'
-        self.emoji = emoji
-
-    class _DiceValues(MessageFilter):
-        __slots__ = ('values', 'emoji')
-
-        def __init__(
-            self,
-            values: SLT[int],
-            name: str,
-            emoji: str = None,
-        ):
-            self.values = [values] if isinstance(values, int) else values
-            self.emoji = emoji
-            self.name = f'{name}({values})'
-
-        def filter(self, message: Message) -> bool:
-            if message.dice and message.dice.value in self.values:
-                if self.emoji:
-                    return message.dice.emoji == self.emoji
-                return True
-            return False
-
-    def __call__(  # type: ignore[override]
-        self, update: Union[Update, List[int], Tuple[int]]
-    ) -> Union[bool, '_DiceValues']:
-        if isinstance(update, Update):
-            return self.filter(update.effective_message)
-        return self._DiceValues(update, self.name, emoji=self.emoji)
+class _All(MessageFilter):
+    __slots__ = ()
 
     def filter(self, message: Message) -> bool:
-        if bool(message.dice):
-            if self.emoji:
-                return message.dice.emoji == self.emoji
-            return True
-        return False
+        return True
 
 
-class Filters:
-    """Predefined filters for use as the ``filter`` argument of
-    :class:`telegram.ext.MessageHandler`.
+ALL = _All(name="filters.ALL")
+"""All Messages."""
+
+
+class _Animation(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.animation)
+
+
+ANIMATION = _Animation(name="filters.ANIMATION")
+"""Messages that contain :attr:`telegram.Message.animation`."""
+
+
+class _Attachment(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.effective_attachment)
+
+
+ATTACHMENT = _Attachment(name="filters.ATTACHMENT")
+"""Messages that contain :meth:`telegram.Message.effective_attachment`.
+
+.. versionadded:: 13.6"""
+
+
+class _Audio(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.audio)
+
+
+AUDIO = _Audio(name="filters.AUDIO")
+"""Messages that contain :attr:`telegram.Message.audio`."""
+
+
+class Caption(MessageFilter):
+    """Messages with a caption. If a list of strings is passed, it filters messages to only
+    allow those whose caption is appearing in the given list.
 
     Examples:
-        Use ``MessageHandler(Filters.video, callback_method)`` to filter all video
-        messages. Use ``MessageHandler(Filters.contact, callback_method)`` for all contacts. etc.
+        ``MessageHandler(filters.Caption(['PTB rocks!', 'PTB'], callback_method_2)``
 
+    .. seealso::
+        :attr:`telegram.ext.filters.CAPTION`
+
+    Args:
+        strings (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which captions to allow. Only
+            exact matches are allowed. If not specified, will allow any message with a caption.
+    """
+
+    __slots__ = ('strings',)
+
+    def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
+        self.strings = strings
+        super().__init__(name=f'filters.Caption({strings})' if strings else 'filters.CAPTION')
+
+    def filter(self, message: Message) -> bool:
+        if self.strings is None:
+            return bool(message.caption)
+        return message.caption in self.strings if message.caption else False
+
+
+CAPTION = Caption()
+"""Shortcut for :class:`telegram.ext.filters.Caption()`.
+
+Examples:
+    To allow any caption, simply use ``MessageHandler(filters.CAPTION, callback_method)``.
+"""
+
+
+class CaptionEntity(MessageFilter):
+    """
+    Filters media messages to only allow those which have a :class:`telegram.MessageEntity`
+    where their :class:`~telegram.MessageEntity.type` matches `entity_type`.
+
+    Examples:
+        ``MessageHandler(filters.CaptionEntity("hashtag"), callback_method)``
+
+    Args:
+        entity_type (:obj:`str`): Caption Entity type to check for. All types can be found as
+            constants in :class:`telegram.MessageEntity`.
+
+    """
+
+    __slots__ = ('entity_type',)
+
+    def __init__(self, entity_type: str):
+        self.entity_type = entity_type
+        super().__init__(name=f'filters.CaptionEntity({self.entity_type})')
+
+    def filter(self, message: Message) -> bool:
+        return any(entity.type == self.entity_type for entity in message.caption_entities)
+
+
+class CaptionRegex(MessageFilter):
+    """
+    Filters updates by searching for an occurrence of ``pattern`` in the message caption.
+
+    This filter works similarly to :class:`Regex`, with the only exception being that
+    it applies to the message caption instead of the text.
+
+    Examples:
+        Use ``MessageHandler(filters.PHOTO & filters.CaptionRegex(r'help'), callback)``
+        to capture all photos with caption containing the word 'help'.
+
+    Note:
+        This filter will not work on simple text messages, but only on media with caption.
+
+    Args:
+        pattern (:obj:`str` | :obj:`re.Pattern`): The regex pattern.
+    """
+
+    __slots__ = ('pattern',)
+
+    def __init__(self, pattern: Union[str, Pattern]):
+        if isinstance(pattern, str):
+            pattern = re.compile(pattern)
+        self.pattern: Pattern = pattern
+        super().__init__(name=f'filters.CaptionRegex({self.pattern})', data_filter=True)
+
+    def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
+        if message.caption:
+            match = self.pattern.search(message.caption)
+            if match:
+                return {'matches': [match]}
+        return {}
+
+
+class _ChatUserBaseFilter(MessageFilter, ABC):
+    __slots__ = (
+        '_chat_id_name',
+        '_username_name',
+        'allow_empty',
+        '__lock',
+        '_chat_ids',
+        '_usernames',
+    )
+
+    def __init__(
+        self,
+        chat_id: SLT[int] = None,
+        username: SLT[str] = None,
+        allow_empty: bool = False,
+    ):
+        super().__init__()
+        self._chat_id_name = 'chat_id'
+        self._username_name = 'username'
+        self.allow_empty = allow_empty
+        self.__lock = Lock()
+
+        self._chat_ids: Set[int] = set()
+        self._usernames: Set[str] = set()
+
+        self._set_chat_ids(chat_id)
+        self._set_usernames(username)
+
+    @abstractmethod
+    def get_chat_or_user(self, message: Message) -> Union[TGChat, TGUser, None]:
+        ...
+
+    @staticmethod
+    def _parse_chat_id(chat_id: SLT[int]) -> Set[int]:
+        if chat_id is None:
+            return set()
+        if isinstance(chat_id, int):
+            return {chat_id}
+        return set(chat_id)
+
+    @staticmethod
+    def _parse_username(username: SLT[str]) -> Set[str]:
+        if username is None:
+            return set()
+        if isinstance(username, str):
+            return {username[1:] if username.startswith('@') else username}
+        return {chat[1:] if chat.startswith('@') else chat for chat in username}
+
+    def _set_chat_ids(self, chat_id: SLT[int]) -> None:
+        with self.__lock:
+            if chat_id and self._usernames:
+                raise RuntimeError(
+                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                    f"{self._username_name}s."
+                )
+            self._chat_ids = self._parse_chat_id(chat_id)
+
+    def _set_usernames(self, username: SLT[str]) -> None:
+        with self.__lock:
+            if username and self._chat_ids:
+                raise RuntimeError(
+                    f"Can't set {self._username_name} in conjunction with (already set) "
+                    f"{self._chat_id_name}s."
+                )
+            self._usernames = self._parse_username(username)
+
+    @property
+    def chat_ids(self) -> FrozenSet[int]:
+        with self.__lock:
+            return frozenset(self._chat_ids)
+
+    @chat_ids.setter
+    def chat_ids(self, chat_id: SLT[int]) -> None:
+        self._set_chat_ids(chat_id)
+
+    @property
+    def usernames(self) -> FrozenSet[str]:
+        """Which username(s) to allow through.
+
+        Warning:
+            :attr:`usernames` will give a *copy* of the saved usernames as :obj:`frozenset`. This
+            is to ensure thread safety. To add/remove a user, you should use :meth:`add_usernames`,
+            and :meth:`remove_usernames`. Only update the entire set by
+            ``filter.usernames = new_set``, if you are entirely sure that it is not causing race
+            conditions, as this will complete replace the current set of allowed users.
+
+        Returns:
+            frozenset(:obj:`str`)
+        """
+        with self.__lock:
+            return frozenset(self._usernames)
+
+    @usernames.setter
+    def usernames(self, username: SLT[str]) -> None:
+        self._set_usernames(username)
+
+    def add_usernames(self, username: SLT[str]) -> None:
+        """
+        Add one or more chats to the allowed usernames.
+
+        Args:
+            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
+                allow through. Leading ``'@'`` s in usernames will be discarded.
+        """
+        with self.__lock:
+            if self._chat_ids:
+                raise RuntimeError(
+                    f"Can't set {self._username_name} in conjunction with (already set) "
+                    f"{self._chat_id_name}s."
+                )
+
+            parsed_username = self._parse_username(username)
+            self._usernames |= parsed_username
+
+    def _add_chat_ids(self, chat_id: SLT[int]) -> None:
+        with self.__lock:
+            if self._usernames:
+                raise RuntimeError(
+                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                    f"{self._username_name}s."
+                )
+
+            parsed_chat_id = self._parse_chat_id(chat_id)
+
+            self._chat_ids |= parsed_chat_id
+
+    def remove_usernames(self, username: SLT[str]) -> None:
+        """
+        Remove one or more chats from allowed usernames.
+
+        Args:
+            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
+                disallow through. Leading ``'@'`` s in usernames will be discarded.
+        """
+        with self.__lock:
+            if self._chat_ids:
+                raise RuntimeError(
+                    f"Can't set {self._username_name} in conjunction with (already set) "
+                    f"{self._chat_id_name}s."
+                )
+
+            parsed_username = self._parse_username(username)
+            self._usernames -= parsed_username
+
+    def _remove_chat_ids(self, chat_id: SLT[int]) -> None:
+        with self.__lock:
+            if self._usernames:
+                raise RuntimeError(
+                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                    f"{self._username_name}s."
+                )
+            parsed_chat_id = self._parse_chat_id(chat_id)
+            self._chat_ids -= parsed_chat_id
+
+    def filter(self, message: Message) -> bool:
+        chat_or_user = self.get_chat_or_user(message)
+        if chat_or_user:
+            if self.chat_ids:
+                return chat_or_user.id in self.chat_ids
+            if self.usernames:
+                return bool(chat_or_user.username and chat_or_user.username in self.usernames)
+            return self.allow_empty
+        return False
+
+    @property
+    def name(self) -> str:
+        return (
+            f'filters.{self.__class__.__name__}('
+            f'{", ".join(str(s) for s in (self.usernames or self.chat_ids))})'
+        )
+
+    @name.setter
+    def name(self, name: str) -> NoReturn:
+        raise RuntimeError(f'Cannot set name for filters.{self.__class__.__name__}')
+
+
+class Chat(_ChatUserBaseFilter):
+    """Filters messages to allow only those which are from a specified chat ID or username.
+
+    Examples:
+        ``MessageHandler(filters.Chat(-1234), callback_method)``
+
+    Warning:
+        :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
+        is to ensure thread safety. To add/remove a chat, you should use :meth:`add_chat_ids`, and
+        :meth:`remove_chat_ids`. Only update the entire set by ``filter.chat_ids = new_set``,
+        if you are entirely sure that it is not causing race conditions, as this will complete
+        replace the current set of allowed chats.
+
+    Args:
+        chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+            Which chat ID(s) to allow through.
+        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+            Which username(s) to allow through.
+            Leading ``'@'`` s in usernames will be discarded.
+        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+            is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`.
+
+    Attributes:
+        chat_ids (set(:obj:`int`)): Which chat ID(s) to allow through.
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no chat
+            is specified in :attr:`chat_ids` and :attr:`usernames`.
+
+    Raises:
+        RuntimeError: If ``chat_id`` and ``username`` are both present.
     """
 
     __slots__ = ()
 
-    class _All(MessageFilter):
+    def get_chat_or_user(self, message: Message) -> Optional[TGChat]:
+        return message.chat
+
+    def add_chat_ids(self, chat_id: SLT[int]) -> None:
+        """
+        Add one or more chats to the allowed chat ids.
+
+        Args:
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat ID(s) to allow
+                through.
+        """
+        return super()._add_chat_ids(chat_id)
+
+    def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+        """
+        Remove one or more chats from allowed chat ids.
+
+        Args:
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat ID(s) to
+                disallow through.
+        """
+        return super()._remove_chat_ids(chat_id)
+
+
+class _Chat(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.chat)
+
+
+CHAT = _Chat(name="filters.CHAT")
+"""This filter filters *any* message that has a :attr:`telegram.Message.chat`."""
+
+
+class ChatType:  # A convenience namespace for Chat types.
+    """Subset for filtering the type of chat.
+
+    Examples:
+        Use these filters like: ``filters.ChatType.CHANNEL`` or
+        ``filters.ChatType.SUPERGROUP`` etc.
+
+    Note:
+        ``filters.ChatType`` itself is *not* a filter, but just a convenience namespace.
+    """
+
+    __slots__ = ()
+
+    class _Channel(MessageFilter):
         __slots__ = ()
-        name = 'Filters.all'
 
         def filter(self, message: Message) -> bool:
-            return True
+            return message.chat.type == TGChat.CHANNEL
 
-    all = _All()
-    """All Messages."""
+    CHANNEL = _Channel(name="filters.ChatType.CHANNEL")
+    """Updates from channel."""
 
-    class _Text(MessageFilter):
+    class _Group(MessageFilter):
         __slots__ = ()
-        name = 'Filters.text'
 
-        class _TextStrings(MessageFilter):
-            __slots__ = ('strings',)
+        def filter(self, message: Message) -> bool:
+            return message.chat.type == TGChat.GROUP
 
-            def __init__(self, strings: Union[List[str], Tuple[str]]):
-                self.strings = strings
-                self.name = f'Filters.text({strings})'
+    GROUP = _Group(name="filters.ChatType.GROUP")
+    """Updates from group."""
 
-            def filter(self, message: Message) -> bool:
-                if message.text:
-                    return message.text in self.strings
+    class _Groups(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return message.chat.type in [TGChat.GROUP, TGChat.SUPERGROUP]
+
+    GROUPS = _Groups(name="filters.ChatType.GROUPS")
+    """Update from group *or* supergroup."""
+
+    class _Private(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return message.chat.type == TGChat.PRIVATE
+
+    PRIVATE = _Private(name="filters.ChatType.PRIVATE")
+    """Update from private chats."""
+
+    class _SuperGroup(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return message.chat.type == TGChat.SUPERGROUP
+
+    SUPERGROUP = _SuperGroup(name="filters.ChatType.SUPERGROUP")
+    """Updates from supergroup."""
+
+
+class Command(MessageFilter):
+    """
+    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
+    messages `starting` with a bot command. Pass :obj:`False` to also allow messages that contain a
+    bot command `anywhere` in the text.
+
+    Examples:
+        ``MessageHandler(filters.Command(False), command_anywhere_callback)``
+
+    .. seealso::
+        :attr:`telegram.ext.filters.COMMAND`.
+
+    Note:
+        :attr:`telegram.ext.filters.TEXT` also accepts messages containing a command.
+
+    Args:
+        only_start (:obj:`bool`, optional): Whether to only allow messages that `start` with a bot
+            command. Defaults to :obj:`True`.
+    """
+
+    __slots__ = ('only_start',)
+
+    def __init__(self, only_start: bool = True):
+        self.only_start = only_start
+        super().__init__(f'filters.Command({only_start})' if not only_start else 'filters.COMMAND')
+
+    def filter(self, message: Message) -> bool:
+        if not message.entities:
+            return False
+
+        first = message.entities[0]
+
+        if self.only_start:
+            return bool(first.type == MessageEntity.BOT_COMMAND and first.offset == 0)
+        return bool(any(e.type == MessageEntity.BOT_COMMAND for e in message.entities))
+
+
+COMMAND = Command()
+"""Shortcut for :class:`telegram.ext.filters.Command()`.
+
+Examples:
+    To allow messages starting with a command use
+    ``MessageHandler(filters.COMMAND, command_at_start_callback)``.
+"""
+
+
+class _Contact(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.contact)
+
+
+CONTACT = _Contact(name="filters.CONTACT")
+"""Messages that contain :attr:`telegram.Message.contact`."""
+
+
+class _Dice(MessageFilter):
+    __slots__ = ('emoji', 'values')
+
+    def __init__(self, values: SLT[int] = None, emoji: DiceEmojiEnum = None):
+        super().__init__()
+        self.emoji = emoji
+        self.values = [values] if isinstance(values, int) else values
+
+        if emoji:  # for filters.Dice.BASKETBALL
+            self.name = f"filters.Dice.{emoji.name}"
+            if self.values and emoji:  # for filters.Dice.Dice(4)  SLOT_MACHINE -> SlotMachine
+                self.name = f"filters.Dice.{emoji.name.title().replace('_', '')}({self.values})"
+        elif values:  # for filters.Dice(4)
+            self.name = f"filters.Dice({self.values})"
+        else:
+            self.name = "filters.Dice.ALL"
+
+    def filter(self, message: Message) -> bool:
+        if not message.dice:  # no dice
+            return False
+
+        if self.emoji:
+            emoji_match = message.dice.emoji == self.emoji
+            if self.values:
+                return message.dice.value in self.values and emoji_match  # emoji and value
+            return emoji_match  # emoji, no value
+        return message.dice.value in self.values if self.values else True  # no emoji, only value
+
+
+class Dice(_Dice):
+    """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
+    allow those whose dice value is appearing in the given list.
+
+    .. versionadded:: 13.4
+
+    Examples:
+        To allow any dice message, simply use
+        ``MessageHandler(filters.Dice.ALL, callback_method)``.
+
+        To allow any dice message, but with value 3 `or` 4, use
+        ``MessageHandler(filters.Dice([3, 4]), callback_method)``
+
+        To allow only dice messages with the emoji 🎲, but any value, use
+        ``MessageHandler(filters.Dice.DICE, callback_method)``.
+
+        To allow only dice messages with the emoji 🎯 and with value 6, use
+        ``MessageHandler(filters.Dice.Darts(6), callback_method)``.
+
+        To allow only dice messages with the emoji ⚽ and with value 5 `or` 6, use
+        ``MessageHandler(filters.Dice.Football([5, 6]), callback_method)``.
+
+    Note:
+        Dice messages don't have text. If you want to filter either text or dice messages, use
+        ``filters.TEXT | filters.Dice.ALL``.
+
+    Args:
+        values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+            Which values to allow. If not specified, will allow the specified dice message.
+    """
+
+    __slots__ = ()
+
+    ALL = _Dice()
+    """Dice messages with any value and any emoji."""
+
+    class Basketball(_Dice):
+        """Dice messages with the emoji 🏀. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.BASKETBALL)
+
+    BASKETBALL = _Dice(emoji=DiceEmojiEnum.BASKETBALL)
+    """Dice messages with the emoji 🏀. Matches any dice value."""
+
+    class Bowling(_Dice):
+        """Dice messages with the emoji 🎳. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.BOWLING)
+
+    BOWLING = _Dice(emoji=DiceEmojiEnum.BOWLING)
+    """Dice messages with the emoji 🎳. Matches any dice value."""
+
+    class Darts(_Dice):
+        """Dice messages with the emoji 🎯. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.DARTS)
+
+    DARTS = _Dice(emoji=DiceEmojiEnum.DARTS)
+    """Dice messages with the emoji 🎯. Matches any dice value."""
+
+    class Dice(_Dice):
+        """Dice messages with the emoji 🎲. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.DICE)
+
+    DICE = _Dice(emoji=DiceEmojiEnum.DICE)  # skipcq: PTC-W0052
+    """Dice messages with the emoji 🎲. Matches any dice value."""
+
+    class Football(_Dice):
+        """Dice messages with the emoji ⚽. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.FOOTBALL)
+
+    FOOTBALL = _Dice(emoji=DiceEmojiEnum.FOOTBALL)
+    """Dice messages with the emoji ⚽. Matches any dice value."""
+
+    class SlotMachine(_Dice):
+        """Dice messages with the emoji 🎰. Supports passing a list of integers.
+
+        Args:
+            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+        """
+
+        __slots__ = ()
+
+        def __init__(self, values: SLT[int]):
+            super().__init__(values, emoji=DiceEmojiEnum.SLOT_MACHINE)
+
+    SLOT_MACHINE = _Dice(emoji=DiceEmojiEnum.SLOT_MACHINE)
+    """Dice messages with the emoji 🎰. Matches any dice value."""
+
+
+class Document(MessageFilter):
+    """
+    Subset for messages containing a document/file.
+
+    Examples:
+        Use these filters like: ``filters.Document.MP3``,
+        ``filters.Document.MimeType("text/plain")`` etc. Or use just ``filters.DOCUMENT`` for all
+        document messages.
+    """
+
+    __slots__ = ()
+
+    class Category(MessageFilter):
+        """Filters documents by their category in the mime-type attribute.
+
+        Args:
+            category (:obj:`str`): Category of the media you want to filter.
+
+        Example:
+            ``filters.Document.Category('audio/')`` returns :obj:`True` for all types
+            of audio sent as a file, for example ``'audio/mpeg'`` or ``'audio/x-wav'``.
+
+        Note:
+            This Filter only filters by the mime_type of the document, it doesn't check the
+            validity of the document. The user can manipulate the mime-type of a message and
+            send media with wrong types that don't fit to this handler.
+        """
+
+        __slots__ = ('_category',)
+
+        def __init__(self, category: str):
+            self._category = category
+            super().__init__(name=f"filters.Document.Category('{self._category}')")
+
+        def filter(self, message: Message) -> bool:
+            if message.document:
+                return message.document.mime_type.startswith(self._category)
+            return False
+
+    APPLICATION = Category('application/')
+    """Use as ``filters.Document.APPLICATION``."""
+    AUDIO = Category('audio/')
+    """Use as ``filters.Document.AUDIO``."""
+    IMAGE = Category('image/')
+    """Use as ``filters.Document.IMAGE``."""
+    VIDEO = Category('video/')
+    """Use as ``filters.Document.VIDEO``."""
+    TEXT = Category('text/')
+    """Use as ``filters.Document.TEXT``."""
+
+    class FileExtension(MessageFilter):
+        """This filter filters documents by their file ending/extension.
+
+        Args:
+            file_extension (:obj:`str` | :obj:`None`): Media file extension you want to filter.
+            case_sensitive (:obj:`bool`, optional): Pass :obj:`True` to make the filter case
+                sensitive. Default: :obj:`False`.
+
+        Example:
+            * ``filters.Document.FileExtension("jpg")``
+              filters files with extension ``".jpg"``.
+            * ``filters.Document.FileExtension(".jpg")``
+              filters files with extension ``"..jpg"``.
+            * ``filters.Document.FileExtension("Dockerfile", case_sensitive=True)``
+              filters files with extension ``".Dockerfile"`` minding the case.
+            * ``filters.Document.FileExtension(None)``
+              filters files without a dot in the filename.
+
+        Note:
+            * This Filter only filters by the file ending/extension of the document,
+              it doesn't check the validity of document.
+            * The user can manipulate the file extension of a document and
+              send media with wrong types that don't fit to this handler.
+            * Case insensitive by default,
+              you may change this with the flag ``case_sensitive=True``.
+            * Extension should be passed without leading dot
+              unless it's a part of the extension.
+            * Pass :obj:`None` to filter files with no extension,
+              i.e. without a dot in the filename.
+        """
+
+        __slots__ = ('_file_extension', 'is_case_sensitive')
+
+        def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
+            super().__init__()
+            self.is_case_sensitive = case_sensitive
+            if file_extension is None:
+                self._file_extension = None
+                self.name = "filters.Document.FileExtension(None)"
+            elif self.is_case_sensitive:
+                self._file_extension = f".{file_extension}"
+                self.name = (
+                    f"filters.Document.FileExtension({file_extension!r}, case_sensitive=True)"
+                )
+            else:
+                self._file_extension = f".{file_extension}".lower()
+                self.name = f"filters.Document.FileExtension({file_extension.lower()!r})"
+
+        def filter(self, message: Message) -> bool:
+            if message.document is None:
                 return False
+            if self._file_extension is None:
+                return "." not in message.document.file_name
+            if self.is_case_sensitive:
+                filename = message.document.file_name
+            else:
+                filename = message.document.file_name.lower()
+            return filename.endswith(self._file_extension)
 
-        def __call__(  # type: ignore[override]
-            self, update: Union[Update, List[str], Tuple[str]]
-        ) -> Union[bool, '_TextStrings']:
-            if isinstance(update, Update):
-                return self.filter(update.effective_message)
-            return self._TextStrings(update)
+    class MimeType(MessageFilter):
+        """This Filter filters documents by their mime-type attribute.
+
+        Args:
+            mimetype (:obj:`str`): The mimetype to filter.
+
+        Example:
+            ``filters.Document.MimeType('audio/mpeg')`` filters all audio in `.mp3` format.
+
+        Note:
+            This Filter only filters by the mime_type of the document, it doesn't check the
+            validity of document. The user can manipulate the mime-type of a message and
+            send media with wrong types that don't fit to this handler.
+        """
+
+        __slots__ = ('mimetype',)
+
+        def __init__(self, mimetype: str):
+            self.mimetype = mimetype  # skipcq: PTC-W0052
+            super().__init__(name=f"filters.Document.MimeType('{self.mimetype}')")
 
         def filter(self, message: Message) -> bool:
-            return bool(message.text)
+            if message.document:
+                return message.document.mime_type == self.mimetype
+            return False
 
-    text = _Text()
+    APK = MimeType('application/vnd.android.package-archive')
+    """Use as ``filters.Document.APK``."""
+    DOC = MimeType(mimetypes.types_map.get('.doc'))
+    """Use as ``filters.Document.DOC``."""
+    DOCX = MimeType('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    """Use as ``filters.Document.DOCX``."""
+    EXE = MimeType(mimetypes.types_map.get('.exe'))
+    """Use as ``filters.Document.EXE``."""
+    MP4 = MimeType(mimetypes.types_map.get('.mp4'))
+    """Use as ``filters.Document.MP4``."""
+    GIF = MimeType(mimetypes.types_map.get('.gif'))
+    """Use as ``filters.Document.GIF``."""
+    JPG = MimeType(mimetypes.types_map.get('.jpg'))
+    """Use as ``filters.Document.JPG``."""
+    MP3 = MimeType(mimetypes.types_map.get('.mp3'))
+    """Use as ``filters.Document.MP3``."""
+    PDF = MimeType(mimetypes.types_map.get('.pdf'))
+    """Use as ``filters.Document.PDF``."""
+    PY = MimeType(mimetypes.types_map.get('.py'))
+    """Use as ``filters.Document.PY``."""
+    SVG = MimeType(mimetypes.types_map.get('.svg'))
+    """Use as ``filters.Document.SVG``."""
+    TXT = MimeType(mimetypes.types_map.get('.txt'))
+    """Use as ``filters.Document.TXT``."""
+    TARGZ = MimeType('application/x-compressed-tar')
+    """Use as ``filters.Document.TARGZ``."""
+    WAV = MimeType(mimetypes.types_map.get('.wav'))
+    """Use as ``filters.Document.WAV``."""
+    XML = MimeType(mimetypes.types_map.get('.xml'))
+    """Use as ``filters.Document.XML``."""
+    ZIP = MimeType(mimetypes.types_map.get('.zip'))
+    """Use as ``filters.Document.ZIP``."""
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.document)
+
+
+DOCUMENT = Document(name="filters.DOCUMENT")
+"""Shortcut for :class:`telegram.ext.filters.Document()`."""
+
+
+class Entity(MessageFilter):
+    """
+    Filters messages to only allow those which have a :class:`telegram.MessageEntity`
+    where their :class:`~telegram.MessageEntity.type` matches `entity_type`.
+
+    Examples:
+        ``MessageHandler(filters.Entity("hashtag"), callback_method)``
+
+    Args:
+        entity_type (:obj:`str`): Entity type to check for. All types can be found as constants
+            in :class:`telegram.MessageEntity`.
+
+    """
+
+    __slots__ = ('entity_type',)
+
+    def __init__(self, entity_type: str):
+        self.entity_type = entity_type
+        super().__init__(name=f'filters.Entity({self.entity_type})')
+
+    def filter(self, message: Message) -> bool:
+        return any(entity.type == self.entity_type for entity in message.entities)
+
+
+class _Forwarded(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.forward_date)
+
+
+FORWARDED = _Forwarded(name="filters.FORWARDED")
+"""Messages that contain :attr:`telegram.Message.forward_date`."""
+
+
+class ForwardedFrom(_ChatUserBaseFilter):
+    """Filters messages to allow only those which are forwarded from the specified chat ID(s)
+    or username(s) based on :attr:`telegram.Message.forward_from` and
+    :attr:`telegram.Message.forward_from_chat`.
+
+    .. versionadded:: 13.5
+
+    Examples:
+        ``MessageHandler(filters.ForwardedFrom(chat_id=1234), callback_method)``
+
+    Note:
+        When a user has disallowed adding a link to their account while forwarding their
+        messages, this filter will *not* work since both
+        :attr:`telegram.Message.forwarded_from` and
+        :attr:`telegram.Message.forwarded_from_chat` are :obj:`None`. However, this behaviour
+        is undocumented and might be changed by Telegram.
+
+    Warning:
+        :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
+        is to ensure thread safety. To add/remove a chat, you should use :meth:`add_chat_ids`, and
+        :meth:`remove_chat_ids`. Only update the entire set by ``filter.chat_ids = new_set``, if
+        you are entirely sure that it is not causing race conditions, as this will complete replace
+        the current set of allowed chats.
+
+    Args:
+        chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+            Which chat/user ID(s) to allow through.
+        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+            Which username(s) to allow through. Leading ``'@'`` s in usernames will be
+            discarded.
+        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
+            is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`.
+
+    Attributes:
+        chat_ids (set(:obj:`int`)): Which chat/user ID(s) to allow through.
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no chat
+            is specified in :attr:`chat_ids` and :attr:`usernames`.
+
+    Raises:
+        RuntimeError: If both ``chat_id`` and ``username`` are present.
+    """
+
+    __slots__ = ()
+
+    def get_chat_or_user(self, message: Message) -> Union[TGUser, TGChat, None]:
+        return message.forward_from or message.forward_from_chat
+
+    def add_chat_ids(self, chat_id: SLT[int]) -> None:
+        """
+        Add one or more chats to the allowed chat ids.
+
+        Args:
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat/user ID(s) to
+                allow through.
+        """
+        return super()._add_chat_ids(chat_id)
+
+    def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+        """
+        Remove one or more chats from allowed chat ids.
+
+        Args:
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat/user ID(s) to
+                disallow through.
+        """
+        return super()._remove_chat_ids(chat_id)
+
+
+class _Game(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.game)
+
+
+GAME = _Game(name="filters.GAME")
+"""Messages that contain :attr:`telegram.Message.game`."""
+
+
+class _HasProtectedContent(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.has_protected_content)
+
+
+HAS_PROTECTED_CONTENT = _HasProtectedContent(name='Filters.has_protected_content')
+"""Messages that contain :attr:`telegram.Message.has_protected_content`.
+
+    .. versionadded:: 13.9
+"""
+
+
+class _Invoice(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.invoice)
+
+
+INVOICE = _Invoice(name="filters.INVOICE")
+"""Messages that contain :attr:`telegram.Message.invoice`."""
+
+
+class _IsAutomaticForward(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.is_automatic_forward)
+
+
+IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name='Filters.is_automatic_forward')
+"""Messages that contain :attr:`telegram.Message.is_automatic_forward`.
+
+    .. versionadded:: 13.9
+"""
+
+
+class Language(MessageFilter):
+    """Filters messages to only allow those which are from users with a certain language code.
+
+    Note:
+        According to official Telegram Bot API documentation, not every single user has the
+        `language_code` attribute. Do not count on this filter working on all users.
+
+    Examples:
+        ``MessageHandler(filters.Language("en"), callback_method)``
+
+    Args:
+        lang (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
+            Which language code(s) to allow through.
+            This will be matched using :obj:`str.startswith` meaning that
+            'en' will match both 'en_US' and 'en_GB'.
+
+    """
+
+    __slots__ = ('lang',)
+
+    def __init__(self, lang: SLT[str]):
+        if isinstance(lang, str):
+            lang = cast(str, lang)
+            self.lang = [lang]
+        else:
+            lang = cast(List[str], lang)
+            self.lang = lang
+        super().__init__(name=f"filters.Language({self.lang})")
+
+    def filter(self, message: Message) -> bool:
+        return bool(
+            message.from_user.language_code
+            and any(message.from_user.language_code.startswith(x) for x in self.lang)
+        )
+
+
+class _Location(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.location)
+
+
+LOCATION = _Location(name="filters.LOCATION")
+"""Messages that contain :attr:`telegram.Message.location`."""
+
+
+class _PassportData(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.passport_data)
+
+
+PASSPORT_DATA = _PassportData(name="filters.PASSPORT_DATA")
+"""Messages that contain :attr:`telegram.Message.passport_data`."""
+
+
+class _Photo(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.photo)
+
+
+PHOTO = _Photo("filters.PHOTO")
+"""Messages that contain :attr:`telegram.Message.photo`."""
+
+
+class _Poll(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.poll)
+
+
+POLL = _Poll(name="filters.POLL")
+"""Messages that contain :attr:`telegram.Message.poll`."""
+
+
+class Regex(MessageFilter):
+    """
+    Filters updates by searching for an occurrence of ``pattern`` in the message text.
+    The :obj:`re.search()` function is used to determine whether an update should be filtered.
+
+    Refer to the documentation of the :obj:`re` module for more information.
+
+    To get the groups and groupdict matched, see :attr:`telegram.ext.CallbackContext.matches`.
+
+    Examples:
+        Use ``MessageHandler(filters.Regex(r'help'), callback)`` to capture all messages that
+        contain the word 'help'. You can also use
+        ``MessageHandler(filters.Regex(re.compile(r'help', re.IGNORECASE)), callback)`` if
+        you want your pattern to be case insensitive. This approach is recommended
+        if you need to specify flags on your pattern.
+
+    Note:
+        Filters use the same short circuiting logic as python's `and`, `or` and `not`.
+        This means that for example:
+
+            >>> filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
+
+        With a :attr:`telegram.Message.text` of `x`, will only ever return the matches for the
+        first filter, since the second one is never evaluated.
+
+    Args:
+        pattern (:obj:`str` | :obj:`re.Pattern`): The regex pattern.
+    """
+
+    __slots__ = ('pattern',)
+
+    def __init__(self, pattern: Union[str, Pattern]):
+        if isinstance(pattern, str):
+            pattern = re.compile(pattern)
+        self.pattern: Pattern = pattern
+        super().__init__(name=f'filters.Regex({self.pattern})', data_filter=True)
+
+    def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
+        if message.text:
+            match = self.pattern.search(message.text)
+            if match:
+                return {'matches': [match]}
+        return {}
+
+
+class _Reply(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.reply_to_message)
+
+
+REPLY = _Reply(name="filters.REPLY")
+"""Messages that contain :attr:`telegram.Message.reply_to_message`."""
+
+
+class _SenderChat(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.sender_chat)
+
+
+class SenderChat(_ChatUserBaseFilter):
+    """Filters messages to allow only those which are from a specified sender chat's chat ID or
+    username.
+
+    Examples:
+        * To filter for messages sent to a group by a channel with ID
+          ``-1234``, use ``MessageHandler(filters.SenderChat(-1234), callback_method)``.
+        * To filter for messages of anonymous admins in a super group with username
+          ``@anonymous``, use
+          ``MessageHandler(filters.SenderChat(username='anonymous'), callback_method)``.
+        * To filter for messages sent to a group by *any* channel, use
+          ``MessageHandler(filters.SenderChat.CHANNEL, callback_method)``.
+        * To filter for messages of anonymous admins in *any* super group, use
+          ``MessageHandler(filters.SenderChat.SUPERGROUP, callback_method)``.
+        * To filter for messages forwarded to a discussion group from *any* channel or of anonymous
+          admins in *any* super group, use ``MessageHandler(filters.SenderChat.ALL, callback)``
+
+    Note:
+        Remember, ``sender_chat`` is also set for messages in a channel as the channel itself,
+        so when your bot is an admin in a channel and the linked discussion group, you would
+        receive the message twice (once from inside the channel, once inside the discussion
+        group). Since v13.9, the field :attr:`telegram.Message.is_automatic_forward` will be
+            :obj:`True` for the discussion group message.
+
+            .. seealso:: :attr:`Filters.is_automatic_forward`
+
+    Warning:
+        :attr:`chat_ids` will return a *copy* of the saved chat ids as :obj:`frozenset`. This
+        is to ensure thread safety. To add/remove a chat, you should use :meth:`add_chat_ids`, and
+        :meth:`remove_chat_ids`. Only update the entire set by ``filter.chat_ids = new_set``, if
+        you are entirely sure that it is not causing race conditions, as this will complete replace
+        the current set of allowed chats.
+
+    Args:
+        chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+            Which sender chat chat ID(s) to allow through.
+        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+            Which sender chat username(s) to allow through.
+            Leading ``'@'`` s in usernames will be discarded.
+        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
+            chat is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`.
+
+    Attributes:
+        chat_ids (set(:obj:`int`)): Which sender chat chat ID(s) to allow through.
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no sender chat is
+            specified in :attr:`chat_ids` and :attr:`usernames`.
+
+    Raises:
+        RuntimeError: If both ``chat_id`` and ``username`` are present.
+    """
+
+    __slots__ = ()
+
+    class _CHANNEL(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            if message.sender_chat:
+                return message.sender_chat.type == TGChat.CHANNEL
+            return False
+
+    class _SUPERGROUP(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            if message.sender_chat:
+                return message.sender_chat.type == TGChat.SUPERGROUP
+            return False
+
+    ALL = _SenderChat(name="filters.SenderChat.ALL")
+    """All messages with a :attr:`telegram.Message.sender_chat`."""
+    SUPER_GROUP = _SUPERGROUP(name="filters.SenderChat.SUPER_GROUP")
+    """Messages whose sender chat is a super group."""
+    CHANNEL = _CHANNEL(name="filters.SenderChat.CHANNEL")
+    """Messages whose sender chat is a channel."""
+
+    def add_chat_ids(self, chat_id: SLT[int]) -> None:
+        """
+        Add one or more sender chats to the allowed chat ids.
+
+        Args:
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which sender chat ID(s) to
+                allow through.
+        """
+        return super()._add_chat_ids(chat_id)
+
+    def get_chat_or_user(self, message: Message) -> Optional[TGChat]:
+        return message.sender_chat
+
+    def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+        """
+        Remove one or more sender chats from allowed chat ids.
+
+        Args:
+            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which sender chat ID(s) to
+                disallow through.
+        """
+        return super()._remove_chat_ids(chat_id)
+
+
+class StatusUpdate:
+    """Subset for messages containing a status update.
+
+    Examples:
+        Use these filters like: ``filters.StatusUpdate.NEW_CHAT_MEMBERS`` etc. Or use just
+        ``filters.StatusUpdate.ALL`` for all status update messages.
+
+    Note:
+        ``filters.StatusUpdate`` itself is *not* a filter, but just a convenience namespace.
+    """
+
+    __slots__ = ()
+
+    class _All(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return bool(
+                StatusUpdate.NEW_CHAT_MEMBERS.check_update(update)
+                or StatusUpdate.LEFT_CHAT_MEMBER.check_update(update)
+                or StatusUpdate.NEW_CHAT_TITLE.check_update(update)
+                or StatusUpdate.NEW_CHAT_PHOTO.check_update(update)
+                or StatusUpdate.DELETE_CHAT_PHOTO.check_update(update)
+                or StatusUpdate.CHAT_CREATED.check_update(update)
+                or StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED.check_update(update)
+                or StatusUpdate.MIGRATE.check_update(update)
+                or StatusUpdate.PINNED_MESSAGE.check_update(update)
+                or StatusUpdate.CONNECTED_WEBSITE.check_update(update)
+                or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
+                or StatusUpdate.VOICE_CHAT_SCHEDULED.check_update(update)
+                or StatusUpdate.VOICE_CHAT_STARTED.check_update(update)
+                or StatusUpdate.VOICE_CHAT_ENDED.check_update(update)
+                or StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED.check_update(update)
+            )
+
+    ALL = _All(name="filters.StatusUpdate.ALL")
+    """Messages that contain any of the below."""
+
+    class _ChatCreated(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(
+                message.group_chat_created
+                or message.supergroup_chat_created
+                or message.channel_chat_created
+            )
+
+    CHAT_CREATED = _ChatCreated(name="filters.StatusUpdate.CHAT_CREATED")
+    """Messages that contain :attr:`telegram.Message.group_chat_created`,
+        :attr:`telegram.Message.supergroup_chat_created` or
+        :attr:`telegram.Message.channel_chat_created`."""
+
+    class _ConnectedWebsite(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.connected_website)
+
+    CONNECTED_WEBSITE = _ConnectedWebsite(name="filters.StatusUpdate.CONNECTED_WEBSITE")
+    """Messages that contain :attr:`telegram.Message.connected_website`."""
+
+    class _DeleteChatPhoto(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.delete_chat_photo)
+
+    DELETE_CHAT_PHOTO = _DeleteChatPhoto(name="filters.StatusUpdate.DELETE_CHAT_PHOTO")
+    """Messages that contain :attr:`telegram.Message.delete_chat_photo`."""
+
+    class _LeftChatMember(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.left_chat_member)
+
+    LEFT_CHAT_MEMBER = _LeftChatMember(name="filters.StatusUpdate.LEFT_CHAT_MEMBER")
+    """Messages that contain :attr:`telegram.Message.left_chat_member`."""
+
+    class _MessageAutoDeleteTimerChanged(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.message_auto_delete_timer_changed)
+
+    MESSAGE_AUTO_DELETE_TIMER_CHANGED = _MessageAutoDeleteTimerChanged(
+        "filters.StatusUpdate.MESSAGE_AUTO_DELETE_TIMER_CHANGED"
+    )
+    """Messages that contain :attr:`telegram.Message.message_auto_delete_timer_changed`
+
+    .. versionadded:: 13.4
+    """
+
+    class _Migrate(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.migrate_from_chat_id or message.migrate_to_chat_id)
+
+    MIGRATE = _Migrate(name="filters.StatusUpdate.MIGRATE")
+    """Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
+        :attr:`telegram.Message.migrate_to_chat_id`."""
+
+    class _NewChatMembers(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.new_chat_members)
+
+    NEW_CHAT_MEMBERS = _NewChatMembers(name="filters.StatusUpdate.NEW_CHAT_MEMBERS")
+    """Messages that contain :attr:`telegram.Message.new_chat_members`."""
+
+    class _NewChatPhoto(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.new_chat_photo)
+
+    NEW_CHAT_PHOTO = _NewChatPhoto(name="filters.StatusUpdate.NEW_CHAT_PHOTO")
+    """Messages that contain :attr:`telegram.Message.new_chat_photo`."""
+
+    class _NewChatTitle(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.new_chat_title)
+
+    NEW_CHAT_TITLE = _NewChatTitle(name="filters.StatusUpdate.NEW_CHAT_TITLE")
+    """Messages that contain :attr:`telegram.Message.new_chat_title`."""
+
+    class _PinnedMessage(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.pinned_message)
+
+    PINNED_MESSAGE = _PinnedMessage(name="filters.StatusUpdate.PINNED_MESSAGE")
+    """Messages that contain :attr:`telegram.Message.pinned_message`."""
+
+    class _ProximityAlertTriggered(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.proximity_alert_triggered)
+
+    PROXIMITY_ALERT_TRIGGERED = _ProximityAlertTriggered(
+        "filters.StatusUpdate.PROXIMITY_ALERT_TRIGGERED"
+    )
+    """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
+
+    class _VoiceChatEnded(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.voice_chat_ended)
+
+    VOICE_CHAT_ENDED = _VoiceChatEnded(name="filters.StatusUpdate.VOICE_CHAT_ENDED")
+    """Messages that contain :attr:`telegram.Message.voice_chat_ended`.
+
+    .. versionadded:: 13.4
+    """
+
+    class _VoiceChatScheduled(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.voice_chat_scheduled)
+
+    VOICE_CHAT_SCHEDULED = _VoiceChatScheduled(name="filters.StatusUpdate.VOICE_CHAT_SCHEDULED")
+    """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`.
+
+    .. versionadded:: 13.5
+    """
+
+    class _VoiceChatStarted(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.voice_chat_started)
+
+    VOICE_CHAT_STARTED = _VoiceChatStarted(name="filters.StatusUpdate.VOICE_CHAT_STARTED")
+    """Messages that contain :attr:`telegram.Message.voice_chat_started`.
+
+    .. versionadded:: 13.4
+    """
+
+    class _VoiceChatParticipantsInvited(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.voice_chat_participants_invited)
+
+    VOICE_CHAT_PARTICIPANTS_INVITED = _VoiceChatParticipantsInvited(
+        "filters.StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED"
+    )
+    """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`.
+
+    .. versionadded:: 13.4
+    """
+
+
+class _Sticker(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.sticker)
+
+
+STICKER = _Sticker(name="filters.STICKER")
+"""Messages that contain :attr:`telegram.Message.sticker`."""
+
+
+class _SuccessfulPayment(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.successful_payment)
+
+
+SUCCESSFUL_PAYMENT = _SuccessfulPayment(name="filters.SUCCESSFUL_PAYMENT")
+"""Messages that contain :attr:`telegram.Message.successful_payment`."""
+
+
+class Text(MessageFilter):
     """Text Messages. If a list of strings is passed, it filters messages to only allow those
     whose text is appearing in the given list.
 
     Examples:
-        To allow any text message, simply use
-        ``MessageHandler(Filters.text, callback_method)``.
-
         A simple use case for passing a list is to allow only messages that were sent by a
         custom :class:`telegram.ReplyKeyboardMarkup`::
 
             buttons = ['Start', 'Settings', 'Back']
             markup = ReplyKeyboardMarkup.from_column(buttons)
             ...
-            MessageHandler(Filters.text(buttons), callback_method)
+            MessageHandler(filters.Text(buttons), callback_method)
+
+    .. seealso::
+        :attr:`telegram.ext.filters.TEXT`
+
 
     Note:
         * Dice messages don't have text. If you want to filter either text or dice messages, use
-          ``Filters.text | Filters.dice``.
+          ``filters.TEXT | filters.Dice.ALL``.
         * Messages containing a command are accepted by this filter. Use
-          ``Filters.text & (~Filters.command)``, if you want to filter only text messages without
+          ``filters.TEXT & (~filters.COMMAND)``, if you want to filter only text messages without
           commands.
 
     Args:
-        update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
+        strings (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which messages to allow. Only
             exact matches are allowed. If not specified, will allow any text message.
     """
 
-    class _Caption(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.caption'
+    __slots__ = ('strings',)
 
-        class _CaptionStrings(MessageFilter):
-            __slots__ = ('strings',)
+    def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
+        self.strings = strings
+        super().__init__(name=f'filters.Text({strings})' if strings else 'filters.TEXT')
 
-            def __init__(self, strings: Union[List[str], Tuple[str]]):
-                self.strings = strings
-                self.name = f'Filters.caption({strings})'
+    def filter(self, message: Message) -> bool:
+        if self.strings is None:
+            return bool(message.text)
+        return message.text in self.strings if message.text else False
 
-            def filter(self, message: Message) -> bool:
-                if message.caption:
-                    return message.caption in self.strings
-                return False
 
-        def __call__(  # type: ignore[override]
-            self, update: Union[Update, List[str], Tuple[str]]
-        ) -> Union[bool, '_CaptionStrings']:
-            if isinstance(update, Update):
-                return self.filter(update.effective_message)
-            return self._CaptionStrings(update)
+TEXT = Text()
+"""
+Shortcut for :class:`telegram.ext.filters.Text()`.
 
-        def filter(self, message: Message) -> bool:
-            return bool(message.caption)
+Examples:
+    To allow any text message, simply use ``MessageHandler(filters.TEXT, callback_method)``.
+"""
 
-    caption = _Caption()
-    """Messages with a caption. If a list of strings is passed, it filters messages to only
-    allow those whose caption is appearing in the given list.
+
+class UpdateType:
+    """
+    Subset for filtering the type of update.
 
     Examples:
-        ``MessageHandler(Filters.caption, callback_method)``
-
-    Args:
-        update (List[:obj:`str`] | Tuple[:obj:`str`], optional): Which captions to allow. Only
-            exact matches are allowed. If not specified, will allow any message with a caption.
-    """
-
-    class _Command(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.command'
-
-        class _CommandOnlyStart(MessageFilter):
-            __slots__ = ('only_start',)
-
-            def __init__(self, only_start: bool):
-                self.only_start = only_start
-                self.name = f'Filters.command({only_start})'
-
-            def filter(self, message: Message) -> bool:
-                return bool(
-                    message.entities
-                    and any(e.type == MessageEntity.BOT_COMMAND for e in message.entities)
-                )
-
-        def __call__(  # type: ignore[override]
-            self, update: Union[bool, Update]
-        ) -> Union[bool, '_CommandOnlyStart']:
-            if isinstance(update, Update):
-                return self.filter(update.effective_message)
-            return self._CommandOnlyStart(update)
-
-        def filter(self, message: Message) -> bool:
-            return bool(
-                message.entities
-                and message.entities[0].type == MessageEntity.BOT_COMMAND
-                and message.entities[0].offset == 0
-            )
-
-    command = _Command()
-    """
-    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
-    messages `starting` with a bot command. Pass :obj:`False` to also allow messages that contain a
-    bot command `anywhere` in the text.
-
-    Examples::
-
-        MessageHandler(Filters.command, command_at_start_callback)
-        MessageHandler(Filters.command(False), command_anywhere_callback)
+        Use these filters like: ``filters.UpdateType.MESSAGE`` or
+        ``filters.UpdateType.CHANNEL_POSTS`` etc.
 
     Note:
-        ``Filters.text`` also accepts messages containing a command.
-
-    Args:
-        update (:obj:`bool`, optional): Whether to only allow messages that `start` with a bot
-            command. Defaults to :obj:`True`.
+        ``filters.UpdateType`` itself is *not* a filter, but just a convenience namespace.
     """
 
-    class regex(MessageFilter):
-        """
-        Filters updates by searching for an occurrence of ``pattern`` in the message text.
-        The ``re.search()`` function is used to determine whether an update should be filtered.
+    __slots__ = ()
 
-        Refer to the documentation of the ``re`` module for more information.
-
-        To get the groups and groupdict matched, see :attr:`telegram.ext.CallbackContext.matches`.
-
-        Examples:
-            Use ``MessageHandler(Filters.regex(r'help'), callback)`` to capture all messages that
-            contain the word 'help'. You can also use
-            ``MessageHandler(Filters.regex(re.compile(r'help', re.IGNORECASE)), callback)`` if
-            you want your pattern to be case insensitive. This approach is recommended
-            if you need to specify flags on your pattern.
-
-        Note:
-            Filters use the same short circuiting logic as python's `and`, `or` and `not`.
-            This means that for example:
-
-                >>> Filters.regex(r'(a?x)') | Filters.regex(r'(b?x)')
-
-            With a message.text of `x`, will only ever return the matches for the first filter,
-            since the second one is never evaluated.
-
-        Args:
-            pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
-        """
-
-        __slots__ = ('pattern',)
-        data_filter = True
-
-        def __init__(self, pattern: Union[str, Pattern]):
-            if isinstance(pattern, str):
-                pattern = re.compile(pattern)
-            pattern = cast(Pattern, pattern)
-            self.pattern: Pattern = pattern
-            self.name = f'Filters.regex({self.pattern})'
-
-        def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
-            """"""  # remove method from docs
-            if message.text:
-                match = self.pattern.search(message.text)
-                if match:
-                    return {'matches': [match]}
-            return {}
-
-    class caption_regex(MessageFilter):
-        """
-        Filters updates by searching for an occurrence of ``pattern`` in the message caption.
-
-        This filter works similarly to :class:`Filters.regex`, with the only exception being that
-        it applies to the message caption instead of the text.
-
-        Examples:
-            Use ``MessageHandler(Filters.photo & Filters.caption_regex(r'help'), callback)``
-            to capture all photos with caption containing the word 'help'.
-
-        Note:
-            This filter will not work on simple text messages, but only on media with caption.
-
-        Args:
-            pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
-        """
-
-        __slots__ = ('pattern',)
-        data_filter = True
-
-        def __init__(self, pattern: Union[str, Pattern]):
-            if isinstance(pattern, str):
-                pattern = re.compile(pattern)
-            pattern = cast(Pattern, pattern)
-            self.pattern: Pattern = pattern
-            self.name = f'Filters.caption_regex({self.pattern})'
-
-        def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
-            """"""  # remove method from docs
-            if message.caption:
-                match = self.pattern.search(message.caption)
-                if match:
-                    return {'matches': [match]}
-            return {}
-
-    class _Reply(MessageFilter):
+    class _ChannelPost(UpdateFilter):
         __slots__ = ()
-        name = 'Filters.reply'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.reply_to_message)
-
-    reply = _Reply()
-    """Messages that are a reply to another message."""
-
-    class _Audio(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.audio'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.audio)
-
-    audio = _Audio()
-    """Messages that contain :class:`telegram.Audio`."""
-
-    class _Document(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.document'
-
-        class category(MessageFilter):
-            """Filters documents by their category in the mime-type attribute.
-
-            Note:
-                This Filter only filters by the mime_type of the document,
-                    it doesn't check the validity of the document.
-                The user can manipulate the mime-type of a message and
-                    send media with wrong types that don't fit to this handler.
-
-            Example:
-                Filters.document.category('audio/') returns :obj:`True` for all types
-                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
-            """
-
-            __slots__ = ('_category',)
-
-            def __init__(self, category: Optional[str]):
-                """Initialize the category you want to filter
-
-                Args:
-                    category (str, optional): category of the media you want to filter
-                """
-                self._category = category
-                self.name = f"Filters.document.category('{self._category}')"
-
-            def filter(self, message: Message) -> bool:
-                """"""  # remove method from docs
-                if message.document:
-                    return message.document.mime_type.startswith(self._category)
-                return False
-
-        application = category('application/')
-        audio = category('audio/')
-        image = category('image/')
-        video = category('video/')
-        text = category('text/')
-
-        class mime_type(MessageFilter):
-            """This Filter filters documents by their mime-type attribute
-
-            Note:
-                This Filter only filters by the mime_type of the document,
-                    it doesn't check the validity of document.
-                The user can manipulate the mime-type of a message and
-                    send media with wrong types that don't fit to this handler.
-
-            Example:
-                ``Filters.document.mime_type('audio/mpeg')`` filters all audio in mp3 format.
-            """
-
-            __slots__ = ('mimetype',)
-
-            def __init__(self, mimetype: Optional[str]):
-                self.mimetype = mimetype
-                self.name = f"Filters.document.mime_type('{self.mimetype}')"
-
-            def filter(self, message: Message) -> bool:
-                """"""  # remove method from docs
-                if message.document:
-                    return message.document.mime_type == self.mimetype
-                return False
-
-        apk = mime_type('application/vnd.android.package-archive')
-        doc = mime_type('application/msword')
-        docx = mime_type('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-        exe = mime_type('application/x-ms-dos-executable')
-        gif = mime_type('video/mp4')
-        jpg = mime_type('image/jpeg')
-        mp3 = mime_type('audio/mpeg')
-        pdf = mime_type('application/pdf')
-        py = mime_type('text/x-python')
-        svg = mime_type('image/svg+xml')
-        txt = mime_type('text/plain')
-        targz = mime_type('application/x-compressed-tar')
-        wav = mime_type('audio/x-wav')
-        xml = mime_type('application/xml')
-        zip = mime_type('application/zip')
-
-        class file_extension(MessageFilter):
-            """This filter filters documents by their file ending/extension.
-
-            Note:
-                * This Filter only filters by the file ending/extension of the document,
-                  it doesn't check the validity of document.
-                * The user can manipulate the file extension of a document and
-                  send media with wrong types that don't fit to this handler.
-                * Case insensitive by default,
-                  you may change this with the flag ``case_sensitive=True``.
-                * Extension should be passed without leading dot
-                  unless it's a part of the extension.
-                * Pass :obj:`None` to filter files with no extension,
-                  i.e. without a dot in the filename.
-
-            Example:
-                * ``Filters.document.file_extension("jpg")``
-                  filters files with extension ``".jpg"``.
-                * ``Filters.document.file_extension(".jpg")``
-                  filters files with extension ``"..jpg"``.
-                * ``Filters.document.file_extension("Dockerfile", case_sensitive=True)``
-                  filters files with extension ``".Dockerfile"`` minding the case.
-                * ``Filters.document.file_extension(None)``
-                  filters files without a dot in the filename.
-            """
-
-            __slots__ = ('_file_extension', 'is_case_sensitive')
-
-            def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
-                """Initialize the extension you want to filter.
-
-                Args:
-                    file_extension (:obj:`str` | :obj:`None`):
-                        media file extension you want to filter.
-                    case_sensitive (:obj:bool, optional):
-                        pass :obj:`True` to make the filter case sensitive.
-                        Default: :obj:`False`.
-                """
-                self.is_case_sensitive = case_sensitive
-                if file_extension is None:
-                    self._file_extension = None
-                    self.name = "Filters.document.file_extension(None)"
-                elif self.is_case_sensitive:
-                    self._file_extension = f".{file_extension}"
-                    self.name = (
-                        f"Filters.document.file_extension({file_extension!r},"
-                        " case_sensitive=True)"
-                    )
-                else:
-                    self._file_extension = f".{file_extension}".lower()
-                    self.name = f"Filters.document.file_extension({file_extension.lower()!r})"
-
-            def filter(self, message: Message) -> bool:
-                """"""  # remove method from docs
-                if message.document is None:
-                    return False
-                if self._file_extension is None:
-                    return "." not in message.document.file_name
-                if self.is_case_sensitive:
-                    filename = message.document.file_name
-                else:
-                    filename = message.document.file_name.lower()
-                return filename.endswith(self._file_extension)
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.document)
-
-    document = _Document()
-    """
-    Subset for messages containing a document/file.
-
-    Examples:
-        Use these filters like: ``Filters.document.mp3``,
-        ``Filters.document.mime_type("text/plain")`` etc. Or use just
-        ``Filters.document`` for all document messages.
-
-    Attributes:
-        category: Filters documents by their category in the mime-type attribute
-
-            Note:
-                This Filter only filters by the mime_type of the document,
-                it doesn't check the validity of the document.
-                The user can manipulate the mime-type of a message and
-                send media with wrong types that don't fit to this handler.
-
-            Example:
-                ``Filters.document.category('audio/')`` filters all types
-                of audio sent as file, for example 'audio/mpeg' or 'audio/x-wav'.
-        application: Same as ``Filters.document.category("application")``.
-        audio: Same as ``Filters.document.category("audio")``.
-        image: Same as ``Filters.document.category("image")``.
-        video: Same as ``Filters.document.category("video")``.
-        text: Same as ``Filters.document.category("text")``.
-        mime_type: Filters documents by their mime-type attribute
-
-            Note:
-                This Filter only filters by the mime_type of the document,
-                it doesn't check the validity of document.
-
-                The user can manipulate the mime-type of a message and
-                send media with wrong types that don't fit to this handler.
-
-            Example:
-                ``Filters.document.mime_type('audio/mpeg')`` filters all audio in mp3 format.
-        apk: Same as ``Filters.document.mime_type("application/vnd.android.package-archive")``.
-        doc: Same as ``Filters.document.mime_type("application/msword")``.
-        docx: Same as ``Filters.document.mime_type("application/vnd.openxmlformats-\
-officedocument.wordprocessingml.document")``.
-        exe: Same as ``Filters.document.mime_type("application/x-ms-dos-executable")``.
-        gif: Same as ``Filters.document.mime_type("video/mp4")``.
-        jpg: Same as ``Filters.document.mime_type("image/jpeg")``.
-        mp3: Same as ``Filters.document.mime_type("audio/mpeg")``.
-        pdf: Same as ``Filters.document.mime_type("application/pdf")``.
-        py: Same as ``Filters.document.mime_type("text/x-python")``.
-        svg: Same as ``Filters.document.mime_type("image/svg+xml")``.
-        txt: Same as ``Filters.document.mime_type("text/plain")``.
-        targz: Same as ``Filters.document.mime_type("application/x-compressed-tar")``.
-        wav: Same as ``Filters.document.mime_type("audio/x-wav")``.
-        xml: Same as ``Filters.document.mime_type("application/xml")``.
-        zip: Same as ``Filters.document.mime_type("application/zip")``.
-        file_extension: This filter filters documents by their file ending/extension.
-
-            Note:
-                * This Filter only filters by the file ending/extension of the document,
-                  it doesn't check the validity of document.
-                * The user can manipulate the file extension of a document and
-                  send media with wrong types that don't fit to this handler.
-                * Case insensitive by default,
-                  you may change this with the flag ``case_sensitive=True``.
-                * Extension should be passed without leading dot
-                  unless it's a part of the extension.
-                * Pass :obj:`None` to filter files with no extension,
-                  i.e. without a dot in the filename.
-
-            Example:
-                * ``Filters.document.file_extension("jpg")``
-                  filters files with extension ``".jpg"``.
-                * ``Filters.document.file_extension(".jpg")``
-                  filters files with extension ``"..jpg"``.
-                * ``Filters.document.file_extension("Dockerfile", case_sensitive=True)``
-                  filters files with extension ``".Dockerfile"`` minding the case.
-                * ``Filters.document.file_extension(None)``
-                  filters files without a dot in the filename.
-    """
-
-    class _Animation(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.animation'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.animation)
-
-    animation = _Animation()
-    """Messages that contain :class:`telegram.Animation`."""
-
-    class _Photo(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.photo'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.photo)
-
-    photo = _Photo()
-    """Messages that contain :class:`telegram.PhotoSize`."""
-
-    class _Sticker(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.sticker'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.sticker)
-
-    sticker = _Sticker()
-    """Messages that contain :class:`telegram.Sticker`."""
-
-    class _Video(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.video'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.video)
-
-    video = _Video()
-    """Messages that contain :class:`telegram.Video`."""
-
-    class _Voice(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.voice'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.voice)
-
-    voice = _Voice()
-    """Messages that contain :class:`telegram.Voice`."""
-
-    class _VideoNote(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.video_note'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.video_note)
-
-    video_note = _VideoNote()
-    """Messages that contain :class:`telegram.VideoNote`."""
-
-    class _Contact(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.contact'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.contact)
-
-    contact = _Contact()
-    """Messages that contain :class:`telegram.Contact`."""
-
-    class _Location(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.location'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.location)
-
-    location = _Location()
-    """Messages that contain :class:`telegram.Location`."""
-
-    class _Venue(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.venue'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.venue)
-
-    venue = _Venue()
-    """Messages that contain :class:`telegram.Venue`."""
-
-    class _StatusUpdate(UpdateFilter):
-        """Subset for messages containing a status update.
-
-        Examples:
-            Use these filters like: ``Filters.status_update.new_chat_members`` etc. Or use just
-            ``Filters.status_update`` for all status update messages.
-
-        """
-
-        __slots__ = ()
-
-        class _NewChatMembers(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.new_chat_members'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.new_chat_members)
-
-        new_chat_members = _NewChatMembers()
-        """Messages that contain :attr:`telegram.Message.new_chat_members`."""
-
-        class _LeftChatMember(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.left_chat_member'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.left_chat_member)
-
-        left_chat_member = _LeftChatMember()
-        """Messages that contain :attr:`telegram.Message.left_chat_member`."""
-
-        class _NewChatTitle(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.new_chat_title'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.new_chat_title)
-
-        new_chat_title = _NewChatTitle()
-        """Messages that contain :attr:`telegram.Message.new_chat_title`."""
-
-        class _NewChatPhoto(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.new_chat_photo'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.new_chat_photo)
-
-        new_chat_photo = _NewChatPhoto()
-        """Messages that contain :attr:`telegram.Message.new_chat_photo`."""
-
-        class _DeleteChatPhoto(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.delete_chat_photo'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.delete_chat_photo)
-
-        delete_chat_photo = _DeleteChatPhoto()
-        """Messages that contain :attr:`telegram.Message.delete_chat_photo`."""
-
-        class _ChatCreated(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.chat_created'
-
-            def filter(self, message: Message) -> bool:
-                return bool(
-                    message.group_chat_created
-                    or message.supergroup_chat_created
-                    or message.channel_chat_created
-                )
-
-        chat_created = _ChatCreated()
-        """Messages that contain :attr:`telegram.Message.group_chat_created`,
-            :attr: `telegram.Message.supergroup_chat_created` or
-            :attr: `telegram.Message.channel_chat_created`."""
-
-        class _MessageAutoDeleteTimerChanged(MessageFilter):
-            __slots__ = ()
-            name = 'MessageAutoDeleteTimerChanged'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.message_auto_delete_timer_changed)
-
-        message_auto_delete_timer_changed = _MessageAutoDeleteTimerChanged()
-        """Messages that contain :attr:`message_auto_delete_timer_changed`"""
-
-        class _Migrate(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.migrate'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.migrate_from_chat_id or message.migrate_to_chat_id)
-
-        migrate = _Migrate()
-        """Messages that contain :attr:`telegram.Message.migrate_from_chat_id` or
-            :attr:`telegram.Message.migrate_to_chat_id`."""
-
-        class _PinnedMessage(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.pinned_message'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.pinned_message)
-
-        pinned_message = _PinnedMessage()
-        """Messages that contain :attr:`telegram.Message.pinned_message`."""
-
-        class _ConnectedWebsite(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.connected_website'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.connected_website)
-
-        connected_website = _ConnectedWebsite()
-        """Messages that contain :attr:`telegram.Message.connected_website`."""
-
-        class _ProximityAlertTriggered(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.proximity_alert_triggered'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.proximity_alert_triggered)
-
-        proximity_alert_triggered = _ProximityAlertTriggered()
-        """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
-
-        class _VoiceChatScheduled(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.voice_chat_scheduled'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.voice_chat_scheduled)
-
-        voice_chat_scheduled = _VoiceChatScheduled()
-        """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`."""
-
-        class _VoiceChatStarted(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.voice_chat_started'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.voice_chat_started)
-
-        voice_chat_started = _VoiceChatStarted()
-        """Messages that contain :attr:`telegram.Message.voice_chat_started`."""
-
-        class _VoiceChatEnded(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.voice_chat_ended'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.voice_chat_ended)
-
-        voice_chat_ended = _VoiceChatEnded()
-        """Messages that contain :attr:`telegram.Message.voice_chat_ended`."""
-
-        class _VoiceChatParticipantsInvited(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.status_update.voice_chat_participants_invited'
-
-            def filter(self, message: Message) -> bool:
-                return bool(message.voice_chat_participants_invited)
-
-        voice_chat_participants_invited = _VoiceChatParticipantsInvited()
-        """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`."""
-
-        name = 'Filters.status_update'
 
         def filter(self, update: Update) -> bool:
-            return bool(
-                self.new_chat_members(update)
-                or self.left_chat_member(update)
-                or self.new_chat_title(update)
-                or self.new_chat_photo(update)
-                or self.delete_chat_photo(update)
-                or self.chat_created(update)
-                or self.message_auto_delete_timer_changed(update)
-                or self.migrate(update)
-                or self.pinned_message(update)
-                or self.connected_website(update)
-                or self.proximity_alert_triggered(update)
-                or self.voice_chat_scheduled(update)
-                or self.voice_chat_started(update)
-                or self.voice_chat_ended(update)
-                or self.voice_chat_participants_invited(update)
-            )
+            return update.channel_post is not None
 
-    status_update = _StatusUpdate()
-    """Subset for messages containing a status update.
+    CHANNEL_POST = _ChannelPost(name="filters.UpdateType.CHANNEL_POST")
+    """Updates with :attr:`telegram.Update.channel_post`."""
 
-    Examples:
-        Use these filters like: ``Filters.status_update.new_chat_members`` etc. Or use just
-        ``Filters.status_update`` for all status update messages.
-
-    Attributes:
-        chat_created: Messages that contain
-            :attr:`telegram.Message.group_chat_created`,
-            :attr:`telegram.Message.supergroup_chat_created` or
-            :attr:`telegram.Message.channel_chat_created`.
-        connected_website: Messages that contain
-            :attr:`telegram.Message.connected_website`.
-        delete_chat_photo: Messages that contain
-            :attr:`telegram.Message.delete_chat_photo`.
-        left_chat_member: Messages that contain
-            :attr:`telegram.Message.left_chat_member`.
-        migrate: Messages that contain
-            :attr:`telegram.Message.migrate_to_chat_id` or
-            :attr:`telegram.Message.migrate_from_chat_id`.
-        new_chat_members: Messages that contain
-            :attr:`telegram.Message.new_chat_members`.
-        new_chat_photo: Messages that contain
-            :attr:`telegram.Message.new_chat_photo`.
-        new_chat_title: Messages that contain
-            :attr:`telegram.Message.new_chat_title`.
-        message_auto_delete_timer_changed: Messages that contain
-            :attr:`message_auto_delete_timer_changed`.
-
-            .. versionadded:: 13.4
-        pinned_message: Messages that contain
-            :attr:`telegram.Message.pinned_message`.
-        proximity_alert_triggered: Messages that contain
-            :attr:`telegram.Message.proximity_alert_triggered`.
-        voice_chat_scheduled: Messages that contain
-            :attr:`telegram.Message.voice_chat_scheduled`.
-
-            .. versionadded:: 13.5
-        voice_chat_started: Messages that contain
-            :attr:`telegram.Message.voice_chat_started`.
-
-            .. versionadded:: 13.4
-        voice_chat_ended: Messages that contain
-            :attr:`telegram.Message.voice_chat_ended`.
-
-            .. versionadded:: 13.4
-        voice_chat_participants_invited: Messages that contain
-            :attr:`telegram.Message.voice_chat_participants_invited`.
-
-            .. versionadded:: 13.4
-
-    """
-
-    class _Forwarded(MessageFilter):
+    class _ChannelPosts(UpdateFilter):
         __slots__ = ()
-        name = 'Filters.forwarded'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.forward_date)
-
-    forwarded = _Forwarded()
-    """Messages that are forwarded."""
-
-    class _Game(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.game'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.game)
-
-    game = _Game()
-    """Messages that contain :class:`telegram.Game`."""
-
-    class entity(MessageFilter):
-        """
-        Filters messages to only allow those which have a :class:`telegram.MessageEntity`
-        where their `type` matches `entity_type`.
-
-        Examples:
-            Example ``MessageHandler(Filters.entity("hashtag"), callback_method)``
-
-        Args:
-            entity_type: Entity type to check for. All types can be found as constants
-                in :class:`telegram.MessageEntity`.
-
-        """
-
-        __slots__ = ('entity_type',)
-
-        def __init__(self, entity_type: str):
-            self.entity_type = entity_type
-            self.name = f'Filters.entity({self.entity_type})'
-
-        def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
-            return any(entity.type == self.entity_type for entity in message.entities)
-
-    class caption_entity(MessageFilter):
-        """
-        Filters media messages to only allow those which have a :class:`telegram.MessageEntity`
-        where their `type` matches `entity_type`.
-
-        Examples:
-            Example ``MessageHandler(Filters.caption_entity("hashtag"), callback_method)``
-
-        Args:
-            entity_type: Caption Entity type to check for. All types can be found as constants
-                in :class:`telegram.MessageEntity`.
-
-        """
-
-        __slots__ = ('entity_type',)
-
-        def __init__(self, entity_type: str):
-            self.entity_type = entity_type
-            self.name = f'Filters.caption_entity({self.entity_type})'
-
-        def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
-            return any(entity.type == self.entity_type for entity in message.caption_entities)
-
-    class _ChatType(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.chat_type'
-
-        class _Channel(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.chat_type.channel'
-
-            def filter(self, message: Message) -> bool:
-                return message.chat.type == Chat.CHANNEL
-
-        channel = _Channel()
-
-        class _Group(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.chat_type.group'
-
-            def filter(self, message: Message) -> bool:
-                return message.chat.type == Chat.GROUP
-
-        group = _Group()
-
-        class _SuperGroup(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.chat_type.supergroup'
-
-            def filter(self, message: Message) -> bool:
-                return message.chat.type == Chat.SUPERGROUP
-
-        supergroup = _SuperGroup()
-
-        class _Groups(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.chat_type.groups'
-
-            def filter(self, message: Message) -> bool:
-                return message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
-
-        groups = _Groups()
-
-        class _Private(MessageFilter):
-            __slots__ = ()
-            name = 'Filters.chat_type.private'
-
-            def filter(self, message: Message) -> bool:
-                return message.chat.type == Chat.PRIVATE
-
-        private = _Private()
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.chat.type)
-
-    chat_type = _ChatType()
-    """Subset for filtering the type of chat.
-
-    Examples:
-        Use these filters like: ``Filters.chat_type.channel`` or
-        ``Filters.chat_type.supergroup`` etc. Or use just ``Filters.chat_type`` for all
-        chat types.
-
-    Attributes:
-        channel: Updates from channel
-        group: Updates from group
-        supergroup: Updates from supergroup
-        groups: Updates from group *or* supergroup
-        private: Updates sent in private chat
-    """
-
-    class _ChatUserBaseFilter(MessageFilter, ABC):
-        __slots__ = (
-            'chat_id_name',
-            'username_name',
-            'allow_empty',
-            '__lock',
-            '_chat_ids',
-            '_usernames',
-        )
-
-        def __init__(
-            self,
-            chat_id: SLT[int] = None,
-            username: SLT[str] = None,
-            allow_empty: bool = False,
-        ):
-            self.chat_id_name = 'chat_id'
-            self.username_name = 'username'
-            self.allow_empty = allow_empty
-            self.__lock = Lock()
-
-            self._chat_ids: Set[int] = set()
-            self._usernames: Set[str] = set()
-
-            self._set_chat_ids(chat_id)
-            self._set_usernames(username)
-
-        @abstractmethod
-        def get_chat_or_user(self, message: Message) -> Union[Chat, User, None]:
-            ...
-
-        @staticmethod
-        def _parse_chat_id(chat_id: SLT[int]) -> Set[int]:
-            if chat_id is None:
-                return set()
-            if isinstance(chat_id, int):
-                return {chat_id}
-            return set(chat_id)
-
-        @staticmethod
-        def _parse_username(username: SLT[str]) -> Set[str]:
-            if username is None:
-                return set()
-            if isinstance(username, str):
-                return {username[1:] if username.startswith('@') else username}
-            return {chat[1:] if chat.startswith('@') else chat for chat in username}
-
-        def _set_chat_ids(self, chat_id: SLT[int]) -> None:
-            with self.__lock:
-                if chat_id and self._usernames:
-                    raise RuntimeError(
-                        f"Can't set {self.chat_id_name} in conjunction with (already set) "
-                        f"{self.username_name}s."
-                    )
-                self._chat_ids = self._parse_chat_id(chat_id)
-
-        def _set_usernames(self, username: SLT[str]) -> None:
-            with self.__lock:
-                if username and self._chat_ids:
-                    raise RuntimeError(
-                        f"Can't set {self.username_name} in conjunction with (already set) "
-                        f"{self.chat_id_name}s."
-                    )
-                self._usernames = self._parse_username(username)
-
-        @property
-        def chat_ids(self) -> FrozenSet[int]:
-            with self.__lock:
-                return frozenset(self._chat_ids)
-
-        @chat_ids.setter
-        def chat_ids(self, chat_id: SLT[int]) -> None:
-            self._set_chat_ids(chat_id)
-
-        @property
-        def usernames(self) -> FrozenSet[str]:
-            with self.__lock:
-                return frozenset(self._usernames)
-
-        @usernames.setter
-        def usernames(self, username: SLT[str]) -> None:
-            self._set_usernames(username)
-
-        def add_usernames(self, username: SLT[str]) -> None:
-            with self.__lock:
-                if self._chat_ids:
-                    raise RuntimeError(
-                        f"Can't set {self.username_name} in conjunction with (already set) "
-                        f"{self.chat_id_name}s."
-                    )
-
-                parsed_username = self._parse_username(username)
-                self._usernames |= parsed_username
-
-        def add_chat_ids(self, chat_id: SLT[int]) -> None:
-            with self.__lock:
-                if self._usernames:
-                    raise RuntimeError(
-                        f"Can't set {self.chat_id_name} in conjunction with (already set) "
-                        f"{self.username_name}s."
-                    )
-
-                parsed_chat_id = self._parse_chat_id(chat_id)
-
-                self._chat_ids |= parsed_chat_id
-
-        def remove_usernames(self, username: SLT[str]) -> None:
-            with self.__lock:
-                if self._chat_ids:
-                    raise RuntimeError(
-                        f"Can't set {self.username_name} in conjunction with (already set) "
-                        f"{self.chat_id_name}s."
-                    )
-
-                parsed_username = self._parse_username(username)
-                self._usernames -= parsed_username
-
-        def remove_chat_ids(self, chat_id: SLT[int]) -> None:
-            with self.__lock:
-                if self._usernames:
-                    raise RuntimeError(
-                        f"Can't set {self.chat_id_name} in conjunction with (already set) "
-                        f"{self.username_name}s."
-                    )
-                parsed_chat_id = self._parse_chat_id(chat_id)
-                self._chat_ids -= parsed_chat_id
-
-        def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
-            chat_or_user = self.get_chat_or_user(message)
-            if chat_or_user:
-                if self.chat_ids:
-                    return chat_or_user.id in self.chat_ids
-                if self.usernames:
-                    return bool(chat_or_user.username and chat_or_user.username in self.usernames)
-                return self.allow_empty
-            return False
-
-        @property
-        def name(self) -> str:
-            return (
-                f'Filters.{self.__class__.__name__}('
-                f'{", ".join(str(s) for s in (self.usernames or self.chat_ids))})'
-            )
-
-        @name.setter
-        def name(self, name: str) -> NoReturn:
-            raise RuntimeError(f'Cannot set name for Filters.{self.__class__.__name__}')
-
-    class user(_ChatUserBaseFilter):
-        # pylint: disable=useless-super-delegation
-        """Filters messages to allow only those which are from specified user ID(s) or
-        username(s).
-
-        Examples:
-            ``MessageHandler(Filters.user(1234), callback_method)``
-
-        Warning:
-            :attr:`user_ids` will give a *copy* of the saved user ids as :class:`frozenset`. This
-            is to ensure thread safety. To add/remove a user, you should use :meth:`add_usernames`,
-            :meth:`add_user_ids`, :meth:`remove_usernames` and :meth:`remove_user_ids`. Only update
-            the entire set by ``filter.user_ids/usernames = new_set``, if you are entirely sure
-            that it is not causing race conditions, as this will complete replace the current set
-            of allowed users.
-
-        Args:
-            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which user ID(s) to allow through.
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to allow through. Leading ``'@'`` s in usernames will be
-                discarded.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
-                is specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`
-
-        Raises:
-            RuntimeError: If user_id and username are both present.
-
-        Attributes:
-            user_ids(set(:obj:`int`), optional): Which user ID(s) to allow through.
-            usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
-                allow through.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
-                is specified in :attr:`user_ids` and :attr:`usernames`.
-
-        """
-
-        __slots__ = ()
-
-        def __init__(
-            self,
-            user_id: SLT[int] = None,
-            username: SLT[str] = None,
-            allow_empty: bool = False,
-        ):
-            super().__init__(chat_id=user_id, username=username, allow_empty=allow_empty)
-            self.chat_id_name = 'user_id'
-
-        def get_chat_or_user(self, message: Message) -> Optional[User]:
-            return message.from_user
-
-        @property
-        def user_ids(self) -> FrozenSet[int]:
-            return self.chat_ids
-
-        @user_ids.setter
-        def user_ids(self, user_id: SLT[int]) -> None:
-            self.chat_ids = user_id  # type: ignore[assignment]
-
-        def add_usernames(self, username: SLT[str]) -> None:
-            """
-            Add one or more users to the allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which username(s) to allow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().add_usernames(username)
-
-        def add_user_ids(self, user_id: SLT[int]) -> None:
-            """
-            Add one or more users to the allowed user ids.
-
-            Args:
-                user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which user ID(s) to allow through.
-            """
-            return super().add_chat_ids(user_id)
-
-        def remove_usernames(self, username: SLT[str]) -> None:
-            """
-            Remove one or more users from allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which username(s) to disallow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().remove_usernames(username)
-
-        def remove_user_ids(self, user_id: SLT[int]) -> None:
-            """
-            Remove one or more users from allowed user ids.
-
-            Args:
-                user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which user ID(s) to disallow through.
-            """
-            return super().remove_chat_ids(user_id)
-
-    class via_bot(_ChatUserBaseFilter):
-        # pylint: disable=useless-super-delegation
-        """Filters messages to allow only those which are from specified via_bot ID(s) or
-        username(s).
-
-        Examples:
-            ``MessageHandler(Filters.via_bot(1234), callback_method)``
-
-        Warning:
-            :attr:`bot_ids` will give a *copy* of the saved bot ids as :class:`frozenset`. This
-            is to ensure thread safety. To add/remove a bot, you should use :meth:`add_usernames`,
-            :meth:`add_bot_ids`, :meth:`remove_usernames` and :meth:`remove_bot_ids`. Only update
-            the entire set by ``filter.bot_ids/usernames = new_set``, if you are entirely sure
-            that it is not causing race conditions, as this will complete replace the current set
-            of allowed bots.
-
-        Args:
-            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which bot ID(s) to allow through.
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to allow through. Leading ``'@'`` s in usernames will be
-                discarded.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
-                is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`
-
-        Raises:
-            RuntimeError: If bot_id and username are both present.
-
-        Attributes:
-            bot_ids(set(:obj:`int`), optional): Which bot ID(s) to allow through.
-            usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
-                allow through.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no bot
-                is specified in :attr:`bot_ids` and :attr:`usernames`.
-
-        """
-
-        __slots__ = ()
-
-        def __init__(
-            self,
-            bot_id: SLT[int] = None,
-            username: SLT[str] = None,
-            allow_empty: bool = False,
-        ):
-            super().__init__(chat_id=bot_id, username=username, allow_empty=allow_empty)
-            self.chat_id_name = 'bot_id'
-
-        def get_chat_or_user(self, message: Message) -> Optional[User]:
-            return message.via_bot
-
-        @property
-        def bot_ids(self) -> FrozenSet[int]:
-            return self.chat_ids
-
-        @bot_ids.setter
-        def bot_ids(self, bot_id: SLT[int]) -> None:
-            self.chat_ids = bot_id  # type: ignore[assignment]
-
-        def add_usernames(self, username: SLT[str]) -> None:
-            """
-            Add one or more users to the allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which username(s) to allow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().add_usernames(username)
-
-        def add_bot_ids(self, bot_id: SLT[int]) -> None:
-            """
-
-            Add one or more users to the allowed user ids.
-
-            Args:
-                bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which bot ID(s) to allow through.
-            """
-            return super().add_chat_ids(bot_id)
-
-        def remove_usernames(self, username: SLT[str]) -> None:
-            """
-            Remove one or more users from allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which username(s) to disallow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().remove_usernames(username)
-
-        def remove_bot_ids(self, bot_id: SLT[int]) -> None:
-            """
-            Remove one or more users from allowed user ids.
-
-            Args:
-                bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which bot ID(s) to disallow through.
-            """
-            return super().remove_chat_ids(bot_id)
-
-    class chat(_ChatUserBaseFilter):
-        # pylint: disable=useless-super-delegation
-        """Filters messages to allow only those which are from a specified chat ID or username.
-
-        Examples:
-            ``MessageHandler(Filters.chat(-1234), callback_method)``
-
-        Warning:
-            :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
-            is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
-            :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
-            the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
-            that it is not causing race conditions, as this will complete replace the current set
-            of allowed chats.
-
-        Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which chat ID(s) to allow through.
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to allow through.
-                Leading ``'@'`` s in usernames will be discarded.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
-                is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`
-
-        Raises:
-            RuntimeError: If chat_id and username are both present.
-
-        Attributes:
-            chat_ids(set(:obj:`int`), optional): Which chat ID(s) to allow through.
-            usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
-                allow through.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
-                is specified in :attr:`chat_ids` and :attr:`usernames`.
-
-        """
-
-        __slots__ = ()
-
-        def get_chat_or_user(self, message: Message) -> Optional[Chat]:
-            return message.chat
-
-        def add_usernames(self, username: SLT[str]) -> None:
-            """
-            Add one or more chats to the allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which username(s) to allow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().add_usernames(username)
-
-        def add_chat_ids(self, chat_id: SLT[int]) -> None:
-            """
-            Add one or more chats to the allowed chat ids.
-
-            Args:
-                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which chat ID(s) to allow through.
-            """
-            return super().add_chat_ids(chat_id)
-
-        def remove_usernames(self, username: SLT[str]) -> None:
-            """
-            Remove one or more chats from allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which username(s) to disallow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().remove_usernames(username)
-
-        def remove_chat_ids(self, chat_id: SLT[int]) -> None:
-            """
-            Remove one or more chats from allowed chat ids.
-
-            Args:
-                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which chat ID(s) to disallow through.
-            """
-            return super().remove_chat_ids(chat_id)
-
-    class forwarded_from(_ChatUserBaseFilter):
-        # pylint: disable=useless-super-delegation
-        """Filters messages to allow only those which are forwarded from the specified chat ID(s)
-        or username(s) based on :attr:`telegram.Message.forward_from` and
-        :attr:`telegram.Message.forward_from_chat`.
-
-        .. versionadded:: 13.5
-
-        Examples:
-            ``MessageHandler(Filters.forwarded_from(chat_id=1234), callback_method)``
-
-        Note:
-            When a user has disallowed adding a link to their account while forwarding their
-            messages, this filter will *not* work since both
-            :attr:`telegram.Message.forwarded_from` and
-            :attr:`telegram.Message.forwarded_from_chat` are :obj:`None`. However, this behaviour
-            is undocumented and might be changed by Telegram.
-
-        Warning:
-            :attr:`chat_ids` will give a *copy* of the saved chat ids as :class:`frozenset`. This
-            is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
-            :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
-            the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
-            that it is not causing race conditions, as this will complete replace the current set
-            of allowed chats.
-
-        Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which chat/user ID(s) to allow through.
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which username(s) to allow through. Leading ``'@'`` s in usernames will be
-                discarded.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
-                is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to :obj:`False`.
-
-        Raises:
-            RuntimeError: If both chat_id and username are present.
-
-        Attributes:
-            chat_ids(set(:obj:`int`), optional): Which chat/user ID(s) to allow through.
-            usernames(set(:obj:`str`), optional): Which username(s) (without leading ``'@'``) to
-                allow through.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
-                is specified in :attr:`chat_ids` and :attr:`usernames`.
-        """
-
-        __slots__ = ()
-
-        def get_chat_or_user(self, message: Message) -> Union[User, Chat, None]:
-            return message.forward_from or message.forward_from_chat
-
-        def add_usernames(self, username: SLT[str]) -> None:
-            """
-            Add one or more chats to the allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which username(s) to allow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().add_usernames(username)
-
-        def add_chat_ids(self, chat_id: SLT[int]) -> None:
-            """
-            Add one or more chats to the allowed chat ids.
-
-            Args:
-                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which chat/user ID(s) to allow through.
-            """
-            return super().add_chat_ids(chat_id)
-
-        def remove_usernames(self, username: SLT[str]) -> None:
-            """
-            Remove one or more chats from allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which username(s) to disallow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().remove_usernames(username)
-
-        def remove_chat_ids(self, chat_id: SLT[int]) -> None:
-            """
-            Remove one or more chats from allowed chat ids.
-
-            Args:
-                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which chat/user ID(s) to disallow through.
-            """
-            return super().remove_chat_ids(chat_id)
-
-    class sender_chat(_ChatUserBaseFilter):
-        # pylint: disable=useless-super-delegation
-        """Filters messages to allow only those which are from a specified sender chat's chat ID or
-        username.
-
-        Examples:
-            * To filter for messages sent to a group by a channel with ID
-              ``-1234``, use ``MessageHandler(Filters.sender_chat(-1234), callback_method)``.
-            * To filter for messages of anonymous admins in a super group with username
-              ``@anonymous``, use
-              ``MessageHandler(Filters.sender_chat(username='anonymous'), callback_method)``.
-            * To filter for messages sent to a group by *any* channel, use
-              ``MessageHandler(Filters.sender_chat.channel, callback_method)``.
-            * To filter for messages of anonymous admins in *any* super group, use
-              ``MessageHandler(Filters.sender_chat.super_group, callback_method)``.
-
-        Note:
-            Remember, ``sender_chat`` is also set for messages in a channel as the channel itself,
-            so when your bot is an admin in a channel and the linked discussion group, you would
-            receive the message twice (once from inside the channel, once inside the discussion
-            group). Since v13.9, the field :attr:`telegram.Message.is_automatic_forward` will be
-            :obj:`True` for the discussion group message.
-
-            .. seealso:: :attr:`Filters.is_automatic_forward`
-
-        Warning:
-            :attr:`chat_ids` will return a *copy* of the saved chat ids as :class:`frozenset`. This
-            is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
-            :meth:`add_chat_ids`, :meth:`remove_usernames` and :meth:`remove_chat_ids`. Only update
-            the entire set by ``filter.chat_ids/usernames = new_set``, if you are entirely sure
-            that it is not causing race conditions, as this will complete replace the current set
-            of allowed chats.
-
-        Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                Which sender chat chat ID(s) to allow through.
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                Which sender chat username(s) to allow through.
-                Leading ``'@'`` s in usernames will be discarded.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
-                chat is specified in :attr:`chat_ids` and :attr:`usernames`. Defaults to
-                :obj:`False`
-
-        Raises:
-            RuntimeError: If both chat_id and username are present.
-
-        Attributes:
-            chat_ids(set(:obj:`int`), optional): Which sender chat chat ID(s) to allow through.
-            usernames(set(:obj:`str`), optional): Which sender chat username(s) (without leading
-                ``'@'``) to allow through.
-            allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
-                chat is specified in :attr:`chat_ids` and :attr:`usernames`.
-            super_group: Messages whose sender chat is a super group.
-
-                Examples:
-                    ``Filters.sender_chat.supergroup``
-            channel: Messages whose sender chat is a channel.
-
-                Examples:
-                    ``Filters.sender_chat.channel``
-
-        """
-
-        __slots__ = ()
-
-        def get_chat_or_user(self, message: Message) -> Optional[Chat]:
-            return message.sender_chat
-
-        def add_usernames(self, username: SLT[str]) -> None:
-            """
-            Add one or more sender chats to the allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which sender chat username(s) to allow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().add_usernames(username)
-
-        def add_chat_ids(self, chat_id: SLT[int]) -> None:
-            """
-            Add one or more sender chats to the allowed chat ids.
-
-            Args:
-                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which sender chat ID(s) to allow through.
-            """
-            return super().add_chat_ids(chat_id)
-
-        def remove_usernames(self, username: SLT[str]) -> None:
-            """
-            Remove one or more sender chats from allowed usernames.
-
-            Args:
-                username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
-                    Which sender chat username(s) to disallow through.
-                    Leading ``'@'`` s in usernames will be discarded.
-            """
-            return super().remove_usernames(username)
-
-        def remove_chat_ids(self, chat_id: SLT[int]) -> None:
-            """
-            Remove one or more sender chats from allowed chat ids.
-
-            Args:
-                chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-                    Which sender chat ID(s) to disallow through.
-            """
-            return super().remove_chat_ids(chat_id)
-
-        class _SuperGroup(MessageFilter):
-            __slots__ = ()
-
-            def filter(self, message: Message) -> bool:
-                if message.sender_chat:
-                    return message.sender_chat.type == Chat.SUPERGROUP
-                return False
-
-        class _Channel(MessageFilter):
-            __slots__ = ()
-
-            def filter(self, message: Message) -> bool:
-                if message.sender_chat:
-                    return message.sender_chat.type == Chat.CHANNEL
-                return False
-
-        super_group = _SuperGroup()
-        channel = _Channel()
-
-    class _IsAutomaticForward(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.is_automatic_forward'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.is_automatic_forward)
-
-    is_automatic_forward = _IsAutomaticForward()
-    """Messages that contain :attr:`telegram.Message.is_automatic_forward`.
-
-        .. versionadded:: 13.9
-    """
-
-    class _HasProtectedContent(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.has_protected_content'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.has_protected_content)
-
-    has_protected_content = _HasProtectedContent()
-    """Messages that contain :attr:`telegram.Message.has_protected_content`.
-
-        .. versionadded:: 13.9
-    """
-
-    class _Invoice(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.invoice'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.invoice)
-
-    invoice = _Invoice()
-    """Messages that contain :class:`telegram.Invoice`."""
-
-    class _SuccessfulPayment(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.successful_payment'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.successful_payment)
-
-    successful_payment = _SuccessfulPayment()
-    """Messages that confirm a :class:`telegram.SuccessfulPayment`."""
-
-    class _PassportData(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.passport_data'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.passport_data)
-
-    passport_data = _PassportData()
-    """Messages that contain a :class:`telegram.PassportData`"""
-
-    class _Poll(MessageFilter):
-        __slots__ = ()
-        name = 'Filters.poll'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.poll)
-
-    poll = _Poll()
-    """Messages that contain a :class:`telegram.Poll`."""
-
-    class _Dice(_DiceEmoji):
-        __slots__ = ()
-        # pylint: disable=no-member
-        dice = _DiceEmoji(DiceEmoji.DICE, DiceEmoji.DICE.name.lower())
-        darts = _DiceEmoji(DiceEmoji.DARTS, DiceEmoji.DARTS.name.lower())
-        basketball = _DiceEmoji(DiceEmoji.BASKETBALL, DiceEmoji.BASKETBALL.name.lower())
-        football = _DiceEmoji(DiceEmoji.FOOTBALL, DiceEmoji.FOOTBALL.name.lower())
-        slot_machine = _DiceEmoji(DiceEmoji.SLOT_MACHINE, DiceEmoji.SLOT_MACHINE.name.lower())
-        bowling = _DiceEmoji(DiceEmoji.BOWLING, DiceEmoji.BOWLING.name.lower())
-
-    dice = _Dice()
-    """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
-    allow those whose dice value is appearing in the given list.
-
-    Examples:
-        To allow any dice message, simply use
-        ``MessageHandler(Filters.dice, callback_method)``.
-
-        To allow only dice messages with the emoji 🎲, but any value, use
-        ``MessageHandler(Filters.dice.dice, callback_method)``.
-
-        To allow only dice messages with the emoji 🎯 and with value 6, use
-        ``MessageHandler(Filters.dice.darts(6), callback_method)``.
-
-        To allow only dice messages with the emoji ⚽ and with value 5 `or` 6, use
-        ``MessageHandler(Filters.dice.football([5, 6]), callback_method)``.
-
-    Note:
-        Dice messages don't have text. If you want to filter either text or dice messages, use
-        ``Filters.text | Filters.dice``.
-
-    Args:
-        update (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
-            Which values to allow. If not specified, will allow any dice message.
-
-    Attributes:
-        dice: Dice messages with the emoji 🎲. Passing a list of integers is supported just as for
-            :attr:`Filters.dice`.
-        darts: Dice messages with the emoji 🎯. Passing a list of integers is supported just as for
-            :attr:`Filters.dice`.
-        basketball: Dice messages with the emoji 🏀. Passing a list of integers is supported just
-            as for :attr:`Filters.dice`.
-        football: Dice messages with the emoji ⚽. Passing a list of integers is supported just
-            as for :attr:`Filters.dice`.
-        slot_machine: Dice messages with the emoji 🎰. Passing a list of integers is supported just
-            as for :attr:`Filters.dice`.
-        bowling: Dice messages with the emoji 🎳. Passing a list of integers is supported just
-            as for :attr:`Filters.dice`.
-
-            .. versionadded:: 13.4
-
-    """
-
-    class language(MessageFilter):
-        """Filters messages to only allow those which are from users with a certain language code.
-
-        Note:
-            According to official Telegram API documentation, not every single user has the
-            `language_code` attribute. Do not count on this filter working on all users.
-
-        Examples:
-            ``MessageHandler(Filters.language("en"), callback_method)``
-
-        Args:
-            lang (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
-                Which language code(s) to allow through.
-                This will be matched using ``.startswith`` meaning that
-                'en' will match both 'en_US' and 'en_GB'.
-
-        """
-
-        __slots__ = ('lang',)
-
-        def __init__(self, lang: SLT[str]):
-            if isinstance(lang, str):
-                lang = cast(str, lang)
-                self.lang = [lang]
-            else:
-                lang = cast(List[str], lang)
-                self.lang = lang
-            self.name = f'Filters.language({self.lang})'
-
-        def filter(self, message: Message) -> bool:
-            """"""  # remove method from docs
-            return bool(
-                message.from_user.language_code
-                and any(message.from_user.language_code.startswith(x) for x in self.lang)
-            )
-
-    class _Attachment(MessageFilter):
-        __slots__ = ()
-
-        name = 'Filters.attachment'
-
-        def filter(self, message: Message) -> bool:
-            return bool(message.effective_attachment)
-
-    attachment = _Attachment()
-    """Messages that contain :meth:`telegram.Message.effective_attachment`.
-
-
-        .. versionadded:: 13.6"""
-
-    class _UpdateType(UpdateFilter):
-        __slots__ = ()
-        name = 'Filters.update'
-
-        class _Message(UpdateFilter):
-            __slots__ = ()
-            name = 'Filters.update.message'
-
-            def filter(self, update: Update) -> bool:
-                return update.message is not None
-
-        message = _Message()
-
-        class _EditedMessage(UpdateFilter):
-            __slots__ = ()
-            name = 'Filters.update.edited_message'
-
-            def filter(self, update: Update) -> bool:
-                return update.edited_message is not None
-
-        edited_message = _EditedMessage()
-
-        class _Messages(UpdateFilter):
-            __slots__ = ()
-            name = 'Filters.update.messages'
-
-            def filter(self, update: Update) -> bool:
-                return update.message is not None or update.edited_message is not None
-
-        messages = _Messages()
-
-        class _ChannelPost(UpdateFilter):
-            __slots__ = ()
-            name = 'Filters.update.channel_post'
-
-            def filter(self, update: Update) -> bool:
-                return update.channel_post is not None
-
-        channel_post = _ChannelPost()
-
-        class _EditedChannelPost(UpdateFilter):
-            __slots__ = ()
-            name = 'Filters.update.edited_channel_post'
-
-            def filter(self, update: Update) -> bool:
-                return update.edited_channel_post is not None
-
-        edited_channel_post = _EditedChannelPost()
-
-        class _Edited(UpdateFilter):
-            __slots__ = ()
-            name = 'Filters.update.edited'
-
-            def filter(self, update: Update) -> bool:
-                return update.edited_message is not None or update.edited_channel_post is not None
-
-        edited = _Edited()
-
-        class _ChannelPosts(UpdateFilter):
-            __slots__ = ()
-            name = 'Filters.update.channel_posts'
-
-            def filter(self, update: Update) -> bool:
-                return update.channel_post is not None or update.edited_channel_post is not None
-
-        channel_posts = _ChannelPosts()
 
         def filter(self, update: Update) -> bool:
-            return bool(self.messages(update) or self.channel_posts(update))
+            return update.channel_post is not None or update.edited_channel_post is not None
 
-    update = _UpdateType()
-    """Subset for filtering the type of update.
+    CHANNEL_POSTS = _ChannelPosts(name="filters.UpdateType.CHANNEL_POSTS")
+    """Updates with either :attr:`telegram.Update.channel_post` or
+    :attr:`telegram.Update.edited_channel_post`."""
+
+    class _Edited(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.edited_message is not None or update.edited_channel_post is not None
+
+    EDITED = _Edited(name="filters.UpdateType.EDITED")
+    """Updates with either :attr:`telegram.Update.edited_message` or
+    :attr:`telegram.Update.edited_channel_post`."""
+
+    class _EditedChannelPost(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.edited_channel_post is not None
+
+    EDITED_CHANNEL_POST = _EditedChannelPost(name="filters.UpdateType.EDITED_CHANNEL_POST")
+    """Updates with :attr:`telegram.Update.edited_channel_post`."""
+
+    class _EditedMessage(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.edited_message is not None
+
+    EDITED_MESSAGE = _EditedMessage(name="filters.UpdateType.EDITED_MESSAGE")
+    """Updates with :attr:`telegram.Update.edited_message`."""
+
+    class _Message(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.message is not None
+
+    MESSAGE = _Message(name="filters.UpdateType.MESSAGE")
+    """Updates with :attr:`telegram.Update.message`."""
+
+    class _Messages(UpdateFilter):
+        __slots__ = ()
+
+        def filter(self, update: Update) -> bool:
+            return update.message is not None or update.edited_message is not None
+
+    MESSAGES = _Messages(name="filters.UpdateType.MESSAGES")
+    """Updates with either :attr:`telegram.Update.message` or
+    :attr:`telegram.Update.edited_message`."""
+
+
+class User(_ChatUserBaseFilter):
+    """Filters messages to allow only those which are from specified user ID(s) or
+    username(s).
 
     Examples:
-        Use these filters like: ``Filters.update.message`` or
-        ``Filters.update.channel_posts`` etc. Or use just ``Filters.update`` for all
-        types.
+        ``MessageHandler(filters.User(1234), callback_method)``
+
+    Args:
+        user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional): Which user ID(s) to
+            allow through.
+        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+            Which username(s) to allow through. Leading ``'@'`` s in usernames will be discarded.
+        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user is
+            specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`.
+
+    Raises:
+        RuntimeError: If ``user_id`` and ``username`` are both present.
 
     Attributes:
-        message: Updates with :attr:`telegram.Update.message`
-        edited_message: Updates with :attr:`telegram.Update.edited_message`
-        messages: Updates with either :attr:`telegram.Update.message` or
-            :attr:`telegram.Update.edited_message`
-        channel_post: Updates with :attr:`telegram.Update.channel_post`
-        edited_channel_post: Updates with
-            :attr:`telegram.Update.edited_channel_post`
-        channel_posts: Updates with either :attr:`telegram.Update.channel_post` or
-            :attr:`telegram.Update.edited_channel_post`
-        edited: Updates with either :attr:`telegram.Update.edited_message` or
-            :attr:`telegram.Update.edited_channel_post`
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no user is specified in
+            :attr:`user_ids` and :attr:`usernames`.
     """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        user_id: SLT[int] = None,
+        username: SLT[str] = None,
+        allow_empty: bool = False,
+    ):
+        super().__init__(chat_id=user_id, username=username, allow_empty=allow_empty)
+        self._chat_id_name = 'user_id'
+
+    def get_chat_or_user(self, message: Message) -> Optional[TGUser]:
+        return message.from_user
+
+    @property
+    def user_ids(self) -> FrozenSet[int]:
+        """
+        Which user ID(s) to allow through.
+
+        Warning:
+            :attr:`user_ids` will give a *copy* of the saved user ids as :obj:`frozenset`. This
+            is to ensure thread safety. To add/remove a user, you should use :meth:`add_user_ids`,
+            and :meth:`remove_user_ids`. Only update the entire set by
+            ``filter.user_ids = new_set``, if you are entirely sure that it is not causing race
+            conditions, as this will complete replace the current set of allowed users.
+
+        Returns:
+            frozenset(:obj:`int`)
+        """
+        return self.chat_ids
+
+    @user_ids.setter
+    def user_ids(self, user_id: SLT[int]) -> None:
+        self.chat_ids = user_id  # type: ignore[assignment]
+
+    def add_user_ids(self, user_id: SLT[int]) -> None:
+        """
+        Add one or more users to the allowed user ids.
+
+        Args:
+            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which user ID(s) to allow
+                through.
+        """
+        return super()._add_chat_ids(user_id)
+
+    def remove_user_ids(self, user_id: SLT[int]) -> None:
+        """
+        Remove one or more users from allowed user ids.
+
+        Args:
+            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which user ID(s) to
+                disallow through.
+        """
+        return super()._remove_chat_ids(user_id)
+
+
+class _User(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.from_user)
+
+
+USER = _User(name="filters.USER")
+"""This filter filters *any* message that has a :attr:`telegram.Message.from_user`."""
+
+
+class _Venue(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.venue)
+
+
+VENUE = _Venue(name="filters.VENUE")
+"""Messages that contain :attr:`telegram.Message.venue`."""
+
+
+class ViaBot(_ChatUserBaseFilter):
+    """Filters messages to allow only those which are from specified via_bot ID(s) or username(s).
+
+    Examples:
+        ``MessageHandler(filters.ViaBot(1234), callback_method)``
+
+    Args:
+        bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional): Which bot ID(s) to
+            allow through.
+        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+            Which username(s) to allow through. Leading ``'@'`` s in usernames will be
+            discarded.
+        allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
+            is specified in :attr:`bot_ids` and :attr:`usernames`. Defaults to :obj:`False`.
+
+    Raises:
+        RuntimeError: If ``bot_id`` and ``username`` are both present.
+
+    Attributes:
+        allow_empty (:obj:`bool`): Whether updates should be processed, if no bot is specified in
+            :attr:`bot_ids` and :attr:`usernames`.
+    """
+
+    __slots__ = ()
+
+    def __init__(
+        self,
+        bot_id: SLT[int] = None,
+        username: SLT[str] = None,
+        allow_empty: bool = False,
+    ):
+        super().__init__(chat_id=bot_id, username=username, allow_empty=allow_empty)
+        self._chat_id_name = 'bot_id'
+
+    def get_chat_or_user(self, message: Message) -> Optional[TGUser]:
+        return message.via_bot
+
+    @property
+    def bot_ids(self) -> FrozenSet[int]:
+        """
+        Which bot ID(s) to allow through.
+
+        Warning:
+            :attr:`bot_ids` will give a *copy* of the saved bot ids as :obj:`frozenset`. This
+            is to ensure thread safety. To add/remove a bot, you should use :meth:`add_bot_ids`,
+            and :meth:`remove_bot_ids`. Only update the entire set by ``filter.bot_ids = new_set``,
+            if you are entirely sure that it is not causing race conditions, as this will complete
+            replace the current set of allowed bots.
+
+        Returns:
+            frozenset(:obj:`int`)
+        """
+        return self.chat_ids
+
+    @bot_ids.setter
+    def bot_ids(self, bot_id: SLT[int]) -> None:
+        self.chat_ids = bot_id  # type: ignore[assignment]
+
+    def add_bot_ids(self, bot_id: SLT[int]) -> None:
+        """
+        Add one or more bots to the allowed bot ids.
+
+        Args:
+            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which bot ID(s) to allow
+                through.
+        """
+        return super()._add_chat_ids(bot_id)
+
+    def remove_bot_ids(self, bot_id: SLT[int]) -> None:
+        """
+        Remove one or more bots from allowed bot ids.
+
+        Args:
+            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional): Which bot ID(s) to
+                disallow through.
+        """
+        return super()._remove_chat_ids(bot_id)
+
+
+class _ViaBot(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.via_bot)
+
+
+VIA_BOT = _ViaBot(name="filters.VIA_BOT")
+"""This filter filters for message that were sent via *any* bot."""
+
+
+class _Video(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.video)
+
+
+VIDEO = _Video(name="filters.VIDEO")
+"""Messages that contain :attr:`telegram.Message.video`."""
+
+
+class _VideoNote(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.video_note)
+
+
+VIDEO_NOTE = _VideoNote(name="filters.VIDEO_NOTE")
+"""Messages that contain :attr:`telegram.Message.video_note`."""
+
+
+class _Voice(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.voice)
+
+
+VOICE = _Voice("filters.VOICE")
+"""Messages that contain :attr:`telegram.Message.voice`."""

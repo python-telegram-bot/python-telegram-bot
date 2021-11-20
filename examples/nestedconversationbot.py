@@ -21,7 +21,7 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import (
     CommandHandler,
     MessageHandler,
-    Filters,
+    filters,
     ConversationHandler,
     CallbackQueryHandler,
     Updater,
@@ -319,7 +319,7 @@ def main() -> None:
             SELECTING_FEATURE: [
                 CallbackQueryHandler(ask_for_input, pattern='^(?!' + str(END) + ').*$')
             ],
-            TYPING: [MessageHandler(Filters.text & ~Filters.command, save_input)],
+            TYPING: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_input)],
         },
         fallbacks=[
             CallbackQueryHandler(end_describing, pattern='^' + str(END) + '$'),

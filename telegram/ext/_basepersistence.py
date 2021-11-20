@@ -29,7 +29,7 @@ from telegram._utils.warnings import warn
 from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 
 
-class PersistenceInput(NamedTuple):
+class PersistenceInput(NamedTuple):  # skipcq: PYL-E0239
     """Convenience wrapper to group boolean input for :class:`BasePersistence`.
 
     Args:

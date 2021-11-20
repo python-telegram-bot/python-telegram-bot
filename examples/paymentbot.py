@@ -10,7 +10,7 @@ from telegram import LabeledPrice, ShippingOption, Update
 from telegram.ext import (
     CommandHandler,
     MessageHandler,
-    Filters,
+    filters,
     PreCheckoutQueryHandler,
     ShippingQueryHandler,
     Updater,
@@ -149,7 +149,7 @@ def main() -> None:
     dispatcher.add_handler(PreCheckoutQueryHandler(precheckout_callback))
 
     # Success! Notify your user!
-    dispatcher.add_handler(MessageHandler(Filters.successful_payment, successful_payment_callback))
+    dispatcher.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
 
     # Start the Bot
     updater.start_polling()
