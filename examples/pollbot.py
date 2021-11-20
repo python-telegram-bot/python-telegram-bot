@@ -23,7 +23,7 @@ from telegram.ext import (
     PollAnswerHandler,
     PollHandler,
     MessageHandler,
-    Filters,
+    filters,
     Updater,
     CallbackContext,
 )
@@ -163,7 +163,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler('quiz', quiz))
     dispatcher.add_handler(PollHandler(receive_quiz_answer))
     dispatcher.add_handler(CommandHandler('preview', preview))
-    dispatcher.add_handler(MessageHandler(Filters.poll, receive_poll))
+    dispatcher.add_handler(MessageHandler(filters.POLL, receive_poll))
     dispatcher.add_handler(CommandHandler('help', help_handler))
 
     # Start the Bot

@@ -14,7 +14,7 @@ import logging
 from pathlib import Path
 
 from telegram import Update
-from telegram.ext import MessageHandler, Filters, Updater, CallbackContext
+from telegram.ext import MessageHandler, filters, Updater, CallbackContext
 
 # Enable logging
 
@@ -110,7 +110,7 @@ def main() -> None:
     dispatcher = updater.dispatcher
 
     # On messages that include passport data call msg
-    dispatcher.add_handler(MessageHandler(Filters.passport_data, msg))
+    dispatcher.add_handler(MessageHandler(filters.PASSPORT_DATA, msg))
 
     # Start the Bot
     updater.start_polling()
