@@ -1415,6 +1415,7 @@ class TestConversationHandler:
             conversation_timeout=42,
         )
 
+        # If per_message is True, per_chat should also be True, since msg ids are not unique
         ConversationHandler(
             entry_points=[CallbackQueryHandler(self.code, "code")],
             states={
@@ -1425,7 +1426,7 @@ class TestConversationHandler:
             per_chat=False,
         )
 
-        # the overall handlers raising an error is 13
+        # the overall number of handlers throwing a warning is 13
         assert len(recwarn) == 13
         # now we test the messages, they are raised in the order they are inserted
         # into the conversation handler
