@@ -35,9 +35,9 @@ try:
 
     CRYPTO_INSTALLED = True
 except ImportError:
-    default_backend = None
-    MGF1, OAEP, Cipher, AES, CBC = (None, None, None, None, None)  # type: ignore[misc]
-    SHA1, SHA256, SHA512, Hash = (None, None, None, None)  # type: ignore[misc]
+    default_backend = None  # type: ignore[assignment]
+    MGF1, OAEP, Cipher, AES, CBC = (None, None, None, None, None)  # type: ignore[misc,assignment]
+    SHA1, SHA256, SHA512, Hash = (None, None, None, None)  # type: ignore[misc,assignment]
 
     CRYPTO_INSTALLED = False
 
@@ -150,7 +150,7 @@ class EncryptedCredentials(TelegramObject):
         self._id_attrs = (self.data, self.hash, self.secret)
 
         self.set_bot(bot)
-        self._decrypted_secret = None
+        self._decrypted_secret: Optional[str] = None
         self._decrypted_data: Optional['Credentials'] = None
 
     @property
@@ -175,7 +175,7 @@ class EncryptedCredentials(TelegramObject):
             # is the default for OAEP, the algorithm is the default for PHP which is what
             # Telegram's backend servers run.
             try:
-                self._decrypted_secret = self.get_bot().private_key.decrypt(
+                self._decrypted_secret = self.get_bot().private_key.decrypt(  # type: ignore
                     b64decode(self.secret),
                     OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),  # skipcq
                 )
@@ -200,7 +200,7 @@ class EncryptedCredentials(TelegramObject):
                 decrypt_json(self.decrypted_secret, b64decode(self.hash), b64decode(self.data)),
                 self.get_bot(),
             )
-        return self._decrypted_data
+        return self._decrypted_data  # type: ignore[return-value]
 
 
 class Credentials(TelegramObject):
@@ -403,8 +403,8 @@ class SecureValue(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['files'] = [p.to_dict() for p in self.files]
-        data['translation'] = [p.to_dict() for p in self.translation]
+        data['files'] = [p.to_dict() for p in self.files]  # type: ignore[union-attr]
+        data['translation'] = [p.to_dict() for p in self.translation]  # type: ignore[union-attr]
 
         return data
 
