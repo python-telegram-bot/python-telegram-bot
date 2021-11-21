@@ -321,11 +321,6 @@ class TestMessage:
 
         assert new.to_dict() == message_params.to_dict()
 
-    def test_dict_approach(self, message):
-        assert message['text'] == message.text
-        assert message['chat_id'] == message.chat_id
-        assert message['no_key'] is None
-
     def test_parse_entity(self):
         text = (
             b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
