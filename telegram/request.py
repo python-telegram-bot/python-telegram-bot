@@ -335,7 +335,7 @@ class Request:
                         media_dict = med.to_dict()
                         media.append(media_dict)
                         if isinstance(med.media, InputFile):
-                            data[med.media.attach] = med.media.field_tuple
+                            data[med.media.attach] = med.media.field_tuple  # type: ignore[index]
                             # if the file has a thumb, we also need to attach it to the data
                             if "thumb" in media_dict:
                                 data[med.thumb.attach] = med.thumb.field_tuple
@@ -345,7 +345,7 @@ class Request:
                     # Attach and set val to attached name
                     media_dict = val.to_dict()
                     if isinstance(val.media, InputFile):
-                        data[val.media.attach] = val.media.field_tuple
+                        data[val.media.attach] = val.media.field_tuple  # type: ignore[index]
                         # if the file has a thumb, we also need to attach it to the data
                         if "thumb" in media_dict:
                             data[val.thumb.attach] = val.thumb.field_tuple

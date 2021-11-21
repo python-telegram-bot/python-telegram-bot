@@ -698,6 +698,10 @@ class TestFilters:
         assert filters.Document.Category("application/").check_update(update)
         assert filters.Document.MimeType("application/x-sh").check_update(update)
 
+        update.message.document.mime_type = None
+        assert not filters.Document.Category("application/").check_update(update)
+        assert not filters.Document.MimeType("application/x-sh").check_update(update)
+
     def test_filters_file_extension_basic(self, update):
         update.message.document = Document(
             "file_id",
@@ -713,6 +717,9 @@ class TestFilters:
         assert filters.Document.FileExtension("tar.gz").check_update(update)
         assert filters.Document.FileExtension("gz").check_update(update)
         assert not filters.Document.FileExtension("tgz").check_update(update)
+        assert not filters.Document.FileExtension("jpg").check_update(update)
+
+        update.message.document.file_name = None
         assert not filters.Document.FileExtension("jpg").check_update(update)
 
         update.message.document = None
@@ -1820,6 +1827,9 @@ class TestFilters:
         assert not filters.Language('en').check_update(update)
         assert not filters.Language('en_GB').check_update(update)
         assert filters.Language('da').check_update(update)
+
+        update.message.from_user = None
+        assert not filters.Language('da').check_update(update)
 
     def test_language_filter_multiple(self, update):
         f = filters.Language(['en_US', 'da'])
