@@ -193,7 +193,9 @@ class MessageFilter(BaseFilter):
     __slots__ = ()
 
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        return self.filter(update.effective_message) if super().check_update(update) else False
+        if super().check_update(update):
+            return self.filter(update.effective_message)  # type: ignore[arg-type]
+        return False
 
     @abstractmethod
     def filter(self, message: Message) -> Optional[Union[bool, DataDict]]:
@@ -559,7 +561,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         ...
 
     @staticmethod
-    def _parse_chat_id(chat_id: SLT[int]) -> Set[int]:
+    def _parse_chat_id(chat_id: Optional[SLT[int]]) -> Set[int]:
         if chat_id is None:
             return set()
         if isinstance(chat_id, int):
@@ -567,14 +569,14 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         return set(chat_id)
 
     @staticmethod
-    def _parse_username(username: SLT[str]) -> Set[str]:
+    def _parse_username(username: Optional[SLT[str]]) -> Set[str]:
         if username is None:
             return set()
         if isinstance(username, str):
             return {username[1:] if username.startswith('@') else username}
         return {chat[1:] if chat.startswith('@') else chat for chat in username}
 
-    def _set_chat_ids(self, chat_id: SLT[int]) -> None:
+    def _set_chat_ids(self, chat_id: Optional[SLT[int]]) -> None:
         with self.__lock:
             if chat_id and self._usernames:
                 raise RuntimeError(
@@ -583,7 +585,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
                 )
             self._chat_ids = self._parse_chat_id(chat_id)
 
-    def _set_usernames(self, username: SLT[str]) -> None:
+    def _set_usernames(self, username: Optional[SLT[str]]) -> None:
         with self.__lock:
             if username and self._chat_ids:
                 raise RuntimeError(
@@ -1077,7 +1079,7 @@ class Document(MessageFilter):
             super().__init__(name=f"filters.Document.Category('{self._category}')")
 
         def filter(self, message: Message) -> bool:
-            if message.document:
+            if message.document and message.document.mime_type:
                 return message.document.mime_type.startswith(self._category)
             return False
 
@@ -1141,7 +1143,7 @@ class Document(MessageFilter):
                 self.name = f"filters.Document.FileExtension({file_extension.lower()!r})"
 
         def filter(self, message: Message) -> bool:
-            if message.document is None:
+            if message.document is None or message.document.file_name is None:
                 return False
             if self._file_extension is None:
                 return "." not in message.document.file_name
@@ -1179,35 +1181,35 @@ class Document(MessageFilter):
 
     APK = MimeType('application/vnd.android.package-archive')
     """Use as ``filters.Document.APK``."""
-    DOC = MimeType(mimetypes.types_map.get('.doc'))
+    DOC = MimeType(mimetypes.types_map['.doc'])
     """Use as ``filters.Document.DOC``."""
     DOCX = MimeType('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     """Use as ``filters.Document.DOCX``."""
-    EXE = MimeType(mimetypes.types_map.get('.exe'))
+    EXE = MimeType(mimetypes.types_map['.exe'])
     """Use as ``filters.Document.EXE``."""
-    MP4 = MimeType(mimetypes.types_map.get('.mp4'))
+    MP4 = MimeType(mimetypes.types_map['.mp4'])
     """Use as ``filters.Document.MP4``."""
-    GIF = MimeType(mimetypes.types_map.get('.gif'))
+    GIF = MimeType(mimetypes.types_map['.gif'])
     """Use as ``filters.Document.GIF``."""
-    JPG = MimeType(mimetypes.types_map.get('.jpg'))
+    JPG = MimeType(mimetypes.types_map['.jpg'])
     """Use as ``filters.Document.JPG``."""
-    MP3 = MimeType(mimetypes.types_map.get('.mp3'))
+    MP3 = MimeType(mimetypes.types_map['.mp3'])
     """Use as ``filters.Document.MP3``."""
-    PDF = MimeType(mimetypes.types_map.get('.pdf'))
+    PDF = MimeType(mimetypes.types_map['.pdf'])
     """Use as ``filters.Document.PDF``."""
-    PY = MimeType(mimetypes.types_map.get('.py'))
+    PY = MimeType(mimetypes.types_map['.py'])
     """Use as ``filters.Document.PY``."""
-    SVG = MimeType(mimetypes.types_map.get('.svg'))
+    SVG = MimeType(mimetypes.types_map['.svg'])
     """Use as ``filters.Document.SVG``."""
-    TXT = MimeType(mimetypes.types_map.get('.txt'))
+    TXT = MimeType(mimetypes.types_map['.txt'])
     """Use as ``filters.Document.TXT``."""
     TARGZ = MimeType('application/x-compressed-tar')
     """Use as ``filters.Document.TARGZ``."""
-    WAV = MimeType(mimetypes.types_map.get('.wav'))
+    WAV = MimeType(mimetypes.types_map['.wav'])
     """Use as ``filters.Document.WAV``."""
-    XML = MimeType(mimetypes.types_map.get('.xml'))
+    XML = MimeType(mimetypes.types_map['.xml'])
     """Use as ``filters.Document.XML``."""
-    ZIP = MimeType(mimetypes.types_map.get('.zip'))
+    ZIP = MimeType(mimetypes.types_map['.zip'])
     """Use as ``filters.Document.ZIP``."""
 
     def filter(self, message: Message) -> bool:
@@ -1402,7 +1404,8 @@ class Language(MessageFilter):
 
     def filter(self, message: Message) -> bool:
         return bool(
-            message.from_user.language_code
+            message.from_user
+            and message.from_user.language_code
             and any(message.from_user.language_code.startswith(x) for x in self.lang)
         )
 
