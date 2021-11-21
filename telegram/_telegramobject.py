@@ -40,7 +40,7 @@ class TelegramObject:
     is equivalent to ``telegram_object.attribute_name``. If the object does not have an attribute
     with the appropriate name, a :exc:`KeyError` will be raised.
 
-    Note:
+    .. versionchanged:: 14.0
         ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
         special cases like :attr:`Message.from_user` that deviate from the official Bot API.
     """
