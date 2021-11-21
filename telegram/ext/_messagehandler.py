@@ -20,7 +20,7 @@
 from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union
 
 from telegram import Update
-from telegram.ext import BaseFilter, Filters, Handler
+from telegram.ext import filters as filters_module, Handler
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 
 from telegram.ext._utils.types import CCT
@@ -39,13 +39,13 @@ class MessageHandler(Handler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
+        filters (:class:`telegram.ext.BaseFilter`): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
-            :class:`telegram.ext.filters.Filters`. Filters can be combined using bitwise
-            operators (& for and, | for or, ~ for not). Default is
-            :attr:`telegram.ext.filters.Filters.update`. This defaults to all message_type updates
-            being: ``message``, ``edited_message``, ``channel_post`` and ``edited_channel_post``.
-            If you don't want or need any of those pass ``~Filters.update.*`` in the filter
+            :mod:`telegram.ext.filters`. Filters can be combined using bitwise
+            operators (& for and, | for or, ~ for not). This defaults to all message updates
+            being: :attr:`Update.message`, :attr:`Update.edited_message`,
+            :attr:`Update.channel_post` and :attr:`Update.edited_channel_post`.
+            If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
             argument.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
@@ -60,8 +60,8 @@ class MessageHandler(Handler[Update, CCT]):
         ValueError
 
     Attributes:
-        filters (:obj:`Filter`): Only allow updates with these Filters. See
-            :mod:`telegram.ext.filters` for a full list of all available filters.
+        filters (:class:`telegram.ext.filters.BaseFilter`): Only allow updates with these Filters.
+            See :mod:`telegram.ext.filters` for a full list of all available filters.
         callback (:obj:`callable`): The callback function for this handler.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
@@ -71,19 +71,13 @@ class MessageHandler(Handler[Update, CCT]):
 
     def __init__(
         self,
-        filters: BaseFilter,
+        filters: filters_module.BaseFilter,
         callback: Callable[[Update, CCT], RT],
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
-        super().__init__(
-            callback,
-            run_async=run_async,
-        )
-        if filters is not None:
-            self.filters = Filters.update & filters
-        else:
-            self.filters = Filters.update
+        super().__init__(callback, run_async=run_async)
+        self.filters = filters if filters is not None else filters_module.ALL
 
     def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
         """Determines whether an update should be passed to this handlers :attr:`callback`.
@@ -96,7 +90,7 @@ class MessageHandler(Handler[Update, CCT]):
 
         """
         if isinstance(update, Update):
-            return self.filters(update)
+            return self.filters.check_update(update)
         return None
 
     def collect_additional_context(

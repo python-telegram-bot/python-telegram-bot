@@ -19,6 +19,7 @@ from typing import Tuple
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
+import inspect
 from docutils.nodes import Element
 from sphinx.application import Sphinx
 from sphinx.domains.python import PyXRefRole
@@ -358,7 +359,23 @@ class TGConstXRefRole(PyXRefRole):
 
 
 def autodoc_skip_member(app, what, name, obj, skip, options):
-    pass
+    """We use this to not document certain members like filter() or check_update() for filters.
+    See https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#skipping-members"""
+
+    included = {'MessageFilter', 'UpdateFilter'}  # filter() and check_update() only for these.
+    included_in_obj = any(inc in repr(obj) for inc in included)
+
+    if included_in_obj:  # it's difficult to see if check_update is from an inherited-member or not
+        for frame in inspect.stack():  # From https://github.com/sphinx-doc/sphinx/issues/9533
+            if frame.function == "filter_members":
+                docobj = frame.frame.f_locals["self"].object
+                if not any(inc in str(docobj) for inc in included) and name == 'check_update':
+                    return True
+                break
+
+    if name == 'filter' and obj.__module__ == 'telegram.ext.filters':
+        if not included_in_obj:
+            return True  # return True to exclude from docs.
 
 
 def setup(app: Sphinx):

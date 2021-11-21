@@ -40,7 +40,7 @@ from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
     MessageHandler,
-    Filters,
+    filters,
     InlineQueryHandler,
     CallbackContext,
     DispatcherHandlerStop,
@@ -770,7 +770,7 @@ class TestConversationHandler:
 
     def test_channel_message_without_chat(self, bot):
         handler = ConversationHandler(
-            entry_points=[MessageHandler(Filters.all, self.start_end)], states={}, fallbacks=[]
+            entry_points=[MessageHandler(filters.ALL, self.start_end)], states={}, fallbacks=[]
         )
         message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, 'Misses Test'), bot=bot)
 
@@ -885,7 +885,7 @@ class TestConversationHandler:
 
         handler = ConversationHandler(
             entry_points=[CommandHandler("start", conv_entry)],
-            states={1: [MessageHandler(Filters.all, raise_error)]},
+            states={1: [MessageHandler(filters.ALL, raise_error)]},
             fallbacks=self.fallbacks,
             run_async=True,
         )
@@ -1168,7 +1168,7 @@ class TestConversationHandler:
             {
                 ConversationHandler.TIMEOUT: [
                     CommandHandler('brew', self.passout),
-                    MessageHandler(~Filters.regex('oding'), self.passout2),
+                    MessageHandler(~filters.Regex('oding'), self.passout2),
                 ]
             }
         )
@@ -1228,7 +1228,7 @@ class TestConversationHandler:
             {
                 ConversationHandler.TIMEOUT: [
                     CommandHandler('brew', self.passout_context),
-                    MessageHandler(~Filters.regex('oding'), self.passout2_context),
+                    MessageHandler(~filters.Regex('oding'), self.passout2_context),
                 ]
             }
         )
@@ -1415,8 +1415,19 @@ class TestConversationHandler:
             conversation_timeout=42,
         )
 
-        # the overall handlers raising an error is 12
-        assert len(recwarn) == 12
+        # If per_message is True, per_chat should also be True, since msg ids are not unique
+        ConversationHandler(
+            entry_points=[CallbackQueryHandler(self.code, "code")],
+            states={
+                self.BREWING: [CallbackQueryHandler(self.code, "code")],
+            },
+            fallbacks=[CallbackQueryHandler(self.code, "code")],
+            per_message=True,
+            per_chat=False,
+        )
+
+        # the overall number of handlers throwing a warning is 13
+        assert len(recwarn) == 13
         # now we test the messages, they are raised in the order they are inserted
         # into the conversation handler
         assert str(recwarn[0].message) == (
@@ -1476,26 +1487,14 @@ class TestConversationHandler:
             " from what you expect."
         )
 
-        # this for loop checks if the correct stacklevel is used when generating the warning
-        for warning in recwarn:
-            assert warning.filename == __file__, "incorrect stacklevel!"
-
-    def test_per_message_but_not_per_chat_warning(self, recwarn):
-        ConversationHandler(
-            entry_points=[CallbackQueryHandler(self.code, "code")],
-            states={
-                self.BREWING: [CallbackQueryHandler(self.code, "code")],
-            },
-            fallbacks=[CallbackQueryHandler(self.code, "code")],
-            per_message=True,
-            per_chat=False,
-        )
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == (
+        assert str(recwarn[12].message) == (
             "If 'per_message=True' is used, 'per_chat=True' should also be used, "
             "since message IDs are not globally unique."
         )
-        assert recwarn[0].filename == __file__, "incorrect stacklevel!"
+
+        # this for loop checks if the correct stacklevel is used when generating the warning
+        for warning in recwarn:
+            assert warning.filename == __file__, "incorrect stacklevel!"
 
     def test_nested_conversation_handler(self, dp, bot, user1, user2):
         self.nested_states[self.DRINKING] = [
