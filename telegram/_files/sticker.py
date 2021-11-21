@@ -225,7 +225,7 @@ class StickerSet(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['stickers'] = [s.to_dict() for s in data.get('stickers')]
+        data['stickers'] = [s.to_dict() for s in data.get('stickers')]  # type: ignore[union-attr]
 
         return data
 
