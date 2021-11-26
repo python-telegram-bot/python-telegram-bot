@@ -593,7 +593,6 @@ class TestBot:
         )
         # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
         if 1 <= abs(msg.poll.close_date.second - aware_close_date.second) < 5:
-            print('too much error!')
             msg.poll.close_date = msg.poll.close_date.replace(second=aware_close_date.second)
         assert msg.poll.close_date == aware_close_date.replace(microsecond=0)
 
