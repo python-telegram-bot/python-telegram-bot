@@ -21,7 +21,6 @@ import logging
 import time
 import datetime as dtm
 from collections import defaultdict
-from platform import python_implementation
 
 import pytest
 import pytz
@@ -54,7 +53,7 @@ from telegram import (
 )
 from telegram.constants import ChatAction, ParseMode, InlineQueryLimit
 from telegram.ext import ExtBot, InvalidCallbackData
-from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TelegramError
+from telegram.error import BadRequest, InvalidToken, NetworkError, TelegramError
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
 from telegram.helpers import escape_markdown
