@@ -428,7 +428,8 @@ class Bot(TelegramObject):
                 italic, fixed-width text or inline URLs in your bot's message. See the constants in
                 :class:`telegram.constants.ParseMode` for the available modes.
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
-                that appear in message text, which can be specified instead of :attr:`parse_mode`.
+                that appear in message text, which can be specified instead of
+                :paramref:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -496,10 +497,10 @@ class Bot(TelegramObject):
               hours ago.
             - Bots can delete outgoing messages in private chats, groups, and supergroups.
             - Bots can delete incoming messages in private chats.
-            - Bots granted :attr:`telegram.ChatMember.can_post_messages` permissions can delete
+            - Bots granted ``can_post_messages`` permissions can delete
               outgoing messages in channels.
             - If the bot is an administrator of a group, it can delete any message there.
-            - If the bot has :attr:`telegram.ChatMember.can_delete_messages` permission in a
+            - If the bot has ``can_delete_messages`` permission in a
               supergroup or a channel, it can delete any message there.
 
         Args:
@@ -637,7 +638,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -747,7 +748,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             duration (:obj:`int`, optional): Duration of sent audio in seconds.
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
@@ -872,7 +873,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -1071,7 +1072,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
                 suitable for streaming.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -1317,7 +1318,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -1428,7 +1429,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             duration (:obj:`int`, optional): Duration of the voice message in seconds.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -1563,7 +1564,8 @@ class Bot(TelegramObject):
         """Use this method to send point on the map.
 
         Note:
-            You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
+            You can either supply a :paramref:`latitude` and :paramref:`longitude` or a
+            :paramref:`location`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1667,7 +1669,8 @@ class Bot(TelegramObject):
         expires or editing is explicitly disabled by a call to :meth:`stop_message_live_location`.
 
         Note:
-            You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
+            You can either supply a :paramref:`latitude` and :paramref:`longitude` or a
+            :paramref:`location`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -1810,10 +1813,11 @@ class Bot(TelegramObject):
         """Use this method to send information about a venue.
 
         Note:
-            * You can either supply :obj:`venue`, or :obj:`latitude`, :obj:`longitude`,
-              :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and
-              :obj:`foursquare_type` or optionally :obj:`google_place_id` and
-              :obj:`google_place_type`.
+            * You can either supply :paramref:`venue`, or :paramref:`latitude`,
+              :paramref:`longitude`,
+              :paramref:title` and :paramref:address` and optionally :paramref:`foursquare_id` and
+              :paramref:`foursquare_typ` or optionally :paramref:`google_place_id` and
+              :paramref:`google_place_typ`.
             * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
 
@@ -1925,8 +1929,9 @@ class Bot(TelegramObject):
         """Use this method to send phone contacts.
 
         Note:
-            You can either supply :obj:`contact` or :obj:`phone_number` and :obj:`first_name`
-            with optionally :obj:`last_name` and optionally :obj:`vcard`.
+            You can either supply :paramref:`contact` or :paramref:`phone_number` and
+            :paramref:`first_name` with optionally :paramref:`last_name` and optionally
+            :paramref:`vcard`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2196,14 +2201,15 @@ class Bot(TelegramObject):
         :tg-const:`telegram.InlineQuery.MAX_RESULTS` results per query are allowed.
 
         Warning:
-            In most use cases :attr:`current_offset` should not be passed manually. Instead of
+            In most use cases :paramref:`current_offset` should not be passed manually. Instead of
             calling this method directly, use the shortcut :meth:`telegram.InlineQuery.answer` with
             ``auto_pagination=True``, which will take care of passing the correct value.
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
             results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
-                the inline query. In case :attr:`current_offset` is passed, ``results`` may also be
+                the inline query. In case :paramref:`current_offset` is passed, ``results`` may
+                also be
                 a callable that accepts the current page index starting from 0. It must return
                 either a list of :class:`telegram.InlineQueryResult` instances or :obj:`None` if
                 there are no more results.
@@ -2493,7 +2499,7 @@ class Bot(TelegramObject):
         via link, etc. The bot must be an administrator for this to work. By default, this method
         guarantees that after the call the user is not a member of the chat, but will be able to
         join it. So if the user is a member of the chat they will also be *removed* from the chat.
-        If you don't want this, use the parameter :attr:`only_if_banned`.
+        If you don't want this, use the parameter :paramref:`only_if_banned`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2655,7 +2661,8 @@ class Bot(TelegramObject):
                 show bold, italic, fixed-width text or inline URLs in your bot's message. See the
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
-                that appear in message text, which can be specified instead of :attr:`parse_mode`.
+                that appear in message text, which can be specified instead of
+                :paramref:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
@@ -2729,7 +2736,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -3012,7 +3019,7 @@ class Bot(TelegramObject):
         Args:
             url (:obj:`str`): HTTPS url to send updates to. Use an empty string to remove webhook
                 integration.
-            certificate (:obj:`filelike`): Upload your public key certificate so that the root
+            certificate (`filelike`): Upload your public key certificate so that the root
                 certificate in use can be checked. See our self-signed guide for details.
                 (https://goo.gl/rw7w6Y)
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
@@ -3516,12 +3523,12 @@ class Bot(TelegramObject):
         """Use this method to send invoices.
 
         Warning:
-            As of API 5.2 :attr:`start_parameter` is an optional argument and therefore the order
-            of the arguments had to be changed. Use keyword arguments to make sure that the
+            As of API 5.2 :paramref:`start_parameter` is an optional argument and therefore the
+            order of the arguments had to be changed. Use keyword arguments to make sure that the
             arguments are passed correctly.
 
         .. versionchanged:: 13.5
-            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
+            As of Bot API 5.2, the parameter :paramref:`start_parameter` is optional.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3964,7 +3971,7 @@ class Bot(TelegramObject):
         """
         Use this method to set default chat permissions for all members. The bot must be an
         administrator in the group or a supergroup for this to work and must have the
-        :attr:`telegram.ChatMember.can_restrict_members` admin rights.
+        ``can_restrict_members`` admin rights.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
@@ -4505,8 +4512,8 @@ class Bot(TelegramObject):
         """
         Use this method to add a message to the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the :attr:`telegram.ChatMember.can_pin_messages` admin right in a supergroup
-        or :attr:`telegram.ChatMember.can_edit_messages` admin right in a channel.
+        and must have the ``can_pin_messages`` admin right in a supergroup
+        or ``can_edit_messages`` admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4549,8 +4556,8 @@ class Bot(TelegramObject):
         """
         Use this method to remove a message from the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the :attr:`telegram.ChatMember.can_pin_messages` admin right in a
-        supergroup or :attr:`telegram.ChatMember.can_edit_messages` admin right in a channel.
+        and must have the ``can_pin_messages`` admin right in a
+        supergroup or ``can_edit_messages`` admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4589,8 +4596,8 @@ class Bot(TelegramObject):
         """
         Use this method to clear the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this
-        to work and must have the :attr:`telegram.ChatMember.can_pin_messages` admin right in a
-        supergroup or :attr:`telegram.ChatMember.can_edit_messages` admin right in a channel.
+        to work and must have the ``can_pin_messages`` admin right in a
+        supergroup or ``can_edit_messages`` admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -5066,13 +5073,13 @@ class Bot(TelegramObject):
                 available modes.
             explanation_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
-                after creation, 5-600. Can't be used together with :attr:`close_date`.
+                after creation, 5-600. Can't be used together with :paramref:`close_date`.
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
                 timestamp) when the poll will be automatically closed. Must be at least 5 and no
                 more than 600 seconds in the future. Can't be used together with
-                :attr:`open_period`.
+                :paramref:`open_period`.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used.
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be

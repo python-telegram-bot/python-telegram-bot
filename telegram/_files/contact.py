@@ -27,7 +27,7 @@ class Contact(TelegramObject):
     """This object represents a phone contact.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`phone_number` is equal.
+    considered equal, if their :paramref:`phone_number` is equal.
 
     Args:
         phone_number (:obj:`str`): Contact's phone number.

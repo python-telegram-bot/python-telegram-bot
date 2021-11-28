@@ -76,10 +76,10 @@ class Handler(Generic[UT, CCT], ABC):
 
         Note:
             Custom updates types can be handled by the dispatcher. Therefore, an implementation of
-            this method should always check the type of :attr:`update`.
+            this method should always check the type of :paramref:`update`.
 
         Args:
-            update (:obj:`str` | :class:`telegram.Update`): The update to be tested.
+            update (:obj:`object` | :class:`telegram.Update`): The update to be tested.
 
         Returns:
             Either :obj:`None` or :obj:`False` if the update should not be handled. Otherwise an
@@ -105,7 +105,7 @@ class Handler(Generic[UT, CCT], ABC):
         Args:
             update (:obj:`str` | :class:`telegram.Update`): The update to be handled.
             dispatcher (:class:`telegram.ext.Dispatcher`): The calling dispatcher.
-            check_result (:obj:`obj`): The result from :attr:`check_update`.
+            check_result (:class:`object`): The result from :attr:`check_update`.
             context (:class:`telegram.ext.CallbackContext`): The context as provided by
                 the dispatcher.
 

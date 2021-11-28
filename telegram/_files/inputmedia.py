@@ -43,8 +43,8 @@ class InputMedia(TelegramObject):
     Base class for Telegram InputMedia Objects.
 
     .. versionchanged:: 14.0:
-        Added arguments and attributes :attr:`media_type`, :attr:`media`, :attr:`caption`,
-            :attr:`caption_entities`, :attr:`parse_mode`.
+        Added arguments and attributes :attr:`type`, :attr:`media`, :attr:`caption`,
+            :attr:`caption_entities`, :paramref:`parse_mode`.
 
     Args:
         media_type (:obj:`str`) Type of media that the instance represents.

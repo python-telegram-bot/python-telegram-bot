@@ -40,7 +40,7 @@ class EncryptedPassportElement(TelegramObject):
     by the user. The data has been automatically decrypted by python-telegram-bot.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`type`, :attr:`data`, :attr:`phone_number`, :attr:`email`,
+    considered equal, if their :attr:`type`, :attr:`data`, :paramref:`phone_number`, :attr:`email`,
     :attr:`files`, :attr:`front_side`, :attr:`reverse_side` and :attr:`selfie` are equal.
 
     Note:

@@ -1,0 +1,20 @@
+a.paramlink {
+    /*Uncomment this to make the link symbols show only on hover*/
+    /*But this introduces an ugly gap between parameter name & type*/
+	/*visibility: hidden;*/
+    color: inherit;
+    /*set font size to 0 to hide the "¶"*/
+    font-size: 0;
+}
+
+/*This is here for the hover part described above*/
+p:hover > a.headerlink, p:hover > a.paramlink, li:hover > a.paramlink, li:hover > a.headerlink {
+   visibility: visible;
+}
+
+a.paramlink:after{
+    content: " \f0c1";
+    font-family: FontAwesome;
+    /*Font size manually picked from the CSS :/*/
+    font-size: 14.4px;
+}
