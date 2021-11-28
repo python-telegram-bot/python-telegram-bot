@@ -54,7 +54,7 @@ class EncryptedPassportElement(TelegramObject):
             "email".
         hash (:obj:`str`): Base64-encoded element hash for using in
             :class:`telegram.PassportElementErrorUnspecified`.
-        data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocument` | \
+        data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocumentData` | \
             :class:`telegram.ResidentialAddress` | :obj:`str`, optional):
             Decrypted or encrypted data, available for "personal_details", "passport",
             "driver_license", "identity_card", "identity_passport" and "address" types.
@@ -89,7 +89,7 @@ class EncryptedPassportElement(TelegramObject):
             "email".
         hash (:obj:`str`): Base64-encoded element hash for using in
             :class:`telegram.PassportElementErrorUnspecified`.
-        data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocument` | \
+        data (:class:`telegram.PersonalDetails` | :class:`telegram.IdDocumentData` | \
             :class:`telegram.ResidentialAddress` | :obj:`str`):
             Optional. Decrypted or encrypted data, available for "personal_details", "passport",
             "driver_license", "identity_card", "identity_passport" and "address" types.

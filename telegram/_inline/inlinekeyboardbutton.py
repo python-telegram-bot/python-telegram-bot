@@ -170,7 +170,7 @@ class InlineKeyboardButton(TelegramObject):
         .. versionadded:: 13.6
 
         Args:
-            callback_data (:obj:`obj`): The new callback data.
+            callback_data (:class:`object`): The new callback data.
         """
         self.callback_data = callback_data
         self._set_id_attrs()

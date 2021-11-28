@@ -90,7 +90,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     Note:
          :meth:`replace_bot` and :meth:`insert_bot` are used *independently* of the implementation
-         of the :meth:`update/get_*` methods, i.e. you don't need to worry about it while
+         of the ``update/get_*`` methods, i.e. you don't need to worry about it while
          implementing a custom persistence subclass.
 
     .. versionchanged:: 14.0
@@ -195,7 +195,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
         :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
-        ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
+        ``frozenset``, ``dict``, :class:`collections.defaultdict` and objects that have a
+        ``__dict__`` or
         ``__slots__`` attribute, excluding classes and objects that can't be copied with
         ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
         the error will be logged.
@@ -204,7 +205,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             obj (:obj:`object`): The object
 
         Returns:
-            :obj:`obj`: Copy of the object with Bot instances replaced.
+            :class:`object`: Copy of the object with Bot instances replaced.
         """
         return cls._replace_bot(obj, {})
 
@@ -297,8 +298,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def insert_bot(self, obj: object) -> object:
         """
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
-        :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
-        ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
+        :paramref:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
+        ``frozenset``, ``dict``, :class:`collections.defaultdict` and objects that have a
+        ``__dict__`` or
         ``__slots__`` attribute, excluding classes and objects that can't be copied with
         ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
         the error will be logged.
@@ -307,7 +309,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             obj (:obj:`object`): The object
 
         Returns:
-            :obj:`obj`: Copy of the object with Bot instances inserted.
+            :class:`object`: Copy of the object with Bot instances inserted.
         """
         return self._insert_bot(obj, {})
 
@@ -401,8 +403,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def get_user_data(self) -> DefaultDict[int, UD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
-        :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
-        corresponding to one of the following:
+        :class:`collections.defaultdict`. In the latter case, the :class:`collections.defaultdict`
+        should produce values corresponding to one of the following:
 
           * :obj:`dict`
           * The type from :attr:`telegram.ext.ContextTypes.user_data`
@@ -417,8 +419,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def get_chat_data(self) -> DefaultDict[int, CD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
-        :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
-        corresponding to one of the following:
+        :class:`collections.defaultdict`. In the latter case, the :class:`collections.defaultdict`
+        should produce values corresponding to one of the following:
 
           * :obj:`dict`
           * The type from :attr:`telegram.ext.ContextTypes.chat_data`
@@ -433,8 +435,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def get_bot_data(self) -> BD:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
-        :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
-        corresponding to one of the following:
+        :class:`collections.defaultdict`. In the latter case, the :class:`collections.defaultdict`
+        should produce values corresponding to one of the following:
 
           * :obj:`dict`
           * The type from :attr:`telegram.ext.ContextTypes.bot_data`
@@ -557,7 +559,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     @abstractmethod
     def refresh_bot_data(self, bot_data: BD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
-        :attr:`bot_data` to a callback. Can be used to update data stored in :attr:`bot_data`
+        :attr:`bot_data` to a callback. Can be used to update data stored in
+        :attr:`~telegram.ext.Dispatcher.bot_data`
         from an external source.
 
         .. versionadded:: 13.6

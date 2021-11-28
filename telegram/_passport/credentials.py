@@ -159,7 +159,7 @@ class EncryptedCredentials(TelegramObject):
         :obj:`str`: Lazily decrypt and return secret.
 
         Raises:
-            telegram.PassportDecryptionError: Decryption failed. Usually due to bad
+            telegram.error.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
         if self._decrypted_secret is None:
@@ -192,7 +192,7 @@ class EncryptedCredentials(TelegramObject):
             `decrypted_data.nonce`.
 
         Raises:
-            telegram.PassportDecryptionError: Decryption failed. Usually due to bad
+            telegram.error.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
         if self._decrypted_data is None:

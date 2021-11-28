@@ -47,6 +47,16 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
             (error-)handler callbacks and job callbacks. Defaults to :obj:`dict`. Must support
             instantiating without arguments.
 
+    Attributes:
+        context (:obj:`type`): The type of the ``context`` argument of all
+            (error-)handler callbacks and job callbacks.
+        bot_data (:obj:`type`): The type of ``context.bot_data`` of all
+            (error-)handler callbacks and job callbacks.
+        chat_data (:obj:`type`): The type of ``context.chat_data`` of all
+            (error-)handler callbacks and job callbacks.
+        user_data (:obj:`type`): The type of ``context.user_data`` of all
+            (error-)handler callbacks and job callbacks.
+
     """
 
     __slots__ = ('_context', '_bot_data', '_chat_data', '_user_data')
