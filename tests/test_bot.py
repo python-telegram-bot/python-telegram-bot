@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime
 import inspect
 import logging
 import time
 import datetime as dtm
 from collections import defaultdict
-from platform import python_implementation
 
 import pytest
 import pytz
@@ -54,7 +54,7 @@ from telegram import (
 )
 from telegram.constants import ChatAction, ParseMode, InlineQueryLimit
 from telegram.ext import ExtBot, InvalidCallbackData
-from telegram.error import BadRequest, InvalidToken, NetworkError, RetryAfter, TelegramError
+from telegram.error import BadRequest, InvalidToken, NetworkError, TelegramError
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
 from telegram.helpers import escape_markdown
@@ -470,10 +470,6 @@ class TestBot:
         assert message.has_protected_content
 
     @flaky(3, 1)
-    @pytest.mark.xfail(raises=RetryAfter)
-    @pytest.mark.skipif(
-        python_implementation() == 'PyPy', reason='Unstable on pypy for some reason'
-    )
     def test_send_contact(self, bot, chat_id):
         phone_number = '+11234567890'
         first_name = 'Leandro'
@@ -602,7 +598,7 @@ class TestBot:
         assert new_message.poll.id == message.poll.id
         assert new_message.poll.is_closed
 
-    @flaky(5, 1)
+    @flaky(3, 1)
     def test_send_close_date_default_tz(self, tz_bot, super_group_id):
         question = 'Is this a test?'
         answers = ['Yes', 'No', 'Maybe']
@@ -613,24 +609,26 @@ class TestBot:
         aware_close_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=5)
         close_date = aware_close_date.replace(tzinfo=None)
 
-        message = tz_bot.send_poll(
+        msg = tz_bot.send_poll(  # The timezone returned from this is always converted to UTC
             chat_id=super_group_id,
             question=question,
             options=answers,
             close_date=close_date,
             timeout=60,
         )
-        assert message.poll.close_date == aware_close_date.replace(microsecond=0)
+        # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
+        msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
+        assert abs(msg.poll.close_date - aware_close_date) <= datetime.timedelta(seconds=5)
 
         time.sleep(5.1)
 
         new_message = tz_bot.edit_message_reply_markup(
             chat_id=super_group_id,
-            message_id=message.message_id,
+            message_id=msg.message_id,
             reply_markup=reply_markup,
             timeout=60,
         )
-        assert new_message.poll.id == message.poll.id
+        assert new_message.poll.id == msg.poll.id
         assert new_message.poll.is_closed
 
     @flaky(3, 1)
