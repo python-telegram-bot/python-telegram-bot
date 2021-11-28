@@ -4,10 +4,12 @@ on:
     branches:
       - master
       - v14
+      - doc-fixes
   push:
     branches: 
       - master
       - v14
+      - doc-fixes
 
 jobs:
   test-sphinx-build:
