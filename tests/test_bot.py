@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime
 import inspect
 import logging
 import time
@@ -583,7 +584,7 @@ class TestBot:
         aware_close_date = dtm.datetime.now(tz=tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=5)
         close_date = aware_close_date.replace(tzinfo=None)
 
-        msg = tz_bot.send_poll(
+        msg = tz_bot.send_poll(  # The timezone returned from this is always converted to UTC
             chat_id=super_group_id,
             question=question,
             options=answers,
@@ -591,9 +592,8 @@ class TestBot:
             timeout=60,
         )
         # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
-        if 1 <= abs(msg.poll.close_date.second - aware_close_date.second) < 5:
-            msg.poll.close_date = msg.poll.close_date.replace(second=aware_close_date.second)
-        assert msg.poll.close_date == aware_close_date.replace(microsecond=0)
+        msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
+        assert abs(msg.poll.close_date - aware_close_date) <= datetime.timedelta(seconds=5)
 
         time.sleep(5.1)
 
