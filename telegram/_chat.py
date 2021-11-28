@@ -204,7 +204,7 @@ class Chat(TelegramObject):
 
     def __init__(
         self,
-        id: int,
+        id: int,  # pylint: disable=invalid-name
         type: str,
         title: str = None,
         username: str = None,

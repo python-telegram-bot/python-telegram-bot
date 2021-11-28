@@ -14,12 +14,14 @@ repos:
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: v2.11.1
+    rev: v2.12.1
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
         args:
           - --rcfile=setup.cfg
+          #  run pylint across multiple cpu cores to speed it up-
+          - --jobs=0  # See https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
         additional_dependencies:
           - certifi
           - tornado>=6.1
