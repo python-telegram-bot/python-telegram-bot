@@ -75,7 +75,7 @@ class InlineQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin
+        id: str,  # pylint: disable=redefined-builtin, invalid-name
         from_user: User,
         query: str,
         offset: str,
