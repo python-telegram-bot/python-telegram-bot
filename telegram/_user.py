@@ -110,7 +110,7 @@ class User(TelegramObject):
 
     def __init__(
         self,
-        id: int,
+        id: int,  # pylint: disable=invalid-name
         first_name: str,
         is_bot: bool,
         last_name: str = None,
