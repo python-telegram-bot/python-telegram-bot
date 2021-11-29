@@ -1788,6 +1788,22 @@ class TestBot:
             bot.edit_chat_invite_link(**data)
 
     @flaky(3, 1)
+    def test_edit_revoke_chat_invite_link_passing_link_objects(self, bot, channel_id):
+        invite_link = bot.create_chat_invite_link(chat_id=channel_id)
+        assert invite_link.name is None
+
+        edited_link = bot.edit_chat_invite_link(
+            chat_id=channel_id, invite_link=invite_link, name='some_name'
+        )
+        assert edited_link == invite_link
+        assert edited_link.name == 'some_name'
+
+        revoked_link = bot.revoke_chat_invite_link(chat_id=channel_id, invite_link=edited_link)
+        assert revoked_link.invite_link == edited_link.invite_link
+        assert revoked_link.is_revoked is True
+        assert revoked_link.name == 'some_name'
+
+    @flaky(3, 1)
     @pytest.mark.parametrize('creates_join_request', [True, False])
     @pytest.mark.parametrize('name', [None, 'name'])
     def test_create_chat_invite_link_basics(self, bot, creates_join_request, name, channel_id):
