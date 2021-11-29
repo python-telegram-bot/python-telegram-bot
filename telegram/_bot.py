@@ -3686,8 +3686,8 @@ class Bot(TelegramObject):
         """
         If you sent an invoice requesting a shipping address and the parameter ``is_flexible`` was
         specified, the Bot API will send an :class:`telegram.Update` with a
-        :attr:`Update.shipping_query` field to the bot. Use this method to reply to shipping
-        queries.
+        :attr:`telegram.Update.shipping_query` field to the bot. Use this method to reply to
+        shipping queries.
 
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -3754,7 +3754,8 @@ class Bot(TelegramObject):
         """
         Once the user has confirmed their payment and shipping details, the Bot API sends the final
         confirmation in the form of an :class:`telegram.Update` with the field
-        :attr:`Update.pre_checkout_query`. Use this method to respond to such pre-checkout queries.
+        :attr:`telegram.Update.pre_checkout_query`. Use this method to respond to such pre-checkout
+        queries.
 
         Note:
             The Bot API must receive an answer within 10 seconds after the pre-checkout

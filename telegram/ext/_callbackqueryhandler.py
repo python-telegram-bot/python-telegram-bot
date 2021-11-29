@@ -44,11 +44,11 @@ RT = TypeVar('RT')
 class CallbackQueryHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram callback queries. Optionally based on a regex.
 
-    Read the documentation of the ``re`` module for more information.
+    Read the documentation of the :mod:`re` module for more information.
 
     Note:
         * If your bot allows arbitrary objects as ``callback_data``, it may happen that the
-          original ``callback_data`` for the incoming :class:`telegram.CallbackQuery`` can not be
+          original ``callback_data`` for the incoming :class:`telegram.CallbackQuery` can not be
           found. This is the case when either a malicious client tempered with the
           ``callback_data`` or the data was simply dropped from cache or not persisted. In these
           cases, an instance of :class:`telegram.ext.InvalidCallbackData` will be set as
@@ -57,7 +57,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
           .. versionadded:: 13.6
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
@@ -69,7 +69,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
             :class:`telegram.ext.ConversationHandler`.
         pattern (:obj:`str` | `Pattern` | :obj:`callable` | :obj:`type`, optional):
             Pattern to test :attr:`telegram.CallbackQuery.data` against. If a string or a regex
-            pattern is passed, :meth:`re.match` is used on :attr:`telegram.CallbackQuery.data` to
+            pattern is passed, :func:`re.match` is used on :attr:`telegram.CallbackQuery.data` to
             determine if an update should be handled by this handler. If your bot allows arbitrary
             objects as ``callback_data``, non-strings will be accepted. To filter arbitrary
             objects you may pass

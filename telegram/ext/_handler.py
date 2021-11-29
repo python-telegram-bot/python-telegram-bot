@@ -36,7 +36,7 @@ class Handler(Generic[UT, CCT], ABC):
     """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:

@@ -34,19 +34,19 @@ RT = TypeVar('RT')
 class StringRegexHandler(Handler[str, CCT]):
     """Handler class to handle string updates based on a regex which checks the update content.
 
-    Read the documentation of the ``re`` module for more information. The ``re.match`` function is
-    used to determine if an update should be handled by this handler.
+    Read the documentation of the :mod:`re` module for more information. The :func:`re.match`
+    function is used to determine if an update should be handled by this handler.
 
     Note:
         This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
         put in the queue. For example to send messages with the bot using command line or API.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature: ``def callback(update: Update, context: CallbackContext)``
@@ -57,7 +57,7 @@ class StringRegexHandler(Handler[str, CCT]):
             Defaults to :obj:`False`.
 
     Attributes:
-        pattern (:obj:`str` | :obj:`Pattern`): The regex pattern.
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
         callback (:obj:`callable`): The callback function for this handler.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 

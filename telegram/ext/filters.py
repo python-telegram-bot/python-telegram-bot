@@ -25,7 +25,7 @@ This module contains filters for use with :class:`telegram.ext.MessageHandler`,
     #. Filters are no longer callable, if you're using a custom filter and are calling an existing
        filter, then switch to the new syntax: ``filters.{filter}.check_update(update)``.
     #. Removed the ``Filters`` class. The filters are now directly attributes/classes of the
-       :mod:`filters` module.
+       :mod:`~telegram.ext.filters` module.
     #. The names of all filters has been updated:
 
         * Filter classes which are ready for use, e.g ``Filters.all`` are now capitalized, e.g
@@ -561,7 +561,7 @@ class CaptionRegex(MessageFilter):
         This filter will not work on simple text messages, but only on media with caption.
 
     Args:
-        pattern (:obj:`str` | :obj:`re.Pattern`): The regex pattern.
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
     """
 
     __slots__ = ('pattern',)
@@ -1320,8 +1320,8 @@ class ForwardedFrom(_ChatUserBaseFilter):
     Note:
         When a user has disallowed adding a link to their account while forwarding their
         messages, this filter will *not* work since both
-        :attr:`telegram.Message.forwarded_from` and
-        :attr:`telegram.Message.forwarded_from_chat` are :obj:`None`. However, this behaviour
+        :attr:`telegram.Message.forward_from` and
+        :attr:`telegram.Message.forward_from_chat` are :obj:`None`. However, this behaviour
         is undocumented and might be changed by Telegram.
 
     Warning:
@@ -1509,7 +1509,7 @@ POLL = _Poll(name="filters.POLL")
 class Regex(MessageFilter):
     """
     Filters updates by searching for an occurrence of ``pattern`` in the message text.
-    The :obj:`re.search()` function is used to determine whether an update should be filtered.
+    The :func:`re.search` function is used to determine whether an update should be filtered.
 
     Refer to the documentation of the :obj:`re` module for more information.
 
@@ -1532,7 +1532,7 @@ class Regex(MessageFilter):
         first filter, since the second one is never evaluated.
 
     Args:
-        pattern (:obj:`str` | :obj:`re.Pattern`): The regex pattern.
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
     """
 
     __slots__ = ('pattern',)

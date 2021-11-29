@@ -395,6 +395,7 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
 # We want to instead show *their* base class
 PRIVATE_BASE_CLASSES = {
     '_ChatUserBaseFilter': 'MessageFilter',
+    '_Dice': 'MessageFilter',
     '_BaseThumbedMedium': 'TelegramObject',
     '_BaseMedium': 'TelegramObject',
     '_CredentialsBase': 'TelegramObject',
