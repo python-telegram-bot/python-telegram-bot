@@ -43,6 +43,7 @@ __all__ = [
     'CallbackQueryLimit',
     'ChatAction',
     'ChatID',
+    'ChatInviteLinkLimit',
     'ChatMemberStatus',
     'ChatType',
     'DiceEmoji',
@@ -189,6 +190,24 @@ class ChatID(IntEnum):
           recommended to use :attr:`Message.sender_chat` instead.
         * This value is undocumented and might be changed by Telegram.
     """
+
+
+class ChatInviteLinkLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.ChatInviteLink`/
+    :meth:`telegram.Bot.create_chat_invite_link`/:meth:`telegram.Bot.edit_chat_invite_link`. The
+    enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 14.0
+    """
+
+    __slots__ = ()
+
+    MEMBER_LIMIT = 99999
+    """:obj:`int`: Maximum value allowed for the ``member_limit`` parameter of
+    :meth:`telegram.Bot.create_chat_invite_link` and :meth:`telegram.Bot.edit_chat_invite_link`."""
+    NAME_LENGTH = 32
+    """:obj:`int`: Maximum number of characters allowed for the ``name`` parameter of
+    :meth:`telegram.Bot.create_chat_invite_link` and :meth:`telegram.Bot.edit_chat_invite_link`."""
 
 
 class ChatMemberStatus(_StringEnum):

@@ -54,8 +54,10 @@ class ChatInviteLink(TelegramObject):
         expire_date (:class:`datetime.datetime`, optional): Date when the link will expire or
             has been expired.
         member_limit (:obj:`int`, optional): Maximum number of users that can be members of the
-            chat simultaneously after joining the chat via this invite link; 1-99999.
+            chat simultaneously after joining the chat via this invite link;
+            1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
         name (:obj:`str`, optional): Invite link name.
+            0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
             .. versionadded:: 13.8
         pending_join_request_count (:obj:`int`, optional): Number of pending join requests

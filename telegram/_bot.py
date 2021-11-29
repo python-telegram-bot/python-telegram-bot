@@ -4096,13 +4096,15 @@ class Bot(TelegramObject):
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
-                the chat simultaneously after joining the chat via this invite link; 1-99999.
+                the chat simultaneously after joining the chat via this invite link;
+                1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-            name (:obj:`str`, optional): Invite link name; 0-32 characters.
+            name (:obj:`str`, optional): Invite link name;
+                0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
                 .. versionadded:: 13.8
             creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
@@ -4147,7 +4149,7 @@ class Bot(TelegramObject):
     def edit_chat_invite_link(
         self,
         chat_id: Union[str, int],
-        invite_link: str,
+        invite_link: Union[str, 'ChatInviteLink'],
         expire_date: Union[int, datetime] = None,
         member_limit: int = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4170,19 +4172,24 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            invite_link (:obj:`str`): The invite link to edit.
+            invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to edit.
+
+                .. versionchanged:: 14.0
+                    Now also accepts :obj:`telegram.ChatInviteLink` instances.
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
-                the chat simultaneously after joining the chat via this invite link; 1-99999.
+                the chat simultaneously after joining the chat via this invite link;
+                1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-            name (:obj:`str`, optional): Invite link name; 0-32 characters.
+            name (:obj:`str`, optional): Invite link name;
+                0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
                 .. versionadded:: 13.8
             creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
@@ -4203,7 +4210,8 @@ class Bot(TelegramObject):
                 "If `creates_join_request` is `True`, `member_limit` can't be specified."
             )
 
-        data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
+        link = invite_link.invite_link if isinstance(invite_link, ChatInviteLink) else invite_link
+        data: JSONDict = {'chat_id': chat_id, 'invite_link': link}
 
         if expire_date is not None:
             data['expire_date'] = expire_date
@@ -4225,7 +4233,7 @@ class Bot(TelegramObject):
     def revoke_chat_invite_link(
         self,
         chat_id: Union[str, int],
-        invite_link: str,
+        invite_link: Union[str, 'ChatInviteLink'],
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> ChatInviteLink:
@@ -4239,7 +4247,10 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            invite_link (:obj:`str`): The invite link to edit.
+            invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to revoke.
+
+                .. versionchanged:: 14.0
+                    Now also accepts :obj:`telegram.ChatInviteLink` instances.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -4253,7 +4264,8 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {'chat_id': chat_id, 'invite_link': invite_link}
+        link = invite_link.invite_link if isinstance(invite_link, ChatInviteLink) else invite_link
+        data: JSONDict = {'chat_id': chat_id, 'invite_link': link}
 
         result = self._post('revokeChatInviteLink', data, timeout=timeout, api_kwargs=api_kwargs)
 
