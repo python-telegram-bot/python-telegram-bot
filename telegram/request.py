@@ -107,7 +107,7 @@ class Request:
         con_pool_size (:obj:`int`): Number of connections to keep in the connection pool.
         proxy_url (:obj:`str`): The URL to the proxy server. For example: `http://127.0.0.1:3128`.
         urllib3_proxy_kwargs (:obj:`dict`): Arbitrary arguments passed as-is to
-            :obj:`urllib3.ProxyManager`. This value will be ignored if :attr:`proxy_url` is not
+            ``urllib3.ProxyManager``. This value will be ignored if :paramref:`proxy_url` is not
             set.
         connect_timeout (:obj:`int` | :obj:`float`): The maximum amount of time (in seconds) to
             wait for a connection attempt to a server to succeed. :obj:`None` will set an

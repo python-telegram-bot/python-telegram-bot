@@ -40,7 +40,7 @@ ConversationDict = Dict[Tuple[int, ...], Optional[object]]
 """
 
 CDCData = Tuple[List[Tuple[str, float, Dict[str, Any]]], Dict[str, str]]
-"""Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]], \
+"""Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :class:`object`]]], \
     Dict[:obj:`str`, :obj:`str`]]: Data returned by
     :attr:`telegram.ext.CallbackDataCache.persistence_data`.
 

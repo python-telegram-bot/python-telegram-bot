@@ -41,7 +41,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     Warning:
         :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by
-        :attr:`REPLACED_BOT` and insert the bot set with
+        :attr:`~telegram.ext.BasePersistence.REPLACED_BOT` and insert the bot set with
         :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
         that changes to the bot apply to the saved objects, too. If you change the bots token, this
         may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
@@ -196,7 +196,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             pickle.dump(data, file)
 
     def get_user_data(self) -> DefaultDict[int, UD]:
-        """Returns the user_data from the pickle file if it exists or an empty :obj:`defaultdict`.
+        """Returns the user_data from the pickle file if it exists or an empty
+        :class:`collections.defaultdict`.
 
         Returns:
             DefaultDict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`]:
@@ -216,7 +217,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         return self.user_data  # type: ignore[return-value]
 
     def get_chat_data(self) -> DefaultDict[int, CD]:
-        """Returns the chat_data from the pickle file if it exists or an empty :obj:`defaultdict`.
+        """Returns the chat_data from the pickle file if it exists or an empty
+        :class:`collections.defaultdict`.
 
         Returns:
             DefaultDict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`]:
@@ -260,7 +262,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]:
+                Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]:
                 The restored meta data or :obj:`None`, if no data was stored.
         """
         if self.callback_data:
@@ -305,7 +307,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         Args:
             name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
-            new_state (:obj:`tuple` | :obj:`Any`): The new state for the given key.
+            new_state (:obj:`tuple` | :class:`object`): The new state for the given key.
         """
         if not self.conversations:
             self.conversations = {}
@@ -380,7 +382,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Args:
             data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]):
+                Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]):
                 The relevant data to restore :class:`telegram.ext.CallbackDataCache`.
         """
         if self.callback_data == data:

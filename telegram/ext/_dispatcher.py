@@ -106,13 +106,15 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
-        update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.
+        update_queue (:class:`queue.Queue`): The synchronized queue that will contain the updates.
         job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
             instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
             ``@run_async`` decorator and :meth:`run_async`.
-        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
-        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
+        user_data (:class:`collections.defaultdict`): A dictionary handlers can use to store dat
+            for the user.
+        chat_data (:class:`collections.defaultdict`): A dictionary handlers can use to store data
+            for the chat.
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
@@ -135,6 +137,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
             .. seealso::
                 :meth:`start`, :meth:`stop`
+        context_types (:class:`telegram.ext.ContextTypes`): Specifies the types used by this
+            dispatcher for the ``context`` argument of handler and job callbacks.
 
     """
 
@@ -351,11 +355,11 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
         Args:
             func (:obj:`callable`): The function to run in the thread.
-            *args (:obj:`tuple`, optional): Arguments to ``func``.
+            *args (:obj:`tuple`, optional): Arguments to :paramref:`func`.
             update (:class:`telegram.Update` | :obj:`object`, optional): The update associated with
                 the functions call. If passed, it will be available in the error handlers, in case
-                an exception is raised by :attr:`func`.
-            **kwargs (:obj:`dict`, optional): Keyword arguments to ``func``.
+                an exception is raised by :paramref:`func`.
+            **kwargs (:obj:`dict`, optional): Keyword arguments to :paramref:`func`.
 
         Returns:
             Promise
@@ -750,8 +754,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         Args:
             update (:obj:`object` | :class:`telegram.Update`): The update that caused the error.
             error (:obj:`Exception`): The error that was raised.
-            promise (:class:`telegram._utils.Promise`, optional): The promise whose pooled function
-                raised the error.
             job (:class:`telegram.ext.Job`, optional): The job that caused the error.
 
                 .. versionadded:: 14.0
