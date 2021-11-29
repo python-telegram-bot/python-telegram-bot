@@ -26,7 +26,7 @@ try:
 except ImportError:
     ujson = None
 
-from telegram import TelegramObject
+from telegram import TelegramObject, Message, Chat, User
 
 
 class TestTelegramObject:
@@ -131,3 +131,17 @@ class TestTelegramObject:
         elif bot_inst is None:
             with pytest.raises(RuntimeError):
                 tg_object.get_bot()
+
+    def test_subscription(self):
+        # We test with Message because that gives us everything we want to test - easier than
+        # implementing a custom subclass just for this test
+        chat = Chat(2, Chat.PRIVATE)
+        user = User(3, 'first_name', False)
+        message = Message(1, None, chat=chat, from_user=user, text='foobar')
+        assert message['text'] == 'foobar'
+        assert message['chat'] is chat
+        assert message['chat_id'] == 2
+        assert message['from'] is user
+        assert message['from_user'] is user
+        with pytest.raises(KeyError, match="Message don't have an attribute called `no_key`"):
+            message['no_key']
