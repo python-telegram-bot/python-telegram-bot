@@ -114,7 +114,7 @@ class File(TelegramObject):
 
         .. versionchanged:: 14.0
 
-            * ``custom_path`` parameter now also accepts :class:`pathlib.Path` as argument.
+            * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
             * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
               returned.
 

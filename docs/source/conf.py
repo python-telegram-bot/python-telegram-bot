@@ -403,7 +403,7 @@ PRIVATE_BASE_CLASSES = {
 
 
 def autodoc_process_bases(app, name, obj, option, bases: list):
-    """Here we fine tue how the base classes classes are displayed."""
+    """Here we fine tune how the base class's classes are displayed."""
     for idx, base in enumerate(bases):
         # let's use a string representation of the object
         base = str(base)

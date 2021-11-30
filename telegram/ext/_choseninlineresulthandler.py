@@ -47,8 +47,8 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
             :class:`telegram.ext.ConversationHandler`.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
             Defaults to :obj:`False`.
-        pattern (:obj:`str` | `Pattern`, optional): Regex pattern. If not :obj:`None`,
-            :func:`re.match`
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Regex pattern. If not
+            :obj:`None`, :func:`re.match`
             is used on :attr:`telegram.ChosenInlineResult.result_id` to determine if an update
             should be handled by this handler. This is accessible in the callback as
             :attr:`telegram.ext.CallbackContext.matches`.

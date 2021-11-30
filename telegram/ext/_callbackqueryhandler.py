@@ -47,12 +47,14 @@ class CallbackQueryHandler(Handler[Update, CCT]):
     Read the documentation of the :mod:`re` module for more information.
 
     Note:
-        * If your bot allows arbitrary objects as ``callback_data``, it may happen that the
-          original ``callback_data`` for the incoming :class:`telegram.CallbackQuery` can not be
-          found. This is the case when either a malicious client tempered with the
-          ``callback_data`` or the data was simply dropped from cache or not persisted. In these
+        * If your bot allows arbitrary objects as
+          :paramref:`~telegram.InlineKeyboardButton.callback_data`, it may happen that the
+          original :attr:`~telegram.InlineKeyboardButton.callback_data` for the incoming
+          :class:`telegram.CallbackQuery` can not be found. This is the case when either a
+          malicious client tempered with the :attr:`telegram.CallbackQuery.data` or the data was
+          simply dropped from cache or not persisted. In these
           cases, an instance of :class:`telegram.ext.InvalidCallbackData` will be set as
-          ``callback_data``.
+          :attr:`telegram.CallbackQuery.data`.
 
           .. versionadded:: 13.6
 

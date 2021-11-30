@@ -82,7 +82,7 @@ class Message(TelegramObject):
     considered equal, if their :attr:`message_id` and :attr:`chat` are equal.
 
     Note:
-        In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
+        In Python :keyword:`from` is a reserved word, :paramref:`from_user`
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.

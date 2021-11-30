@@ -194,12 +194,12 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def replace_bot(cls, obj: object) -> object:
         """
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
-        :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
-        ``frozenset``, ``dict``, :class:`collections.defaultdict` and objects that have a
-        ``__dict__`` or
-        ``__slots__`` attribute, excluding classes and objects that can't be copied with
-        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
-        the error will be logged.
+        :attr:`REPLACED_BOT`. Currently, this handles objects of type :class:`list`,
+        :class:`tuple`, :class:`set`, :class:`frozenset`, :class:`dict`,
+        :class:`collections.defaultdict` and objects that have a :attr:`~object.__dict__` or
+        :data:`~object.__slots__` attribute, excluding classes and objects that can't be copied
+        with :func:`copy.copy`. If the parsing of an object fails, the object will be returned
+        unchanged and the error will be logged.
 
         Args:
             obj (:obj:`object`): The object
@@ -298,12 +298,12 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def insert_bot(self, obj: object) -> object:
         """
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
-        :paramref:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
-        ``frozenset``, ``dict``, :class:`collections.defaultdict` and objects that have a
-        ``__dict__`` or
-        ``__slots__`` attribute, excluding classes and objects that can't be copied with
-        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
-        the error will be logged.
+        :paramref:`bot`. Currently, this handles objects of type :class:`list`,
+        :class:`tuple`, :class:`set`, :class:`frozenset`, :class:`dict`,
+        :class:`collections.defaultdict` and objects that have a :attr:`~object.__dict__` or
+        :data:`~object.__slots__` attribute, excluding classes and objects that can't be copied
+        with :func:`copy.copy`. If the parsing of an object fails, the object will be returned
+        unchanged and the error will be logged.
 
         Args:
             obj (:obj:`object`): The object

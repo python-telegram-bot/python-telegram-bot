@@ -31,7 +31,7 @@ class OrderInfo(TelegramObject):
     """This object represents information about an order.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`name`, :paramref:`phone_number`, :attr:`email` and
+    considered equal, if their :attr:`name`, :attr:`phone_number`, :attr:`email` and
     :attr:`shipping_address` are equal.
 
     Args:

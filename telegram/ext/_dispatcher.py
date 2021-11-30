@@ -111,7 +111,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
             ``@run_async`` decorator and :meth:`run_async`.
-        user_data (:class:`collections.defaultdict`): A dictionary handlers can use to store dat
+        user_data (:class:`collections.defaultdict`): A dictionary handlers can use to store data
             for the user.
         chat_data (:class:`collections.defaultdict`): A dictionary handlers can use to store data
             for the chat.
