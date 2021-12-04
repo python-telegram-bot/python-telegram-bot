@@ -42,7 +42,7 @@ class PTBRuntimeWarning(PTBUserWarning, RuntimeWarning):
     __slots__ = ()
 
 
-# https://www.python.org/dev/peps/pep-0565/ recommends to use a custom warning class derived from
+# https://www.python.org/dev/peps/pep-0565/ recommends using a custom warning class derived from
 # DeprecationWarning. We also subclass from TGUserWarning so users can easily 'switch off' warnings
 class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
     """
