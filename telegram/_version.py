@@ -18,7 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
 
+__version__ = '13.8.1'
+
 from telegram import constants
 
-__version__ = '13.8.1'
 bot_api_version = constants.BOT_API_VERSION  # pylint: disable=invalid-name
