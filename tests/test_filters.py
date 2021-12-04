@@ -112,17 +112,8 @@ class TestFilters:
 
             assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
 
-            assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
-
             for attr in cls.__slots__:
                 assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}' for {name}"
-
-        class CustomFilter(filters.MessageFilter):
-            def filter(self, message: Message):
-                pass
-
-        with pytest.warns(None):
-            CustomFilter().custom = 'allowed'  # Test setting custom attr to custom filters
 
     def test_filters_all(self, update):
         assert filters.ALL.check_update(update)
