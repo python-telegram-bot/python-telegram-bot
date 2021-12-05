@@ -23,6 +23,14 @@
    module ``telegram.utils.helpers``.
 """
 
+__all__ = (
+    'create_deep_linked_url',
+    'effective_message_type',
+    'escape_markdown',
+    'mention_html',
+    'mention_markdown',
+)
+
 import re
 
 from html import escape

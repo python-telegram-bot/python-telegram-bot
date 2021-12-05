@@ -33,9 +33,6 @@ Attributes:
 The following constants are related to specific classes or topics and are grouped into enums. If
 they are related to a specific class, then they are also available as attributes of those classes.
 """
-from enum import Enum, IntEnum
-from typing import List
-
 
 __all__ = [
     'BOT_API_VERSION',
@@ -65,6 +62,9 @@ __all__ = [
     'SUPPORTED_WEBHOOK_PORTS',
     'UpdateType',
 ]
+
+from enum import Enum, IntEnum
+from typing import List
 
 
 class _StringEnum(str, Enum):
