@@ -45,6 +45,12 @@ class InlineKeyboardButton(TelegramObject):
 
           .. versionadded:: 13.6
 
+        * Added support for mentioning users by their ID in inline keyboards. This will only work
+          in Telegram versions released after December 7, 2021. Older clients will display
+          *unsupported message*.
+
+          .. versionadded:: 13.9
+
     Warning:
         If your bot allows your arbitrary callback data, buttons whose callback data is a
         non-hashable object will be come unhashable. Trying to evaluate ``hash(button)`` will
@@ -54,7 +60,9 @@ class InlineKeyboardButton(TelegramObject):
 
     Args:
         text (:obj:`str`): Label text on the button.
-        url (:obj:`str`, optional): HTTP or tg:// url to be opened when button is pressed.
+        url (:obj:`str`, optional): HTTP or tg:// url to be opened when the button is pressed.
+            Links <code>tg://user?id=&lt;user_id&gt;</code> can be used to mention a user by
+            their ID without using a username, if this is allowed by their privacy settings.
         login_url (:class:`telegram.LoginUrl`, optional): An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str` | :obj:`Any`, optional): Data to be sent in a callback query to
@@ -81,7 +89,9 @@ class InlineKeyboardButton(TelegramObject):
 
     Attributes:
         text (:obj:`str`): Label text on the button.
-        url (:obj:`str`): Optional. HTTP or tg:// url to be opened when button is pressed.
+        url (:obj:`str`): Optional. HTTP or tg:// url to be opened when the button is pressed.
+            Links <code>tg://user?id=&lt;user_id&gt;</code> can be used to mention a user by
+            their ID without using a username, if this is allowed by their privacy settings.
         login_url (:class:`telegram.LoginUrl`): Optional. An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str` | :obj:`object`): Optional. Data to be sent in a callback query

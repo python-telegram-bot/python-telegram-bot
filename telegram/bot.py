@@ -2409,6 +2409,58 @@ class Bot(TelegramObject):
         return result  # type: ignore[return-value]
 
     @log
+    def ban_chat_sender_chat(
+        self,
+        chat_id: Union[str, int],
+        sender_chat_id: int,
+        until_date: Union[int, datetime] = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to ban a channel chat in a supergroup or a channel. The owner of the chat
+        will not be able to send messages and join live streams on behalf of the chat, unless it
+        is unbanned first. The bot must be an administrator in the supergroup or channel for this
+        to work and must have the appropriate administrator rights.
+
+         .. versionadded:: 13.9
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
+                of the target supergroup or channel (in the format ``@channelusername``).
+            sender_chat_id (:obj:`int`): Unique identifier of the target sender chat
+            until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the sender chat
+                will be unbanned, unix time. If the chat is banned for more than 366 days or less
+                than 30 seconds from the current time they are considered to be banned forever.
+                For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+                bot will be used.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {'chat_id': chat_id, 'sender_chat_id': sender_chat_id}
+
+        if until_date is not None:
+            if isinstance(until_date, datetime):
+                until_date = to_timestamp(
+                    until_date, tzinfo=self.defaults.tzinfo if self.defaults else None
+                )
+            data['until_date'] = until_date
+
+        result = self._post('banChatSenderChat', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        return result  # type: ignore[return-value]
+
+    @log
     def unban_chat_member(
         self,
         chat_id: Union[str, int],
@@ -2449,6 +2501,43 @@ class Bot(TelegramObject):
             data['only_if_banned'] = only_if_banned
 
         result = self._post('unbanChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
+
+        return result  # type: ignore[return-value]
+
+    @log
+    def unban_chat_sender_chat(
+        self,
+        chat_id: Union[str, int],
+        sender_chat_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Use this method to unban a previously banned channel in a supergroup or channel.
+        The bot must be an administrator for this to work and must have the
+        appropriate administrator rights.
+
+        .. versionadded:: 13.9
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target supergroup or channel (in the format ``@channelusername``).
+            sender_chat_id (:obj:`int`): Unique identifier of the target sender chat.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool` On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {'chat_id': chat_id, 'sender_chat_id': sender_chat_id}
+
+        result = self._post('unbanChatSenderChat', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
 
@@ -5499,10 +5588,14 @@ class Bot(TelegramObject):
     """Alias for :meth:`get_file`"""
     banChatMember = ban_chat_member
     """Alias for :meth:`ban_chat_member`"""
+    banChatSenderChat = ban_chat_sender_chat
+    """Alias for :meth:`ban_chat_sender_chat`"""
     kickChatMember = kick_chat_member
     """Alias for :meth:`kick_chat_member`"""
     unbanChatMember = unban_chat_member
     """Alias for :meth:`unban_chat_member`"""
+    unbanChatSenderChat = unban_chat_sender_chat
+    """Alias for :meth:`ban_chat_sender_chat`"""
     answerCallbackQuery = answer_callback_query
     """Alias for :meth:`answer_callback_query`"""
     editMessageText = edit_message_text
