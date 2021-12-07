@@ -41,6 +41,8 @@ def chat(bot):
         bio=TestChat.bio,
         linked_chat_id=TestChat.linked_chat_id,
         location=TestChat.location,
+        has_private_forwards=True,
+        has_protected_content=True,
     )
 
 
@@ -62,6 +64,8 @@ class TestChat:
     bio = "I'm a Barbie Girl in a Barbie World"
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), 'Barbie World')
+    has_protected_content = True
+    has_private_forwards = True
 
     def test_slot_behaviour(self, chat, recwarn, mro_slots):
         for attr in chat.__slots__:
@@ -84,6 +88,8 @@ class TestChat:
             'slow_mode_delay': self.slow_mode_delay,
             'message_auto_delete_time': self.message_auto_delete_time,
             'bio': self.bio,
+            'has_protected_content': self.has_protected_content,
+            'has_private_forwards': self.has_private_forwards,
             'linked_chat_id': self.linked_chat_id,
             'location': self.location.to_dict(),
         }
@@ -100,6 +106,8 @@ class TestChat:
         assert chat.slow_mode_delay == self.slow_mode_delay
         assert chat.message_auto_delete_time == self.message_auto_delete_time
         assert chat.bio == self.bio
+        assert chat.has_protected_content == self.has_protected_content
+        assert chat.has_private_forwards == self.has_private_forwards
         assert chat.linked_chat_id == self.linked_chat_id
         assert chat.location.location == self.location.location
         assert chat.location.address == self.location.address
@@ -117,6 +125,8 @@ class TestChat:
         assert chat_dict['slow_mode_delay'] == chat.slow_mode_delay
         assert chat_dict['message_auto_delete_time'] == chat.message_auto_delete_time
         assert chat_dict['bio'] == chat.bio
+        assert chat_dict['has_private_forwards'] == chat.has_private_forwards
+        assert chat_dict['has_protected_content'] == chat.has_protected_content
         assert chat_dict['linked_chat_id'] == chat.linked_chat_id
         assert chat_dict['location'] == chat.location.to_dict()
 

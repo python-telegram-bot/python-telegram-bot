@@ -180,6 +180,8 @@ def message(bot):
             )
         },
         {'sender_chat': Chat(-123, 'discussion_channel')},
+        {'is_automatic_forward': True},
+        {'has_protected_content': True},
     ],
     ids=[
         'forwarded_user',
@@ -229,6 +231,8 @@ def message(bot):
         'voice_chat_ended',
         'voice_chat_participants_invited',
         'sender_chat',
+        'is_automatic_forward',
+        'has_protected_content',
     ],
 )
 def message_params(bot, request):
