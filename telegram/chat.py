@@ -457,6 +457,52 @@ class Chat(TelegramObject):
             revoke_messages=revoke_messages,
         )
 
+    def ban_sender_chat(
+        self,
+        sender_chat_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.ban_chat_sender_chat(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.ban_chat_sender_chat`.
+
+        .. versionadded:: 13.9
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.ban_chat_sender_chat(
+            chat_id=self.id, sender_chat_id=sender_chat_id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def unban_sender_chat(
+        self,
+        sender_chat_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.unban_chat_sender_chat(update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.unban_chat_sender_chat`.
+
+        .. versionadded:: 13.9
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unban_chat_sender_chat(
+            chat_id=self.id, sender_chat_id=sender_chat_id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
     def unban_member(
         self,
         user_id: Union[str, int],
