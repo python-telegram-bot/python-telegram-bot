@@ -579,6 +579,14 @@ class Bot(TelegramObject):
     ) -> Message:
         """Use this method to forward messages of any kind. Service messages can't be forwarded.
 
+        Note:
+            Since the release of Bot API 5.5 it can be impossible to forward messages from
+            some chats. Use the field :attr:`telegram.Message.has_protected_content` and
+            :attr:`telegram.Chat.has_protected_content` to check this.
+
+            As a workaround, it is still possible to use :meth:`copy_message`. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -5595,7 +5603,7 @@ class Bot(TelegramObject):
     unbanChatMember = unban_chat_member
     """Alias for :meth:`unban_chat_member`"""
     unbanChatSenderChat = unban_chat_sender_chat
-    """Alias for :meth:`ban_chat_sender_chat`"""
+    """Alias for :meth:`unban_chat_sender_chat`"""
     answerCallbackQuery = answer_callback_query
     """Alias for :meth:`answer_callback_query`"""
     editMessageText = edit_message_text

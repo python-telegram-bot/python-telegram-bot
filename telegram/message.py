@@ -1817,6 +1817,14 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
+        Note:
+            Since the release of Bot API 5.5 it can be impossible to forward messages from
+            some chats. Use the field :attr:`telegram.Message.has_protected_content` and
+            :attr:`telegram.Chat.has_protected_content` to check this.
+
+            As a workaround, it is still possible to use :meth:`copy`. However, this
+            behaviour is undocumented and might be changed by Telegram.
+
         Returns:
             :class:`telegram.Message`: On success, instance representing the message forwarded.
 

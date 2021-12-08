@@ -1965,16 +1965,16 @@ officedocument.wordprocessingml.document")``.
 
     class sender_chat(_ChatUserBaseFilter):
         # pylint: disable=W0235
-        """Filters messages to allow only those which are from a specified sender chats chat ID or
+        """Filters messages to allow only those which are from a specified sender chat's chat ID or
         username.
 
         Examples:
-            * To filter for messages forwarded to a discussion group from a channel with ID
+            * To filter for messages sent to a group by a channel with ID
               ``-1234``, use ``MessageHandler(Filters.sender_chat(-1234), callback_method)``.
             * To filter for messages of anonymous admins in a super group with username
               ``@anonymous``, use
               ``MessageHandler(Filters.sender_chat(username='anonymous'), callback_method)``.
-            * To filter for messages forwarded to a discussion group from *any* channel, use
+            * To filter for messages sent to a group by *any* channel, use
               ``MessageHandler(Filters.sender_chat.channel, callback_method)``.
             * To filter for messages of anonymous admins in *any* super group, use
               ``MessageHandler(Filters.sender_chat.super_group, callback_method)``.
@@ -1983,7 +1983,8 @@ officedocument.wordprocessingml.document")``.
             Remember, ``sender_chat`` is also set for messages in a channel as the channel itself,
             so when your bot is an admin in a channel and the linked discussion group, you would
             receive the message twice (once from inside the channel, once inside the discussion
-            group).
+            group). Since v13.9, the field :attr:`telegram.Message.is_automatic_forward` will be
+            :obj:`True` for the discussion group message.
 
         Warning:
             :attr:`chat_ids` will return a *copy* of the saved chat ids as :class:`frozenset`. This
