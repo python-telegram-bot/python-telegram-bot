@@ -90,12 +90,12 @@ class Message(TelegramObject):
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`, optional): Sender, empty for messages sent
-            to channels.
+        from_user (:class:`telegram.User`, optional): Sender of the message; empty for messages
+            sent to channels. For backward compatibility, this will contain a fake sender user in
+            non-channel chats, if the message was sent on behalf of a chat.
         sender_chat (:class:`telegram.Chat`, optional): Sender of the message, sent on behalf of a
-            chat. The channel itself for channel messages. The supergroup itself for messages from
-            anonymous group administrators. The linked channel for messages automatically forwarded
-            to the discussion group.
+            chat. For backward compatibility, :attr:`from_user` contains a fake sender user in
+            non-channel chats, if the message was sent on behalf of a chat.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
@@ -233,11 +233,12 @@ class Message(TelegramObject):
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`): Optional. Sender.
+        from_user (:class:`telegram.User`): Optional. Sender of the message; empty for messages
+            sent to channels. For backward compatibility, this will contain a fake sender user in
+            non-channel chats, if the message was sent on behalf of a chat.
         sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
-            chat. The channel itself for channel messages. The supergroup itself for messages from
-            anonymous group administrators. The linked channel for messages automatically forwarded
-            to the discussion group.
+            chat. For backward compatibility, :attr:`from_user` contains a fake sender user in
+            non-channel chats, if the message was sent on behalf of a chat.
         date (:class:`datetime.datetime`): Date the message was sent.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`): Optional. Sender of the original message.
