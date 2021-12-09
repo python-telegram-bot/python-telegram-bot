@@ -246,11 +246,9 @@ class User(TelegramObject):
             name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
 
         Returns:
-            :obj:`InlineKeyboardButton`: InlineButton with url set to the user mention
+            :class:`telegram.InlineKeyboardButton`: InlineButton with url set to the user mention
         """
-        if name:
-            return InlineKeyboardButton(text=name, url=f"tg://user?id={self.id}")
-        return InlineKeyboardButton(text=self.full_name, url=f"tg://user?id={self.id}")
+        return InlineKeyboardButton(text=name or self.full_name, url=f"tg://user?id={self.id}")
 
     def pin_message(
         self,
