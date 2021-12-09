@@ -1819,7 +1819,7 @@ class Message(TelegramObject):
 
         Note:
             Since the release of Bot API 5.5 it can be impossible to forward messages from
-            some chats. Use the field :attr:`telegram.Message.has_protected_content` and
+            some chats. Use the attributes :attr:`telegram.Message.has_protected_content` and
             :attr:`telegram.Chat.has_protected_content` to check this.
 
             As a workaround, it is still possible to use :meth:`copy`. However, this

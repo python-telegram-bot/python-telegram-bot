@@ -250,6 +250,21 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'ban_chat_sender_chat', make_assertion)
         assert chat.ban_sender_chat(42)
 
+    def test_ban_chat(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == 42
+            sender_chat_id = kwargs['sender_chat_id'] == chat.id
+            return chat_id and sender_chat_id
+
+        assert check_shortcut_signature(
+            Chat.ban_chat, Bot.ban_chat_sender_chat, ['sender_chat_id'], []
+        )
+        assert check_shortcut_call(chat.ban_chat, chat.bot, 'ban_chat_sender_chat')
+        assert check_defaults_handling(chat.ban_chat, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'ban_chat_sender_chat', make_assertion)
+        assert chat.ban_chat(42)
+
     def test_kick_member_warning(self, chat, monkeypatch, recwarn):
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -291,6 +306,21 @@ class TestChat:
 
         monkeypatch.setattr(chat.bot, 'unban_chat_sender_chat', make_assertion)
         assert chat.unban_sender_chat(42)
+
+    def test_unban_chat(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == 42
+            sender_chat_id = kwargs['sender_chat_id'] == chat.id
+            return chat_id and sender_chat_id
+
+        assert check_shortcut_signature(
+            Chat.unban_chat, Bot.ban_chat_sender_chat, ['sender_chat_id'], []
+        )
+        assert check_shortcut_call(chat.unban_chat, chat.bot, 'unban_chat_sender_chat')
+        assert check_defaults_handling(chat.unban_chat, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'unban_chat_sender_chat', make_assertion)
+        assert chat.unban_chat(42)
 
     @pytest.mark.parametrize('is_anonymous', [True, False, None])
     def test_promote_member(self, monkeypatch, chat, is_anonymous):

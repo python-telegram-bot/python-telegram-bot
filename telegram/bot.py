@@ -581,7 +581,7 @@ class Bot(TelegramObject):
 
         Note:
             Since the release of Bot API 5.5 it can be impossible to forward messages from
-            some chats. Use the field :attr:`telegram.Message.has_protected_content` and
+            some chats. Use the attributes :attr:`telegram.Message.has_protected_content` and
             :attr:`telegram.Chat.has_protected_content` to check this.
 
             As a workaround, it is still possible to use :meth:`copy_message`. However, this
@@ -2426,11 +2426,11 @@ class Bot(TelegramObject):
     ) -> bool:
         """
         Use this method to ban a channel chat in a supergroup or a channel. Until the chat is
-        unbanned, the owner of the banned chat won't be able to send messages on behalf of *any of
-        their channels*. The bot must be an administrator in the supergroup or channel for this
+        unbanned, the owner of the banned chat won't be able to send messages on behalf of **any of
+        their channels**. The bot must be an administrator in the supergroup or channel for this
         to work and must have the appropriate administrator rights.
 
-         .. versionadded:: 13.9
+        .. versionadded:: 13.9
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
@@ -2484,7 +2484,7 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :obj:`bool` On success, :obj:`True` is returned.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -2524,7 +2524,7 @@ class Bot(TelegramObject):
                 Telegram API.
 
         Returns:
-            :obj:`bool` On success, :obj:`True` is returned.
+            :obj:`bool`: On success, :obj:`True` is returned.
 
         Raises:
             :class:`telegram.error.TelegramError`

@@ -1013,12 +1013,12 @@ class TestBot:
         assert tz_bot.ban_chat_member(2, 32, until_date=until_timestamp)
 
     def test_ban_chat_sender_chat(self, monkeypatch, bot):
-        def test(url, data, *args, **kwargs):
+        def make_assertion(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
             sender_chat_id = data['sender_chat_id'] == 32
             return chat_id and sender_chat_id
 
-        monkeypatch.setattr(bot.request, 'post', test)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
         assert bot.ban_chat_sender_chat(2, 32)
         monkeypatch.delattr(bot.request, 'post')
 

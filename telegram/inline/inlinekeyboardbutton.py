@@ -63,6 +63,9 @@ class InlineKeyboardButton(TelegramObject):
         url (:obj:`str`, optional): HTTP or tg:// url to be opened when the button is pressed.
             Links ``tg://user?id=<user_id>`` can be used to mention a user by
             their ID without using a username, if this is allowed by their privacy settings.
+
+            .. versionchanged:: 13.9
+               You can now mention a user using ``tg://user?id=<user_id>``.
         login_url (:class:`telegram.LoginUrl`, optional): An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str` | :obj:`Any`, optional): Data to be sent in a callback query to
@@ -93,6 +96,9 @@ class InlineKeyboardButton(TelegramObject):
         url (:obj:`str`): Optional. HTTP or tg:// url to be opened when the button is pressed.
             Links ``tg://user?id=<user_id>`` can be used to mention a user by
             their ID without using a username, if this is allowed by their privacy settings.
+
+            .. versionchanged:: 13.9
+               You can now mention a user using ``tg://user?id=<user_id>``.
         login_url (:class:`telegram.LoginUrl`): Optional. An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str` | :obj:`object`): Optional. Data to be sent in a callback query

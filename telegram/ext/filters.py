@@ -1986,6 +1986,8 @@ officedocument.wordprocessingml.document")``.
             group). Since v13.9, the field :attr:`telegram.Message.is_automatic_forward` will be
             :obj:`True` for the discussion group message.
 
+            .. seealso:: :attr:`Filters.is_automatic_forward`
+
         Warning:
             :attr:`chat_ids` will return a *copy* of the saved chat ids as :class:`frozenset`. This
             is to ensure thread safety. To add/remove a chat, you should use :meth:`add_usernames`,
@@ -2089,6 +2091,32 @@ officedocument.wordprocessingml.document")``.
 
         super_group = _SuperGroup()
         channel = _Channel()
+
+    class _IsAutomaticForward(MessageFilter):
+        __slots__ = ()
+        name = 'Filters.is_automatic_forward'
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.is_automatic_forward)
+
+    is_automatic_forward = _IsAutomaticForward()
+    """Messages that contain :attr:`telegram.Message.is_automatic_forward`.
+
+        .. versionadded:: 13.9
+    """
+
+    class _HasProtectedContent(MessageFilter):
+        __slots__ = ()
+        name = 'Filters.has_protected_content'
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.has_protected_content)
+
+    has_protected_content = _HasProtectedContent()
+    """Messages that contain :attr:`telegram.Message.has_protected_content`.
+
+        .. versionadded:: 13.9
+    """
 
     class _Invoice(MessageFilter):
         __slots__ = ()
