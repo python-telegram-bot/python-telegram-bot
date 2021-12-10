@@ -48,6 +48,10 @@ Attributes:
     ANONYMOUS_ADMIN_ID (:obj:`int`): ``1087968824`` (User id in groups for anonymous admin)
     SERVICE_CHAT_ID (:obj:`int`): ``777000`` (Telegram service chat, that also acts as sender of
         channel posts forwarded to discussion groups)
+    FAKE_CHANNEL_ID (:obj:`int`): ``136817688`` (User id in groups when message is sent on behalf
+        of a channel).
+
+        .. versionadded:: 13.9
 
 The following constants are related to specific classes and are also available
 as attributes of those classes:
@@ -245,6 +249,7 @@ MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
 SERVICE_CHAT_ID: int = 777000
+FAKE_CHANNEL_ID: int = 136817688
 
 # constants above this line are tested
 

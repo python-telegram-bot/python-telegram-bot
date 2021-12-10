@@ -87,7 +87,7 @@ class InlineKeyboardButton(TelegramObject):
             be launched when the user presses the button. This type of button must always be
             the ``first`` button in the first row.
         pay (:obj:`bool`, optional): Specify :obj:`True`, to send a Pay button. This type of button
-            must always be the ``first`` button in the first row and can only be used in invoice
+            must always be the `first` button in the first row and can only be used in invoice
             messages.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
