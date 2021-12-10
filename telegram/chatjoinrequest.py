@@ -36,11 +36,11 @@ class ChatJoinRequest(TelegramObject):
 
     .. versionadded:: 13.8
 
-    Bots are now allowed to contact users who sent a join request to a chat where the bot is
-    an administrator with the can_invite_users administrator right – even if the user
-    never interacted with the bot before.
-
     .. versionchanged:: 13.9
+
+    Bots are now allowed to contact users who sent a join request to a chat where the bot is
+    an administrator with the :attr:`telegram.ChatMemberAdministrator.can_invite_users`
+    administrator right – even if the user never interacted with the bot before.
 
     Args:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.

@@ -45,11 +45,9 @@ class InlineKeyboardButton(TelegramObject):
 
           .. versionadded:: 13.6
 
-        * Added support for mentioning users by their ID in inline keyboards. This will only work
-          in Telegram versions released after December 7, 2021. Older clients will display
-          *unsupported message*.
-
-          .. versionadded:: 13.9
+        * Since Bot API 5.5, it's now allowed to mention users by their ID in inline keyboards.
+          This will only work in Telegram versions released after December 7, 2021.
+          Older clients will display *unsupported message*.
 
     Warning:
         If your bot allows your arbitrary callback data, buttons whose callback data is a
