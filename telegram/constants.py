@@ -21,7 +21,7 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.3`. Telegram Bot API version supported by this
+    BOT_API_VERSION (:obj:`str`): `5.5`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
@@ -48,6 +48,10 @@ Attributes:
     ANONYMOUS_ADMIN_ID (:obj:`int`): ``1087968824`` (User id in groups for anonymous admin)
     SERVICE_CHAT_ID (:obj:`int`): ``777000`` (Telegram service chat, that also acts as sender of
         channel posts forwarded to discussion groups)
+    FAKE_CHANNEL_ID (:obj:`int`): ``136817688`` (User id in groups when message is sent on behalf
+        of a channel).
+
+        .. versionadded:: 13.9
 
 The following constants are related to specific classes and are also available
 as attributes of those classes:
@@ -240,11 +244,12 @@ Attributes:
 """
 from typing import List
 
-BOT_API_VERSION: str = '5.4'
+BOT_API_VERSION: str = '5.5'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
 SERVICE_CHAT_ID: int = 777000
+FAKE_CHANNEL_ID: int = 136817688
 
 # constants above this line are tested
 

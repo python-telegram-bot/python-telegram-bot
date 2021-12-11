@@ -45,16 +45,25 @@ class InlineKeyboardButton(TelegramObject):
 
           .. versionadded:: 13.6
 
+        * Since Bot API 5.5, it's now allowed to mention users by their ID in inline keyboards.
+          This will only work in Telegram versions released after December 7, 2021.
+          Older clients will display *unsupported message*.
+
     Warning:
         If your bot allows your arbitrary callback data, buttons whose callback data is a
-        non-hashable object will be come unhashable. Trying to evaluate ``hash(button)`` will
+        non-hashable object will become unhashable. Trying to evaluate ``hash(button)`` will
         result in a :class:`TypeError`.
 
         .. versionchanged:: 13.6
 
     Args:
         text (:obj:`str`): Label text on the button.
-        url (:obj:`str`, optional): HTTP or tg:// url to be opened when button is pressed.
+        url (:obj:`str`, optional): HTTP or tg:// url to be opened when the button is pressed.
+            Links ``tg://user?id=<user_id>`` can be used to mention a user by
+            their ID without using a username, if this is allowed by their privacy settings.
+
+            .. versionchanged:: 13.9
+               You can now mention a user using ``tg://user?id=<user_id>``.
         login_url (:class:`telegram.LoginUrl`, optional): An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str` | :obj:`Any`, optional): Data to be sent in a callback query to
@@ -76,12 +85,18 @@ class InlineKeyboardButton(TelegramObject):
             be launched when the user presses the button. This type of button must always be
             the ``first`` button in the first row.
         pay (:obj:`bool`, optional): Specify :obj:`True`, to send a Pay button. This type of button
-            must always be the ``first`` button in the first row.
+            must always be the `first` button in the first row and can only be used in invoice
+            messages.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         text (:obj:`str`): Label text on the button.
-        url (:obj:`str`): Optional. HTTP or tg:// url to be opened when button is pressed.
+        url (:obj:`str`): Optional. HTTP or tg:// url to be opened when the button is pressed.
+            Links ``tg://user?id=<user_id>`` can be used to mention a user by
+            their ID without using a username, if this is allowed by their privacy settings.
+
+            .. versionchanged:: 13.9
+               You can now mention a user using ``tg://user?id=<user_id>``.
         login_url (:class:`telegram.LoginUrl`): Optional. An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
         callback_data (:obj:`str` | :obj:`object`): Optional. Data to be sent in a callback query

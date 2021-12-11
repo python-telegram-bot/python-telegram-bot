@@ -41,6 +41,8 @@ def chat(bot):
         bio=TestChat.bio,
         linked_chat_id=TestChat.linked_chat_id,
         location=TestChat.location,
+        has_private_forwards=True,
+        has_protected_content=True,
     )
 
 
@@ -62,6 +64,8 @@ class TestChat:
     bio = "I'm a Barbie Girl in a Barbie World"
     linked_chat_id = 11880
     location = ChatLocation(Location(123, 456), 'Barbie World')
+    has_protected_content = True
+    has_private_forwards = True
 
     def test_slot_behaviour(self, chat, recwarn, mro_slots):
         for attr in chat.__slots__:
@@ -84,6 +88,8 @@ class TestChat:
             'slow_mode_delay': self.slow_mode_delay,
             'message_auto_delete_time': self.message_auto_delete_time,
             'bio': self.bio,
+            'has_protected_content': self.has_protected_content,
+            'has_private_forwards': self.has_private_forwards,
             'linked_chat_id': self.linked_chat_id,
             'location': self.location.to_dict(),
         }
@@ -100,6 +106,8 @@ class TestChat:
         assert chat.slow_mode_delay == self.slow_mode_delay
         assert chat.message_auto_delete_time == self.message_auto_delete_time
         assert chat.bio == self.bio
+        assert chat.has_protected_content == self.has_protected_content
+        assert chat.has_private_forwards == self.has_private_forwards
         assert chat.linked_chat_id == self.linked_chat_id
         assert chat.location.location == self.location.location
         assert chat.location.address == self.location.address
@@ -117,6 +125,8 @@ class TestChat:
         assert chat_dict['slow_mode_delay'] == chat.slow_mode_delay
         assert chat_dict['message_auto_delete_time'] == chat.message_auto_delete_time
         assert chat_dict['bio'] == chat.bio
+        assert chat_dict['has_private_forwards'] == chat.has_private_forwards
+        assert chat_dict['has_protected_content'] == chat.has_protected_content
         assert chat_dict['linked_chat_id'] == chat.linked_chat_id
         assert chat_dict['location'] == chat.location.to_dict()
 
@@ -225,6 +235,36 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'ban_chat_member', make_assertion)
         assert chat.ban_member(user_id=42, until_date=43)
 
+    def test_ban_sender_chat(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == chat.id
+            sender_chat_id = kwargs['sender_chat_id'] == 42
+            return chat_id and sender_chat_id
+
+        assert check_shortcut_signature(
+            Chat.ban_sender_chat, Bot.ban_chat_sender_chat, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.ban_sender_chat, chat.bot, 'ban_chat_sender_chat')
+        assert check_defaults_handling(chat.ban_sender_chat, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'ban_chat_sender_chat', make_assertion)
+        assert chat.ban_sender_chat(42)
+
+    def test_ban_chat(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == 42
+            sender_chat_id = kwargs['sender_chat_id'] == chat.id
+            return chat_id and sender_chat_id
+
+        assert check_shortcut_signature(
+            Chat.ban_chat, Bot.ban_chat_sender_chat, ['sender_chat_id'], []
+        )
+        assert check_shortcut_call(chat.ban_chat, chat.bot, 'ban_chat_sender_chat')
+        assert check_defaults_handling(chat.ban_chat, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'ban_chat_sender_chat', make_assertion)
+        assert chat.ban_chat(42)
+
     def test_kick_member_warning(self, chat, monkeypatch, recwarn):
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -251,6 +291,36 @@ class TestChat:
 
         monkeypatch.setattr(chat.bot, 'unban_chat_member', make_assertion)
         assert chat.unban_member(user_id=42, only_if_banned=only_if_banned)
+
+    def test_unban_sender_chat(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == chat.id
+            sender_chat_id = kwargs['sender_chat_id'] == 42
+            return chat_id and sender_chat_id
+
+        assert check_shortcut_signature(
+            Chat.unban_sender_chat, Bot.unban_chat_sender_chat, ['chat_id'], []
+        )
+        assert check_shortcut_call(chat.unban_sender_chat, chat.bot, 'unban_chat_sender_chat')
+        assert check_defaults_handling(chat.unban_sender_chat, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'unban_chat_sender_chat', make_assertion)
+        assert chat.unban_sender_chat(42)
+
+    def test_unban_chat(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            chat_id = kwargs['chat_id'] == 42
+            sender_chat_id = kwargs['sender_chat_id'] == chat.id
+            return chat_id and sender_chat_id
+
+        assert check_shortcut_signature(
+            Chat.unban_chat, Bot.ban_chat_sender_chat, ['sender_chat_id'], []
+        )
+        assert check_shortcut_call(chat.unban_chat, chat.bot, 'unban_chat_sender_chat')
+        assert check_defaults_handling(chat.unban_chat, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'unban_chat_sender_chat', make_assertion)
+        assert chat.unban_chat(42)
 
     @pytest.mark.parametrize('is_anonymous', [True, False, None])
     def test_promote_member(self, monkeypatch, chat, is_anonymous):

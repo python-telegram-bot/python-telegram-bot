@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Update, User, Bot
+from telegram import Update, User, Bot, InlineKeyboardButton
 from telegram.utils.helpers import escape_markdown
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
@@ -472,6 +472,13 @@ class TestUser:
             user.id, 'the&lt;b&gt;name\u2022'
         )
         assert user.mention_html(user.username) == expected.format(user.id, user.username)
+
+    def test_mention_button(self, user):
+        expected_name = InlineKeyboardButton(text="Bob", url=f"tg://user?id={user.id}")
+        expected_full = InlineKeyboardButton(text=user.full_name, url=f"tg://user?id={user.id}")
+
+        assert user.mention_button("Bob") == expected_name
+        assert user.mention_button() == expected_full
 
     def test_mention_markdown(self, user):
         expected = '[{}](tg://user?id={})'

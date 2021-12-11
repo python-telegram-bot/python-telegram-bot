@@ -1012,6 +1012,17 @@ class TestBot:
         assert tz_bot.ban_chat_member(2, 32, until_date=until)
         assert tz_bot.ban_chat_member(2, 32, until_date=until_timestamp)
 
+    def test_ban_chat_sender_chat(self, monkeypatch, bot):
+        # For now, we just test that we pass the correct data to TG
+        def make_assertion(url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            sender_chat_id = data['sender_chat_id'] == 32
+            return chat_id and sender_chat_id
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        assert bot.ban_chat_sender_chat(2, 32)
+        monkeypatch.delattr(bot.request, 'post')
+
     def test_kick_chat_member_warning(self, monkeypatch, bot, recwarn):
         def test(url, data, *args, **kwargs):
             chat_id = data['chat_id'] == 2
@@ -1036,6 +1047,15 @@ class TestBot:
         monkeypatch.setattr(bot.request, 'post', make_assertion)
 
         assert bot.unban_chat_member(2, 32, only_if_banned=only_if_banned)
+
+    def test_unban_chat_sender_chat(self, monkeypatch, bot):
+        def make_assertion(url, data, *args, **kwargs):
+            chat_id = data['chat_id'] == 2
+            sender_chat_id = data['sender_chat_id'] == 32
+            return chat_id and sender_chat_id
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        assert bot.unbanChatSenderChat(2, 32)
 
     def test_set_chat_permissions(self, monkeypatch, bot, chat_permissions):
         def test(url, data, *args, **kwargs):

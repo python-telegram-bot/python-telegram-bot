@@ -81,6 +81,11 @@ class Chat(TelegramObject):
             Returned only in :meth:`telegram.Bot.get_chat`.
         bio (:obj:`str`, optional): Bio of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
+        has_private_forwards (:obj:`bool`, optional): :obj:`True`, if privacy settings of the other
+            party in the private chat allows to use ``tg://user?id=<user_id>`` links only in chats
+            with the user. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.9
         description (:obj:`str`, optional): Description, for groups, supergroups and channel chats.
             Returned only in :meth:`telegram.Bot.get_chat`.
         invite_link (:obj:`str`, optional): Primary invite link, for groups, supergroups and
@@ -97,6 +102,10 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.4
+        has_protected_content (:obj:`bool`, optional): :obj:`True`, if messages from the chat can't
+            be forwarded to other chats. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.9
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
@@ -119,6 +128,11 @@ class Chat(TelegramObject):
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
         bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
+        has_private_forwards (:obj:`bool`): Optional. :obj:`True`, if privacy settings of the other
+            party in the private chat allows to use ``tg://user?id=<user_id>`` links only in chats
+            with the user.
+
+            .. versionadded:: 13.9
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
         invite_link (:obj:`str`): Optional. Primary invite link, for groups, supergroups and
             channel. Returned only in :meth:`telegram.Bot.get_chat`.
@@ -134,6 +148,10 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.4
+        has_protected_content (:obj:`bool`): Optional. :obj:`True`, if messages from the chat can't
+            be forwarded to other chats.
+
+            .. versionadded:: 13.9
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
             sticker set.
@@ -166,6 +184,8 @@ class Chat(TelegramObject):
         'linked_chat_id',
         'all_members_are_administrators',
         'message_auto_delete_time',
+        'has_protected_content',
+        'has_private_forwards',
         '_id_attrs',
     )
 
@@ -204,6 +224,8 @@ class Chat(TelegramObject):
         linked_chat_id: int = None,
         location: ChatLocation = None,
         message_auto_delete_time: int = None,
+        has_private_forwards: bool = None,
+        has_protected_content: bool = None,
         **_kwargs: Any,
     ):
         # Required
@@ -218,6 +240,7 @@ class Chat(TelegramObject):
         self.all_members_are_administrators = _kwargs.get('all_members_are_administrators')
         self.photo = photo
         self.bio = bio
+        self.has_private_forwards = has_private_forwards
         self.description = description
         self.invite_link = invite_link
         self.pinned_message = pinned_message
@@ -226,6 +249,7 @@ class Chat(TelegramObject):
         self.message_auto_delete_time = (
             int(message_auto_delete_time) if message_auto_delete_time is not None else None
         )
+        self.has_protected_content = has_protected_content
         self.sticker_set_name = sticker_set_name
         self.can_set_sticker_set = can_set_sticker_set
         self.linked_chat_id = linked_chat_id
@@ -431,6 +455,98 @@ class Chat(TelegramObject):
             until_date=until_date,
             api_kwargs=api_kwargs,
             revoke_messages=revoke_messages,
+        )
+
+    def ban_sender_chat(
+        self,
+        sender_chat_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.ban_chat_sender_chat(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.ban_chat_sender_chat`.
+
+        .. versionadded:: 13.9
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.ban_chat_sender_chat(
+            chat_id=self.id, sender_chat_id=sender_chat_id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def ban_chat(
+        self,
+        chat_id: Union[str, int],
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.ban_chat_sender_chat(sender_chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.ban_chat_sender_chat`.
+
+        .. versionadded:: 13.9
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.ban_chat_sender_chat(
+            chat_id=chat_id, sender_chat_id=self.id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def unban_sender_chat(
+        self,
+        sender_chat_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.unban_chat_sender_chat(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.unban_chat_sender_chat`.
+
+        .. versionadded:: 13.9
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unban_chat_sender_chat(
+            chat_id=self.id, sender_chat_id=sender_chat_id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def unban_chat(
+        self,
+        chat_id: Union[str, int],
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+            bot.unban_chat_sender_chat(sender_chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.unban_chat_sender_chat`.
+
+        .. versionadded:: 13.9
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return self.bot.unban_chat_sender_chat(
+            chat_id=chat_id, sender_chat_id=self.id, timeout=timeout, api_kwargs=api_kwargs
         )
 
     def unban_member(

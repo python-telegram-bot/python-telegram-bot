@@ -90,12 +90,15 @@ class Message(TelegramObject):
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`, optional): Sender, empty for messages sent
-            to channels.
+        from_user (:class:`telegram.User`, optional): Sender of the message; empty for messages
+            sent to channels. For backward compatibility, this will contain a fake sender user in
+            non-channel chats, if the message was sent on behalf of a chat.
         sender_chat (:class:`telegram.Chat`, optional): Sender of the message, sent on behalf of a
-            chat. The channel itself for channel messages. The supergroup itself for messages from
-            anonymous group administrators. The linked channel for messages automatically forwarded
-            to the discussion group.
+            chat.  For example, the channel itself for channel posts, the supergroup itself for
+            messages from anonymous group administrators, the linked channel for messages
+            automatically forwarded to the discussion group. For backward compatibility,
+            :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
+            sent on behalf of a chat.
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
@@ -109,9 +112,17 @@ class Message(TelegramObject):
             who disallow adding a link to their account in forwarded messages.
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
+        is_automatic_forward (:obj:`bool`, optional): :obj:`True`, if the message is a channel post
+            that was automatically forwarded to the connected discussion group.
+
+            .. versionadded:: 13.9
         reply_to_message (:class:`telegram.Message`, optional): For replies, the original message.
         edit_date (:class:`datetime.datetime`, optional): Date the message was last edited in Unix
             time. Converted to :class:`datetime.datetime`.
+        has_protected_content (:obj:`bool`, optional): :obj:`True`, if the message can't be
+            forwarded.
+
+            .. versionadded:: 13.9
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
         text (str, optional): For text messages, the actual UTF-8 text of the message, 0-4096
@@ -225,11 +236,12 @@ class Message(TelegramObject):
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
-        from_user (:class:`telegram.User`): Optional. Sender.
+        from_user (:class:`telegram.User`): Optional. Sender of the message; empty for messages
+            sent to channels. For backward compatibility, this will contain a fake sender user in
+            non-channel chats, if the message was sent on behalf of a chat.
         sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
-            chat. The channel itself for channel messages. The supergroup itself for messages from
-            anonymous group administrators. The linked channel for messages automatically forwarded
-            to the discussion group.
+            chat. For backward compatibility, :attr:`from_user` contains a fake sender user in
+            non-channel chats, if the message was sent on behalf of a chat.
         date (:class:`datetime.datetime`): Date the message was sent.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
         forward_from (:class:`telegram.User`): Optional. Sender of the original message.
@@ -238,10 +250,18 @@ class Message(TelegramObject):
         forward_from_message_id (:obj:`int`): Optional. Identifier of the original message in the
             channel.
         forward_date (:class:`datetime.datetime`): Optional. Date the original message was sent.
+        is_automatic_forward (:obj:`bool`): Optional. :obj:`True`, if the message is a channel post
+            that was automatically forwarded to the connected discussion group.
+
+            .. versionadded:: 13.9
         reply_to_message (:class:`telegram.Message`): Optional. For replies, the original message.
             Note that the Message object in this field will not contain further
             ``reply_to_message`` fields even if it itself is a reply.
         edit_date (:class:`datetime.datetime`): Optional. Date the message was last edited.
+        has_protected_content (:obj:`bool`): Optional. :obj:`True`, if the message can't be
+            forwarded.
+
+            .. versionadded:: 13.9
         media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`): Optional. The actual UTF-8 text of the message.
@@ -390,6 +410,8 @@ class Message(TelegramObject):
         'voice_chat_participants_invited',
         'voice_chat_started',
         'voice_chat_scheduled',
+        'is_automatic_forward',
+        'has_protected_content',
         '_id_attrs',
     )
 
@@ -492,6 +514,8 @@ class Message(TelegramObject):
         voice_chat_participants_invited: VoiceChatParticipantsInvited = None,
         message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged = None,
         voice_chat_scheduled: VoiceChatScheduled = None,
+        is_automatic_forward: bool = None,
+        has_protected_content: bool = None,
         **_kwargs: Any,
     ):
         # Required
@@ -504,8 +528,10 @@ class Message(TelegramObject):
         self.forward_from = forward_from
         self.forward_from_chat = forward_from_chat
         self.forward_date = forward_date
+        self.is_automatic_forward = is_automatic_forward
         self.reply_to_message = reply_to_message
         self.edit_date = edit_date
+        self.has_protected_content = has_protected_content
         self.text = text
         self.entities = entities or []
         self.caption_entities = caption_entities or []
@@ -1794,6 +1820,14 @@ class Message(TelegramObject):
                                 **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
+
+        Note:
+            Since the release of Bot API 5.5 it can be impossible to forward messages from
+            some chats. Use the attributes :attr:`telegram.Message.has_protected_content` and
+            :attr:`telegram.Chat.has_protected_content` to check this.
+
+            As a workaround, it is still possible to use :meth:`copy`. However, this
+            behaviour is undocumented and might be changed by Telegram.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message forwarded.
