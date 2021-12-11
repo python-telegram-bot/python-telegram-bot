@@ -2,6 +2,23 @@
 Changelog
 =========
 
+Version 13.9
+============
+*Released 2021-12-11*
+
+This is the technical changelog for version 13.9. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+**Major Changes:**
+
+- Full Support for Api 5.5 (`#2809`_)
+
+**Minor Changes**
+
+- Adjust Automated Locking of Inactive Issues (`#2775`_)
+
+.. _`#2809`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2809
+.. _`#2775`: https://github.com/python-telegram-bot/python-telegram-bot/pull/2775
+
 Version 13.8.1
 ==============
 *Released 2021-11-08*

@@ -20,5 +20,5 @@
 
 from telegram import constants
 
-__version__ = '13.8.1'
+__version__ = '13.9'
 bot_api_version = constants.BOT_API_VERSION  # pylint: disable=C0103
