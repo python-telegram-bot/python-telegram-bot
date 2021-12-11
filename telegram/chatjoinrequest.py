@@ -34,13 +34,13 @@ class ChatJoinRequest(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`chat`, :attr:`from_user` and :attr:`date` are equal.
 
+    Note:
+        Since Bot API 5.5, bots are allowed to contact users who sent a join request to a chat
+        where the bot is an administrator with the
+        :attr:`~telegram.ChatMemberAdministrator.can_invite_users` administrator right – even if
+        the user never interacted with the bot before.
+
     .. versionadded:: 13.8
-
-    .. versionchanged:: 13.9
-
-    Bots are now allowed to contact users who sent a join request to a chat where the bot is
-    an administrator with the :attr:`telegram.ChatMemberAdministrator.can_invite_users`
-    administrator right – even if the user never interacted with the bot before.
 
     Args:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
