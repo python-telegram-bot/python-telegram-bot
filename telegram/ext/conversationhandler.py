@@ -265,15 +265,14 @@ class ConversationHandler(Handler[Update, CCT]):
                 "since message IDs are not globally unique."
             )
 
-        all_handlers: List[Handler] = []
-        all_handlers.extend(entry_points)
+        all_handlers: List[Handler] = list(entry_points)
         all_handlers.extend(fallbacks)
 
         for state_handlers in states.values():
             all_handlers.extend(state_handlers)
 
-        if self.per_message:
-            for handler in all_handlers:
+        for handler in all_handlers:
+            if self.per_message:
                 if not isinstance(handler, CallbackQueryHandler):
                     warnings.warn(
                         "If 'per_message=True', all entry points and state handlers"
@@ -281,14 +280,12 @@ class ConversationHandler(Handler[Update, CCT]):
                         "have a message context."
                     )
                     break
-        else:
-            for handler in all_handlers:
-                if isinstance(handler, CallbackQueryHandler):
-                    warnings.warn(
-                        "If 'per_message=False', 'CallbackQueryHandler' will not be "
-                        "tracked for every message."
-                    )
-                    break
+            elif isinstance(handler, CallbackQueryHandler):
+                warnings.warn(
+                    "If 'per_message=False', 'CallbackQueryHandler' will not be "
+                    "tracked for every message."
+                )
+                break
 
         if self.per_chat:
             for handler in all_handlers:
@@ -629,27 +626,25 @@ class ConversationHandler(Handler[Update, CCT]):
             raise_dp_handler_stop = True
         with self._timeout_jobs_lock:
             if self.conversation_timeout:
-                if dispatcher.job_queue is not None:
-                    # Add the new timeout job
-                    if isinstance(new_state, Promise):
-                        new_state.add_done_callback(
-                            functools.partial(
-                                self._schedule_job,
-                                dispatcher=dispatcher,
-                                update=update,
-                                context=context,
-                                conversation_key=conversation_key,
-                            )
-                        )
-                    elif new_state != self.END:
-                        self._schedule_job(
-                            new_state, dispatcher, update, context, conversation_key
-                        )
-                else:
+                if dispatcher.job_queue is None:
                     self.logger.warning(
                         "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue."
                     )
 
+                elif isinstance(new_state, Promise):
+                    new_state.add_done_callback(
+                        functools.partial(
+                            self._schedule_job,
+                            dispatcher=dispatcher,
+                            update=update,
+                            context=context,
+                            conversation_key=conversation_key,
+                        )
+                    )
+                elif new_state != self.END:
+                    self._schedule_job(
+                        new_state, dispatcher, update, context, conversation_key
+                    )
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self._update_state(self.END, conversation_key)
             if raise_dp_handler_stop:
@@ -697,10 +692,7 @@ class ConversationHandler(Handler[Update, CCT]):
         # Backward compatibility with bots that do not use CallbackContext
         if isinstance(context, CallbackContext):
             job = context.job
-            ctxt = cast(_ConversationTimeoutContext, job.context)  # type: ignore[union-attr]
-        else:
-            ctxt = cast(_ConversationTimeoutContext, job.context)
-
+        ctxt = cast(_ConversationTimeoutContext, job.context)  # type: ignore[union-attr]
         callback_context = ctxt.callback_context
 
         with self._timeout_jobs_lock:

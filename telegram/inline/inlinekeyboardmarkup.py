@@ -135,4 +135,4 @@ class InlineKeyboardMarkup(ReplyMarkup):
         return cls(button_grid, **kwargs)
 
     def __hash__(self) -> int:
-        return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))
+        return hash(tuple(tuple(row) for row in self.inline_keyboard))

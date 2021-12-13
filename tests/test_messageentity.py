@@ -24,15 +24,11 @@ from telegram import MessageEntity, User
 @pytest.fixture(scope="class", params=MessageEntity.ALL_TYPES)
 def message_entity(request):
     type_ = request.param
-    url = None
-    if type_ == MessageEntity.TEXT_LINK:
-        url = 't.me'
+    url = 't.me' if type_ == MessageEntity.TEXT_LINK else None
     user = None
     if type_ == MessageEntity.TEXT_MENTION:
         user = User(1, 'test_user', False)
-    language = None
-    if type == MessageEntity.PRE:
-        language = "python"
+    language = "python" if type == MessageEntity.PRE else None
     return MessageEntity(type, 1, 3, url=url, user=user, language=language)
 
 

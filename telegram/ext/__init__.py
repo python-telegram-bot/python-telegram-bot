@@ -19,6 +19,7 @@
 # pylint: disable=C0413
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
+
 from .extbot import ExtBot
 from .basepersistence import BasePersistence
 from .picklepersistence import PicklePersistence
@@ -34,9 +35,7 @@ from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
 try:
     del Dispatcher.__slots__
 except AttributeError as exc:
-    if str(exc) == '__slots__':
-        pass
-    else:
+    if str(exc) != '__slots__':
         raise exc
 
 from .jobqueue import JobQueue, Job

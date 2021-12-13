@@ -502,7 +502,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         total = len(threads)
 
         # Stop all threads in the thread pool by put()ting one non-tuple per thread
-        for i in range(total):
+        for _ in range(total):
             self.__async_queue.put(None)
 
         for i, thr in enumerate(threads):
@@ -663,79 +663,73 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
             self.__update_persistence(update)
 
     def __update_persistence(self, update: object = None) -> None:
-        if self.persistence:
-            # We use list() here in order to decouple chat_ids from self.chat_data, as dict view
-            # objects will change, when the dict does and we want to loop over chat_ids
-            chat_ids = list(self.chat_data.keys())
-            user_ids = list(self.user_data.keys())
+        if not self.persistence:
+            return
+        # We use list() here in order to decouple chat_ids from self.chat_data, as dict view
+        # objects will change, when the dict does and we want to loop over chat_ids
+        chat_ids = list(self.chat_data.keys())
+        user_ids = list(self.user_data.keys())
 
-            if isinstance(update, Update):
-                if update.effective_chat:
-                    chat_ids = [update.effective_chat.id]
-                else:
-                    chat_ids = []
-                if update.effective_user:
-                    user_ids = [update.effective_user.id]
-                else:
-                    user_ids = []
-
-            if self.persistence.store_callback_data:
-                self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
+        if isinstance(update, Update):
+            chat_ids = [update.effective_chat.id] if update.effective_chat else []
+            user_ids = [update.effective_user.id] if update.effective_user else []
+        if self.persistence.store_callback_data:
+            self.bot = cast(telegram.ext.extbot.ExtBot, self.bot)
+            try:
+                self.persistence.update_callback_data(
+                    self.bot.callback_data_cache.persistence_data
+                )
+            except Exception as exc:
                 try:
-                    self.persistence.update_callback_data(
-                        self.bot.callback_data_cache.persistence_data
+                    self.dispatch_error(update, exc)
+                except Exception:
+                    message = (
+                        'Saving callback data raised an error and an '
+                        'uncaught error was raised while handling '
+                        'the error with an error_handler'
                     )
-                except Exception as exc:
-                    try:
-                        self.dispatch_error(update, exc)
-                    except Exception:
-                        message = (
-                            'Saving callback data raised an error and an '
-                            'uncaught error was raised while handling '
-                            'the error with an error_handler'
-                        )
-                        self.logger.exception(message)
-            if self.persistence.store_bot_data:
+                    self.logger.exception(message)
+        if self.persistence.store_bot_data:
+            try:
+                self.persistence.update_bot_data(self.bot_data)
+            except Exception as exc:
                 try:
-                    self.persistence.update_bot_data(self.bot_data)
+                    self.dispatch_error(update, exc)
+                except Exception:
+                    message = (
+                        'Saving bot data raised an error and an '
+                        'uncaught error was raised while handling '
+                        'the error with an error_handler'
+                    )
+                    self.logger.exception(message)
+        if self.persistence.store_chat_data:
+            for chat_id in chat_ids:
+                try:
+                    self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
                 except Exception as exc:
                     try:
                         self.dispatch_error(update, exc)
                     except Exception:
                         message = (
-                            'Saving bot data raised an error and an '
+                            'Saving chat data raised an error and an '
                             'uncaught error was raised while handling '
                             'the error with an error_handler'
                         )
                         self.logger.exception(message)
-            if self.persistence.store_chat_data:
-                for chat_id in chat_ids:
+        if self.persistence.store_user_data:
+            for user_id in user_ids:
+                try:
+                    self.persistence.update_user_data(user_id, self.user_data[user_id])
+                except Exception as exc:
                     try:
-                        self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
-                    except Exception as exc:
-                        try:
-                            self.dispatch_error(update, exc)
-                        except Exception:
-                            message = (
-                                'Saving chat data raised an error and an '
-                                'uncaught error was raised while handling '
-                                'the error with an error_handler'
-                            )
-                            self.logger.exception(message)
-            if self.persistence.store_user_data:
-                for user_id in user_ids:
-                    try:
-                        self.persistence.update_user_data(user_id, self.user_data[user_id])
-                    except Exception as exc:
-                        try:
-                            self.dispatch_error(update, exc)
-                        except Exception:
-                            message = (
-                                'Saving user data raised an error and an '
-                                'uncaught error was raised while handling '
-                                'the error with an error_handler'
-                            )
-                            self.logger.exception(message)
+                        self.dispatch_error(update, exc)
+                    except Exception:
+                        message = (
+                            'Saving user data raised an error and an '
+                            'uncaught error was raised while handling '
+                            'the error with an error_handler'
+                        )
+                        self.logger.exception(message)
 
     def add_error_handler(
         self,
@@ -808,11 +802,10 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                         self.run_async(callback, update, context, update=update)
                     else:
                         callback(update, context)
+                elif run_async:
+                    self.run_async(callback, self.bot, update, error, update=update)
                 else:
-                    if run_async:
-                        self.run_async(callback, self.bot, update, error, update=update)
-                    else:
-                        callback(self.bot, update, error)
+                    callback(self.bot, update, error)
 
         else:
             self.logger.exception(

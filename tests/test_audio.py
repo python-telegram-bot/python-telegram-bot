@@ -29,9 +29,8 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 @pytest.fixture(scope='function')
 def audio_file():
-    f = open('tests/data/telegram.mp3', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/telegram.mp3', 'rb') as f:
+        yield f
 
 
 @pytest.fixture(scope='class')

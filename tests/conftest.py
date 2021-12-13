@@ -209,16 +209,14 @@ def updater(bot):
 
 @pytest.fixture(scope='function')
 def thumb_file():
-    f = open('tests/data/thumb.jpg', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/thumb.jpg', 'rb') as f:
+        yield f
 
 
 @pytest.fixture(scope='class')
 def class_thumb_file():
-    f = open('tests/data/thumb.jpg', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/thumb.jpg', 'rb') as f:
+        yield f
 
 
 def pytest_configure(config):
@@ -429,24 +427,26 @@ def check_shortcut_signature(
     # all
     for kwarg in effective_shortcut_args:
         if bot_sig.parameters[kwarg].annotation != shortcut_sig.parameters[kwarg].annotation:
-            if isinstance(bot_sig.parameters[kwarg].annotation, type):
-                if bot_sig.parameters[kwarg].annotation.__name__ != str(
-                    shortcut_sig.parameters[kwarg].annotation
-                ):
-                    raise Exception(
-                        f'For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, '
-                        f'but got {shortcut_sig.parameters[kwarg].annotation}'
-                    )
-            else:
+            if not isinstance(bot_sig.parameters[kwarg].annotation, type):
                 raise Exception(
                     f'For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, but '
                     f'got {shortcut_sig.parameters[kwarg].annotation}'
                 )
 
+            if bot_sig.parameters[kwarg].annotation.__name__ != str(
+                shortcut_sig.parameters[kwarg].annotation
+            ):
+                raise Exception(
+                    f'For argument {kwarg} I expected {bot_sig.parameters[kwarg].annotation}, '
+                    f'but got {shortcut_sig.parameters[kwarg].annotation}'
+                )
     bot_method_sig = inspect.signature(bot_method)
     shortcut_sig = inspect.signature(shortcut)
     for arg in expected_args:
-        if not shortcut_sig.parameters[arg].default == bot_method_sig.parameters[arg].default:
+        if (
+            shortcut_sig.parameters[arg].default
+            != bot_method_sig.parameters[arg].default
+        ):
             raise Exception(
                 f'Default for argument {arg} does not match the default of the Bot method.'
             )
@@ -500,7 +500,7 @@ def check_shortcut_call(
         received_kwargs = {
             name for name, value in kw.items() if name in ignored_args or value == name
         }
-        if not received_kwargs == expected_args:
+        if received_kwargs != expected_args:
             raise Exception(
                 f'{orig_bot_method.__name__} did not receive correct value for the parameters '
                 f'{expected_args - received_kwargs}'

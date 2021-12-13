@@ -145,7 +145,7 @@ class MessageHandler(Handler[Update, CCT]):
             pass_chat_data=pass_chat_data,
             run_async=run_async,
         )
-        if message_updates is False and channel_post_updates is False and edited_updates is False:
+        if not message_updates and not channel_post_updates and not edited_updates:
             raise ValueError(
                 'message_updates, channel_post_updates and edited_updates are all False'
             )
@@ -159,7 +159,7 @@ class MessageHandler(Handler[Update, CCT]):
                 TelegramDeprecationWarning,
                 stacklevel=2,
             )
-            if message_updates is False:
+            if not message_updates:
                 self.filters &= ~Filters.update.message
 
         if channel_post_updates is not None:
@@ -168,7 +168,7 @@ class MessageHandler(Handler[Update, CCT]):
                 TelegramDeprecationWarning,
                 stacklevel=2,
             )
-            if channel_post_updates is False:
+            if not channel_post_updates:
                 self.filters &= ~Filters.update.channel_post
 
         if edited_updates is not None:
@@ -177,7 +177,7 @@ class MessageHandler(Handler[Update, CCT]):
                 TelegramDeprecationWarning,
                 stacklevel=2,
             )
-            if edited_updates is False:
+            if not edited_updates:
                 self.filters &= ~(
                     Filters.update.edited_message | Filters.update.edited_channel_post
                 )

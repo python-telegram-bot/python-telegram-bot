@@ -134,8 +134,7 @@ class TestLocation:
     # TODO: Needs improvement with in inline sent live location.
     def test_stop_live_inline_message(self, monkeypatch, bot):
         def test(url, data, **kwargs):
-            id_ = data['inline_message_id'] == 1234
-            return id_
+            return data['inline_message_id'] == 1234
 
         monkeypatch.setattr(bot.request, 'post', test)
         assert bot.stop_message_live_location(inline_message_id=1234)

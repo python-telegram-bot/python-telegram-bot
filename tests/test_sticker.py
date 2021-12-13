@@ -30,9 +30,8 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 @pytest.fixture(scope='function')
 def sticker_file():
-    f = open('tests/data/telegram.webp', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/telegram.webp', 'rb') as f:
+        yield f
 
 
 @pytest.fixture(scope='class')
@@ -43,9 +42,8 @@ def sticker(bot, chat_id):
 
 @pytest.fixture(scope='function')
 def animated_sticker_file():
-    f = open('tests/data/telegram_animated_sticker.tgs', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/telegram_animated_sticker.tgs', 'rb') as f:
+        yield f
 
 
 @pytest.fixture(scope='class')
@@ -337,9 +335,8 @@ def animated_sticker_set(bot):
 
 @pytest.fixture(scope='function')
 def sticker_set_thumb_file():
-    f = open('tests/data/sticker_set_thumb.png', 'rb')
-    yield f
-    f.close()
+    with open('tests/data/sticker_set_thumb.png', 'rb') as f:
+        yield f
 
 
 class TestStickerSet:
