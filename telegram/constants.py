@@ -171,23 +171,23 @@ class ChatID(IntEnum):
     """:obj:`int`: User ID in groups for messages sent by anonymous admins.
 
     Note:
-        :attr:`Message.from_user` will contain this ID for backwards compatibility only. It's
-        recommended to use :attr:`Message.sender_chat` instead.
+        :attr:`telegram.Message.from_user` will contain this ID for backwards compatibility only.
+        It's recommended to use :attr:`telegram.Message.sender_chat` instead.
     """
     SERVICE_CHAT = 777000
     """:obj:`int`: Telegram service chat, that also acts as sender of channel posts forwarded to
     discussion groups.
 
     Note:
-        :attr:`Message.from_user` will contain this ID for backwards compatibility only. It's
-        recommended to use :attr:`Message.sender_chat` instead.
+        :attr:`telegram.Message.from_user` will contain this ID for backwards compatibility only.
+        It's recommended to use :attr:`telegram.Message.sender_chat` instead.
     """
     FAKE_CHANNEL = 136817688
     """:obj:`int`: User ID in groups when message is sent on behalf of a channel.
 
     Note:
-        * :attr:`Message.from_user` will contain this ID for backwards compatibility only. It's
-          recommended to use :attr:`Message.sender_chat` instead.
+        * :attr:`telegram.Message.from_user` will contain this ID for backwards compatibility only.
+          It's recommended to use :attr:`telegram.Message.sender_chat` instead.
         * This value is undocumented and might be changed by Telegram.
     """
 
