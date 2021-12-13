@@ -823,7 +823,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     Example:
         .. code:: python
 
-            dispatcher = UpdaterBuilder().token('TOKEN').build()
+            updater = UpdaterBuilder().token('TOKEN').build()
 
     Please see the description of the individual methods for information on which arguments can be
     set and what the defaults are when not called. When no default is mentioned, the argument will
@@ -1192,7 +1192,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         dispatcher: Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]],
     ) -> 'UpdaterBuilder[Optional[Dispatcher[InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]], InBT, InCCT, InUD, InCD, InBD, InJQ, InPT]':
         """Sets a :class:`telegram.ext.Dispatcher` instance to be used for
-        :attr:`telegram.ext.Updater.dispatcher`. If not called, a queue will be instantiated.
+        :attr:`telegram.ext.Updater.dispatcher`.
         The dispatchers :attr:`telegram.ext.Dispatcher.bot`,
         :attr:`telegram.ext.Dispatcher.update_queue` and
         :attr:`telegram.ext.Dispatcher.exception_event` will be used for the respective arguments

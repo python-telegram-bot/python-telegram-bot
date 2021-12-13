@@ -44,7 +44,7 @@ class Audio(_BaseThumbedMedium):
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
-        file_size (:obj:`int`, optional): File size.
+        file_size (:obj:`int`, optional): File size in bytes.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -61,7 +61,7 @@ class Audio(_BaseThumbedMedium):
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
         file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
-        file_size (:obj:`int`): Optional. File size.
+        file_size (:obj:`int`): Optional. File size in bytes.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
             which the music file belongs.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.

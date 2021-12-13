@@ -53,7 +53,7 @@ class File(TelegramObject):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`int`, optional): Optional. File size, if known.
+        file_size (:obj:`int`, optional): Optional. File size in bytes, if known.
         file_path (:obj:`str`, optional): File path. Use :attr:`download` to get the file.
         bot (:obj:`telegram.Bot`, optional): Bot to use with shortcut method.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -63,7 +63,7 @@ class File(TelegramObject):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`str`): Optional. File size.
+        file_size (:obj:`str`): Optional. File size in bytes.
         file_path (:obj:`str`): Optional. File path. Use :attr:`download` to get the file.
 
     """

@@ -146,7 +146,7 @@ class InputMediaAnimation(InputMedia):
             entities that appear in the caption, which can be specified instead of parse_mode.
         width (:obj:`int`, optional): Animation width.
         height (:obj:`int`, optional): Animation height.
-        duration (:obj:`int`, optional): Animation duration.
+        duration (:obj:`int`, optional): Animation duration in seconds.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.ANIMATION`.
@@ -158,7 +158,7 @@ class InputMediaAnimation(InputMedia):
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
         width (:obj:`int`): Optional. Animation width.
         height (:obj:`int`): Optional. Animation height.
-        duration (:obj:`int`): Optional. Animation duration.
+        duration (:obj:`int`): Optional. Animation duration in seconds.
 
     """
 
@@ -276,7 +276,7 @@ class InputMediaVideo(InputMedia):
             entities that appear in the caption, which can be specified instead of parse_mode.
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
-        duration (:obj:`int`, optional): Video duration.
+        duration (:obj:`int`, optional): Video duration in seconds.
         supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
         thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
@@ -298,7 +298,7 @@ class InputMediaVideo(InputMedia):
             entities that appear in the caption.
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
-        duration (:obj:`int`): Optional. Video duration.
+        duration (:obj:`int`): Optional. Video duration in seconds.
         supports_streaming (:obj:`bool`): Optional. Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
