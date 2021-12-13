@@ -36,6 +36,56 @@ This module contains filters for use with :class:`telegram.ext.MessageHandler`,
 
 """
 
+__all__ = (
+    'ALL',
+    'ANIMATION',
+    'ATTACHMENT',
+    'AUDIO',
+    'BaseFilter',
+    'CAPTION',
+    'CHAT',
+    'COMMAND',
+    'CONTACT',
+    'Caption',
+    'CaptionEntity',
+    'CaptionRegex',
+    'Chat',
+    'ChatType',
+    'Command',
+    'DOCUMENT',
+    'Dice',
+    'Document',
+    'Entity',
+    'FORWARDED',
+    'ForwardedFrom',
+    'GAME',
+    'INVOICE',
+    'LOCATION',
+    'Language',
+    'MessageFilter',
+    'PASSPORT_DATA',
+    'PHOTO',
+    'POLL',
+    'REPLY',
+    'Regex',
+    'STICKER',
+    'SUCCESSFUL_PAYMENT',
+    'SenderChat',
+    'StatusUpdate',
+    'TEXT',
+    'Text',
+    'USER',
+    'UpdateFilter',
+    'UpdateType',
+    'User',
+    'VENUE',
+    'VIA_BOT',
+    'VIDEO',
+    'VIDEO_NOTE',
+    'VOICE',
+    'ViaBot',
+)
+
 import mimetypes
 import re
 
@@ -1334,6 +1384,21 @@ GAME = _Game(name="filters.GAME")
 """Messages that contain :attr:`telegram.Message.game`."""
 
 
+class _HasProtectedContent(MessageFilter):
+    __slots__ = ()
+    name = 'Filters.has_protected_content'
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.has_protected_content)
+
+
+HAS_PROTECTED_CONTENT = _HasProtectedContent()
+"""Messages that contain :attr:`telegram.Message.has_protected_content`.
+
+    .. versionadded:: 13.9
+"""
+
+
 class _Invoice(MessageFilter):
     __slots__ = ()
 
@@ -1343,6 +1408,21 @@ class _Invoice(MessageFilter):
 
 INVOICE = _Invoice(name="filters.INVOICE")
 """Messages that contain :attr:`telegram.Message.invoice`."""
+
+
+class _IsAutomaticForward(MessageFilter):
+    __slots__ = ()
+    name = 'Filters.is_automatic_forward'
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.is_automatic_forward)
+
+
+IS_AUTOMATIC_FORWARD = _IsAutomaticForward()
+"""Messages that contain :attr:`telegram.Message.is_automatic_forward`.
+
+    .. versionadded:: 13.9
+"""
 
 
 class Language(MessageFilter):
@@ -1490,16 +1570,16 @@ class _SenderChat(MessageFilter):
 
 
 class SenderChat(_ChatUserBaseFilter):
-    """Filters messages to allow only those which are from a specified sender chats chat ID or
+    """Filters messages to allow only those which are from a specified sender chat's chat ID or
     username.
 
     Examples:
-        * To filter for messages forwarded to a discussion group from a channel with ID
+        * To filter for messages sent to a group by a channel with ID
           ``-1234``, use ``MessageHandler(filters.SenderChat(-1234), callback_method)``.
         * To filter for messages of anonymous admins in a super group with username
           ``@anonymous``, use
           ``MessageHandler(filters.SenderChat(username='anonymous'), callback_method)``.
-        * To filter for messages forwarded to a discussion group from *any* channel, use
+        * To filter for messages sent to a group by *any* channel, use
           ``MessageHandler(filters.SenderChat.CHANNEL, callback_method)``.
         * To filter for messages of anonymous admins in *any* super group, use
           ``MessageHandler(filters.SenderChat.SUPERGROUP, callback_method)``.
@@ -1510,7 +1590,10 @@ class SenderChat(_ChatUserBaseFilter):
         Remember, ``sender_chat`` is also set for messages in a channel as the channel itself,
         so when your bot is an admin in a channel and the linked discussion group, you would
         receive the message twice (once from inside the channel, once inside the discussion
-        group).
+        group). Since v13.9, the field :attr:`telegram.Message.is_automatic_forward` will be
+            :obj:`True` for the discussion group message.
+
+            .. seealso:: :attr:`Filters.is_automatic_forward`
 
     Warning:
         :attr:`chat_ids` will return a *copy* of the saved chat ids as :obj:`frozenset`. This

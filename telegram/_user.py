@@ -22,6 +22,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple
 
 from telegram import TelegramObject, constants
+from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.helpers import (
     mention_markdown as helpers_mention_markdown,
     mention_html as helpers_mention_html,
@@ -230,6 +231,22 @@ class User(TelegramObject):
         if name:
             return helpers_mention_html(self.id, name)
         return helpers_mention_html(self.id, self.full_name)
+
+    def mention_button(self, name: str = None) -> InlineKeyboardButton:
+        """
+        Shortcut for::
+
+            InlineKeyboardButton(text=name, url=f"tg://user?id={update.effective_user.id}")
+
+        .. versionadded:: 13.9
+
+        Args:
+            name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
+
+        Returns:
+            :class:`telegram.InlineKeyboardButton`: InlineButton with url set to the user mention
+        """
+        return InlineKeyboardButton(text=name or self.full_name, url=f"tg://user?id={self.id}")
 
     def pin_message(
         self,

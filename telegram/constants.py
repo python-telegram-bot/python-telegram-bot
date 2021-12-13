@@ -24,28 +24,22 @@ Unless noted otherwise, all constants in this module were extracted from the
     Since v14.0, most of the constants in this module are grouped into enums.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.3`. Telegram Bot API version supported by this
+    BOT_API_VERSION (:obj:`str`): `5.5`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
-    ANONYMOUS_ADMIN_ID (:obj:`int`): ``1087968824`` (User id in groups for anonymous admin)
-    SERVICE_CHAT_ID (:obj:`int`): ``777000`` (Telegram service chat, that also acts as sender of
-        channel posts forwarded to discussion groups)
 
 The following constants are related to specific classes or topics and are grouped into enums. If
 they are related to a specific class, then they are also available as attributes of those classes.
 """
-from enum import Enum, IntEnum
-from typing import List
-
 
 __all__ = [
-    'ANONYMOUS_ADMIN_ID',
     'BOT_API_VERSION',
     'BotCommandScopeType',
     'CallbackQueryLimit',
     'ChatAction',
+    'ChatID',
     'ChatInviteLinkLimit',
     'ChatMemberStatus',
     'ChatType',
@@ -65,10 +59,12 @@ __all__ = [
     'ParseMode',
     'PollLimit',
     'PollType',
-    'SERVICE_CHAT_ID',
     'SUPPORTED_WEBHOOK_PORTS',
     'UpdateType',
 ]
+
+from enum import Enum, IntEnum
+from typing import List
 
 
 class _StringEnum(str, Enum):
@@ -82,9 +78,7 @@ class _StringEnum(str, Enum):
         return f'<{self.__class__.__name__}.{self.name}>'
 
 
-BOT_API_VERSION = '5.3'
-ANONYMOUS_ADMIN_ID = 1087968824
-SERVICE_CHAT_ID = 777000
+BOT_API_VERSION = '5.5'
 
 # constants above this line are tested
 
@@ -162,6 +156,40 @@ class ChatAction(_StringEnum):
     """:obj:`str`: Chat action indicating that the bot is uploading a video."""
     UPLOAD_VIDEO_NOTE = 'upload_video_note'
     """:obj:`str`: Chat action indicating that the bot is uploading a video note."""
+
+
+class ChatID(IntEnum):
+    """This enum contains some special chat IDs. The enum
+    members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 14.0
+    """
+
+    __slots__ = ()
+
+    ANONYMOUS_ADMIN = 1087968824
+    """:obj:`int`: User ID in groups for messages sent by anonymous admins.
+
+    Note:
+        :attr:`Message.from_user` will contain this ID for backwards compatibility only. It's
+        recommended to use :attr:`Message.sender_chat` instead.
+    """
+    SERVICE_CHAT = 777000
+    """:obj:`int`: Telegram service chat, that also acts as sender of channel posts forwarded to
+    discussion groups.
+
+    Note:
+        :attr:`Message.from_user` will contain this ID for backwards compatibility only. It's
+        recommended to use :attr:`Message.sender_chat` instead.
+    """
+    FAKE_CHANNEL = 136817688
+    """:obj:`int`: User ID in groups when message is sent on behalf of a channel.
+
+    Note:
+        * :attr:`Message.from_user` will contain this ID for backwards compatibility only. It's
+          recommended to use :attr:`Message.sender_chat` instead.
+        * This value is undocumented and might be changed by Telegram.
+    """
 
 
 class ChatInviteLinkLimit(IntEnum):

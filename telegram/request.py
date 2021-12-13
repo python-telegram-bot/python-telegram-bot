@@ -19,6 +19,9 @@
 """This module contains the Request class which handles the communication with the Telegram
 servers.
 """
+
+__all__ = ('Request',)
+
 import logging
 import os
 import socket

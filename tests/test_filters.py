@@ -112,17 +112,8 @@ class TestFilters:
 
             assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
 
-            assert len(mro_slots(inst)) == len(set(mro_slots(inst))), f"same slot in {name}"
-
             for attr in cls.__slots__:
                 assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}' for {name}"
-
-        class CustomFilter(filters.MessageFilter):
-            def filter(self, message: Message):
-                pass
-
-        with pytest.warns(None):
-            CustomFilter().custom = 'allowed'  # Test setting custom attr to custom filters
 
     def test_filters_all(self, update):
         assert filters.ALL.check_update(update)
@@ -1717,6 +1708,16 @@ class TestFilters:
         assert filters.SenderChat.CHANNEL.check_update(update)
         update.message.sender_chat = None
         assert not filters.SenderChat.CHANNEL.check_update(update)
+
+    def test_filters_is_automatic_forward(self, update):
+        assert not filters.IS_AUTOMATIC_FORWARD.check_update(update)
+        update.message.is_automatic_forward = True
+        assert filters.IS_AUTOMATIC_FORWARD.check_update(update)
+
+    def test_filters_has_protected_content(self, update):
+        assert not filters.HAS_PROTECTED_CONTENT.check_update(update)
+        update.message.has_protected_content = True
+        assert filters.HAS_PROTECTED_CONTENT.check_update(update)
 
     def test_filters_invoice(self, update):
         assert not filters.INVOICE.check_update(update)

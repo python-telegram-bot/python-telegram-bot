@@ -17,6 +17,19 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an classes that represent Telegram errors."""
+
+__all__ = (
+    'BadRequest',
+    'ChatMigrated',
+    'Conflict',
+    'InvalidToken',
+    'NetworkError',
+    'PassportDecryptionError',
+    'RetryAfter',
+    'TelegramError',
+    'TimedOut',
+)
+
 from typing import Tuple, Union
 
 

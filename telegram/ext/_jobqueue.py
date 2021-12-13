@@ -281,6 +281,10 @@ class JobQueue:
             The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
             parameter to have the job run on the last day of the month.
 
+        .. versionchanged:: 14.0
+            The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
+            parameter to have the job run on the last day of the month.
+
         Args:
             callback (:obj:`callable`):  The callback function that should be executed by the new
                 job. Callback signature: ``def callback(context: CallbackContext)``
@@ -510,7 +514,6 @@ class Job:
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher this job is associated
                 with.
-
         """
         try:
             self.callback(dispatcher.context_types.context.from_job(self, dispatcher))
