@@ -116,11 +116,11 @@ class JobQueue:
         name: str = None,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
-        """Creates a new ``Job`` that runs once and adds it to the queue.
+        """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
+                job. Callback signature: ``def callback(context: CallbackContext)``
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
@@ -131,22 +131,23 @@ class JobQueue:
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run. If the timezone (``datetime.tzinfo``) is :obj:`None`,
-                  the default timezone of the bot will be used.
+                  which the job should run. If the timezone (:attr:`datetime.datetime.tzinfo`) is
+                  :obj:`None`, the default timezone of the bot will be used.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow. If the timezone (``time.tzinfo``) is :obj:`None`, the
+                  tomorrow. If the timezone (:attr:`datetime.time.tzinfo`) is :obj:`None`, the
                   default timezone of the bot will be used.
 
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
+                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+                :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
-                ``scheduler.add_job()``.
+                :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -180,7 +181,8 @@ class JobQueue:
         name: str = None,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
-        """Creates a new ``Job`` that runs at specified intervals and adds it to the queue.
+        """Creates a new :class:`Job` instance that runs at specified intervals and adds it to the
+            queue.
 
         Note:
             For a note about DST, please see the documentation of `APScheduler`_.
@@ -190,7 +192,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
+                job. Callback signature: ``def callback(context: CallbackContext)``
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
@@ -204,11 +206,11 @@ class JobQueue:
                 * :obj:`datetime.timedelta` will be interpreted as "time from now" in which the
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
-                  which the job should run. If the timezone (``datetime.tzinfo``) is :obj:`None`,
-                  the default timezone of the bot will be used.
+                  which the job should run. If the timezone (:attr:`datetime.datetime.tzinfo`) is
+                  :obj:`None`, the default timezone of the bot will be used.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
-                  tomorrow. If the timezone (``time.tzinfo``) is :obj:`None`, the
+                  tomorrow. If the timezone (:attr:`datetime.time.tzinfo`) is :obj:`None`, the
                   default timezone of the bot will be used.
 
                 Defaults to ``interval``
@@ -223,14 +225,15 @@ class JobQueue:
 
                 Defaults to :obj:`None`.
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
+                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+                :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
-                ``scheduler.add_job()``.
+                :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -272,7 +275,11 @@ class JobQueue:
         name: str = None,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
-        """Creates a new ``Job`` that runs on a monthly basis and adds it to the queue.
+        """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
+
+        .. versionchanged:: 14.0
+            The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
+            parameter to have the job run on the last day of the month.
 
         .. versionchanged:: 14.0
             The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
@@ -280,7 +287,7 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`):  The callback function that should be executed by the new
-                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
+                job. Callback signature: ``def callback(context: CallbackContext)``
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
@@ -288,14 +295,15 @@ class JobQueue:
                 number, the job will not run in this month. Passing -1 leads to the job running on
                 the last day of the month.
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
+                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+                :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
-                ``scheduler.add_job()``.
+                :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -329,7 +337,7 @@ class JobQueue:
         name: str = None,
         job_kwargs: JSONDict = None,
     ) -> 'Job':
-        """Creates a new ``Job`` that runs on a daily basis and adds it to the queue.
+        """Creates a new :class:`Job` that runs on a daily basis and adds it to the queue.
 
         Note:
             For a note about DST, please see the documentation of `APScheduler`_.
@@ -339,20 +347,21 @@ class JobQueue:
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
+                job. Callback signature: ``def callback(context: CallbackContext)``
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
-                (``time.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
+                (:obj:`time.tzinfo`) is :obj:`None`, the default timezone of the bot will be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run (where ``0-6`` correspond to monday - sunday). Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
+                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+                :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
-                ``scheduler.add_job()``.
+                :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -385,20 +394,21 @@ class JobQueue:
         context: object = None,
         name: str = None,
     ) -> 'Job':
-        """Creates a new customly defined ``Job``.
+        """Creates a new custom defined :class:`Job`.
 
         Args:
             callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature: ``def callback(update: Update, context: CallbackContext)``
+                job. Callback signature: ``def callback(context: CallbackContext)``
             job_kwargs (:obj:`dict`): Arbitrary keyword arguments. Used as arguments for
-                ``scheduler.add_job``.
+                :meth:`apscheduler.schedulers.base.BaseScheduler.add_job`.
             context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through ``job.context`` in the callback. Defaults to ``None``.
+                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+                :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 ``callback.__name__``.
 
         Returns:
-            :class:`telegram.ext.Job`: The new ``Job`` instance that has been added to the job
+            :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
             queue.
 
         """
@@ -421,7 +431,7 @@ class JobQueue:
             self.scheduler.shutdown()
 
     def jobs(self) -> Tuple['Job', ...]:
-        """Returns a tuple of all *scheduled* jobs that are currently in the ``JobQueue``."""
+        """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`."""
         return tuple(
             Job._from_aps_job(job)  # pylint: disable=protected-access
             for job in self.scheduler.get_jobs()
@@ -429,7 +439,7 @@ class JobQueue:
 
     def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
-        in the ``JobQueue``.
+        in the :class:`JobQueue`.
         """
         return tuple(job for job in self.jobs() if job.name == name)
 
@@ -446,7 +456,7 @@ class Job:
         * All attributes and instance methods of :attr:`job` are also directly available as
           attributes/methods of the corresponding :class:`telegram.ext.Job` object.
         * Two instances of :class:`telegram.ext.Job` are considered equal, if their corresponding
-          ``job`` attributes have the same ``id``.
+          :attr:`job` attributes have the same ``id``.
         * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
           this :class:`telegram.ext.Job` to be useful.
 
@@ -455,9 +465,9 @@ class Job:
 
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+            Callback signature: ``def callback(context: CallbackContext)``
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
-            accessed through ``job.context`` in the callback. Defaults to :obj:`None`.
+            accessed through :attr:`Job.context` in the callback. Defaults to :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
 
@@ -498,7 +508,7 @@ class Job:
         """Executes the callback function independently of the jobs schedule. Also calls
         :meth:`telegram.ext.Dispatcher.update_persistence`.
 
-        .. versionchaged:: 14.0
+        .. versionchanged:: 14.0
             Calls :meth:`telegram.ext.Dispatcher.update_persistence`.
 
         Args:
@@ -531,8 +541,8 @@ class Job:
 
     def schedule_removal(self) -> None:
         """
-        Schedules this job for removal from the ``JobQueue``. It will be removed without executing
-        its callback function again.
+        Schedules this job for removal from the :class:`JobQueue`. It will be removed without
+        executing its callback function again.
         """
         self.job.remove()
         self._removed = True
@@ -559,7 +569,7 @@ class Job:
     def next_t(self) -> Optional[datetime.datetime]:
         """
         :obj:`datetime.datetime`: Datetime for the next job execution.
-            Datetime is localized according to :attr:`tzinfo`.
+            Datetime is localized according to :attr:`datetime.datetime.tzinfo`.
             If job is removed or already ran it equals to :obj:`None`.
         """
         return self.job.next_run_time

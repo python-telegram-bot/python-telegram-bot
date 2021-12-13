@@ -41,7 +41,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
         mpeg4_width (:obj:`int`, optional): Video width.
         mpeg4_height (:obj:`int`, optional): Video height.
-        mpeg4_duration (:obj:`int`, optional): Video duration.
+        mpeg4_duration (:obj:`int`, optional): Video duration in seconds.
         thumb_url (:obj:`str`): URL of the static thumbnail (jpeg or gif) for the result.
         thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail, must be one of
             ``'image/jpeg'``, ``'image/gif'``, or ``'video/mp4'``. Defaults to ``'image/jpeg'``.
@@ -67,7 +67,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
         mpeg4_width (:obj:`int`): Optional. Video width.
         mpeg4_height (:obj:`int`): Optional. Video height.
-        mpeg4_duration (:obj:`int`): Optional. Video duration.
+        mpeg4_duration (:obj:`int`): Optional. Video duration in seconds.
         thumb_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for
             the result.
         thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.

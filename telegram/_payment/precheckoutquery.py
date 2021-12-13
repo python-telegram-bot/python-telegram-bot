@@ -35,7 +35,7 @@ class PreCheckoutQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        In Python ``from`` is a reserved word, use ``from_user`` instead.
+        In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
 
     Args:
         id (:obj:`str`): Unique query identifier.
