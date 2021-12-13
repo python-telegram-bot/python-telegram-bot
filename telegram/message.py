@@ -595,11 +595,7 @@ class Message(TelegramObject):
         a private chat or normal group, returns a t.me link of the message.
         """
         if self.chat.type not in [Chat.PRIVATE, Chat.GROUP]:
-            if self.chat.username:
-                to_link = self.chat.username
-            else:
-                # Get rid of leading -100 for supergroups
-                to_link = f"c/{str(self.chat.id)[4:]}"
+            to_link = self.chat.username or f"c/{str(self.chat.id)[4:]}"
             return f"https://t.me/{to_link}/{self.message_id}"
         return None
 
@@ -742,17 +738,13 @@ class Message(TelegramObject):
         if reply_to_message_id is not None:
             return reply_to_message_id
 
-        if quote is not None:
-            if quote:
-                return self.message_id
-
-        else:
-            if self.bot.defaults:
-                default_quote = self.bot.defaults.quote
-            else:
-                default_quote = None
+        if quote is None:
+            default_quote = self.bot.defaults.quote if self.bot.defaults else None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:
                 return self.message_id
+
+        elif quote:
+            return self.message_id
 
         return None
 
@@ -2548,16 +2540,15 @@ class Message(TelegramObject):
                             )
                             + insert
                         )
+                elif sys.maxunicode == 0xFFFF:
+                    html_text += message_text[last_offset : entity.offset - offset] + insert
                 else:
-                    if sys.maxunicode == 0xFFFF:
-                        html_text += message_text[last_offset : entity.offset - offset] + insert
-                    else:
-                        html_text += (
-                            message_text[  # type: ignore
-                                last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode('utf-16-le')
-                            + insert
-                        )
+                    html_text += (
+                        message_text[  # type: ignore
+                            last_offset * 2 : (entity.offset - offset) * 2
+                        ].decode('utf-16-le')
+                        + insert
+                    )
 
                 last_offset = entity.offset - offset + entity.length
 
@@ -2568,11 +2559,10 @@ class Message(TelegramObject):
                 html_text += escape(
                     message_text[last_offset * 2 :].decode('utf-16-le')  # type: ignore
                 )
+        elif sys.maxunicode == 0xFFFF:
+            html_text += message_text[last_offset:]
         else:
-            if sys.maxunicode == 0xFFFF:
-                html_text += message_text[last_offset:]
-            else:
-                html_text += message_text[last_offset * 2 :].decode('utf-16-le')  # type: ignore
+            html_text += message_text[last_offset * 2 :].decode('utf-16-le')  # type: ignore
 
         return html_text
 
@@ -2672,13 +2662,14 @@ class Message(TelegramObject):
                             'Nested entities are not supported for Markdown ' 'version 1'
                         )
 
-                    text = Message._parse_markdown(
-                        orig_text,
-                        nested_entities,
-                        urled=urled,
-                        offset=entity.offset,
-                        version=version,
-                    )
+                    else:
+                        text = Message._parse_markdown(
+                            orig_text,
+                            nested_entities,
+                            urled=urled,
+                            offset=entity.offset,
+                            version=version,
+                        )
 
                 if entity.type == MessageEntity.TEXT_LINK:
                     if version == 1:
@@ -2692,10 +2683,7 @@ class Message(TelegramObject):
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
                     insert = f'[{text}](tg://user?id={entity.user.id})'
                 elif entity.type == MessageEntity.URL and urled:
-                    if version == 1:
-                        link = orig_text
-                    else:
-                        link = text
+                    link = orig_text if version == 1 else text
                     insert = f'[{link}]({orig_text})'
                 elif entity.type == MessageEntity.BOLD:
                     insert = '*' + text + '*'
@@ -2718,10 +2706,7 @@ class Message(TelegramObject):
                     if entity.language:
                         prefix = '```' + entity.language + '\n'
                     else:
-                        if code.startswith('\\'):
-                            prefix = '```'
-                        else:
-                            prefix = '```\n'
+                        prefix = '```' if code.startswith('\\') else '```\n'
                     insert = prefix + code + '```'
                 elif entity.type == MessageEntity.UNDERLINE:
                     if version == 1:
@@ -2779,13 +2764,12 @@ class Message(TelegramObject):
                     message_text[last_offset * 2 :].decode('utf-16-le'),  # type: ignore
                     version=version,
                 )
+        elif sys.maxunicode == 0xFFFF:
+            markdown_text += message_text[last_offset:]
         else:
-            if sys.maxunicode == 0xFFFF:
-                markdown_text += message_text[last_offset:]
-            else:
-                markdown_text += message_text[last_offset * 2 :].decode(  # type: ignore
-                    'utf-16-le'
-                )
+            markdown_text += message_text[last_offset * 2 :].decode(  # type: ignore
+                'utf-16-le'
+            )
 
         return markdown_text
 

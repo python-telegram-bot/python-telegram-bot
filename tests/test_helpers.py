@@ -168,7 +168,9 @@ class TestHelpers:
         # test for a time of day that is still to come, and one in the past
         time_future, time_past = dtm.time(hour + hour_delta), dtm.time(hour - hour_delta)
         assert helpers.to_float_timestamp(time_future, ref_t) == ref_t + 60 * 60 * hour_delta
-        assert helpers.to_float_timestamp(time_past, ref_t) == ref_t + 60 * 60 * (24 - hour_delta)
+        assert helpers.to_float_timestamp(time_past, ref_t) == ref_t + 60 ** 2 * (
+            24 - hour_delta
+        )
 
     def test_to_float_timestamp_time_of_day_timezone(self, timezone):
         """Conversion from timezone-aware time-of-day specification to timestamp"""

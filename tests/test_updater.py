@@ -212,7 +212,7 @@ class TestUpdater:
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
             updater.bot = ExtBot(updater.bot.token)
-        if not ext_bot and not type(updater.bot) is Bot:
+        if not ext_bot and type(updater.bot) is not Bot:
             updater.bot = Bot(updater.bot.token)
 
         q = Queue()

@@ -188,18 +188,17 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         """
         if isinstance(update, Update) and update.callback_query:
             callback_data = update.callback_query.data
-            if self.pattern:
-                if callback_data is None:
-                    return False
-                if isinstance(self.pattern, type):
-                    return isinstance(callback_data, self.pattern)
-                if callable(self.pattern):
-                    return self.pattern(callback_data)
-                match = re.match(self.pattern, callback_data)
-                if match:
-                    return match
-            else:
+            if not self.pattern:
                 return True
+            if callback_data is None:
+                return False
+            if isinstance(self.pattern, type):
+                return isinstance(callback_data, self.pattern)
+            if callable(self.pattern):
+                return self.pattern(callback_data)
+            match = re.match(self.pattern, callback_data)
+            if match:
+                return match
         return None
 
     def collect_optional_args(

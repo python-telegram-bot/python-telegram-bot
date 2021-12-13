@@ -131,11 +131,12 @@ def parse_file_input(
     if isinstance(file_input, str) and file_input.startswith('file://'):
         return file_input
     if isinstance(file_input, (str, Path)):
-        if is_local_file(file_input):
-            out = Path(file_input).absolute().as_uri()
-        else:
-            out = file_input  # type: ignore[assignment]
-        return out
+        return (
+            Path(file_input).absolute().as_uri()
+            if is_local_file(file_input)
+            else file_input
+        )
+
     if isinstance(file_input, bytes):
         return InputFile(file_input, attach=attach, filename=filename)
     if InputFile.is_file(file_input):
@@ -162,7 +163,7 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
     if int(version) == 1:
         escape_chars = r'_*`['
     elif int(version) == 2:
-        if entity_type in ['pre', 'code']:
+        if entity_type in {'pre', 'code'}:
             escape_chars = r'\`'
         elif entity_type == 'text_link':
             escape_chars = r'\)'
@@ -423,11 +424,7 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
             "URLs: A-Z, a-z, 0-9, _ and -"
         )
 
-    if group:
-        key = 'startgroup'
-    else:
-        key = 'start'
-
+    key = 'startgroup' if group else 'start'
     return f'{base_url}?{key}={payload}'
 
 

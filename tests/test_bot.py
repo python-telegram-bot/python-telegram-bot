@@ -1723,7 +1723,7 @@ class TestBot:
         with pytest.raises(ValueError, match="`member_limit` can't be specified"):
             bot.create_chat_invite_link(**data)
 
-        data.update({'invite_link': 'https://invite.link'})
+        data['invite_link'] = 'https://invite.link'
         with pytest.raises(ValueError, match="`member_limit` can't be specified"):
             bot.edit_chat_invite_link(**data)
 

@@ -56,10 +56,7 @@ class InputFile:
 
     def __init__(self, obj: Union[IO, bytes], filename: str = None, attach: bool = None):
         self.filename = None
-        if isinstance(obj, bytes):
-            self.input_file_content = obj
-        else:
-            self.input_file_content = obj.read()
+        self.input_file_content = obj if isinstance(obj, bytes) else obj.read()
         self.attach = 'attached' + uuid4().hex if attach else None
 
         if filename:

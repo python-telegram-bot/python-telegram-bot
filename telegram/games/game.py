@@ -183,4 +183,4 @@ class Game(TelegramObject):
         }
 
     def __hash__(self) -> int:
-        return hash((self.title, self.description, tuple(p for p in self.photo)))
+        return hash((self.title, self.description, tuple(self.photo)))

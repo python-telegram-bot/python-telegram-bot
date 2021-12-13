@@ -74,12 +74,13 @@ def receive_poll_answer(update: Update, context: CallbackContext) -> None:
     except KeyError:
         return
     selected_options = answer.option_ids
-    answer_string = ""
-    for question_id in selected_options:
-        if question_id != selected_options[-1]:
-            answer_string += questions[question_id] + " and "
-        else:
-            answer_string += questions[question_id]
+    answer_string = "".join(
+        questions[question_id] + " and "
+        if question_id != selected_options[-1]
+        else questions[question_id]
+        for question_id in selected_options
+    )
+
     context.bot.send_message(
         context.bot_data[poll_id]["chat_id"],
         f"{update.effective_user.mention_html()} feels {answer_string}!",

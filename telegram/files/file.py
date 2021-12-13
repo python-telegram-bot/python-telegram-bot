@@ -134,12 +134,7 @@ class File(TelegramObject):
 
         local_file = is_local_file(self.file_path)
 
-        if local_file:
-            url = self.file_path
-        else:
-            # Convert any UTF-8 char into a url encoded ASCII string.
-            url = self._get_encoded_url()
-
+        url = self.file_path if local_file else self._get_encoded_url()
         if out:
             if local_file:
                 with open(url, 'rb') as file:

@@ -135,12 +135,13 @@ class TestDispatcher:
                 context.my_flag = True
 
         def two(update, context):
-            if update.message.text == 'test':
-                if not hasattr(context, 'my_flag'):
-                    pytest.fail()
-            else:
-                if hasattr(context, 'my_flag'):
-                    pytest.fail()
+            if (
+                update.message.text == 'test'
+                and not hasattr(context, 'my_flag')
+                or update.message.text != 'test'
+                and hasattr(context, 'my_flag')
+            ):
+                pytest.fail()
 
         cdp.add_handler(MessageHandler(Filters.regex('test'), one), group=1)
         cdp.add_handler(MessageHandler(None, two), group=2)

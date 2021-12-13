@@ -43,10 +43,7 @@ def test_class_has_slots_and_dict(mro_slots):
 
     for path in tg_paths:
         # windows uses backslashes:
-        if os.name == 'nt':
-            split_path = path.split('\\')
-        else:
-            split_path = path.split('/')
+        split_path = path.split('\\') if os.name == 'nt' else path.split('/')
         mod_name = f"telegram{'.ext.' if split_path[1] == 'ext' else '.'}{split_path[-1][:-3]}"
         spec = importlib.util.spec_from_file_location(mod_name, path)
         module = importlib.util.module_from_spec(spec)

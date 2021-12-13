@@ -264,8 +264,7 @@ class TestCallbackQuery:
 
     def test_stop_message_live_location(self, monkeypatch, callback_query):
         def make_assertion(*_, **kwargs):
-            ids = self.check_passed_ids(callback_query, kwargs)
-            return ids
+            return self.check_passed_ids(callback_query, kwargs)
 
         assert check_shortcut_signature(
             CallbackQuery.stop_message_live_location,

@@ -168,13 +168,7 @@ class Request:
             'SOCKSProxyManager',  # noqa: F821
             urllib3.ProxyManager,
         ] = None  # type: ignore
-        if not proxy_url:
-            if appengine.is_appengine_sandbox():
-                # Use URLFetch service if running in App Engine
-                self._con_pool = appengine.AppEngineManager()
-            else:
-                self._con_pool = urllib3.PoolManager(**kwargs)
-        else:
+        if proxy_url:
             kwargs.update(urllib3_proxy_kwargs)
             if proxy_url.startswith('socks'):
                 try:
@@ -191,6 +185,12 @@ class Request:
                     mgr.proxy_headers.update(auth_hdrs)
 
                 self._con_pool = mgr
+
+        elif appengine.is_appengine_sandbox():
+            # Use URLFetch service if running in App Engine
+            self._con_pool = appengine.AppEngineManager()
+        else:
+            self._con_pool = urllib3.PoolManager(**kwargs)
 
     def __setattr__(self, key: str, value: object) -> None:
         set_new_attribute_deprecated(self, key, value)

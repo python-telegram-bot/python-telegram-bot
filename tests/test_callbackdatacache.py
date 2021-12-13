@@ -384,4 +384,4 @@ class TestCallbackDataCache:
         callback_data = [
             list(data[2].values())[0] for data in callback_data_cache.persistence_data[0]
         ]
-        assert callback_data == list(str(i) for i in range(50, 100))
+        assert callback_data == [str(i) for i in range(50, 100)]

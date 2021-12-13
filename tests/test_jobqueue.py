@@ -443,7 +443,7 @@ class TestJobQueue:
 
     def test_job_lt_eq(self, job_queue):
         job = job_queue.run_repeating(self.job_run_once, 0.02)
-        assert not job == job_queue
+        assert job != job_queue
         assert not job < job
 
     def test_dispatch_error(self, job_queue, dp):
