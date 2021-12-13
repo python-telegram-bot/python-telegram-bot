@@ -163,7 +163,12 @@ class Conflict(TelegramError):
 
 
 class PassportDecryptionError(TelegramError):
-    """Something went wrong with decryption."""
+    """Something went wrong with decryption.
+
+    .. versionchanged:: 14.0
+        This class was previously named ``TelegramDecryptionError`` and was available via
+        ``telegram.TelegramDecryptionError``.
+    """
 
     __slots__ = ('_msg',)
 

@@ -40,7 +40,7 @@ class Voice(_BaseMedium):
             Can't be used to download or reuse the file.
         duration (:obj:`int`, optional): Duration of the audio in seconds as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
-        file_size (:obj:`int`, optional): File size.
+        file_size (:obj:`int`, optional): File size in bytes.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -51,7 +51,7 @@ class Voice(_BaseMedium):
             Can't be used to download or reuse the file.
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
-        file_size (:obj:`int`): Optional. File size.
+        file_size (:obj:`int`): Optional. File size in bytes.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """

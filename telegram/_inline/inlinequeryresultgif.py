@@ -41,7 +41,7 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
         gif_width (:obj:`int`, optional): Width of the GIF.
         gif_height (:obj:`int`, optional): Height of the GIF.
-        gif_duration (:obj:`int`, optional): Duration of the GIF
+        gif_duration (:obj:`int`, optional): Duration of the GIF in seconds.
         thumb_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for
             the result.
         thumb_mime_type (:obj:`str`, optional): MIME type of the thumbnail, must be one of
@@ -68,7 +68,7 @@ class InlineQueryResultGif(InlineQueryResult):
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
         gif_width (:obj:`int`): Optional. Width of the GIF.
         gif_height (:obj:`int`): Optional. Height of the GIF.
-        gif_duration (:obj:`int`): Optional. Duration of the GIF.
+        gif_duration (:obj:`int`): Optional. Duration of the GIF in seconds.
         thumb_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for
             the result.
         thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.

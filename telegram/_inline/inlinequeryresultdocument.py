@@ -56,7 +56,7 @@ class InlineQueryResultDocument(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the file.
-        thumb_url (:obj:`str`, optional): URL of the thumbnail (jpeg only) for the file.
+        thumb_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the file.
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -82,7 +82,7 @@ class InlineQueryResultDocument(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the file.
-        thumb_url (:obj:`str`): Optional. URL of the thumbnail (jpeg only) for the file.
+        thumb_url (:obj:`str`): Optional. URL of the thumbnail (JPEG only) for the file.
         thumb_width (:obj:`int`): Optional. Thumbnail width.
         thumb_height (:obj:`int`): Optional. Thumbnail height.
 

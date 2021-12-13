@@ -40,7 +40,7 @@ class PhotoSize(_BaseMedium):
             Can't be used to download or reuse the file.
         width (:obj:`int`): Photo width.
         height (:obj:`int`): Photo height.
-        file_size (:obj:`int`, optional): File size.
+        file_size (:obj:`int`, optional): File size in bytes.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -51,7 +51,7 @@ class PhotoSize(_BaseMedium):
             Can't be used to download or reuse the file.
         width (:obj:`int`): Photo width.
         height (:obj:`int`): Photo height.
-        file_size (:obj:`int`): Optional. File size.
+        file_size (:obj:`int`): Optional. File size in bytes.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
