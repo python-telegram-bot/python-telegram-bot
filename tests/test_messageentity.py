@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import MessageEntity, User
+from telegram.constants import MessageEntityType
 
 
 @pytest.fixture(scope="class", params=MessageEntity.ALL_TYPES)
@@ -69,6 +70,12 @@ class TestMessageEntity:
             assert entity_dict['user'] == message_entity.user.to_dict()
         if message_entity.language:
             assert entity_dict['language'] == message_entity.language
+
+    def test_enum_init(self):
+        entity = MessageEntity(type='foo', offset=0, length=1)
+        assert entity.type == 'foo'
+        entity = MessageEntity(type='url', offset=0, length=1)
+        assert entity.type is MessageEntityType.URL
 
     def test_equality(self):
         a = MessageEntity(MessageEntity.BOLD, 2, 3)

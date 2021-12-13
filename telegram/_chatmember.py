@@ -51,7 +51,7 @@ class ChatMember(TelegramObject):
     Args:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat. Can be
-            :attr:`~telegram.ChatMember.ADMINISTRATOR`, :attr:`~telegram.ChatMember.CREATOR`,
+            :attr:`~telegram.ChatMember.ADMINISTRATOR`, :attr:`~telegram.ChatMember.OWNER`,
             :attr:`~telegram.ChatMember.KICKED`, :attr:`~telegram.ChatMember.LEFT`,
             :attr:`~telegram.ChatMember.MEMBER` or :attr:`~telegram.ChatMember.RESTRICTED`.
 
@@ -65,8 +65,8 @@ class ChatMember(TelegramObject):
 
     ADMINISTRATOR: ClassVar[str] = constants.ChatMemberStatus.ADMINISTRATOR
     """:const:`telegram.constants.ChatMemberStatus.ADMINISTRATOR`"""
-    CREATOR: ClassVar[str] = constants.ChatMemberStatus.CREATOR
-    """:const:`telegram.constants.ChatMemberStatus.CREATOR`"""
+    OWNER: ClassVar[str] = constants.ChatMemberStatus.OWNER
+    """:const:`telegram.constants.ChatMemberStatus.OWNER`"""
     KICKED: ClassVar[str] = constants.ChatMemberStatus.KICKED
     """:const:`telegram.constants.ChatMemberStatus.KICKED`"""
     LEFT: ClassVar[str] = constants.ChatMemberStatus.LEFT
@@ -95,7 +95,7 @@ class ChatMember(TelegramObject):
         data['until_date'] = from_timestamp(data.get('until_date', None))
 
         _class_mapping: Dict[str, Type['ChatMember']] = {
-            cls.CREATOR: ChatMemberOwner,
+            cls.OWNER: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
             cls.MEMBER: ChatMemberMember,
             cls.RESTRICTED: ChatMemberRestricted,
@@ -132,7 +132,7 @@ class ChatMemberOwner(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always :tg-const:`telegram.ChatMember.CREATOR`.
+            always :tg-const:`telegram.ChatMember.OWNER`.
         user (:class:`telegram.User`): Information about the user.
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's
             presence in the chat is hidden.
@@ -149,7 +149,7 @@ class ChatMemberOwner(ChatMember):
         custom_title: str = None,
         **_kwargs: object,
     ):
-        super().__init__(status=ChatMember.CREATOR, user=user)
+        super().__init__(status=ChatMember.OWNER, user=user)
         self.is_anonymous = is_anonymous
         self.custom_title = custom_title
 

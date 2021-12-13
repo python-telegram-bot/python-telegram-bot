@@ -22,6 +22,7 @@ from datetime import datetime
 
 from telegram import Poll, PollOption, PollAnswer, User, MessageEntity
 from telegram._utils.datetime import to_timestamp
+from telegram.constants import PollType
 
 
 @pytest.fixture(scope="class")
@@ -210,6 +211,30 @@ class TestPoll:
         assert poll_dict['explanation_entities'] == [poll.explanation_entities[0].to_dict()]
         assert poll_dict['open_period'] == poll.open_period
         assert poll_dict['close_date'] == to_timestamp(poll.close_date)
+
+    def test_enum_init(self):
+        poll = Poll(
+            type='foo',
+            id='id',
+            question='question',
+            options=[],
+            total_voter_count=0,
+            is_closed=False,
+            is_anonymous=False,
+            allows_multiple_answers=False,
+        )
+        assert poll.type == 'foo'
+        poll = Poll(
+            type=PollType.QUIZ,
+            id='id',
+            question='question',
+            options=[],
+            total_voter_count=0,
+            is_closed=False,
+            is_anonymous=False,
+            allows_multiple_answers=False,
+        )
+        assert poll.type is PollType.QUIZ
 
     def test_parse_entity(self, poll):
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
