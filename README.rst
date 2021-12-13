@@ -167,8 +167,8 @@ Learning by example
 
 We believe that the best way to learn this package is by example. Here
 are some examples for you to review. Even if it is not your approach for learning, please take a
-look at ``echobot.py``, it is the de facto base for most of the bots out there. Best of all,
-the code for these examples are released to the public domain, so you can start by grabbing the
+look at ``echobot.py``. It is the de facto base for most of the bots out there. Best of all,
+the code for these examples is released to the public domain, so you can start by grabbing the
 code and building on top of it.
 
 Visit `this page <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/README.md>`_ to discover the official examples or look at the examples on the `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Examples>`_ to see other bots the community has built.
@@ -231,7 +231,7 @@ Contributions of all sizes are welcome. Please review our `contribution guidelin
 ========
 Donating
 ========
-Occasionally we are asked if we accept donations to support the development. While we appreciate the thought, maintaining PTB is our hobby and we have almost no running costs for it. We therefore have nothing set up to accept donations. If you still want to donate, we kindly ask you to donate to another open source project/initiative of your choice instead.
+Occasionally we are asked if we accept donations to support the development. While we appreciate the thought, maintaining PTB is our hobby, and we have almost no running costs for it. We therefore have nothing set up to accept donations. If you still want to donate, we kindly ask you to donate to another open source project/initiative of your choice instead.
 
 =======
 License

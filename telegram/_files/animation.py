@@ -44,7 +44,7 @@ class Animation(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`, optional): Animation thumbnail as defined by sender.
         file_name (:obj:`str`, optional): Original animation filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
-        file_size (:obj:`int`, optional): File size.
+        file_size (:obj:`int`, optional): File size in bytes.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
@@ -59,7 +59,7 @@ class Animation(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined by sender.
         file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
-        file_size (:obj:`int`): Optional. File size.
+        file_size (:obj:`int`): Optional. File size in bytes.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
