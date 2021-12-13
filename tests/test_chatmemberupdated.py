@@ -180,7 +180,7 @@ class TestChatMemberUpdated:
             Chat(1, 'chat'),
             User(1, '', False),
             time,
-            ChatMember(User(1, '', False), ChatMember.CREATOR),
+            ChatMember(User(1, '', False), ChatMember.OWNER),
             new_chat_member,
         )
         # wrong new_chat_member
@@ -189,10 +189,10 @@ class TestChatMemberUpdated:
             User(1, '', False),
             time,
             old_chat_member,
-            ChatMember(User(1, '', False), ChatMember.CREATOR),
+            ChatMember(User(1, '', False), ChatMember.OWNER),
         )
         # wrong type
-        g = ChatMember(User(1, '', False), ChatMember.CREATOR)
+        g = ChatMember(User(1, '', False), ChatMember.OWNER)
 
         assert a == b
         assert hash(a) == hash(b)
