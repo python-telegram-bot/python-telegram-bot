@@ -31,9 +31,9 @@ class BotCommand(TelegramObject):
     considered equal, if their :attr:`command` and :attr:`description` are equal.
 
     Args:
-        command (:obj:`str`): Text of the command, 1-32 characters. Can contain only lowercase
+        command (:obj:`str`): Text of the command; 1-32 characters. Can contain only lowercase
             English letters, digits and underscores.
-        description (:obj:`str`): Description of the command, 1-256 characters.
+        description (:obj:`str`): Description of the command; 1-256 characters.
 
     Attributes:
         command (:obj:`str`): Text of the command.
