@@ -99,7 +99,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
          :meth:`builder` (for convenience).
 
     .. versionchanged:: 14.0
-        Initialization is now done through the :class:`telegram.ext.DispatcherBuilder`.
+
+        * Initialization is now done through the :class:`telegram.ext.DispatcherBuilder`.
+        * Removed the attribute ``groups``.
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
@@ -119,10 +121,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             :attr:`telegram.ext.Updater.exception_event`.
         handlers (Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]): A dictionary mapping each
             handler group to the list of handlers registered to that group.
-
-            .. seealso::
-                :meth:`add_handler`, :meth:`add_handlers`.
-        groups (List[:obj:`int`]): A list of all handler groups that have handlers registered.
 
             .. seealso::
                 :meth:`add_handler`, :meth:`add_handlers`.
@@ -150,7 +148,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         'bot_data',
         '_update_persistence_lock',
         'handlers',
-        'groups',
         'error_handlers',
         'running',
         '__stop_event',
@@ -244,7 +241,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.persistence = None
 
         self.handlers: Dict[int, List[Handler]] = {}
-        self.groups: List[int] = []
         self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
 
         self.running = False
@@ -483,7 +479,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         handled = False
         sync_modes = []
 
-        for group in self.groups:
+        for group in sorted(self.handlers):  # lower -> higher groups
             try:
                 for handler in self.handlers[group]:
                     check = handler.check_update(update)
@@ -574,8 +570,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
         if group not in self.handlers:
             self.handlers[group] = []
-            self.groups.append(group)
-            self.groups = sorted(self.groups)
 
         self.handlers[group].append(handler)
 
@@ -625,7 +619,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.handlers[group].remove(handler)
             if not self.handlers[group]:
                 del self.handlers[group]
-                self.groups.remove(group)
 
     def update_persistence(self, update: object = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
