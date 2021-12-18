@@ -87,7 +87,7 @@ def deep_linked_level_3(update: Update, context: CallbackContext.DEFAULT_TYPE) -
     )
 
 
-def deep_link_level_3_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+def deep_link_level_3_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Answers CallbackQuery with deeplinking url."""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_KEYBOARD)
@@ -114,30 +114,24 @@ def main() -> None:
     # https://core.telegram.org/bots#deep-linking
 
     # Register a deep-linking handler
-    dispatcher.add_handler(
-        CommandHandler("start", deep_linked_level_1, filters.Regex(CHECK_THIS_OUT))
-    )
+    level_1 = CommandHandler("start", deep_linked_level_1, filters.Regex(CHECK_THIS_OUT))
 
-    # This one works with a textual link instead of an URL
-    dispatcher.add_handler(CommandHandler("start", deep_linked_level_2, filters.Regex(SO_COOL)))
+    # This one works with a textual link instead of a URL
+    level_2 = CommandHandler("start", deep_linked_level_2, filters.Regex(SO_COOL))
 
     # We can also pass on the deep-linking payload
-    dispatcher.add_handler(
-        CommandHandler("start", deep_linked_level_3, filters.Regex(USING_ENTITIES))
-    )
+    level_3 = CommandHandler("start", deep_linked_level_3, filters.Regex(USING_ENTITIES))
 
     # Possible with inline keyboard buttons as well
-    dispatcher.add_handler(
-        CommandHandler("start", deep_linked_level_4, filters.Regex(USING_KEYBOARD))
-    )
+    level_4 = CommandHandler("start", deep_linked_level_4, filters.Regex(USING_KEYBOARD))
 
     # register callback handler for inline keyboard button
-    dispatcher.add_handler(
-        CallbackQueryHandler(deep_link_level_3_callback, pattern=KEYBOARD_CALLBACKDATA)
-    )
+    level_3_button = CallbackQueryHandler(deep_link_level_3_button, pattern=KEYBOARD_CALLBACKDATA)
+
+    start_handler = CommandHandler("start", start)
 
     # Make sure the deep-linking handlers occur *before* the normal /start handler.
-    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handlers([level_1, level_2, level_3, level_4, level_3_button, start_handler])
 
     # Start the Bot
     updater.start_polling()
