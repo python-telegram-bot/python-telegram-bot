@@ -36,6 +36,7 @@ from typing import (
     Generic,
     TypeVar,
     TYPE_CHECKING,
+    Sequence,
 )
 from uuid import uuid4
 
@@ -120,11 +121,11 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             handler group to the list of handlers registered to that group.
 
             .. seealso::
-                :meth:`add_handler`
+                :meth:`add_handler`, :meth:`add_handlers`.
         groups (List[:obj:`int`]): A list of all handler groups that have handlers registered.
 
             .. seealso::
-                :meth:`add_handler`
+                :meth:`add_handler`, :meth:`add_handlers`.
         error_handlers (Dict[:obj:`callable`, :obj:`bool`]): A dict, where the keys are error
             handlers and the values indicate whether they are to be run asynchronously via
             :meth:`run_async`.
@@ -577,6 +578,40 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.groups = sorted(self.groups)
 
         self.handlers[group].append(handler)
+
+    def add_handlers(
+        self,
+        handlers: Union[Sequence[Handler], Dict[int, Sequence[Handler]]],
+        group: int = DEFAULT_GROUP,
+    ) -> None:
+        """Register multiple handlers at once. Priority/order of handlers matters.
+
+        .. versionadded:: 14.0
+
+        Args:
+            handlers (Sequence[:obj:`telegram.ext.Handler`] | \
+                Dict[int, Sequence[:obj:`telegram.ext.Handler`]]): \
+                Specify a sequence of handlers *or* a dictionary where the keys are groups and
+                values are handlers.
+            group (:obj:`int`, optional): Specify which group the sequence of ``handlers``
+                should be added to. Defaults to ``0``.
+
+        .. seealso:: :meth:`add_handler`
+        """
+        if isinstance(handlers, dict) and group != DEFAULT_GROUP:
+            raise ValueError('The `group` argument can only be used with a sequence of handlers.')
+
+        if isinstance(handlers, list):
+            for handler in handlers:
+                self.add_handler(handler, group)
+
+        elif isinstance(handlers, dict):
+            for handler_group, grp_handlers in handlers.items():
+                if not isinstance(grp_handlers, Sequence):
+                    raise ValueError(f'Handlers for group {handler_group} should be a sequence!')
+
+                for handler in grp_handlers:
+                    self.add_handler(handler, handler_group)
 
     def remove_handler(self, handler: Handler, group: int = DEFAULT_GROUP) -> None:
         """Remove a handler from the specified group.
