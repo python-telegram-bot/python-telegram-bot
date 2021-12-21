@@ -32,6 +32,47 @@ class MessageEntity(TelegramObject):
     This object represents one special entity in a text message. For example, hashtags,
     usernames, URLs, etc.
 
+    .. seealso:: :attr:`telegram.Message.entities`
+
+        :attr:`telegram.Message.caption_entities`
+
+        :attr:`telegram.Poll.explanation_entities`
+
+        :attr:`telegram.InputMedia.caption_entities`
+
+        :attr:`telegram.Game.text_entities`
+
+        :attr:`telegram.InlineQueryResultAudio.caption_entities`
+
+        :attr:`telegram.InlineQueryResultCachedAudio.caption_entities`
+
+        :attr:`telegram.InlineQueryResultDocument.caption_entities`
+
+        :attr:`telegram.InlineQueryResultCachedDocument.caption_entities`
+
+        :attr:`telegram.InlineQueryResultGif.caption_entities`
+
+        :attr:`telegram.InlineQueryResultCachedGif.caption_entities`
+
+        :attr:`telegram.InlineQueryResultMpeg4Gif.caption_entities`
+
+        :attr:`telegram.InlineQueryResultCachedMpeg4Gif.caption_entities`
+
+        :attr:`telegram.InlineQueryResultPhoto.caption_entities`
+
+        :attr:`telegram.InlineQueryResultCachedPhoto.caption_entities`
+
+        :attr:`telegram.InlineQueryResultVideo.caption_entities`
+
+        :attr:`telegram.InlineQueryResultCachedVideo.caption_entities`
+
+        :attr:`telegram.InlineQueryResultVoice.caption_entities`
+
+        :attr:`telegram.InlineQueryResultCachedVoice.caption_entities`
+
+        :attr:`telegram.InputTextMessageContent.entities`
+
+
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type`, :attr:`offset` and :attr:`length` are equal.
 

@@ -42,6 +42,8 @@ class ChatInviteLink(TelegramObject):
          Bot API.
        * Comparing objects of this class now also takes :attr:`creates_join_request` into account.
 
+    .. seealso:: :attr:`telegram.ChatJoinRequest.invite_link`
+
     Args:
         invite_link (:obj:`str`): The invite link.
         creator (:class:`telegram.User`): Creator of the link.

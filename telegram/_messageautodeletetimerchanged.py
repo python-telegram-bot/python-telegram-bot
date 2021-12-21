@@ -33,6 +33,8 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
 
     .. versionadded:: 13.4
 
+    .. seealso:: :attr:`telegram.Message.message_auto_delete_timer_changed`
+
     Args:
         message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the
             chat.

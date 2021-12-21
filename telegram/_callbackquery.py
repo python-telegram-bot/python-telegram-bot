@@ -60,6 +60,7 @@ class CallbackQuery(TelegramObject):
 
           .. versionadded:: 13.6
 
+    .. seealso:: :attr:`telegram.Update.callback_query`
 
     Args:
         id (:obj:`str`): Unique identifier for this query.

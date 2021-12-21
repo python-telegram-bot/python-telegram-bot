@@ -66,6 +66,10 @@ class Chat(TelegramObject):
     .. versionchanged:: 14.0
         Removed the deprecated methods ``kick_member`` and ``get_members_count``.
 
+    .. seealso:: :attr:`telegram.Message.chat`
+
+        :attr:`telegram.ChatJoinRequest.chat`
+
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
             and some programming languages may have difficulty/silent defects in interpreting it.

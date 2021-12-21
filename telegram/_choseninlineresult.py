@@ -41,6 +41,8 @@ class ChosenInlineResult(TelegramObject):
         * It is necessary to enable inline feedback via `@Botfather <https://t.me/BotFather>`_ in
           order to receive these objects in updates.
 
+    .. seealso:: :attr:`telegram.Update.chosen_inline_result`
+
     Args:
         result_id (:obj:`str`): The unique identifier for the result that was chosen.
         from_user (:class:`telegram.User`): The user that chose the result.

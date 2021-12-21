@@ -40,6 +40,10 @@ class ChatMemberUpdated(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
 
+    .. seealso:: :attr:`telegram.Update.my_chat_member`
+
+        :attr:`telegram.Update.chat_member`
+
     Args:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
         from_user (:class:`telegram.User`): Performer of the action, which resulted in the change.

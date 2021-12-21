@@ -39,6 +39,8 @@ class LoginUrl(TelegramObject):
         and the integrity of the data as described in
         `Checking authorization <https://core.telegram.org/widgets/login#checking-authorization>`_
 
+    .. seealso:: :attr:`telegram.InlineKeyboardButton.login_url`
+
     Args:
         url (:obj:`str`): An HTTP URL to be opened with user authorization data added to the query
             string when the button is pressed. If the user refuses to provide authorization data,

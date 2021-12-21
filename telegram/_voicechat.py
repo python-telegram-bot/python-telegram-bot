@@ -36,6 +36,8 @@ class VoiceChatStarted(TelegramObject):
     chat started in the chat. Currently holds no information.
 
     .. versionadded:: 13.4
+
+    .. seealso:: :attr:`telegram.Message.voice_chat_started`
     """
 
     __slots__ = ()
@@ -54,6 +56,8 @@ class VoiceChatEnded(TelegramObject):
     :attr:`duration` are equal.
 
     .. versionadded:: 13.4
+
+    .. seealso:: :attr:`telegram.Message.voice_chat_ended`
 
     Args:
         duration (:obj:`int`): Voice chat duration in seconds.
@@ -81,6 +85,8 @@ class VoiceChatParticipantsInvited(TelegramObject):
     :attr:`users` are equal.
 
     .. versionadded:: 13.4
+
+    .. seealso:: :attr:`telegram.Message.voice_chat_participants_invited`
 
     Args:
         users (List[:class:`telegram.User`], optional):  New members that
@@ -129,6 +135,8 @@ class VoiceChatScheduled(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`start_date` are equal.
+
+    .. seealso:: :attr:`telegram.Message.voice_chat_scheduled`
 
     Args:
         start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the voice

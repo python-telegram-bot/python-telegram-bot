@@ -64,6 +64,52 @@ class User(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
+    .. seealso:: :attr:`telegram.Update.effective_user`
+
+        :attr:`telegram.Message.from_user`
+
+        :attr:`telegram.Message.forward_from_user`
+
+        :attr:`telegram.Message.new_chat_members`
+
+        :attr:`telegram.Message.left_chat_member`
+
+        :attr:`telegram.Message.via_bot`
+
+        :attr:`telegram.VoiceChatParticipantsInvited.users`
+
+        :attr:`telegram.MessageEntity.user`
+
+        :attr:`telegram.PrecheckoutQuery.from_user`
+
+        :attr:`telegram.ShippingQuery.from_user`
+
+        :attr:`telegram.PollAnswer.user`
+
+        :attr:`telegram.Bot.bot_user`
+
+        :attr:`telegram.CallbackQuery.from_user`
+
+        :attr:`telegram.ChatInviteLink.creator`
+
+        :attr:`telegram.ChatJoinRequest.from_user`
+
+        :attr:`telegram.ChatMember.user`
+
+        :attr:`telegram.ChatMemberUpdated.from_user`
+
+        :attr:`telegram.ChosenInlineResult.from_user`
+
+        :attr:`telegram.GameHighScore.user`
+
+        :attr:`telegram.InlineQuery.from_user`
+
+        :attr:`telegram.InlineQuery.from_user`
+
+        :attr:`telegram.ProximityAlertTriggered.traveler`
+
+        :attr:`telegram.ProximityAlertTriggered.watcher`
+
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
         is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.

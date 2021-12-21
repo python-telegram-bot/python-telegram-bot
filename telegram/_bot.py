@@ -420,6 +420,18 @@ class Bot(TelegramObject):
     ) -> Message:
         """Use this method to send text messages.
 
+        .. seealso:: :meth:`telegram.Chat.send_message`
+
+            :meth:`telegram.User.send_message`
+
+            :meth:`telegram.Message.reply_text`
+
+            :meth:`telegram.Message.reply_markdown`
+
+            :meth:`telegram.Message.reply_markdown_v2`
+
+            :meth:`telegram.Message.reply_html`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -504,6 +516,10 @@ class Bot(TelegramObject):
             - If the bot has :attr:`telegram.ChatMember.can_delete_messages` permission in a
               supergroup or a channel, it can delete any message there.
 
+        .. seealso:: :meth:`telegram.CallbackQuery.delete_message`
+
+            :meth:`telegram.Message.delete`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -547,6 +563,9 @@ class Bot(TelegramObject):
 
             As a workaround, it is still possible to use :meth:`copy_message`. However, this
             behaviour is undocumented and might be changed by Telegram.
+
+
+        .. seealso:: :meth:`telegram.Message.forward`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -613,6 +632,12 @@ class Bot(TelegramObject):
         Note:
             The photo argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
+
+        .. seealso:: :meth:`telegram.Chat.send_photo`
+
+            :meth:`telegram.User.send_photo`
+
+            :meth:`telegram.Message.reply_photo`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -723,6 +748,12 @@ class Bot(TelegramObject):
         Note:
             The audio argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
+
+        .. seealso:: :meth:`telegram.Chat.send_audio`
+
+            :meth:`telegram.User.send_audio`
+
+            :meth:`telegram.Message.reply_audio`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -849,6 +880,12 @@ class Bot(TelegramObject):
             The document argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
 
+        .. seealso:: :meth:`telegram.Chat.send_document`
+
+            :meth:`telegram.User.send_document`
+
+            :meth:`telegram.Message.reply_document`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -957,6 +994,12 @@ class Bot(TelegramObject):
             The sticker argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
 
+        .. seealso:: :meth:`telegram.Chat.send_sticker`
+
+            :meth:`telegram.User.send_sticker`
+
+            :meth:`telegram.Message.reply_sticker`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1037,6 +1080,12 @@ class Bot(TelegramObject):
         Bots can currently send video files of up to
         :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD` in size, this limit may be
         changed in the future.
+
+        .. seealso:: :meth:`telegram.Chat.send_video`
+
+            :meth:`telegram.User.send_video`
+
+            :meth:`telegram.Message.reply_video`
 
         Note:
             * The video argument can be either a file_id, an URL or a file from disk
@@ -1171,6 +1220,12 @@ class Bot(TelegramObject):
               generate thumb nails. However, this behaviour is undocumented and might be changed
               by Telegram.
 
+        .. seealso:: :meth:`telegram.Chat.send_video_note`
+
+            :meth:`telegram.User.send_video_note`
+
+            :meth:`telegram.Message.reply_video_note`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1280,6 +1335,12 @@ class Bot(TelegramObject):
             ``thumb`` will be ignored for small files, for which Telegram can easily
             generate thumb nails. However, this behaviour is undocumented and might be changed
             by Telegram.
+
+        .. seealso:: :meth:`telegram.Chat.send_animation`
+
+            :meth:`telegram.User.send_animation`
+
+            :meth:`telegram.Message.reply_animation`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1405,6 +1466,12 @@ class Bot(TelegramObject):
             The voice argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
 
+        .. seealso:: :meth:`telegram.Chat.send_voice`
+
+            :meth:`telegram.User.send_voice`
+
+            :meth:`telegram.Message.reply_voice`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1499,6 +1566,12 @@ class Bot(TelegramObject):
     ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
 
+        .. seealso:: :meth:`telegram.Chat.send_media_group`
+
+            :meth:`telegram.User.send_media_group`
+
+            :meth:`telegram.Message.reply_media_group`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1566,6 +1639,12 @@ class Bot(TelegramObject):
 
         Note:
             You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
+
+        .. seealso:: :meth:`telegram.Chat.send_location`
+
+            :meth:`telegram.User.send_location`
+
+            :meth:`telegram.Message.reply_location`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1671,6 +1750,10 @@ class Bot(TelegramObject):
         Note:
             You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
 
+        .. seealso:: :meth:`telegram.Message.edit_live_location`
+
+            :meth:`telegram.CallbackQuery.edit_message_live_location`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
@@ -1751,6 +1834,10 @@ class Bot(TelegramObject):
         """Use this method to stop updating a live location message sent by the bot or via the bot
         (for inline bots) before live_period expires.
 
+        .. seealso:: :meth:`telegram.Message.stop_live_location`
+
+            :meth:`telegram.CallbackQuery.stop_message_live_location`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Required if inline_message_id is not specified.
                 Unique identifier for the target chat or username of the target channel
@@ -1818,6 +1905,12 @@ class Bot(TelegramObject):
               :obj:`google_place_type`.
             * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
+
+        .. seealso:: :meth:`telegram.Chat.send_venue`
+
+            :meth:`telegram.User.send_venue`
+
+            :meth:`telegram.Message.reply_venue`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1930,6 +2023,12 @@ class Bot(TelegramObject):
             You can either supply :obj:`contact` or :obj:`phone_number` and :obj:`first_name`
             with optionally :obj:`last_name` and optionally :obj:`vcard`.
 
+        .. seealso:: :meth:`telegram.Chat.send_contact`
+
+            :meth:`telegram.User.send_contact`
+
+            :meth:`telegram.Message.reply_contact`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -2015,6 +2114,12 @@ class Bot(TelegramObject):
     ) -> Message:
         """Use this method to send a game.
 
+        .. seealso:: :meth:`telegram.Chat.send_game`
+
+            :meth:`telegram.User.send_game`
+
+            :meth:`telegram.Message.reply_game`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat.
             game_short_name (:obj:`str`): Short name of the game, serves as the unique identifier
@@ -2073,6 +2178,12 @@ class Bot(TelegramObject):
         side. The status is set for 5 seconds or less (when a message arrives from your bot,
         Telegram clients clear its typing status). Telegram only recommends using this method when
         a response from the bot will take a noticeable amount of time to arrive.
+
+        .. seealso:: :meth:`telegram.Chat.send_chat_action`
+
+            :meth:`telegram.User.send_chat_action`
+
+            :meth:`telegram.Message.reply_chat_action`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2202,6 +2313,8 @@ class Bot(TelegramObject):
             calling this method directly, use the shortcut :meth:`telegram.InlineQuery.answer` with
             ``auto_pagination=True``, which will take care of passing the correct value.
 
+        .. seealso:: :meth:`telegram.InlineQuery.answer`
+
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
             results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
@@ -2292,6 +2405,8 @@ class Bot(TelegramObject):
     ) -> Optional[UserProfilePhotos]:
         """Use this method to get a list of profile pictures for a user.
 
+        .. seealso:: :meth:`telegram.User.get_profile_photos`
+
         Args:
             user_id (:obj:`int`): Unique identifier of the target user.
             offset (:obj:`int`, optional): Sequential number of the first photo to be returned.
@@ -2344,6 +2459,12 @@ class Bot(TelegramObject):
              This function may not preserve the original file name and MIME type.
              You should save the file's MIME type and name (if available) when the File object
              is received.
+
+        .. seealso:: :meth:`telegram.ChatPhoto.get_small_file`
+
+            :meth:`telegram.ChatPhoto.get_big_file`
+
+            :meth:`telegram.PassportFile.get_file`
 
         Args:
             file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
@@ -2399,6 +2520,8 @@ class Bot(TelegramObject):
         chat for this to work and must have the appropriate admin rights.
 
          .. versionadded:: 13.7
+
+        .. seealso:: :meth:`telegram.Chat.ban_member`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
@@ -2457,6 +2580,10 @@ class Bot(TelegramObject):
 
         .. versionadded:: 13.9
 
+        .. seealso:: :meth:`telegram.Chat.ban_sender_chat`
+
+            :meth:`telegram.Chat.ban_chat`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
                 of the target supergroup or channel (in the format ``@channelusername``).
@@ -2496,6 +2623,8 @@ class Bot(TelegramObject):
         guarantees that after the call the user is not a member of the chat, but will be able to
         join it. So if the user is a member of the chat they will also be *removed* from the chat.
         If you don't want this, use the parameter :attr:`only_if_banned`.
+
+        .. seealso:: :meth:`telegram.Chat.unban_member`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2537,6 +2666,10 @@ class Bot(TelegramObject):
         appropriate administrator rights.
 
         .. versionadded:: 13.9
+
+        .. seealso:: :meth:`telegram.Chat.unban_sender_chat`
+
+            :meth:`telegram.Chat.unban_chat`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2580,6 +2713,8 @@ class Bot(TelegramObject):
         work, you must first create a game for your bot via `@BotFather <https://t.me/BotFather>`_
         and accept the terms. Otherwise, you may use links like t.me/your_bot?start=XXXX that open
         your bot with a parameter.
+
+        .. seealso:: :meth:`telegram.CallbackQuery.answer`
 
         Args:
             callback_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -2641,6 +2776,10 @@ class Bot(TelegramObject):
     ) -> Union[Message, bool]:
         """
         Use this method to edit text and game messages.
+
+        .. seealso:: :meth:`telegram.Message.edit_text`
+
+            :meth:`telegram.CallbackQuery.edit_message_text`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2714,6 +2853,10 @@ class Bot(TelegramObject):
     ) -> Union[Message, bool]:
         """
         Use this method to edit captions of messages.
+
+        .. seealso:: :meth:`telegram.Message.edit_caption`
+
+            :meth:`telegram.CallbackQuery.edit_message_caption`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -2793,6 +2936,10 @@ class Bot(TelegramObject):
         message is edited, a new file can't be uploaded; use a previously uploaded file via its
         ``file_id`` or specify a URL.
 
+        .. seealso:: :meth:`telegram.Message.edit_media`
+
+            :meth:`telegram.CallbackQuery.edit_message_media`
+
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content
                 of the message.
@@ -2854,6 +3001,10 @@ class Bot(TelegramObject):
         """
         Use this method to edit only the reply markup of messages sent by the bot or via the bot
         (for inline bots).
+
+        .. seealso:: :meth:`telegram.Message.edit_reply_markup`
+
+            :meth:`telegram.CallbackQuery.edit_message_reply_markup`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -3123,6 +3274,8 @@ class Bot(TelegramObject):
     ) -> bool:
         """Use this method for your bot to leave a group, supergroup or channel.
 
+        .. seealso:: :meth:`telegram.Chat.leave`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
@@ -3188,6 +3341,8 @@ class Bot(TelegramObject):
         """
         Use this method to get a list of administrators in a chat.
 
+        .. seealso:: :meth:`telegram.Chat.get_administrators`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
@@ -3224,6 +3379,8 @@ class Bot(TelegramObject):
 
          .. versionadded:: 13.7
 
+        .. seealso:: :meth:`telegram.Chat.get_members_count`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
@@ -3255,6 +3412,8 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> ChatMember:
         """Use this method to get information about a member of a chat.
+
+        .. seealso:: :meth:`telegram.Chat.get_member`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3381,6 +3540,10 @@ class Bot(TelegramObject):
         """
         Use this method to set the score of the specified user in a game message.
 
+        .. seealso:: :meth:`telegram.CallbackQuery.set_game_score`
+
+            :meth:`telegram.Message.set_game_score`
+
         Args:
             user_id (:obj:`int`): User identifier.
             score (:obj:`int`): New score, must be non-negative.
@@ -3447,6 +3610,10 @@ class Bot(TelegramObject):
             This method will currently return scores for the target user, plus two of their
             closest neighbors on each side. Will also return the top three users if the user and
             his neighbors are not among them. Please note that this behavior is subject to change.
+
+        .. seealso:: :meth:`telegram.CallbackQuery.get_game_high_scores`
+
+            :meth:`telegram.Message.get_game_high_scores`
 
         Args:
             user_id (:obj:`int`): Target user id.
@@ -3524,6 +3691,10 @@ class Bot(TelegramObject):
 
         .. versionchanged:: 13.5
             As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
+
+        .. seealso:: :meth:`telegram.Chat.send_invoice`
+
+            :meth:`telegram.Message.reply_invoice`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3684,6 +3855,8 @@ class Bot(TelegramObject):
         :attr:`Update.shipping_query` field to the bot. Use this method to reply to shipping
         queries.
 
+        .. seealso:: :meth:`telegram.ShippingQuery.answer`
+
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
             ok (:obj:`bool`): Specify :obj:`True` if delivery to the specified address is possible
@@ -3755,6 +3928,8 @@ class Bot(TelegramObject):
             The Bot API must receive an answer within 10 seconds after the pre-checkout
             query was sent.
 
+        .. seealso:: :meth:`telegram.PreCheckoutQuery.answer`
+
         Args:
             pre_checkout_query_id (:obj:`str`): Unique identifier for the query to be answered.
             ok (:obj:`bool`): Specify :obj:`True` if everything is alright
@@ -3816,6 +3991,8 @@ class Bot(TelegramObject):
             single argument of type :class:`telegram.ChatPermissions`. The old way of passing
             parameters will not keep working forever.
 
+        .. seealso:: :meth:`telegram.Chat.restrict_member`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup (in the format @supergroupusername).
@@ -3876,6 +4053,8 @@ class Bot(TelegramObject):
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
         an administrator in the chat for this to work and must have the appropriate admin rights.
         Pass :obj:`False` for all boolean parameters to demote a user.
+
+        .. seealso:: :meth:`telegram.Chat.promote_member`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3968,6 +4147,8 @@ class Bot(TelegramObject):
         administrator in the group or a supergroup for this to work and must have the
         :attr:`telegram.ChatMember.can_restrict_members` admin rights.
 
+        .. seealso:: :meth:`telegram.Chat.set_permissions`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
                 the target supergroup (in the format `@supergroupusername`).
@@ -4003,6 +4184,8 @@ class Bot(TelegramObject):
         """
         Use this method to set a custom title for administrators promoted by the bot in a
         supergroup. The bot must be an administrator for this to work.
+
+        .. seealso:: :meth:`telegram.Chat.set_administrator_custom_title`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
@@ -4042,6 +4225,8 @@ class Bot(TelegramObject):
         Use this method to generate a new primary invite link for a chat; any previously generated
         link is revoked. The bot must be an administrator in the chat for this to work and must
         have the appropriate admin rights.
+
+        .. seealso:: :meth:`telegram.Chat.export_invite_link`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4089,6 +4274,8 @@ class Bot(TelegramObject):
         The link can be revoked using the method :meth:`revoke_chat_invite_link`.
 
         .. versionadded:: 13.4
+
+        .. seealso:: :meth:`telegram.Chat.create_invite_link`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4171,6 +4358,8 @@ class Bot(TelegramObject):
 
         .. versionadded:: 13.4
 
+        .. seealso:: :meth:`telegram.Chat.edit_invite_link`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -4246,6 +4435,8 @@ class Bot(TelegramObject):
 
         .. versionadded:: 13.4
 
+        .. seealso:: :meth:`telegram.Chat.revoke_invite_link`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -4288,6 +4479,12 @@ class Bot(TelegramObject):
 
         .. versionadded:: 13.8
 
+        .. seealso:: :meth:`telegram.Chat.approve_join_request`
+
+            :meth:`telegram.ChatJoinRequest.approve`
+
+            :meth:`telegram.User.approve_join_request`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -4324,6 +4521,12 @@ class Bot(TelegramObject):
         :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
 
         .. versionadded:: 13.8
+
+        .. seealso:: :meth:`telegram.Chat.decline_join_request`
+
+            :meth:`telegram.ChatJoinRequest.decline`
+
+            :meth:`telegram.User.decline_join_request`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4510,6 +4713,12 @@ class Bot(TelegramObject):
         and must have the :attr:`telegram.ChatMember.can_pin_messages` admin right in a supergroup
         or :attr:`telegram.ChatMember.can_edit_messages` admin right in a channel.
 
+        .. seealso:: :meth:`telegram.Chat.pin_message`
+
+            :meth:`telegram.Message.pin`
+
+            :meth:`telegram.User.pin_message`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -4554,6 +4763,12 @@ class Bot(TelegramObject):
         and must have the :attr:`telegram.ChatMember.can_pin_messages` admin right in a
         supergroup or :attr:`telegram.ChatMember.can_edit_messages` admin right in a channel.
 
+        .. seealso:: :meth:`telegram.Chat.unpin_message`
+
+            :meth:`telegram.Message.unpin`
+
+            :meth:`telegram.User.unpin_message`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -4593,6 +4808,10 @@ class Bot(TelegramObject):
         chat is not a private chat, the bot must be an administrator in the chat for this
         to work and must have the :attr:`telegram.ChatMember.can_pin_messages` admin right in a
         supergroup or :attr:`telegram.ChatMember.can_edit_messages` admin right in a channel.
+
+        .. seealso:: :meth:`telegram.Chat.unpin_all_messages`
+
+            :meth:`telegram.User.unpin_all_messages`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -5044,6 +5263,12 @@ class Bot(TelegramObject):
         """
         Use this method to send a native poll.
 
+        .. seealso:: :meth:`telegram.Chat.send_poll`
+
+            :meth:`telegram.Message.reply_poll`
+
+            :meth:`telegram.User.send_poll`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -5156,6 +5381,8 @@ class Bot(TelegramObject):
         """
         Use this method to stop a poll which was sent by the bot.
 
+        .. seealso:: :meth:`telegram.Message.stop_poll`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -5204,6 +5431,13 @@ class Bot(TelegramObject):
     ) -> Message:
         """
         Use this method to send an animated emoji that will display a random value.
+
+        .. seealso:: :meth:`telegram.Message.reply_dice`
+
+            :meth:`telegram.Chat.send_dice`
+
+            :meth:`telegram.User.send_dice`
+
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -5481,6 +5715,18 @@ class Bot(TelegramObject):
         Use this method to copy messages of any kind. Service messages and invoice messages can't
         be copied. The method is analogous to the method :meth:`forward_message`, but the copied
         message doesn't have a link to the original message.
+
+        .. seealso:: :meth:`telegram.Message.copy`
+
+            :meth:`telegram.Message.reply_copy`
+
+            :meth:`telegram.Chat.send_copy`
+
+            :meth:`telegram.Chat.copy_message`
+
+            :meth:`telegram.User.copy_message`
+
+            :meth:`telegram.User.send_copy`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username

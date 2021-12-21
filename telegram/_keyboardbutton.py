@@ -39,6 +39,7 @@ class KeyboardButton(TelegramObject):
         * :attr:`request_poll` option will only work in Telegram versions released after 23
           January, 2020. Older clients will receive unsupported message.
 
+    .. seealso:: :attr:`telegram.ReplyKeyboardMarkup.keyboard`
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
             sent to the bot as a message when the button is pressed.

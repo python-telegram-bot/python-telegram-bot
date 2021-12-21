@@ -27,6 +27,48 @@ class ReplyMarkup(TelegramObject):
     :class:`telegram.ReplyKeyboardRemove` and :class:`telegram.ForceReply` for
     detailed use.
 
+    .. seealso:: :attr:`telegram.Message.reply_markup`
+
+        :attr:`telegram.InlineQueryResultAudio.reply_markup`
+
+        :attr:`telegram.InlineQueryResultCachedAudio.reply_markup`
+
+        :attr:`telegram.InlineQueryResultDocument.reply_markup`
+
+        :attr:`telegram.InlineQueryResultCachedDocument.reply_markup`
+
+        :attr:`telegram.InlineQueryResultGif.reply_markup`
+
+        :attr:`telegram.InlineQueryResultCachedGif.reply_markup`
+
+        :attr:`telegram.InlineQueryResultMpeg4Gif.reply_markup`
+
+        :attr:`telegram.InlineQueryResultCachedMpeg4Gif.reply_markup`
+
+        :attr:`telegram.InlineQueryResultPhoto.reply_markup`
+
+        :attr:`telegram.InlineQueryResultCachedPhoto.reply_markup`
+
+        :attr:`telegram.InlineQueryResultVideo.reply_markup`
+
+        :attr:`telegram.InlineQueryResultCachedVideo.reply_markup`
+
+        :attr:`telegram.InlineQueryResultVoice.reply_markup`
+
+        :attr:`telegram.InlineQueryResultCachedVoice.reply_markup`
+
+        :attr:`telegram.InlineQueryResultSticker.reply_markup`
+
+        :attr:`telegram.InlineQueryResultContact.reply_markup`
+
+        :attr:`telegram.InlineQueryResultGame.reply_markup`
+
+        :attr:`telegram.InlineQueryResultLocation.reply_markup`
+
+        :attr:`telegram.InlineQueryResultVenue.reply_markup`
+
+        :attr:`telegram.InlineQueryResultArticle.reply_markup`
+
     """
 
     __slots__ = ()

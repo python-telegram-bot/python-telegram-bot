@@ -53,6 +53,8 @@ class Dice(TelegramObject):
         can be found at our `wiki <https://git.io/JkeC6>`_. However, this behaviour is undocumented
         and might be changed by Telegram.
 
+    .. seealso:: :attr:`telegram.Message.dice`
+
     Args:
         value (:obj:`int`): Value of the dice. 1-6 for dice, darts and bowling balls, 1-5 for
             basketball and football/soccer ball, 1-64 for slot machine.

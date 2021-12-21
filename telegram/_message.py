@@ -84,6 +84,22 @@ class Message(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
 
+    .. seealso:: :meth:`telegram.Bot.send_message`
+
+        :attr:`telegram.CallbackQuery.message`
+
+        :attr:`telegram.Chat.pinned_message`
+
+        :attr:`telegram.Update.message`
+
+        :attr:`telegram.Update.edited_message`
+
+        :attr:`telegram.Update.channel_post`
+
+        :attr:`telegram.Update.edited_channel_post`
+
+        :attr:`telegram.Update.effective_message`
+
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
         from_user (:class:`telegram.User`, optional): Sender of the message; empty for messages
