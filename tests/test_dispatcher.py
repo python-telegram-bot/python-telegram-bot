@@ -419,7 +419,7 @@ class TestDispatcher:
         msg_handler_inc_count = MessageHandler(filters.PHOTO, self.callback_increase_count)
 
         dp.add_handler(msg_handler_set_count, 1)
-        dp.add_handlers([msg_handler_inc_count, msg_handler_inc_count], 1)
+        dp.add_handlers((msg_handler_inc_count, msg_handler_inc_count), 1)
 
         photo_update = Update(2, message=Message(2, None, None, photo=True))
         dp.update_queue.put(self.message_update)  # Putting updates in the queue calls the callback
@@ -430,15 +430,16 @@ class TestDispatcher:
         assert (
             self.count == 2
             and len(dp.handlers[1]) == 3
-            and dp.handlers[1][0].filters.name == 'filters.TEXT'
+            and dp.handlers[1][0] is msg_handler_set_count
         )
 
         # Now lets test add_handlers when `handlers` is a dict-
+        voice_filter_handler_to_check = MessageHandler(filters.VOICE, self.callback_increase_count)
         dp.add_handlers(
             handlers={
                 1: [
                     MessageHandler(filters.USER, self.callback_increase_count),
-                    MessageHandler(filters.VOICE, self.callback_increase_count),
+                    voice_filter_handler_to_check,
                 ],
                 -1: [MessageHandler(filters.CAPTION, self.callback_set_count(2))],
             }
@@ -453,7 +454,7 @@ class TestDispatcher:
         assert (
             self.count == 4
             and len(dp.handlers[1]) == 5
-            and dp.handlers[1][-1].filters.name == 'filters.VOICE'
+            and dp.handlers[1][-1] is voice_filter_handler_to_check
         )
 
         dp.update_queue.put(Update(5, message=Message(5, None, None, caption='cap')))
@@ -463,9 +464,11 @@ class TestDispatcher:
 
         # Now lets test the errors which can be produced-
         with pytest.raises(ValueError, match="The `group` argument"):
-            dp.add_handlers({2: [msg_handler_set_count]}, group=3)
+            dp.add_handlers({2: [msg_handler_set_count]}, group=0)
         with pytest.raises(ValueError, match="Handlers for group 3"):
             dp.add_handlers({3: msg_handler_set_count})
+        with pytest.raises(ValueError, match="The `handlers` argument must be a sequence"):
+            dp.add_handlers({msg_handler_set_count})
 
     def test_add_handler_errors(self, dp):
         handler = 'not a handler'

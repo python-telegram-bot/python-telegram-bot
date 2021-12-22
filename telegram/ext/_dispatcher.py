@@ -36,11 +36,12 @@ from typing import (
     Generic,
     TypeVar,
     TYPE_CHECKING,
-    Sequence,
+    Tuple,
 )
 from uuid import uuid4
 
 from telegram import Update
+from telegram._utils.types import DVInput
 from telegram.error import TelegramError
 from telegram.ext import BasePersistence, ContextTypes, ExtBot
 from telegram.ext._handler import Handler
@@ -479,9 +480,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         handled = False
         sync_modes = []
 
-        for group in sorted(self.handlers):  # lower -> higher groups
+        for handlers in self.handlers.values():
             try:
-                for handler in self.handlers[group]:
+                for handler in handlers:
                     check = handler.check_update(update)
                     if check is not None and check is not False:
                         if not context:
@@ -570,42 +571,52 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
         if group not in self.handlers:
             self.handlers[group] = []
+            self.handlers = dict(sorted(self.handlers.items()))  # lower -> higher groups
 
         self.handlers[group].append(handler)
 
     def add_handlers(
         self,
-        handlers: Union[Sequence[Handler], Dict[int, Sequence[Handler]]],
-        group: int = DEFAULT_GROUP,
+        handlers: Union[
+            Union[List[Handler], Tuple[Handler]], Dict[int, Union[List[Handler], Tuple[Handler]]]
+        ],
+        group: DVInput[int] = DefaultValue(0),
     ) -> None:
-        """Register multiple handlers at once. Priority/order of handlers matters.
+        """Registers multiple handlers at once. The order of the handlers in the passed
+        sequence(s) matters. See :meth:`add_handler` for details.
 
         .. versionadded:: 14.0
+        .. seealso:: :meth:`add_handler`
 
         Args:
-            handlers (Sequence[:obj:`telegram.ext.Handler`] | \
-                Dict[int, Sequence[:obj:`telegram.ext.Handler`]]): \
+            handlers (List[:obj:`telegram.ext.Handler`] | \
+                Dict[int, List[:obj:`telegram.ext.Handler`]]): \
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
             group (:obj:`int`, optional): Specify which group the sequence of ``handlers``
                 should be added to. Defaults to ``0``.
 
-        .. seealso:: :meth:`add_handler`
         """
-        if isinstance(handlers, dict) and group != DEFAULT_GROUP:
+        if isinstance(handlers, dict) and not isinstance(group, DefaultValue):
             raise ValueError('The `group` argument can only be used with a sequence of handlers.')
 
-        if isinstance(handlers, list):
-            for handler in handlers:
-                self.add_handler(handler, group)
-
-        elif isinstance(handlers, dict):
+        if isinstance(handlers, dict):
             for handler_group, grp_handlers in handlers.items():
-                if not isinstance(grp_handlers, Sequence):
-                    raise ValueError(f'Handlers for group {handler_group} should be a sequence!')
+                if not isinstance(grp_handlers, (list, tuple)):
+                    raise ValueError(f'Handlers for group {handler_group} must be a list or tuple')
 
                 for handler in grp_handlers:
                     self.add_handler(handler, handler_group)
+
+        elif isinstance(handlers, (list, tuple)):
+            for handler in handlers:
+                self.add_handler(handler, DefaultValue.get_value(group))
+
+        else:
+            raise ValueError(
+                "The `handlers` argument must be a sequence of handlers or a "
+                "dictionary where the keys are groups and values are handlers."
+            )
 
     def remove_handler(self, handler: Handler, group: int = DEFAULT_GROUP) -> None:
         """Remove a handler from the specified group.
