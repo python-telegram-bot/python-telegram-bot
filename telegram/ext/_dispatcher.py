@@ -615,7 +615,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         else:
             raise ValueError(
                 "The `handlers` argument must be a sequence of handlers or a "
-                "dictionary where the keys are groups and values are handlers."
+                "dictionary where the keys are groups and values are sequences of handlers."
             )
 
     def remove_handler(self, handler: Handler, group: int = DEFAULT_GROUP) -> None:
