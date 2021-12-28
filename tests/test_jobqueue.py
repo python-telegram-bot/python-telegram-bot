@@ -519,3 +519,10 @@ class TestJobQueue:
         job_queue.run_once(callback, 0.1)
         sleep(0.15)
         assert self.result == (CustomContext, None, None, int)
+
+    def test_attribute_error(self):
+        job = Job(self.job_run_once)
+        with pytest.raises(
+            AttributeError, match="nor 'apscheduler.job.Job' has attribute 'error'"
+        ):
+            job.error

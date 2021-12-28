@@ -579,7 +579,12 @@ class Job:
         return job.func
 
     def __getattr__(self, item: str) -> object:
-        return getattr(self.job, item)
+        try:
+            return getattr(self.job, item)
+        except AttributeError as exc:
+            raise AttributeError(
+                f"Neither 'telegram.ext.Job' nor 'apscheduler.job.Job' has attribute '{item}'"
+            ) from exc
 
     def __lt__(self, other: object) -> bool:
         return False
