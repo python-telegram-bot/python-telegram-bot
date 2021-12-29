@@ -500,7 +500,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
                 workaround on Windows + Python 3.8+. No longer has any effect.
 
                 .. deprecated:: 13.6
-                   Since version 13.6, ``tornade>=6.1`` is required, which resolves the former
+                   Since version 13.6, ``tornado>=6.1`` is required, which resolves the former
                    issue.
 
             max_connections (:obj:`int`, optional): Passed to
