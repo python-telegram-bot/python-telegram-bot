@@ -116,6 +116,8 @@ class EncryptedCredentials(TelegramObject):
         This object is decrypted only when originating from
         :obj:`telegram.PassportData.decrypted_credentials`.
 
+    .. seealso:: :attr:`telegram.PassportData.credentials`
+
     Args:
         data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
             nonce, data hashes and secrets used for EncryptedPassportElement decryption and
@@ -208,6 +210,8 @@ class Credentials(TelegramObject):
     Attributes:
         secure_data (:class:`telegram.SecureData`): Credentials for encrypted data
         nonce (:obj:`str`): Bot-specified nonce
+
+    .. seealso:: :attr:`telegram.EncryptedPassportElement.credentials`
     """
 
     __slots__ = ('bot', 'nonce', 'secure_data')
@@ -236,6 +240,8 @@ class SecureData(TelegramObject):
     """
     This object represents the credentials that were used to decrypt the encrypted data.
     All fields are optional and depend on fields that were requested.
+
+    .. seealso:: :attr:`telegram.Credentials.secure_data`
 
     Attributes:
         personal_details (:class:`telegram.SecureValue`, optional): Credentials for encrypted

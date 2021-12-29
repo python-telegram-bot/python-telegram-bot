@@ -40,6 +40,8 @@ class InlineQuery(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
 
+    .. seealso:: :attr:`telegram.Update.inline_query`
+
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.

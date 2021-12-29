@@ -30,6 +30,8 @@ class ShippingAddress(TelegramObject):
     considered equal, if their  :attr:`country_code`, :attr:`state`, :attr:`city`,
     :attr:`street_line1`, :attr:`street_line2` and :attr:`post_cod` are equal.
 
+    .. seealso:: :attr:`telegram.ShippingQuery.shipping_address`
+
     Args:
         country_code (:obj:`str`): ISO 3166-1 alpha-2 country code.
         state (:obj:`str`): State, if applicable.

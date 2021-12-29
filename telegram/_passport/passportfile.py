@@ -36,6 +36,16 @@ class PassportFile(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    .. seealso:: :attr:`telegram.EncryptedPassportElement.files`
+
+        :attr:`telegram.EncryptedPassportElement.front_side`
+
+        :attr:`telegram.EncryptedPassportElement.reverse_side`
+
+        :attr:`telegram.EncryptedPassportElement.selfie`
+
+        :attr:`telegram.EncryptedPassportElement.translation`
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.

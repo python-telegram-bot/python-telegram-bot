@@ -32,6 +32,24 @@ class PhotoSize(_BaseMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    .. seealso:: :attr:`telegram.Animation.thumb`
+
+        :attr:`telegram.Audio.thumb`
+
+        :attr:`telegram.Document.thumb`
+
+        :attr:`telegram.Sticker.thumb`
+
+        :attr:`telegram.Video.thumb`
+
+        :attr:`telegram.VideoNote.thumb`
+
+        :attr:`telegram.Game.photo`
+
+        :attr:`telegram.Message.photo`
+
+        :attr:`telegram.UserProfilePhotos.photos`
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.

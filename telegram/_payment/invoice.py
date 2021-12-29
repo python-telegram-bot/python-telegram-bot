@@ -30,6 +30,8 @@ class Invoice(TelegramObject):
     considered equal, if their :attr:`title`, :attr:`description`, :attr:`start_parameter`,
     :attr:`currency` and :attr:`total_amount` are equal.
 
+    .. seealso:: :attr:`telegram.Message.invoice`
+
     Args:
         title (:obj:`str`): Product name.
         description (:obj:`str`): Product description.

@@ -34,6 +34,8 @@ class SuccessfulPayment(TelegramObject):
     considered equal, if their :attr:`telegram_payment_charge_id` and
     :attr:`provider_payment_charge_id` are equal.
 
+    .. seealso:: :attr:`telegram.Message.successful_payment`
+
     Args:
         currency (:obj:`str`): Three-letter ISO 4217 currency code.
         total_amount (:obj:`int`): Total price in the smallest units of the currency (integer, not

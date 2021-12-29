@@ -33,6 +33,8 @@ class ShippingOption(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
+    .. seealso:: :attr:`telegram.ShippingQuery.shipping_options`
+
     Args:
         id (:obj:`str`): Shipping option identifier.
         title (:obj:`str`): Option title.

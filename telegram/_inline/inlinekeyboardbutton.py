@@ -34,6 +34,8 @@ class InlineKeyboardButton(TelegramObject):
     :attr:`switch_inline_query`, :attr:`switch_inline_query_current_chat`, :attr:`callback_game`
     and :attr:`pay` are equal.
 
+    .. seealso:: :attr:`telegram.InlineKeyboardMarkup.inline_keyboard`
+
     Note:
         * You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
           working as expected. Putting a game short name in it might, but is not guaranteed to

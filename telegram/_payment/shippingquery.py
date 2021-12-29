@@ -37,6 +37,8 @@ class ShippingQuery(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
 
+    .. seealso:: :attr:`telegram.Update.shipping_query`
+
     Args:
         id (:obj:`str`): Unique query identifier.
         from_user (:class:`telegram.User`): User who sent the query.

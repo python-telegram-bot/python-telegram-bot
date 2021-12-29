@@ -46,6 +46,10 @@ class InputMedia(TelegramObject):
         Added arguments and attributes :attr:`media_type`, :attr:`media`, :attr:`caption`,
             :attr:`caption_entities`, :attr:`parse_mode`.
 
+    .. seealso:: :attr:`telegram.CallbackQuery.media`
+
+        :attr:`telegram.messages.media`
+
     Args:
         media_type (:obj:`str`) Type of media that the instance represents.
         media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \

@@ -29,6 +29,8 @@ class PersonalDetails(TelegramObject):
     """
     This object represents personal details.
 
+    .. seealso:: :attr:`telegram.EncryptedPassportElement.data`
+
     Attributes:
         first_name (:obj:`str`): First Name.
         middle_name (:obj:`str`): Optional. First Name.

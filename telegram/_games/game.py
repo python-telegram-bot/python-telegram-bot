@@ -36,6 +36,8 @@ class Game(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`title`, :attr:`description` and :attr:`photo` are equal.
 
+    .. seealso:: :attr:`telegram.Message.game`
+
     Args:
         title (:obj:`str`): Title of the game.
         description (:obj:`str`): Description of the game.

@@ -37,6 +37,8 @@ class Venue(TelegramObject):
       Foursquare details and Google Pace details are mutually exclusive. However, this
       behaviour is undocumented and might be changed by Telegram.
 
+    .. seealso:: :attr:`telegram.Message.venue`
+
     Args:
         location (:class:`telegram.Location`): Venue location.
         title (:obj:`str`): Name of the venue.
