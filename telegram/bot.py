@@ -463,6 +463,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        protect_content: bool = None,
     ) -> Message:
         """Use this method to send text messages.
 
@@ -480,6 +481,10 @@ class Bot(TelegramObject):
                 this message.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of sent messages from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -509,6 +514,9 @@ class Bot(TelegramObject):
 
         if entities:
             data['entities'] = [me.to_dict() for me in entities]
+
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendMessage',
@@ -576,6 +584,7 @@ class Bot(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        protect_content: bool = None,
     ) -> Message:
         """Use this method to forward messages of any kind. Service messages can't be forwarded.
 
@@ -595,6 +604,11 @@ class Bot(TelegramObject):
             message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -616,7 +630,8 @@ class Bot(TelegramObject):
             data['from_chat_id'] = from_chat_id
         if message_id:
             data['message_id'] = message_id
-
+        if protect_content:
+            data['protect_content'] = protect_content
         return self._message(  # type: ignore[return-value]
             'forwardMessage',
             data,
@@ -640,6 +655,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> Message:
         """Use this method to send photos.
 
@@ -674,6 +690,11 @@ class Bot(TelegramObject):
                 :attr:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -703,6 +724,9 @@ class Bot(TelegramObject):
 
         if caption_entities:
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
+
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendPhoto',
@@ -734,6 +758,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> Message:
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -778,6 +803,11 @@ class Bot(TelegramObject):
             title (:obj:`str`, optional): Track name.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -824,6 +854,8 @@ class Bot(TelegramObject):
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
+        if protect_content:
+            data['protect_content'] = None
 
         return self._message(  # type: ignore[return-value]
             'sendAudio',
@@ -853,6 +885,7 @@ class Bot(TelegramObject):
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        protect_content: bool = None,
     ) -> Message:
         """
         Use this method to send general files.
@@ -891,6 +924,11 @@ class Bot(TelegramObject):
                 :attr:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -933,6 +971,8 @@ class Bot(TelegramObject):
             data['disable_content_type_detection'] = disable_content_type_detection
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendDocument',
@@ -956,6 +996,7 @@ class Bot(TelegramObject):
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> Message:
         """
         Use this method to send static .WEBP or animated .TGS stickers.
@@ -978,6 +1019,11 @@ class Bot(TelegramObject):
                    Accept :obj:`bytes` as input.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -997,6 +1043,9 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'sticker': parse_file_input(sticker, Sticker)}
+
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendSticker',
@@ -1029,6 +1078,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> Message:
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -1076,6 +1126,11 @@ class Bot(TelegramObject):
                 suitable for streaming.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1123,6 +1178,8 @@ class Bot(TelegramObject):
             data['height'] = height
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendVideo',
@@ -1150,6 +1207,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: str = None,
+        protect_content: bool = None,
     ) -> Message:
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
@@ -1184,6 +1242,11 @@ class Bot(TelegramObject):
                 message.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1222,6 +1285,8 @@ class Bot(TelegramObject):
             data['length'] = length
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendVideoNote',
@@ -1253,6 +1318,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> Message:
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -1303,6 +1369,11 @@ class Bot(TelegramObject):
                 :attr:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1339,6 +1410,8 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if caption_entities:
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendAnimation',
@@ -1367,6 +1440,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> Message:
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -1406,6 +1480,11 @@ class Bot(TelegramObject):
             duration (:obj:`int`, optional): Duration of the voice message in seconds.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1438,6 +1517,9 @@ class Bot(TelegramObject):
         if caption_entities:
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
+        if protect_content:
+            data['protect_content'] = protect_content
+
         return self._message(  # type: ignore[return-value]
             'sendVoice',
             data,
@@ -1461,6 +1543,7 @@ class Bot(TelegramObject):
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
 
@@ -1472,6 +1555,11 @@ class Bot(TelegramObject):
                 describing messages to be sent, must include 2–10 items.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1503,6 +1591,9 @@ class Bot(TelegramObject):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
 
+        if protect_content:
+            data['protect_content'] = protect_content
+
         result = self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return Message.de_list(result, self)  # type: ignore
@@ -1524,6 +1615,7 @@ class Bot(TelegramObject):
         heading: int = None,
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> Message:
         """Use this method to send point on the map.
 
@@ -1547,6 +1639,11 @@ class Bot(TelegramObject):
                 between 1 and 100000 if specified.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                     original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1591,6 +1688,8 @@ class Bot(TelegramObject):
             data['heading'] = heading
         if proximity_alert_radius:
             data['proximity_alert_radius'] = proximity_alert_radius
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendLocation',
@@ -1761,6 +1860,7 @@ class Bot(TelegramObject):
         google_place_id: str = None,
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> Message:
         """Use this method to send information about a venue.
 
@@ -1790,6 +1890,11 @@ class Bot(TelegramObject):
             venue (:class:`telegram.Venue`, optional): The venue to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1842,6 +1947,8 @@ class Bot(TelegramObject):
             data['google_place_id'] = google_place_id
         if google_place_type:
             data['google_place_type'] = google_place_type
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendVenue',
@@ -1869,6 +1976,7 @@ class Bot(TelegramObject):
         vcard: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> Message:
         """Use this method to send phone contacts.
 
@@ -1887,6 +1995,11 @@ class Bot(TelegramObject):
             contact (:class:`telegram.Contact`, optional): The contact to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1928,6 +2041,8 @@ class Bot(TelegramObject):
             data['last_name'] = last_name
         if vcard:
             data['vcard'] = vcard
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendContact',
@@ -1951,6 +2066,7 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> Message:
         """Use this method to send a game.
 
@@ -1960,6 +2076,11 @@ class Bot(TelegramObject):
                 for the game. Set up your games via `@BotFather <https://t.me/BotFather>`_.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1981,6 +2102,9 @@ class Bot(TelegramObject):
 
         """
         data: JSONDict = {'chat_id': chat_id, 'game_short_name': game_short_name}
+
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendGame',
@@ -3505,6 +3629,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
+        protect_content: bool = None,
     ) -> Message:
         """Use this method to send invoices.
 
@@ -3579,6 +3704,11 @@ class Bot(TelegramObject):
                 the shipping method.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -3641,6 +3771,8 @@ class Bot(TelegramObject):
             data['send_phone_number_to_provider'] = send_phone_number_to_provider
         if send_email_to_provider is not None:
             data['send_email_to_provider'] = send_email_to_provider
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendInvoice',
@@ -5021,6 +5153,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        protect_content: bool = None,
     ) -> Message:
         """
         Use this method to send a native poll.
@@ -5059,6 +5192,11 @@ class Bot(TelegramObject):
                 immediately closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -5108,6 +5246,8 @@ class Bot(TelegramObject):
                     close_date, tzinfo=self.defaults.tzinfo if self.defaults else None
                 )
             data['close_date'] = close_date
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendPoll',
@@ -5177,6 +5317,7 @@ class Bot(TelegramObject):
         emoji: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> Message:
         """
         Use this method to send an animated emoji that will display a random value.
@@ -5193,6 +5334,11 @@ class Bot(TelegramObject):
                    Added the "🎳" emoji.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -5213,12 +5359,12 @@ class Bot(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {
-            'chat_id': chat_id,
-        }
+        data: JSONDict = {'chat_id': chat_id}
 
         if emoji:
             data['emoji'] = emoji
+        if protect_content:
+            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendDice',
@@ -5454,6 +5600,7 @@ class Bot(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        protect_content: bool = None,
     ) -> MessageId:
         """
         Use this method to copy messages of any kind. Service messages and invoice messages can't
@@ -5475,6 +5622,11 @@ class Bot(TelegramObject):
                 parse_mode
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
+            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+                forwarding and saving.
+
+                .. versionadded:: 13.10
+
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -5508,6 +5660,8 @@ class Bot(TelegramObject):
             data['caption_entities'] = caption_entities
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
+        if protect_content:
+            data['protect_content'] = protect_content
         if reply_markup:
             if isinstance(reply_markup, ReplyMarkup):
                 # We need to_json() instead of to_dict() here, because reply_markups may be

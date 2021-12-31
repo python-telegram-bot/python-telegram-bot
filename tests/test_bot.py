@@ -2150,6 +2150,7 @@ class TestBot:
             assert data["reply_markup"] == keyboard.to_json()
             assert data["disable_notification"] is True
             assert data["caption_entities"] == [MessageEntity(MessageEntity.BOLD, 0, 4)]
+            assert data['protect_content'] is True
             return data
 
         monkeypatch.setattr(bot.request, 'post', post)
@@ -2163,6 +2164,7 @@ class TestBot:
             reply_to_message_id=media_message.message_id,
             reply_markup=keyboard.to_json() if json_keyboard else keyboard,
             disable_notification=True,
+            protect_content=True,
         )
 
     @flaky(3, 1)

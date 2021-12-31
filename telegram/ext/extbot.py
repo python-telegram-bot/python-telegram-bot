@@ -299,6 +299,7 @@ class ExtBot(telegram.bot.Bot):
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        protect_content: bool = None,
     ) -> MessageId:
         # We override this method to call self._replace_keyboard
         return super().copy_message(
@@ -314,6 +315,7 @@ class ExtBot(telegram.bot.Bot):
             reply_markup=self._replace_keyboard(reply_markup),
             timeout=timeout,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     def get_chat(
