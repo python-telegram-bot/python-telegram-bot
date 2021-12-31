@@ -31,9 +31,9 @@ def message_entity(request):
     if type_ == MessageEntity.TEXT_MENTION:
         user = User(1, 'test_user', False)
     language = None
-    if type == MessageEntity.PRE:
+    if type_ == MessageEntity.PRE:
         language = "python"
-    return MessageEntity(type, 1, 3, url=url, user=user, language=language)
+    return MessageEntity(type_, 1, 3, url=url, user=user, language=language)
 
 
 class TestMessageEntity:

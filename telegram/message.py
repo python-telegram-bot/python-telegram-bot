@@ -2577,6 +2577,8 @@ class Message(TelegramObject):
                     insert = '<u>' + text + '</u>'
                 elif entity.type == MessageEntity.STRIKETHROUGH:
                     insert = '<s>' + text + '</s>'
+                elif entity.type == MessageEntity.SPOILER:
+                    insert = f'<span class="tg-spoiler">{text}</span>'
                 else:
                     insert = text
 
@@ -2781,6 +2783,12 @@ class Message(TelegramObject):
                             'Strikethrough entities are not supported for Markdown ' 'version 1'
                         )
                     insert = '~' + text + '~'
+                elif entity.type == MessageEntity.SPOILER:
+                    if version == 1:
+                        raise ValueError(
+                            "Spoiler entities are not supported for Markdown " "version 1"
+                        )
+                    insert = f"||{text}||"
                 else:
                     insert = text
 
