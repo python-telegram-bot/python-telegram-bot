@@ -173,7 +173,9 @@ class TestCommandHandler(BaseTest):
         ids=['too long', 'invalid letter', 'invalid characters'],
     )
     def test_invalid_commands(self, cmd):
-        with pytest.raises(ValueError, match='not a valid bot command'):
+        with pytest.raises(
+            ValueError, match=f'`{re.escape(cmd.lower())}` is not a valid bot command'
+        ):
             CommandHandler(cmd, self.callback_basic)
 
     def test_command_list(self):
