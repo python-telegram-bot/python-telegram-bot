@@ -141,6 +141,9 @@ Attributes:
     MESSAGEENTITY_TEXT_MENTION (:obj:`str`): ``'text_mention'``
     MESSAGEENTITY_UNDERLINE (:obj:`str`): ``'underline'``
     MESSAGEENTITY_STRIKETHROUGH (:obj:`str`): ``'strikethrough'``
+    MESSAGEENTITY_SPOILER (:obj:`str`): ``'spoiler'``
+
+        .. versionadded:: 13.10
     MESSAGEENTITY_ALL_TYPES (List[:obj:`str`]): List of all the types of message entity.
 
 :class:`telegram.ParseMode`:
