@@ -356,7 +356,7 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
         raise RuntimeError(f'{cls.__name__} not initialized or multiple instances exist')
 
     def _pooled(self) -> None:
-        thr_name = current_thread().getName()
+        thr_name = current_thread().name
         while 1:
             promise = self.__async_queue.get()
 
