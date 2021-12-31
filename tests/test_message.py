@@ -1146,14 +1146,15 @@ class TestMessage:
             quote=True,
         )
 
-    @pytest.mark.parametrize('disable_notification', [False, True])
-    def test_forward(self, monkeypatch, message, disable_notification):
+    @pytest.mark.parametrize('disable_notification,protected', [(False, True), (True, False)])
+    def test_forward(self, monkeypatch, message, disable_notification, protected):
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == 123456
             from_chat = kwargs['from_chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
             notification = kwargs['disable_notification'] == disable_notification
-            return chat_id and from_chat and message_id and notification
+            protected_cont = kwargs['protect_content'] == protected
+            return chat_id and from_chat and message_id and notification and protected_cont
 
         assert check_shortcut_signature(
             Message.forward, Bot.forward_message, ['from_chat_id', 'message_id'], []
@@ -1162,11 +1163,13 @@ class TestMessage:
         assert check_defaults_handling(message.forward, message.bot)
 
         monkeypatch.setattr(message.bot, 'forward_message', make_assertion)
-        assert message.forward(123456, disable_notification=disable_notification)
+        assert message.forward(
+            123456, disable_notification=disable_notification, protect_content=protected
+        )
         assert not message.forward(635241)
 
-    @pytest.mark.parametrize('disable_notification', [True, False])
-    def test_copy(self, monkeypatch, message, disable_notification):
+    @pytest.mark.parametrize('disable_notification,protected', [(True, False), (False, True)])
+    def test_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 
         def make_assertion(*_, **kwargs):
@@ -1174,11 +1177,19 @@ class TestMessage:
             from_chat = kwargs['from_chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
             notification = kwargs['disable_notification'] == disable_notification
+            protected_cont = kwargs['protect_content'] == protected
             if kwargs.get('reply_markup') is not None:
                 reply_markup = kwargs['reply_markup'] is keyboard
             else:
                 reply_markup = True
-            return chat_id and from_chat and message_id and notification and reply_markup
+            return (
+                chat_id
+                and from_chat
+                and message_id
+                and notification
+                and reply_markup
+                and protected_cont
+            )
 
         assert check_shortcut_signature(
             Message.copy, Bot.copy_message, ['from_chat_id', 'message_id'], []
@@ -1187,14 +1198,19 @@ class TestMessage:
         assert check_defaults_handling(message.copy, message.bot)
 
         monkeypatch.setattr(message.bot, 'copy_message', make_assertion)
-        assert message.copy(123456, disable_notification=disable_notification)
         assert message.copy(
-            123456, reply_markup=keyboard, disable_notification=disable_notification
+            123456, disable_notification=disable_notification, protect_content=protected
+        )
+        assert message.copy(
+            123456,
+            reply_markup=keyboard,
+            disable_notification=disable_notification,
+            protect_content=protected,
         )
         assert not message.copy(635241)
 
-    @pytest.mark.parametrize('disable_notification', [True, False])
-    def test_reply_copy(self, monkeypatch, message, disable_notification):
+    @pytest.mark.parametrize('disable_notification,protected', [(True, False), (False, True)])
+    def test_reply_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 
         def make_assertion(*_, **kwargs):
@@ -1202,6 +1218,7 @@ class TestMessage:
             from_chat = kwargs['chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == 456789
             notification = kwargs['disable_notification'] == disable_notification
+            is_protected = kwargs['protect_content'] == protected
             if kwargs.get('reply_markup') is not None:
                 reply_markup = kwargs['reply_markup'] is keyboard
             else:
@@ -1210,7 +1227,15 @@ class TestMessage:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return chat_id and from_chat and message_id and notification and reply_markup and reply
+            return (
+                chat_id
+                and from_chat
+                and message_id
+                and notification
+                and reply_markup
+                and reply
+                and is_protected
+            )
 
         assert check_shortcut_signature(
             Message.reply_copy, Bot.copy_message, ['chat_id'], ['quote']
@@ -1219,12 +1244,22 @@ class TestMessage:
         assert check_defaults_handling(message.copy, message.bot)
 
         monkeypatch.setattr(message.bot, 'copy_message', make_assertion)
-        assert message.reply_copy(123456, 456789, disable_notification=disable_notification)
         assert message.reply_copy(
-            123456, 456789, reply_markup=keyboard, disable_notification=disable_notification
+            123456, 456789, disable_notification=disable_notification, protect_content=protected
         )
         assert message.reply_copy(
-            123456, 456789, quote=True, disable_notification=disable_notification
+            123456,
+            456789,
+            reply_markup=keyboard,
+            disable_notification=disable_notification,
+            protect_content=protected,
+        )
+        assert message.reply_copy(
+            123456,
+            456789,
+            quote=True,
+            disable_notification=disable_notification,
+            protect_content=protected,
         )
         assert message.reply_copy(
             123456,
@@ -1232,6 +1267,7 @@ class TestMessage:
             quote=True,
             reply_to_message_id=message.message_id,
             disable_notification=disable_notification,
+            protect_content=protected,
         )
 
     def test_edit_text(self, monkeypatch, message):

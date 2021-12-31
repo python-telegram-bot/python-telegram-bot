@@ -2634,6 +2634,9 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
+
         """
         return self._parse_html(self.text, self.parse_entities(), urled=False)
 
@@ -2646,6 +2649,9 @@ class Message(TelegramObject):
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
+
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
 
         """
         return self._parse_html(self.text, self.parse_entities(), urled=True)
@@ -2661,6 +2667,9 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
+
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=False)
 
@@ -2674,6 +2683,9 @@ class Message(TelegramObject):
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
+
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
 
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
@@ -2786,7 +2798,7 @@ class Message(TelegramObject):
                 elif entity.type == MessageEntity.SPOILER:
                     if version == 1:
                         raise ValueError(
-                            "Spoiler entities are not supported for Markdown " "version 1"
+                            "Spoiler entities are not supported for Markdown version 1"
                         )
                     insert = f"||{text}||"
                 else:
@@ -2872,6 +2884,9 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as Markdown V2.
+
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=False, version=2)
 
@@ -2904,6 +2919,9 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as Markdown V2.
+
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=True, version=2)
 
@@ -2935,6 +2953,9 @@ class Message(TelegramObject):
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as Markdown V2.
 
         """
         return self._parse_markdown(
@@ -2969,6 +2990,9 @@ class Message(TelegramObject):
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
+
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as Markdown V2.
 
         """
         return self._parse_markdown(

@@ -103,6 +103,7 @@ class TestPhoto:
             photo_file,
             caption=self.caption,
             disable_notification=False,
+            protect_content=True,
             parse_mode='Markdown',
         )
 
@@ -125,6 +126,7 @@ class TestPhoto:
         assert message.photo[1].file_size == photo.file_size
 
         assert message.caption == TestPhoto.caption.replace('*', '')
+        assert message.has_protected_content
 
     @flaky(3, 1)
     def test_send_photo_custom_filename(self, bot, chat_id, photo_file, monkeypatch):

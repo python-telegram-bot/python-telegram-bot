@@ -98,6 +98,7 @@ class TestVideo:
             caption=self.caption,
             supports_streaming=self.supports_streaming,
             disable_notification=False,
+            protect_content=True,
             width=video.width,
             height=video.height,
             parse_mode='Markdown',
@@ -121,6 +122,7 @@ class TestVideo:
         assert message.video.thumb.height == self.thumb_height
 
         assert message.video.file_name == self.file_name
+        assert message.has_protected_content
 
     @flaky(3, 1)
     def test_send_video_custom_filename(self, bot, chat_id, video_file, monkeypatch):

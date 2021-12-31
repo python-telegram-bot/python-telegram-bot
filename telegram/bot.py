@@ -306,9 +306,13 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        protect_content: bool = None,
     ) -> Union[bool, Message]:
         if reply_to_message_id is not None:
             data['reply_to_message_id'] = reply_to_message_id
+
+        if protect_content:
+            data['protect_content'] = protect_content
 
         # We don't check if (DEFAULT_)None here, so that _put is able to insert the defaults
         # correctly, if necessary
@@ -515,9 +519,6 @@ class Bot(TelegramObject):
         if entities:
             data['entities'] = [me.to_dict() for me in entities]
 
-        if protect_content:
-            data['protect_content'] = protect_content
-
         return self._message(  # type: ignore[return-value]
             'sendMessage',
             data,
@@ -527,6 +528,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -630,14 +632,13 @@ class Bot(TelegramObject):
             data['from_chat_id'] = from_chat_id
         if message_id:
             data['message_id'] = message_id
-        if protect_content:
-            data['protect_content'] = protect_content
         return self._message(  # type: ignore[return-value]
             'forwardMessage',
             data,
             disable_notification=disable_notification,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -725,9 +726,6 @@ class Bot(TelegramObject):
         if caption_entities:
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
-        if protect_content:
-            data['protect_content'] = protect_content
-
         return self._message(  # type: ignore[return-value]
             'sendPhoto',
             data,
@@ -737,6 +735,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -854,8 +853,6 @@ class Bot(TelegramObject):
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
-        if protect_content:
-            data['protect_content'] = None
 
         return self._message(  # type: ignore[return-value]
             'sendAudio',
@@ -866,6 +863,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -971,8 +969,6 @@ class Bot(TelegramObject):
             data['disable_content_type_detection'] = disable_content_type_detection
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendDocument',
@@ -983,6 +979,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -1044,9 +1041,6 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id, 'sticker': parse_file_input(sticker, Sticker)}
 
-        if protect_content:
-            data['protect_content'] = protect_content
-
         return self._message(  # type: ignore[return-value]
             'sendSticker',
             data,
@@ -1056,6 +1050,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -1178,8 +1173,6 @@ class Bot(TelegramObject):
             data['height'] = height
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendVideo',
@@ -1190,6 +1183,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -1285,8 +1279,6 @@ class Bot(TelegramObject):
             data['length'] = length
         if thumb:
             data['thumb'] = parse_file_input(thumb, attach=True)
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendVideoNote',
@@ -1297,6 +1289,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -1410,8 +1403,6 @@ class Bot(TelegramObject):
             data['caption'] = caption
         if caption_entities:
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendAnimation',
@@ -1422,6 +1413,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -1517,9 +1509,6 @@ class Bot(TelegramObject):
         if caption_entities:
             data['caption_entities'] = [me.to_dict() for me in caption_entities]
 
-        if protect_content:
-            data['protect_content'] = protect_content
-
         return self._message(  # type: ignore[return-value]
             'sendVoice',
             data,
@@ -1529,6 +1518,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -1688,8 +1678,6 @@ class Bot(TelegramObject):
             data['heading'] = heading
         if proximity_alert_radius:
             data['proximity_alert_radius'] = proximity_alert_radius
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendLocation',
@@ -1700,6 +1688,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -1947,8 +1936,6 @@ class Bot(TelegramObject):
             data['google_place_id'] = google_place_id
         if google_place_type:
             data['google_place_type'] = google_place_type
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendVenue',
@@ -1959,6 +1946,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -2041,8 +2029,6 @@ class Bot(TelegramObject):
             data['last_name'] = last_name
         if vcard:
             data['vcard'] = vcard
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendContact',
@@ -2053,6 +2039,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -2103,9 +2090,6 @@ class Bot(TelegramObject):
         """
         data: JSONDict = {'chat_id': chat_id, 'game_short_name': game_short_name}
 
-        if protect_content:
-            data['protect_content'] = protect_content
-
         return self._message(  # type: ignore[return-value]
             'sendGame',
             data,
@@ -2115,6 +2099,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -3771,8 +3756,6 @@ class Bot(TelegramObject):
             data['send_phone_number_to_provider'] = send_phone_number_to_provider
         if send_email_to_provider is not None:
             data['send_email_to_provider'] = send_email_to_provider
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendInvoice',
@@ -3783,6 +3766,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -5246,8 +5230,6 @@ class Bot(TelegramObject):
                     close_date, tzinfo=self.defaults.tzinfo if self.defaults else None
                 )
             data['close_date'] = close_date
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendPoll',
@@ -5258,6 +5240,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log
@@ -5363,8 +5346,6 @@ class Bot(TelegramObject):
 
         if emoji:
             data['emoji'] = emoji
-        if protect_content:
-            data['protect_content'] = protect_content
 
         return self._message(  # type: ignore[return-value]
             'sendDice',
@@ -5375,6 +5356,7 @@ class Bot(TelegramObject):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     @log

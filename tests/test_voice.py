@@ -81,6 +81,7 @@ class TestVoice:
             duration=self.duration,
             caption=self.caption,
             disable_notification=False,
+            protect_content=True,
             parse_mode='Markdown',
         )
 
@@ -93,6 +94,7 @@ class TestVoice:
         assert message.voice.mime_type == voice.mime_type
         assert message.voice.file_size == voice.file_size
         assert message.caption == self.caption.replace('*', '')
+        assert message.has_protected_content
 
     @flaky(3, 1)
     def test_send_voice_custom_filename(self, bot, chat_id, voice_file, monkeypatch):
