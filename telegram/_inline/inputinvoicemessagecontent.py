@@ -46,7 +46,7 @@ class InputInvoiceMessageContent(InputMessageContent):
             `@Botfather <https://t.me/Botfather>`_.
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_
-        prices (List[:class:`telegram.LabeledPrice`]): Price breakdown, a JSON-serialized list of
+        prices (List[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
             components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus,
             etc.)
         max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the smallest
@@ -55,12 +55,12 @@ class InputInvoiceMessageContent(InputMessageContent):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
             shows the number of digits past the decimal point for each currency (2 for the majority
             of currencies). Defaults to ``0``.
-        suggested_tip_amounts (List[:obj:`int`], optional): A JSON-serialized array of suggested
+        suggested_tip_amounts (List[:obj:`int`], optional): An array of suggested
             amounts of tip in the smallest units of the currency (integer, not float/double). At
             most 4 suggested tip amounts can be specified. The suggested tip amounts must be
             positive, passed in a strictly increased order and must not exceed
             :attr:`max_tip_amount`.
-        provider_data (:obj:`str`, optional): A JSON-serialized object for data about the invoice,
+        provider_data (:obj:`str`, optional): An object for data about the invoice,
             which will be shared with the payment provider. A detailed description of the required
             fields should be provided by the payment provider.
         photo_url (:obj:`str`, optional): URL of the product photo for the invoice. Can be a photo
@@ -94,13 +94,13 @@ class InputInvoiceMessageContent(InputMessageContent):
             `@Botfather <https://t.me/Botfather>`_.
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_
-        prices (List[:class:`telegram.LabeledPrice`]): Price breakdown, a JSON-serialized list of
+        prices (List[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
             components.
         max_tip_amount (:obj:`int`): Optional. The maximum accepted amount for tips in the smallest
             units of the currency (integer, not float/double).
-        suggested_tip_amounts (List[:obj:`int`]): Optional. A JSON-serialized array of suggested
+        suggested_tip_amounts (List[:obj:`int`]): Optional. An array of suggested
             amounts of tip in the smallest units of the currency (integer, not float/double).
-        provider_data (:obj:`str`): Optional. A JSON-serialized object for data about the invoice,
+        provider_data (:obj:`str`): Optional. An object for data about the invoice,
             which will be shared with the payment provider.
         photo_url (:obj:`str`): Optional. URL of the product photo for the invoice.
         photo_size (:obj:`int`): Optional. Photo size.
