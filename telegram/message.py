@@ -2884,7 +2884,7 @@ class Message(TelegramObject):
         in the same way the original message was formatted.
 
         .. versionchanged:: 13.10
-           Spoiler entities are now formatted as HTML.
+           Spoiler entities are now formatted as Markdown V2.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -2922,7 +2922,7 @@ class Message(TelegramObject):
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         .. versionchanged:: 13.10
-           Spoiler entities are now formatted as HTML.
+           Spoiler entities are now formatted as Markdown V2.
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -2960,7 +2960,7 @@ class Message(TelegramObject):
         Markdown in the same way the original message was formatted.
 
         .. versionchanged:: 13.10
-           Spoiler entities are now formatted as HTML.
+           Spoiler entities are now formatted as Markdown V2.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -3000,7 +3000,7 @@ class Message(TelegramObject):
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         .. versionchanged:: 13.10
-           Spoiler entities are now formatted as HTML.
+           Spoiler entities are now formatted as Markdown V2.
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
