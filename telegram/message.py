@@ -2631,11 +2631,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as HTML in
         the same way the original message was formatted.
 
-        Returns:
-            :obj:`str`: Message text with entities formatted as HTML.
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as HTML.
 
         """
         return self._parse_html(self.text, self.parse_entities(), urled=False)
@@ -2647,11 +2647,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as HTML.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Returns:
-            :obj:`str`: Message text with entities formatted as HTML.
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
+
+        Returns:
+            :obj:`str`: Message text with entities formatted as HTML.
 
         """
         return self._parse_html(self.text, self.parse_entities(), urled=True)
@@ -2664,12 +2664,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML in the same way the original message was formatted.
 
-        Returns:
-            :obj:`str`: Message caption with caption entities formatted as HTML.
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as HTML.
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=False)
 
@@ -2681,12 +2680,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
-        Returns:
-            :obj:`str`: Message caption with caption entities formatted as HTML.
-
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
+        Returns:
+            :obj:`str`: Message caption with caption entities formatted as HTML.
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
@@ -2870,6 +2868,10 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
+        Raises:
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
+                entities.
+
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=False)
 
@@ -2881,12 +2883,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
-
-        .. versionchanged:: 13.10
-           Spoiler entities are now formatted as Markdown V2.
-
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=False, version=2)
 
@@ -2905,6 +2906,10 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
+        Raises:
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
+                entities.
+
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=True)
 
@@ -2916,12 +2921,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
-
-        .. versionchanged:: 13.10
-           Spoiler entities are now formatted as Markdown V2.
-
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=True, version=2)
 
@@ -2940,6 +2944,10 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
+        Raises:
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
+                entities.
+
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
 
@@ -2951,12 +2959,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
-
-        .. versionchanged:: 13.10
-           Spoiler entities are now formatted as Markdown V2.
-
         """
         return self._parse_markdown(
             self.caption, self.parse_caption_entities(), urled=False, version=2
@@ -2977,6 +2984,10 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
+        Raises:
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
+                entities.
+
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
 
@@ -2988,12 +2999,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
-
-        .. versionchanged:: 13.10
-           Spoiler entities are now formatted as Markdown V2.
-
         """
         return self._parse_markdown(
             self.caption, self.parse_caption_entities(), urled=True, version=2
