@@ -162,7 +162,7 @@ class TelegramObject:
     def get_bot(self) -> 'Bot':
         """Returns the :class:`telegram.Bot` instance associated with this object.
 
-        .. seealso:: :meth: `set_bot`
+        .. seealso:: :meth:`set_bot`
 
         .. versionadded: 14.0
 
@@ -179,7 +179,7 @@ class TelegramObject:
     def set_bot(self, bot: Optional['Bot']) -> None:
         """Sets the :class:`telegram.Bot` instance associated with this object.
 
-        .. seealso:: :meth: `get_bot`
+        .. seealso:: :meth:`get_bot`
 
         .. versionadded: 14.0
 

@@ -1591,9 +1591,9 @@ class SenderChat(_ChatUserBaseFilter):
         so when your bot is an admin in a channel and the linked discussion group, you would
         receive the message twice (once from inside the channel, once inside the discussion
         group). Since v13.9, the field :attr:`telegram.Message.is_automatic_forward` will be
-            :obj:`True` for the discussion group message.
+        :obj:`True` for the discussion group message.
 
-            .. seealso:: :attr:`Filters.is_automatic_forward`
+            .. seealso:: :attr:`telegram.ext.filters.IS_AUTOMATIC_FORWARD`
 
     Warning:
         :attr:`chat_ids` will return a *copy* of the saved chat ids as :obj:`frozenset`. This
