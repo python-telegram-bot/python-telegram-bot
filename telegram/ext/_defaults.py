@@ -240,7 +240,7 @@ class Defaults:
     @protect_content.setter
     def protect_content(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can't assign a new value to protect_content" " after initialization."
+            "You can't assign a new value to protect_content after initialization."
         )
 
     def __hash__(self) -> int:
