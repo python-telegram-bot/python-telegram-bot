@@ -199,7 +199,6 @@ def dp(_dp):
     _dp.bot_data = {}
     _dp.persistence = None
     _dp.handlers = {}
-    _dp.groups = []
     _dp.error_handlers = {}
     _dp.exception_event = Event()
     _dp.__stop_event = Event()
