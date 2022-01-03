@@ -80,7 +80,7 @@ class TestDispatcher:
         self.count += 1
 
     def callback_set_count(self, count):
-        def callback(bot, update):
+        def callback(update, context):
             self.count = count
 
         return callback
@@ -412,6 +412,63 @@ class TestDispatcher:
         dp.update_queue.put(self.message_update)
         sleep(0.1)
         assert self.count == 3
+
+    def test_add_handlers_complex(self, dp):
+        """Tests both add_handler & add_handlers together & confirms the correct insertion order"""
+        msg_handler_set_count = MessageHandler(filters.TEXT, self.callback_set_count(1))
+        msg_handler_inc_count = MessageHandler(filters.PHOTO, self.callback_increase_count)
+
+        dp.add_handler(msg_handler_set_count, 1)
+        dp.add_handlers((msg_handler_inc_count, msg_handler_inc_count), 1)
+
+        photo_update = Update(2, message=Message(2, None, None, photo=True))
+        dp.update_queue.put(self.message_update)  # Putting updates in the queue calls the callback
+        dp.update_queue.put(photo_update)
+        sleep(0.1)  # sleep is required otherwise there is random behaviour
+
+        # Test if handler was added to correct group with correct order-
+        assert (
+            self.count == 2
+            and len(dp.handlers[1]) == 3
+            and dp.handlers[1][0] is msg_handler_set_count
+        )
+
+        # Now lets test add_handlers when `handlers` is a dict-
+        voice_filter_handler_to_check = MessageHandler(filters.VOICE, self.callback_increase_count)
+        dp.add_handlers(
+            handlers={
+                1: [
+                    MessageHandler(filters.USER, self.callback_increase_count),
+                    voice_filter_handler_to_check,
+                ],
+                -1: [MessageHandler(filters.CAPTION, self.callback_set_count(2))],
+            }
+        )
+
+        user_update = Update(3, message=Message(3, None, None, from_user=User(1, 's', True)))
+        voice_update = Update(4, message=Message(4, None, None, voice=True))
+        dp.update_queue.put(user_update)
+        dp.update_queue.put(voice_update)
+        sleep(0.1)
+
+        assert (
+            self.count == 4
+            and len(dp.handlers[1]) == 5
+            and dp.handlers[1][-1] is voice_filter_handler_to_check
+        )
+
+        dp.update_queue.put(Update(5, message=Message(5, None, None, caption='cap')))
+        sleep(0.1)
+
+        assert self.count == 2 and len(dp.handlers[-1]) == 1
+
+        # Now lets test the errors which can be produced-
+        with pytest.raises(ValueError, match="The `group` argument"):
+            dp.add_handlers({2: [msg_handler_set_count]}, group=0)
+        with pytest.raises(ValueError, match="Handlers for group 3"):
+            dp.add_handlers({3: msg_handler_set_count})
+        with pytest.raises(ValueError, match="The `handlers` argument must be a sequence"):
+            dp.add_handlers({msg_handler_set_count})
 
     def test_add_handler_errors(self, dp):
         handler = 'not a handler'
