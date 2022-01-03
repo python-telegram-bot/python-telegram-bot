@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
+import inspect
 
 from telegram.ext import Defaults
 from telegram import User
@@ -33,24 +34,9 @@ class TestDefault:
     def test_data_assignment(self, dp):
         defaults = Defaults()
 
-        with pytest.raises(AttributeError):
-            defaults.parse_mode = True
-        with pytest.raises(AttributeError):
-            defaults.explanation_parse_mode = True
-        with pytest.raises(AttributeError):
-            defaults.disable_notification = True
-        with pytest.raises(AttributeError):
-            defaults.disable_web_page_preview = True
-        with pytest.raises(AttributeError):
-            defaults.allow_sending_without_reply = True
-        with pytest.raises(AttributeError):
-            defaults.timeout = True
-        with pytest.raises(AttributeError):
-            defaults.quote = True
-        with pytest.raises(AttributeError):
-            defaults.tzinfo = True
-        with pytest.raises(AttributeError):
-            defaults.run_async = True
+        for name, val in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
+            with pytest.raises(AttributeError):
+                setattr(defaults, name, True)
 
     def test_equality(self):
         a = Defaults(parse_mode='HTML', quote=True)
