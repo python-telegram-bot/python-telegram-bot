@@ -4,6 +4,7 @@
     Instructions: Install the extension on a Chromium-based browser
     Then do this to export the CSS: https://git.io/JOM6t and drop it here
     Some color values where manually changed - just search for "/*" in this file and insert them in the new css
+    Some were modified by PTB. Search for PTB.
     */
     /* User-Agent Style */
     html {
@@ -2411,15 +2412,15 @@
         a.wy-text-neutral:hover {
             color: rgb(177, 170, 160) !important;
         }
-        hr {
-            border-color: rgb(120, 112, 99) currentcolor currentcolor;
+        hr {  /* PTB (modified) - makes the top divider line in docs the same as background */
+            border-color: rgb(21, 22, 23) currentcolor currentcolor;
         }
         .rst-content code,
         .rst-content tt,
         code {
             background-color: rgb(19, 21, 22);
             background-image: none;
-            border-color: rgb(120, 112, 99);
+            border-color: rgb(54, 54, 52);  /* PTB (modified) - Change color of border buttons to match background */
             color: rgb(234, 96, 82);
         }
         .rst-content .section ul,
@@ -2514,7 +2515,7 @@
         }
         .wy-menu-vertical li.current a {
             color: rgb(160, 151, 139);
-            border-right-color: rgb(118, 110, 97);
+            border-right-color: rgb(40, 40, 40);  /* PTB (modified) - Changes sidebar button right border to match bg */
         }
         .wy-menu-vertical li.current a:hover {
             background-color: rgb(38, 41, 42);
@@ -2536,7 +2537,7 @@
             color: rgb(188, 182, 173);
             background-color: rgb(21, 22, 23);
             background-image: none;
-            border-color: currentcolor;
+            border-color: rgb(40, 40, 40);  /* PTB (modified)- Makes border color almost match background */
         }
         .wy-menu-vertical li.current > a:hover,
         .wy-menu-vertical li.on a:hover {
@@ -2551,9 +2552,10 @@
         .wy-menu-vertical li.on a span.toctree-expand {
             color: rgb(193, 188, 180);
         }
+        /* PTB (modified)- Makes border color of sidebar buttons almost match background */
         .wy-menu-vertical li.toctree-l1.current > a {
-            border-bottom-color: rgb(118, 110, 97);
-            border-top-color: rgb(118, 110, 97);
+            border-bottom-color: rgb(40, 40, 40);
+            border-top-color: rgb(40, 40, 40);
         }
         .wy-menu-vertical li.toctree-l2 a,
         .wy-menu-vertical li.toctree-l3 a,
@@ -2784,7 +2786,8 @@
         }
         .rst-content div[class^="highlight"],
         .rst-content pre.literal-block {
-            border-color: rgb(120, 112, 99);
+            border-color: rgb(52, 52, 52);  /* PTB (modified)- Changes the border color in boxes like 'examples' */
+            border-radius: 10px;  /* PTB (added) - Makes the examples box a bit rounded */
         }
         .rst-content div[class^="highlight"] div[class^="highlight"], .rst-content pre.literal-block div[class^="highlight"] {
             border-color: currentcolor;
