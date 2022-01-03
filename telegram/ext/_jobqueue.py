@@ -568,9 +568,13 @@ class Job:
     @property
     def next_t(self) -> Optional[datetime.datetime]:
         """
-        :obj:`datetime.datetime`: Datetime for the next job execution.
-            Datetime is localized according to :attr:`datetime.datetime.tzinfo`.
-            If job is removed or already ran it equals to :obj:`None`.
+        :class:`datetime.datetime`: Datetime for the next job execution.
+        Datetime is localized according to :attr:`datetime.datetime.tzinfo`.
+        If job is removed or already ran it equals to :obj:`None`.
+
+        Warning:
+            This attribute is only available, if the :class:`telegram.ext.JobQueue` this job
+            belongs to is already started. Otherwise APScheduler raises an :exc:`AttributeError`.
         """
         return self.job.next_run_time
 
@@ -579,7 +583,12 @@ class Job:
         return job.func
 
     def __getattr__(self, item: str) -> object:
-        return getattr(self.job, item)
+        try:
+            return getattr(self.job, item)
+        except AttributeError as exc:
+            raise AttributeError(
+                f"Neither 'telegram.ext.Job' nor 'apscheduler.job.Job' has attribute '{item}'"
+            ) from exc
 
     def __lt__(self, other: object) -> bool:
         return False
