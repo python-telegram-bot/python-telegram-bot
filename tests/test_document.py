@@ -83,6 +83,7 @@ class TestDocument:
             document=document_file,
             caption=self.caption,
             disable_notification=False,
+            protect_content=True,
             filename='telegram_custom.png',
             parse_mode='Markdown',
             thumb=thumb_file,
@@ -100,6 +101,7 @@ class TestDocument:
         assert message.caption == self.caption.replace('*', '')
         assert message.document.thumb.width == self.thumb_width
         assert message.document.thumb.height == self.thumb_height
+        assert message.has_protected_content
 
     @flaky(3, 1)
     def test_get_and_download(self, bot, document):

@@ -36,10 +36,11 @@ class MessageEntity(TelegramObject):
     considered equal, if their :attr:`type`, :attr:`offset` and :attr:`length` are equal.
 
     Args:
-        type (:obj:`str`): Type of the entity. Can be mention (@username), hashtag, bot_command,
-            url, email, phone_number, bold (bold text), italic (italic text), strikethrough,
-            code (monowidth string), pre (monowidth block), text_link (for clickable text URLs),
-            text_mention (for users without usernames).
+        type (:obj:`str`): Type of the entity. Currently, can be mention (@username), hashtag,
+            bot_command, url, email, phone_number, bold (bold text), italic (italic text),
+            strikethrough, spoiler (spoiler message), code (monowidth string), pre
+            (monowidth block), text_link (for clickable text URLs), text_mention
+            (for users without usernames).
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`, optional): For :attr:`TEXT_LINK` only, url that will be opened after
@@ -124,6 +125,11 @@ class MessageEntity(TelegramObject):
     """:const:`telegram.constants.MESSAGEENTITY_UNDERLINE`"""
     STRIKETHROUGH: ClassVar[str] = constants.MESSAGEENTITY_STRIKETHROUGH
     """:const:`telegram.constants.MESSAGEENTITY_STRIKETHROUGH`"""
+    SPOILER: ClassVar[str] = constants.MESSAGEENTITY_SPOILER
+    """:const:`telegram.constants.MESSAGEENTITY_SPOILER`
+
+    .. versionadded:: 13.10
+    """
     ALL_TYPES: ClassVar[List[str]] = constants.MESSAGEENTITY_ALL_TYPES
     """:const:`telegram.constants.MESSAGEENTITY_ALL_TYPES`\n
     List of all the types"""

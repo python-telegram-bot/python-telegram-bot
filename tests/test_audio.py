@@ -95,6 +95,7 @@ class TestAudio:
             performer=self.performer,
             title=self.title,
             disable_notification=False,
+            protect_content=True,
             parse_mode='Markdown',
             thumb=thumb_file,
         )
@@ -115,6 +116,7 @@ class TestAudio:
         assert message.audio.thumb.file_size == self.thumb_file_size
         assert message.audio.thumb.width == self.thumb_width
         assert message.audio.thumb.height == self.thumb_height
+        assert message.has_protected_content
 
     @flaky(3, 1)
     def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):

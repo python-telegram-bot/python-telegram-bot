@@ -769,6 +769,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -799,6 +800,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
+            protect_content=protect_content,
         )
 
     def reply_markdown(
@@ -813,6 +815,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -853,6 +856,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
+            protect_content=protect_content,
         )
 
     def reply_markdown_v2(
@@ -867,6 +871,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -903,6 +908,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
+            protect_content=protect_content,
         )
 
     def reply_html(
@@ -917,6 +923,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -953,6 +960,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
+            protect_content=protect_content,
         )
 
     def reply_media_group(
@@ -966,6 +974,7 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> List['Message']:
         """Shortcut for::
 
@@ -994,6 +1003,7 @@ class Message(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def reply_photo(
@@ -1010,6 +1020,7 @@ class Message(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1041,6 +1052,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def reply_audio(
@@ -1061,6 +1073,7 @@ class Message(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1096,6 +1109,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def reply_document(
@@ -1114,6 +1128,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1147,6 +1162,7 @@ class Message(TelegramObject):
             disable_content_type_detection=disable_content_type_detection,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
+            protect_content=protect_content,
         )
 
     def reply_animation(
@@ -1167,6 +1183,7 @@ class Message(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1202,6 +1219,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def reply_sticker(
@@ -1214,6 +1232,7 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1241,6 +1260,7 @@ class Message(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def reply_video(
@@ -1262,6 +1282,7 @@ class Message(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1298,6 +1319,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def reply_video_note(
@@ -1314,6 +1336,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: str = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1345,6 +1368,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def reply_voice(
@@ -1362,6 +1386,7 @@ class Message(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1394,6 +1419,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def reply_location(
@@ -1412,6 +1438,7 @@ class Message(TelegramObject):
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1445,6 +1472,7 @@ class Message(TelegramObject):
             heading=heading,
             proximity_alert_radius=proximity_alert_radius,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def reply_venue(
@@ -1465,6 +1493,7 @@ class Message(TelegramObject):
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1500,6 +1529,7 @@ class Message(TelegramObject):
             google_place_id=google_place_id,
             google_place_type=google_place_type,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def reply_contact(
@@ -1516,6 +1546,7 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1547,6 +1578,7 @@ class Message(TelegramObject):
             vcard=vcard,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def reply_poll(
@@ -1570,6 +1602,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1608,6 +1641,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             explanation_entities=explanation_entities,
+            protect_content=protect_content,
         )
 
     def reply_dice(
@@ -1620,6 +1654,7 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1647,6 +1682,7 @@ class Message(TelegramObject):
             emoji=emoji,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def reply_chat_action(
@@ -1684,6 +1720,7 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1713,6 +1750,7 @@ class Message(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def reply_invoice(
@@ -1745,6 +1783,7 @@ class Message(TelegramObject):
         quote: bool = None,
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1802,6 +1841,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             max_tip_amount=max_tip_amount,
             suggested_tip_amounts=suggested_tip_amounts,
+            protect_content=protect_content,
         )
 
     def forward(
@@ -1810,6 +1850,7 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1840,6 +1881,7 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     def copy(
@@ -1854,6 +1896,7 @@ class Message(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        protect_content: bool = None,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -1882,6 +1925,7 @@ class Message(TelegramObject):
             reply_markup=reply_markup,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     def reply_copy(
@@ -1898,6 +1942,7 @@ class Message(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         quote: bool = None,
+        protect_content: bool = None,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -1935,6 +1980,7 @@ class Message(TelegramObject):
             reply_markup=reply_markup,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     def edit_text(
@@ -2531,6 +2577,8 @@ class Message(TelegramObject):
                     insert = '<u>' + text + '</u>'
                 elif entity.type == MessageEntity.STRIKETHROUGH:
                     insert = '<s>' + text + '</s>'
+                elif entity.type == MessageEntity.SPOILER:
+                    insert = f'<span class="tg-spoiler">{text}</span>'
                 else:
                     insert = text
 
@@ -2583,6 +2631,9 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as HTML in
         the same way the original message was formatted.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
+
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
 
@@ -2595,6 +2646,9 @@ class Message(TelegramObject):
 
         Use this if you want to retrieve the message text with the entities formatted as HTML.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
 
         Returns:
             :obj:`str`: Message text with entities formatted as HTML.
@@ -2610,9 +2664,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML in the same way the original message was formatted.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
-
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=False)
 
@@ -2624,9 +2680,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as HTML.
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as HTML.
-
         """
         return self._parse_html(self.caption, self.parse_caption_entities(), urled=True)
 
@@ -2735,6 +2793,12 @@ class Message(TelegramObject):
                             'Strikethrough entities are not supported for Markdown ' 'version 1'
                         )
                     insert = '~' + text + '~'
+                elif entity.type == MessageEntity.SPOILER:
+                    if version == 1:
+                        raise ValueError(
+                            "Spoiler entities are not supported for Markdown version 1"
+                        )
+                    insert = f"||{text}||"
                 else:
                     insert = text
 
@@ -2804,6 +2868,10 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
+        Raises:
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
+                entities.
+
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=False)
 
@@ -2815,9 +2883,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as Markdown V2.
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
-
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=False, version=2)
 
@@ -2836,6 +2906,10 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
+        Raises:
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
+                entities.
+
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=True)
 
@@ -2847,9 +2921,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as Markdown V2.
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
-
         """
         return self._parse_markdown(self.text, self.parse_entities(), urled=True, version=2)
 
@@ -2868,6 +2944,10 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
+        Raises:
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
+                entities.
+
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=False)
 
@@ -2879,9 +2959,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as Markdown V2.
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
-
         """
         return self._parse_markdown(
             self.caption, self.parse_caption_entities(), urled=False, version=2
@@ -2902,6 +2984,10 @@ class Message(TelegramObject):
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
+        Raises:
+            :exc:`ValueError`: If the message contains underline, strikethrough, spoiler or nested
+                entities.
+
         """
         return self._parse_markdown(self.caption, self.parse_caption_entities(), urled=True)
 
@@ -2913,9 +2999,11 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
+        .. versionchanged:: 13.10
+           Spoiler entities are now formatted as Markdown V2.
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
-
         """
         return self._parse_markdown(
             self.caption, self.parse_caption_entities(), urled=True, version=2

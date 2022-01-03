@@ -80,6 +80,7 @@ class TestLocation:
             horizontal_accuracy=50,
             heading=90,
             proximity_alert_radius=1000,
+            protect_content=True,
         )
         assert message.location
         assert pytest.approx(52.223880, message.location.latitude)
@@ -88,6 +89,7 @@ class TestLocation:
         assert message.location.horizontal_accuracy == 50
         assert message.location.heading == 90
         assert message.location.proximity_alert_radius == 1000
+        assert message.has_protected_content
 
         message2 = bot.edit_message_live_location(
             message.chat_id,

@@ -324,6 +324,20 @@ class TestBot:
         assert forward_message.forward_from.username == message.from_user.username
         assert isinstance(forward_message.forward_date, dtm.datetime)
 
+    def test_forward_protected_message(self, bot, message, chat_id):
+        to_forward_protected = bot.send_message(chat_id, 'cant forward me', protect_content=True)
+        assert to_forward_protected.has_protected_content
+
+        with pytest.raises(BadRequest, match="can't be forwarded"):
+            to_forward_protected.forward(chat_id)
+
+        to_forward_unprotected = bot.send_message(chat_id, 'forward me', protect_content=False)
+        assert not to_forward_unprotected.has_protected_content
+        forwarded_but_now_protected = to_forward_unprotected.forward(chat_id, protect_content=True)
+        assert forwarded_but_now_protected.has_protected_content
+        with pytest.raises(BadRequest, match="can't be forwarded"):
+            forwarded_but_now_protected.forward(chat_id)
+
     @flaky(3, 1)
     def test_delete_message(self, bot, chat_id):
         message = bot.send_message(chat_id, text='will be deleted')
@@ -360,6 +374,7 @@ class TestBot:
             longitude=longitude,
             foursquare_id=foursquare_id,
             foursquare_type=foursquare_type,
+            protect_content=True,
         )
 
         assert message.venue
@@ -371,6 +386,7 @@ class TestBot:
         assert message.venue.foursquare_type == foursquare_type
         assert message.venue.google_place_id is None
         assert message.venue.google_place_type is None
+        assert message.has_protected_content
 
         message = bot.send_venue(
             chat_id=chat_id,
@@ -380,6 +396,7 @@ class TestBot:
             longitude=longitude,
             google_place_id=google_place_id,
             google_place_type=google_place_type,
+            protect_content=True,
         )
 
         assert message.venue
@@ -391,6 +408,7 @@ class TestBot:
         assert message.venue.google_place_type == google_place_type
         assert message.venue.foursquare_id is None
         assert message.venue.foursquare_type is None
+        assert message.has_protected_content
 
     @flaky(3, 1)
     @pytest.mark.xfail(raises=RetryAfter)
@@ -402,13 +420,18 @@ class TestBot:
         first_name = 'Leandro'
         last_name = 'Toledo'
         message = bot.send_contact(
-            chat_id=chat_id, phone_number=phone_number, first_name=first_name, last_name=last_name
+            chat_id=chat_id,
+            phone_number=phone_number,
+            first_name=first_name,
+            last_name=last_name,
+            protect_content=True,
         )
 
         assert message.contact
         assert message.contact.phone_number == phone_number
         assert message.contact.first_name == first_name
         assert message.contact.last_name == last_name
+        assert message.has_protected_content
 
     # TODO: Add bot to group to test polls too
 
@@ -435,6 +458,7 @@ class TestBot:
             is_anonymous=False,
             allows_multiple_answers=True,
             timeout=60,
+            protect_content=True,
         )
 
         assert message.poll
@@ -446,6 +470,7 @@ class TestBot:
         assert message.poll.allows_multiple_answers
         assert not message.poll.is_closed
         assert message.poll.type == Poll.REGULAR
+        assert message.has_protected_content
 
         # Since only the poll and not the complete message is returned, we can't check that the
         # reply_markup is correct. So we just test that sending doesn't give an error.
@@ -664,9 +689,10 @@ class TestBot:
     @flaky(3, 1)
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI + [None])
     def test_send_dice(self, bot, chat_id, emoji):
-        message = bot.send_dice(chat_id, emoji=emoji)
+        message = bot.send_dice(chat_id, emoji=emoji, protect_content=True)
 
         assert message.dice
+        assert message.has_protected_content
         if emoji is None:
             assert message.dice.emoji == Dice.DICE
         else:
@@ -1414,7 +1440,7 @@ class TestBot:
     @flaky(3, 1)
     def test_send_game(self, bot, chat_id):
         game_short_name = 'test_game'
-        message = bot.send_game(chat_id, game_short_name)
+        message = bot.send_game(chat_id, game_short_name, protect_content=True)
 
         assert message.game
         assert message.game.description == (
@@ -1424,6 +1450,7 @@ class TestBot:
         # We added some test bots later and for some reason the file size is not the same for them
         # so we accept three different sizes here. Shouldn't be too much of
         assert message.game.photo[0].file_size in [851, 4928, 850]
+        assert message.has_protected_content
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
@@ -1980,11 +2007,12 @@ class TestBot:
 
     @flaky(3, 1)
     def test_send_message_entities(self, bot, chat_id):
-        test_string = 'Italic Bold Code'
+        test_string = 'Italic Bold Code Spoiler'
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.ITALIC, 7, 4),
             MessageEntity(MessageEntity.ITALIC, 12, 4),
+            MessageEntity(MessageEntity.SPOILER, 17, 7),
         ]
         message = bot.send_message(chat_id=chat_id, text=test_string, entities=entities)
         assert message.text == test_string
@@ -2150,6 +2178,7 @@ class TestBot:
             assert data["reply_markup"] == keyboard.to_json()
             assert data["disable_notification"] is True
             assert data["caption_entities"] == [MessageEntity(MessageEntity.BOLD, 0, 4)]
+            assert data['protect_content'] is True
             return data
 
         monkeypatch.setattr(bot.request, 'post', post)
@@ -2163,6 +2192,7 @@ class TestBot:
             reply_to_message_id=media_message.message_id,
             reply_markup=keyboard.to_json() if json_keyboard else keyboard,
             disable_notification=True,
+            protect_content=True,
         )
 
     @flaky(3, 1)

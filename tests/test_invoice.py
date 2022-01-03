@@ -127,6 +127,8 @@ class TestInvoice:
             send_phone_number_to_provider=True,
             send_email_to_provider=True,
             is_flexible=True,
+            disable_notification=True,
+            protect_content=True,
         )
 
         assert message.invoice.currency == self.currency
@@ -134,6 +136,7 @@ class TestInvoice:
         assert message.invoice.description == self.description
         assert message.invoice.title == self.title
         assert message.invoice.total_amount == self.total_amount
+        assert message.has_protected_content
 
         # We do this next one as safety guard to make sure that we pass all of the optional
         # parameters correctly because #2526 went unnoticed for 3 years …
@@ -188,6 +191,8 @@ class TestInvoice:
             send_phone_number_to_provider='send_phone_number_to_provider',
             send_email_to_provider='send_email_to_provider',
             is_flexible='is_flexible',
+            disable_notification=True,
+            protect_content=True,
         )
 
     def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):

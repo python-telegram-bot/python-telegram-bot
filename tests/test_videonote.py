@@ -88,6 +88,7 @@ class TestVideoNote:
             duration=self.duration,
             length=self.length,
             disable_notification=False,
+            protect_content=True,
             thumb=thumb_file,
         )
 
@@ -103,6 +104,7 @@ class TestVideoNote:
         assert message.video_note.thumb.file_size == self.thumb_file_size
         assert message.video_note.thumb.width == self.thumb_width
         assert message.video_note.thumb.height == self.thumb_height
+        assert message.has_protected_content
 
     @flaky(3, 1)
     def test_send_video_note_custom_filename(self, bot, chat_id, video_note_file, monkeypatch):

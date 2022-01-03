@@ -285,10 +285,11 @@ class TestMessage:
         {'length': 29, 'offset': 91, 'type': 'bold'},
         {'length': 9, 'offset': 101, 'type': 'strikethrough'},
         {'length': 10, 'offset': 129, 'type': 'pre', 'language': 'python'},
+        {'length': 7, 'offset': 141, 'type': 'spoiler'},
     ]
     test_text_v2 = (
         r'Test for <bold, ita_lic, \`code, links, text-mention and `\pre. '
-        'http://google.com and bold nested in strk>trgh nested in italic. Python pre.'
+        'http://google.com and bold nested in strk>trgh nested in italic. Python pre. Spoiled.'
     )
     test_message = Message(
         message_id=1,
@@ -388,7 +389,8 @@ class TestMessage:
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. http://google.com '
             'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
-            '<pre><code class="python">Python pre</code></pre>.'
+            '<pre><code class="python">Python pre</code></pre>. '
+            '<span class="tg-spoiler">Spoiled</span>.'
         )
         text_html = self.test_message_v2.text_html
         assert text_html == test_html_string
@@ -406,7 +408,8 @@ class TestMessage:
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
             'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
-            '<pre><code class="python">Python pre</code></pre>.'
+            '<pre><code class="python">Python pre</code></pre>. '
+            '<span class="tg-spoiler">Spoiled</span>.'
         )
         text_html = self.test_message_v2.text_html_urled
         assert text_html == test_html_string
@@ -427,7 +430,7 @@ class TestMessage:
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
             r'http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. '
-            '```python\nPython pre```\\.'
+            '```python\nPython pre```\\. ||Spoiled||\\.'
         )
         text_markdown = self.test_message_v2.text_markdown_v2
         assert text_markdown == test_md_string
@@ -446,6 +449,10 @@ class TestMessage:
             message.text_markdown
 
         message.entities = [MessageEntity(MessageEntity.STRIKETHROUGH, offset=0, length=4)]
+        with pytest.raises(ValueError):
+            message.text_markdown
+
+        message.entities = [MessageEntity(MessageEntity.SPOILER, offset=0, length=4)]
         with pytest.raises(ValueError):
             message.text_markdown
 
@@ -473,7 +480,7 @@ class TestMessage:
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
             r'[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ '
-            'nested in* italic_\\. ```python\nPython pre```\\.'
+            'nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\.'
         )
         text_markdown = self.test_message_v2.text_markdown_v2_urled
         assert text_markdown == test_md_string
@@ -504,7 +511,8 @@ class TestMessage:
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. http://google.com '
             'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
-            '<pre><code class="python">Python pre</code></pre>.'
+            '<pre><code class="python">Python pre</code></pre>. '
+            '<span class="tg-spoiler">Spoiled</span>.'
         )
         caption_html = self.test_message_v2.caption_html
         assert caption_html == test_html_string
@@ -522,7 +530,8 @@ class TestMessage:
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. <a href="http://google.com">http://google.com</a> '
             'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
-            '<pre><code class="python">Python pre</code></pre>.'
+            '<pre><code class="python">Python pre</code></pre>. '
+            '<span class="tg-spoiler">Spoiled</span>.'
         )
         caption_html = self.test_message_v2.caption_html_urled
         assert caption_html == test_html_string
@@ -543,7 +552,7 @@ class TestMessage:
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
             r'http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. '
-            '```python\nPython pre```\\.'
+            '```python\nPython pre```\\. ||Spoiled||\\.'
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2
         assert caption_markdown == test_md_string
@@ -570,7 +579,7 @@ class TestMessage:
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
             r'[http://google\.com](http://google.com) and _bold *nested in ~strk\>trgh~ '
-            'nested in* italic_\\. ```python\nPython pre```\\.'
+            'nested in* italic_\\. ```python\nPython pre```\\. ||Spoiled||\\.'
         )
         caption_markdown = self.test_message_v2.caption_markdown_v2_urled
         assert caption_markdown == test_md_string
@@ -726,7 +735,7 @@ class TestMessage:
             '[links](http://github.com/abc\\\\\\)def), '
             '[text\\-mention](tg://user?id=123456789) and ```\\`\\\\pre```\\. '
             r'http://google\.com and _bold *nested in ~strk\>trgh~ nested in* italic_\. '
-            '```python\nPython pre```\\.'
+            '```python\nPython pre```\\. ||Spoiled||\\.'
         )
 
         def make_assertion(*_, **kwargs):
@@ -765,7 +774,8 @@ class TestMessage:
             '<a href="tg://user?id=123456789">text-mention</a> and '
             r'<pre>`\pre</pre>. http://google.com '
             'and <i>bold <b>nested in <s>strk&gt;trgh</s> nested in</b> italic</i>. '
-            '<pre><code class="python">Python pre</code></pre>.'
+            '<pre><code class="python">Python pre</code></pre>. '
+            '<span class="tg-spoiler">Spoiled</span>.'
         )
 
         def make_assertion(*_, **kwargs):
@@ -1136,14 +1146,15 @@ class TestMessage:
             quote=True,
         )
 
-    @pytest.mark.parametrize('disable_notification', [False, True])
-    def test_forward(self, monkeypatch, message, disable_notification):
+    @pytest.mark.parametrize('disable_notification,protected', [(False, True), (True, False)])
+    def test_forward(self, monkeypatch, message, disable_notification, protected):
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == 123456
             from_chat = kwargs['from_chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
             notification = kwargs['disable_notification'] == disable_notification
-            return chat_id and from_chat and message_id and notification
+            protected_cont = kwargs['protect_content'] == protected
+            return chat_id and from_chat and message_id and notification and protected_cont
 
         assert check_shortcut_signature(
             Message.forward, Bot.forward_message, ['from_chat_id', 'message_id'], []
@@ -1152,11 +1163,13 @@ class TestMessage:
         assert check_defaults_handling(message.forward, message.bot)
 
         monkeypatch.setattr(message.bot, 'forward_message', make_assertion)
-        assert message.forward(123456, disable_notification=disable_notification)
+        assert message.forward(
+            123456, disable_notification=disable_notification, protect_content=protected
+        )
         assert not message.forward(635241)
 
-    @pytest.mark.parametrize('disable_notification', [True, False])
-    def test_copy(self, monkeypatch, message, disable_notification):
+    @pytest.mark.parametrize('disable_notification,protected', [(True, False), (False, True)])
+    def test_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 
         def make_assertion(*_, **kwargs):
@@ -1164,11 +1177,19 @@ class TestMessage:
             from_chat = kwargs['from_chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == message.message_id
             notification = kwargs['disable_notification'] == disable_notification
+            protected_cont = kwargs['protect_content'] == protected
             if kwargs.get('reply_markup') is not None:
                 reply_markup = kwargs['reply_markup'] is keyboard
             else:
                 reply_markup = True
-            return chat_id and from_chat and message_id and notification and reply_markup
+            return (
+                chat_id
+                and from_chat
+                and message_id
+                and notification
+                and reply_markup
+                and protected_cont
+            )
 
         assert check_shortcut_signature(
             Message.copy, Bot.copy_message, ['from_chat_id', 'message_id'], []
@@ -1177,14 +1198,19 @@ class TestMessage:
         assert check_defaults_handling(message.copy, message.bot)
 
         monkeypatch.setattr(message.bot, 'copy_message', make_assertion)
-        assert message.copy(123456, disable_notification=disable_notification)
         assert message.copy(
-            123456, reply_markup=keyboard, disable_notification=disable_notification
+            123456, disable_notification=disable_notification, protect_content=protected
+        )
+        assert message.copy(
+            123456,
+            reply_markup=keyboard,
+            disable_notification=disable_notification,
+            protect_content=protected,
         )
         assert not message.copy(635241)
 
-    @pytest.mark.parametrize('disable_notification', [True, False])
-    def test_reply_copy(self, monkeypatch, message, disable_notification):
+    @pytest.mark.parametrize('disable_notification,protected', [(True, False), (False, True)])
+    def test_reply_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 
         def make_assertion(*_, **kwargs):
@@ -1192,6 +1218,7 @@ class TestMessage:
             from_chat = kwargs['chat_id'] == message.chat_id
             message_id = kwargs['message_id'] == 456789
             notification = kwargs['disable_notification'] == disable_notification
+            is_protected = kwargs['protect_content'] == protected
             if kwargs.get('reply_markup') is not None:
                 reply_markup = kwargs['reply_markup'] is keyboard
             else:
@@ -1200,7 +1227,15 @@ class TestMessage:
                 reply = kwargs['reply_to_message_id'] == message.message_id
             else:
                 reply = True
-            return chat_id and from_chat and message_id and notification and reply_markup and reply
+            return (
+                chat_id
+                and from_chat
+                and message_id
+                and notification
+                and reply_markup
+                and reply
+                and is_protected
+            )
 
         assert check_shortcut_signature(
             Message.reply_copy, Bot.copy_message, ['chat_id'], ['quote']
@@ -1209,12 +1244,22 @@ class TestMessage:
         assert check_defaults_handling(message.copy, message.bot)
 
         monkeypatch.setattr(message.bot, 'copy_message', make_assertion)
-        assert message.reply_copy(123456, 456789, disable_notification=disable_notification)
         assert message.reply_copy(
-            123456, 456789, reply_markup=keyboard, disable_notification=disable_notification
+            123456, 456789, disable_notification=disable_notification, protect_content=protected
         )
         assert message.reply_copy(
-            123456, 456789, quote=True, disable_notification=disable_notification
+            123456,
+            456789,
+            reply_markup=keyboard,
+            disable_notification=disable_notification,
+            protect_content=protected,
+        )
+        assert message.reply_copy(
+            123456,
+            456789,
+            quote=True,
+            disable_notification=disable_notification,
+            protect_content=protected,
         )
         assert message.reply_copy(
             123456,
@@ -1222,6 +1267,7 @@ class TestMessage:
             quote=True,
             reply_to_message_id=message.message_id,
             disable_notification=disable_notification,
+            protect_content=protected,
         )
 
     def test_edit_text(self, monkeypatch, message):

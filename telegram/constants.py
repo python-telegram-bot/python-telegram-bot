@@ -21,7 +21,7 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.5`. Telegram Bot API version supported by this
+    BOT_API_VERSION (:obj:`str`): `5.6`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
@@ -141,6 +141,9 @@ Attributes:
     MESSAGEENTITY_TEXT_MENTION (:obj:`str`): ``'text_mention'``
     MESSAGEENTITY_UNDERLINE (:obj:`str`): ``'underline'``
     MESSAGEENTITY_STRIKETHROUGH (:obj:`str`): ``'strikethrough'``
+    MESSAGEENTITY_SPOILER (:obj:`str`): ``'spoiler'``
+
+        .. versionadded:: 13.10
     MESSAGEENTITY_ALL_TYPES (List[:obj:`str`]): List of all the types of message entity.
 
 :class:`telegram.ParseMode`:
@@ -244,7 +247,7 @@ Attributes:
 """
 from typing import List
 
-BOT_API_VERSION: str = '5.5'
+BOT_API_VERSION: str = '5.6'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
@@ -321,6 +324,7 @@ MESSAGEENTITY_TEXT_LINK: str = 'text_link'
 MESSAGEENTITY_TEXT_MENTION: str = 'text_mention'
 MESSAGEENTITY_UNDERLINE: str = 'underline'
 MESSAGEENTITY_STRIKETHROUGH: str = 'strikethrough'
+MESSAGEENTITY_SPOILER: str = 'spoiler'
 MESSAGEENTITY_ALL_TYPES: List[str] = [
     MESSAGEENTITY_MENTION,
     MESSAGEENTITY_HASHTAG,
@@ -337,6 +341,7 @@ MESSAGEENTITY_ALL_TYPES: List[str] = [
     MESSAGEENTITY_TEXT_MENTION,
     MESSAGEENTITY_UNDERLINE,
     MESSAGEENTITY_STRIKETHROUGH,
+    MESSAGEENTITY_SPOILER,
 ]
 
 PARSEMODE_MARKDOWN: str = 'Markdown'

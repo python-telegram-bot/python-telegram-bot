@@ -338,6 +338,7 @@ class User(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -361,6 +362,7 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
+            protect_content=protect_content,
         )
 
     def send_photo(
@@ -376,6 +378,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -400,6 +403,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def send_media_group(
@@ -412,6 +416,7 @@ class User(TelegramObject):
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> List['Message']:
         """Shortcut for::
 
@@ -431,6 +436,7 @@ class User(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def send_audio(
@@ -450,6 +456,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -478,6 +485,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def send_chat_action(
@@ -519,6 +527,7 @@ class User(TelegramObject):
         vcard: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -543,6 +552,7 @@ class User(TelegramObject):
             vcard=vcard,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def send_dice(
@@ -554,6 +564,7 @@ class User(TelegramObject):
         emoji: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -574,6 +585,7 @@ class User(TelegramObject):
             emoji=emoji,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def send_document(
@@ -591,6 +603,7 @@ class User(TelegramObject):
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -617,6 +630,7 @@ class User(TelegramObject):
             disable_content_type_detection=disable_content_type_detection,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
+            protect_content=protect_content,
         )
 
     def send_game(
@@ -628,6 +642,7 @@ class User(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -648,6 +663,7 @@ class User(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def send_invoice(
@@ -679,6 +695,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -727,6 +744,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             max_tip_amount=max_tip_amount,
             suggested_tip_amounts=suggested_tip_amounts,
+            protect_content=protect_content,
         )
 
     def send_location(
@@ -744,6 +762,7 @@ class User(TelegramObject):
         heading: int = None,
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -770,6 +789,7 @@ class User(TelegramObject):
             heading=heading,
             proximity_alert_radius=proximity_alert_radius,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def send_animation(
@@ -789,6 +809,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -817,6 +838,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def send_sticker(
@@ -828,6 +850,7 @@ class User(TelegramObject):
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -848,6 +871,7 @@ class User(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def send_video(
@@ -868,6 +892,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -897,6 +922,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def send_venue(
@@ -916,6 +942,7 @@ class User(TelegramObject):
         google_place_id: str = None,
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -944,6 +971,7 @@ class User(TelegramObject):
             google_place_id=google_place_id,
             google_place_type=google_place_type,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
         )
 
     def send_video_note(
@@ -959,6 +987,7 @@ class User(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: str = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -983,6 +1012,7 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def send_voice(
@@ -999,6 +1029,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1024,6 +1055,7 @@ class User(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
+            protect_content=protect_content,
         )
 
     def send_poll(
@@ -1047,6 +1079,7 @@ class User(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        protect_content: bool = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1078,6 +1111,7 @@ class User(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             explanation_entities=explanation_entities,
+            protect_content=protect_content,
         )
 
     def send_copy(
@@ -1093,6 +1127,7 @@ class User(TelegramObject):
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        protect_content: bool = None,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -1117,6 +1152,7 @@ class User(TelegramObject):
             reply_markup=reply_markup,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     def copy_message(
@@ -1132,6 +1168,7 @@ class User(TelegramObject):
         reply_markup: 'ReplyMarkup' = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        protect_content: bool = None,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -1156,6 +1193,7 @@ class User(TelegramObject):
             reply_markup=reply_markup,
             timeout=timeout,
             api_kwargs=api_kwargs,
+            protect_content=protect_content,
         )
 
     def approve_join_request(
