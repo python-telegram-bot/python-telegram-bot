@@ -267,7 +267,13 @@ class Update(TelegramObject):
     def effective_user(self) -> Optional['User']:
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
-            is. Will be :obj:`None` for :attr:`channel_post` and :attr:`poll`.
+        is. If no user is associated with this update, this gives :obj:`None`. This is the case
+        if :attr:`channel_post`, :attr:`edited_channel_post` or :attr:`poll` is present.
+
+        Example:
+            * If :attr:`message` is present, this will give
+              :attr:`telegram.Message.from_user`.
+            * If :attr:`poll_answer` is present, this will give :attr:`telegram.PollAnswer.user`.
 
         """
         if self._effective_user:
@@ -315,10 +321,15 @@ class Update(TelegramObject):
     def effective_chat(self) -> Optional['Chat']:
         """
         :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
-            update this is. Will be :obj:`None` for :attr:`inline_query`,
-            :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
-            :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` and
-            :attr:`poll_answer`.
+        update this is.
+        If no chat is associated with this update, this gives :obj:`None`.
+        This is the case, if :attr:`inline_query`,
+        :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
+        :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll` or
+        :attr:`poll_answer` is present.
+
+        Example:
+            If :attr:`message` is present, this will give :attr:`telegram.Message.chat`.
 
         """
         if self._effective_chat:
@@ -357,12 +368,10 @@ class Update(TelegramObject):
     def effective_message(self) -> Optional[Message]:
         """
         :class:`telegram.Message`: The message included in this update, no matter what kind of
-            update this is. Will be :obj:`None` for :attr:`inline_query`,
-            :attr:`chosen_inline_result`, :attr:`callback_query` from inline messages,
-            :attr:`shipping_query`, :attr:`pre_checkout_query`, :attr:`poll`,
-            :attr:`poll_answer`, :attr:`my_chat_member`, :attr:`chat_member` as well as
-            :attr:`chat_join_request` in case the bot is missing the
-            :attr:`telegram.ChatPermissions.can_invite_users` administrator right in the chat.
+            update this is. More precisely, this will be the message contained in :attr:`message`,
+            :attr:`edited_message`, :attr:`channel_post`, :attr:`edited_channel_post` or
+            :attr:`callback_query` (i.e. :attr:`telegram.CallbackQuery.message`) or :obj:`None`, if
+            none of those are present.
 
         """
         if self._effective_message:

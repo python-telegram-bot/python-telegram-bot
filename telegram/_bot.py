@@ -442,7 +442,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                A JSON-serialized object for an inline keyboard, custom reply keyboard,
+                An object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -649,8 +649,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -762,8 +762,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
@@ -884,8 +884,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
@@ -978,8 +978,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1085,8 +1085,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
@@ -1200,8 +1200,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard,
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
@@ -1329,8 +1329,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1441,8 +1441,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard,
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1593,8 +1593,8 @@ class Bot(TelegramObject):
                     original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard,
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -1688,8 +1688,8 @@ class Bot(TelegramObject):
             proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts
                 about approaching another chat member, in meters. Must be between 1 and
                 :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
-                object for a new inline keyboard.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
+                inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1757,8 +1757,8 @@ class Bot(TelegramObject):
                 Identifier of the sent message with live location to stop.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
-                object for a new inline keyboard.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
+                inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1844,8 +1844,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -1948,8 +1948,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -2028,8 +2028,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
-                object for a new inline keyboard. If empty, one ‘Play game_title’ button will be
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
+                inline keyboard. If empty, one ‘Play game_title’ button will be
                 shown. If not empty, the first button must launch the game.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -2658,8 +2658,8 @@ class Bot(TelegramObject):
                 that appear in message text, which can be specified instead of :attr:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
-                object for an inline keyboard.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
+                inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2730,8 +2730,8 @@ class Bot(TelegramObject):
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
                 :attr:`parse_mode`.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
-                object for an inline keyboard.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
+                inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2801,8 +2801,8 @@ class Bot(TelegramObject):
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
-                object for an inline keyboard.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
+                inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2861,8 +2861,8 @@ class Bot(TelegramObject):
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
-                object for an inline keyboard.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
+                inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2928,7 +2928,7 @@ class Bot(TelegramObject):
             read_latency (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
                 the reply from server. Will be added to the ``timeout`` value and used as the read
                 timeout from server. Defaults to  ``2``.
-            allowed_updates (List[:obj:`str`]), optional): A JSON-serialized list the types of
+            allowed_updates (List[:obj:`str`]), optional): A list the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
@@ -2999,7 +2999,7 @@ class Bot(TelegramObject):
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
         Whenever there is an update for the bot, Telegram will send an HTTPS POST request to the
-        specified url, containing a JSON-serialized Update. In case of an unsuccessful request,
+        specified url, containing An Update. In case of an unsuccessful request,
         Telegram will give up after a reasonable amount of attempts.
 
         If you'd like to make sure that the Webhook request comes from Telegram, Telegram
@@ -3021,7 +3021,7 @@ class Bot(TelegramObject):
                 connections to the webhook for update delivery, 1-100. Defaults to ``40``. Use
                 lower values to limit the load on your bot's server, and higher values to increase
                 your bot's throughput.
-            allowed_updates (List[:obj:`str`], optional): A JSON-serialized list the types of
+            allowed_updates (List[:obj:`str`], optional): A list the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
                 See :class:`telegram.Update` for a complete list of available update types.
@@ -3533,7 +3533,7 @@ class Bot(TelegramObject):
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
             currency (:obj:`str`): Three-letter ISO 4217 currency code.
-            prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a JSON-serialized list
+            prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
@@ -3544,7 +3544,7 @@ class Bot(TelegramObject):
                 majority of currencies). Defaults to ``0``.
 
                 .. versionadded:: 13.5
-            suggested_tip_amounts (List[:obj:`int`], optional): A JSON-serialized array of
+            suggested_tip_amounts (List[:obj:`int`], optional): An array of
                 suggested amounts of tips in the smallest units of the currency (integer, not
                 float/double). At most 4 suggested tip amounts can be specified. The suggested tip
                 amounts must be positive, passed in a strictly increased order and must not exceed
@@ -3560,7 +3560,7 @@ class Bot(TelegramObject):
 
                 .. versionchanged:: 13.5
                     As of Bot API 5.2, this parameter is optional.
-            provider_data (:obj:`str` | :obj:`object`, optional): JSON-serialized data about the
+            provider_data (:obj:`str` | :obj:`object`, optional): data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is
                 passed, it will be encoded as JSON.
@@ -3595,8 +3595,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
-                object for an inline keyboard. If empty, one 'Pay total price' button will be
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
+                inline keyboard. If empty, one 'Pay total price' button will be
                 shown. If not empty, the first button must be a Pay button.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -3688,7 +3688,7 @@ class Bot(TelegramObject):
                 and :obj:`False` if there are any problems (for example, if delivery to the
                 specified address is not possible).
             shipping_options (List[:class:`telegram.ShippingOption`]), optional]: Required if ok is
-                :obj:`True`. A JSON-serialized array of available shipping options.
+                :obj:`True`. An array of available shipping options.
             error_message (:obj:`str`, optional): Required if ok is :obj:`False`. Error message in
                 human readable form that explains why it is impossible to complete the order (e.g.
                 "Sorry, delivery to your desired address is unavailable"). Telegram will display
@@ -3824,7 +3824,7 @@ class Bot(TelegramObject):
                 restricted forever.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used.
-            permissions (:class:`telegram.ChatPermissions`): A JSON-serialized object for new user
+            permissions (:class:`telegram.ChatPermissions`): An object for new user
                 permissions.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -5016,7 +5016,7 @@ class Bot(TelegramObject):
 
         Args:
             user_id (:obj:`int`): User identifier
-            errors (List[:class:`PassportElementError`]): A JSON-serialized array describing the
+            errors (List[:class:`PassportElementError`]): An array describing the
                 errors.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
@@ -5110,8 +5110,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -5180,8 +5180,8 @@ class Bot(TelegramObject):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             message_id (:obj:`int`): Identifier of the original message with the poll.
-            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): A JSON-serialized
-                object for a new message inline keyboard.
+            reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
+                message inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -5251,8 +5251,8 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options. A
-                JSON-serialized object for an inline keyboard, custom reply keyboard, instructions
+            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
+                An object for an inline keyboard, custom reply keyboard, instructions
                 to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -5302,7 +5302,7 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-            scope (:class:`telegram.BotCommandScope`, optional): A JSON-serialized object,
+            scope (:class:`telegram.BotCommandScope`, optional): An object,
                 describing scope of users. Defaults to :class:`telegram.BotCommandScopeDefault`.
 
                 .. versionadded:: 13.7
@@ -5347,7 +5347,7 @@ class Bot(TelegramObject):
         commands.
 
         Args:
-            commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A JSON-serialized list
+            commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list
                 of bot commands to be set as the list of the bot's commands. At most 100 commands
                 can be specified.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -5355,7 +5355,7 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-            scope (:class:`telegram.BotCommandScope`, optional): A JSON-serialized object,
+            scope (:class:`telegram.BotCommandScope`, optional): An object,
                 describing scope of users for which the commands are relevant. Defaults to
                 :class:`telegram.BotCommandScopeDefault`.
 
@@ -5405,7 +5405,7 @@ class Bot(TelegramObject):
         .. versionadded:: 13.7
 
         Args:
-            scope (:class:`telegram.BotCommandScope`, optional): A JSON-serialized object,
+            scope (:class:`telegram.BotCommandScope`, optional): An object,
                 describing scope of users for which the commands are relevant. Defaults to
                 :class:`telegram.BotCommandScopeDefault`.
             language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
@@ -5528,7 +5528,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
             reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                A JSON-serialized object for an inline keyboard, custom reply keyboard,
+                An object for an inline keyboard, custom reply keyboard,
                 instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
