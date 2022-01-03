@@ -253,7 +253,6 @@ class TestBot:
                 'de_list',
                 'to_dict',
                 'to_json',
-                'log',
                 'parse_data',
                 'get_updates',
                 'getUpdates',
@@ -2083,6 +2082,15 @@ class TestBot:
         message = default_bot.send_message(chat_id, test_markdown_string, parse_mode='HTML')
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_message_default_protect_content(self, default_bot, chat_id):
+        to_check = default_bot.send_message(chat_id, "test")
+        assert to_check.has_protected_content
+
+        no_protect = default_bot.send_message(chat_id, "test", protect_content=False)
+        assert not no_protect.has_protected_content
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
