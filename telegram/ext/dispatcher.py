@@ -652,49 +652,57 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 del self.handlers[group]
                 self.groups.remove(group)
 
-    def move_chat_data(self, old_id: int, new_id: int, update_values: bool = False, copy_values: bool = False) -> None:
+    def move_chat_data(self,
+                       old_id: int,
+                       new_id: int,
+                       update_values: bool = False,
+                       copy_values: bool = False) -> None:
         """Move chat_data content for old_id to new_id.
 
         Args:
             old_id (:obj:`int`, required): The old chat_id
             new_id (:obj:`int`, required): The new chat_id
-            update_values (:obj:`bool`, optional): if True, dict.update will be used else, an assigment operation will be performed. Set to False by default
+            update_values (:obj:`bool`, optional): if True, dict.update will be used else, an override operation will be performed. Set to False by default
             copy_values (:obj:`bool`, optional): if False, the user_data of old_id will be deleted. Set to True by default
         """
         if not isinstance(old_id, int) or not isinstance(new_id, int):
-            raise ValueError("old_id, and new_id must be integers")
+            raise ValueError("old_id and new_id must be integers")
 
         if update_values:
-            self.chat_data.setdefault(new_id, {}).update(self.chat_data.get(old_id, {}))
+            self.chat_data[new_id].update(self.chat_data[old_id])
         else:
-            self.chat_data[new_id] = self.chat_data.get(old_id, {})
+            self.chat_data[new_id] = self.chat_data[old_id]
 
         if copy_values is False:
-            self.chat_data.pop(old_id, None)
+            del self.chat_data[old_id]
 
-        self.__update_persistence()
+        self.update_persistence()
 
-    def move_user_data(self, old_id: int, new_id: int, update_values: bool = False, copy_values: bool = False) -> None:
+    def move_user_data(self,
+                       old_id: int,
+                       new_id: int,
+                       update_values: bool = False,
+                       copy_values: bool = False) -> None:
         """Move user_data content for old_id to new_id
 
         Args:
             old_id (:obj:`int`, required): The old user_id
             new_id (:obj:`int`, required): The new user_id
-            update_values (:obj:`bool`, optional): if True, dict.update will be used else, an assigment operation will be performed. Set to False by default
+            update_values (:obj:`bool`, optional): if True, dict.update will be used else, an override operation will be performed. Set to False by default
             copy_values (:obj:`bool`, optional): if False, the user_data of old_id will be deleted. Set to False by default
         """
         if not isinstance(old_id, int) or not isinstance(new_id, int):
-            raise ValueError("old_id, and new_id must be integers")
+            raise ValueError("old_id and new_id must be integers")
 
         if update_values:
-            self.user_data.setdefault(new_id, {}).update(self.user_data.get(old_id, {}))
+            self.user_data[new_id].update(self.user_data[old_id])
         else:
-            self.user_data[new_id] = self.user_data.get(old_id, {})
+            self.user_data[new_id] = self.user_data[old_id]
 
         if copy_values is False:
-            self.user_data.pop(old_id, None)
+            del self.user_data[old_id]
 
-        self.__update_persistence()
+        self.update_persistence()
 
     def update_persistence(self, update: object = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
