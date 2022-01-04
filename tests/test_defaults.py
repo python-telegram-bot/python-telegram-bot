@@ -41,7 +41,7 @@ class TestDefault:
     def test_equality(self):
         a = Defaults(parse_mode='HTML', quote=True)
         b = Defaults(parse_mode='HTML', quote=True)
-        c = Defaults(parse_mode='HTML', quote=False)
+        c = Defaults(parse_mode='HTML', quote=True, protect_content=True)
         d = Defaults(parse_mode='HTML', timeout=50)
         e = User(123, 'test_user', False)
 

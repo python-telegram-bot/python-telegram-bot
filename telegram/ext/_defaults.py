@@ -254,6 +254,7 @@ class Defaults:
                 self._quote,
                 self._tzinfo,
                 self._run_async,
+                self._protect_content,
             )
         )
 
