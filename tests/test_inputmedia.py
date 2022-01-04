@@ -566,6 +566,14 @@ class TestSendMediaGroup:
                 )
 
     @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_media_group_default_protect_content(self, chat_id, media_group, default_bot):
+        protected = default_bot.send_media_group(chat_id, media_group)
+        assert all(msg.has_protected_content for msg in protected)
+        unprotected = default_bot.send_media_group(chat_id, media_group, protect_content=False)
+        assert not all(msg.has_protected_content for msg in unprotected)
+
+    @flaky(3, 1)
     def test_edit_message_media(self, bot, chat_id, media_group):
         messages = bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id

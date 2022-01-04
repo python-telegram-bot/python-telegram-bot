@@ -1858,7 +1858,7 @@ class Bot(TelegramObject):
         """
         if not (venue or all([latitude, longitude, address, title])):
             raise ValueError(
-                "Either venue or latitude, longitude, address and title must be"
+                "Either venue or latitude, longitude, address and title must be "
                 "passed as arguments."
             )
 
