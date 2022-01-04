@@ -414,8 +414,7 @@ class TestBot:
     # duplicate here.
 
     @flaky(3, 1)
-    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
-    def test_send_venue_with_default_protect_content(self, default_bot, chat_id):
+    def test_send_venue(self, bot, chat_id):
         longitude = -46.788279
         latitude = -23.691288
         title = 'title'
@@ -425,7 +424,7 @@ class TestBot:
         google_place_id = 'google_place id'
         google_place_type = 'google_place type'
 
-        message = default_bot.send_venue(
+        message = bot.send_venue(
             chat_id=chat_id,
             title=title,
             address=address,
@@ -433,6 +432,7 @@ class TestBot:
             longitude=longitude,
             foursquare_id=foursquare_id,
             foursquare_type=foursquare_type,
+            protect_content=True,
         )
 
         assert message.venue
@@ -446,7 +446,7 @@ class TestBot:
         assert message.venue.google_place_type is None
         assert message.has_protected_content
 
-        message = default_bot.send_venue(
+        message = bot.send_venue(
             chat_id=chat_id,
             title=title,
             address=address,
@@ -454,7 +454,7 @@ class TestBot:
             longitude=longitude,
             google_place_id=google_place_id,
             google_place_type=google_place_type,
-            protect_content=False,
+            protect_content=True,
         )
 
         assert message.venue
@@ -466,19 +466,19 @@ class TestBot:
         assert message.venue.google_place_type == google_place_type
         assert message.venue.foursquare_id is None
         assert message.venue.foursquare_type is None
-        assert not message.has_protected_content
+        assert message.has_protected_content
 
     @flaky(3, 1)
-    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
-    def test_send_contact_with_default_protect_content(self, default_bot, chat_id):
+    def test_send_contact(self, bot, chat_id):
         phone_number = '+11234567890'
         first_name = 'Leandro'
         last_name = 'Toledo'
-        message = default_bot.send_contact(
+        message = bot.send_contact(
             chat_id=chat_id,
             phone_number=phone_number,
             first_name=first_name,
             last_name=last_name,
+            protect_content=True,
         )
 
         assert message.contact
