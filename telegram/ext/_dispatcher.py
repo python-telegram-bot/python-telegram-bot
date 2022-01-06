@@ -647,7 +647,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         """
         if all((message, old_chat_id, new_chat_id)):
             raise ValueError("Message and chat_id pair are mutually exclusive")
-        elif not any((message, old_chat_id, new_chat_id)):
+        if not any((message, old_chat_id, new_chat_id)):
             raise ValueError("chat_id pair or message must be passed")
 
         if message:
