@@ -631,6 +631,40 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             if not self.handlers[group]:
                 del self.handlers[group]
 
+    def migrate_chat_data(
+        self, message: 'Message' = None, old_chat_id: int = None, new_chat_id: int = None
+    ) -> None:
+        """
+        Migrate chat_data content
+
+        Warning:
+            The old_chat_id chat_data will be deleted
+        Args:
+            message (:class:`Message`, optional): The message containing old and new chat_id
+            old_chat_id (:obj:`int`, optional): The old chat_id
+            new_chat_id (:obj:`int`, optional): The new chat_id
+
+        """
+        if all((message, old_chat_id, new_chat_id)):
+            raise ValueError("Message and chat_id pair are mutually exclusive")
+        elif not any((message, old_chat_id, new_chat_id)):
+            raise ValueError("chat_id pair or message must be passed")
+
+        if message:
+            if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
+                raise ValueError("Invalid message istance, can't detect old/new chat_id")
+
+            old_chat_id = message.migrate_from_chat_id or message.chat.id
+            new_chat_id = message.migrate_to_chat_id or message.chat.id
+
+        elif not (isinstance(old_chat_id, int) and isinstance(new_chat_id, int)):
+            raise ValueError("old_chat_id and new_chat_id must be integers")
+
+        old_chat_data = self.chat_data.pop(old_chat_id, None)
+        if old_chat_data:
+            self.chat_data[new_chat_id] = old_chat_data
+            self.update_persistence()
+
     def update_persistence(self, update: object = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
 
