@@ -660,9 +660,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         elif not (isinstance(old_chat_id, int) and isinstance(new_chat_id, int)):
             raise ValueError("old_chat_id and new_chat_id must be integers")
 
-        old_chat_data = self.chat_data.pop(old_chat_id, None)
-        if old_chat_data:
-            self.chat_data[new_chat_id] = old_chat_data
+        if old_chat_id in self.chat_data:
+            self.chat_data[new_chat_id] = self.chat_data[old_chat_id]
+            del self.chat_data[old_chat_id]
             self.update_persistence()
 
     def update_persistence(self, update: object = None) -> None:
