@@ -643,7 +643,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             message (:class:`Message`, optional): A message with either :attr:`telegram.Message.migrate_from_chat_id` or :attr:`telegram.Message.migrate_to_chat_id`. Mutually exclusive with passing ``old_chat_id`` and ``new_chat_id``
             
                 .. seealso: `telegram.ext.filters.StatusUpdate.MIGRATE`
-            old_chat_id (:obj:`int`, optional): The old chat_id
+            old_chat_id (:obj:`int`, optional): The old chat ID. Mutually exclusive with passing ``message``
             new_chat_id (:obj:`int`, optional): The new chat_id
 
         """
