@@ -640,7 +640,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         Warning:
             The old_chat_id chat_data will be deleted
         Args:
-            message (:class:`Message`, optional): The message containing old and new chat_id
+            message (:class:`Message`, optional): A message with either :attr:`telegram.Message.migrate_from_chat_id` or :attr:`telegram.Message.migrate_to_chat_id`. Mutually exclusive with passing ``old_chat_id`` and ``new_chat_id``
+            
+                .. seealso: `telegram.ext.filters.StatusUpdate.MIGRATE`
             old_chat_id (:obj:`int`, optional): The old chat_id
             new_chat_id (:obj:`int`, optional): The new chat_id
 
