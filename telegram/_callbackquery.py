@@ -618,7 +618,7 @@ class CallbackQuery(TelegramObject):
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'MessageId':
         """Shortcut for::
 
