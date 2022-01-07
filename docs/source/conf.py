@@ -13,13 +13,13 @@
 # serve to show the default.
 import sys
 import os
+import inspect
 from enum import Enum
 from typing import Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-import inspect
 from docutils.nodes import Element
 from sphinx.application import Sphinx
 from sphinx.domains.python import PyXRefRole
@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '4.2.0'
+needs_sphinx = '4.3.2'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -39,7 +39,8 @@ needs_sphinx = '4.2.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.linkcode'
 ]
 
 # Use intersphinx to reference the python builtin library docs
@@ -129,13 +130,18 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'furo'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'style_external_links': True,
+    # 'style_external_links': True,  # Use after https://github.com/pradyunsg/furo/discussions/348
+    'navigation_with_keys': True,
+    'dark_css_variables': {'admonition-title-font-size': '0.95rem',
+                           'admonition-font-size': '0.92rem'},
+    'light_css_variables': {'admonition-title-font-size': '0.95rem',
+                            'admonition-font-size': '0.92rem'}
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -143,14 +149,14 @@ html_theme_options = {
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+html_title = f"PTB v{version}"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = 'ptb-logo-orange.png'
+html_logo = 'ptb-logo_1024.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -386,7 +392,23 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
             return True  # return True to exclude from docs.
 
 
+def linkcode_resolve(domain, info):
+    """Used for [source] links in documentation. After
+    https://github.com/sphinx-doc/sphinx/issues/1556 is closed, we can update the links to be more
+    specific."""
+    class_name = info['fullname'].split('.')[0]
+    module = info['module']
+    combined = f"{module}.{class_name}"
+    if class_name == module.split('.')[-1]:
+        combined = module  # Edge case where module is telegram.ext.ExtBot and class name is ExtBot
+
+    obj = eval(combined)
+    if hasattr(obj, '__module__'):
+        module = obj.__module__
+    path = module.replace('.', '/')
+    return f"https://github.com/python-telegram-bot/python-telegram-bot/blob/master/{path}.py"
+
+
 def setup(app: Sphinx):
-    app.add_css_file("dark.css")
     app.connect('autodoc-skip-member', autodoc_skip_member)
     app.add_role_to_domain('py', CONSTANTS_ROLE, TGConstXRefRole())
