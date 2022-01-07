@@ -647,7 +647,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             new_chat_id (:obj:`int`, optional): The new chat_id
 
         """
-        if all((message, old_chat_id, new_chat_id)):
+        if message and (old_chat_id or new_chat_id):
             raise ValueError("Message and chat_id pair are mutually exclusive")
         if not any((message, old_chat_id, new_chat_id)):
             raise ValueError("chat_id pair or message must be passed")
