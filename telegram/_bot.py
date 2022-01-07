@@ -3973,7 +3973,7 @@ class Bot(TelegramObject):
         """
         Use this method to set default chat permissions for all members. The bot must be an
         administrator in the group or a supergroup for this to work and must have the
-        ``can_restrict_members`` admin rights.
+        :attr:`telegram.ChatMemberAdministrator.can_restrict_members` admin rights.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
@@ -4515,7 +4515,7 @@ class Bot(TelegramObject):
         Use this method to add a message to the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
         and must have the ``can_pin_messages`` admin right in a supergroup
-        or ``can_edit_messages`` admin right in a channel.
+        or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4559,7 +4559,8 @@ class Bot(TelegramObject):
         Use this method to remove a message from the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
         and must have the ``can_pin_messages`` admin right in a
-        supergroup or ``can_edit_messages`` admin right in a channel.
+        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
+        channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4599,7 +4600,8 @@ class Bot(TelegramObject):
         Use this method to clear the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this
         to work and must have the ``can_pin_messages`` admin right in a
-        supergroup or ``can_edit_messages`` admin right in a channel.
+        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
+        channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
