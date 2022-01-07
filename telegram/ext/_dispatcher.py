@@ -53,6 +53,7 @@ from telegram.ext._utils.types import CCT, UD, CD, BD, BT, JQ, PT
 from telegram.ext._utils.stack import was_called_by
 
 if TYPE_CHECKING:
+    from telegram import Message
     from telegram.ext._jobqueue import Job
     from telegram.ext._builders import InitDispatcherBuilder
 
@@ -635,8 +636,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         self, message: 'Message' = None, old_chat_id: int = None, new_chat_id: int = None
     ) -> None:
         """
-        Migrate chat_data content
-
+        Moves the contents of :attr:`chat_data` at key old_chat_id to the key new_chat_id. Also updates the persistence by calling :attr:`update_persistence`.
+ 
         Warning:
         
             * Any data stored in :attr:\`chat_data\` at key `new_chat_id` will be overridden
@@ -647,7 +648,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             
                 .. seealso: `telegram.ext.filters.StatusUpdate.MIGRATE`
             old_chat_id (:obj:`int`, optional): The old chat ID. Mutually exclusive with passing ``message``
-            new_chat_id (:obj:`int`, optional): The new chat_id
+            new_chat_id (:obj:`int`, optional): The new chat ID. Mutually exclusive with passing ``message``
 
         """
         if message and (old_chat_id or new_chat_id):
