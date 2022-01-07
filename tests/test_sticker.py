@@ -277,6 +277,14 @@ class TestSticker:
                     chat_id, sticker, reply_to_message_id=reply_to_message.message_id
                 )
 
+    @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_sticker_default_protect_content(self, chat_id, sticker, default_bot):
+        protected = default_bot.send_sticker(chat_id, sticker)
+        assert protected.has_protected_content
+        unprotected = default_bot.send_sticker(chat_id, sticker, protect_content=False)
+        assert not unprotected.has_protected_content
+
     def test_to_dict(self, sticker):
         sticker_dict = sticker.to_dict()
 

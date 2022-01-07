@@ -246,6 +246,14 @@ class TestAnimation:
                 )
 
     @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_animation_default_protect_content(self, default_bot, chat_id, animation):
+        animation_protected = default_bot.send_animation(chat_id, animation)
+        assert animation_protected.has_protected_content
+        ani_unprotected = default_bot.send_animation(chat_id, animation, protect_content=False)
+        assert not ani_unprotected.has_protected_content
+
+    @flaky(3, 1)
     def test_resend(self, bot, chat_id, animation):
         message = bot.send_animation(chat_id, animation.file_id)
 

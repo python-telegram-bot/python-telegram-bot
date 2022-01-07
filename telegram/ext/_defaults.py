@@ -54,6 +54,10 @@ class Defaults:
         run_async (:obj:`bool`, optional): Default setting for the ``run_async`` parameter of
             handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
             :meth:`Dispatcher.add_error_handler`. Defaults to :obj:`False`.
+        protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
+            forwarding and saving.
+
+            .. versionadded:: 14.0
     """
 
     __slots__ = (
@@ -66,6 +70,7 @@ class Defaults:
         '_allow_sending_without_reply',
         '_parse_mode',
         '_api_defaults',
+        '_protect_content',
     )
 
     def __init__(
@@ -80,6 +85,7 @@ class Defaults:
         tzinfo: pytz.BaseTzInfo = pytz.utc,
         run_async: bool = False,
         allow_sending_without_reply: bool = None,
+        protect_content: bool = None,
     ):
         self._parse_mode = parse_mode
         self._disable_notification = disable_notification
@@ -89,6 +95,7 @@ class Defaults:
         self._quote = quote
         self._tzinfo = tzinfo
         self._run_async = run_async
+        self._protect_content = protect_content
 
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
@@ -98,6 +105,7 @@ class Defaults:
             'disable_notification',
             'disable_web_page_preview',
             'allow_sending_without_reply',
+            'protect_content',
         ):
             value = getattr(self, kwarg)
             if value not in [None, DEFAULT_NONE]:
@@ -220,6 +228,21 @@ class Defaults:
     def run_async(self, value: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to run_async after initialization.")
 
+    @property
+    def protect_content(self) -> Optional[bool]:
+        """:obj:`bool`: Optional. Protects the contents of the sent message from forwarding and
+        saving.
+
+        .. versionadded:: 14.0
+        """
+        return self._protect_content
+
+    @protect_content.setter
+    def protect_content(self, value: object) -> NoReturn:
+        raise AttributeError(
+            "You can't assign a new value to protect_content after initialization."
+        )
+
     def __hash__(self) -> int:
         return hash(
             (
@@ -231,6 +254,7 @@ class Defaults:
                 self._quote,
                 self._tzinfo,
                 self._run_async,
+                self._protect_content,
             )
         )
 
