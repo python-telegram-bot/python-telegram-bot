@@ -730,26 +730,32 @@ class TestDispatcher:
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
-    @pytest.mark.parametrize(
+   @pytest.mark.parametrize(
         'message',
         [
             Message(message_id=1, chat=Chat(id=1, type=None), migrate_from_chat_id=1, date=None),
             Message(message_id=1, chat=Chat(id=1, type=None), migrate_to_chat_id=1, date=None),
-            Message(message_id=1, chat=None, date=None),
+            Message(message_id=1, chat=Chat(id=1, type=None), date=None),
         ],
     )
     @pytest.mark.parametrize(
         'old_chat_id,new_chat_id', [(None, None), (1, None), (None, 1), (1, 1)]
     )
     def test_migrate_chat_data(self, message: 'Message', old_chat_id: int, new_chat_id: int):
-        if message and (old_chat_id or new_chat_id):
-            return
-        if any((message, old_chat_id, new_chat_id)):
-            return
+        if (message and (old_chat_id or new_chat_id)) or not any(
+            (message, old_chat_id, new_chat_id)
+        ):
+            with pytest.raises(ValueError) as exc:
+                Dispatcher.migrate_chat_data(None, message, old_chat_id, new_chat_id)
+            if exc.type != ValueError:
+                pytest.fail()
 
         if message:
             if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
-                return
+                with pytest.raises(ValueError) as exc:
+                    Dispatcher.migrate_chat_data(None, message, old_chat_id, new_chat_id)
+                if exc.type != ValueError:
+                    pytest.fail()
             old_chat_id = message.migrate_from_chat_id or message.chat.id
             new_chat_id = message.migrate_to_chat_id or message.chat.id
 
