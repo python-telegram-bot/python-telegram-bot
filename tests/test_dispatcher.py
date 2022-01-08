@@ -730,7 +730,7 @@ class TestDispatcher:
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
-   @pytest.mark.parametrize(
+    @pytest.mark.parametrize(
         'message',
         [
             Message(message_id=1, chat=Chat(id=1, type=None), migrate_from_chat_id=1, date=None),
