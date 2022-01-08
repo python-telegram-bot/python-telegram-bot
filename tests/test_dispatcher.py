@@ -730,7 +730,6 @@ class TestDispatcher:
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
-    @pytest.mark.filterwarnings('ignore::telegram.warnings.PTBUserWarning')
     @pytest.mark.parametrize(
         'message',
         [
@@ -741,41 +740,34 @@ class TestDispatcher:
     )
     @pytest.mark.parametrize('old_chat_id', [None, 1, "1"])
     @pytest.mark.parametrize('new_chat_id', [None, 2, "1"])
-    def test_migrate_chat_data(self, message: 'Message', old_chat_id: int, new_chat_id: int):
+    def test_migrate_chat_data(self, dp, message: 'Message', old_chat_id: int, new_chat_id: int):
         class testBot(Bot):
             def _validate_token(self, token):
                 return token
 
-        dp = DispatcherBuilder().bot(testBot("a")).build()
-
-        def call():
-            try:
+        def call(match: str):
+            with pytest.raises(ValueError, match=match):
                 dp.migrate_chat_data(
                     message=message, old_chat_id=old_chat_id, new_chat_id=new_chat_id
                 )
-            except ValueError:
-                pass
-            else:
-                pytest.fail()
 
         if message and (old_chat_id or new_chat_id):
-            call()
+            call("^Message and chat_id pair are mutually exclusive$")
             return
 
         if not any((message, old_chat_id, new_chat_id)):
-            call()
+            call("^chat_id pair or message must be passed$")
             return
 
         if message:
             if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
-                call()
+                call("^Invalid message istance, can't detect old/new chat_id$")
                 return
-
             old_chat_id = message.migrate_from_chat_id or message.chat.id
             new_chat_id = message.migrate_to_chat_id or message.chat.id
 
-        elif not isinstance(old_chat_id, int) or not isinstance(new_chat_id, int):
-            call()
+        elif not isinstance(old_chat_id, int) and not isinstance(new_chat_id, int):
+            call("^old_chat_id and new_chat_id must be integers$")
             return
 
         dp.chat_data[old_chat_id] = "test"
