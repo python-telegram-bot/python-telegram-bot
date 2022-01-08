@@ -1,6 +1,7 @@
 .. raw:: html
 
-   <hr><p>Since this class has a large number of methods and attributes, below you can find a quick overview.
+   <hr style="height:2px;border-width:0;color:gray;background-color:gray">
+   <p>Since this class has a large number of methods and attributes, below you can find a quick overview.
 
    </p>
    <details>
@@ -54,7 +55,7 @@
 .. raw:: html
 
    </details>
-   </hr>
+   <br>
 
 .. raw:: html
 
@@ -91,6 +92,7 @@
 .. raw:: html
 
    </details>
+   <br>
 
 .. raw:: html
 
@@ -165,6 +167,7 @@
 .. raw:: html
 
    </details>
+   <br>
 
 .. raw:: html
 
@@ -197,6 +200,7 @@
 .. raw:: html
 
    </details>
+   <br>
 
 .. raw:: html
 
@@ -215,6 +219,7 @@
 .. raw:: html
 
    </details>
+   <br>
 
 .. raw:: html
 
@@ -237,6 +242,7 @@
 .. raw:: html
 
    </details>
+   <br>
 
 .. raw:: html
 
@@ -259,6 +265,7 @@
 .. raw:: html
 
    </details>
+   <br>
 
 .. raw:: html
 
@@ -293,3 +300,5 @@
 .. raw:: html
 
    </details>
+   <br>
+   <hr style="height:2px;border-width:0;color:gray;background-color:gray">

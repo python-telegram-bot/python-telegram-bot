@@ -143,7 +143,8 @@ html_theme_options = {
                             'admonition-font-size': '0.92rem'},
     "announcement": 'PTB has undergone significant changes in v14. Please read the documentation '
                     'carefully and also check out the transition guide in the '
-                    '<a href="#TODO: Add link">wiki</a>',
+                    '<a href="https://github.com/python-telegram-bot/python-telegram-bot/wiki">'
+                    'wiki</a>',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
