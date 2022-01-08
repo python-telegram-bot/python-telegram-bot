@@ -1,84 +1,88 @@
 .. raw:: html
 
+   <hr><p>Since this class has a large number of methods and attributes, below you can find a quick overview.
+
+   </p>
    <details>
    <summary>Sending Messages</summary>
 
-.. list-table:: Sending Messages
+.. list-table::
         :align: left
         :widths: 1 4
 
+        * - :meth:`send_animation`
+          - Used for sending animations
+        * - :meth:`send_audio`
+          - Used for sending audio files
+        * - :meth:`send_chat_action`
+          - Used for sending chat actions
+        * - :meth:`send_contact`
+          - Used for sending contacts
+        * - :meth:`send_dice`
+          - Used for sending dice messages
+        * - :meth:`send_document`
+          - Used for sending documents
+        * - :meth:`send_game`
+          - Used for sending a game
+        * - :meth:`send_invoice`
+          - Used for sending an invoice
+        * - :meth:`send_location`
+          - Used for sending location
+        * - :meth:`send_media_group`
+          - Used for sending media grouped together
         * - :meth:`send_message`
           - Used for sending text messages
         * - :meth:`send_photo`
           - Used for sending photos
-        * - :meth:`send_audio`
-          - Used for sending audio files
-        * - :meth:`send_document`
-          - Used for sending documents
-        * - :meth:`send_video`
-          - Used for sending videos
-        * - :meth:`send_animation`
-          - Used for sending animations
-        * - :meth:`send_voice`
-          - Used for sending voice messages
-        * - :meth:`send_video_note`
-          - Used for sending video notes
-        * - :meth:`send_media_group`
-          - Used for sending media grouped together
-        * - :meth:`send_location`
-          - Used for sending location
-        * - :meth:`send_venue`
-          - Used for sending venue locations.
-        * - :meth:`send_contact`
-          - Used for sending contacts
         * - :meth:`send_poll`
           - Used for sending polls
         * - :meth:`send_sticker`
           - Used for sending stickers
-        * - :meth:`send_invoice`
-          - Used for sending an invoice
-        * - :meth:`send_game`
-          - Used for sending a game
-        * - :meth:`send_dice`
-          - Used for sending dice messages
-        * - :meth:`send_chat_action`
-          - Used for sending chat actions
+        * - :meth:`send_venue`
+          - Used for sending venue locations.
+        * - :meth:`send_video`
+          - Used for sending videos
+        * - :meth:`send_video_note`
+          - Used for sending video notes
+        * - :meth:`send_voice`
+          - Used for sending voice messages
+        * - :meth:`copy_message`
+          - Used for copying the contents of an arbitrary message
         * - :meth:`forward_message`
           - Used for forwarding messages
-        * - :meth:`copy_message`
-          - Used for forwarding messages without original sender name.
 
 .. raw:: html
 
    </details>
+   </hr>
 
 .. raw:: html
 
    <details>
    <summary>Updating Messages</summary>
 
-.. list-table:: Updating Messages
+.. list-table::
     :align: left
     :widths: 1 4
 
-    * - :meth:`edit_message_text`
-      - Used for editing text messages
-    * - :meth:`edit_message_caption`
-      - Used for editing captions
-    * - :meth:`edit_message_media`
-      - Used for editing the media on messages
-    * - :meth:`edit_message_reply_markup`
-      - Used for editing the reply markup on messages
-    * - :meth:`edit_message_live_location`
-      - Used for editing the location in live location messages
     * - :meth:`answer_callback_query`
       - Used for answering the callback query
     * - :meth:`answer_inline_query`
       - Used for answering the inline query
-    * - :meth:`answer_shipping_query`
-      - Used for answering a shipping query
     * - :meth:`answer_pre_checkout_query`
       - Used for answering a pre checkout query
+    * - :meth:`answer_shipping_query`
+      - Used for answering a shipping query
+    * - :meth:`edit_message_caption`
+      - Used for editing captions
+    * - :meth:`edit_message_media`
+      - Used for editing the media on messages
+    * - :meth:`edit_message_live_location`
+      - Used for editing the location in live location messages
+    * - :meth:`edit_message_reply_markup`
+      - Used for editing the reply markup on messages
+    * - :meth:`edit_message_text`
+      - Used for editing text messages
     * - :meth:`stop_poll`
       - Used for stopping the running poll
     * - :meth:`delete_message`
@@ -93,7 +97,7 @@
    <details>
    <summary>Chat Moderation and information</summary>
 
-.. list-table:: Chat Moderation and information
+.. list-table::
     :align: left
     :widths: 1 4
 
@@ -101,14 +105,14 @@
       - Used for banning a member from the chat
     * - :meth:`unban_chat_member`
       - Used for unbanning a member from the chat
-    * - :meth:`restrict_chat_member`
-      - Used for restricting a chat member
-    * - :meth:`promote_chat_member`
-      - Used for promoting a chat member
     * - :meth:`ban_chat_sender_chat`
       - Used for banning a channel in a channel or supergroup
     * - :meth:`unban_chat_sender_chat`
       - Used for unbanning a channel in a channel or supergroup
+    * - :meth:`restrict_chat_member`
+      - Used for restricting a chat member
+    * - :meth:`promote_chat_member`
+      - Used for promoting a chat member
     * - :meth:`set_chat_administrator_custom_title`
       - Used for assigning a custom admin title to an admin
     * - :meth:`set_chat_permissions`
@@ -165,30 +169,30 @@
 .. raw:: html
 
    <details>
-   <summary>Stickers</summary>
+   <summary>Stickerset management</summary>
 
-.. list-table:: Stickers
+.. list-table::
     :align: left
     :widths: 1 4
 
+    * - :meth:`add_sticker_to_set`
+      - Used for adding a sticker to a set
+    * - :meth:`delete_sticker_from_set`
+      - Used for deleting a sticker from a set
+    * - :meth:`create_new_sticker_set`
+      - Used for creating a new sticker set
     * - :meth:`set_chat_sticker_set`
       - Used for setting a sticker set
     * - :meth:`delete_chat_sticker_set`
       - Used for deleting the set sticker set
+    * - :meth:`set_sticker_position_in_set`
+      - Used for moving a sticker's position in the set
+    * - :meth:`set_sticker_set_thumb`
+      - Used for setting the thumbnail of a sticker set
     * - :meth:`get_sticker_set`
       - Used for getting a sticker set
     * - :meth:`upload_sticker_file`
       - Used for uploading a sticker file
-    * - :meth:`create_new_sticker_set`
-      - Used for creating a new sticker set
-    * - :meth:`add_sticker_to_set`
-      - Used for adding a sticker to a set
-    * - :meth:`set_sticker_position_in_set`
-      - Used for moving a sticker's position in the set
-    * - :meth:`delete_sticker_from_set`
-      - Used for deleting a sticker from a set
-    * - :meth:`set_sticker_set_thumb`
-      - Used for setting the thumbnail of a sticker set
 
 .. raw:: html
 
@@ -199,14 +203,14 @@
    <details>
    <summary>Games</summary>
 
-.. list-table:: Games
+.. list-table::
     :align: left
     :widths: 1 4
 
-    * - :meth:`set_game_score`
-      - Used for setting the game score
     * - :meth:`get_game_high_scores`
       - Used for getting the game high scores
+    * - :meth:`set_game_score`
+      - Used for setting the game score
 
 .. raw:: html
 
@@ -217,18 +221,18 @@
    <details>
    <summary>Getting updates</summary>
 
-.. list-table:: Getting updates
+.. list-table::
     :align: left
     :widths: 1 4
 
     * - :meth:`get_updates`
       - Used for getting updates using long polling
+    * - :meth:`get_webhook_info`
+      - Used for getting current webhook status
     * - :meth:`set_webhook`
       - Used for setting a webhook to receive updates
     * - :meth:`delete_webhook`
       - Used for removing webhook integration
-    * - :meth:`get_webhook_info`
-      - Used for getting current webhook status
 
 .. raw:: html
 
@@ -239,18 +243,18 @@
    <details>
    <summary>Miscellaneous</summary>
 
-.. list-table:: Miscellaneous
+.. list-table::
     :align: left
     :widths: 1 4
 
-    * - :meth:`get_me`
-      - Used for getting basic information about the bot
-    * - :meth:`log_out`
-      - Used for logging out from cloud Bot API server
     * - :meth:`close`
       - Used for closing server instance when switching to another local server
+    * - :meth:`log_out`
+      - Used for logging out from cloud Bot API server
     * - :meth:`get_file`
       - Used for getting basic info about a file
+    * - :meth:`get_me`
+      - Used for getting basic information about the bot
 
 .. raw:: html
 
@@ -261,14 +265,20 @@
    <details>
    <summary>Properties</summary>
 
-.. list-table:: Properties
+.. list-table::
     :align: left
     :widths: 1 4
 
     * - :attr:`bot`
       - The user instance of the bot as returned by :meth:`get_me`
+    * - :attr:`can_join_groups`
+      - Whether the bot can join groups
+    * - :attr:`can_read_all_group_messages`
+      - Whether the bot can read all incoming group messages
     * - :attr:`id`
       - The user id of the bot
+    * - :attr:`name`
+      - The username of the bot, with leading ``@``
     * - :attr:`first_name`
       - The first name of the bot
     * - :attr:`last_name`
@@ -277,14 +287,8 @@
       - The username of the bot, without leading ``@``
     * - :attr:`link`
       - The t.me link of the bot
-    * - :attr:`can_join_groups`
-      - Whether the bot can join groups
-    * - :attr:`can_read_all_group_messages`
-      - Whether the bot can read all incoming group messages
     * - :attr:`supports_inline_queries`
       - Whether the bot supports inline queries
-    * - :attr:`name`
-      - The username of the bot, with leading ``@``
 
 .. raw:: html
 

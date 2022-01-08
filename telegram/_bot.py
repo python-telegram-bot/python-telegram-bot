@@ -144,8 +144,6 @@ class Bot(TelegramObject):
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
 
-    Available methods:
-
     .. include:: bot_methods.rst
 
     """
