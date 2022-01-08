@@ -136,7 +136,6 @@ html_theme = 'furo'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    # 'style_external_links': True,  # Use after https://github.com/pradyunsg/furo/discussions/348
     'navigation_with_keys': True,
     'dark_css_variables': {'admonition-title-font-size': '0.95rem',
                            'admonition-font-size': '0.92rem'},
@@ -170,6 +169,8 @@ html_favicon = 'ptb-logo_1024.ico'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_css_files = ['style_external_link.css']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
