@@ -736,6 +736,7 @@ class TestDispatcher:
             Message(message_id=1, chat=Chat(id=2, type=None), migrate_from_chat_id=1, date=None),
             Message(message_id=1, chat=Chat(id=1, type=None), migrate_to_chat_id=2, date=None),
             Message(message_id=1, chat=Chat(id=1, type=None), date=None),
+            None,
         ],
     )
     @pytest.mark.parametrize('old_chat_id', [None, 1, "1"])
@@ -762,7 +763,7 @@ class TestDispatcher:
             _old_chat_id = message.migrate_from_chat_id or message.chat.id
             _new_chat_id = message.migrate_to_chat_id or message.chat.id
 
-        elif not isinstance(old_chat_id, int) and not isinstance(new_chat_id, int):
+        elif not (isinstance(old_chat_id, int) and isinstance(new_chat_id, int)):
             call(r"^old_chat_id and new_chat_id must be integers$")
             return
         else:
