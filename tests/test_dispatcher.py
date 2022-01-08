@@ -730,6 +730,31 @@ class TestDispatcher:
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
+    @pytest.mark.parametrize(
+        'message',
+        [
+            Message(message_id=1, chat=Chat(id=1, type=None), migrate_from_chat_id=1, date=None),
+            Message(message_id=1, chat=Chat(id=1, type=None), migrate_to_chat_id=1, date=None),
+            Message(message_id=1, chat=None, date=None),
+        ],
+    )
+    @pytest.mark.parametrize(
+        'old_chat_id,new_chat_id', [(None, None), (1, None), (None, 1), (1, 1)]
+    )
+    def test_migrate_chat_data(self, message: 'Message', old_chat_id: int, new_chat_id: int):
+        if message and (old_chat_id or new_chat_id):
+            return
+        if any((message, old_chat_id, new_chat_id)):
+            return
+
+        if message:
+            if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
+                return
+            old_chat_id = message.migrate_from_chat_id or message.chat.id
+            new_chat_id = message.migrate_to_chat_id or message.chat.id
+
+        assert isinstance(old_chat_id, int) and isinstance(new_chat_id, int)
+
     def test_error_while_persisting(self, dp, caplog):
         class OwnPersistence(BasePersistence):
             def update(self, data):
