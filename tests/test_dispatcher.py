@@ -730,36 +730,58 @@ class TestDispatcher:
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
+    @pytest.mark.filterwarnings('ignore::telegram.warnings.PTBUserWarning')
     @pytest.mark.parametrize(
         'message',
         [
-            Message(message_id=1, chat=Chat(id=1, type=None), migrate_from_chat_id=1, date=None),
-            Message(message_id=1, chat=Chat(id=1, type=None), migrate_to_chat_id=1, date=None),
+            Message(message_id=1, chat=Chat(id=2, type=None), migrate_from_chat_id=1, date=None),
+            Message(message_id=1, chat=Chat(id=1, type=None), migrate_to_chat_id=2, date=None),
             Message(message_id=1, chat=Chat(id=1, type=None), date=None),
         ],
     )
-    @pytest.mark.parametrize(
-        'old_chat_id,new_chat_id', [(None, None), (1, None), (None, 1), (1, 1)]
-    )
+    @pytest.mark.parametrize('old_chat_id', [None, 1, "1"])
+    @pytest.mark.parametrize('new_chat_id', [None, 2, "1"])
     def test_migrate_chat_data(self, message: 'Message', old_chat_id: int, new_chat_id: int):
-        if (message and (old_chat_id or new_chat_id)) or not any(
-            (message, old_chat_id, new_chat_id)
-        ):
-            with pytest.raises(ValueError) as exc:
-                Dispatcher.migrate_chat_data(None, message, old_chat_id, new_chat_id)
-            if exc.type != ValueError:
+        class testBot(Bot):
+            def _validate_token(self, token):
+                return token
+
+        dp = DispatcherBuilder().bot(testBot("a")).build()
+
+        def call():
+            try:
+                dp.migrate_chat_data(
+                    message=message, old_chat_id=old_chat_id, new_chat_id=new_chat_id
+                )
+            except ValueError:
+                pass
+            else:
                 pytest.fail()
+
+        if message and (old_chat_id or new_chat_id):
+            call()
+            return
+
+        if not any((message, old_chat_id, new_chat_id)):
+            call()
+            return
 
         if message:
             if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
-                with pytest.raises(ValueError) as exc:
-                    Dispatcher.migrate_chat_data(None, message, old_chat_id, new_chat_id)
-                if exc.type != ValueError:
-                    pytest.fail()
+                call()
+                return
+
             old_chat_id = message.migrate_from_chat_id or message.chat.id
             new_chat_id = message.migrate_to_chat_id or message.chat.id
 
-        assert isinstance(old_chat_id, int) and isinstance(new_chat_id, int)
+        elif not isinstance(old_chat_id, int) or not isinstance(new_chat_id, int):
+            call()
+            return
+
+        dp.chat_data[old_chat_id] = "test"
+        dp.migrate_chat_data(message=None, old_chat_id=old_chat_id, new_chat_id=new_chat_id)
+        assert old_chat_id not in dp.chat_data
+        assert dp.chat_data[new_chat_id] == "test"
 
     def test_error_while_persisting(self, dp, caplog):
         class OwnPersistence(BasePersistence):
