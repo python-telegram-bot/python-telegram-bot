@@ -741,10 +741,6 @@ class TestDispatcher:
     @pytest.mark.parametrize('old_chat_id', [None, 1, "1"])
     @pytest.mark.parametrize('new_chat_id', [None, 2, "1"])
     def test_migrate_chat_data(self, dp, message: 'Message', old_chat_id: int, new_chat_id: int):
-        class testBot(Bot):
-            def _validate_token(self, token):
-                return token
-
         def call(match: str):
             with pytest.raises(ValueError, match=match):
                 dp.migrate_chat_data(
@@ -752,22 +748,22 @@ class TestDispatcher:
                 )
 
         if message and (old_chat_id or new_chat_id):
-            call("^Message and chat_id pair are mutually exclusive$")
+            call(r"^Message and chat_id pair are mutually exclusive$")
             return
 
         if not any((message, old_chat_id, new_chat_id)):
-            call("^chat_id pair or message must be passed$")
+            call(r"^chat_id pair or message must be passed$")
             return
 
         if message:
             if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
-                call("^Invalid message istance, can't detect old/new chat_id$")
+                call(r"^Invalid message istance, can't detect old/new chat_id$")
                 return
             _old_chat_id = message.migrate_from_chat_id or message.chat.id
             _new_chat_id = message.migrate_to_chat_id or message.chat.id
 
         elif not isinstance(old_chat_id, int) and not isinstance(new_chat_id, int):
-            call("^old_chat_id and new_chat_id must be integers$")
+            call(r"^old_chat_id and new_chat_id must be integers$")
             return
         else:
             _old_chat_id = old_chat_id
