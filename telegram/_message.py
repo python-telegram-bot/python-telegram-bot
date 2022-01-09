@@ -2533,20 +2533,20 @@ class Message(TelegramObject):
                 elif entity.type == MessageEntity.URL and urled:
                     insert = f'<a href="{text}">{text}</a>'
                 elif entity.type == MessageEntity.BOLD:
-                    insert = '<b>' + text + '</b>'
+                    insert = f'<b>{text}</b>'
                 elif entity.type == MessageEntity.ITALIC:
-                    insert = '<i>' + text + '</i>'
+                    insert = f'<i>{text}</i>'
                 elif entity.type == MessageEntity.CODE:
-                    insert = '<code>' + text + '</code>'
+                    insert = f'<code>{text}</code>'
                 elif entity.type == MessageEntity.PRE:
                     if entity.language:
                         insert = f'<pre><code class="{entity.language}">{text}</code></pre>'
                     else:
-                        insert = '<pre>' + text + '</pre>'
+                        insert = f'<pre>{text}</pre>'
                 elif entity.type == MessageEntity.UNDERLINE:
-                    insert = '<u>' + text + '</u>'
+                    insert = f'<u>{text}</u>'
                 elif entity.type == MessageEntity.STRIKETHROUGH:
-                    insert = '<s>' + text + '</s>'
+                    insert = f'<s>{text}</s>'
                 elif entity.type == MessageEntity.SPOILER:
                     insert = f'<span class="tg-spoiler">{text}</span>'
                 else:
@@ -2697,7 +2697,7 @@ class Message(TelegramObject):
                 if nested_entities:
                     if version < 2:
                         raise ValueError(
-                            'Nested entities are not supported for Markdown ' 'version 1'
+                            'Nested entities are not supported for Markdown version 1'
                         )
 
                     text = Message._parse_markdown(
@@ -2726,43 +2726,38 @@ class Message(TelegramObject):
                         link = text
                     insert = f'[{link}]({orig_text})'
                 elif entity.type == MessageEntity.BOLD:
-                    insert = '*' + text + '*'
+                    insert = f'*{text}*'
                 elif entity.type == MessageEntity.ITALIC:
-                    insert = '_' + text + '_'
+                    insert = f'_{text}_'
                 elif entity.type == MessageEntity.CODE:
                     # Monospace needs special escaping. Also can't have entities nested within
-                    insert = (
-                        '`'
-                        + escape_markdown(
-                            orig_text, version=version, entity_type=MessageEntity.CODE
-                        )
-                        + '`'
-                    )
+                    insert = f'`{escape_markdown(orig_text, version, MessageEntity.CODE)}`'
+
                 elif entity.type == MessageEntity.PRE:
                     # Monospace needs special escaping. Also can't have entities nested within
                     code = escape_markdown(
                         orig_text, version=version, entity_type=MessageEntity.PRE
                     )
                     if entity.language:
-                        prefix = '```' + entity.language + '\n'
+                        prefix = f'```{entity.language}\n'
                     else:
                         if code.startswith('\\'):
                             prefix = '```'
                         else:
                             prefix = '```\n'
-                    insert = prefix + code + '```'
+                    insert = f'{prefix}{code}```'
                 elif entity.type == MessageEntity.UNDERLINE:
                     if version == 1:
                         raise ValueError(
-                            'Underline entities are not supported for Markdown ' 'version 1'
+                            'Underline entities are not supported for Markdown version 1'
                         )
-                    insert = '__' + text + '__'
+                    insert = f'__{text}__'
                 elif entity.type == MessageEntity.STRIKETHROUGH:
                     if version == 1:
                         raise ValueError(
-                            'Strikethrough entities are not supported for Markdown ' 'version 1'
+                            'Strikethrough entities are not supported for Markdown version 1'
                         )
-                    insert = '~' + text + '~'
+                    insert = f'~{text}~'
                 elif entity.type == MessageEntity.SPOILER:
                     if version == 1:
                         raise ValueError(
