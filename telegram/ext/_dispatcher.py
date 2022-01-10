@@ -668,7 +668,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             :exc:`ValueError`: When both :paramref:`chat_id` and :paramref:`all_empty_entries` are
                 provided, or none of them are passed.
         """
-
         if chat_id and all_empty_entries:
             raise ValueError("You must pass either `chat_id` or `all_empty_entries` not both.")
 
@@ -705,7 +704,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             :exc:`ValueError`: When both :paramref:`user_id` and :paramref:`all_empty_entries` are
                 provided, or none of them are passed.
         """
-
         if user_id and all_empty_entries:
             raise ValueError("You must pass either `user_id` or `all_empty_entries` not both.")
 
