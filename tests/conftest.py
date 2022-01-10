@@ -194,8 +194,8 @@ def dp(_dp):
     # Reset the dispatcher first
     while not _dp.update_queue.empty():
         _dp.update_queue.get(False)
-    _dp.chat_data = defaultdict(dict)
-    _dp.user_data = defaultdict(dict)
+    _dp._chat_data = defaultdict(dict)
+    _dp._user_data = defaultdict(dict)
     _dp.bot_data = {}
     _dp.persistence = None
     _dp.handlers = {}

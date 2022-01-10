@@ -125,6 +125,15 @@ class TestDispatcher:
         )
         assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
+    @pytest.mark.parametrize("data", ["chat_data", "user_data"])
+    def test_chat_user_data_read_only(self, dp, data):
+        read_only_data = getattr(dp, data)
+        writable_data = getattr(dp, f"_{data}")
+        writable_data[123] = 321
+        assert read_only_data == writable_data
+        with pytest.raises(TypeError):
+            read_only_data[111] = 123
+
     @pytest.mark.parametrize(
         'builder',
         (DispatcherBuilder(), UpdaterBuilder()),
@@ -890,7 +899,7 @@ class TestDispatcher:
         ],
     )
     def test_drop_chat_data(self, dp, remove_all, c_id, expected):
-        dp.chat_data = {123: [], 321: {'not_empty': 'no'}, 222: "remove_me"}
+        dp._chat_data = {123: [], 321: {'not_empty': 'no'}, 222: "remove_me"}
 
         if (remove_all and c_id) or (not remove_all and not c_id):
             with pytest.raises(ValueError, match="You must pass either"):
@@ -914,7 +923,7 @@ class TestDispatcher:
         ],
     )
     def test_drop_user_data(self, dp, remove_all, u_id, expected):
-        dp.user_data = {123: [], 321: {'not_empty': 'no'}, 222: "remove_me"}
+        dp._user_data = {123: [], 321: {'not_empty': 'no'}, 222: "remove_me"}
 
         if (remove_all and u_id) or (not remove_all and not u_id):
             with pytest.raises(ValueError, match="You must pass either"):

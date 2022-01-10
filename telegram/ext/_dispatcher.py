@@ -37,7 +37,9 @@ from typing import (
     TypeVar,
     TYPE_CHECKING,
     Tuple,
+    Mapping,
 )
+from types import MappingProxyType
 from uuid import uuid4
 
 from telegram import Update
@@ -111,8 +113,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
             ``@run_async`` decorator and :meth:`run_async`.
-        user_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the user.
-        chat_data (:obj:`defaultdict`): A dictionary handlers can use to store data for the chat.
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
@@ -144,8 +144,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         'persistence',
         'update_queue',
         'job_queue',
-        'user_data',
-        'chat_data',
+        '_user_data',
+        '_chat_data',
         'bot_data',
         '_update_persistence_lock',
         'handlers',
@@ -198,8 +198,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 stacklevel=stack_level,
             )
 
-        self.user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
-        self.chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
+        self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
+        self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
         self.bot_data = self.context_types.bot_data()
         self.persistence: Optional[BasePersistence] = None
         self._update_persistence_lock = Lock()
@@ -213,12 +213,12 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.persistence.set_bot(self.bot)
 
             if self.persistence.store_data.user_data:
-                self.user_data = self.persistence.get_user_data()
-                if not isinstance(self.user_data, defaultdict):
+                self._user_data = self.persistence.get_user_data()
+                if not isinstance(self._user_data, defaultdict):
                     raise ValueError("user_data must be of type defaultdict")
             if self.persistence.store_data.chat_data:
-                self.chat_data = self.persistence.get_chat_data()
-                if not isinstance(self.chat_data, defaultdict):
+                self._chat_data = self.persistence.get_chat_data()
+                if not isinstance(self._chat_data, defaultdict):
                     raise ValueError("chat_data must be of type defaultdict")
             if self.persistence.store_data.bot_data:
                 self.bot_data = self.persistence.get_bot_data()
@@ -281,6 +281,27 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
     def _set_singleton(cls, val: Optional['Dispatcher']) -> None:
         cls.logger.debug('Setting singleton dispatcher as %s', val)
         cls.__singleton = weakref.ref(val) if val else None
+
+    @property
+    def chat_data(self) -> Mapping[int, CD]:
+        """
+        :obj:`types.MappingProxyType`: A dictionary handlers can use to store data for the chat.
+
+        .. versionchanged:: 14.0
+           :attr:`chat_data` is now read-only
+
+        """
+        return MappingProxyType(self._chat_data)
+
+    @property
+    def user_data(self) -> Mapping[int, UD]:
+        """:obj:`types.MappingProxyType`: A dictionary handlers can use to store data for the user.
+
+        .. versionchanged:: 14.0
+           :attr:`user_data` is now read-only
+
+        """
+        return MappingProxyType(self._user_data)
 
     @classmethod
     def get_instance(cls) -> 'Dispatcher':
@@ -632,7 +653,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 del self.handlers[group]
 
     def drop_chat_data(self, chat_id: int = None, all_empty_entries: bool = False) -> None:
-        """Used for deleting a key from the persistence.
+        """Used for deleting a key from the :attr:`chat_data`.
+
+        .. versionadded:: 14.0
 
         Args:
             chat_id (:obj:`int`, optional): The chat id to delete from the persistence. The entry
@@ -653,24 +676,26 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             raise ValueError("You must pass either `chat_id` or `all_empty_entries`.")
 
         if chat_id:
-            if chat_id not in self.chat_data:
+            if chat_id not in self._chat_data:
                 raise ValueError("The specified `chat_id` is not present in `chat_data`")
-            del self.chat_data[chat_id]
+            del self._chat_data[chat_id]
 
         elif all_empty_entries:
-            chat_ids = list(self.chat_data.keys())
+            chat_ids = list(self._chat_data.keys())
 
             for _id in chat_ids:
-                if not self.chat_data[_id]:
-                    del self.chat_data[_id]
+                if not self._chat_data[_id]:
+                    del self._chat_data[_id]
 
         self.update_persistence()
 
     def drop_user_data(self, user_id: int = None, all_empty_entries: bool = False) -> None:
-        """Used for deleting a key from the persistence.
+        """Used for deleting a key from the :attr:`user_data`.
+
+        .. versionadded:: 14.0
 
         Args:
-            user_id (:obj:`int`, optional): The chat id to delete from the persistence. The entry
+            user_id (:obj:`int`, optional): The user id to delete from the persistence. The entry
                 will be deleted even if it is not empty. Mutually exclusive with
                 :paramref:`all_empty_entries`.
             all_empty_entries (:obj:`bool`, optional): If :obj:`True`, all empty entries from
@@ -688,16 +713,16 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             raise ValueError("You must pass either `user_id` or `all_empty_entries`.")
 
         if user_id:
-            if user_id not in self.user_data:
+            if user_id not in self._user_data:
                 raise ValueError("The specified `user_id` is not present in `user_data`")
-            del self.user_data[user_id]
+            del self._user_data[user_id]
 
         elif all_empty_entries:
-            user_ids = list(self.user_data.keys())
+            user_ids = list(self._user_data.keys())
 
             for u_id in user_ids:
-                if not self.user_data[u_id]:
-                    del self.user_data[u_id]
+                if not self._user_data[u_id]:
+                    del self._user_data[u_id]
 
         self.update_persistence()
 
@@ -713,10 +738,10 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
     def __update_persistence(self, update: object = None) -> None:
         if self.persistence:
-            # We use list() here in order to decouple chat_ids from self.chat_data, as dict view
+            # We use list() here in order to decouple chat_ids from self._chat_data, as dict view
             # objects will change, when the dict does and we want to loop over chat_ids
-            chat_ids = list(self.chat_data.keys())
-            user_ids = list(self.user_data.keys())
+            chat_ids = list(self._chat_data.keys())
+            user_ids = list(self._user_data.keys())
 
             if isinstance(update, Update):
                 if update.effective_chat:
@@ -745,13 +770,13 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             if self.persistence.store_data.chat_data:
                 for chat_id in chat_ids:
                     try:
-                        self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
+                        self.persistence.update_chat_data(chat_id, self._chat_data[chat_id])
                     except Exception as exc:
                         self.dispatch_error(update, exc)
             if self.persistence.store_data.user_data:
                 for user_id in user_ids:
                     try:
-                        self.persistence.update_user_data(user_id, self.user_data[user_id])
+                        self.persistence.update_user_data(user_id, self._user_data[user_id])
                     except Exception as exc:
                         self.dispatch_error(update, exc)
 
@@ -828,7 +853,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
         Returns:
             :obj:`bool`: :obj:`True` if one of the error handlers raised
-                :class:`telegram.ext.DispatcherHandlerStop`. :obj:`False`, otherwise.
+            :class:`telegram.ext.DispatcherHandlerStop`. :obj:`False`, otherwise.
         """
         async_args = None if not promise else promise.args
         async_kwargs = None if not promise else promise.kwargs
