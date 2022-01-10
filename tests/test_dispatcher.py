@@ -760,20 +760,20 @@ class TestDispatcher:
             if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
                 call(r"^Invalid message instance, can't detect old/new chat_id$")
                 return
-            _old_chat_id = message.migrate_from_chat_id or message.chat.id
-            _new_chat_id = message.migrate_to_chat_id or message.chat.id
+            effective_old_chat_id = message.migrate_from_chat_id or message.chat.id
+            effective_new_chat_id = message.migrate_to_chat_id or message.chat.id
 
         elif not (isinstance(old_chat_id, int) and isinstance(new_chat_id, int)):
             call(r"^old_chat_id and new_chat_id must be integers$")
             return
         else:
-            _old_chat_id = old_chat_id
-            _new_chat_id = new_chat_id
+            effective_old_chat_id = old_chat_id
+            effective_new_chat_id = new_chat_id
 
-        dp.chat_data[_old_chat_id] = "test"
+        dp.chat_data[effective_old_chat_id] = "test"
         dp.migrate_chat_data(message=message, old_chat_id=old_chat_id, new_chat_id=new_chat_id)
-        assert old_chat_id not in dp.chat_data
-        assert dp.chat_data[_new_chat_id] == "test"
+        assert effective_old_chat_id not in dp.chat_data
+        assert dp.chat_data[effective_new_chat_id] == "test"
 
     def test_error_while_persisting(self, dp, caplog):
         class OwnPersistence(BasePersistence):
