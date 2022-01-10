@@ -758,7 +758,7 @@ class TestDispatcher:
 
         if message:
             if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
-                call(r"^Invalid message istance, can't detect old/new chat_id$")
+                call(r"^Invalid message instance, can't detect old/new chat_id$")
                 return
             _old_chat_id = message.migrate_from_chat_id or message.chat.id
             _new_chat_id = message.migrate_to_chat_id or message.chat.id

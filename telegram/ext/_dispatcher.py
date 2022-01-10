@@ -663,7 +663,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
         if message:
             if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
-                raise ValueError("Invalid message istance, can't detect old/new chat_id")
+                raise ValueError("Invalid message instance, can't detect old/new chat_id")
 
             old_chat_id = message.migrate_from_chat_id or message.chat.id
             new_chat_id = message.migrate_to_chat_id or message.chat.id
