@@ -78,11 +78,11 @@ class DispatcherHandlerStop(Exception):
     Note:
         Has no effect, if the handler or error handler is run asynchronously.
 
-    Attributes:
-        state (:obj:`object`): Optional. The next state of the conversation.
-
     Args:
         state (:obj:`object`, optional): The next state of the conversation.
+
+    Attributes:
+        state (:obj:`object`): Optional. The next state of the conversation.
     """
 
     __slots__ = ('state',)
@@ -630,6 +630,76 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.handlers[group].remove(handler)
             if not self.handlers[group]:
                 del self.handlers[group]
+
+    def drop_chat_data(self, chat_id: int = None, all_empty_entries: bool = False) -> None:
+        """Used for deleting a key from the persistence.
+
+        Args:
+            chat_id (:obj:`int`, optional): The chat id to delete from the persistence. The entry
+                will be deleted even if it is not empty. Mutually exclusive with
+                :paramref:`all_empty_entries`.
+            all_empty_entries (:obj:`bool`, optional): If :obj:`True`, all empty entries from
+                :attr:`chat_data` will be deleted. Mutually exclusive with :paramref:`chat_id`.
+
+        Raises:
+            :exc:`ValueError`: When both :paramref:`chat_id` and :paramref:`all_empty_entries` are
+                provided, or none of them are passed.
+        """
+
+        if chat_id and all_empty_entries:
+            raise ValueError("You must pass either `chat_id` or `all_empty_entries` not both.")
+
+        if chat_id is None and not all_empty_entries:
+            raise ValueError("You must pass either `chat_id` or `all_empty_entries`.")
+
+        if chat_id:
+            if chat_id not in self.chat_data:
+                raise ValueError("The specified `chat_id` is not present in `chat_data`")
+            del self.chat_data[chat_id]
+
+        elif all_empty_entries:
+            chat_ids = list(self.chat_data.keys())
+
+            for _id in chat_ids:
+                if not self.chat_data[_id]:
+                    del self.chat_data[_id]
+
+        self.update_persistence()
+
+    def drop_user_data(self, user_id: int = None, all_empty_entries: bool = False) -> None:
+        """Used for deleting a key from the persistence.
+
+        Args:
+            user_id (:obj:`int`, optional): The chat id to delete from the persistence. The entry
+                will be deleted even if it is not empty. Mutually exclusive with
+                :paramref:`all_empty_entries`.
+            all_empty_entries (:obj:`bool`, optional): If :obj:`True`, all empty entries from
+                :attr:`user_data` will be deleted. Mutually exclusive with :paramref:`user_id`.
+
+        Raises:
+            :exc:`ValueError`: When both :paramref:`user_id` and :paramref:`all_empty_entries` are
+                provided, or none of them are passed.
+        """
+
+        if user_id and all_empty_entries:
+            raise ValueError("You must pass either `user_id` or `all_empty_entries` not both.")
+
+        if user_id is None and not all_empty_entries:
+            raise ValueError("You must pass either `user_id` or `all_empty_entries`.")
+
+        if user_id:
+            if user_id not in self.user_data:
+                raise ValueError("The specified `user_id` is not present in `user_data`")
+            del self.user_data[user_id]
+
+        elif all_empty_entries:
+            user_ids = list(self.user_data.keys())
+
+            for u_id in user_ids:
+                if not self.user_data[u_id]:
+                    del self.user_data[u_id]
+
+        self.update_persistence()
 
     def update_persistence(self, update: object = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
