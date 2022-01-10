@@ -182,7 +182,7 @@ class JobQueue:
         job_kwargs: JSONDict = None,
     ) -> 'Job':
         """Creates a new :class:`Job` instance that runs at specified intervals and adds it to the
-            queue.
+        queue.
 
         Note:
             For a note about DST, please see the documentation of `APScheduler`_.
@@ -276,10 +276,6 @@ class JobQueue:
         job_kwargs: JSONDict = None,
     ) -> 'Job':
         """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
-
-        .. versionchanged:: 14.0
-            The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
-            parameter to have the job run on the last day of the month.
 
         .. versionchanged:: 14.0
             The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``

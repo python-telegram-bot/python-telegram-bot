@@ -146,6 +146,8 @@ class Bot(TelegramObject):
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
 
+    .. include:: bot_methods.rst
+
     """
 
     __slots__ = (
@@ -3056,7 +3058,7 @@ class Bot(TelegramObject):
                using certificate parameter. Please upload as InputFile, sending a String will not
                work.
             3. Ports currently supported for Webhooks:
-                :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
+               :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
 
             If you're having any trouble setting up webhooks, please check out this `guide to
             Webhooks`_.
