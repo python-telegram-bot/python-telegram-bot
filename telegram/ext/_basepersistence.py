@@ -32,6 +32,8 @@ from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 class PersistenceInput(NamedTuple):  # skipcq: PYL-E0239
     """Convenience wrapper to group boolean input for :class:`BasePersistence`.
 
+    .. seealso:: :attr:`telegram.ext.BasePersistence.store_data`
+
     Args:
         bot_data (:obj:`bool`, optional): Whether the setting should be applied for ``bot_data``.
             Defaults to :obj:`True`.
@@ -95,6 +97,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     .. versionchanged:: 14.0
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
+
+    .. seealso:: :attr:`telegram.ext.ConversationHandler.persistence`
+
+        :attr:`telegram.ext.Dispatcher.persistence`
 
     Args:
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be

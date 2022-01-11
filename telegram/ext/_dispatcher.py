@@ -104,6 +104,10 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         * Initialization is now done through the :class:`telegram.ext.DispatcherBuilder`.
         * Removed the attribute ``groups``.
 
+    .. seealso:: :attr:`telegram.ext.CallbackContext.dispatcher`
+
+        :attr:`telegram.ext.JobQueue.dispatcher`
+
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
         update_queue (:obj:`Queue`): The synchronized queue that will contain the updates.

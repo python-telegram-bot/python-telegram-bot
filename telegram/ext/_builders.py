@@ -503,6 +503,8 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
     .. seealso::
         :class:`telegram.ext.UpdaterBuilder`
 
+        :meth:`telegram.ext.Dispatcher.builder`
+
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern.
     """
 
@@ -837,6 +839,8 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
 
     .. seealso::
         :class:`telegram.ext.DispatcherBuilder`
+
+        :meth:`telegram.ext.Updater.builder`
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern.
     """

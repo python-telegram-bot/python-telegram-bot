@@ -38,6 +38,10 @@ class JobQueue:
     """This class allows you to periodically perform tasks with the bot. It is a convenience
     wrapper for the APScheduler library.
 
+    .. seealso:: :attr:`telegram.ext.CallbackContext.job_queue`
+
+        :attr:`telegram.ext.Dispatcher.job_queue`
+
     Attributes:
         scheduler (:class:`apscheduler.schedulers.background.BackgroundScheduler`): The APScheduler
 
