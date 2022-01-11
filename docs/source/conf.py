@@ -11,10 +11,12 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
+import subprocess
 import sys
 import os
 import inspect
 from enum import Enum
+from pathlib import Path
 from typing import Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -397,23 +399,91 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
             return True  # return True to exclude from docs.
 
 
-def linkcode_resolve(domain, info):
-    """Used for [source] links in documentation. After
-    https://github.com/sphinx-doc/sphinx/issues/1556 is closed, we can update the links to be more
-    specific."""
-    class_name = info['fullname'].split('.')[0]
-    module = info['module']
-    combined = f"{module}.{class_name}"
-    if class_name == module.split('.')[-1]:
-        combined = module  # Edge case where module is telegram.ext.ExtBot and class name is ExtBot
+# ------------------------------------------------------------------------------------------------
+# This part is for getting the [source] links on the classes, methods etc link to the correct
+# files & lines on github. Can be simplified once https://github.com/sphinx-doc/sphinx/issues/1556
+# is closed
 
-    obj = eval(combined)
-    if hasattr(obj, '__module__'):
-        module = obj.__module__
-    path = module.replace('.', '/')
-    return f"https://github.com/python-telegram-bot/python-telegram-bot/blob/master/{path}.py"
+line_numbers = {}
+file_root = Path(inspect.getsourcefile(telegram)).parent.parent.resolve()
+import telegram.ext  # Needed for checking if an object is a BaseFilter
+
+
+def autodoc_process_docstring(app: Sphinx, what, name: str, obj: object, options, lines):
+    """We misuse this autodoc hook to get the file names & line numbers because we have access
+    to the actual object here.
+    """
+    # Ce can't properly handle ordinary attributes.
+    # In linkcode_resolve we'll resolve to the `__init__` or module instead
+    if what == 'attribute':
+        return
+
+    # Special casing for properties
+    if hasattr(obj, 'fget'):
+        obj = obj.fget
+
+    # Special casing for filters
+    if isinstance(obj, telegram.ext.filters.BaseFilter):
+        obj = obj.__class__
+
+    try:
+        source_lines, start_line = inspect.getsourcelines(obj)
+        end_line = start_line + len(source_lines)
+        file = Path(inspect.getsourcefile(obj)).relative_to(file_root)
+        line_numbers[name] = (file, start_line, end_line)
+    except Exception:
+        pass
+
+    # Since we don't document the `__init__`, we call this manually to have it available for
+    # attributes -- see the note above
+    if what == 'class':
+        autodoc_process_docstring(app, 'method', f'{name}.__init__', obj.__init__, options, lines)
+
+
+def _git_branch() -> str:
+    """Get's the current git sha if available or fall back to `master`"""
+    try:
+        output = subprocess.check_output(  # skipcq: BAN-B607
+            ["git", "describe", "--tags"], stderr=subprocess.STDOUT
+        )
+        return output.decode().strip()
+    except Exception:
+        return 'master'
+
+
+git_branch = _git_branch()
+base_url = "https://github.com/python-telegram-bot/python-telegram-bot/blob/"
+
+
+def linkcode_resolve(_, info):
+    """See www.sphinx-doc.org/en/master/usage/extensions/linkcode.html"""
+    combined = '.'.join((info['module'], info['fullname']))
+    # special casing for ExtBot which is due to the special structure of extbot.rst
+    combined = combined.replace('ExtBot.ExtBot', 'ExtBot')
+
+    line_info = line_numbers.get(combined)
+
+    if not line_info:
+        # Try the __init__
+        line_info = line_numbers.get(f"{combined.rsplit('.', 1)[0]}.__init__")
+    if not line_info:
+        # Try the class
+        line_info = line_numbers.get(f"{combined.rsplit('.', 1)[0]}")
+    if not line_info:
+        # Try the module
+        line_info = line_numbers.get(info['module'])
+
+    if not line_info:
+        return
+
+    file, start_line, end_line = line_info
+    return f"{base_url}{git_branch}/{file}#L{start_line}-L{end_line}"
+
+# End of logic for the [source] links
+# ------------------------------------------------------------------------------------------------
 
 
 def setup(app: Sphinx):
     app.connect('autodoc-skip-member', autodoc_skip_member)
+    app.connect('autodoc-process-docstring', autodoc_process_docstring)
     app.add_role_to_domain('py', CONSTANTS_ROLE, TGConstXRefRole())
