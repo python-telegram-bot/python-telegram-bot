@@ -444,11 +444,11 @@ def _git_branch() -> str:
     """Get's the current git branch if available or fall back to `master`"""
     try:
         output = subprocess.check_output(  # skipcq: BAN-B607
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"], stderr=subprocess.STDOUT
+            ["git", "show", "-s", "--pretty=%d", "HEAD"], stderr=subprocess.STDOUT
         )
-    except (subprocess.SubprocessError, OSError) as exc:
+        return output.decode().strip(' \n()').split(', ')[1].split('/')[1]
+    except Exception:
         return 'master'
-    return output.decode().strip()
 
 
 git_branch = _git_branch()
