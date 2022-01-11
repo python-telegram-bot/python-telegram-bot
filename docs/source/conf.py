@@ -441,12 +441,12 @@ def autodoc_process_docstring(app: Sphinx, what, name: str, obj: object, options
 
 
 def _git_branch() -> str:
-    """Get's the current git branch if available or fall back to `master`"""
+    """Get's the current git sha if available or fall back to `master`"""
     try:
         output = subprocess.check_output(  # skipcq: BAN-B607
-            ["git", "show", "-s", "--pretty=%d", "HEAD"], stderr=subprocess.STDOUT
+            ["git", "describe", "--tags"], stderr=subprocess.STDOUT
         )
-        return output.decode().strip(' \n()').split(', ')[1].split('/')[1]
+        return output.decode().strip()
     except Exception:
         return 'master'
 
