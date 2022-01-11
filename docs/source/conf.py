@@ -458,6 +458,9 @@ base_url = "https://github.com/python-telegram-bot/python-telegram-bot/blob/"
 def linkcode_resolve(_, info):
     """See www.sphinx-doc.org/en/master/usage/extensions/linkcode.html"""
     combined = '.'.join((info['module'], info['fullname']))
+    # special casing for ExtBot which is due to the special structure of extbot.rst
+    combined = combined.replace('ExtBot.ExtBot', 'ExtBot')
+
     line_info = line_numbers.get(combined)
 
     if not line_info:
