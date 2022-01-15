@@ -113,6 +113,24 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             instance to pass onto handler callbacks.
         workers (:obj:`int`, optional): Number of maximum concurrent worker threads for the
             ``@run_async`` decorator and :meth:`run_async`.
+        chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
+            the chat.
+
+            .. versionchanged:: 14.0
+                :attr:`chat_data` is now read-only
+
+            .. tip::
+               Manually modifying :attr:`chat_data` is almost never needed and unadvisable.
+
+        user_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
+            the user.
+
+            .. versionchanged:: 14.0
+               :attr:`user_data` is now read-only
+
+            .. tip::
+               Manually modifying :attr:`user_data` is almost never needed and unadvisable.
+
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
             store data that should be persistent over restarts.
@@ -145,7 +163,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         'update_queue',
         'job_queue',
         '_user_data',
+        'user_data',
         '_chat_data',
+        'chat_data',
         'bot_data',
         '_update_persistence_lock',
         'handlers',
@@ -198,10 +218,17 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 stacklevel=stack_level,
             )
 
-        self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
-        self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
+        self._user_data: DefaultDict[int, UD]
+        self._chat_data: DefaultDict[int, CD]
+        # Read only mapping-
+        self.user_data: Mapping[int, UD]
+        self.chat_data: Mapping[int, CD]
+
+        self._set_user_data(defaultdict(self.context_types.user_data))
+        self._set_chat_data(defaultdict(self.context_types.chat_data))
         self.bot_data = self.context_types.bot_data()
-        self.persistence: Optional[BasePersistence] = None
+
+        self.persistence: Optional[BasePersistence]
         self._update_persistence_lock = Lock()
         if persistence:
             if not isinstance(persistence, BasePersistence):
@@ -213,11 +240,11 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.persistence.set_bot(self.bot)
 
             if self.persistence.store_data.user_data:
-                self._user_data = self.persistence.get_user_data()
+                self._set_user_data(self.persistence.get_user_data())
                 if not isinstance(self._user_data, defaultdict):
                     raise ValueError("user_data must be of type defaultdict")
             if self.persistence.store_data.chat_data:
-                self._chat_data = self.persistence.get_chat_data()
+                self._set_chat_data(self.persistence.get_chat_data())
                 if not isinstance(self._chat_data, defaultdict):
                     raise ValueError("chat_data must be of type defaultdict")
             if self.persistence.store_data.bot_data:
@@ -282,27 +309,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         cls.logger.debug('Setting singleton dispatcher as %s', val)
         cls.__singleton = weakref.ref(val) if val else None
 
-    @property
-    def chat_data(self) -> Mapping[int, CD]:
-        """
-        :obj:`types.MappingProxyType`: A dictionary handlers can use to store data for the chat.
-
-        .. versionchanged:: 14.0
-           :attr:`chat_data` is now read-only
-
-        """
-        return MappingProxyType(self._chat_data)
-
-    @property
-    def user_data(self) -> Mapping[int, UD]:
-        """:obj:`types.MappingProxyType`: A dictionary handlers can use to store data for the user.
-
-        .. versionchanged:: 14.0
-           :attr:`user_data` is now read-only
-
-        """
-        return MappingProxyType(self._user_data)
-
     @classmethod
     def get_instance(cls) -> 'Dispatcher':
         """Get the singleton instance of this class.
@@ -317,6 +323,18 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         if cls.__singleton is not None:
             return cls.__singleton()  # type: ignore[return-value] # pylint: disable=not-callable
         raise RuntimeError(f'{cls.__name__} not initialized or multiple instances exist')
+
+    def _set_chat_data(self, data: DefaultDict[int, CD]) -> None:
+        """Used for assigning a new value to the underlying chat_data dictionary. Also updates
+        the read-only mapping."""
+        self._chat_data = data
+        self.chat_data = MappingProxyType(self._chat_data)
+
+    def _set_user_data(self, data: DefaultDict[int, UD]) -> None:
+        """Used for assigning a new value to the underlying user_data dictionary. Also updates
+        the read-only mapping."""
+        self._user_data = data
+        self.user_data = MappingProxyType(self._user_data)
 
     def _pooled(self) -> None:
         thr_name = current_thread().name
@@ -660,30 +678,26 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         Args:
             chat_id (:obj:`int`, optional): The chat id to delete from the persistence. The entry
                 will be deleted even if it is not empty. Mutually exclusive with
-                :paramref:`all_empty_entries`.
-            all_empty_entries (:obj:`bool`, optional): If :obj:`True`, all empty entries from
-                :attr:`chat_data` will be deleted. Mutually exclusive with :paramref:`chat_id`.
+                ``all_empty_entries``.
+            all_empty_entries (:obj:`bool`, optional): If :obj:`True`, all entries which evaluates
+                to :obj:`False` in a boolean context in :attr:`chat_data` will be deleted.
+                Mutually exclusive with ``chat_id``.
 
         Raises:
-            :exc:`ValueError`: When both :paramref:`chat_id` and :paramref:`all_empty_entries` are
+            :exc:`ValueError`: When both ``chat_id`` and ``all_empty_entries`` are
                 provided, or none of them are passed.
         """
-        if chat_id and all_empty_entries:
-            raise ValueError("You must pass either `chat_id` or `all_empty_entries` not both.")
-
-        if chat_id is None and not all_empty_entries:
+        if not bool(chat_id) ^ bool(all_empty_entries):
             raise ValueError("You must pass either `chat_id` or `all_empty_entries`.")
 
         if chat_id:
-            if chat_id not in self._chat_data:
-                raise ValueError("The specified `chat_id` is not present in `chat_data`")
             del self._chat_data[chat_id]
 
         elif all_empty_entries:
             chat_ids = list(self._chat_data.keys())
 
             for _id in chat_ids:
-                if not self._chat_data[_id]:
+                if not bool(self._chat_data[_id]):
                     del self._chat_data[_id]
 
         self.update_persistence()
@@ -696,30 +710,26 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         Args:
             user_id (:obj:`int`, optional): The user id to delete from the persistence. The entry
                 will be deleted even if it is not empty. Mutually exclusive with
-                :paramref:`all_empty_entries`.
-            all_empty_entries (:obj:`bool`, optional): If :obj:`True`, all empty entries from
-                :attr:`user_data` will be deleted. Mutually exclusive with :paramref:`user_id`.
+                ``all_empty_entries``.
+            all_empty_entries (:obj:`bool`, optional): If :obj:`True`, all entries which evaluates
+                to :obj:`False` in a boolean context in :attr:`user_data` will be deleted.
+                Mutually exclusive with ``user_id``.
 
         Raises:
-            :exc:`ValueError`: When both :paramref:`user_id` and :paramref:`all_empty_entries` are
+            :exc:`ValueError`: When both ``user_id`` and ``all_empty_entries`` are
                 provided, or none of them are passed.
         """
-        if user_id and all_empty_entries:
-            raise ValueError("You must pass either `user_id` or `all_empty_entries` not both.")
-
-        if user_id is None and not all_empty_entries:
+        if not bool(user_id) ^ bool(all_empty_entries):
             raise ValueError("You must pass either `user_id` or `all_empty_entries`.")
 
         if user_id:
-            if user_id not in self._user_data:
-                raise ValueError("The specified `user_id` is not present in `user_data`")
             del self._user_data[user_id]
 
         elif all_empty_entries:
             user_ids = list(self._user_data.keys())
 
             for u_id in user_ids:
-                if not self._user_data[u_id]:
+                if not bool(self._user_data[u_id]):
                     del self._user_data[u_id]
 
         self.update_persistence()

@@ -897,16 +897,23 @@ class TestDispatcher:
             (False, 321, {123: [], 222: "remove_me"}),
             (False, 111, None),
         ],
+        ids=[
+            "Passing all parameters (error)",
+            "Passing no parameters (error)",
+            "test all_empty removal",
+            "test chat_id removal",
+            "test no key in data (error)",
+        ],
     )
     def test_drop_chat_data(self, dp, remove_all, c_id, expected):
-        dp._chat_data = {123: [], 321: {'not_empty': 'no'}, 222: "remove_me"}
+        dp._chat_data.update({123: [], 321: {'not_empty': 'no'}, 222: "remove_me"})
 
         if (remove_all and c_id) or (not remove_all and not c_id):
             with pytest.raises(ValueError, match="You must pass either"):
                 dp.drop_chat_data(c_id, all_empty_entries=remove_all)
         else:
             if c_id is not None and c_id not in dp.chat_data:
-                with pytest.raises(ValueError, match="The specified"):
+                with pytest.raises(KeyError):
                     dp.drop_chat_data(c_id)
             else:
                 dp.drop_chat_data(c_id, all_empty_entries=remove_all)
@@ -921,16 +928,23 @@ class TestDispatcher:
             (False, 321, {123: [], 222: "remove_me"}),
             (False, 111, None),
         ],
+        ids=[
+            "Passing all parameters (error)",
+            "Passing no parameters (error)",
+            "test all_empty removal",
+            "test chat_id removal",
+            "test no key in data (error)",
+        ],
     )
     def test_drop_user_data(self, dp, remove_all, u_id, expected):
-        dp._user_data = {123: [], 321: {'not_empty': 'no'}, 222: "remove_me"}
+        dp._user_data.update({123: [], 321: {'not_empty': 'no'}, 222: "remove_me"})
 
         if (remove_all and u_id) or (not remove_all and not u_id):
             with pytest.raises(ValueError, match="You must pass either"):
                 dp.drop_user_data(u_id, all_empty_entries=remove_all)
         else:
             if u_id is not None and u_id not in dp.user_data:
-                with pytest.raises(ValueError, match="The specified"):
+                with pytest.raises(KeyError):
                     dp.drop_user_data(u_id)
             else:
                 dp.drop_user_data(u_id, all_empty_entries=remove_all)
