@@ -149,7 +149,6 @@ class TestAnimation:
             'game.gif'
         ) == animation.file_name.startswith('game.gif')
         assert message.animation.mime_type == animation.mime_type
-        assert message.animation.file_size == 4127 and animation.file_size == 5859
 
     @flaky(3, 1)
     def test_send_animation_caption_entities(self, bot, chat_id, animation):
