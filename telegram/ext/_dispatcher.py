@@ -326,13 +326,15 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
     def _set_chat_data(self, data: DefaultDict[int, CD]) -> None:
         """Used for assigning a new value to the underlying chat_data dictionary. Also updates
-        the read-only mapping."""
+        the read-only mapping.
+        """
         self._chat_data = data
         self.chat_data = MappingProxyType(self._chat_data)
 
     def _set_user_data(self, data: DefaultDict[int, UD]) -> None:
         """Used for assigning a new value to the underlying user_data dictionary. Also updates
-        the read-only mapping."""
+        the read-only mapping.
+        """
         self._user_data = data
         self.user_data = MappingProxyType(self._user_data)
 
@@ -670,67 +672,29 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             if not self.handlers[group]:
                 del self.handlers[group]
 
-    def drop_chat_data(self, chat_id: int = None, all_empty_entries: bool = False) -> None:
+    def drop_chat_data(self, chat_id: int) -> None:
         """Used for deleting a key from the :attr:`chat_data`.
 
         .. versionadded:: 14.0
 
         Args:
-            chat_id (:obj:`int`, optional): The chat id to delete from the persistence. The entry
-                will be deleted even if it is not empty. Mutually exclusive with
-                ``all_empty_entries``.
-            all_empty_entries (:obj:`bool`, optional): If :obj:`True`, all entries which evaluates
-                to :obj:`False` in a boolean context in :attr:`chat_data` will be deleted.
-                Mutually exclusive with ``chat_id``.
-
-        Raises:
-            :exc:`ValueError`: When both ``chat_id`` and ``all_empty_entries`` are
-                provided, or none of them are passed.
+            chat_id (:obj:`int`): The chat id to delete from the persistence. The entry
+                will be deleted even if it is not empty.
         """
-        if not bool(chat_id) ^ bool(all_empty_entries):
-            raise ValueError("You must pass either `chat_id` or `all_empty_entries`.")
-
-        if chat_id:
-            del self._chat_data[chat_id]
-
-        elif all_empty_entries:
-            chat_ids = list(self._chat_data.keys())
-
-            for _id in chat_ids:
-                if not bool(self._chat_data[_id]):
-                    del self._chat_data[_id]
+        del self._chat_data[chat_id]
 
         self.update_persistence()
 
-    def drop_user_data(self, user_id: int = None, all_empty_entries: bool = False) -> None:
+    def drop_user_data(self, user_id: int) -> None:
         """Used for deleting a key from the :attr:`user_data`.
 
         .. versionadded:: 14.0
 
         Args:
-            user_id (:obj:`int`, optional): The user id to delete from the persistence. The entry
-                will be deleted even if it is not empty. Mutually exclusive with
-                ``all_empty_entries``.
-            all_empty_entries (:obj:`bool`, optional): If :obj:`True`, all entries which evaluates
-                to :obj:`False` in a boolean context in :attr:`user_data` will be deleted.
-                Mutually exclusive with ``user_id``.
-
-        Raises:
-            :exc:`ValueError`: When both ``user_id`` and ``all_empty_entries`` are
-                provided, or none of them are passed.
+            user_id (:obj:`int`): The user id to delete from the persistence. The entry
+                will be deleted even if it is not empty.
         """
-        if not bool(user_id) ^ bool(all_empty_entries):
-            raise ValueError("You must pass either `user_id` or `all_empty_entries`.")
-
-        if user_id:
-            del self._user_data[user_id]
-
-        elif all_empty_entries:
-            user_ids = list(self._user_data.keys())
-
-            for u_id in user_ids:
-                if not bool(self._user_data[u_id]):
-                    del self._user_data[u_id]
+        del self._user_data[user_id]
 
         self.update_persistence()
 
@@ -748,8 +712,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         if self.persistence:
             # We use list() here in order to decouple chat_ids from self._chat_data, as dict view
             # objects will change, when the dict does and we want to loop over chat_ids
-            chat_ids = list(self._chat_data.keys())
-            user_ids = list(self._user_data.keys())
+            chat_ids = list(self.chat_data.keys())
+            user_ids = list(self.user_data.keys())
 
             if isinstance(update, Update):
                 if update.effective_chat:
@@ -778,13 +742,13 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             if self.persistence.store_data.chat_data:
                 for chat_id in chat_ids:
                     try:
-                        self.persistence.update_chat_data(chat_id, self._chat_data[chat_id])
+                        self.persistence.update_chat_data(chat_id, self.chat_data[chat_id])
                     except Exception as exc:
                         self.dispatch_error(update, exc)
             if self.persistence.store_data.user_data:
                 for user_id in user_ids:
                     try:
-                        self.persistence.update_user_data(user_id, self._user_data[user_id])
+                        self.persistence.update_user_data(user_id, self.user_data[user_id])
                     except Exception as exc:
                         self.dispatch_error(update, exc)
 
