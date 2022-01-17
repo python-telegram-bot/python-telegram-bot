@@ -532,7 +532,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             data (Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]):
+                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]]):
                 The relevant data to restore :class:`telegram.ext.CallbackDataCache`.
         """
 

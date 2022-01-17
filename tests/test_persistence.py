@@ -1931,6 +1931,12 @@ class TestPicklePersistence:
 
         persistence.user_data = None
         persistence.chat_data = None
+        persistence.drop_user_data(123)
+        persistence.drop_chat_data(123)
+        assert isinstance(persistence.get_user_data(), defaultdict)
+        assert isinstance(persistence.get_chat_data(), defaultdict)
+        persistence.user_data = None
+        persistence.chat_data = None
         persistence.update_user_data(1, ud(1))
         persistence.update_chat_data(1, cd(1))
         persistence.update_bot_data(bd(1))
@@ -2158,6 +2164,9 @@ class TestDictPersistence:
         assert dict_persistence.user_data_json == json.dumps(user_data)
         dict_persistence.drop_user_data(67890)
         assert 67890 not in dict_persistence.user_data
+        dict_persistence._user_data = None
+        dict_persistence.drop_user_data(123)
+        assert isinstance(dict_persistence.get_user_data(), defaultdict)
 
         chat_data = dict_persistence.get_chat_data()
         chat_data[-12345]['test3']['test4'] = 'test6'
@@ -2172,6 +2181,9 @@ class TestDictPersistence:
         assert dict_persistence.chat_data_json == json.dumps(chat_data)
         dict_persistence.drop_chat_data(-67890)
         assert -67890 not in dict_persistence.chat_data
+        dict_persistence._chat_data = None
+        dict_persistence.drop_chat_data(123)
+        assert isinstance(dict_persistence.get_chat_data(), defaultdict)
 
         bot_data = dict_persistence.get_bot_data()
         bot_data['test3']['test4'] = 'test6'
