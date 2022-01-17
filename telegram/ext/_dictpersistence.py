@@ -364,6 +364,8 @@ class DictPersistence(BasePersistence):
     def drop_chat_data(self, chat_id: int) -> None:
         """Will delete the specified key from the :attr:`chat_data`.
 
+        .. versionadded:: 14.0
+
         Args:
             chat_id (:obj:`int`): The chat id to delete from the persistence.
         """
@@ -375,6 +377,8 @@ class DictPersistence(BasePersistence):
 
     def drop_user_data(self, user_id: int) -> None:
         """Will delete the specified key from the :attr:`user_data`.
+
+        .. versionadded:: 14.0
 
         Args:
             user_id (:obj:`int`): The user id to delete from the persistence.

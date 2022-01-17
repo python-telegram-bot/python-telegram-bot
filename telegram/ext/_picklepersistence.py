@@ -396,6 +396,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """Will delete the specified key from the :attr:`chat_data` and depending on
         :attr:`on_flush` save the pickle file.
 
+        .. versionadded:: 14.0
+
         Args:
             chat_id (:obj:`int`): The chat id to delete from the persistence.
         """
@@ -413,6 +415,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def drop_user_data(self, user_id: int) -> None:
         """Will delete the specified key from the :attr:`user_data` and depending on
         :attr:`on_flush` save the pickle file.
+
+        .. versionadded:: 14.0
 
         Args:
             user_id (:obj:`int`): The user id to delete from the persistence.
