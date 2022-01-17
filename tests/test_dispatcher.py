@@ -630,6 +630,12 @@ class TestDispatcher:
             def update_bot_data(self, data):
                 raise Exception
 
+            def drop_chat_data(self, chat_id):
+                pass
+
+            def drop_user_data(self, user_id):
+                pass
+
             def get_chat_data(self):
                 return defaultdict(dict)
 
@@ -756,6 +762,12 @@ class TestDispatcher:
             def update_user_data(self, user_id, data):
                 self.update(data)
 
+            def drop_user_data(self, user_id):
+                pass
+
+            def drop_chat_data(self, chat_id):
+                pass
+
             def get_chat_data(self):
                 pass
 
@@ -832,6 +844,12 @@ class TestDispatcher:
                 self.test_flag_user_data = True
 
             def update_conversation(self, name, key, new_state):
+                pass
+
+            def drop_chat_data(self, chat_id):
+                pass
+
+            def drop_user_data(self, user_id):
                 pass
 
             def get_conversations(self, name):

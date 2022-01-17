@@ -683,7 +683,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         """
         del self._chat_data[chat_id]
 
-        self.update_persistence()
+        if self.persistence:
+            self.persistence.drop_chat_data(chat_id)
 
     def drop_user_data(self, user_id: int) -> None:
         """Used for deleting a key from the :attr:`user_data`.
@@ -696,7 +697,8 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         """
         del self._user_data[user_id]
 
-        self.update_persistence()
+        if self.persistence:
+            self.persistence.drop_user_data(user_id)
 
     def update_persistence(self, update: object = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.
