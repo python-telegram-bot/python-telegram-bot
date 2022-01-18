@@ -89,6 +89,9 @@ from telegram import (
     WebhookInfo,
     InlineKeyboardMarkup,
     ChatInviteLink,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    ForceReply,
 )
 from telegram.error import InvalidToken, TelegramError
 from telegram.constants import InlineQueryLimit
@@ -290,7 +293,8 @@ class Bot(TelegramObject):
         data['protect_content'] = protect_content
 
         if reply_markup is not None:
-            if isinstance(reply_markup, ReplyMarkup):
+            markups = (InlineKeyboardMarkup, ReplyKeyboardMarkup, ForceReply, ReplyKeyboardRemove)
+            if isinstance(reply_markup, markups):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -5171,7 +5175,8 @@ class Bot(TelegramObject):
         data: JSONDict = {'chat_id': chat_id, 'message_id': message_id}
 
         if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
+            markups = (InlineKeyboardMarkup, ReplyKeyboardMarkup, ForceReply, ReplyKeyboardRemove)
+            if isinstance(reply_markup, markups):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -5531,7 +5536,8 @@ class Bot(TelegramObject):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
+            markups = (InlineKeyboardMarkup, ReplyKeyboardMarkup, ForceReply, ReplyKeyboardRemove)
+            if isinstance(reply_markup, markups):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
