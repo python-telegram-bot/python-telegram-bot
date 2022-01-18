@@ -20,13 +20,13 @@
 
 from typing import TYPE_CHECKING, Any, Union, Tuple, List
 
-from telegram import InlineQueryResult, MessageEntity
+from telegram import InlineQueryResult, MessageEntity, InlineKeyboardMarkup
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
-    from telegram import InputMessageContent, ReplyMarkup
+    from telegram import InputMessageContent
 
 
 class InlineQueryResultCachedVoice(InlineQueryResult):
@@ -91,7 +91,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         voice_file_id: str,
         title: str,
         caption: str = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: InlineKeyboardMarkup = None,
         input_message_content: 'InputMessageContent' = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,

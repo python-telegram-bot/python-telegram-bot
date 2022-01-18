@@ -20,11 +20,11 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
-    from telegram import InputMessageContent, ReplyMarkup
+    from telegram import InputMessageContent
 
 
 class InlineQueryResultArticle(InlineQueryResult):
@@ -81,7 +81,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         title: str,
         input_message_content: 'InputMessageContent',
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: InlineKeyboardMarkup = None,
         url: str = None,
         hide_url: bool = None,
         description: str = None,
