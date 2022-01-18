@@ -218,14 +218,12 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 stacklevel=stack_level,
             )
 
-        self._user_data: DefaultDict[int, UD]
-        self._chat_data: DefaultDict[int, CD]
+        self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
+        self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
         # Read only mapping-
-        self.user_data: Mapping[int, UD]
-        self.chat_data: Mapping[int, CD]
+        self.user_data: Mapping[int, UD] = MappingProxyType(self._user_data)
+        self.chat_data: Mapping[int, CD] = MappingProxyType(self._chat_data)
 
-        self._set_user_data(defaultdict(self.context_types.user_data))
-        self._set_chat_data(defaultdict(self.context_types.chat_data))
         self.bot_data = self.context_types.bot_data()
 
         self.persistence: Optional[BasePersistence]
@@ -240,13 +238,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             self.persistence.set_bot(self.bot)
 
             if self.persistence.store_data.user_data:
-                self._set_user_data(self.persistence.get_user_data())
-                if not isinstance(self._user_data, defaultdict):
-                    raise ValueError("user_data must be of type defaultdict")
+                self._user_data.update(self.persistence.get_user_data())
             if self.persistence.store_data.chat_data:
-                self._set_chat_data(self.persistence.get_chat_data())
-                if not isinstance(self._chat_data, defaultdict):
-                    raise ValueError("chat_data must be of type defaultdict")
+                self._chat_data.update(self.persistence.get_chat_data())
             if self.persistence.store_data.bot_data:
                 self.bot_data = self.persistence.get_bot_data()
                 if not isinstance(self.bot_data, self.context_types.bot_data):
@@ -257,7 +251,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                 persistent_data = self.persistence.get_callback_data()
                 if persistent_data is not None:
                     if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
-                        raise ValueError('callback_data must be a 2-tuple')
+                        raise ValueError('callback_data must be a tuple of length 2')
                     # Mypy doesn't know that persistence.set_bot (see above) already checks that
                     # self.bot is an instance of ExtBot if callback_data should be stored ...
                     self.bot.callback_data_cache = CallbackDataCache(  # type: ignore[attr-defined]
@@ -323,20 +317,6 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         if cls.__singleton is not None:
             return cls.__singleton()  # type: ignore[return-value] # pylint: disable=not-callable
         raise RuntimeError(f'{cls.__name__} not initialized or multiple instances exist')
-
-    def _set_chat_data(self, data: DefaultDict[int, CD]) -> None:
-        """Used for assigning a new value to the underlying chat_data dictionary. Also updates
-        the read-only mapping.
-        """
-        self._chat_data = data
-        self.chat_data = MappingProxyType(self._chat_data)
-
-    def _set_user_data(self, data: DefaultDict[int, UD]) -> None:
-        """Used for assigning a new value to the underlying user_data dictionary. Also updates
-        the read-only mapping.
-        """
-        self._user_data = data
-        self.user_data = MappingProxyType(self._user_data)
 
     def _pooled(self) -> None:
         thr_name = current_thread().name
@@ -681,7 +661,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             chat_id (:obj:`int`): The chat id to delete from the persistence. The entry
                 will be deleted even if it is not empty.
         """
-        del self._chat_data[chat_id]
+        self._chat_data.pop(chat_id, None)  # type: ignore[arg-type]
 
         if self.persistence:
             self.persistence.drop_chat_data(chat_id)
@@ -695,7 +675,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             user_id (:obj:`int`): The user id to delete from the persistence. The entry
                 will be deleted even if it is not empty.
         """
-        del self._user_data[user_id]
+        self._user_data.pop(user_id, None)  # type: ignore[arg-type]
 
         if self.persistence:
             self.persistence.drop_user_data(user_id)

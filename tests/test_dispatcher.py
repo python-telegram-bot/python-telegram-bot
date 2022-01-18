@@ -908,33 +908,23 @@ class TestDispatcher:
 
     @pytest.mark.parametrize(
         "c_id,expected",
-        [(321, {123: [], 222: "remove_me"}), (111, None)],
-        ids=["test chat_id removal", "test no key in data (error)"],
+        [(321, {222: "remove_me"}), (111, {321: {'not_empty': 'no'}, 222: "remove_me"})],
+        ids=["test chat_id removal", "test no key in data (no error)"],
     )
     def test_drop_chat_data(self, dp, c_id, expected):
-        dp._chat_data.update({123: [], 321: {'not_empty': 'no'}, 222: "remove_me"})
-
-        if c_id is not None and c_id not in dp.chat_data:
-            with pytest.raises(KeyError):
-                dp.drop_chat_data(c_id)
-        else:
-            dp.drop_chat_data(c_id)
-            assert dp.chat_data == expected
+        dp._chat_data.update({321: {'not_empty': 'no'}, 222: "remove_me"})
+        dp.drop_chat_data(c_id)
+        assert dp.chat_data == expected
 
     @pytest.mark.parametrize(
         "u_id,expected",
-        [(321, {123: [], 222: "remove_me"}), (111, None)],
-        ids=["test user_id removal", "test no key in data (error)"],
+        [(321, {222: "remove_me"}), (111, {321: {'not_empty': 'no'}, 222: "remove_me"})],
+        ids=["test user_id removal", "test no key in data (no error)"],
     )
     def test_drop_user_data(self, dp, u_id, expected):
-        dp._user_data.update({123: [], 321: {'not_empty': 'no'}, 222: "remove_me"})
-
-        if u_id is not None and u_id not in dp.user_data:
-            with pytest.raises(KeyError):
-                dp.drop_user_data(u_id)
-        else:
-            dp.drop_user_data(u_id)
-            assert dp.user_data == expected
+        dp._user_data.update({321: {'not_empty': 'no'}, 222: "remove_me"})
+        dp.drop_user_data(u_id)
+        assert dp.user_data == expected
 
     def test_update_persistence_once_per_update(self, monkeypatch, dp):
         def update_persistence(*args, **kwargs):

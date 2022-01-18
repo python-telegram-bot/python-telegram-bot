@@ -402,9 +402,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             chat_id (:obj:`int`): The chat id to delete from the persistence.
         """
         if self.chat_data is None:
-            self.chat_data = defaultdict(self.context_types.chat_data)
-        else:
-            del self.chat_data[chat_id]
+            return
+        self.chat_data.pop(chat_id, None)  # type: ignore[arg-type]
 
         if not self.on_flush:
             if not self.single_file:
@@ -422,9 +421,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             user_id (:obj:`int`): The user id to delete from the persistence.
         """
         if self.user_data is None:
-            self.user_data = defaultdict(self.context_types.user_data)
-        else:
-            del self.user_data[user_id]
+            return
+        self.user_data.pop(user_id, None)  # type: ignore[arg-type]
 
         if not self.on_flush:
             if not self.single_file:

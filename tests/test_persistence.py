@@ -296,52 +296,40 @@ class TestBasePersistence:
     def test_dispatcher_integration_init(
         self, bot, base_persistence, chat_data, user_data, bot_data, callback_data
     ):
-        def get_user_data():
+        # Bad data testing-
+        def bad_get_bot_data():
             return "test"
 
-        def get_chat_data():
+        def bad_get_callback_data():
             return "test"
 
-        def get_bot_data():
-            return "test"
-
-        def get_callback_data():
-            return "test"
-
-        base_persistence.get_user_data = get_user_data
-        base_persistence.get_chat_data = get_chat_data
-        base_persistence.get_bot_data = get_bot_data
-        base_persistence.get_callback_data = get_callback_data
-
-        with pytest.raises(ValueError, match="user_data must be of type defaultdict"):
-            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
-
-        def get_user_data():
+        # Good data testing-
+        def good_get_user_data():
             return user_data
 
-        base_persistence.get_user_data = get_user_data
-        with pytest.raises(ValueError, match="chat_data must be of type defaultdict"):
-            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
-
-        def get_chat_data():
+        def good_get_chat_data():
             return chat_data
 
-        base_persistence.get_chat_data = get_chat_data
+        def good_get_bot_data():
+            return bot_data
+
+        def good_get_callback_data():
+            return callback_data
+
+        base_persistence.get_user_data = good_get_user_data  # No errors to be tested so
+        base_persistence.get_chat_data = good_get_chat_data
+        base_persistence.get_bot_data = bad_get_bot_data
+        base_persistence.get_callback_data = bad_get_callback_data
+
         with pytest.raises(ValueError, match="bot_data must be of type dict"):
             UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
-        def get_bot_data():
-            return bot_data
-
-        base_persistence.get_bot_data = get_bot_data
-        with pytest.raises(ValueError, match="callback_data must be a 2-tuple"):
+        base_persistence.get_bot_data = good_get_bot_data
+        with pytest.raises(ValueError, match="callback_data must be a tuple of length 2"):
             UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
-        def get_callback_data():
-            return callback_data
-
         base_persistence.bot = None
-        base_persistence.get_callback_data = get_callback_data
+        base_persistence.get_callback_data = good_get_callback_data
         u = UpdaterBuilder().bot(bot).persistence(base_persistence).build()
         assert u.dispatcher.bot is base_persistence.bot
         assert u.dispatcher.bot_data == bot_data
@@ -1511,6 +1499,9 @@ class TestPicklePersistence:
         pickle_persistence.update_user_data(54321, user_data[54321])
         assert pickle_persistence.user_data == user_data
 
+        pickle_persistence.drop_user_data(0)
+        assert pickle_persistence.user_data == user_data
+
         with Path('pickletest_user_data').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f))
         assert not user_data_test == user_data
@@ -1521,6 +1512,9 @@ class TestPicklePersistence:
 
         pickle_persistence.update_chat_data(54321, chat_data[54321])
         assert pickle_persistence.chat_data == chat_data
+
+        pickle_persistence.drop_chat_data(0)
+        assert pickle_persistence.user_data == user_data
 
         with Path('pickletest_chat_data').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f))

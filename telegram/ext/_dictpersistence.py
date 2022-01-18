@@ -370,10 +370,9 @@ class DictPersistence(BasePersistence):
             chat_id (:obj:`int`): The chat id to delete from the persistence.
         """
         if self._chat_data is None:
-            self._chat_data = defaultdict(dict)
-        else:
-            del self._chat_data[chat_id]
-            self._chat_data_json = None
+            return
+        self._chat_data.pop(chat_id, None)
+        self._chat_data_json = None
 
     def drop_user_data(self, user_id: int) -> None:
         """Will delete the specified key from the :attr:`user_data`.
@@ -384,10 +383,9 @@ class DictPersistence(BasePersistence):
             user_id (:obj:`int`): The user id to delete from the persistence.
         """
         if self._user_data is None:
-            self._user_data = defaultdict(dict)
-        else:
-            del self._user_data[user_id]
-            self._user_data_json = None
+            return
+        self._user_data.pop(user_id, None)
+        self._user_data_json = None
 
     def refresh_user_data(self, user_id: int, user_data: Dict) -> None:
         """Does nothing.

@@ -457,7 +457,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]:
+                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]]:
                 The restored meta data or :obj:`None`, if no data was stored.
         """
 
