@@ -75,7 +75,6 @@ from telegram import (
     PassportElementError,
     PhotoSize,
     Poll,
-    ReplyMarkup,
     ShippingOption,
     Sticker,
     StickerSet,
@@ -97,7 +96,7 @@ from telegram.request import Request
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.files import is_local_file, parse_file_input
-from telegram._utils.types import FileInput, JSONDict, ODVInput, DVInput
+from telegram._utils.types import FileInput, JSONDict, ODVInput, DVInput, ReplyMarkup
 
 if TYPE_CHECKING:
     from telegram import (

@@ -41,7 +41,6 @@ if TYPE_CHECKING:
         InputMediaPhoto,
         InputMediaVideo,
         MessageEntity,
-        ReplyMarkup,
         PhotoSize,
         Audio,
         Contact,
@@ -56,6 +55,7 @@ if TYPE_CHECKING:
         VideoNote,
         Voice,
     )
+    from telegram._utils.types import ReplyMarkup
 
 
 class User(TelegramObject):

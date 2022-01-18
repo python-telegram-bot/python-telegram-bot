@@ -35,7 +35,6 @@ if TYPE_CHECKING:
         ChatInviteLink,
         Message,
         MessageId,
-        ReplyMarkup,
         Contact,
         InlineKeyboardMarkup,
         Location,
@@ -55,6 +54,7 @@ if TYPE_CHECKING:
         VideoNote,
         Voice,
     )
+    from telegram._utils.types import ReplyMarkup
 
 
 class Chat(TelegramObject):
