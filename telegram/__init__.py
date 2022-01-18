@@ -137,7 +137,6 @@ __all__ = (  # Keep this alphabetically ordered
     'ProximityAlertTriggered',
     'ReplyKeyboardMarkup',
     'ReplyKeyboardRemove',
-    'ReplyMarkup',
     'request',
     'ResidentialAddress',
     'SecureData',
@@ -199,7 +198,6 @@ from ._dice import Dice
 from ._userprofilephotos import UserProfilePhotos
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
 from ._keyboardbutton import KeyboardButton
-from ._replymarkup import ReplyMarkup
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
 from ._forcereply import ForceReply
