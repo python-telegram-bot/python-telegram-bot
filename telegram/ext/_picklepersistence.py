@@ -392,6 +392,44 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             else:
                 self._dump_singlefile()
 
+    def drop_chat_data(self, chat_id: int) -> None:
+        """Will delete the specified key from the :attr:`chat_data` and depending on
+        :attr:`on_flush` save the pickle file.
+
+        .. versionadded:: 14.0
+
+        Args:
+            chat_id (:obj:`int`): The chat id to delete from the persistence.
+        """
+        if self.chat_data is None:
+            return
+        self.chat_data.pop(chat_id, None)  # type: ignore[arg-type]
+
+        if not self.on_flush:
+            if not self.single_file:
+                self._dump_file(Path(f"{self.filepath}_chat_data"), self.chat_data)
+            else:
+                self._dump_singlefile()
+
+    def drop_user_data(self, user_id: int) -> None:
+        """Will delete the specified key from the :attr:`user_data` and depending on
+        :attr:`on_flush` save the pickle file.
+
+        .. versionadded:: 14.0
+
+        Args:
+            user_id (:obj:`int`): The user id to delete from the persistence.
+        """
+        if self.user_data is None:
+            return
+        self.user_data.pop(user_id, None)  # type: ignore[arg-type]
+
+        if not self.on_flush:
+            if not self.single_file:
+                self._dump_file(Path(f"{self.filepath}_user_data"), self.user_data)
+            else:
+                self._dump_singlefile()
+
     def refresh_user_data(self, user_id: int, user_data: UD) -> None:
         """Does nothing.
 
