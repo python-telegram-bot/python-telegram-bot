@@ -39,6 +39,7 @@ from typing import (
 if TYPE_CHECKING:
     from telegram import InputFile  # noqa: F401
     from telegram._utils.defaultvalue import DefaultValue  # noqa: F401
+    from telegram import InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply
 
 FileLike = Union[IO, 'InputFile']
 """Either an open file handler or a :class:`telegram.InputFile`."""
@@ -64,3 +65,11 @@ as ``Union[DefaultValue, type]``."""
 RT = TypeVar("RT")
 SLT = Union[RT, List[RT], Tuple[RT, ...]]
 """Single instance or list/tuple of instances."""
+
+ReplyMarkup = Union[
+    'InlineKeyboardMarkup', 'ReplyKeyboardMarkup', 'ReplyKeyboardRemove', 'ForceReply'
+]
+"""Type alias for reply markup objects.
+
+.. versionadded:: 14.0
+"""

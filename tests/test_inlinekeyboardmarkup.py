@@ -20,7 +20,13 @@
 import pytest
 from flaky import flaky
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyMarkup, ReplyKeyboardMarkup
+from telegram import (
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ForceReply,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+)
 
 
 @pytest.fixture(scope='class')
@@ -100,7 +106,13 @@ class TestInlineKeyboardMarkup:
             **kwargs,
         ):
             if reply_markup is not None:
-                if isinstance(reply_markup, ReplyMarkup):
+                markups = (
+                    InlineKeyboardMarkup,
+                    ReplyKeyboardMarkup,
+                    ForceReply,
+                    ReplyKeyboardRemove,
+                )
+                if isinstance(reply_markup, markups):
                     data['reply_markup'] = reply_markup.to_dict()
                 else:
                     data['reply_markup'] = reply_markup

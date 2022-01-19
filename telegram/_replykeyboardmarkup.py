@@ -20,11 +20,12 @@
 
 from typing import Any, List, Union, Sequence
 
-from telegram import KeyboardButton, ReplyMarkup
+from telegram import KeyboardButton, TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.markup import check_keyboard_type
 
 
-class ReplyKeyboardMarkup(ReplyMarkup):
+class ReplyKeyboardMarkup(TelegramObject):
     """This object represents a custom keyboard with reply options.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -92,7 +93,7 @@ class ReplyKeyboardMarkup(ReplyMarkup):
         input_field_placeholder: str = None,
         **_kwargs: Any,
     ):
-        if not self._check_keyboard_type(keyboard):
+        if not check_keyboard_type(keyboard):
             raise ValueError(
                 "The parameter `keyboard` should be a list of list of "
                 "strings or KeyboardButtons"
