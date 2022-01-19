@@ -20,13 +20,13 @@
 
 from typing import TYPE_CHECKING, Any, Union, Tuple, List
 
-from telegram import InlineQueryResult, MessageEntity
+from telegram import InlineQueryResult, MessageEntity, InlineKeyboardMarkup
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
-    from telegram import InputMessageContent, ReplyMarkup
+    from telegram import InputMessageContent
 
 
 class InlineQueryResultDocument(InlineQueryResult):
@@ -111,7 +111,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         mime_type: str,
         caption: str = None,
         description: str = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: InlineKeyboardMarkup = None,
         input_message_content: 'InputMessageContent' = None,
         thumb_url: str = None,
         thumb_width: int = None,

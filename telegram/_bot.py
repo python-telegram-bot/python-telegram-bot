@@ -75,7 +75,6 @@ from telegram import (
     PassportElementError,
     PhotoSize,
     Poll,
-    ReplyMarkup,
     ShippingOption,
     Sticker,
     StickerSet,
@@ -90,6 +89,9 @@ from telegram import (
     WebhookInfo,
     InlineKeyboardMarkup,
     ChatInviteLink,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    ForceReply,
 )
 from telegram.error import InvalidToken, TelegramError
 from telegram.constants import InlineQueryLimit
@@ -97,7 +99,7 @@ from telegram.request import Request
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_20
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.files import is_local_file, parse_file_input
-from telegram._utils.types import FileInput, JSONDict, ODVInput, DVInput
+from telegram._utils.types import FileInput, JSONDict, ODVInput, DVInput, ReplyMarkup
 
 if TYPE_CHECKING:
     from telegram import (
@@ -291,7 +293,8 @@ class Bot(TelegramObject):
         data['protect_content'] = protect_content
 
         if reply_markup is not None:
-            if isinstance(reply_markup, ReplyMarkup):
+            markups = (InlineKeyboardMarkup, ReplyKeyboardMarkup, ForceReply, ReplyKeyboardRemove)
+            if isinstance(reply_markup, markups):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -439,9 +442,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard,
-                instructions to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -647,9 +651,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
@@ -760,9 +765,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
@@ -882,9 +888,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
@@ -976,9 +983,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
@@ -1083,9 +1091,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
@@ -1198,9 +1207,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard,
-                instructions to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
@@ -1327,9 +1337,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
@@ -1439,9 +1450,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard,
-                instructions to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): Send file timeout (default: 20 seconds).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
@@ -1589,9 +1601,10 @@ class Bot(TelegramObject):
                     original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard,
-                instructions to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1840,9 +1853,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -1944,9 +1958,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -5106,9 +5121,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -5194,7 +5210,8 @@ class Bot(TelegramObject):
         data: JSONDict = {'chat_id': chat_id, 'message_id': message_id}
 
         if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
+            markups = (InlineKeyboardMarkup, ReplyKeyboardMarkup, ForceReply, ReplyKeyboardRemove)
+            if isinstance(reply_markup, markups):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()
@@ -5247,9 +5264,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions
-                to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -5523,9 +5541,10 @@ class Bot(TelegramObject):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`telegram.ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard,
-                instructions to remove reply keyboard or to force a reply from the user.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -5554,7 +5573,8 @@ class Bot(TelegramObject):
         if reply_to_message_id:
             data['reply_to_message_id'] = reply_to_message_id
         if reply_markup:
-            if isinstance(reply_markup, ReplyMarkup):
+            markups = (InlineKeyboardMarkup, ReplyKeyboardMarkup, ForceReply, ReplyKeyboardRemove)
+            if isinstance(reply_markup, markups):
                 # We need to_json() instead of to_dict() here, because reply_markups may be
                 # attached to media messages, which aren't json dumped by telegram.request
                 data['reply_markup'] = reply_markup.to_json()

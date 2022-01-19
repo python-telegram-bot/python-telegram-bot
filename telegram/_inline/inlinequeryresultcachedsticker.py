@@ -20,11 +20,11 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
-    from telegram import InputMessageContent, ReplyMarkup
+    from telegram import InputMessageContent
 
 
 class InlineQueryResultCachedSticker(InlineQueryResult):
@@ -59,7 +59,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         self,
         id: str,  # pylint: disable=redefined-builtin
         sticker_file_id: str,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: InlineKeyboardMarkup = None,
         input_message_content: 'InputMessageContent' = None,
         **_kwargs: Any,
     ):

@@ -20,11 +20,11 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
-    from telegram import InputMessageContent, ReplyMarkup
+    from telegram import InputMessageContent
 
 
 class InlineQueryResultArticle(InlineQueryResult):
@@ -35,8 +35,8 @@ class InlineQueryResultArticle(InlineQueryResult):
         title (:obj:`str`): Title of the result.
         input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
             be sent.
-        reply_markup (:class:`telegram.ReplyMarkup`, optional): Inline keyboard attached to
-            the message
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+            to the message.
         url (:obj:`str`, optional): URL of the result.
         hide_url (:obj:`bool`, optional): Pass :obj:`True`, if you don't want the URL to be shown
             in the message.
@@ -52,8 +52,8 @@ class InlineQueryResultArticle(InlineQueryResult):
         title (:obj:`str`): Title of the result.
         input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
             be sent.
-        reply_markup (:class:`telegram.ReplyMarkup`): Optional. Inline keyboard attached to
-            the message.
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
+            to the message.
         url (:obj:`str`): Optional. URL of the result.
         hide_url (:obj:`bool`): Optional. Pass :obj:`True`, if you don't want the URL to be shown
             in the message.
@@ -81,7 +81,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         title: str,
         input_message_content: 'InputMessageContent',
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: InlineKeyboardMarkup = None,
         url: str = None,
         hide_url: bool = None,
         description: str = None,

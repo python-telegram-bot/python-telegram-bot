@@ -37,7 +37,6 @@ from typing import (
 
 from telegram import (
     Bot,
-    ReplyMarkup,
     Message,
     InlineKeyboardMarkup,
     Poll,
@@ -48,7 +47,7 @@ from telegram import (
     InputMedia,
 )
 
-from telegram._utils.types import JSONDict, ODVInput, DVInput
+from telegram._utils.types import JSONDict, ODVInput, DVInput, ReplyMarkup
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.datetime import to_timestamp
 from telegram.ext._callbackdatacache import CallbackDataCache

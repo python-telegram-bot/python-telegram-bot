@@ -59,7 +59,6 @@ telegram package
     telegram.proximityalerttriggered
     telegram.replykeyboardremove
     telegram.replykeyboardmarkup
-    telegram.replymarkup
     telegram.telegramobject
     telegram.update
     telegram.user
