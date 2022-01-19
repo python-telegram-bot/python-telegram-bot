@@ -50,14 +50,14 @@ from telegram.ext import (
     JobQueue,
     ContextTypes,
 )
+from telegram.ext._callbackdatacache import _KeyboardData
 
 
 @pytest.fixture(autouse=True)
-def change_directory(tmp_path):
+def change_directory(tmp_path: Path):
     orig_dir = Path.cwd()
-    # Switch to a temporary directory so we don't have to worry about cleaning up files
-    # (str() for py<3.6)
-    os.chdir(str(tmp_path))
+    # Switch to a temporary directory, so we don't have to worry about cleaning up files
+    os.chdir(tmp_path)
     yield
     # Go back to original directory
     os.chdir(orig_dir)
@@ -97,6 +97,12 @@ class OwnPersistence(BasePersistence):
         raise NotImplementedError
 
     def get_callback_data(self):
+        raise NotImplementedError
+
+    def drop_user_data(self, user_id):
+        raise NotImplementedError
+
+    def drop_chat_data(self, chat_id):
         raise NotImplementedError
 
     def refresh_user_data(self, user_id, user_data):
@@ -158,6 +164,12 @@ def bot_persistence():
 
         def update_callback_data(self, data):
             self.callback_data = data
+
+        def drop_user_data(self, user_id):
+            pass
+
+        def drop_chat_data(self, chat_id):
+            pass
 
         def update_conversation(self, name, key, new_state):
             raise NotImplementedError
@@ -257,7 +269,7 @@ class TestBasePersistence:
         with pytest.raises(
             TypeError,
             match=(
-                'flush, get_bot_data, get_callback_data, '
+                'drop_chat_data, drop_user_data, flush, get_bot_data, get_callback_data, '
                 'get_chat_data, get_conversations, '
                 'get_user_data, refresh_bot_data, refresh_chat_data, '
                 'refresh_user_data, update_bot_data, update_callback_data, '
@@ -284,52 +296,40 @@ class TestBasePersistence:
     def test_dispatcher_integration_init(
         self, bot, base_persistence, chat_data, user_data, bot_data, callback_data
     ):
-        def get_user_data():
+        # Bad data testing-
+        def bad_get_bot_data():
             return "test"
 
-        def get_chat_data():
+        def bad_get_callback_data():
             return "test"
 
-        def get_bot_data():
-            return "test"
-
-        def get_callback_data():
-            return "test"
-
-        base_persistence.get_user_data = get_user_data
-        base_persistence.get_chat_data = get_chat_data
-        base_persistence.get_bot_data = get_bot_data
-        base_persistence.get_callback_data = get_callback_data
-
-        with pytest.raises(ValueError, match="user_data must be of type defaultdict"):
-            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
-
-        def get_user_data():
+        # Good data testing-
+        def good_get_user_data():
             return user_data
 
-        base_persistence.get_user_data = get_user_data
-        with pytest.raises(ValueError, match="chat_data must be of type defaultdict"):
-            UpdaterBuilder().bot(bot).persistence(base_persistence).build()
-
-        def get_chat_data():
+        def good_get_chat_data():
             return chat_data
 
-        base_persistence.get_chat_data = get_chat_data
+        def good_get_bot_data():
+            return bot_data
+
+        def good_get_callback_data():
+            return callback_data
+
+        base_persistence.get_user_data = good_get_user_data  # No errors to be tested so
+        base_persistence.get_chat_data = good_get_chat_data
+        base_persistence.get_bot_data = bad_get_bot_data
+        base_persistence.get_callback_data = bad_get_callback_data
+
         with pytest.raises(ValueError, match="bot_data must be of type dict"):
             UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
-        def get_bot_data():
-            return bot_data
-
-        base_persistence.get_bot_data = get_bot_data
-        with pytest.raises(ValueError, match="callback_data must be a 2-tuple"):
+        base_persistence.get_bot_data = good_get_bot_data
+        with pytest.raises(ValueError, match="callback_data must be a tuple of length 2"):
             UpdaterBuilder().bot(bot).persistence(base_persistence).build()
 
-        def get_callback_data():
-            return callback_data
-
         base_persistence.bot = None
-        base_persistence.get_callback_data = get_callback_data
+        base_persistence.get_callback_data = good_get_callback_data
         u = UpdaterBuilder().bot(bot).persistence(base_persistence).build()
         assert u.dispatcher.bot is base_persistence.bot
         assert u.dispatcher.bot_data == bot_data
@@ -339,7 +339,7 @@ class TestBasePersistence:
         u.dispatcher.chat_data[442233]['test5'] = 'test6'
         assert u.dispatcher.chat_data[442233]['test5'] == 'test6'
 
-    @pytest.mark.parametrize('run_async', [True, False], ids=['synchronous', 'run_async'])
+    @pytest.mark.parametrize('run_async', [True, False], ids=['run_async', 'synchronous'])
     def test_dispatcher_integration_handlers(
         self,
         dp,
@@ -368,8 +368,6 @@ class TestBasePersistence:
         base_persistence.get_chat_data = get_chat_data
         base_persistence.get_bot_data = get_bot_data
         base_persistence.get_callback_data = get_callback_data
-        # base_persistence.update_chat_data = lambda x: x
-        # base_persistence.update_user_data = lambda x: x
         base_persistence.refresh_bot_data = lambda x: x
         base_persistence.refresh_chat_data = lambda x, y: x
         base_persistence.refresh_user_data = lambda x, y: x
@@ -383,7 +381,7 @@ class TestBasePersistence:
                 pytest.fail('bot_data corrupt')
 
         def callback_known_chat(update, context):
-            if not context.chat_data['test3'] == 'test4':
+            if not context.chat_data[3] == 'test4':
                 pytest.fail('chat_data corrupt')
             if not context.bot_data == bot_data:
                 pytest.fail('bot_data corrupt')
@@ -398,20 +396,17 @@ class TestBasePersistence:
             context.user_data[1] = 'test7'
             context.chat_data[2] = 'test8'
             context.bot_data['test0'] = 'test0'
-            context.bot.callback_data_cache.put('test0')
+            # Let's now delete user1 and chat1
+            context.dispatcher.drop_chat_data(-67890)
+            context.dispatcher.drop_user_data(12345)
+            # Test setting new keyboard callback data-
+            context.bot.callback_data_cache._keyboard_data['id'] = _KeyboardData(
+                'id', button_data={'button3': 'test3'}
+            )
 
-        known_user = MessageHandler(
-            filters.User(user_id=12345),
-            callback_known_user,
-        )
-        known_chat = MessageHandler(
-            filters.Chat(chat_id=-67890),
-            callback_known_chat,
-        )
-        unknown = MessageHandler(
-            filters.ALL,
-            callback_unknown_user_or_chat,
-        )
+        known_user = MessageHandler(filters.User(user_id=12345), callback_known_user)  # user1
+        known_chat = MessageHandler(filters.Chat(chat_id=-67890), callback_known_chat)  # chat1
+        unknown = MessageHandler(filters.ALL, callback_unknown_user_or_chat)  # user2 and chat2
         dp.add_handler(known_user)
         dp.add_handler(known_chat)
         dp.add_handler(unknown)
@@ -420,51 +415,64 @@ class TestBasePersistence:
         chat1 = Chat(id=-67890, type='group')
         chat2 = Chat(id=-987654, type='group')
         m = Message(1, None, chat2, from_user=user1)
-        u = Update(0, m)
-        with caplog.at_level(logging.ERROR):
-            dp.process_update(u)
-        rec = caplog.records[-1]
-        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
-        assert rec.levelname == 'ERROR'
-        rec = caplog.records[-2]
-        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
-        assert rec.levelname == 'ERROR'
-        rec = caplog.records[-3]
-        assert rec.getMessage() == 'No error handlers are registered, logging exception.'
-        assert rec.levelname == 'ERROR'
+        u_known_user = Update(0, m)
+        dp.process_update(u_known_user)
+        # 4 errors which arise since update_*_data are raising NotImplementedError here.
+        assert len(caplog.records) == 4
         m.from_user = user2
         m.chat = chat1
-        u = Update(1, m)
-        dp.process_update(u)
+        u_known_chat = Update(1, m)
+        dp.process_update(u_known_chat)
         m.chat = chat2
-        u = Update(2, m)
+        u_unknown_user_or_chat = Update(2, m)
 
         def save_bot_data(data):
             if 'test0' not in data:
                 pytest.fail()
 
-        def save_chat_data(data):
-            if -987654 not in data:
+        def save_chat_data(_id, data):
+            if 2 not in data:  # data should be: {2: 'test8'}
                 pytest.fail()
 
-        def save_user_data(data):
-            if 54321 not in data:
+        def save_user_data(_id, data):
+            if 1 not in data:  # data should be: {1: 'test7'}
                 pytest.fail()
 
         def save_callback_data(data):
-            if not assert_data_in_cache(dp.bot.callback_data, 'test0'):
+            if not assert_data_in_cache(dp.bot.callback_data_cache, 'test3'):
                 pytest.fail()
+
+        # Functions to check deletion-
+        def delete_user_data(user_id):
+            if 12345 != user_id:
+                pytest.fail("The id being deleted is not of user1's")
+            user_data.pop(user_id, None)
+
+        def delete_chat_data(chat_id):
+            if -67890 != chat_id:
+                pytest.fail("The chat id being deleted is not of chat1's")
+            chat_data.pop(chat_id, None)
 
         base_persistence.update_chat_data = save_chat_data
         base_persistence.update_user_data = save_user_data
         base_persistence.update_bot_data = save_bot_data
         base_persistence.update_callback_data = save_callback_data
-        dp.process_update(u)
+        base_persistence.drop_chat_data = delete_chat_data
+        base_persistence.drop_user_data = delete_user_data
+        dp.process_update(u_unknown_user_or_chat)
 
+        # Test callback_unknown_user_or_chat worked correctly-
         assert dp.user_data[54321][1] == 'test7'
         assert dp.chat_data[-987654][2] == 'test8'
         assert dp.bot_data['test0'] == 'test0'
-        assert assert_data_in_cache(dp.bot.callback_data_cache, 'test0')
+        assert assert_data_in_cache(dp.bot.callback_data_cache, 'test3')
+        assert 12345 not in dp.user_data  # Tests if dp.drop_user_data worked or not
+        assert -67890 not in dp.chat_data
+        assert len(caplog.records) == 8  # Errors double since new update is processed.
+        for r in caplog.records:
+            assert issubclass(r.exc_info[0], NotImplementedError)
+            assert r.getMessage() == 'No error handlers are registered, logging exception.'
+            assert r.levelname == 'ERROR'
 
     @pytest.mark.parametrize(
         'store_user_data', [True, False], ids=['store_user_data-True', 'store_user_data-False']
@@ -475,7 +483,7 @@ class TestBasePersistence:
     @pytest.mark.parametrize(
         'store_bot_data', [True, False], ids=['store_bot_data-True', 'store_bot_data-False']
     )
-    @pytest.mark.parametrize('run_async', [True, False], ids=['synchronous', 'run_async'])
+    @pytest.mark.parametrize('run_async', [True, False], ids=['run_async', 'synchronous'])
     def test_persistence_dispatcher_integration_refresh_data(
         self,
         dp,
@@ -1043,13 +1051,9 @@ class TestPicklePersistence:
 
     def test_no_files_present_multi_file(self, pickle_persistence):
         assert pickle_persistence.get_user_data() == defaultdict(dict)
-        assert pickle_persistence.get_user_data() == defaultdict(dict)
         assert pickle_persistence.get_chat_data() == defaultdict(dict)
-        assert pickle_persistence.get_chat_data() == defaultdict(dict)
-        assert pickle_persistence.get_bot_data() == {}
         assert pickle_persistence.get_bot_data() == {}
         assert pickle_persistence.get_callback_data() is None
-        assert pickle_persistence.get_conversations('noname') == {}
         assert pickle_persistence.get_conversations('noname') == {}
 
     def test_no_files_present_single_file(self, pickle_persistence):
@@ -1342,6 +1346,8 @@ class TestPicklePersistence:
         with Path('pickletest_user_data').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f))
         assert user_data_test == user_data
+        pickle_persistence.drop_user_data(67890)
+        assert 67890 not in pickle_persistence.get_user_data()
 
         chat_data = pickle_persistence.get_chat_data()
         chat_data[-12345]['test3']['test4'] = 'test6'
@@ -1354,6 +1360,8 @@ class TestPicklePersistence:
         with Path('pickletest_chat_data').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f))
         assert chat_data_test == chat_data
+        pickle_persistence.drop_chat_data(-67890)
+        assert -67890 not in pickle_persistence.get_chat_data()
 
         bot_data = pickle_persistence.get_bot_data()
         bot_data['test3']['test4'] = 'test6'
@@ -1408,6 +1416,8 @@ class TestPicklePersistence:
         with Path('pickletest').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f)['user_data'])
         assert user_data_test == user_data
+        pickle_persistence.drop_user_data(67890)
+        assert 67890 not in pickle_persistence.get_user_data()
 
         chat_data = pickle_persistence.get_chat_data()
         chat_data[-12345]['test3']['test4'] = 'test6'
@@ -1420,6 +1430,8 @@ class TestPicklePersistence:
         with Path('pickletest').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f)['chat_data'])
         assert chat_data_test == chat_data
+        pickle_persistence.drop_chat_data(-67890)
+        assert -67890 not in pickle_persistence.get_chat_data()
 
         bot_data = pickle_persistence.get_bot_data()
         bot_data['test3']['test4'] = 'test6'
@@ -1487,6 +1499,9 @@ class TestPicklePersistence:
         pickle_persistence.update_user_data(54321, user_data[54321])
         assert pickle_persistence.user_data == user_data
 
+        pickle_persistence.drop_user_data(0)
+        assert pickle_persistence.user_data == user_data
+
         with Path('pickletest_user_data').open('rb') as f:
             user_data_test = defaultdict(dict, pickle.load(f))
         assert not user_data_test == user_data
@@ -1497,6 +1512,9 @@ class TestPicklePersistence:
 
         pickle_persistence.update_chat_data(54321, chat_data[54321])
         assert pickle_persistence.chat_data == chat_data
+
+        pickle_persistence.drop_chat_data(0)
+        assert pickle_persistence.user_data == user_data
 
         with Path('pickletest_chat_data').open('rb') as f:
             chat_data_test = defaultdict(dict, pickle.load(f))
@@ -1907,6 +1925,12 @@ class TestPicklePersistence:
 
         persistence.user_data = None
         persistence.chat_data = None
+        persistence.drop_user_data(123)
+        persistence.drop_chat_data(123)
+        assert isinstance(persistence.get_user_data(), defaultdict)
+        assert isinstance(persistence.get_chat_data(), defaultdict)
+        persistence.user_data = None
+        persistence.chat_data = None
         persistence.update_user_data(1, ud(1))
         persistence.update_chat_data(1, cd(1))
         persistence.update_bot_data(bd(1))
@@ -2132,6 +2156,11 @@ class TestDictPersistence:
         dict_persistence.update_user_data(12345, user_data[12345])
         assert dict_persistence.user_data == user_data
         assert dict_persistence.user_data_json == json.dumps(user_data)
+        dict_persistence.drop_user_data(67890)
+        assert 67890 not in dict_persistence.user_data
+        dict_persistence._user_data = None
+        dict_persistence.drop_user_data(123)
+        assert isinstance(dict_persistence.get_user_data(), defaultdict)
 
         chat_data = dict_persistence.get_chat_data()
         chat_data[-12345]['test3']['test4'] = 'test6'
@@ -2144,6 +2173,11 @@ class TestDictPersistence:
         dict_persistence.update_chat_data(-12345, chat_data[-12345])
         assert dict_persistence.chat_data == chat_data
         assert dict_persistence.chat_data_json == json.dumps(chat_data)
+        dict_persistence.drop_chat_data(-67890)
+        assert -67890 not in dict_persistence.chat_data
+        dict_persistence._chat_data = None
+        dict_persistence.drop_chat_data(123)
+        assert isinstance(dict_persistence.get_chat_data(), defaultdict)
 
         bot_data = dict_persistence.get_bot_data()
         bot_data['test3']['test4'] = 'test6'

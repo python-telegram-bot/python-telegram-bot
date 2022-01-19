@@ -125,6 +125,15 @@ class TestDispatcher:
         )
         assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
+    @pytest.mark.parametrize("data", ["chat_data", "user_data"])
+    def test_chat_user_data_read_only(self, dp, data):
+        read_only_data = getattr(dp, data)
+        writable_data = getattr(dp, f"_{data}")
+        writable_data[123] = 321
+        assert read_only_data == writable_data
+        with pytest.raises(TypeError):
+            read_only_data[111] = 123
+
     @pytest.mark.parametrize(
         'builder',
         (DispatcherBuilder(), UpdaterBuilder()),
@@ -621,6 +630,12 @@ class TestDispatcher:
             def update_bot_data(self, data):
                 raise Exception
 
+            def drop_chat_data(self, chat_id):
+                pass
+
+            def drop_user_data(self, user_id):
+                pass
+
             def get_chat_data(self):
                 return defaultdict(dict)
 
@@ -747,6 +762,12 @@ class TestDispatcher:
             def update_user_data(self, user_id, data):
                 self.update(data)
 
+            def drop_user_data(self, user_id):
+                pass
+
+            def drop_chat_data(self, chat_id):
+                pass
+
             def get_chat_data(self):
                 pass
 
@@ -825,6 +846,12 @@ class TestDispatcher:
             def update_conversation(self, name, key, new_state):
                 pass
 
+            def drop_chat_data(self, chat_id):
+                pass
+
+            def drop_user_data(self, user_id):
+                pass
+
             def get_conversations(self, name):
                 pass
 
@@ -878,6 +905,26 @@ class TestDispatcher:
         assert dp.persistence.test_flag_bot_data
         assert not dp.persistence.test_flag_user_data
         assert dp.persistence.test_flag_chat_data
+
+    @pytest.mark.parametrize(
+        "c_id,expected",
+        [(321, {222: "remove_me"}), (111, {321: {'not_empty': 'no'}, 222: "remove_me"})],
+        ids=["test chat_id removal", "test no key in data (no error)"],
+    )
+    def test_drop_chat_data(self, dp, c_id, expected):
+        dp._chat_data.update({321: {'not_empty': 'no'}, 222: "remove_me"})
+        dp.drop_chat_data(c_id)
+        assert dp.chat_data == expected
+
+    @pytest.mark.parametrize(
+        "u_id,expected",
+        [(321, {222: "remove_me"}), (111, {321: {'not_empty': 'no'}, 222: "remove_me"})],
+        ids=["test user_id removal", "test no key in data (no error)"],
+    )
+    def test_drop_user_data(self, dp, u_id, expected):
+        dp._user_data.update({321: {'not_empty': 'no'}, 222: "remove_me"})
+        dp.drop_user_data(u_id)
+        assert dp.user_data == expected
 
     def test_update_persistence_once_per_update(self, monkeypatch, dp):
         def update_persistence(*args, **kwargs):

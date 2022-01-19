@@ -28,6 +28,7 @@ from queue import Queue
 from threading import Thread, Event
 from time import sleep
 from typing import Callable, List, Iterable, Any
+from types import MappingProxyType
 
 import pytest
 import pytz
@@ -194,10 +195,11 @@ def dp(_dp):
     # Reset the dispatcher first
     while not _dp.update_queue.empty():
         _dp.update_queue.get(False)
-    _dp.chat_data = defaultdict(dict)
-    _dp.user_data = defaultdict(dict)
+    _dp._chat_data = defaultdict(dict)
+    _dp._user_data = defaultdict(dict)
+    _dp.chat_data = MappingProxyType(_dp._chat_data)  # Rebuild the mapping so it updates
+    _dp.user_data = MappingProxyType(_dp._user_data)
     _dp.bot_data = {}
-    _dp.persistence = None
     _dp.handlers = {}
     _dp.error_handlers = {}
     _dp.exception_event = Event()
