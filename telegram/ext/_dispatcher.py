@@ -55,6 +55,7 @@ from telegram.ext._utils.types import CCT, UD, CD, BD, BT, JQ, PT
 from telegram.ext._utils.stack import was_called_by
 
 if TYPE_CHECKING:
+    from telegram import Message
     from telegram.ext._jobqueue import Job
     from telegram.ext._builders import InitDispatcherBuilder
 
@@ -679,6 +680,52 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
         if self.persistence:
             self.persistence.drop_user_data(user_id)
+
+    def migrate_chat_data(
+        self, message: 'Message' = None, old_chat_id: int = None, new_chat_id: int = None
+    ) -> None:
+        """Moves the contents of :attr:`chat_data` at key old_chat_id to the key new_chat_id.
+        Also updates the persistence by calling :attr:`update_persistence`.
+
+        Warning:
+
+            * Any data stored in :attr:`chat_data` at key `new_chat_id` will be overridden
+            * The key `old_chat_id` of :attr:`chat_data` will be deleted
+
+        Args:
+            message (:class:`Message`, optional): A message with either
+                :attr:`telegram.Message.migrate_from_chat_id` or
+                :attr:`telegram.Message.migrate_to_chat_id`.
+                Mutually exclusive with passing ``old_chat_id`` and ``new_chat_id``
+
+                .. seealso: `telegram.ext.filters.StatusUpdate.MIGRATE`
+            old_chat_id (:obj:`int`, optional): The old chat ID.
+                Mutually exclusive with passing ``message``
+            new_chat_id (:obj:`int`, optional): The new chat ID.
+                Mutually exclusive with passing ``message``
+
+        """
+        if message and (old_chat_id or new_chat_id):
+            raise ValueError("Message and chat_id pair are mutually exclusive")
+        if not any((message, old_chat_id, new_chat_id)):
+            raise ValueError("chat_id pair or message must be passed")
+
+        if message:
+            if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
+                raise ValueError(
+                    "Invalid message instance. The message must have either "
+                    "`Message.migrate_from_chat_id` or `Message.migrate_to_chat_id`."
+                )
+
+            old_chat_id = message.migrate_from_chat_id or message.chat.id
+            new_chat_id = message.migrate_to_chat_id or message.chat.id
+
+        elif not (isinstance(old_chat_id, int) and isinstance(new_chat_id, int)):
+            raise ValueError("old_chat_id and new_chat_id must be integers")
+
+        self._chat_data[new_chat_id] = self._chat_data[old_chat_id]
+        self.drop_chat_data(old_chat_id)
+        self.update_persistence()
 
     def update_persistence(self, update: object = None) -> None:
         """Update :attr:`user_data`, :attr:`chat_data` and :attr:`bot_data` in :attr:`persistence`.

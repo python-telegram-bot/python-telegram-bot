@@ -745,6 +745,51 @@ class TestDispatcher:
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
+    @pytest.mark.parametrize(
+        'message',
+        [
+            Message(message_id=1, chat=Chat(id=2, type=None), migrate_from_chat_id=1, date=None),
+            Message(message_id=1, chat=Chat(id=1, type=None), migrate_to_chat_id=2, date=None),
+            Message(message_id=1, chat=Chat(id=1, type=None), date=None),
+            None,
+        ],
+    )
+    @pytest.mark.parametrize('old_chat_id', [None, 1, "1"])
+    @pytest.mark.parametrize('new_chat_id', [None, 2, "1"])
+    def test_migrate_chat_data(self, dp, message: 'Message', old_chat_id: int, new_chat_id: int):
+        def call(match: str):
+            with pytest.raises(ValueError, match=match):
+                dp.migrate_chat_data(
+                    message=message, old_chat_id=old_chat_id, new_chat_id=new_chat_id
+                )
+
+        if message and (old_chat_id or new_chat_id):
+            call(r"^Message and chat_id pair are mutually exclusive$")
+            return
+
+        if not any((message, old_chat_id, new_chat_id)):
+            call(r"^chat_id pair or message must be passed$")
+            return
+
+        if message:
+            if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
+                call(r"^Invalid message instance")
+                return
+            effective_old_chat_id = message.migrate_from_chat_id or message.chat.id
+            effective_new_chat_id = message.migrate_to_chat_id or message.chat.id
+
+        elif not (isinstance(old_chat_id, int) and isinstance(new_chat_id, int)):
+            call(r"^old_chat_id and new_chat_id must be integers$")
+            return
+        else:
+            effective_old_chat_id = old_chat_id
+            effective_new_chat_id = new_chat_id
+
+        dp.chat_data[effective_old_chat_id]['key'] = "test"
+        dp.migrate_chat_data(message=message, old_chat_id=old_chat_id, new_chat_id=new_chat_id)
+        assert effective_old_chat_id not in dp.chat_data
+        assert dp.chat_data[effective_new_chat_id]['key'] == "test"
+
     def test_error_while_persisting(self, dp, caplog):
         class OwnPersistence(BasePersistence):
             def update(self, data):

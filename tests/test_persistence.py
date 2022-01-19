@@ -166,10 +166,10 @@ def bot_persistence():
             self.callback_data = data
 
         def drop_user_data(self, user_id):
-            pass
+            self.user_data.pop(user_id, None)
 
         def drop_chat_data(self, chat_id):
-            pass
+            self.chat_data.pop(chat_id, None)
 
         def update_conversation(self, name, key, new_state):
             raise NotImplementedError
@@ -473,6 +473,15 @@ class TestBasePersistence:
             assert issubclass(r.exc_info[0], NotImplementedError)
             assert r.getMessage() == 'No error handlers are registered, logging exception.'
             assert r.levelname == 'ERROR'
+
+    def test_dispatcher_integration_migrate_chat_data(self, dp, bot_persistence):
+        dp.persistence = bot_persistence
+        dp.chat_data[1]['key'] = 'value'
+        dp.update_persistence()
+        assert bot_persistence.chat_data == {1: {'key': 'value'}}
+
+        dp.migrate_chat_data(old_chat_id=1, new_chat_id=2)
+        assert bot_persistence.chat_data == {2: {'key': 'value'}}
 
     @pytest.mark.parametrize(
         'store_user_data', [True, False], ids=['store_user_data-True', 'store_user_data-False']
