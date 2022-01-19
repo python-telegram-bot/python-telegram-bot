@@ -30,7 +30,9 @@ Warning:
 
 
 def check_keyboard_type(keyboard: object) -> bool:
-    """Checks if the keyboard provided is of the correct type - A list of lists."""
+    """Checks if the keyboard provided is of the correct type - A list of lists.
+    Implicitly tested in the init-tests of `{Inline, Reply}KeyboardMarkup`
+    """
     if not isinstance(keyboard, list):
         return False
     for row in keyboard:
