@@ -361,6 +361,32 @@ class DictPersistence(BasePersistence):
         self._callback_data = (data[0], data[1].copy())
         self._callback_data_json = None
 
+    def drop_chat_data(self, chat_id: int) -> None:
+        """Will delete the specified key from the :attr:`chat_data`.
+
+        .. versionadded:: 14.0
+
+        Args:
+            chat_id (:obj:`int`): The chat id to delete from the persistence.
+        """
+        if self._chat_data is None:
+            return
+        self._chat_data.pop(chat_id, None)
+        self._chat_data_json = None
+
+    def drop_user_data(self, user_id: int) -> None:
+        """Will delete the specified key from the :attr:`user_data`.
+
+        .. versionadded:: 14.0
+
+        Args:
+            user_id (:obj:`int`): The user id to delete from the persistence.
+        """
+        if self._user_data is None:
+            return
+        self._user_data.pop(user_id, None)
+        self._user_data_json = None
+
     def refresh_user_data(self, user_id: int, user_data: Dict) -> None:
         """Does nothing.
 
