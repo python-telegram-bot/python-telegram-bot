@@ -92,7 +92,8 @@ class ConversationHandler(Handler[Update, CCT]):
 
         Finally, ``ConversationHandler``, does *not* handle (edited) channel posts.
 
-    .. _`FAQ`: https://git.io/JtcyU
+    .. _`FAQ`: https://github.com/python-telegram-bot/python-telegram-bot/wiki\
+        /Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do
 
     The first collection, a ``list`` named :attr:`entry_points`, is used to initiate the
     conversation, for example with a :class:`telegram.ext.CommandHandler` or
@@ -299,7 +300,9 @@ class ConversationHandler(Handler[Update, CCT]):
 
         # this link will be added to all warnings tied to per_* setting
         per_faq_link = (
-            " Read this FAQ entry to learn more about the per_* settings: https://git.io/JtcyU."
+            " Read this FAQ entry to learn more about the per_* settings: "
+            "https://github.com/python-telegram-bot/python-telegram-bot/wiki"
+            "/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do."
         )
 
         for handler in all_handlers:
