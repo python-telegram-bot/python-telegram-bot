@@ -40,6 +40,11 @@ if TYPE_CHECKING:
     from telegram.ext import Dispatcher, Job, JobQueue
     from telegram.ext._utils.types import CCT
 
+_STORING_DATA_WIKI = (
+    "https://github.com/python-telegram-bot/python-telegram-bot"
+    "/wiki/Storing-bot%2C-user-and-chat-related-data"
+)
+
 
 class CallbackContext(Generic[BT, UD, CD, BD]):
     """
@@ -155,7 +160,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @bot_data.setter
     def bot_data(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to bot_data, see https://git.io/Jt6ic"
+            f"You can not assign a new value to bot_data, see {_STORING_DATA_WIKI}"
         )
 
     @property
@@ -176,7 +181,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @chat_data.setter
     def chat_data(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to chat_data, see https://git.io/Jt6ic"
+            f"You can not assign a new value to chat_data, see {_STORING_DATA_WIKI}"
         )
 
     @property
@@ -191,7 +196,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @user_data.setter
     def user_data(self, value: object) -> NoReturn:
         raise AttributeError(
-            "You can not assign a new value to user_data, see https://git.io/Jt6ic"
+            f"You can not assign a new value to user_data, see {_STORING_DATA_WIKI}"
         )
 
     def refresh_data(self) -> None:

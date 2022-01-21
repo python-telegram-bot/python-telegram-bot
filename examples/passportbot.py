@@ -7,7 +7,8 @@ Simple Bot to print/download all incoming passport data
 
 See https://telegram.org/blog/passport for info about what telegram passport is.
 
-See https://git.io/fAvYd for how to use Telegram Passport properly with python-telegram-bot.
+See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Telegram-Passport
+ for how to use Telegram Passport properly with python-telegram-bot.
 
 """
 import logging
