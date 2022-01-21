@@ -321,7 +321,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
     def _pooled(self) -> None:
         thr_name = current_thread().name
-        while 1:
+        while True:
             promise = self.__async_queue.get()
 
             # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
@@ -417,7 +417,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         if ready is not None:
             ready.set()
 
-        while 1:
+        while True:
             try:
                 # Pop update from update queue.
                 update = self.update_queue.get(True, 1)
@@ -527,9 +527,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                     self.logger.debug('Error handler stopped further handlers.')
                     break
 
-        # Update persistence, if handled
-        handled_only_async = all(sync_modes)
+        # Update persistence, if an update was handled
         if handled:
+            handled_only_async = all(sync_modes)
             # Respect default settings
             if (
                 all(mode is DEFAULT_FALSE for mode in sync_modes)
@@ -739,7 +739,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
     def __update_persistence(self, update: object = None) -> None:
         if self.persistence:
-            # We use list() here in order to decouple chat_ids from self._chat_data, as dict view
+            # We use list() here in order to decouple chat_ids from self.chat_data, as dict view
             # objects will change, when the dict does and we want to loop over chat_ids
             chat_ids = list(self.chat_data.keys())
             user_ids = list(self.user_data.keys())
@@ -856,10 +856,10 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             :obj:`bool`: :obj:`True` if one of the error handlers raised
             :class:`telegram.ext.DispatcherHandlerStop`. :obj:`False`, otherwise.
         """
-        async_args = None if not promise else promise.args
-        async_kwargs = None if not promise else promise.kwargs
-
         if self.error_handlers:
+            async_args = None if not promise else promise.args
+            async_kwargs = None if not promise else promise.kwargs
+
             for (
                 callback,
                 run_async,
