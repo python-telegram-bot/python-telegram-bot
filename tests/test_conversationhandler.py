@@ -1449,7 +1449,9 @@ class TestConversationHandler:
         )
 
         per_faq_link = (
-            " Read this FAQ entry to learn more about the per_* settings: https://git.io/JtcyU."
+            " Read this FAQ entry to learn more about the per_* settings: "
+            "https://github.com/python-telegram-bot/python-telegram-bot/wiki"
+            "/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do."
         )
 
         assert str(recwarn[4].message) == (

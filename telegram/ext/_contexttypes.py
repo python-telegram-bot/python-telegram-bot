@@ -53,7 +53,8 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     __slots__ = ('_context', '_bot_data', '_chat_data', '_user_data')
 
-    # overload signatures generated with https://git.io/JtJPj
+    # overload signatures generated with
+    # https://gist.github.com/Bibo-Joshi/399382cda537fb01bd86b13c3d03a956
 
     @overload
     def __init__(
