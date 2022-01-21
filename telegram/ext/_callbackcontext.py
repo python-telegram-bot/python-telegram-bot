@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from telegram.ext._utils.types import CCT
 
 _STORING_DATA_WIKI = (
-    " https://github.com/python-telegram-bot/python-telegram-bot"
+    "https://github.com/python-telegram-bot/python-telegram-bot"
     "/wiki/Storing-bot%2C-user-and-chat-related-data"
 )
 
