@@ -993,8 +993,8 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         to be used for :attr:`telegram.ext.Updater.bot`.
 
         .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
-            /tree/master/examples#passportbotpy>`_, `Telegram Passports <>`_https://github.com/python-telegram-bot\
-            /python-telegram-bot/wiki/Telegram-Passport
+            /tree/master/examples#passportbotpy>`_, `Telegram Passports <https://github.com/python-telegram-bot\
+            /python-telegram-bot/wiki/Telegram-Passport>`_
 
         Args:
             private_key (:obj:`bytes` | :obj:`str` | :obj:`pathlib.Path`): The private key or the

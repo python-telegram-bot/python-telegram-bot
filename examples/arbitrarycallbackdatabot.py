@@ -5,7 +5,6 @@
 """This example showcases how PTBs "arbitrary callback data" feature can be used.
 
 For detailed info on arbitrary callback data, see the wiki page at
-
 https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data
 """
 import logging
