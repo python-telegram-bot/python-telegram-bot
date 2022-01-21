@@ -666,7 +666,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         be stored in memory.
 
         .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot\
-            /python-telegram-bot/issues/1321>`_,
+            /python-telegram-bot/wiki/Arbitrary-callback_data>`_,
             `arbitrarycallbackdatabot.py <https://github.com/python-telegram-bot\
                 /python-telegram-bot/tree/master/examples#arbitrarycallbackdatabotpy>`_
 
