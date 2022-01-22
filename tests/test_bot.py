@@ -253,7 +253,6 @@ class TestBot:
                 'de_list',
                 'to_dict',
                 'to_json',
-                'log',
                 'parse_data',
                 'get_updates',
                 'getUpdates',
@@ -744,6 +743,14 @@ class TestBot:
                 )
 
     @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_poll_default_protect_content(self, chat_id, default_bot):
+        protected_poll = default_bot.send_poll(chat_id, 'Test', ['1', '2'])
+        assert protected_poll.has_protected_content
+        unprotect_poll = default_bot.send_poll(chat_id, 'test', ['1', '2'], protect_content=False)
+        assert not unprotect_poll.has_protected_content
+
+    @flaky(3, 1)
     @pytest.mark.parametrize('emoji', Dice.ALL_EMOJI + [None])
     def test_send_dice(self, bot, chat_id, emoji):
         message = bot.send_dice(chat_id, emoji=emoji, protect_content=True)
@@ -784,6 +791,14 @@ class TestBot:
         else:
             with pytest.raises(BadRequest, match='message not found'):
                 default_bot.send_dice(chat_id, reply_to_message_id=reply_to_message.message_id)
+
+    @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_dice_default_protect_content(self, chat_id, default_bot):
+        protected_dice = default_bot.send_dice(chat_id)
+        assert protected_dice.has_protected_content
+        unprotected_dice = default_bot.send_dice(chat_id, protect_content=False)
+        assert not unprotected_dice.has_protected_content
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
@@ -1520,6 +1535,16 @@ class TestBot:
                     chat_id, game_short_name, reply_to_message_id=reply_to_message.message_id
                 )
 
+    @flaky(3, 1)
+    @pytest.mark.parametrize(
+        'default_bot,val',
+        [({'protect_content': True}, True), ({'protect_content': False}, None)],
+        indirect=['default_bot'],
+    )
+    def test_send_game_default_protect_content(self, default_bot, chat_id, val):
+        protected = default_bot.send_game(chat_id, 'test_game', protect_content=val)
+        assert protected.has_protected_content is val
+
     @xfail
     def test_set_game_score_1(self, bot, chat_id):
         # NOTE: numbering of methods assures proper order between test_set_game_scoreX methods
@@ -2083,6 +2108,15 @@ class TestBot:
         message = default_bot.send_message(chat_id, test_markdown_string, parse_mode='HTML')
         assert message.text == test_markdown_string
         assert message.text_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_message_default_protect_content(self, default_bot, chat_id):
+        to_check = default_bot.send_message(chat_id, "test")
+        assert to_check.has_protected_content
+
+        no_protect = default_bot.send_message(chat_id, "test", protect_content=False)
+        assert not no_protect.has_protected_content
 
     @flaky(3, 1)
     @pytest.mark.parametrize(

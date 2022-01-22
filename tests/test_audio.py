@@ -35,9 +35,8 @@ from tests.conftest import (
 
 @pytest.fixture(scope='function')
 def audio_file():
-    f = data_file('telegram.mp3').open('rb')
-    yield f
-    f.close()
+    with open(data_file('telegram.mp3'), 'rb') as f:
+        yield f
 
 
 @pytest.fixture(scope='class')
@@ -186,7 +185,7 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file, thumb_file):
+    def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
@@ -196,7 +195,7 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file, thumb_file):
+    def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
         message = default_bot.send_audio(
@@ -207,7 +206,7 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file, thumb_file):
+    def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
         message = default_bot.send_audio(
@@ -215,6 +214,14 @@ class TestAudio:
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
+
+    @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_audio_default_protect_content(self, default_bot, chat_id, audio):
+        protected_audio = default_bot.send_audio(chat_id, audio)
+        assert protected_audio.has_protected_content
+        unprotected = default_bot.send_audio(chat_id, audio, protect_content=False)
+        assert not unprotected.has_protected_content
 
     def test_send_audio_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up

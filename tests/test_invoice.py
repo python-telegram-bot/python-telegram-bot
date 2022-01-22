@@ -264,6 +264,31 @@ class TestInvoice:
                     reply_to_message_id=reply_to_message.message_id,
                 )
 
+    @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_invoice_default_protect_content(self, chat_id, default_bot, provider_token):
+        protected = default_bot.send_invoice(
+            chat_id,
+            self.title,
+            self.description,
+            self.payload,
+            provider_token,
+            self.currency,
+            self.prices,
+        )
+        assert protected.has_protected_content
+        unprotected = default_bot.send_invoice(
+            chat_id,
+            self.title,
+            self.description,
+            self.payload,
+            provider_token,
+            self.currency,
+            self.prices,
+            protect_content=False,
+        )
+        assert not unprotected.has_protected_content
+
     def test_equality(self):
         a = Invoice('invoice', 'desc', 'start', 'EUR', 7)
         b = Invoice('invoice', 'desc', 'start', 'EUR', 7)

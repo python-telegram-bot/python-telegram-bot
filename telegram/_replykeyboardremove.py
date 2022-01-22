@@ -19,10 +19,10 @@
 """This module contains an object that represents a Telegram ReplyKeyboardRemove."""
 from typing import Any
 
-from telegram import ReplyMarkup
+from telegram import TelegramObject
 
 
-class ReplyKeyboardRemove(ReplyMarkup):
+class ReplyKeyboardRemove(TelegramObject):
     """
     Upon receiving a message with this object, Telegram clients will remove the current custom
     keyboard and display the default letter-keyboard. By default, custom keyboards are displayed

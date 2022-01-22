@@ -37,7 +37,6 @@ from typing import (
 
 from telegram import (
     Bot,
-    ReplyMarkup,
     Message,
     InlineKeyboardMarkup,
     Poll,
@@ -48,7 +47,7 @@ from telegram import (
     InputMedia,
 )
 
-from telegram._utils.types import JSONDict, ODVInput, DVInput
+from telegram._utils.types import JSONDict, ODVInput, DVInput, ReplyMarkup
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.datetime import to_timestamp
 from telegram.ext._callbackdatacache import CallbackDataCache
@@ -78,7 +77,8 @@ class ExtBot(Bot):
         arbitrary_callback_data (:obj:`bool` | :obj:`int`, optional): Whether to
             allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
             Pass an integer to specify the maximum number of objects cached in memory. For more
-            details, please see our `wiki <https://git.io/JGBDI>`_. Defaults to :obj:`False`.
+            details, please see our `wiki <https://github.com/python-telegram-bot\
+                /python-telegram-bot/wiki/Arbitrary-callback_data>`_. Defaults to :obj:`False`.
 
     Attributes:
         arbitrary_callback_data (:obj:`bool` | :obj:`int`): Whether this bot instance
@@ -256,7 +256,7 @@ class ExtBot(Bot):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Union[bool, Message]:
         # We override this method to call self._replace_keyboard and self._insert_callback_data.
         # This covers most methods that have a reply_markup
@@ -387,7 +387,7 @@ class ExtBot(Bot):
         reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> MessageId:
         # We override this method to call self._replace_keyboard
         return super().copy_message(

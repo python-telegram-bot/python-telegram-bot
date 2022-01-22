@@ -60,6 +60,11 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 
+    Attention:
+        The interface provided by this class is intended to be accessed exclusively by
+        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+
     All relevant methods must be overwritten. This includes:
 
     * :meth:`get_bot_data`
@@ -459,7 +464,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]:
+                Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]]:
                 The restored meta data or :obj:`None`, if no data was stored.
         """
 
@@ -523,6 +528,44 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
+    def update_callback_data(self, data: CDCData) -> None:
+        """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
+        handled an update.
+
+        .. versionadded:: 13.6
+
+        .. versionchanged:: 14.0
+           Changed this method into an ``@abstractmethod``.
+
+        Args:
+            data (Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
+                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]]):
+                The relevant data to restore :class:`telegram.ext.CallbackDataCache`.
+        """
+
+    @abstractmethod
+    def drop_chat_data(self, chat_id: int) -> None:
+        """Will be called by the :class:`telegram.ext.Dispatcher`, when using
+        :meth:`~telegram.ext.Dispatcher.drop_chat_data`.
+
+        .. versionadded:: 14.0
+
+        Args:
+            chat_id (:obj:`int`): The chat id to delete from the persistence.
+        """
+
+    @abstractmethod
+    def drop_user_data(self, user_id: int) -> None:
+        """Will be called by the :class:`telegram.ext.Dispatcher`, when using
+        :meth:`~telegram.ext.Dispatcher.drop_user_data`.
+
+        .. versionadded:: 14.0
+
+        Args:
+            user_id (:obj:`int`): The user id to delete from the persistence.
+        """
+
+    @abstractmethod
     def refresh_user_data(self, user_id: int, user_data: UD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
         :attr:`~telegram.ext.Dispatcher.user_data` to a callback. Can be used to update data stored
@@ -572,22 +615,6 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             bot_data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`):
                 The ``bot_data``.
-        """
-
-    @abstractmethod
-    def update_callback_data(self, data: CDCData) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
-        handled an update.
-
-        .. versionadded:: 13.6
-
-        .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
-
-        Args:
-            data (Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]):
-                The relevant data to restore :class:`telegram.ext.CallbackDataCache`.
         """
 
     @abstractmethod

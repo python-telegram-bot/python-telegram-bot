@@ -11,16 +11,18 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
+import subprocess
 import re
 import sys
 import os
+import inspect
 from enum import Enum
+from pathlib import Path
 from typing import Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-import inspect
 from docutils.nodes import Element
 from sphinx.application import Sphinx
 from sphinx.domains.python import PyXRefRole
@@ -32,7 +34,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '4.2.0'
+needs_sphinx = '4.3.2'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -41,6 +43,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.linkcode',
     'sphinx_paramlinks',
 ]
 
@@ -134,13 +137,21 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'furo'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'style_external_links': True,
+    'navigation_with_keys': True,
+    'dark_css_variables': {'admonition-title-font-size': '0.95rem',
+                           'admonition-font-size': '0.92rem'},
+    'light_css_variables': {'admonition-title-font-size': '0.95rem',
+                            'admonition-font-size': '0.92rem'},
+    "announcement": 'PTB has undergone significant changes in v14. Please read the documentation '
+                    'carefully and also check out the transition guide in the '
+                    '<a href="https://github.com/python-telegram-bot/python-telegram-bot/wiki">'
+                    'wiki</a>',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -148,24 +159,26 @@ html_theme_options = {
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+html_title = f"python-telegram-bot<br>v{version}"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = 'ptb-logo-orange.png'
+html_logo = 'ptb-logo_1024.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'ptb-logo-orange.ico'
+html_favicon = 'ptb-logo_1024.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_css_files = ['style_external_link.css']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -391,6 +404,90 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
             return True  # return True to exclude from docs.
 
 
+# ------------------------------------------------------------------------------------------------
+# This part is for getting the [source] links on the classes, methods etc link to the correct
+# files & lines on github. Can be simplified once https://github.com/sphinx-doc/sphinx/issues/1556
+# is closed
+
+line_numbers = {}
+file_root = Path(inspect.getsourcefile(telegram)).parent.parent.resolve()
+import telegram.ext  # Needed for checking if an object is a BaseFilter
+
+
+def autodoc_process_docstring(app: Sphinx, what, name: str, obj: object, options, lines):
+    """We misuse this autodoc hook to get the file names & line numbers because we have access
+    to the actual object here.
+    """
+    # Ce can't properly handle ordinary attributes.
+    # In linkcode_resolve we'll resolve to the `__init__` or module instead
+    if what == 'attribute':
+        return
+
+    # Special casing for properties
+    if hasattr(obj, 'fget'):
+        obj = obj.fget
+
+    # Special casing for filters
+    if isinstance(obj, telegram.ext.filters.BaseFilter):
+        obj = obj.__class__
+
+    try:
+        source_lines, start_line = inspect.getsourcelines(obj)
+        end_line = start_line + len(source_lines)
+        file = Path(inspect.getsourcefile(obj)).relative_to(file_root)
+        line_numbers[name] = (file, start_line, end_line)
+    except Exception:
+        pass
+
+    # Since we don't document the `__init__`, we call this manually to have it available for
+    # attributes -- see the note above
+    if what == 'class':
+        autodoc_process_docstring(app, 'method', f'{name}.__init__', obj.__init__, options, lines)
+
+
+def _git_branch() -> str:
+    """Get's the current git sha if available or fall back to `master`"""
+    try:
+        output = subprocess.check_output(  # skipcq: BAN-B607
+            ["git", "describe", "--tags"], stderr=subprocess.STDOUT
+        )
+        return output.decode().strip()
+    except Exception:
+        return 'master'
+
+
+git_branch = _git_branch()
+base_url = "https://github.com/python-telegram-bot/python-telegram-bot/blob/"
+
+
+def linkcode_resolve(_, info):
+    """See www.sphinx-doc.org/en/master/usage/extensions/linkcode.html"""
+    combined = '.'.join((info['module'], info['fullname']))
+    # special casing for ExtBot which is due to the special structure of extbot.rst
+    combined = combined.replace('ExtBot.ExtBot', 'ExtBot')
+
+    line_info = line_numbers.get(combined)
+
+    if not line_info:
+        # Try the __init__
+        line_info = line_numbers.get(f"{combined.rsplit('.', 1)[0]}.__init__")
+    if not line_info:
+        # Try the class
+        line_info = line_numbers.get(f"{combined.rsplit('.', 1)[0]}")
+    if not line_info:
+        # Try the module
+        line_info = line_numbers.get(info['module'])
+
+    if not line_info:
+        return
+
+    file, start_line, end_line = line_info
+    return f"{base_url}{git_branch}/{file}#L{start_line}-L{end_line}"
+
+# End of logic for the [source] links
+# ------------------------------------------------------------------------------------------------
+
+
 # Some base classes are implementation detail
 # We want to instead show *their* base class
 PRIVATE_BASE_CLASSES = {
@@ -441,8 +538,8 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
 
 
 def setup(app: Sphinx):
-    app.add_css_file("dark.css")
     app.add_css_file("sphinx_paramlinks_override.css")
     app.connect('autodoc-skip-member', autodoc_skip_member)
     app.connect('autodoc-process-bases', autodoc_process_bases)
+    app.connect('autodoc-process-docstring', autodoc_process_docstring)
     app.add_role_to_domain('py', CONSTANTS_ROLE, TGConstXRefRole())
