@@ -178,7 +178,7 @@ html_favicon = 'ptb-logo_1024.ico'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_css_files = ['style_external_link.css']
+html_css_files = ['style_external_link.css', "sphinx_paramlinks_override.css"]
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -538,7 +538,6 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
 
 
 def setup(app: Sphinx):
-    app.add_css_file("sphinx_paramlinks_override.css")
     app.connect('autodoc-skip-member', autodoc_skip_member)
     app.connect('autodoc-process-bases', autodoc_process_bases)
     app.connect('autodoc-process-docstring', autodoc_process_docstring)
