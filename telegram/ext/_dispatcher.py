@@ -321,7 +321,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
     def _pooled(self) -> None:
         thr_name = current_thread().name
-        while True:
+        while 1:
             promise = self.__async_queue.get()
 
             # If unpacking fails, the thread pool is being closed from Updater._join_async_threads
@@ -417,7 +417,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
         if ready is not None:
             ready.set()
 
-        while True:
+        while 1:
             try:
                 # Pop update from update queue.
                 update = self.update_queue.get(True, 1)
@@ -527,9 +527,9 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
                     self.logger.debug('Error handler stopped further handlers.')
                     break
 
-        # Update persistence, if an update was handled
+        # Update persistence, if handled
+        handled_only_async = all(sync_modes)
         if handled:
-            handled_only_async = all(sync_modes)
             # Respect default settings
             if (
                 all(mode is DEFAULT_FALSE for mode in sync_modes)
@@ -856,10 +856,10 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             :obj:`bool`: :obj:`True` if one of the error handlers raised
             :class:`telegram.ext.DispatcherHandlerStop`. :obj:`False`, otherwise.
         """
-        if self.error_handlers:
-            async_args = None if not promise else promise.args
-            async_kwargs = None if not promise else promise.kwargs
+        async_args = None if not promise else promise.args
+        async_kwargs = None if not promise else promise.kwargs
 
+        if self.error_handlers:
             for (
                 callback,
                 run_async,
