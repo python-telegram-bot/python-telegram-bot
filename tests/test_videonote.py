@@ -220,6 +220,14 @@ class TestVideoNote:
                 )
 
     @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_video_note_default_protect_content(self, chat_id, default_bot, video_note):
+        protected = default_bot.send_video_note(chat_id, video_note)
+        assert protected.has_protected_content
+        unprotected = default_bot.send_video_note(chat_id, video_note, protect_content=False)
+        assert not unprotected.has_protected_content
+
+    @flaky(3, 1)
     def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             bot.send_video_note(chat_id, open(os.devnull, 'rb'))

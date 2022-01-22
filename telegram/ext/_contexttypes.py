@@ -18,11 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=no-self-use
 """This module contains the auxiliary class ContextTypes."""
-from typing import Type, Generic, overload, Dict  # pylint: disable=unused-import
+from typing import Type, Generic, overload, Dict, TYPE_CHECKING  # pylint: disable=unused-import
 
 from telegram.ext._callbackcontext import CallbackContext
-from telegram.ext._extbot import ExtBot  # pylint: disable=unused-import
 from telegram.ext._utils.types import CCT, UD, CD, BD
+
+if TYPE_CHECKING:
+    from telegram.ext._extbot import ExtBot  # pylint: disable=unused-import
 
 
 class ContextTypes(Generic[CCT, UD, CD, BD]):
@@ -51,7 +53,8 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     __slots__ = ('_context', '_bot_data', '_chat_data', '_user_data')
 
-    # overload signatures generated with https://git.io/JtJPj
+    # overload signatures generated with
+    # https://gist.github.com/Bibo-Joshi/399382cda537fb01bd86b13c3d03a956
 
     @overload
     def __init__(

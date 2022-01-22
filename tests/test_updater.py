@@ -615,13 +615,13 @@ class TestUpdater:
         # (bots) running simultaneously while testing in github actions.
         records = caplog.records.copy()  # To avoid iterating and removing at same time
         for idx, log in enumerate(records):
-            print(log)
+            print(idx, log)
             msg = log.getMessage()
             if msg.startswith('Error while getting Updates: Conflict'):
-                caplog.records.pop(idx)  # For stability
+                caplog.records.remove(log)  # For stability
 
-            if msg.startswith('No error handlers are registered'):
-                caplog.records.pop(idx)
+            elif msg.startswith('No error handlers are registered'):
+                caplog.records.remove(log)
 
         assert len(caplog.records) == 2, caplog.records
 

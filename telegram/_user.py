@@ -28,7 +28,7 @@ from telegram.helpers import (
     mention_html as helpers_mention_html,
 )
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
-from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput
+from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput, ReplyMarkup
 
 if TYPE_CHECKING:
     from telegram import (
@@ -41,7 +41,6 @@ if TYPE_CHECKING:
         InputMediaPhoto,
         InputMediaVideo,
         MessageEntity,
-        ReplyMarkup,
         PhotoSize,
         Audio,
         Contact,
@@ -331,12 +330,12 @@ class User(TelegramObject):
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -369,14 +368,14 @@ class User(TelegramObject):
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -414,7 +413,7 @@ class User(TelegramObject):
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> List['Message']:
         """Shortcut for::
 
@@ -446,7 +445,7 @@ class User(TelegramObject):
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
@@ -454,7 +453,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -519,13 +518,13 @@ class User(TelegramObject):
         last_name: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         contact: 'Contact' = None,
         vcard: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -557,12 +556,12 @@ class User(TelegramObject):
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         emoji: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -593,7 +592,7 @@ class User(TelegramObject):
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
@@ -601,7 +600,7 @@ class User(TelegramObject):
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -640,7 +639,7 @@ class User(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -693,7 +692,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -751,7 +750,7 @@ class User(TelegramObject):
         longitude: float = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         location: 'Location' = None,
         live_period: int = None,
@@ -760,7 +759,7 @@ class User(TelegramObject):
         heading: int = None,
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -801,13 +800,13 @@ class User(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -844,11 +843,11 @@ class User(TelegramObject):
         sticker: Union[FileInput, 'Sticker'],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -879,7 +878,7 @@ class User(TelegramObject):
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         width: int = None,
         height: int = None,
@@ -890,7 +889,7 @@ class User(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -932,7 +931,7 @@ class User(TelegramObject):
         foursquare_id: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         venue: 'Venue' = None,
         foursquare_type: str = None,
@@ -940,7 +939,7 @@ class User(TelegramObject):
         google_place_id: str = None,
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -979,13 +978,13 @@ class User(TelegramObject):
         length: int = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: str = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1020,14 +1019,14 @@ class User(TelegramObject):
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: DVInput[float] = DEFAULT_20,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1068,7 +1067,7 @@ class User(TelegramObject):
         is_closed: bool = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         explanation: str = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1077,7 +1076,7 @@ class User(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1122,10 +1121,10 @@ class User(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -1163,10 +1162,10 @@ class User(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: ReplyMarkup = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: bool = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'MessageId':
         """Shortcut for::
 

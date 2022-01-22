@@ -241,6 +241,14 @@ class TestDocument:
                     chat_id, document, reply_to_message_id=reply_to_message.message_id
                 )
 
+    @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_document_default_protect_content(self, chat_id, default_bot, document):
+        protected = default_bot.send_document(chat_id, document)
+        assert protected.has_protected_content
+        unprotected = default_bot.send_document(chat_id, document, protect_content=False)
+        assert not unprotected.has_protected_content
+
     def test_send_document_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False

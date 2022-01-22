@@ -125,6 +125,15 @@ class TestDispatcher:
         )
         assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
+    @pytest.mark.parametrize("data", ["chat_data", "user_data"])
+    def test_chat_user_data_read_only(self, dp, data):
+        read_only_data = getattr(dp, data)
+        writable_data = getattr(dp, f"_{data}")
+        writable_data[123] = 321
+        assert read_only_data == writable_data
+        with pytest.raises(TypeError):
+            read_only_data[111] = 123
+
     @pytest.mark.parametrize(
         'builder',
         (DispatcherBuilder(), UpdaterBuilder()),
@@ -621,6 +630,12 @@ class TestDispatcher:
             def update_bot_data(self, data):
                 raise Exception
 
+            def drop_chat_data(self, chat_id):
+                pass
+
+            def drop_user_data(self, user_id):
+                pass
+
             def get_chat_data(self):
                 return defaultdict(dict)
 
@@ -730,6 +745,51 @@ class TestDispatcher:
         for thread_name in thread_names:
             assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
 
+    @pytest.mark.parametrize(
+        'message',
+        [
+            Message(message_id=1, chat=Chat(id=2, type=None), migrate_from_chat_id=1, date=None),
+            Message(message_id=1, chat=Chat(id=1, type=None), migrate_to_chat_id=2, date=None),
+            Message(message_id=1, chat=Chat(id=1, type=None), date=None),
+            None,
+        ],
+    )
+    @pytest.mark.parametrize('old_chat_id', [None, 1, "1"])
+    @pytest.mark.parametrize('new_chat_id', [None, 2, "1"])
+    def test_migrate_chat_data(self, dp, message: 'Message', old_chat_id: int, new_chat_id: int):
+        def call(match: str):
+            with pytest.raises(ValueError, match=match):
+                dp.migrate_chat_data(
+                    message=message, old_chat_id=old_chat_id, new_chat_id=new_chat_id
+                )
+
+        if message and (old_chat_id or new_chat_id):
+            call(r"^Message and chat_id pair are mutually exclusive$")
+            return
+
+        if not any((message, old_chat_id, new_chat_id)):
+            call(r"^chat_id pair or message must be passed$")
+            return
+
+        if message:
+            if message.migrate_from_chat_id is None and message.migrate_to_chat_id is None:
+                call(r"^Invalid message instance")
+                return
+            effective_old_chat_id = message.migrate_from_chat_id or message.chat.id
+            effective_new_chat_id = message.migrate_to_chat_id or message.chat.id
+
+        elif not (isinstance(old_chat_id, int) and isinstance(new_chat_id, int)):
+            call(r"^old_chat_id and new_chat_id must be integers$")
+            return
+        else:
+            effective_old_chat_id = old_chat_id
+            effective_new_chat_id = new_chat_id
+
+        dp.chat_data[effective_old_chat_id]['key'] = "test"
+        dp.migrate_chat_data(message=message, old_chat_id=old_chat_id, new_chat_id=new_chat_id)
+        assert effective_old_chat_id not in dp.chat_data
+        assert dp.chat_data[effective_new_chat_id]['key'] == "test"
+
     def test_error_while_persisting(self, dp, caplog):
         class OwnPersistence(BasePersistence):
             def update(self, data):
@@ -746,6 +806,12 @@ class TestDispatcher:
 
             def update_user_data(self, user_id, data):
                 self.update(data)
+
+            def drop_user_data(self, user_id):
+                pass
+
+            def drop_chat_data(self, chat_id):
+                pass
 
             def get_chat_data(self):
                 pass
@@ -825,6 +891,12 @@ class TestDispatcher:
             def update_conversation(self, name, key, new_state):
                 pass
 
+            def drop_chat_data(self, chat_id):
+                pass
+
+            def drop_user_data(self, user_id):
+                pass
+
             def get_conversations(self, name):
                 pass
 
@@ -878,6 +950,26 @@ class TestDispatcher:
         assert dp.persistence.test_flag_bot_data
         assert not dp.persistence.test_flag_user_data
         assert dp.persistence.test_flag_chat_data
+
+    @pytest.mark.parametrize(
+        "c_id,expected",
+        [(321, {222: "remove_me"}), (111, {321: {'not_empty': 'no'}, 222: "remove_me"})],
+        ids=["test chat_id removal", "test no key in data (no error)"],
+    )
+    def test_drop_chat_data(self, dp, c_id, expected):
+        dp._chat_data.update({321: {'not_empty': 'no'}, 222: "remove_me"})
+        dp.drop_chat_data(c_id)
+        assert dp.chat_data == expected
+
+    @pytest.mark.parametrize(
+        "u_id,expected",
+        [(321, {222: "remove_me"}), (111, {321: {'not_empty': 'no'}, 222: "remove_me"})],
+        ids=["test user_id removal", "test no key in data (no error)"],
+    )
+    def test_drop_user_data(self, dp, u_id, expected):
+        dp._user_data.update({321: {'not_empty': 'no'}, 222: "remove_me"})
+        dp.drop_user_data(u_id)
+        assert dp.user_data == expected
 
     def test_update_persistence_once_per_update(self, monkeypatch, dp):
         def update_persistence(*args, **kwargs):

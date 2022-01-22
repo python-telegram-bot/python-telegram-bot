@@ -18,13 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGame."""
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup
 from telegram.constants import InlineQueryResultType
-
-if TYPE_CHECKING:
-    from telegram import ReplyMarkup
 
 
 class InlineQueryResultGame(InlineQueryResult):
@@ -52,7 +49,7 @@ class InlineQueryResultGame(InlineQueryResult):
         self,
         id: str,  # pylint: disable=redefined-builtin
         game_short_name: str,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: InlineKeyboardMarkup = None,
         **_kwargs: Any,
     ):
         # Required

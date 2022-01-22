@@ -62,7 +62,7 @@ def get_setup_kwargs(raw=False):
         author_email='devs@python-telegram-bot.org',
         license='LGPLv3',
         url='https://python-telegram-bot.org/',
-        # Keywords supported by PyPI can be found at https://git.io/JtLIZ
+        # Keywords supported by PyPI can be found at https://github.com/pypa/warehouse/blob/aafc5185e57e67d43487ce4faa95913dd4573e14/warehouse/templates/packaging/detail.html#L20-L58
         project_urls={
             "Documentation": "https://python-telegram-bot.readthedocs.io",
             "Bug Tracker": "https://github.com/python-telegram-bot/python-telegram-bot/issues",

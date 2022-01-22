@@ -9,9 +9,9 @@ body:
       value: |
         Hey there, you have a question? We are happy to answer. Please make sure no similar question was opened already.
 
-        To make it easier for us to help you, please read this [article](https://git.io/JURJO).
+        To make it easier for us to help you, please read this [article](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Ask-Right).
 
-        Please mind that there is also a users' [Telegram group](https://t.me/pythontelegrambotgroup) for questions about the library. Questions asked there might be answered quicker than here. Moreover, [GitHub Discussions](https://git.io/JG3rk) offer a slightly better format to discuss usage questions.
+        Please mind that there is also a users' [Telegram group](https://t.me/pythontelegrambotgroup) for questions about the library. Questions asked there might be answered quicker than here. Moreover, [GitHub Discussions](https://github.com/python-telegram-bot/python-telegram-bot/discussions) offer a slightly better format to discuss usage questions.
 
   - type: textarea
     id: issue-faced

@@ -20,19 +20,20 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import InlineKeyboardButton, ReplyMarkup
+from telegram import InlineKeyboardButton, TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.markup import check_keyboard_type
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-class InlineKeyboardMarkup(ReplyMarkup):
+class InlineKeyboardMarkup(TelegramObject):
     """
     This object represents an inline keyboard that appears right next to the message it belongs to.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their the size of :attr:`inline_keyboard` and all the buttons are equal.
+    considered equal, if their size of :attr:`inline_keyboard` and all the buttons are equal.
 
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
@@ -48,7 +49,7 @@ class InlineKeyboardMarkup(ReplyMarkup):
     __slots__ = ('inline_keyboard',)
 
     def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]], **_kwargs: Any):
-        if not self._check_keyboard_type(inline_keyboard):
+        if not check_keyboard_type(inline_keyboard):
             raise ValueError(
                 "The parameter `inline_keyboard` should be a list of "
                 "list of InlineKeyboardButtons"
