@@ -19,7 +19,7 @@
 """This module contains the BasePersistence class."""
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, DefaultDict, NamedTuple, Union
+from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, NamedTuple
 
 from telegram import Bot
 from telegram.ext import ExtBot
@@ -395,7 +395,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         return obj
 
     @abstractmethod
-    def get_user_data(self) -> Union[DefaultDict[int, UD], Dict[int, UD]]:
+    def get_user_data(self) -> Dict[int, UD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
         :obj:`defaultdict` or :obj:`dict`. In the latter case, the dictionary should produce values
@@ -405,13 +405,16 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
           * The type from :attr:`telegram.ext.ContextTypes.user_data`
             if :class:`telegram.ext.ContextTypes` is used.
 
+        .. versionchanged:: 14.0
+            This method may now return a :obj:`dict` instead of a :obj:`collections.defaultdict`
+
         Returns:
             Dict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`]:
                 The restored user data.
         """
 
     @abstractmethod
-    def get_chat_data(self) -> Union[DefaultDict[int, CD], Dict[int, CD]]:
+    def get_chat_data(self) -> Dict[int, CD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
         :obj:`defaultdict` or :obj:`dict`. In the latter case, the dictionary should produce values
@@ -420,6 +423,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
           * :obj:`dict`
           * The type from :attr:`telegram.ext.ContextTypes.chat_data`
             if :class:`telegram.ext.ContextTypes` is used.
+
+        .. versionchanged:: 14.0
+            This method may now return a :obj:`dict` instead of a :obj:`collections.defaultdict`
 
         Returns:
             Dict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`]:
