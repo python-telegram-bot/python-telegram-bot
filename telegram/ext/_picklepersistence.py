@@ -319,7 +319,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """
         if self.user_data is None:
             self.user_data = {}
-        if self.user_data.get(user_id, None) == data:  # type: ignore[arg-type]
+        if self.user_data.get(user_id) == data:
             return
         self.user_data[user_id] = data
         if not self.on_flush:
@@ -337,7 +337,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """
         if self.chat_data is None:
             self.chat_data = {}
-        if self.chat_data.get(chat_id, None) == data:  # type: ignore[arg-type]
+        if self.chat_data.get(chat_id) == data:
             return
         self.chat_data[chat_id] = data
         if not self.on_flush:

@@ -132,10 +132,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         update_bot_data = instance.update_bot_data
         update_callback_data = instance.update_callback_data
 
-        def get_user_data_insert_bot() -> Union[DefaultDict[int, UD], Dict[int, UD]]:
+        def get_user_data_insert_bot() -> Dict[int, UD]:
             return instance.insert_bot(get_user_data())
 
-        def get_chat_data_insert_bot() -> Union[DefaultDict[int, CD], Dict[int, CD]]:
+        def get_chat_data_insert_bot() -> Dict[int, CD]:
             return instance.insert_bot(get_chat_data())
 
         def get_bot_data_insert_bot() -> BD:
