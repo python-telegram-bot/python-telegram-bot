@@ -194,16 +194,22 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @property
     def context(self) -> Type[CCT]:
+        """The type of the ``context`` argument of all (error-)handler callbacks and job
+        callbacks.
+        """
         return self._context
 
     @property
     def bot_data(self) -> Type[BD]:
+        """The type of ``context.bot_data`` of all (error-)handler callbacks and job callbacks."""
         return self._bot_data
 
     @property
     def chat_data(self) -> Type[CD]:
+        """The type of ``context.chat_data`` of all (error-)handler callbacks and job callbacks."""
         return self._chat_data
 
     @property
     def user_data(self) -> Type[UD]:
+        """The type of ``context.user_data`` of all (error-)handler callbacks and job callbacks."""
         return self._user_data

@@ -47,7 +47,7 @@ class CommandHandler(Handler[Update, CCT]):
         * :class:`CommandHandler` does *not* handle (edited) channel posts.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
@@ -60,7 +60,7 @@ class CommandHandler(Handler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
+        filters (:class:`telegram.ext.filters.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :mod:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
@@ -75,7 +75,7 @@ class CommandHandler(Handler[Update, CCT]):
             The command or list of commands this handler should listen for.
             Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler.
-        filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
+        filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
     """
@@ -194,7 +194,7 @@ class PrefixHandler(CommandHandler):
         * :class:`PrefixHandler` does *not* handle (edited) channel posts.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
@@ -208,7 +208,7 @@ class PrefixHandler(CommandHandler):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        filters (:class:`telegram.ext.BaseFilter`, optional): A filter inheriting from
+        filters (:class:`telegram.ext.filters.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :mod:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not).
@@ -217,7 +217,7 @@ class PrefixHandler(CommandHandler):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
-        filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
+        filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 

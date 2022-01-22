@@ -12,6 +12,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 import subprocess
+import re
 import sys
 import os
 import inspect
@@ -42,7 +43,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.linkcode'
+    'sphinx.ext.linkcode',
+    'sphinx_paramlinks',
 ]
 
 # Use intersphinx to reference the python builtin library docs
@@ -57,6 +59,13 @@ autodoc_typehints = 'none'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+# Fail on warnings & unresolved references etc
+nitpicky = True
+
+# Paramlink style
+paramlinks_hyperlink_param = 'name'
+
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -483,7 +492,57 @@ def linkcode_resolve(_, info):
 # ------------------------------------------------------------------------------------------------
 
 
+# Some base classes are implementation detail
+# We want to instead show *their* base class
+PRIVATE_BASE_CLASSES = {
+    '_ChatUserBaseFilter': 'MessageFilter',
+    '_Dice': 'MessageFilter',
+    '_BaseThumbedMedium': 'TelegramObject',
+    '_BaseMedium': 'TelegramObject',
+    '_CredentialsBase': 'TelegramObject',
+}
+
+
+def autodoc_process_bases(app, name, obj, option, bases: list):
+    """Here we fine tune how the base class's classes are displayed."""
+    for idx, base in enumerate(bases):
+        # let's use a string representation of the object
+        base = str(base)
+
+        # Special case because base classes are in std lib:
+        if "_StringEnum" in base:
+            bases[idx] = ":class:`enum.Enum`"
+            bases.insert(0, ':class:`str`')
+            continue
+
+        # Drop generics (at least for now)
+        if base.endswith("]"):
+            base = base.split("[", maxsplit=1)[0]
+            bases[idx] = f':class:`{base}`'
+
+        # Now convert `telegram._message.Message` to `telegram.Message` etc
+        match = re.search(pattern=r"(telegram(\.ext|))\.", string=base)
+        if match and '_utils' not in base:
+            base = base.rstrip("'>")
+            parts = base.rsplit(".", maxsplit=2)
+
+            # Replace private base classes with their respective parent
+            parts[-1] = PRIVATE_BASE_CLASSES.get(parts[-1], parts[-1])
+
+            # To make sure that e.g. `telegram.ext.filters.BaseFilter` keeps the `filters` part
+            if not parts[-2].startswith('_') and '_' not in parts[0]:
+                base = '.'.join(parts[-2:])
+            else:
+                base = parts[-1]
+
+            # add `telegram(.ext).` back in front
+            base = f'{match.group(0)}{base}'
+
+            bases[idx] = f':class:`{base}`'
+
+
 def setup(app: Sphinx):
     app.connect('autodoc-skip-member', autodoc_skip_member)
+    app.connect('autodoc-process-bases', autodoc_process_bases)
     app.connect('autodoc-process-docstring', autodoc_process_docstring)
     app.add_role_to_domain('py', CONSTANTS_ROLE, TGConstXRefRole())

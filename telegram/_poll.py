@@ -65,7 +65,7 @@ class PollAnswer(TelegramObject):
     This object represents an answer of a user in a non-anonymous poll.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`options_ids` are equal.
+    considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`option_ids` are equal.
 
     Args:
         poll_id (:obj:`str`): Unique poll identifier.

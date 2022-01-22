@@ -46,7 +46,7 @@ class DictPersistence(BasePersistence):
 
     Warning:
         :class:`DictPersistence` will try to replace :class:`telegram.Bot` instances by
-        :attr:`REPLACED_BOT` and insert the bot set with
+        :attr:`~telegram.ext.BasePersistence.REPLACED_BOT` and insert the bot set with
         :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
         that changes to the bot apply to the saved objects, too. If you change the bots token, this
         may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
@@ -207,7 +207,7 @@ class DictPersistence(BasePersistence):
 
     @property
     def callback_data(self) -> Optional[CDCData]:
-        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]], \
+        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :class:`object`]]], \
         Dict[:obj:`str`, :obj:`str`]]: The metadata on the stored callback data.
 
         .. versionadded:: 13.6
@@ -272,7 +272,7 @@ class DictPersistence(BasePersistence):
         .. versionadded:: 13.6
 
         Returns:
-            Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]], \
+            Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :class:`object`]]], \
                 Dict[:obj:`str`, :obj:`str`]]: The restored metadata or :obj:`None`, \
                 if no data was stored.
         """
@@ -300,7 +300,7 @@ class DictPersistence(BasePersistence):
         Args:
             name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
-            new_state (:obj:`tuple` | :obj:`Any`): The new state for the given key.
+            new_state (:obj:`tuple` | :class:`object`): The new state for the given key.
         """
         if not self._conversations:
             self._conversations = {}
@@ -354,7 +354,7 @@ class DictPersistence(BasePersistence):
         .. versionadded:: 13.6
 
         Args:
-            data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]], \
+            data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :class:`object`]]], \
                 Dict[:obj:`str`, :obj:`str`]]): The relevant data to restore
                 :class:`telegram.ext.CallbackDataCache`.
         """

@@ -54,7 +54,7 @@ class InlineQueryResultVideo(InlineQueryResult):
             in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
+            :paramref:`parse_mode`.
         video_width (:obj:`int`, optional): Video width.
         video_height (:obj:`int`, optional): Video height.
         video_duration (:obj:`int`, optional): Video duration in seconds.
@@ -82,7 +82,7 @@ class InlineQueryResultVideo(InlineQueryResult):
             in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
+            :paramref:`parse_mode`.
         video_width (:obj:`int`): Optional. Video width.
         video_height (:obj:`int`): Optional. Video height.
         video_duration (:obj:`int`): Optional. Video duration in seconds.

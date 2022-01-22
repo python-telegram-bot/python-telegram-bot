@@ -47,13 +47,14 @@ class CallbackQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        * In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
+        * In Python :keyword:`from` is a reserved word, :paramref:`from_user`
         * Exactly one of the fields :attr:`data` or :attr:`game_short_name` will be present.
         * After the user presses an inline button, Telegram clients will display a progress bar
           until you call :attr:`answer`. It is, therefore, necessary to react
           by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
           is needed (e.g., without specifying any of the optional parameters).
-        * If you're using :attr:`Bot.arbitrary_callback_data`, :attr:`data` may be an instance
+        * If you're using :attr:`telegram.ext.ExtBot.arbitrary_callback_data`, :attr:`data` may be
+          an instance
           of :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
           associated with the button triggering the :class:`telegram.CallbackQuery` was already
           deleted or if :attr:`data` was manipulated by a malicious client.
@@ -520,7 +521,8 @@ class CallbackQuery(TelegramObject):
                                      *args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.get_game_high_scores` and :meth:`telegram.Message.get_game_high_score`.
+        :meth:`telegram.Bot.get_game_high_scores` and
+        :meth:`telegram.Message.get_game_high_scores`.
 
         Returns:
             List[:class:`telegram.GameHighScore`]

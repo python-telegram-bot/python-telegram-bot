@@ -345,7 +345,8 @@ class JobQueue:
             callback (:obj:`callable`): The callback function that should be executed by the new
                 job. Callback signature: ``def callback(context: CallbackContext)``
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
-                (:obj:`time.tzinfo`) is :obj:`None`, the default timezone of the bot will be used.
+                (:obj:`datetime.time.tzinfo`) is :obj:`None`, the default timezone of the bot will
+                be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run (where ``0-6`` correspond to monday - sunday). Defaults to ``EVERY_DAY``
             context (:obj:`object`, optional): Additional data needed for the callback function.
@@ -446,7 +447,7 @@ class Job:
     instance.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`id` is equal.
+    considered equal, if their :class:`id <apscheduler.job.Job>` is equal.
 
     Note:
         * All attributes and instance methods of :attr:`job` are also directly available as
@@ -457,7 +458,7 @@ class Job:
           this :class:`telegram.ext.Job` to be useful.
 
     .. versionchanged:: 14.0
-        Removed argument and attribute :attr:`job_queue`.
+        Removed argument and attribute ``job_queue``.
 
     Args:
         callback (:obj:`callable`): The callback function that should be executed by the new job.

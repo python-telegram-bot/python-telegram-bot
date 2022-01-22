@@ -32,9 +32,9 @@ class PassportData(TelegramObject):
 
     Note:
         To be able to decrypt this object, you must pass your ``private_key`` to either
-        :class:`telegram.Updater` or :class:`telegram.Bot`. Decrypted data is then found in
+        :class:`telegram.ext.Updater` or :class:`telegram.Bot`. Decrypted data is then found in
         :attr:`decrypted_data` and the payload can be found in :attr:`decrypted_credentials`'s
-        attribute :attr:`telegram.Credentials.payload`.
+        attribute :attr:`telegram.Credentials.nonce`.
 
     Args:
         data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
@@ -95,7 +95,7 @@ class PassportData(TelegramObject):
             about documents and other Telegram Passport elements which were shared with the bot.
 
         Raises:
-            telegram.PassportDecryptionError: Decryption failed. Usually due to bad
+            telegram.error.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
         if self._decrypted_data is None:
@@ -115,7 +115,7 @@ class PassportData(TelegramObject):
             `decrypted_data.payload`.
 
         Raises:
-            telegram.PassportDecryptionError: Decryption failed. Usually due to bad
+            telegram.error.PassportDecryptionError: Decryption failed. Usually due to bad
                 private/public key but can also suggest malformed/tampered data.
         """
         return self.credentials.decrypted_data

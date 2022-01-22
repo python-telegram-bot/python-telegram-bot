@@ -64,7 +64,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     Warning:
          Do not combine custom attributes and ``@run_async``/
-         :meth:`telegram.ext.Disptacher.run_async`. Due to how ``run_async`` works, it will
+         :func:`telegram.ext.Dispatcher.run_async`. Due to how ``run_async`` works, it will
          almost certainly execute the callbacks for an update out of order, and the attributes
          that you think you added will not be present.
 
@@ -72,7 +72,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this context.
 
     Attributes:
-        matches (List[:obj:`re match object`]): Optional. If the associated update originated from
+        matches (List[:meth:`re.Match <re.Match.expand>`]): Optional. If the associated update
+            originated from
             a :class:`filters.Regex`, this will contain a list of match objects for every pattern
             where ``re.search(pattern, string)`` returned a match. Note that filters short circuit,
             so combined regex filters will not always be evaluated.
