@@ -63,6 +63,10 @@ templates_path = ['_templates']
 # Fail on warnings & unresolved references etc
 nitpicky = True
 
+# Paramlink style
+paramlinks_hyperlink_param = 'name'
+
+
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 # source_suffix = ['.rst', '.md']
@@ -538,7 +542,6 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
 
 
 def setup(app: Sphinx):
-    app.add_css_file("sphinx_paramlinks_override.css")
     app.connect('autodoc-skip-member', autodoc_skip_member)
     app.connect('autodoc-process-bases', autodoc_process_bases)
     app.connect('autodoc-process-docstring', autodoc_process_docstring)
