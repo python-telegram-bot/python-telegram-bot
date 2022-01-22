@@ -313,7 +313,7 @@ class DictPersistence(BasePersistence):
         """
         if self._user_data is None:
             self._user_data = {}
-        if self._user_data.get(user_id, None) == data:
+        if self._user_data.get(user_id) == data:
             return
         self._user_data[user_id] = data
         self._user_data_json = None
@@ -327,7 +327,7 @@ class DictPersistence(BasePersistence):
         """
         if self._chat_data is None:
             self._chat_data = {}
-        if self._chat_data.get(chat_id, None) == data:
+        if self._chat_data.get(chat_id) == data:
             return
         self._chat_data[chat_id] = data
         self._chat_data_json = None

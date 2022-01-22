@@ -398,7 +398,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def get_user_data(self) -> Dict[int, UD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
-        :obj:`defaultdict` or :obj:`dict`. In the latter case, the dictionary should produce values
+        :obj:`dict`. In the latter case, the dictionary should produce values
         corresponding to one of the following:
 
           * :obj:`dict`
@@ -417,7 +417,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def get_chat_data(self) -> Dict[int, CD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
-        :obj:`defaultdict` or :obj:`dict`. In the latter case, the dictionary should produce values
+        :obj:`dict`. In the latter case, the dictionary should produce values
         corresponding to one of the following:
 
           * :obj:`dict`
