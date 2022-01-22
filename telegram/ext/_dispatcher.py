@@ -120,7 +120,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             .. versionchanged:: 14.0
                 :attr:`chat_data` is now read-only
 
-            .. tip::
+            Tip:
                Manually modifying :attr:`chat_data` is almost never needed and unadvisable.
 
         user_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
@@ -129,7 +129,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             .. versionchanged:: 14.0
                :attr:`user_data` is now read-only
 
-            .. tip::
+            Tip:
                Manually modifying :attr:`user_data` is almost never needed and unadvisable.
 
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.

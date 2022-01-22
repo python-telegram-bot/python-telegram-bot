@@ -60,6 +60,11 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 
+    Attention:
+        The interface provided by this class is intended to be accessed exclusively by
+        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+
     All relevant methods must be overwritten. This includes:
 
     * :meth:`get_bot_data`
