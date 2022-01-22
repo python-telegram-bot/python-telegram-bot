@@ -400,7 +400,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
                 self._dump_singlefile()
 
     def drop_chat_data(self, chat_id: int) -> None:
-        """Will delete the specified key from the :attr:`chat_data` and depending on
+        """Will delete the specified key from the ``chat_data`` and depending on
         :attr:`on_flush` save the pickle file.
 
         .. versionadded:: 14.0
@@ -419,7 +419,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
                 self._dump_singlefile()
 
     def drop_user_data(self, user_id: int) -> None:
-        """Will delete the specified key from the :attr:`user_data` and depending on
+        """Will delete the specified key from the ``user_data`` and depending on
         :attr:`on_flush` save the pickle file.
 
         .. versionadded:: 14.0
