@@ -695,7 +695,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
             * The key `old_chat_id` of :attr:`chat_data` will be deleted
 
         Args:
-            message (:class:`Message`, optional): A message with either
+            message (:class:`telegram.Message`, optional): A message with either
                 :attr:`telegram.Message.migrate_from_chat_id` or
                 :attr:`telegram.Message.migrate_to_chat_id`.
                 Mutually exclusive with passing ``old_chat_id`` and ``new_chat_id``
