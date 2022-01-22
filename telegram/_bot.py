@@ -2225,15 +2225,15 @@ class Bot(TelegramObject):
                 exceed 64 bytes.
             switch_pm_text (:obj:`str`, optional): If passed, clients will display a button with
                 specified text that switches the user to a private chat with the bot and sends the
-                bot a start message with the parameter ``switch_pm_parameter``.
-            switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
-                message sent to the bot when user presses the switch button.
+                bot a start message with the parameter :paramref:`switch_pm_parameter`.
+            switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
+                :guilabel:`/start` message sent to the bot when user presses the switch button.
                 1-:tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
-                only A-Z, a-z, 0-9, _ and - are allowed.
+                only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
                 the inline query to answer. If passed, PTB will automatically take care of
-                the pagination for you, i.e. pass the correct ``next_offset`` and truncate the
-                results list/get the results from the callable you passed.
+                the pagination for you, i.e. pass the correct :paramref:`next_offset` and truncate
+                the results list/get the results from the callable you passed.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
