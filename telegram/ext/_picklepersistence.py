@@ -37,6 +37,11 @@ from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 class PicklePersistence(BasePersistence[UD, CD, BD]):
     """Using python's builtin pickle for making your bot persistent.
 
+    Attention:
+        The interface provided by this class is intended to be accessed exclusively by
+        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+
     Warning:
         :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by
         :attr:`REPLACED_BOT` and insert the bot set with

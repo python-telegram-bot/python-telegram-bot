@@ -33,6 +33,11 @@ except ImportError:
 class DictPersistence(BasePersistence):
     """Using Python's :obj:`dict` and ``json`` for making your bot persistent.
 
+    Attention:
+        The interface provided by this class is intended to be accessed exclusively by
+        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+
     Note:
         This class does *not* implement a :meth:`flush` method, meaning that data managed by
         ``DictPersistence`` is in-memory only and will be lost when the bot shuts down. This is,
