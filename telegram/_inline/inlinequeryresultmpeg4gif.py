@@ -20,13 +20,13 @@
 
 from typing import TYPE_CHECKING, Any, Union, Tuple, List
 
-from telegram import InlineQueryResult, MessageEntity
+from telegram import InlineQueryResult, MessageEntity, InlineKeyboardMarkup
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
-    from telegram import InputMessageContent, ReplyMarkup
+    from telegram import InputMessageContent
 
 
 class InlineQueryResultMpeg4Gif(InlineQueryResult):
@@ -112,7 +112,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         mpeg4_height: int = None,
         title: str = None,
         caption: str = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: InlineKeyboardMarkup = None,
         input_message_content: 'InputMessageContent' = None,
         mpeg4_duration: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,

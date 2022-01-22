@@ -39,6 +39,11 @@ from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 class PicklePersistence(BasePersistence[UD, CD, BD]):
     """Using python's builtin pickle for making your bot persistent.
 
+    Attention:
+        The interface provided by this class is intended to be accessed exclusively by
+        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+
     Warning:
         :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by
         :attr:`~telegram.ext.BasePersistence.REPLACED_BOT` and insert the bot set with
@@ -391,6 +396,44 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         if not self.on_flush:
             if not self.single_file:
                 self._dump_file(Path(f"{self.filepath}_callback_data"), self.callback_data)
+            else:
+                self._dump_singlefile()
+
+    def drop_chat_data(self, chat_id: int) -> None:
+        """Will delete the specified key from the :attr:`chat_data` and depending on
+        :attr:`on_flush` save the pickle file.
+
+        .. versionadded:: 14.0
+
+        Args:
+            chat_id (:obj:`int`): The chat id to delete from the persistence.
+        """
+        if self.chat_data is None:
+            return
+        self.chat_data.pop(chat_id, None)  # type: ignore[arg-type]
+
+        if not self.on_flush:
+            if not self.single_file:
+                self._dump_file(Path(f"{self.filepath}_chat_data"), self.chat_data)
+            else:
+                self._dump_singlefile()
+
+    def drop_user_data(self, user_id: int) -> None:
+        """Will delete the specified key from the :attr:`user_data` and depending on
+        :attr:`on_flush` save the pickle file.
+
+        .. versionadded:: 14.0
+
+        Args:
+            user_id (:obj:`int`): The user id to delete from the persistence.
+        """
+        if self.user_data is None:
+            return
+        self.user_data.pop(user_id, None)  # type: ignore[arg-type]
+
+        if not self.on_flush:
+            if not self.single_file:
+                self._dump_file(Path(f"{self.filepath}_user_data"), self.user_data)
             else:
                 self._dump_singlefile()
 

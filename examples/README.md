@@ -25,7 +25,7 @@ A even more complex example of a bot that uses the nested `ConversationHandler`s
 A basic example of a bot store conversation state and user_data over multiple restarts.
 
 ### [`inlinekeyboard.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard.py)
-This example sheds some light on inline keyboards, callback queries and message editing. A wiki site explaining this examples lives at https://git.io/JOmFw.
+This example sheds some light on inline keyboards, callback queries and message editing. A wiki site explaining this examples lives [here](https://github.com/python-telegram-bot/python-telegram-bot/wiki/InlineKeyboard-Example).
 
 ### [`inlinekeyboard2.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard2.py)
 A more complex example about inline keyboards, callback queries and message editing. This example showcases how an interactive menu could be build using inline keyboards.
@@ -40,7 +40,7 @@ A basic example of an [inline bot](https://core.telegram.org/bots/inline). Don't
 This example sheds some light on polls, poll answers and the corresponding handlers.
 
 ### [`passportbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/passportbot.py)
-A basic example of a bot that can accept passports. Use in combination with [`passportbot.html`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/passportbot.html). Don't forget to enable and configure payments with [@BotFather](https://telegram.me/BotFather). Check out this [guide](https://git.io/fAvYd) on Telegram passports in PTB.
+A basic example of a bot that can accept passports. Use in combination with [`passportbot.html`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/passportbot.html). Don't forget to enable and configure payments with [@BotFather](https://telegram.me/BotFather). Check out this [guide](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Telegram-Passport) on Telegram passports in PTB.
 
 ### [`paymentbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/paymentbot.py)
 A basic example of a bot that can accept payments. Don't forget to enable and configure payments with [@BotFather](https://telegram.me/BotFather).

@@ -20,11 +20,11 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import InlineQueryResult
+from telegram import InlineQueryResult, InlineKeyboardMarkup
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
-    from telegram import InputMessageContent, ReplyMarkup
+    from telegram import InputMessageContent
 
 
 class InlineQueryResultLocation(InlineQueryResult):
@@ -103,7 +103,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         longitude: float,
         title: str,
         live_period: int = None,
-        reply_markup: 'ReplyMarkup' = None,
+        reply_markup: InlineKeyboardMarkup = None,
         input_message_content: 'InputMessageContent' = None,
         thumb_url: str = None,
         thumb_width: int = None,

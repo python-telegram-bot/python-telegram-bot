@@ -232,6 +232,14 @@ class TestVideo:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
+    @flaky(3, 1)
+    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    def test_send_video_default_protect_content(self, chat_id, default_bot, video):
+        protected = default_bot.send_video(chat_id, video)
+        assert protected.has_protected_content
+        unprotected = default_bot.send_video(chat_id, video, protect_content=False)
+        assert not unprotected.has_protected_content
+
     def test_send_video_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
