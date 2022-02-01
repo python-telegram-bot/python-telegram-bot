@@ -19,7 +19,7 @@
 """This module contains the BasePersistence class."""
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, DefaultDict, NamedTuple
+from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, NamedTuple
 
 from telegram import Bot
 from telegram.ext import ExtBot
@@ -132,10 +132,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         update_bot_data = instance.update_bot_data
         update_callback_data = instance.update_callback_data
 
-        def get_user_data_insert_bot() -> DefaultDict[int, UD]:
+        def get_user_data_insert_bot() -> Dict[int, UD]:
             return instance.insert_bot(get_user_data())
 
-        def get_chat_data_insert_bot() -> DefaultDict[int, CD]:
+        def get_chat_data_insert_bot() -> Dict[int, CD]:
             return instance.insert_bot(get_chat_data())
 
         def get_bot_data_insert_bot() -> BD:
@@ -171,10 +171,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         setattr(instance, 'update_callback_data', update_callback_data_replace_bot)
         return instance
 
-    def __init__(
-        self,
-        store_data: PersistenceInput = None,
-    ):
+    def __init__(self, store_data: PersistenceInput = None):
         self.store_data = store_data or PersistenceInput()
 
         self.bot: Bot = None  # type: ignore[assignment]
@@ -398,34 +395,40 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         return obj
 
     @abstractmethod
-    def get_user_data(self) -> DefaultDict[int, UD]:
+    def get_user_data(self) -> Dict[int, UD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
-        :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
+        :obj:`dict`. In the latter case, the dictionary should produce values
         corresponding to one of the following:
 
           * :obj:`dict`
           * The type from :attr:`telegram.ext.ContextTypes.user_data`
-            if :class:`telegram.ext.ContextTypes` are used.
+            if :class:`telegram.ext.ContextTypes` is used.
+
+        .. versionchanged:: 14.0
+            This method may now return a :obj:`dict` instead of a :obj:`collections.defaultdict`
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`]:
+            Dict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`]:
                 The restored user data.
         """
 
     @abstractmethod
-    def get_chat_data(self) -> DefaultDict[int, CD]:
+    def get_chat_data(self) -> Dict[int, CD]:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
-        :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
+        :obj:`dict`. In the latter case, the dictionary should produce values
         corresponding to one of the following:
 
           * :obj:`dict`
           * The type from :attr:`telegram.ext.ContextTypes.chat_data`
-            if :class:`telegram.ext.ContextTypes` are used.
+            if :class:`telegram.ext.ContextTypes` is used.
+
+        .. versionchanged:: 14.0
+            This method may now return a :obj:`dict` instead of a :obj:`collections.defaultdict`
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`]:
+            Dict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`]:
                 The restored chat data.
         """
 
@@ -433,7 +436,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def get_bot_data(self) -> BD:
         """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
-        :obj:`defaultdict`. In the latter case, the :obj:`defaultdict` should produce values
+        :obj:`dict`. In the latter case, the :obj:`dict` should produce values
         corresponding to one of the following:
 
           * :obj:`dict`
@@ -441,7 +444,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             if :class:`telegram.ext.ContextTypes` are used.
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`]:
+            Dict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`]:
                 The restored bot data.
         """
 
