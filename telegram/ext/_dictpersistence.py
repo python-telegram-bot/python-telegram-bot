@@ -18,8 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
 
-from typing import DefaultDict, Dict, Optional, Tuple, cast
-from collections import defaultdict
+from typing import Dict, Optional, Tuple, cast
 
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram._utils.types import JSONDict
@@ -166,7 +165,7 @@ class DictPersistence(BasePersistence):
                 ) from exc
 
     @property
-    def user_data(self) -> Optional[DefaultDict[int, Dict]]:
+    def user_data(self) -> Optional[Dict[int, Dict]]:
         """:obj:`dict`: The user_data as a dict."""
         return self._user_data
 
@@ -178,7 +177,7 @@ class DictPersistence(BasePersistence):
         return json.dumps(self.user_data)
 
     @property
-    def chat_data(self) -> Optional[DefaultDict[int, Dict]]:
+    def chat_data(self) -> Optional[Dict[int, Dict]]:
         """:obj:`dict`: The chat_data as a dict."""
         return self._chat_data
 
@@ -204,7 +203,7 @@ class DictPersistence(BasePersistence):
     @property
     def callback_data(self) -> Optional[CDCData]:
         """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]], \
-        Dict[:obj:`str`, :obj:`str`]]: The meta data on the stored callback data.
+        Dict[:obj:`str`, :obj:`str`]]: The metadata on the stored callback data.
 
         .. versionadded:: 13.6
         """
@@ -212,7 +211,7 @@ class DictPersistence(BasePersistence):
 
     @property
     def callback_data_json(self) -> str:
-        """:obj:`str`: The meta data on the stored callback data as a JSON-string.
+        """:obj:`str`: The metadata on the stored callback data as a JSON-string.
 
         .. versionadded:: 13.6
         """
@@ -232,26 +231,24 @@ class DictPersistence(BasePersistence):
             return self._conversations_json
         return self._encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
 
-    def get_user_data(self) -> DefaultDict[int, Dict[object, object]]:
-        """Returns the user_data created from the ``user_data_json`` or an empty
-        :obj:`defaultdict`.
+    def get_user_data(self) -> Dict[int, Dict[object, object]]:
+        """Returns the user_data created from the ``user_data_json`` or an empty :obj:`dict`.
 
         Returns:
-            :obj:`defaultdict`: The restored user data.
+            :obj:`dict`: The restored user data.
         """
         if self.user_data is None:
-            self._user_data = defaultdict(dict)
+            self._user_data = {}
         return self.user_data  # type: ignore[return-value]
 
-    def get_chat_data(self) -> DefaultDict[int, Dict[object, object]]:
-        """Returns the chat_data created from the ``chat_data_json`` or an empty
-        :obj:`defaultdict`.
+    def get_chat_data(self) -> Dict[int, Dict[object, object]]:
+        """Returns the chat_data created from the ``chat_data_json`` or an empty :obj:`dict`.
 
         Returns:
-            :obj:`defaultdict`: The restored chat data.
+            :obj:`dict`: The restored chat data.
         """
         if self.chat_data is None:
-            self._chat_data = defaultdict(dict)
+            self._chat_data = {}
         return self.chat_data  # type: ignore[return-value]
 
     def get_bot_data(self) -> Dict[object, object]:
@@ -271,7 +268,7 @@ class DictPersistence(BasePersistence):
 
         Returns:
             Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]], \
-                Dict[:obj:`str`, :obj:`str`]]: The restored meta data or :obj:`None`, \
+                Dict[:obj:`str`, :obj:`str`]]: The restored metadata or :obj:`None`, \
                 if no data was stored.
         """
         if self.callback_data is None:
@@ -315,7 +312,7 @@ class DictPersistence(BasePersistence):
             data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
         if self._user_data is None:
-            self._user_data = defaultdict(dict)
+            self._user_data = {}
         if self._user_data.get(user_id) == data:
             return
         self._user_data[user_id] = data
@@ -329,7 +326,7 @@ class DictPersistence(BasePersistence):
             data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
         if self._chat_data is None:
-            self._chat_data = defaultdict(dict)
+            self._chat_data = {}
         if self._chat_data.get(chat_id) == data:
             return
         self._chat_data[chat_id] = data
@@ -453,7 +450,7 @@ class DictPersistence(BasePersistence):
         return conversations
 
     @staticmethod
-    def _decode_user_chat_data_from_json(data: str) -> DefaultDict[int, Dict[object, object]]:
+    def _decode_user_chat_data_from_json(data: str) -> Dict[int, Dict[object, object]]:
         """Helper method to decode chat or user data (that uses ints as keys) from a
         JSON-string.
 
@@ -463,7 +460,7 @@ class DictPersistence(BasePersistence):
         Returns:
             :obj:`dict`: The user/chat_data defaultdict after decoding
         """
-        tmp: DefaultDict[int, Dict[object, object]] = defaultdict(dict)
+        tmp: Dict[int, Dict[object, object]] = {}
         decoded_data = json.loads(data)
         for user, user_data in decoded_data.items():
             user = int(user)

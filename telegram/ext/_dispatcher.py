@@ -739,7 +739,7 @@ class Dispatcher(Generic[BT, CCT, UD, CD, BD, JQ, PT]):
 
     def __update_persistence(self, update: object = None) -> None:
         if self.persistence:
-            # We use list() here in order to decouple chat_ids from self._chat_data, as dict view
+            # We use list() here in order to decouple chat_ids from self.chat_data, as dict view
             # objects will change, when the dict does and we want to loop over chat_ids
             chat_ids = list(self.chat_data.keys())
             user_ids = list(self.user_data.keys())

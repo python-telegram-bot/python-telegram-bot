@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PicklePersistence class."""
 import pickle
-from collections import defaultdict
 from pathlib import Path
 from typing import (
     Any,
@@ -27,7 +26,6 @@ from typing import (
     Tuple,
     overload,
     cast,
-    DefaultDict,
 )
 
 from telegram._utils.types import FilePathInput
@@ -138,8 +136,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         self.filepath = Path(filepath)
         self.single_file = single_file
         self.on_flush = on_flush
-        self.user_data: Optional[DefaultDict[int, UD]] = None
-        self.chat_data: Optional[DefaultDict[int, CD]] = None
+        self.user_data: Optional[Dict[int, UD]] = None
+        self.chat_data: Optional[Dict[int, CD]] = None
         self.bot_data: Optional[BD] = None
         self.callback_data: Optional[CDCData] = None
         self.conversations: Optional[Dict[str, Dict[Tuple, object]]] = None
@@ -149,16 +147,16 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         try:
             with self.filepath.open("rb") as file:
                 data = pickle.load(file)
-            self.user_data = defaultdict(self.context_types.user_data, data['user_data'])
-            self.chat_data = defaultdict(self.context_types.chat_data, data['chat_data'])
+            self.user_data = data['user_data']
+            self.chat_data = data['chat_data']
             # For backwards compatibility with files not containing bot data
             self.bot_data = data.get('bot_data', self.context_types.bot_data())
             self.callback_data = data.get('callback_data', {})
             self.conversations = data['conversations']
         except OSError:
             self.conversations = {}
-            self.user_data = defaultdict(self.context_types.user_data)
-            self.chat_data = defaultdict(self.context_types.chat_data)
+            self.user_data = {}
+            self.chat_data = {}
             self.bot_data = self.context_types.bot_data()
             self.callback_data = None
         except pickle.UnpicklingError as exc:
@@ -195,41 +193,35 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         with filepath.open("wb") as file:
             pickle.dump(data, file)
 
-    def get_user_data(self) -> DefaultDict[int, UD]:
-        """Returns the user_data from the pickle file if it exists or an empty :obj:`defaultdict`.
+    def get_user_data(self) -> Dict[int, UD]:
+        """Returns the user_data from the pickle file if it exists or an empty :obj:`dict`.
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`]:
-                The restored user data.
+            Dict[:obj:`int`, :obj:`dict`]: The restored user data.
         """
         if self.user_data:
             pass
         elif not self.single_file:
             data = self._load_file(Path(f"{self.filepath}_user_data"))
             if not data:
-                data = defaultdict(self.context_types.user_data)
-            else:
-                data = defaultdict(self.context_types.user_data, data)
+                data = {}
             self.user_data = data
         else:
             self._load_singlefile()
         return self.user_data  # type: ignore[return-value]
 
-    def get_chat_data(self) -> DefaultDict[int, CD]:
-        """Returns the chat_data from the pickle file if it exists or an empty :obj:`defaultdict`.
+    def get_chat_data(self) -> Dict[int, CD]:
+        """Returns the chat_data from the pickle file if it exists or an empty :obj:`dict`.
 
         Returns:
-            DefaultDict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`]:
-                The restored chat data.
+            Dict[:obj:`int`, :obj:`dict`]: The restored chat data.
         """
         if self.chat_data:
             pass
         elif not self.single_file:
             data = self._load_file(Path(f"{self.filepath}_chat_data"))
             if not data:
-                data = defaultdict(self.context_types.chat_data)
-            else:
-                data = defaultdict(self.context_types.chat_data, data)
+                data = {}
             self.chat_data = data
         else:
             self._load_singlefile()
@@ -260,8 +252,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]:
-                The restored meta data or :obj:`None`, if no data was stored.
+                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]]:
+                The restored metadata or :obj:`None`, if no data was stored.
         """
         if self.callback_data:
             pass
@@ -323,11 +315,10 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`): The
-                :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
+            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
         """
         if self.user_data is None:
-            self.user_data = defaultdict(self.context_types.user_data)
+            self.user_data = {}
         if self.user_data.get(user_id) == data:
             return
         self.user_data[user_id] = data
@@ -342,11 +333,10 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`): The
-                :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
+            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
         """
         if self.chat_data is None:
-            self.chat_data = defaultdict(self.context_types.chat_data)
+            self.chat_data = {}
         if self.chat_data.get(chat_id) == data:
             return
         self.chat_data[chat_id] = data
