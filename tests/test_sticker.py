@@ -30,8 +30,9 @@ from tests.conftest import check_shortcut_call, check_shortcut_signature, check_
 
 @pytest.fixture(scope='function')
 def sticker_file():
-    with open('tests/data/telegram.webp', 'rb') as f:
-        yield f
+    f = open('tests/data/telegram.webp', 'rb')
+    yield f
+    f.close()
 
 
 @pytest.fixture(scope='class')
@@ -42,8 +43,9 @@ def sticker(bot, chat_id):
 
 @pytest.fixture(scope='function')
 def animated_sticker_file():
-    with open('tests/data/telegram_animated_sticker.tgs', 'rb') as f:
-        yield f
+    f = open('tests/data/telegram_animated_sticker.tgs', 'rb')
+    yield f
+    f.close()
 
 
 @pytest.fixture(scope='class')
@@ -378,8 +380,9 @@ def video_sticker_set(bot):
 
 @pytest.fixture(scope='function')
 def sticker_set_thumb_file():
-    with open('tests/data/sticker_set_thumb.png', 'rb') as f:
-        yield f
+    f = open('tests/data/sticker_set_thumb.png', 'rb')
+    yield f
+    f.close()
 
 
 class TestStickerSet:
@@ -411,8 +414,12 @@ class TestStickerSet:
         assert sticker_set.stickers == self.stickers
         assert sticker_set.thumb == sticker.thumb
 
-    def test_create_sticker_set(self, bot, chat_id, video_sticker_file):
-        """Creates the sticker set (if needed) which is required for tests"""
+    def test_create_sticker_set(
+        self, bot, chat_id, sticker_file, animated_sticker_file, video_sticker_file
+    ):
+        """Creates the sticker set (if needed) which is required for tests. Make sure that this
+        test comes before the tests that actually use the sticker sets!
+        """
         test_by = f"test_by_{bot.username}"
         for sticker_set in [test_by, f'animated_{test_by}', f'video_{test_by}']:
             try:
@@ -421,17 +428,33 @@ class TestStickerSet:
                 if not e.message == "Stickerset_invalid":
                     raise e
 
-                # We already have static and animated sticker sets, this is just for creating
-                # a video sticker set
-                if sticker_set.startswith("video"):
-                    c = bot.create_new_sticker_set(
+                if sticker_set.startswith(test_by):
+                    s = bot.create_new_sticker_set(
+                        chat_id,
+                        name=sticker_set,
+                        title="Sticker Test",
+                        png_sticker=sticker_file,
+                        emojis='😄',
+                    )
+                    assert s
+                elif sticker_set.startswith("animated"):
+                    a = bot.create_new_sticker_set(
+                        chat_id,
+                        name=sticker_set,
+                        title="Animated Test",
+                        tgs_sticker=animated_sticker_file,
+                        emojis='😄',
+                    )
+                    assert a
+                elif sticker_set.startswith("video"):
+                    v = bot.create_new_sticker_set(
                         chat_id,
                         name=sticker_set,
                         title="Video Test",
                         webm_sticker=video_sticker_file,
                         emojis='🤔',
                     )
-                    assert c
+                    assert v
 
     @flaky(3, 1)
     def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
@@ -508,6 +531,14 @@ class TestStickerSet:
         file_id = animated_sticker_set.stickers[-1].file_id
         # also test with file input and mask
         assert bot.set_sticker_set_thumb(animated_test, chat_id, file_id)
+
+    # TODO: Try the below by creating a custom .webm and not by downloading another pack's thumb
+    @pytest.mark.skip(
+        "Skipped for now since Telegram throws a 'File is too big' error "
+        "regardless of the .webm file size."
+    )
+    def test_bot_methods_3_webm(self, bot, chat_id, video_sticker_file, video_sticker_set):
+        pass
 
     @flaky(10, 1)
     def test_bot_methods_4_png(self, bot, sticker_set):
