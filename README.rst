@@ -20,7 +20,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-5.6-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-5.7-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -111,7 +111,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **5.6** are supported.
+All types and methods of the Telegram Bot API **5.7** are supported.
 
 ==========
 Installing

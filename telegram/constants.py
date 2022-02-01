@@ -21,7 +21,7 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.6`. Telegram Bot API version supported by this
+    BOT_API_VERSION (:obj:`str`): `5.7`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
@@ -247,7 +247,7 @@ Attributes:
 """
 from typing import List
 
-BOT_API_VERSION: str = '5.6'
+BOT_API_VERSION: str = '5.7'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
