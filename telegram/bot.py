@@ -996,7 +996,7 @@ class Bot(TelegramObject):
         protect_content: bool = None,
     ) -> Message:
         """
-        Use this method to send static .WEBP or animated .TGS stickers.
+        Use this method to send static ``.WEBP``, animated ``.TGS``, or video ``.WEBM`` stickers.
 
         Note:
             The sticker argument can be either a file_id, an URL or a file from disk
@@ -4753,7 +4753,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> File:
         """
-        Use this method to upload a .png file with a sticker for later use in
+        Use this method to upload a ``.PNG`` file with a sticker for later use in
         :meth:`create_new_sticker_set` and :meth:`add_sticker_to_set` methods (can be used multiple
         times).
 
@@ -4764,9 +4764,8 @@ class Bot(TelegramObject):
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
             png_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`):
-                Png image with the sticker,
-                must be up to 512 kilobytes in size, dimensions must not exceed 512px,
-                and either width or height must be exactly 512px.
+                **PNG** image with the sticker, must be up to 512 kilobytes in size,
+                dimensions must not exceed 512px, and either width or height must be exactly 512px.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
@@ -4802,11 +4801,13 @@ class Bot(TelegramObject):
         timeout: DVInput[float] = DEFAULT_20,
         tgs_sticker: FileInput = None,
         api_kwargs: JSONDict = None,
+        webm_sticker: FileInput = None,
     ) -> bool:
         """
         Use this method to create new sticker set owned by a user.
         The bot will be able to edit the created sticker set.
-        You must use exactly one of the fields ``png_sticker`` or ``tgs_sticker``.
+        You must use exactly one of the fields ``png_sticker``, ``tgs_sticker``, or
+        ``webm_sticker``.
 
         Warning:
             As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
@@ -4826,7 +4827,7 @@ class Bot(TelegramObject):
                 1-64 characters.
             title (:obj:`str`): Sticker set title, 1-64 characters.
             png_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): Png image with the sticker,
+                optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
                 send a file that already exists on the Telegram servers, pass an HTTP URL as a
@@ -4836,13 +4837,19 @@ class Bot(TelegramObject):
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
             tgs_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): TGS animation with the sticker,
-                uploaded using multipart/form-data. See
-                https://core.telegram.org/animated_stickers#technical-requirements for technical
+                optional): **TGS** animation with the sticker, uploaded using multipart/form-data.
+                See https://core.telegram.org/stickers#animated-sticker-requirements for technical
                 requirements.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+            webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
+                optional): **WEBM** video with the sticker, uploaded using multipart/form-data.
+                See https://core.telegram.org/stickers#video-sticker-requirements for
+                technical requirements.
+
+                .. versionadded:: 13.11
+
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             contains_masks (:obj:`bool`, optional): Pass :obj:`True`, if a set of mask stickers
                 should be created.
@@ -4867,6 +4874,8 @@ class Bot(TelegramObject):
             data['png_sticker'] = parse_file_input(png_sticker)
         if tgs_sticker is not None:
             data['tgs_sticker'] = parse_file_input(tgs_sticker)
+        if webm_sticker is not None:
+            data['webm_sticker'] = parse_file_input(webm_sticker)
         if contains_masks is not None:
             data['contains_masks'] = contains_masks
         if mask_position is not None:
@@ -4889,12 +4898,14 @@ class Bot(TelegramObject):
         timeout: DVInput[float] = DEFAULT_20,
         tgs_sticker: FileInput = None,
         api_kwargs: JSONDict = None,
+        webm_sticker: FileInput = None,
     ) -> bool:
         """
         Use this method to add a new sticker to a set created by the bot.
-        You must use exactly one of the fields ``png_sticker`` or ``tgs_sticker``. Animated
-        stickers can be added to animated sticker sets and only to them. Animated sticker sets can
-        have up to 50 stickers. Static sticker sets can have up to 120 stickers.
+        You **must** use exactly one of the fields ``png_sticker``, ``tgs_sticker`` or
+        ``webm_sticker``. Animated stickers can be added to animated sticker sets and only to them.
+        Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120
+        stickers.
 
         Warning:
             As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
@@ -4910,7 +4921,7 @@ class Bot(TelegramObject):
 
             name (:obj:`str`): Sticker set name.
             png_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): PNG image with the sticker,
+                optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
                 send a file that already exists on the Telegram servers, pass an HTTP URL as a
@@ -4920,13 +4931,18 @@ class Bot(TelegramObject):
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
             tgs_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): TGS animation with the sticker,
-                uploaded using multipart/form-data. See
-                https://core.telegram.org/animated_stickers#technical-requirements for technical
+                optional): **TGS** animation with the sticker, uploaded using multipart/form-data.
+                See https://core.telegram.org/stickers#animated-sticker-requirements for technical
                 requirements.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+            webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
+                optional): **WEBM** video with the sticker, uploaded using multipart/form-data.
+                See https://core.telegram.org/stickers#video-sticker-requirements for
+                technical requirements.
+
+                .. versionadded:: 13.11
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
@@ -4949,6 +4965,8 @@ class Bot(TelegramObject):
             data['png_sticker'] = parse_file_input(png_sticker)
         if tgs_sticker is not None:
             data['tgs_sticker'] = parse_file_input(tgs_sticker)
+        if webm_sticker is not None:
+            data['webm_sticker'] = parse_file_input(webm_sticker)
         if mask_position is not None:
             # We need to_json() instead of to_dict() here, because we're sending a media
             # message here, which isn't json dumped by utils.request
@@ -5032,7 +5050,8 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Use this method to set the thumbnail of a sticker set. Animated thumbnails can be set
-        for animated sticker sets only.
+        for animated sticker sets only. Video thumbnails can be set only for video sticker sets
+        only.
 
         Note:
             The thumb can be either a file_id, an URL or a file from disk ``open(filename, 'rb')``
@@ -5041,14 +5060,17 @@ class Bot(TelegramObject):
             name (:obj:`str`): Sticker set name
             user_id (:obj:`int`): User identifier of created sticker set owner.
             thumb (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): A PNG image with the thumbnail, must
-                be up to 128 kilobytes in size and have width and height exactly 100px, or a TGS
-                animation with the thumbnail up to 32 kilobytes in size; see
-                https://core.telegram.org/animated_stickers#technical-requirements for animated
-                sticker technical requirements. Pass a file_id as a String to send a file that
+                optional): A **PNG** image with the thumbnail, must
+                be up to 128 kilobytes in size and have width and height exactly 100px, or a
+                **TGS** animation with the thumbnail up to 32 kilobytes in size; see
+                https://core.telegram.org/stickers#animated-sticker-requirements for animated
+                sticker technical requirements, or a **WEBM** video with the thumbnail up to 32
+                kilobytes in size; see
+                https://core.telegram.org/stickers#video-sticker-requirements for video sticker
+                technical requirements. Pass a file_id as a String to send a file that
                 already exists on the Telegram servers, pass an HTTP URL as a String for Telegram
                 to get a file from the Internet, or upload a new one using multipart/form-data.
-                Animated sticker set thumbnail can't be uploaded via HTTP URL.
+                Animated sticker set thumbnails can't be uploaded via HTTP URL.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.

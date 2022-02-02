@@ -1429,11 +1429,11 @@ class TestBot:
         assert chat_member.user.first_name == 'PTB'
         assert chat_member.user.last_name == 'Test user'
 
-    @pytest.mark.skip(reason="Not implemented yet.")
+    @pytest.mark.skip(reason="Not implemented since we need a supergroup with many members")
     def test_set_chat_sticker_set(self):
         pass
 
-    @pytest.mark.skip(reason="Not implemented yet.")
+    @pytest.mark.skip(reason="Not implemented since we need a supergroup with many members")
     def test_delete_chat_sticker_set(self):
         pass
 

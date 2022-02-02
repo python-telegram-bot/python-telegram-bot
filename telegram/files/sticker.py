@@ -34,6 +34,11 @@ class Sticker(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    Note:
+        As of v13.11 ``is_video`` is a required argument and therefore the order of the
+        arguments had to be changed. Use keyword arguments to make sure that the arguments are
+        passed correctly.
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -43,6 +48,9 @@ class Sticker(TelegramObject):
         width (:obj:`int`): Sticker width.
         height (:obj:`int`): Sticker height.
         is_animated (:obj:`bool`): :obj:`True`, if the sticker is animated.
+        is_video (:obj:`bool`): :obj:`True`, if the sticker is a video sticker.
+
+            .. versionadded:: 13.11
         thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the .WEBP or .JPG
             format.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
@@ -62,6 +70,9 @@ class Sticker(TelegramObject):
         width (:obj:`int`): Sticker width.
         height (:obj:`int`): Sticker height.
         is_animated (:obj:`bool`): :obj:`True`, if the sticker is animated.
+        is_video (:obj:`bool`): :obj:`True`, if the sticker is a video sticker.
+
+            .. versionadded:: 13.11
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the .webp or .jpg
             format.
         emoji (:obj:`str`): Optional. Emoji associated with the sticker.
@@ -78,6 +89,7 @@ class Sticker(TelegramObject):
         'width',
         'file_id',
         'is_animated',
+        'is_video',
         'file_size',
         'thumb',
         'set_name',
@@ -95,6 +107,7 @@ class Sticker(TelegramObject):
         width: int,
         height: int,
         is_animated: bool,
+        is_video: bool,
         thumb: PhotoSize = None,
         emoji: str = None,
         file_size: int = None,
@@ -109,6 +122,7 @@ class Sticker(TelegramObject):
         self.width = int(width)
         self.height = int(height)
         self.is_animated = is_animated
+        self.is_video = is_video
         # Optionals
         self.thumb = thumb
         self.emoji = emoji
@@ -155,28 +169,40 @@ class StickerSet(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`name` is equal.
 
-    Attributes:
-        name (:obj:`str`): Sticker set name.
-        title (:obj:`str`): Sticker set title.
-        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
-        contains_masks (:obj:`bool`): :obj:`True`, if the sticker set contains masks.
-        stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
-        thumb (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the .WEBP or .TGS
-            format.
+    Note:
+        As of v13.11 ``is_video`` is a required argument and therefore the order of the
+        arguments had to be changed. Use keyword arguments to make sure that the arguments are
+        passed correctly.
 
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
         is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
+        is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
+
+            .. versionadded:: 13.11
         contains_masks (:obj:`bool`): :obj:`True`, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
-        thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the .WEBP or .TGS
-            format.
+        thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
+            ``.TGS``, or ``.WEBM`` format.
+
+    Attributes:
+        name (:obj:`str`): Sticker set name.
+        title (:obj:`str`): Sticker set title.
+        is_animated (:obj:`bool`): :obj:`True`, if the sticker set contains animated stickers.
+        is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
+
+            .. versionadded:: 13.11
+        contains_masks (:obj:`bool`): :obj:`True`, if the sticker set contains masks.
+        stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+        thumb (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
+            ``.TGS`` or ``.WEBM`` format.
 
     """
 
     __slots__ = (
         'is_animated',
+        'is_video',
         'contains_masks',
         'thumb',
         'title',
@@ -192,12 +218,14 @@ class StickerSet(TelegramObject):
         is_animated: bool,
         contains_masks: bool,
         stickers: List[Sticker],
+        is_video: bool,
         thumb: PhotoSize = None,
         **_kwargs: Any,
     ):
         self.name = name
         self.title = title
         self.is_animated = is_animated
+        self.is_video = is_video
         self.contains_masks = contains_masks
         self.stickers = stickers
         # Optionals

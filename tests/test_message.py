@@ -105,7 +105,7 @@ def message(bot):
             )
         },
         {'photo': [PhotoSize('photo_id', 'unique_id', 50, 50)], 'caption': 'photo_file'},
-        {'sticker': Sticker('sticker_id', 'unique_id', 50, 50, True)},
+        {'sticker': Sticker('sticker_id', 'unique_id', 50, 50, True, False)},
         {'video': Video('video_id', 'unique_id', 12, 12, 12), 'caption': 'video_file'},
         {'voice': Voice('voice_id', 'unique_id', 5)},
         {'video_note': VideoNote('video_note_id', 'unique_id', 20, 12)},
