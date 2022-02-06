@@ -25,8 +25,9 @@ from typing import IO, TYPE_CHECKING, Any, Optional, Union
 
 from telegram import TelegramObject
 from telegram._passport.credentials import decrypt
+from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import is_local_file
-from telegram._utils.types import FilePathInput
+from telegram._utils.types import FilePathInput, ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot, FileCredentials
@@ -96,8 +97,14 @@ class File(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
-    def download(
-        self, custom_path: FilePathInput = None, out: IO = None, timeout: int = None
+    async def download(
+        self,
+        custom_path: FilePathInput = None,
+        out: IO = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[Path, IO]:
         """
         Download this file. By default, the file is saved in the current working directory with its
@@ -146,7 +153,7 @@ class File(TelegramObject):
             if local_file:
                 buf = path.read_bytes()
             else:
-                buf = self.get_bot().request.retrieve(url)
+                buf = await self.get_bot().request.retrieve(url)
                 if self._credentials:
                     buf = decrypt(
                         b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
@@ -167,7 +174,13 @@ class File(TelegramObject):
         else:
             filename = Path.cwd() / self.file_id
 
-        buf = self.get_bot().request.retrieve(url, timeout=timeout)
+        buf = await self.get_bot().request.retrieve(
+            url,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+        )
         if self._credentials:
             buf = decrypt(
                 b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
@@ -184,7 +197,7 @@ class File(TelegramObject):
             )
         )
 
-    def download_as_bytearray(self, buf: bytearray = None) -> bytes:
+    async def download_as_bytearray(self, buf: bytearray = None) -> bytes:
         """Download this file and return it as a bytearray.
 
         Args:
@@ -200,7 +213,7 @@ class File(TelegramObject):
         if is_local_file(self.file_path):
             buf.extend(Path(self.file_path).read_bytes())
         else:
-            buf.extend(self.get_bot().request.retrieve(self._get_encoded_url()))
+            buf.extend(await self.get_bot().request.retrieve(self._get_encoded_url()))
         return buf
 
     def set_credentials(self, credentials: 'FileCredentials') -> None:

@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the TypeHandler class."""
 
-from typing import Callable, Type, TypeVar, Union
+from typing import Type, TypeVar
 
+from telegram._utils.types import DVInput
 from telegram.ext import Handler
-from telegram.ext._utils.types import CCT
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram.ext._utils.types import CCT, HandlerCallback
+from telegram._utils.defaultvalue import DEFAULT_TRUE
 
 RT = TypeVar('RT')
 UT = TypeVar('UT')
@@ -32,7 +33,7 @@ class TypeHandler(Handler[UT, CCT]):
     """Handler class to handle updates of custom types.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting ``block`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
@@ -46,14 +47,17 @@ class TypeHandler(Handler[UT, CCT]):
             :class:`telegram.ext.ConversationHandler`.
         strict (:obj:`bool`, optional): Use ``type`` instead of ``isinstance``.
             Default is :obj:`False`
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
         type (:obj:`type`): The ``type`` of updates this handler should process.
         callback (:obj:`callable`): The callback function for this handler.
         strict (:obj:`bool`): Use ``type`` instead of ``isinstance``. Default is :obj:`False`.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
 
     """
 
@@ -62,14 +66,11 @@ class TypeHandler(Handler[UT, CCT]):
     def __init__(
         self,
         type: Type[UT],  # pylint: disable=redefined-builtin
-        callback: Callable[[UT, CCT], RT],
+        callback: HandlerCallback[UT, CCT, RT],
         strict: bool = False,
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
-        super().__init__(
-            callback,
-            run_async=run_async,
-        )
+        super().__init__(callback, block=block)
         self.type = type  # pylint: disable=assigning-non-slot
         self.strict = strict  # pylint: disable=assigning-non-slot
 

@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, List, Optional, ClassVar, Union, Tuple, Any
 
 from telegram import ChatPhoto, TelegramObject, constants
 from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput, ReplyMarkup
-from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_20
+from telegram._utils.defaultvalue import DEFAULT_NONE
 
 from telegram._chatpermissions import ChatPermissions
 from telegram._chatlocation import ChatLocation
@@ -300,7 +300,14 @@ class Chat(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def leave(self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None) -> bool:
+    async def leave(
+        self,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
         """Shortcut for::
 
             bot.leave_chat(update.effective_chat.id, *args, **kwargs)
@@ -311,14 +318,22 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().leave_chat(
+        return await self.get_bot().leave_chat(
             chat_id=self.id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def get_administrators(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
+    async def get_administrators(
+        self,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> List['ChatMember']:
         """Shortcut for::
 
@@ -334,14 +349,22 @@ class Chat(TelegramObject):
             and no administrators were appointed, only the creator will be returned.
 
         """
-        return self.get_bot().get_chat_administrators(
+        return await self.get_bot().get_chat_administrators(
             chat_id=self.id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def get_member_count(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
+    async def get_member_count(
+        self,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> int:
         """Shortcut for::
 
@@ -353,16 +376,22 @@ class Chat(TelegramObject):
         Returns:
             :obj:`int`
         """
-        return self.get_bot().get_chat_member_count(
+        return await self.get_bot().get_chat_member_count(
             chat_id=self.id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def get_member(
+    async def get_member(
         self,
         user_id: Union[str, int],
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> 'ChatMember':
         """Shortcut for::
@@ -375,17 +404,23 @@ class Chat(TelegramObject):
             :class:`telegram.ChatMember`
 
         """
-        return self.get_bot().get_chat_member(
+        return await self.get_bot().get_chat_member(
             chat_id=self.id,
             user_id=user_id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def ban_member(
+    async def ban_member(
         self,
         user_id: Union[str, int],
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         until_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
         revoke_messages: bool = None,
@@ -400,19 +435,25 @@ class Chat(TelegramObject):
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
         """
-        return self.get_bot().ban_chat_member(
+        return await self.get_bot().ban_chat_member(
             chat_id=self.id,
             user_id=user_id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             until_date=until_date,
             api_kwargs=api_kwargs,
             revoke_messages=revoke_messages,
         )
 
-    def ban_sender_chat(
+    async def ban_sender_chat(
         self,
         sender_chat_id: int,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -428,14 +469,23 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().ban_chat_sender_chat(
-            chat_id=self.id, sender_chat_id=sender_chat_id, timeout=timeout, api_kwargs=api_kwargs
+        return await self.get_bot().ban_chat_sender_chat(
+            chat_id=self.id,
+            sender_chat_id=sender_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
-    def ban_chat(
+    async def ban_chat(
         self,
         chat_id: Union[str, int],
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -451,14 +501,23 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().ban_chat_sender_chat(
-            chat_id=chat_id, sender_chat_id=self.id, timeout=timeout, api_kwargs=api_kwargs
+        return await self.get_bot().ban_chat_sender_chat(
+            chat_id=chat_id,
+            sender_chat_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
-    def unban_sender_chat(
+    async def unban_sender_chat(
         self,
         sender_chat_id: int,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -474,14 +533,23 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().unban_chat_sender_chat(
-            chat_id=self.id, sender_chat_id=sender_chat_id, timeout=timeout, api_kwargs=api_kwargs
+        return await self.get_bot().unban_chat_sender_chat(
+            chat_id=self.id,
+            sender_chat_id=sender_chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
-    def unban_chat(
+    async def unban_chat(
         self,
         chat_id: Union[str, int],
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -497,14 +565,23 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().unban_chat_sender_chat(
-            chat_id=chat_id, sender_chat_id=self.id, timeout=timeout, api_kwargs=api_kwargs
+        return await self.get_bot().unban_chat_sender_chat(
+            chat_id=chat_id,
+            sender_chat_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
-    def unban_member(
+    async def unban_member(
         self,
         user_id: Union[str, int],
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         only_if_banned: bool = None,
     ) -> bool:
@@ -518,15 +595,18 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().unban_chat_member(
+        return await self.get_bot().unban_chat_member(
             chat_id=self.id,
             user_id=user_id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             only_if_banned=only_if_banned,
         )
 
-    def promote_member(
+    async def promote_member(
         self,
         user_id: Union[str, int],
         can_change_info: bool = None,
@@ -537,7 +617,10 @@ class Chat(TelegramObject):
         can_restrict_members: bool = None,
         can_pin_messages: bool = None,
         can_promote_members: bool = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
@@ -556,7 +639,7 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().promote_chat_member(
+        return await self.get_bot().promote_chat_member(
             chat_id=self.id,
             user_id=user_id,
             can_change_info=can_change_info,
@@ -567,19 +650,25 @@ class Chat(TelegramObject):
             can_restrict_members=can_restrict_members,
             can_pin_messages=can_pin_messages,
             can_promote_members=can_promote_members,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             is_anonymous=is_anonymous,
             can_manage_chat=can_manage_chat,
             can_manage_voice_chats=can_manage_voice_chats,
         )
 
-    def restrict_member(
+    async def restrict_member(
         self,
         user_id: Union[str, int],
         permissions: ChatPermissions,
         until_date: Union[int, datetime] = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -595,19 +684,25 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().restrict_chat_member(
+        return await self.get_bot().restrict_chat_member(
             chat_id=self.id,
             user_id=user_id,
             permissions=permissions,
             until_date=until_date,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def set_permissions(
+    async def set_permissions(
         self,
         permissions: ChatPermissions,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -621,18 +716,24 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().set_chat_permissions(
+        return await self.get_bot().set_chat_permissions(
             chat_id=self.id,
             permissions=permissions,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def set_administrator_custom_title(
+    async def set_administrator_custom_title(
         self,
         user_id: Union[int, str],
         custom_title: str,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -646,19 +747,25 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().set_chat_administrator_custom_title(
+        return await self.get_bot().set_chat_administrator_custom_title(
             chat_id=self.id,
             user_id=user_id,
             custom_title=custom_title,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def pin_message(
+    async def pin_message(
         self,
         message_id: int,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -674,17 +781,23 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().pin_chat_message(
+        return await self.get_bot().pin_chat_message(
             chat_id=self.id,
             message_id=message_id,
             disable_notification=disable_notification,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def unpin_message(
+    async def unpin_message(
         self,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         message_id: int = None,
     ) -> bool:
@@ -701,16 +814,22 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().unpin_chat_message(
+        return await self.get_bot().unpin_chat_message(
             chat_id=self.id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             message_id=message_id,
         )
 
-    def unpin_all_messages(
+    async def unpin_all_messages(
         self,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -726,13 +845,16 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().unpin_all_chat_messages(
+        return await self.get_bot().unpin_all_chat_messages(
             chat_id=self.id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def send_message(
+    async def send_message(
         self,
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -740,7 +862,10 @@ class Chat(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
@@ -756,7 +881,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_message(
+        return await self.get_bot().send_message(
             chat_id=self.id,
             text=text,
             parse_mode=parse_mode,
@@ -764,21 +889,27 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
         )
 
-    def send_media_group(
+    async def send_media_group(
         self,
         media: List[
             Union['InputMediaAudio', 'InputMediaDocument', 'InputMediaPhoto', 'InputMediaVideo']
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: float = 20,
+        write_timeout: float = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -793,21 +924,27 @@ class Chat(TelegramObject):
             List[:class:`telegram.Message`]: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_media_group(
+        return await self.get_bot().send_media_group(
             chat_id=self.id,
             media=media,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
         )
 
-    def send_chat_action(
+    async def send_chat_action(
         self,
         action: str,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -820,24 +957,30 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().send_chat_action(
+        return await self.get_bot().send_chat_action(
             chat_id=self.id,
             action=action,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
     send_action = send_chat_action
     """Alias for :attr:`send_chat_action`"""
 
-    def send_photo(
+    async def send_photo(
         self,
         photo: Union[FileInput, 'PhotoSize'],
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: float = 20,
+        write_timeout: float = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -855,14 +998,17 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_photo(
+        return await self.get_bot().send_photo(
             chat_id=self.id,
             photo=photo,
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -871,7 +1017,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_contact(
+    async def send_contact(
         self,
         phone_number: str = None,
         first_name: str = None,
@@ -879,7 +1025,10 @@ class Chat(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         contact: 'Contact' = None,
         vcard: str = None,
         api_kwargs: JSONDict = None,
@@ -896,7 +1045,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_contact(
+        return await self.get_bot().send_contact(
             chat_id=self.id,
             phone_number=phone_number,
             first_name=first_name,
@@ -904,7 +1053,10 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             contact=contact,
             vcard=vcard,
             api_kwargs=api_kwargs,
@@ -912,7 +1064,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_audio(
+    async def send_audio(
         self,
         audio: Union[FileInput, 'Audio'],
         duration: int = None,
@@ -922,7 +1074,10 @@ class Chat(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: float = 20,
+        write_timeout: float = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
@@ -941,7 +1096,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_audio(
+        return await self.get_bot().send_audio(
             chat_id=self.id,
             audio=audio,
             duration=duration,
@@ -951,7 +1106,10 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             thumb=thumb,
             api_kwargs=api_kwargs,
@@ -961,7 +1119,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_document(
+    async def send_document(
         self,
         document: Union[FileInput, 'Document'],
         filename: str = None,
@@ -969,7 +1127,10 @@ class Chat(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: float = 20,
+        write_timeout: float = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
@@ -988,7 +1149,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_document(
+        return await self.get_bot().send_document(
             chat_id=self.id,
             document=document,
             filename=filename,
@@ -996,7 +1157,10 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             thumb=thumb,
             api_kwargs=api_kwargs,
@@ -1006,12 +1170,15 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_dice(
+    async def send_dice(
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         emoji: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1027,25 +1194,31 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_dice(
+        return await self.get_bot().send_dice(
             chat_id=self.id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             emoji=emoji,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
         )
 
-    def send_game(
+    async def send_game(
         self,
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: 'InlineKeyboardMarkup' = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1060,19 +1233,22 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_game(
+        return await self.get_bot().send_game(
             chat_id=self.id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
         )
 
-    def send_invoice(
+    async def send_invoice(
         self,
         title: str,
         description: str,
@@ -1096,7 +1272,10 @@ class Chat(TelegramObject):
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         max_tip_amount: int = None,
@@ -1121,7 +1300,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_invoice(
+        return await self.get_bot().send_invoice(
             chat_id=self.id,
             title=title,
             description=description,
@@ -1145,7 +1324,10 @@ class Chat(TelegramObject):
             provider_data=provider_data,
             send_phone_number_to_provider=send_phone_number_to_provider,
             send_email_to_provider=send_email_to_provider,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             max_tip_amount=max_tip_amount,
@@ -1153,14 +1335,17 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_location(
+    async def send_location(
         self,
         latitude: float = None,
         longitude: float = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         location: 'Location' = None,
         live_period: int = None,
         api_kwargs: JSONDict = None,
@@ -1180,14 +1365,17 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_location(
+        return await self.get_bot().send_location(
             chat_id=self.id,
             latitude=latitude,
             longitude=longitude,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             location=location,
             live_period=live_period,
             api_kwargs=api_kwargs,
@@ -1198,7 +1386,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_animation(
+    async def send_animation(
         self,
         animation: Union[FileInput, 'Animation'],
         duration: int = None,
@@ -1210,7 +1398,10 @@ class Chat(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: float = 20,
+        write_timeout: float = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
@@ -1227,7 +1418,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_animation(
+        return await self.get_bot().send_animation(
             chat_id=self.id,
             animation=animation,
             duration=duration,
@@ -1239,7 +1430,10 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
@@ -1247,13 +1441,16 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_sticker(
+    async def send_sticker(
         self,
         sticker: Union[FileInput, 'Sticker'],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: float = 20,
+        write_timeout: float = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
@@ -1268,19 +1465,22 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_sticker(
+        return await self.get_bot().send_sticker(
             chat_id=self.id,
             sticker=sticker,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
         )
 
-    def send_venue(
+    async def send_venue(
         self,
         latitude: float = None,
         longitude: float = None,
@@ -1290,7 +1490,10 @@ class Chat(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         venue: 'Venue' = None,
         foursquare_type: str = None,
         api_kwargs: JSONDict = None,
@@ -1309,7 +1512,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_venue(
+        return await self.get_bot().send_venue(
             chat_id=self.id,
             latitude=latitude,
             longitude=longitude,
@@ -1319,7 +1522,10 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             venue=venue,
             foursquare_type=foursquare_type,
             api_kwargs=api_kwargs,
@@ -1329,7 +1535,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_video(
+    async def send_video(
         self,
         video: Union[FileInput, 'Video'],
         duration: int = None,
@@ -1337,7 +1543,10 @@ class Chat(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: float = 20,
+        write_timeout: float = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         width: int = None,
         height: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1359,7 +1568,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_video(
+        return await self.get_bot().send_video(
             chat_id=self.id,
             video=video,
             duration=duration,
@@ -1367,7 +1576,10 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             width=width,
             height=height,
             parse_mode=parse_mode,
@@ -1380,7 +1592,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_video_note(
+    async def send_video_note(
         self,
         video_note: Union[FileInput, 'VideoNote'],
         duration: int = None,
@@ -1388,7 +1600,10 @@ class Chat(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: float = 20,
+        write_timeout: float = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1405,7 +1620,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_video_note(
+        return await self.get_bot().send_video_note(
             chat_id=self.id,
             video_note=video_note,
             duration=duration,
@@ -1413,7 +1628,10 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             thumb=thumb,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1421,7 +1639,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_voice(
+    async def send_voice(
         self,
         voice: Union[FileInput, 'Voice'],
         duration: int = None,
@@ -1429,7 +1647,10 @@ class Chat(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: float = 20,
+        write_timeout: float = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1447,7 +1668,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_voice(
+        return await self.get_bot().send_voice(
             chat_id=self.id,
             voice=voice,
             duration=duration,
@@ -1455,7 +1676,10 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1464,7 +1688,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_poll(
+    async def send_poll(
         self,
         question: str,
         options: List[str],
@@ -1477,7 +1701,10 @@ class Chat(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         explanation: str = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: int = None,
@@ -1497,7 +1724,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().send_poll(
+        return await self.get_bot().send_poll(
             chat_id=self.id,
             question=question,
             options=options,
@@ -1509,7 +1736,10 @@ class Chat(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             explanation=explanation,
             explanation_parse_mode=explanation_parse_mode,
             open_period=open_period,
@@ -1520,7 +1750,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    def send_copy(
+    async def send_copy(
         self,
         from_chat_id: Union[str, int],
         message_id: int,
@@ -1531,7 +1761,10 @@ class Chat(TelegramObject):
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'MessageId':
@@ -1545,7 +1778,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().copy_message(
+        return await self.get_bot().copy_message(
             chat_id=self.id,
             from_chat_id=from_chat_id,
             message_id=message_id,
@@ -1556,12 +1789,15 @@ class Chat(TelegramObject):
             reply_to_message_id=reply_to_message_id,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
         )
 
-    def copy_message(
+    async def copy_message(
         self,
         chat_id: Union[int, str],
         message_id: int,
@@ -1572,7 +1808,10 @@ class Chat(TelegramObject):
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'MessageId':
@@ -1586,7 +1825,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return self.get_bot().copy_message(
+        return await self.get_bot().copy_message(
             from_chat_id=self.id,
             chat_id=chat_id,
             message_id=message_id,
@@ -1597,14 +1836,20 @@ class Chat(TelegramObject):
             reply_to_message_id=reply_to_message_id,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
         )
 
-    def export_invite_link(
+    async def export_invite_link(
         self,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> str:
         """Shortcut for::
@@ -1620,15 +1865,23 @@ class Chat(TelegramObject):
             :obj:`str`: New invite link on success.
 
         """
-        return self.get_bot().export_chat_invite_link(
-            chat_id=self.id, timeout=timeout, api_kwargs=api_kwargs
+        return await self.get_bot().export_chat_invite_link(
+            chat_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
-    def create_invite_link(
+    async def create_invite_link(
         self,
         expire_date: Union[int, datetime] = None,
         member_limit: int = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         name: str = None,
         creates_join_request: bool = None,
@@ -1650,22 +1903,28 @@ class Chat(TelegramObject):
             :class:`telegram.ChatInviteLink`
 
         """
-        return self.get_bot().create_chat_invite_link(
+        return await self.get_bot().create_chat_invite_link(
             chat_id=self.id,
             expire_date=expire_date,
             member_limit=member_limit,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             name=name,
             creates_join_request=creates_join_request,
         )
 
-    def edit_invite_link(
+    async def edit_invite_link(
         self,
         invite_link: Union[str, 'ChatInviteLink'],
         expire_date: Union[int, datetime] = None,
         member_limit: int = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         name: str = None,
         creates_join_request: bool = None,
@@ -1686,21 +1945,27 @@ class Chat(TelegramObject):
             :class:`telegram.ChatInviteLink`
 
         """
-        return self.get_bot().edit_chat_invite_link(
+        return await self.get_bot().edit_chat_invite_link(
             chat_id=self.id,
             invite_link=invite_link,
             expire_date=expire_date,
             member_limit=member_limit,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             name=name,
             creates_join_request=creates_join_request,
         )
 
-    def revoke_invite_link(
+    async def revoke_invite_link(
         self,
         invite_link: Union[str, 'ChatInviteLink'],
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> 'ChatInviteLink':
         """Shortcut for::
@@ -1716,14 +1981,23 @@ class Chat(TelegramObject):
             :class:`telegram.ChatInviteLink`
 
         """
-        return self.get_bot().revoke_chat_invite_link(
-            chat_id=self.id, invite_link=invite_link, timeout=timeout, api_kwargs=api_kwargs
+        return await self.get_bot().revoke_chat_invite_link(
+            chat_id=self.id,
+            invite_link=invite_link,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
-    def approve_join_request(
+    async def approve_join_request(
         self,
         user_id: int,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -1739,14 +2013,23 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().approve_chat_join_request(
-            chat_id=self.id, user_id=user_id, timeout=timeout, api_kwargs=api_kwargs
+        return await self.get_bot().approve_chat_join_request(
+            chat_id=self.id,
+            user_id=user_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
-    def decline_join_request(
+    async def decline_join_request(
         self,
         user_id: int,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
@@ -1762,6 +2045,12 @@ class Chat(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().decline_chat_join_request(
-            chat_id=self.id, user_id=user_id, timeout=timeout, api_kwargs=api_kwargs
+        return await self.get_bot().decline_chat_join_request(
+            chat_id=self.id,
+            user_id=user_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )

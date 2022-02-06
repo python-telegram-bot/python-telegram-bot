@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
-
 from typing import Union, List, Tuple, Optional
 
 from telegram import (
@@ -102,7 +101,7 @@ class InputMedia(TelegramObject):
 
     @staticmethod
     def _parse_thumb_input(thumb: Optional[FileInput]) -> Optional[Union[str, InputFile]]:
-        return parse_file_input(thumb, attach=True) if thumb is not None else thumb
+        return parse_file_input(thumb) if thumb is not None else thumb
 
 
 class InputMediaAnimation(InputMedia):
@@ -182,7 +181,7 @@ class InputMediaAnimation(InputMedia):
             duration = media.duration if duration is None else duration
             media = media.file_id
         else:
-            media = parse_file_input(media, attach=True, filename=filename)
+            media = parse_file_input(media, filename=filename)
 
         super().__init__(InputMediaType.ANIMATION, media, caption, caption_entities, parse_mode)
         self.thumb = self._parse_thumb_input(thumb)
@@ -237,7 +236,7 @@ class InputMediaPhoto(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        media = parse_file_input(media, PhotoSize, attach=True, filename=filename)
+        media = parse_file_input(media, PhotoSize, filename=filename)
         super().__init__(InputMediaType.PHOTO, media, caption, caption_entities, parse_mode)
 
 
@@ -327,7 +326,7 @@ class InputMediaVideo(InputMedia):
             duration = duration if duration is not None else media.duration
             media = media.file_id
         else:
-            media = parse_file_input(media, attach=True, filename=filename)
+            media = parse_file_input(media, filename=filename)
 
         super().__init__(InputMediaType.VIDEO, media, caption, caption_entities, parse_mode)
         self.width = width
@@ -417,7 +416,7 @@ class InputMediaAudio(InputMedia):
             title = media.title if title is None else title
             media = media.file_id
         else:
-            media = parse_file_input(media, attach=True, filename=filename)
+            media = parse_file_input(media, filename=filename)
 
         super().__init__(InputMediaType.AUDIO, media, caption, caption_entities, parse_mode)
         self.thumb = self._parse_thumb_input(thumb)
@@ -490,7 +489,7 @@ class InputMediaDocument(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        media = parse_file_input(media, Document, attach=True, filename=filename)
+        media = parse_file_input(media, Document, filename=filename)
         super().__init__(InputMediaType.DOCUMENT, media, caption, caption_entities, parse_mode)
         self.thumb = self._parse_thumb_input(thumb)
         self.disable_content_type_detection = disable_content_type_detection

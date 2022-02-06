@@ -171,8 +171,7 @@ class TelegramObject:
         """
         if self._bot is None:
             raise RuntimeError(
-                'This object has no bot associated with it. \
-                Shortcuts cannot be used.'
+                'This object has no bot associated with it. Shortcuts cannot be used.'
             )
         return self._bot
 

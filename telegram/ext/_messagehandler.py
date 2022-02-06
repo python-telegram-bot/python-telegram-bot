@@ -17,16 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the MessageHandler class."""
-from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, Optional, TypeVar, Union
 
 from telegram import Update
+from telegram._utils.types import DVInput
 from telegram.ext import filters as filters_module, Handler
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram._utils.defaultvalue import DEFAULT_TRUE
 
-from telegram.ext._utils.types import CCT
+from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher
+    from telegram.ext import Application
 
 RT = TypeVar('RT')
 
@@ -35,7 +36,7 @@ class MessageHandler(Handler[Update, CCT]):
     """Handler class to handle telegram messages. They might contain text, media or status updates.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting ``block`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
@@ -53,8 +54,9 @@ class MessageHandler(Handler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Raises:
         ValueError
@@ -63,7 +65,9 @@ class MessageHandler(Handler[Update, CCT]):
         filters (:class:`telegram.ext.filters.BaseFilter`): Only allow updates with these Filters.
             See :mod:`telegram.ext.filters` for a full list of all available filters.
         callback (:obj:`callable`): The callback function for this handler.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
 
     """
 
@@ -72,11 +76,11 @@ class MessageHandler(Handler[Update, CCT]):
     def __init__(
         self,
         filters: filters_module.BaseFilter,
-        callback: Callable[[Update, CCT], RT],
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        callback: HandlerCallback[Update, CCT, RT],
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
 
-        super().__init__(callback, run_async=run_async)
+        super().__init__(callback, block=block)
         self.filters = filters if filters is not None else filters_module.ALL
 
     def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
@@ -97,7 +101,7 @@ class MessageHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        dispatcher: 'Dispatcher',
+        application: 'Application',
         check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
         """Adds possible output of data filters to the :class:`CallbackContext`."""

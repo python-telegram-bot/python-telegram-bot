@@ -125,12 +125,6 @@ Or you can install from source with:
     $ cd python-telegram-bot
     $ python setup-raw.py install
 
-In case you have a previously cloned local repository already, you should initialize the added urllib3 submodule before installing with:
-
-.. code:: shell
-
-    $ git submodule update --init --recursive
-
 ----
 Note
 ----

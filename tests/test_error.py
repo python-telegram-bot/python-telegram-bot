@@ -22,7 +22,7 @@ from collections import defaultdict
 import pytest
 
 from telegram.error import (
-    Unauthorized,
+    Forbidden,
     InvalidToken,
     NetworkError,
     BadRequest,
@@ -48,14 +48,14 @@ class TestErrors:
             raise TelegramError("Bad Request: test message")
 
     def test_unauthorized(self):
-        with pytest.raises(Unauthorized, match="test message"):
-            raise Unauthorized("test message")
-        with pytest.raises(Unauthorized, match="^Test message$"):
-            raise Unauthorized("Error: test message")
-        with pytest.raises(Unauthorized, match="^Test message$"):
-            raise Unauthorized("[Error]: test message")
-        with pytest.raises(Unauthorized, match="^Test message$"):
-            raise Unauthorized("Bad Request: test message")
+        with pytest.raises(Forbidden, match="test message"):
+            raise Forbidden("test message")
+        with pytest.raises(Forbidden, match="^Test message$"):
+            raise Forbidden("Error: test message")
+        with pytest.raises(Forbidden, match="^Test message$"):
+            raise Forbidden("[Error]: test message")
+        with pytest.raises(Forbidden, match="^Test message$"):
+            raise Forbidden("Bad Request: test message")
 
     def test_invalid_token(self):
         with pytest.raises(InvalidToken, match="Invalid token"):
@@ -105,7 +105,7 @@ class TestErrors:
         "exception, attributes",
         [
             (TelegramError("test message"), ["message"]),
-            (Unauthorized("test message"), ["message"]),
+            (Forbidden("test message"), ["message"]),
             (InvalidToken(), ["message"]),
             (NetworkError("test message"), ["message"]),
             (BadRequest("test message"), ["message"]),
@@ -130,7 +130,7 @@ class TestErrors:
         "inst",
         [
             (TelegramError("test message")),
-            (Unauthorized("test message")),
+            (Forbidden("test message")),
             (InvalidToken()),
             (NetworkError("test message")),
             (BadRequest("test message")),
@@ -164,7 +164,7 @@ class TestErrors:
         covered_subclasses.update(
             {
                 TelegramError: {
-                    Unauthorized,
+                    Forbidden,
                     InvalidToken,
                     NetworkError,
                     ChatMigrated,

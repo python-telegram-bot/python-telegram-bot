@@ -57,7 +57,6 @@ def is_local_file(obj: Optional[FilePathInput]) -> bool:
 def parse_file_input(
     file_input: Union[FileInput, 'TelegramObject'],
     tg_type: Type['TelegramObject'] = None,
-    attach: bool = None,
     filename: str = None,
 ) -> Union[str, 'InputFile', Any]:
     """
@@ -76,9 +75,6 @@ def parse_file_input(
             input to parse.
         tg_type (:obj:`type`, optional): The Telegram media type the input can be. E.g.
             :class:`telegram.Animation`.
-        attach (:obj:`bool`, optional): Whether this file should be send as one file or is part of
-            a collection of files. Only relevant in case an :class:`telegram.InputFile` is
-            returned.
         filename (:obj:`str`, optional): The filename. Only relevant in case an
             :class:`telegram.InputFile` is returned.
 
@@ -98,10 +94,10 @@ def parse_file_input(
             out = file_input  # type: ignore[assignment]
         return out
     if isinstance(file_input, bytes):
-        return InputFile(file_input, attach=attach, filename=filename)
+        return InputFile(file_input, filename=filename)
     if InputFile.is_file(file_input):
         file_input = cast(IO, file_input)
-        return InputFile(file_input, attach=attach, filename=filename)
+        return InputFile(file_input, filename=filename)
     if tg_type and isinstance(file_input, tg_type):
         return file_input.file_id  # type: ignore[attr-defined]
     return file_input

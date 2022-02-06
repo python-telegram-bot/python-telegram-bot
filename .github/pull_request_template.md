@@ -8,7 +8,7 @@ Hey! You're PRing? Cool! Please have a look at the below checklist. It's here to
 - [ ] Created new or adapted existing unit tests
 - [ ] Documented code changes according to the [CSI standard](https://standards.mousepawmedia.com/en/stable/csi.html)
 - [ ] Added myself alphabetically to `AUTHORS.rst` (optional)
-- [ ] Added new classes & modules to the docs
+- [ ] Added new classes & modules to the docs and all suitable `__all__` s
 
 
 ### If the PR contains API changes (otherwise, you can delete this passage)

@@ -23,10 +23,12 @@ import imghdr
 import logging
 import mimetypes
 from pathlib import Path
-from typing import IO, Optional, Tuple, Union
+from typing import IO, Optional, Union
 from uuid import uuid4
 
-DEFAULT_MIME_TYPE = 'application/octet-stream'
+from telegram._utils.types import FieldTuple
+
+_DEFAULT_MIME_TYPE = 'application/octet-stream'
 logger = logging.getLogger(__name__)
 
 
@@ -36,29 +38,32 @@ class InputFile:
     Args:
         obj (:obj:`File handler` | :obj:`bytes`): An open file descriptor or the files content as
             bytes.
+
+            Note:
+                If ``obj`` is a string, it will be encoded as bytes via ``obj.encode('utf-8')``.
         filename (:obj:`str`, optional): Filename for this InputFile.
-        attach (:obj:`bool`, optional): Whether this should be send as one file or is part of a
-            collection of files.
 
     Raises:
         TelegramError
 
     Attributes:
         input_file_content (:obj:`bytes`): The binary content of the file to send.
+        attach_name (:obj:`str`): Attach name.
         filename (:obj:`str`): Optional. Filename for the file to be sent.
-        attach (:obj:`str`): Optional. Attach id for sending multiple files.
         mimetype (:obj:`str`): Optional. The mimetype inferred from the file to be sent.
 
     """
 
-    __slots__ = ('filename', 'attach', 'input_file_content', 'mimetype')
+    __slots__ = ('filename', 'attach_name', 'input_file_content', 'mimetype')
 
-    def __init__(self, obj: Union[IO, bytes], filename: str = None, attach: bool = None):
+    def __init__(self, obj: Union[IO[bytes], bytes, str], filename: str = None):
         if isinstance(obj, bytes):
             self.input_file_content = obj
+        elif isinstance(obj, str):
+            self.input_file_content = obj.encode('utf-8')
         else:
             self.input_file_content = obj.read()
-        self.attach = 'attached' + uuid4().hex if attach else None
+        self.attach_name = 'attached' + uuid4().hex
 
         if (
             not filename
@@ -71,14 +76,14 @@ class InputFile:
         if image_mime_type:
             self.mimetype = image_mime_type
         elif filename:
-            self.mimetype = mimetypes.guess_type(filename)[0] or DEFAULT_MIME_TYPE
+            self.mimetype = mimetypes.guess_type(filename)[0] or _DEFAULT_MIME_TYPE
         else:
-            self.mimetype = DEFAULT_MIME_TYPE
+            self.mimetype = _DEFAULT_MIME_TYPE
 
         self.filename = filename or self.mimetype.replace('/', '.')
 
     @property
-    def field_tuple(self) -> Tuple[str, bytes, str]:  # skipcq: PY-D0003
+    def field_tuple(self) -> FieldTuple:  # skipcq: PY-D0003
         return self.filename, self.input_file_content, self.mimetype
 
     @staticmethod
@@ -108,8 +113,7 @@ class InputFile:
     def is_file(obj: object) -> bool:  # skipcq: PY-D0003
         return hasattr(obj, 'read')
 
-    def to_dict(self) -> Optional[str]:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        if self.attach:
-            return 'attach://' + self.attach
-        return None
+    @property
+    def attach_uri(self) -> str:
+        """URI to insert into the JSON data for uploading the file."""
+        return f'attach://{self.attach_name}'

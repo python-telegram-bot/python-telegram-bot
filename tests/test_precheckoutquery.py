@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 import pytest
 
 from telegram import Update, User, PreCheckoutQuery, OrderInfo, Bot
@@ -44,12 +45,6 @@ class TestPreCheckoutQuery:
     total_amount = 100
     from_user = User(0, '', False)
     order_info = OrderInfo()
-
-    def test_slot_behaviour(self, pre_checkout_query, mro_slots):
-        inst = pre_checkout_query
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, bot):
         json_dict = {
@@ -84,24 +79,27 @@ class TestPreCheckoutQuery:
         assert pre_checkout_query_dict['from'] == pre_checkout_query.from_user.to_dict()
         assert pre_checkout_query_dict['order_info'] == pre_checkout_query.order_info.to_dict()
 
-    def test_answer(self, monkeypatch, pre_checkout_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_answer(self, monkeypatch, pre_checkout_query):
+        async def make_assertion(*_, **kwargs):
             return kwargs['pre_checkout_query_id'] == pre_checkout_query.id
 
         assert check_shortcut_signature(
             PreCheckoutQuery.answer, Bot.answer_pre_checkout_query, ['pre_checkout_query_id'], []
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             pre_checkout_query.answer,
             pre_checkout_query.get_bot(),
             'answer_pre_checkout_query',
         )
-        assert check_defaults_handling(pre_checkout_query.answer, pre_checkout_query.get_bot())
+        assert await check_defaults_handling(
+            pre_checkout_query.answer, pre_checkout_query.get_bot()
+        )
 
         monkeypatch.setattr(
             pre_checkout_query.get_bot(), 'answer_pre_checkout_query', make_assertion
         )
-        assert pre_checkout_query.answer(ok=True)
+        assert await pre_checkout_query.answer(ok=True)
 
     def test_equality(self):
         a = PreCheckoutQuery(

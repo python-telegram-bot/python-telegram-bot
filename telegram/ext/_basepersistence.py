@@ -19,7 +19,16 @@
 """This module contains the BasePersistence class."""
 from abc import ABC, abstractmethod
 from copy import copy
-from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, NamedTuple
+from typing import (
+    Dict,
+    Optional,
+    Tuple,
+    cast,
+    ClassVar,
+    Generic,
+    NamedTuple,
+    NoReturn,
+)
 
 from telegram import Bot
 from telegram.ext import ExtBot
@@ -100,6 +109,12 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
             saved.
+        update_interval (:obj:`int` | :obj:`float:, optional): The
+            :class:`~telegram.ext.Application` will update
+            the persistence in regular intervals. This parameter specifies the time (in seconds) to
+            wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
+
+            .. versionadded:: 14.0
 
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
@@ -109,6 +124,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     __slots__ = (
         'bot',
         'store_data',
+        '_update_interval',
         '__dict__',  # __dict__ is included because we replace methods in the __new__
     )
 
@@ -132,33 +148,33 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         update_bot_data = instance.update_bot_data
         update_callback_data = instance.update_callback_data
 
-        def get_user_data_insert_bot() -> Dict[int, UD]:
-            return instance.insert_bot(get_user_data())
+        async def get_user_data_insert_bot() -> Dict[int, UD]:
+            return instance.insert_bot(await get_user_data())
 
-        def get_chat_data_insert_bot() -> Dict[int, CD]:
-            return instance.insert_bot(get_chat_data())
+        async def get_chat_data_insert_bot() -> Dict[int, CD]:
+            return instance.insert_bot(await get_chat_data())
 
-        def get_bot_data_insert_bot() -> BD:
-            return instance.insert_bot(get_bot_data())
+        async def get_bot_data_insert_bot() -> BD:
+            return instance.insert_bot(await get_bot_data())
 
-        def get_callback_data_insert_bot() -> Optional[CDCData]:
-            cdc_data = get_callback_data()
+        async def get_callback_data_insert_bot() -> Optional[CDCData]:
+            cdc_data = await get_callback_data()
             if cdc_data is None:
                 return None
             return instance.insert_bot(cdc_data[0]), cdc_data[1]
 
-        def update_user_data_replace_bot(user_id: int, data: UD) -> None:
-            return update_user_data(user_id, instance.replace_bot(data))
+        async def update_user_data_replace_bot(user_id: int, data: UD) -> None:
+            return await update_user_data(user_id, instance.replace_bot(data))
 
-        def update_chat_data_replace_bot(chat_id: int, data: CD) -> None:
-            return update_chat_data(chat_id, instance.replace_bot(data))
+        async def update_chat_data_replace_bot(chat_id: int, data: CD) -> None:
+            return await update_chat_data(chat_id, instance.replace_bot(data))
 
-        def update_bot_data_replace_bot(data: BD) -> None:
-            return update_bot_data(instance.replace_bot(data))
+        async def update_bot_data_replace_bot(data: BD) -> None:
+            return await update_bot_data(instance.replace_bot(data))
 
-        def update_callback_data_replace_bot(data: CDCData) -> None:
+        async def update_callback_data_replace_bot(data: CDCData) -> None:
             obj_data, queue = data
-            return update_callback_data((instance.replace_bot(obj_data), queue))
+            return await update_callback_data((instance.replace_bot(obj_data), queue))
 
         # Adds to __dict__
         setattr(instance, 'get_user_data', get_user_data_insert_bot)
@@ -171,10 +187,30 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         setattr(instance, 'update_callback_data', update_callback_data_replace_bot)
         return instance
 
-    def __init__(self, store_data: PersistenceInput = None):
+    def __init__(
+        self,
+        store_data: PersistenceInput = None,
+        update_interval: float = 60,
+    ):
         self.store_data = store_data or PersistenceInput()
+        self._update_interval = update_interval
 
         self.bot: Bot = None  # type: ignore[assignment]
+
+    @property
+    def update_interval(self) -> float:
+        """:obj:`int`, optional): Time (in seconds) that the :class:`~telegram.ext.Application`
+        will wait between two consecutive runs of updating the persistence.
+
+        .. versionadded:: 14.0
+        """
+        return self._update_interval
+
+    @update_interval.setter
+    def update_interval(self, value: object) -> NoReturn:  # pylint: disable=no-self-use
+        raise AttributeError(
+            "You can not assign a new value to update_interval after initialization."
+        )
 
     def set_bot(self, bot: Bot) -> None:
         """Set the Bot to be used by this persistence instance.
@@ -395,8 +431,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         return obj
 
     @abstractmethod
-    def get_user_data(self) -> Dict[int, UD]:
-        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+    async def get_user_data(self) -> Dict[int, UD]:
+        """Will be called by :class:`telegram.ext.Application` upon creation with a
         persistence object. It should return the ``user_data`` if stored, or an empty
         :obj:`dict`. In the latter case, the dictionary should produce values
         corresponding to one of the following:
@@ -414,8 +450,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def get_chat_data(self) -> Dict[int, CD]:
-        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+    async def get_chat_data(self) -> Dict[int, CD]:
+        """Will be called by :class:`telegram.ext.Application` upon creation with a
         persistence object. It should return the ``chat_data`` if stored, or an empty
         :obj:`dict`. In the latter case, the dictionary should produce values
         corresponding to one of the following:
@@ -433,8 +469,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def get_bot_data(self) -> BD:
-        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+    async def get_bot_data(self) -> BD:
+        """Will be called by :class:`telegram.ext.Application` upon creation with a
         persistence object. It should return the ``bot_data`` if stored, or an empty
         :obj:`dict`. In the latter case, the :obj:`dict` should produce values
         corresponding to one of the following:
@@ -449,8 +485,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def get_callback_data(self) -> Optional[CDCData]:
-        """Will be called by :class:`telegram.ext.Dispatcher` upon creation with a
+    async def get_callback_data(self) -> Optional[CDCData]:
+        """Will be called by :class:`telegram.ext.Application` upon creation with a
         persistence object. If callback data was stored, it should be returned.
 
         .. versionadded:: 13.6
@@ -465,8 +501,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def get_conversations(self, name: str) -> ConversationDict:
-        """Will be called by :class:`telegram.ext.Dispatcher` when a
+    async def get_conversations(self, name: str) -> ConversationDict:
+        """Will be called by :class:`telegram.ext.Application` when a
         :class:`telegram.ext.ConversationHandler` is added if
         :attr:`telegram.ext.ConversationHandler.persistent` is :obj:`True`.
         It should return the conversations for the handler with `name` or an empty :obj:`dict`
@@ -479,7 +515,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def update_conversation(
+    async def update_conversation(
         self, name: str, key: Tuple[int, ...], new_state: Optional[object]
     ) -> None:
         """Will be called when a :class:`telegram.ext.ConversationHandler` changes states.
@@ -492,40 +528,40 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def update_user_data(self, user_id: int, data: UD) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
+    async def update_user_data(self, user_id: int, data: UD) -> None:
+        """Will be called by the :class:`telegram.ext.Application` after a handler has
         handled an update.
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
             data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`):
-                The :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
+                The :attr:`telegram.ext.Application.user_data` ``[user_id]``.
         """
 
     @abstractmethod
-    def update_chat_data(self, chat_id: int, data: CD) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
+    async def update_chat_data(self, chat_id: int, data: CD) -> None:
+        """Will be called by the :class:`telegram.ext.Application` after a handler has
         handled an update.
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
             data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`):
-                The :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
+                The :attr:`telegram.ext.Application.chat_data` ``[chat_id]``.
         """
 
     @abstractmethod
-    def update_bot_data(self, data: BD) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
+    async def update_bot_data(self, data: BD) -> None:
+        """Will be called by the :class:`telegram.ext.Application` after a handler has
         handled an update.
 
         Args:
             data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`):
-                The :attr:`telegram.ext.Dispatcher.bot_data`.
+                The :attr:`telegram.ext.Application.bot_data`.
         """
 
     @abstractmethod
-    def update_callback_data(self, data: CDCData) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher` after a handler has
+    async def update_callback_data(self, data: CDCData) -> None:
+        """Will be called by the :class:`telegram.ext.Application` after a handler has
         handled an update.
 
         .. versionadded:: 13.6
@@ -540,9 +576,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def drop_chat_data(self, chat_id: int) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher`, when using
-        :meth:`~telegram.ext.Dispatcher.drop_chat_data`.
+    async def drop_chat_data(self, chat_id: int) -> None:
+        """Will be called by the :class:`telegram.ext.Application`, when using
+        :meth:`~telegram.ext.Application.drop_chat_data`.
 
         .. versionadded:: 14.0
 
@@ -551,9 +587,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def drop_user_data(self, user_id: int) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher`, when using
-        :meth:`~telegram.ext.Dispatcher.drop_user_data`.
+    async def drop_user_data(self, user_id: int) -> None:
+        """Will be called by the :class:`telegram.ext.Application`, when using
+        :meth:`~telegram.ext.Application.drop_user_data`.
 
         .. versionadded:: 14.0
 
@@ -562,8 +598,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def refresh_user_data(self, user_id: int, user_data: UD) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
+    async def refresh_user_data(self, user_id: int, user_data: UD) -> None:
+        """Will be called by the :class:`telegram.ext.Application` before passing the
         :attr:`user_data` to a callback. Can be used to update data stored in :attr:`user_data`
         from an external source.
 
@@ -579,8 +615,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
+    async def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
+        """Will be called by the :class:`telegram.ext.Application` before passing the
         :attr:`chat_data` to a callback. Can be used to update data stored in :attr:`chat_data`
         from an external source.
 
@@ -596,8 +632,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def refresh_bot_data(self, bot_data: BD) -> None:
-        """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
+    async def refresh_bot_data(self, bot_data: BD) -> None:
+        """Will be called by the :class:`telegram.ext.Application` before passing the
         :attr:`bot_data` to a callback. Can be used to update data stored in :attr:`bot_data`
         from an external source.
 
@@ -612,8 +648,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """
 
     @abstractmethod
-    def flush(self) -> None:
-        """Will be called by :class:`telegram.ext.Updater` upon receiving a stop signal. Gives the
+    async def flush(self) -> None:
+        """Will be called by :meth:`telegram.ext.Application.stop`. Gives the
         persistence a chance to finish up saving or close a database connection gracefully.
 
         .. versionchanged:: 14.0

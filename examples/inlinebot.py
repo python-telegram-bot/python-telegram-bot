@@ -4,7 +4,7 @@
 
 """
 First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
+the Application and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 
 Usage:
@@ -18,7 +18,7 @@ from uuid import uuid4
 from telegram import InlineQueryResultArticle, InputTextMessageContent, Update
 from telegram.constants import ParseMode
 from telegram.helpers import escape_markdown
-from telegram.ext import Updater, InlineQueryHandler, CommandHandler, CallbackContext
+from telegram.ext import Application, InlineQueryHandler, CommandHandler, CallbackContext
 
 # Enable logging
 logging.basicConfig(
@@ -29,17 +29,17 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    await update.message.reply_text('Hi!')
 
 
-def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    await update.message.reply_text('Help!')
 
 
-def inlinequery(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def inlinequery(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Handle the inline query."""
     query = update.inline_query.query
 
@@ -68,31 +68,23 @@ def inlinequery(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
         ),
     ]
 
-    update.inline_query.answer(results)
+    await update.inline_query.answer(results)
 
 
 def main() -> None:
     """Run the bot."""
-    # Create the Updater and pass it your bot's token.
-    updater = Updater.builder().token("TOKEN").build()
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("TOKEN").build()
 
     # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
 
     # on non command i.e message - echo the message on Telegram
-    dispatcher.add_handler(InlineQueryHandler(inlinequery))
+    application.add_handler(InlineQueryHandler(inlinequery))
 
-    # Start the Bot
-    updater.start_polling()
-
-    # Block until the user presses Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 
 if __name__ == '__main__':

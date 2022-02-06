@@ -25,6 +25,7 @@ from flaky import flaky
 from telegram import Audio, Voice, MessageEntity, Bot
 from telegram.error import TelegramError
 from telegram.helpers import escape_markdown
+from telegram.request import RequestData
 from tests.conftest import (
     check_shortcut_call,
     check_shortcut_signature,
@@ -40,10 +41,13 @@ def audio_file():
 
 
 @pytest.fixture(scope='class')
-def audio(bot, chat_id):
+@pytest.mark.asyncio
+async def audio(bot, chat_id):
     with data_file('telegram.mp3').open('rb') as f:
         thumb = data_file('thumb.jpg')
-        return bot.send_audio(chat_id, audio=f, timeout=50, thumb=thumb.open('rb')).audio
+        return (
+            await bot.send_audio(chat_id, audio=f, read_timeout=50, thumb=thumb.open('rb'))
+        ).audio
 
 
 class TestAudio:
@@ -87,8 +91,9 @@ class TestAudio:
         assert audio.thumb.height == self.thumb_height
 
     @flaky(3, 1)
-    def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
-        message = bot.send_audio(
+    @pytest.mark.asyncio
+    async def test_send_all_args(self, bot, chat_id, audio_file, thumb_file):
+        message = await bot.send_audio(
             chat_id,
             audio=audio_file,
             caption=self.caption,
@@ -120,30 +125,39 @@ class TestAudio:
         assert message.has_protected_content
 
     @flaky(3, 1)
-    def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
-        def make_assertion(url, data, **kwargs):
-            return data['audio'].filename == 'custom_filename'
+    @pytest.mark.asyncio
+    async def test_send_audio_custom_filename(self, bot, chat_id, audio_file, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return list(request_data.multipart_data.values())[0][0] == 'custom_filename'
 
         monkeypatch.setattr(bot.request, 'post', make_assertion)
 
-        assert bot.send_audio(chat_id, audio_file, filename='custom_filename')
+        assert await bot.send_audio(chat_id, audio_file, filename='custom_filename')
 
     @flaky(3, 1)
-    def test_get_and_download(self, bot, audio):
-        new_file = bot.get_file(audio.file_id)
+    @pytest.mark.asyncio
+    async def test_get_and_download(self, bot, audio):
+        path = Path('telegram.mp3')
+        if path.is_file():
+            path.unlink()
+
+        new_file = await bot.get_file(audio.file_id)
 
         assert new_file.file_size == self.file_size
         assert new_file.file_id == audio.file_id
         assert new_file.file_unique_id == audio.file_unique_id
         assert str(new_file.file_path).startswith('https://')
 
-        new_file.download('telegram.mp3')
+        await new_file.download('telegram.mp3')
 
-        assert Path('telegram.mp3').is_file()
+        assert path.is_file()
 
     @flaky(3, 1)
-    def test_send_mp3_url_file(self, bot, chat_id, audio):
-        message = bot.send_audio(chat_id=chat_id, audio=self.audio_file_url, caption=self.caption)
+    @pytest.mark.asyncio
+    async def test_send_mp3_url_file(self, bot, chat_id, audio):
+        message = await bot.send_audio(
+            chat_id=chat_id, audio=self.audio_file_url, caption=self.caption
+        )
 
         assert message.caption == self.caption
 
@@ -157,48 +171,55 @@ class TestAudio:
         assert message.audio.file_size == audio.file_size
 
     @flaky(3, 1)
-    def test_resend(self, bot, chat_id, audio):
-        message = bot.send_audio(chat_id=chat_id, audio=audio.file_id)
+    @pytest.mark.asyncio
+    async def test_resend(self, bot, chat_id, audio):
+        message = await bot.send_audio(chat_id=chat_id, audio=audio.file_id)
 
         assert message.audio == audio
 
-    def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
-        def test(url, data, **kwargs):
-            return data['audio'] == audio.file_id
+    @pytest.mark.asyncio
+    async def test_send_with_audio(self, monkeypatch, bot, chat_id, audio):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters['audio'] == audio.file_id
 
-        monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.send_audio(audio=audio, chat_id=chat_id)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        message = await bot.send_audio(audio=audio, chat_id=chat_id)
         assert message
 
     @flaky(3, 1)
-    def test_send_audio_caption_entities(self, bot, chat_id, audio):
+    @pytest.mark.asyncio
+    async def test_send_audio_caption_entities(self, bot, chat_id, audio):
         test_string = 'Italic Bold Code'
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.ITALIC, 7, 4),
             MessageEntity(MessageEntity.ITALIC, 12, 4),
         ]
-        message = bot.send_audio(chat_id, audio, caption=test_string, caption_entities=entities)
+        message = await bot.send_audio(
+            chat_id, audio, caption=test_string, caption_entities=entities
+        )
 
         assert message.caption == test_string
         assert message.caption_entities == entities
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file):
+    @pytest.mark.asyncio
+    async def test_send_audio_default_parse_mode_1(self, default_bot, chat_id, audio_file):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_audio(chat_id, audio_file, caption=test_markdown_string)
+        message = await default_bot.send_audio(chat_id, audio_file, caption=test_markdown_string)
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file):
+    @pytest.mark.asyncio
+    async def test_send_audio_default_parse_mode_2(self, default_bot, chat_id, audio_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_audio(
+        message = await default_bot.send_audio(
             chat_id, audio_file, caption=test_markdown_string, parse_mode=None
         )
         assert message.caption == test_markdown_string
@@ -206,35 +227,38 @@ class TestAudio:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file):
+    @pytest.mark.asyncio
+    async def test_send_audio_default_parse_mode_3(self, default_bot, chat_id, audio_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_audio(
+        message = await default_bot.send_audio(
             chat_id, audio_file, caption=test_markdown_string, parse_mode='HTML'
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
+    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
-    def test_send_audio_default_protect_content(self, default_bot, chat_id, audio):
-        protected_audio = default_bot.send_audio(chat_id, audio)
+    async def test_send_audio_default_protect_content(self, default_bot, chat_id, audio):
+        protected_audio = await default_bot.send_audio(chat_id, audio)
         assert protected_audio.has_protected_content
-        unprotected = default_bot.send_audio(chat_id, audio, protect_content=False)
+        unprotected = await default_bot.send_audio(chat_id, audio, protect_content=False)
         assert not unprotected.has_protected_content
 
-    def test_send_audio_local_files(self, monkeypatch, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_audio_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file('telegram.jpg')
         expected = file.as_uri()
 
-        def make_assertion(_, data, *args, **kwargs):
+        async def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
             test_flag = data.get('audio') == expected and data.get('thumb') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)
-        bot.send_audio(chat_id, file, thumb=file)
+        await bot.send_audio(chat_id, file, thumb=file)
         assert test_flag
         monkeypatch.delattr(bot, '_post')
 
@@ -275,31 +299,35 @@ class TestAudio:
         assert audio_dict['file_name'] == audio.file_name
 
     @flaky(3, 1)
-    def test_error_send_empty_file(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file(self, bot, chat_id):
         audio_file = open(os.devnull, 'rb')
 
         with pytest.raises(TelegramError):
-            bot.send_audio(chat_id=chat_id, audio=audio_file)
+            await bot.send_audio(chat_id=chat_id, audio=audio_file)
 
     @flaky(3, 1)
-    def test_error_send_empty_file_id(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_audio(chat_id=chat_id, audio='')
+            await bot.send_audio(chat_id=chat_id, audio='')
 
-    def test_error_send_without_required_args(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
-            bot.send_audio(chat_id=chat_id)
+            await bot.send_audio(chat_id=chat_id)
 
-    def test_get_file_instance_method(self, monkeypatch, audio):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, audio):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == audio.file_id
 
         assert check_shortcut_signature(Audio.get_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(audio.get_file, audio.get_bot(), 'get_file')
-        assert check_defaults_handling(audio.get_file, audio.get_bot())
+        assert await check_shortcut_call(audio.get_file, audio.get_bot(), 'get_file')
+        assert await check_defaults_handling(audio.get_file, audio.get_bot())
 
         monkeypatch.setattr(audio._bot, 'get_file', make_assertion)
-        assert audio.get_file()
+        assert await audio.get_file()
 
     def test_equality(self, audio):
         a = Audio(audio.file_id, audio.file_unique_id, audio.duration)
