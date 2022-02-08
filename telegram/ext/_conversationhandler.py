@@ -20,8 +20,9 @@
 """This module contains the ConversationHandler."""
 import asyncio
 import logging
-import functools
 import datetime
+import threading
+from dataclasses import dataclass
 from typing import (  # pylint: disable=unused-import  # for the "Any" import
     TYPE_CHECKING,
     Dict,
@@ -34,6 +35,7 @@ from typing import (  # pylint: disable=unused-import  # for the "Any" import
     ClassVar,
     Any,
     Set,
+    Generic,
 )
 
 from telegram import Update
@@ -57,27 +59,61 @@ if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
 CheckUpdateType = Tuple[object, Tuple[int, ...], Handler, object]
 
+_logger = logging.getLogger(__name__)
 
-class _ConversationTimeoutContext:
+
+@dataclass
+class _ConversationTimeoutContext(Generic[CCT]):
     __slots__ = ('conversation_key', 'update', 'application', 'callback_context')
 
-    def __init__(
-        self,
-        conversation_key: Tuple[int, ...],
-        update: Update,
-        application: 'Application[Any, CCT, Any, Any, Any, JobQueue]',
-        callback_context: CallbackContext,
-    ):
-        self.conversation_key = conversation_key
-        self.update = update
-        self.application = application
-        self.callback_context = callback_context
+    conversation_key: Tuple[int, ...]
+    update: Update
+    application: 'Application[Any, CCT, Any, Any, Any, JobQueue]'
+    callback_context: CallbackContext
+
+
+@dataclass
+class PendingState:
+    """Thin wrapper around asyncio.Task to handle block=False handlers. Note that this is a
+    public class of this module, since `Application.update_persistence` needs to access it."""
+
+    __slots__ = ('task', 'old_state')
+
+    task: asyncio.Task
+    old_state: object
+
+    def done(self) -> bool:
+        return self.task.done()
+
+    def resolve(self) -> object:
+        if not self.task.done():
+            raise RuntimeError('New state is not yet available')
+
+        exc = self.task.exception()
+        if exc:
+            _logger.exception(
+                "Task function raised exception. Falling back to old state %s",
+                self.old_state,
+                exc_info=exc,
+            )
+            return self.old_state
+
+        res = self.task.result()
+        if res is None and self.old_state is None:
+            res = ConversationHandler.END
+
+        return res
 
 
 class ConversationHandler(Handler[Update, CCT]):
     """
     A handler to hold a conversation with a single or multiple users through Telegram updates by
     managing four collections of other handlers.
+
+    Warning:
+        :class:`ConversationHandler` heavily relies on incoming updates being processed one by one.
+        When using this handler, :attr:`telegram.ext.Application.concurrent_updates` should be
+        :obj:`False`.
 
     Note:
         ``ConversationHandler`` will only accept updates that are (subclass-)instances of
@@ -179,7 +215,7 @@ class ConversationHandler(Handler[Update, CCT]):
         block (:obj:`bool`, optional): Pass :obj:`False` to *overrule* the
             :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
             :attr:`states` and :attr:`fallbacks`).
-            Defaults to :obj:`True`.
+            Defaults to :obj:`True`, in which case the handlers setting will be respected.
 
             .. versionadded:: 13.2
             .. versionchanged:: 14.0
@@ -267,14 +303,13 @@ class ConversationHandler(Handler[Update, CCT]):
         self.timeout_jobs: Dict[Tuple[int, ...], 'Job'] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
-        self._conversations_lock = asyncio.Lock()
+        # TODO: Do we still need this lock?
+        self._conversations_lock = threading.Lock()
         self._child_conversations: Set['ConversationHandler'] = set()
 
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
         self.persistent: bool = persistent
-
-        self._logger = logging.getLogger(__name__)
 
         if not any((self.per_user, self.per_chat, self.per_message)):
             raise ValueError("'per_user', 'per_chat' and 'per_message' can't all be 'False'")
@@ -541,49 +576,54 @@ class ConversationHandler(Handler[Update, CCT]):
 
         return tuple(key)
 
-    def _resolve_task(self, state: Tuple[object, asyncio.Task]) -> object:
-        old_state, new_state = state
-        res = new_state.result()
-        res = res if res is not None else old_state
-
-        exc = new_state.exception()
-        if exc:
-            self._logger.exception("Task function raised exception")
-            self._logger.exception("%s", exc)
-            res = old_state
-
-        if res is None and old_state is None:
-            res = self.END
-
-        return res
-
-    def _schedule_job(
+    async def _schedule_job_delayed(
         self,
-        new_state: Union[object, asyncio.Task],
+        new_state: asyncio.Task,
         application: 'Application[Any, CCT, Any, Any, Any, JobQueue]',
         update: Update,
         context: CallbackContext,
         conversation_key: Tuple[int, ...],
     ) -> None:
-        if isinstance(new_state, asyncio.Task):
-            new_state = new_state.result()
+        try:
+            effective_new_state = await new_state
+        except Exception as exc:
+            _logger.debug(
+                'Non-blocking handler callback raised exception. Not scheduling conversation '
+                'timeout.',
+                exc_info=exc,
+            )
+            return
+        return self._schedule_job(
+            new_state=effective_new_state,
+            application=application,
+            update=update,
+            context=context,
+            conversation_key=conversation_key,
+        )
 
-        if new_state != self.END:
-            try:
-                # both job_queue & conversation_timeout are checked before calling _schedule_job
-                j_queue = application.job_queue
-                self.timeout_jobs[conversation_key] = j_queue.run_once(
-                    self._trigger_timeout,
-                    self.conversation_timeout,  # type: ignore[arg-type]
-                    context=_ConversationTimeoutContext(
-                        conversation_key, update, application, context
-                    ),
-                )
-            except Exception as exc:
-                self._logger.exception(
-                    "Failed to schedule timeout job due to the following exception:"
-                )
-                self._logger.exception("%s", exc)
+    def _schedule_job(
+        self,
+        new_state: object,
+        application: 'Application[Any, CCT, Any, Any, Any, JobQueue]',
+        update: Update,
+        context: CallbackContext,
+        conversation_key: Tuple[int, ...],
+    ) -> None:
+        if new_state == self.END:
+            return
+
+        try:
+            # both job_queue & conversation_timeout are checked before calling _schedule_job
+            j_queue = application.job_queue
+            self.timeout_jobs[conversation_key] = j_queue.run_once(
+                self._trigger_timeout,
+                self.conversation_timeout,  # type: ignore[arg-type]
+                context=_ConversationTimeoutContext(
+                    conversation_key, update, application, context
+                ),
+            )
+        except Exception as exc:
+            _logger.exception("Failed to schedule timeout.", exc_info=exc)
 
     # pylint: disable=too-many-return-statements
     def check_update(self, update: object) -> Optional[CheckUpdateType]:
@@ -615,12 +655,12 @@ class ConversationHandler(Handler[Update, CCT]):
             state = self._conversations.get(key)
 
         # Resolve promises
-        if isinstance(state, tuple) and len(state) == 2 and isinstance(state[1], asyncio.Task):
-            self._logger.warning('Waiting for asyncio Task to finish ...')
+        if isinstance(state, PendingState):
+            _logger.debug('Waiting for asyncio Task to finish ...')
 
             # check if promise is finished or not
-            if state[1].done():
-                res = self._resolve_task(state)  # type: ignore[arg-type]
+            if state.done():
+                res = state.resolve()
                 self._update_state(res, key)
                 with self._conversations_lock:
                     state = self._conversations.get(key)
@@ -634,7 +674,7 @@ class ConversationHandler(Handler[Update, CCT]):
                         return self.WAITING, key, handler_, check
                 return None
 
-        self._logger.debug('Selecting conversation %s with state %s', str(key), str(state))
+        _logger.debug('Selecting conversation %s with state %s', str(key), str(state))
 
         handler: Optional[Handler] = None
 
@@ -693,7 +733,7 @@ class ConversationHandler(Handler[Update, CCT]):
         current_state, conversation_key, handler, handler_check_result = check_result
         raise_dp_handler_stop = False
 
-        with self._timeout_jobs_lock:
+        async with self._timeout_jobs_lock:
             # Remove the old timeout job (if present)
             timeout_job = self.timeout_jobs.pop(conversation_key, None)
 
@@ -701,27 +741,34 @@ class ConversationHandler(Handler[Update, CCT]):
                 timeout_job.schedule_removal()
         try:
             # TODO handle non-blocking handlers correctly
-            new_state: object = await handler.handle_update(
-                update, application, handler_check_result, context
-            )
+            block = self.block and handler.block
+            if block:
+                new_state: object = await handler.handle_update(
+                    update, application, handler_check_result, context
+                )
+            else:
+                new_state = application.create_task(
+                    coroutine=handler.handle_update(
+                        update, application, handler_check_result, context
+                    ),
+                    update=update,
+                )
         except ApplicationHandlerStop as exception:
             new_state = exception.state
             raise_dp_handler_stop = True
-        with self._timeout_jobs_lock:
+        async with self._timeout_jobs_lock:
             if self.conversation_timeout:
                 if application.job_queue is not None:
                     # Add the new timeout job
+                    # checking if the new state is self.END is done in _schedule_job
                     if isinstance(new_state, asyncio.Task):
-                        new_state.add_done_callback(
-                            functools.partial(
-                                self._schedule_job,
-                                application=application,
-                                update=update,
-                                context=context,
-                                conversation_key=conversation_key,
-                            )
+                        application.create_task(
+                            self._schedule_job_delayed(
+                                new_state, application, update, context, conversation_key
+                            ),
+                            update=update,
                         )
-                    elif new_state != self.END:
+                    else:
                         self._schedule_job(
                             new_state, application, update, context, conversation_key
                         )
@@ -754,13 +801,16 @@ class ConversationHandler(Handler[Update, CCT]):
 
         elif isinstance(new_state, asyncio.Task):
             with self._conversations_lock:
-                self._conversations[key] = (self._conversations.get(key), new_state)
+                self._conversations[key] = PendingState(
+                    old_state=self._conversations.get(key), task=new_state
+                )
 
         elif new_state is not None:
             if new_state not in self.states:
                 warn(
                     f"Handler returned state {new_state} which is unknown to the "
                     f"ConversationHandler{' ' + self.name if self.name is not None else ''}.",
+                    stacklevel=2,
                 )
             with self._conversations_lock:
                 self._conversations[key] = new_state
@@ -769,13 +819,13 @@ class ConversationHandler(Handler[Update, CCT]):
         job = cast('Job', context.job)
         ctxt = cast(_ConversationTimeoutContext, job.context)
 
-        self._logger.debug(
+        _logger.debug(
             'Conversation timeout was triggered for conversation %s!', ctxt.conversation_key
         )
 
         callback_context = ctxt.callback_context
 
-        with self._timeout_jobs_lock:
+        async with self._timeout_jobs_lock:
             found_job = self.timeout_jobs.get(ctxt.conversation_key)
             if found_job is not job:
                 # The timeout has been cancelled in handle_update

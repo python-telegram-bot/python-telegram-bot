@@ -336,10 +336,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         if not self.persistence:
             return
 
-        # This raises an exception if persistence.store_data.callback_data is True
-        # but self.bot is not an instance of ExtBot - so no need to check that later on
-        self.persistence.set_bot(self.bot)
-
         if self.persistence.store_data.user_data:
             cast(TrackingDefaultDict, self._user_data).update_no_track(
                 await self.persistence.get_user_data()
@@ -950,32 +946,39 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 else:
                     coroutines.add(self.persistence.drop_user_data(user_id))
 
+        # Unfortunately due to circular imports this has to be here
+        # pylint: disable=import-outside-toplevel
+        from telegram.ext._conversationhandler import PendingState
+
         for name, (key, new_state) in itertools.chain.from_iterable(
             zip(itertools.repeat(name), states_dict.pop_accessed_write_items())
             for name, states_dict in self._conversation_handler_conversations.items()
         ):
-            if isinstance(new_state, tuple) and isinstance(new_state[1], asyncio.Task):
+            if isinstance(new_state, PendingState):
                 # If the handler was running non-blocking, we check if the new state is already
                 # available. Otherwise, we update with the old state, which is the next best
                 # guess.
                 # Note that when updating the persistence one last time during self.stop(),
                 # *all* tasks will be done.
-                try:
-                    result = new_state[1].result()
-                    coroutines.add(
-                        self.persistence.update_conversation(name=name, key=key, new_state=result)
+                if not new_state.done():
+                    # TODO: Try to test that this doesn't happen on shutdown
+                    _logger.warning(
+                        'A ConversationHandlers state was not yet resolved. Updating the '
+                        'persistence with the current state.'
                     )
-                except (asyncio.InvalidStateError, asyncio.CancelledError):
-                    effective_new_state = (
-                        None if new_state[0] is TrackingDefaultDict.DELETED else new_state[0]
+                    result = new_state.old_state
+                else:
+                    result = new_state.resolve()
+
+                effective_new_state = None if result is TrackingDefaultDict.DELETED else result
+                print(name, key, effective_new_state)
+                # TODO: Test that we actually pass `None` here in case the conversation had ended,
+                #  i.e. effective_new_state is TrackingDefaultDict.DELETED
+                coroutines.add(
+                    self.persistence.update_conversation(
+                        name=name, key=key, new_state=effective_new_state
                     )
-                    coroutines.add(
-                        self.persistence.update_conversation(
-                            name=name,
-                            key=key,
-                            new_state=effective_new_state,
-                        )
-                    )
+                )
 
         results = await asyncio.gather(*coroutines, return_exceptions=True)
         _logger.debug('Finished updating persistence.')

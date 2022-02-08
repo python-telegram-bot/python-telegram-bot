@@ -181,7 +181,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._updater: ODVInput[Updater] = DEFAULT_NONE
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
-        prefix = 'get_updates_' if get_updates else ''
+        prefix = '_get_updates_' if get_updates else '_'
         if not isinstance(getattr(self, f'{prefix}request'), DefaultValue):
             return getattr(self, f'{prefix}request')
 
@@ -228,10 +228,14 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     ) -> Application[BT, CCT, UD, CD, BD, JQ]:
         """Builds a :class:`telegram.ext.Application` with the provided arguments.
 
+        Calls :meth:`telegram.ext.JobQueue.set_application` and
+        :meth:`telegram.ext.BasePersistence.set_bot` if appropriate.
+
         Returns:
             :class:`telegram.ext.Application`
         """
         job_queue = DefaultValue.get_value(self._job_queue)
+        persistence = DefaultValue.get_value(self._persistence)
 
         if isinstance(self._updater, DefaultValue) or self._updater is None:
             if isinstance(self._bot, DefaultValue):
@@ -255,13 +259,18 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             updater=updater,
             concurrent_updates=DefaultValue.get_value(self._concurrent_updates),
             job_queue=job_queue,
-            persistence=DefaultValue.get_value(self._persistence),
+            persistence=persistence,
             context_types=DefaultValue.get_value(self._context_types),
             **self._application_kwargs,
         )
 
         if job_queue is not None:
             job_queue.set_application(application)
+
+        if persistence is not None:
+            # This raises an exception if persistence.store_data.callback_data is True
+            # but self.bot is not an instance of ExtBot - so no need to check that later on
+            persistence.set_bot(bot)
 
         return application
 
