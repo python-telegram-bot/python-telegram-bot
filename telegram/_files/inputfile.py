@@ -34,7 +34,7 @@ class InputFile:
     """This object represents a Telegram InputFile.
 
     Args:
-        obj (:obj:`File handler` | :obj:`bytes`): An open file descriptor or the files content as
+        obj (:term:`file object` | :obj:`bytes`): An open file descriptor or the files content as
             bytes.
         filename (:obj:`str`, optional): Filename for this InputFile.
         attach (:obj:`bool`, optional): Whether this should be send as one file or is part of a

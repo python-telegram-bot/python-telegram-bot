@@ -44,10 +44,10 @@ RT = TypeVar('RT')
 class InlineQueryHandler(Handler[Update, CCT]):
     """
     Handler class to handle Telegram inline queries. Optionally based on a regex. Read the
-    documentation of the ``re`` module for more information.
+    documentation of the :mod:`re` module for more information.
 
     Warning:
-        * When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        * When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
           attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
         * :attr:`telegram.InlineQuery.chat_type` will not be set for inline queries from secret
           chats and may not be set for inline queries coming from third-party clients. These
@@ -60,9 +60,9 @@ class InlineQueryHandler(Handler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pattern (:obj:`str` | :obj:`Pattern`, optional): Regex pattern. If not :obj:`None`,
-            ``re.match`` is used on :attr:`telegram.InlineQuery.query` to determine if an update
-            should be handled by this handler.
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Regex pattern.
+            If not :obj:`None`, :func:`re.match` is used on :attr:`telegram.InlineQuery.query`
+            to determine if an update should be handled by this handler.
         chat_types (List[:obj:`str`], optional): List of allowed chat types. If passed, will only
             handle inline queries with the appropriate :attr:`telegram.InlineQuery.chat_type`.
 
@@ -72,7 +72,7 @@ class InlineQueryHandler(Handler[Update, CCT]):
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
-        pattern (:obj:`str` | :obj:`Pattern`): Optional. Regex pattern to test
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): Optional. Regex pattern to test
             :attr:`telegram.InlineQuery.query` against.
         chat_types (List[:obj:`str`], optional): List of allowed chat types.
 

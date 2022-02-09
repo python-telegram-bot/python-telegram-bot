@@ -131,7 +131,7 @@ class Defaults:
 
     @property
     def explanation_parse_mode(self) -> Optional[str]:
-        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
+        """:obj:`str`: Optional. Alias for :paramref:`parse_mode`, used for
         the corresponding parameter of :meth:`telegram.Bot.send_poll`.
         """
         return self._parse_mode

@@ -109,7 +109,7 @@ class CallbackDataCache:
             Defaults to 1024.
 
         persistent_data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-        Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
+        Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
         Data to initialize the cache with, as returned by \
         :meth:`telegram.ext.BasePersistence.get_callback_data`.
 
@@ -146,7 +146,7 @@ class CallbackDataCache:
 
     @property
     def persistence_data(self) -> CDCData:
-        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :obj:`Any`]]],
+        """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :class:`object`]]],
         Dict[:obj:`str`, :obj:`str`]]: The data that needs to be persisted to allow
         caching callback data across bot reboots.
         """
@@ -160,7 +160,8 @@ class CallbackDataCache:
 
     def process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
         """Registers the reply markup to the cache. If any of the buttons have
-        :attr:`callback_data`, stores that data and builds a new keyboard with the correspondingly
+        :attr:`~telegram.InlineKeyboardButton.callback_data`, stores that data and builds a new
+        keyboard with the correspondingly
         replaced buttons. Otherwise does nothing and returns the original reply markup.
 
         Args:
@@ -307,8 +308,9 @@ class CallbackDataCache:
         """Replaces the data in the callback query and the attached messages keyboard with the
         cached objects, if necessary. If the data could not be found,
         :class:`telegram.ext.InvalidCallbackData` will be inserted.
-        If :attr:`callback_query.data` or :attr:`callback_query.message` is present, this also
-        saves the callback queries ID in order to be able to resolve it to the stored data.
+        If :attr:`telegram.CallbackQuery.data` or :attr:`telegram.CallbackQuery.message` is
+        present, this also saves the callback queries ID in order to be able to resolve it to the
+        stored data.
 
         Note:
             Also considers inserts data into the buttons of

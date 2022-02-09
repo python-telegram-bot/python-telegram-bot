@@ -146,6 +146,8 @@ class Bot(TelegramObject):
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
 
+    .. include:: bot_methods.rst
+
     """
 
     __slots__ = (
@@ -429,7 +431,8 @@ class Bot(TelegramObject):
                 italic, fixed-width text or inline URLs in your bot's message. See the constants in
                 :class:`telegram.constants.ParseMode` for the available modes.
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
-                that appear in message text, which can be specified instead of :attr:`parse_mode`.
+                that appear in message text, which can be specified instead of
+                :paramref:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -498,11 +501,11 @@ class Bot(TelegramObject):
               hours ago.
             - Bots can delete outgoing messages in private chats, groups, and supergroups.
             - Bots can delete incoming messages in private chats.
-            - Bots granted :attr:`telegram.ChatMember.can_post_messages` permissions can delete
-              outgoing messages in channels.
+            - Bots granted :attr:`~telegram.ChatMemberAdministrator.can_post_messages` permissions
+              can delete outgoing messages in channels.
             - If the bot is an administrator of a group, it can delete any message there.
-            - If the bot has :attr:`telegram.ChatMember.can_delete_messages` permission in a
-              supergroup or a channel, it can delete any message there.
+            - If the bot has :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
+              permission in a supergroup or a channel, it can delete any message there.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -617,7 +620,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            photo (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            photo (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.PhotoSize`): Photo to send.
                 Pass a file_id as String to send a photo that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get a photo from the
@@ -639,7 +642,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -728,7 +731,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            audio (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            audio (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Audio`): Audio file to send.
                 Pass a file_id as String to send an audio file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get an audio file from
@@ -750,7 +753,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             duration (:obj:`int`, optional): Duration of sent audio in seconds.
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
@@ -769,7 +772,7 @@ class Bot(TelegramObject):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
@@ -854,7 +857,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            document (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            document (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Document`): File to send.
                 Pass a file_id as String to send a file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get a file from the
@@ -876,7 +879,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -892,7 +895,7 @@ class Bot(TelegramObject):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
@@ -963,7 +966,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Sticker`): Sticker to send.
                 Pass a file_id as String to send a file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get a .webp file from
@@ -1052,7 +1055,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            video (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            video (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Video`): Video file to send.
                 Pass a file_id as String to send an video file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get an video file from
@@ -1077,7 +1080,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
                 suitable for streaming.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
@@ -1095,7 +1098,7 @@ class Bot(TelegramObject):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
@@ -1179,7 +1182,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            video_note (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            video_note (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.VideoNote`): Video note
                 to send. Pass a file_id as String to send a video note that exists on the Telegram
                 servers (recommended) or upload a new video using multipart/form-data. Or you can
@@ -1211,7 +1214,7 @@ class Bot(TelegramObject):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
@@ -1290,7 +1293,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            animation (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            animation (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Animation`): Animation to
                 send. Pass a file_id as String to send an animation that exists on the Telegram
                 servers (recommended), pass an HTTP URL as a String for Telegram to get an
@@ -1307,7 +1310,7 @@ class Bot(TelegramObject):
             duration (:obj:`int`, optional): Duration of sent animation in seconds.
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
-            thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
                 of the file sent; can be ignored if
                 thumbnail generation for the file is supported server-side. The thumbnail should be
                 in JPEG format and less than 200 kB in size. A thumbnail's width and height should
@@ -1325,7 +1328,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -1415,7 +1418,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            voice (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+            voice (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Voice`): Voice file to send.
                 Pass a file_id as String to send an voice file that exists on the Telegram servers
                 (recommended), pass an HTTP URL as a String for Telegram to get an voice file from
@@ -1437,7 +1440,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             duration (:obj:`int`, optional): Duration of the voice message in seconds.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -1571,7 +1574,8 @@ class Bot(TelegramObject):
         """Use this method to send point on the map.
 
         Note:
-            You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
+            You can either supply a :paramref:`latitude` and :paramref:`longitude` or a
+            :paramref:`location`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1676,7 +1680,8 @@ class Bot(TelegramObject):
         expires or editing is explicitly disabled by a call to :meth:`stop_message_live_location`.
 
         Note:
-            You can either supply a :obj:`latitude` and :obj:`longitude` or a :obj:`location`.
+            You can either supply a :paramref:`latitude` and :paramref:`longitude` or a
+            :paramref:`location`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -1819,10 +1824,11 @@ class Bot(TelegramObject):
         """Use this method to send information about a venue.
 
         Note:
-            * You can either supply :obj:`venue`, or :obj:`latitude`, :obj:`longitude`,
-              :obj:`title` and :obj:`address` and optionally :obj:`foursquare_id` and
-              :obj:`foursquare_type` or optionally :obj:`google_place_id` and
-              :obj:`google_place_type`.
+            * You can either supply :paramref:`venue`, or :paramref:`latitude`,
+              :paramref:`longitude`,
+              :paramref:title` and :paramref:address` and optionally :paramref:`foursquare_id` and
+              :paramref:`foursquare_type` or optionally :paramref:`google_place_id` and
+              :paramref:`google_place_type`.
             * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
 
@@ -1935,8 +1941,9 @@ class Bot(TelegramObject):
         """Use this method to send phone contacts.
 
         Note:
-            You can either supply :obj:`contact` or :obj:`phone_number` and :obj:`first_name`
-            with optionally :obj:`last_name` and optionally :obj:`vcard`.
+            You can either supply :paramref:`contact` or :paramref:`phone_number` and
+            :paramref:`first_name` with optionally :paramref:`last_name` and optionally
+            :paramref:`vcard`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2207,14 +2214,16 @@ class Bot(TelegramObject):
         :tg-const:`telegram.InlineQuery.MAX_RESULTS` results per query are allowed.
 
         Warning:
-            In most use cases :attr:`current_offset` should not be passed manually. Instead of
+            In most use cases :paramref:`current_offset` should not be passed manually. Instead of
             calling this method directly, use the shortcut :meth:`telegram.InlineQuery.answer` with
-            ``auto_pagination=True``, which will take care of passing the correct value.
+            :paramref:`telegram.InlineQuery.answer.auto_pagination` set to :obj:`True`, which will
+            take care of passing the correct value.
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
             results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
-                the inline query. In case :attr:`current_offset` is passed, ``results`` may also be
+                the inline query. In case :paramref:`current_offset` is passed,
+                :paramref:`results` may also be
                 a callable that accepts the current page index starting from 0. It must return
                 either a list of :class:`telegram.InlineQueryResult` instances or :obj:`None` if
                 there are no more results.
@@ -2229,15 +2238,15 @@ class Bot(TelegramObject):
                 exceed 64 bytes.
             switch_pm_text (:obj:`str`, optional): If passed, clients will display a button with
                 specified text that switches the user to a private chat with the bot and sends the
-                bot a start message with the parameter ``switch_pm_parameter``.
-            switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the /start
-                message sent to the bot when user presses the switch button.
+                bot a start message with the parameter :paramref:`switch_pm_parameter`.
+            switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
+                :guilabel:`/start` message sent to the bot when user presses the switch button.
                 1-:tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
-                only A-Z, a-z, 0-9, _ and - are allowed.
+                only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
                 the inline query to answer. If passed, PTB will automatically take care of
-                the pagination for you, i.e. pass the correct ``next_offset`` and truncate the
-                results list/get the results from the callable you passed.
+                the pagination for you, i.e. pass the correct :paramref:`next_offset` and truncate
+                the results list/get the results from the callable you passed.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -2504,7 +2513,7 @@ class Bot(TelegramObject):
         via link, etc. The bot must be an administrator for this to work. By default, this method
         guarantees that after the call the user is not a member of the chat, but will be able to
         join it. So if the user is a member of the chat they will also be *removed* from the chat.
-        If you don't want this, use the parameter :attr:`only_if_banned`.
+        If you don't want this, use the parameter :paramref:`only_if_banned`.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2666,7 +2675,8 @@ class Bot(TelegramObject):
                 show bold, italic, fixed-width text or inline URLs in your bot's message. See the
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
-                that appear in message text, which can be specified instead of :attr:`parse_mode`.
+                that appear in message text, which can be specified instead of
+                :paramref:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
@@ -2740,7 +2750,7 @@ class Bot(TelegramObject):
                 constants in :class:`telegram.constants.ParseMode` for the available modes.
             caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -3023,7 +3033,7 @@ class Bot(TelegramObject):
         Args:
             url (:obj:`str`): HTTPS url to send updates to. Use an empty string to remove webhook
                 integration.
-            certificate (:obj:`filelike`): Upload your public key certificate so that the root
+            certificate (:term:`file object`): Upload your public key certificate so that the root
                 certificate in use can be checked. See our self-signed guide for details.
                 (https://goo.gl/rw7w6Y)
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
@@ -3056,7 +3066,7 @@ class Bot(TelegramObject):
                using certificate parameter. Please upload as InputFile, sending a String will not
                work.
             3. Ports currently supported for Webhooks:
-                :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
+               :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
 
             If you're having any trouble setting up webhooks, please check out this `guide to
             Webhooks`_.
@@ -3527,12 +3537,12 @@ class Bot(TelegramObject):
         """Use this method to send invoices.
 
         Warning:
-            As of API 5.2 :attr:`start_parameter` is an optional argument and therefore the order
-            of the arguments had to be changed. Use keyword arguments to make sure that the
+            As of API 5.2 :paramref:`start_parameter` is an optional argument and therefore the
+            order of the arguments had to be changed. Use keyword arguments to make sure that the
             arguments are passed correctly.
 
         .. versionchanged:: 13.5
-            As of Bot API 5.2, the parameter :attr:`start_parameter` is optional.
+            As of Bot API 5.2, the parameter :paramref:`start_parameter` is optional.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -3690,8 +3700,8 @@ class Bot(TelegramObject):
         """
         If you sent an invoice requesting a shipping address and the parameter ``is_flexible`` was
         specified, the Bot API will send an :class:`telegram.Update` with a
-        :attr:`Update.shipping_query` field to the bot. Use this method to reply to shipping
-        queries.
+        :attr:`telegram.Update.shipping_query` field to the bot. Use this method to reply to
+        shipping queries.
 
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -3758,7 +3768,8 @@ class Bot(TelegramObject):
         """
         Once the user has confirmed their payment and shipping details, the Bot API sends the final
         confirmation in the form of an :class:`telegram.Update` with the field
-        :attr:`Update.pre_checkout_query`. Use this method to respond to such pre-checkout queries.
+        :attr:`telegram.Update.pre_checkout_query`. Use this method to respond to such pre-checkout
+        queries.
 
         Note:
             The Bot API must receive an answer within 10 seconds after the pre-checkout
@@ -3975,7 +3986,7 @@ class Bot(TelegramObject):
         """
         Use this method to set default chat permissions for all members. The bot must be an
         administrator in the group or a supergroup for this to work and must have the
-        :attr:`telegram.ChatMember.can_restrict_members` admin rights.
+        :attr:`telegram.ChatMemberAdministrator.can_restrict_members` admin rights.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
@@ -4372,7 +4383,7 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            photo (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`): New chat photo.
+            photo (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`): New chat photo.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
@@ -4516,8 +4527,8 @@ class Bot(TelegramObject):
         """
         Use this method to add a message to the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the :attr:`telegram.ChatMember.can_pin_messages` admin right in a supergroup
-        or :attr:`telegram.ChatMember.can_edit_messages` admin right in a channel.
+        and must have the ``can_pin_messages`` admin right in a supergroup
+        or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4560,8 +4571,9 @@ class Bot(TelegramObject):
         """
         Use this method to remove a message from the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the :attr:`telegram.ChatMember.can_pin_messages` admin right in a
-        supergroup or :attr:`telegram.ChatMember.can_edit_messages` admin right in a channel.
+        and must have the ``can_pin_messages`` admin right in a
+        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
+        channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4600,8 +4612,9 @@ class Bot(TelegramObject):
         """
         Use this method to clear the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this
-        to work and must have the :attr:`telegram.ChatMember.can_pin_messages` admin right in a
-        supergroup or :attr:`telegram.ChatMember.can_edit_messages` admin right in a channel.
+        to work and must have the ``can_pin_messages`` admin right in a
+        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
+        channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4674,7 +4687,7 @@ class Bot(TelegramObject):
 
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
-            png_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`):
+            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`):
                 **PNG** image with the sticker, must be up to 512 kilobytes in size,
                 dimensions must not exceed 512px, and either width or height must be exactly 512px.
 
@@ -4737,7 +4750,7 @@ class Bot(TelegramObject):
                 must end in "_by_<bot username>". <bot_username> is case insensitive.
                 1-64 characters.
             title (:obj:`str`): Sticker set title, 1-64 characters.
-            png_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
@@ -4747,7 +4760,7 @@ class Bot(TelegramObject):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            tgs_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+            tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **TGS** animation with the sticker, uploaded using multipart/form-data.
                 See https://core.telegram.org/stickers#animated-sticker-requirements for technical
                 requirements.
@@ -4831,7 +4844,7 @@ class Bot(TelegramObject):
             user_id (:obj:`int`): User identifier of created sticker set owner.
 
             name (:obj:`str`): Sticker set name.
-            png_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+            png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
                 and either width or height must be exactly 512px. Pass a file_id as a String to
@@ -4841,7 +4854,7 @@ class Bot(TelegramObject):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            tgs_sticker (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+            tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **TGS** animation with the sticker, uploaded using multipart/form-data.
                 See https://core.telegram.org/stickers#animated-sticker-requirements for technical
                 requirements.
@@ -4970,7 +4983,7 @@ class Bot(TelegramObject):
         Args:
             name (:obj:`str`): Sticker set name
             user_id (:obj:`int`): User identifier of created sticker set owner.
-            thumb (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path`, \
+            thumb (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): A **PNG** image with the thumbnail, must
                 be up to 128 kilobytes in size and have width and height exactly 100px, or a
                 **TGS** animation with the thumbnail up to 32 kilobytes in size; see
@@ -5099,13 +5112,13 @@ class Bot(TelegramObject):
                 available modes.
             explanation_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :attr:`parse_mode`.
+                :paramref:`parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
-                after creation, 5-600. Can't be used together with :attr:`close_date`.
+                after creation, 5-600. Can't be used together with :paramref:`close_date`.
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
                 timestamp) when the poll will be automatically closed. Must be at least 5 and no
                 more than 600 seconds in the future. Can't be used together with
-                :attr:`open_period`.
+                :paramref:`open_period`.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used.
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be

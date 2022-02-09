@@ -60,6 +60,11 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     """Interface class for adding persistence to your bot.
     Subclass this object for different implementations of a persistent bot.
 
+    Attention:
+        The interface provided by this class is intended to be accessed exclusively by
+        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+
     All relevant methods must be overwritten. This includes:
 
     * :meth:`get_bot_data`
@@ -90,7 +95,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     Note:
          :meth:`replace_bot` and :meth:`insert_bot` are used *independently* of the implementation
-         of the :meth:`update/get_*` methods, i.e. you don't need to worry about it while
+         of the ``update/get_*`` methods, i.e. you don't need to worry about it while
          implementing a custom persistence subclass.
 
     .. versionchanged:: 14.0
@@ -191,17 +196,18 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def replace_bot(cls, obj: object) -> object:
         """
         Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
-        :attr:`REPLACED_BOT`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
-        ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slots__`` attribute, excluding classes and objects that can't be copied with
-        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
-        the error will be logged.
+        :attr:`REPLACED_BOT`. Currently, this handles objects of type :class:`list`,
+        :class:`tuple`, :class:`set`, :class:`frozenset`, :class:`dict`,
+        :class:`collections.defaultdict` and objects that have a :attr:`~object.__dict__` or
+        :data:`~object.__slots__` attribute, excluding classes and objects that can't be copied
+        with :func:`copy.copy`. If the parsing of an object fails, the object will be returned
+        unchanged and the error will be logged.
 
         Args:
             obj (:obj:`object`): The object
 
         Returns:
-            :obj:`obj`: Copy of the object with Bot instances replaced.
+            :class:`object`: Copy of the object with Bot instances replaced.
         """
         return cls._replace_bot(obj, {})
 
@@ -294,17 +300,18 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     def insert_bot(self, obj: object) -> object:
         """
         Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
-        :attr:`bot`. Currently, this handles objects of type ``list``, ``tuple``, ``set``,
-        ``frozenset``, ``dict``, ``defaultdict`` and objects that have a ``__dict__`` or
-        ``__slots__`` attribute, excluding classes and objects that can't be copied with
-        ``copy.copy``. If the parsing of an object fails, the object will be returned unchanged and
-        the error will be logged.
+        :paramref:`bot`. Currently, this handles objects of type :class:`list`,
+        :class:`tuple`, :class:`set`, :class:`frozenset`, :class:`dict`,
+        :class:`collections.defaultdict` and objects that have a :attr:`~object.__dict__` or
+        :data:`~object.__slots__` attribute, excluding classes and objects that can't be copied
+        with :func:`copy.copy`. If the parsing of an object fails, the object will be returned
+        unchanged and the error will be logged.
 
         Args:
             obj (:obj:`object`): The object
 
         Returns:
-            :obj:`obj`: Copy of the object with Bot instances inserted.
+            :class:`object`: Copy of the object with Bot instances inserted.
         """
         return self._insert_bot(obj, {})
 
@@ -460,7 +467,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]]:
+                Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]]:
                 The restored meta data or :obj:`None`, if no data was stored.
         """
 
@@ -488,7 +495,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
-            new_state (:obj:`tuple` | :obj:`Any`): The new state for the given key.
+            new_state (:obj:`tuple` | :class:`object`): The new state for the given key.
         """
 
     @abstractmethod
@@ -564,8 +571,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     @abstractmethod
     def refresh_user_data(self, user_id: int, user_data: UD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
-        :attr:`user_data` to a callback. Can be used to update data stored in :attr:`user_data`
-        from an external source.
+        :attr:`~telegram.ext.Dispatcher.user_data` to a callback. Can be used to update data stored
+        in :attr:`~telegram.ext.Dispatcher.user_data` from an external source.
 
         .. versionadded:: 13.6
 
@@ -573,7 +580,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Args:
-            user_id (:obj:`int`): The user ID this :attr:`user_data` is associated with.
+            user_id (:obj:`int`): The user ID this :attr:`~telegram.ext.Dispatcher.user_data` is
+                associated with.
             user_data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`):
                 The ``user_data`` of a single user.
         """
@@ -581,8 +589,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     @abstractmethod
     def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
-        :attr:`chat_data` to a callback. Can be used to update data stored in :attr:`chat_data`
-        from an external source.
+        :attr:`~telegram.ext.Dispatcher.chat_data` to a callback. Can be used to update data stored
+        in :attr:`~telegram.ext.Dispatcher.chat_data` from an external source.
 
         .. versionadded:: 13.6
 
@@ -590,7 +598,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Args:
-            chat_id (:obj:`int`): The chat ID this :attr:`chat_data` is associated with.
+            chat_id (:obj:`int`): The chat ID this :attr:`~telegram.ext.Dispatcher.chat_data` is
+                associated with.
             chat_data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`):
                 The ``chat_data`` of a single chat.
         """
@@ -598,8 +607,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     @abstractmethod
     def refresh_bot_data(self, bot_data: BD) -> None:
         """Will be called by the :class:`telegram.ext.Dispatcher` before passing the
-        :attr:`bot_data` to a callback. Can be used to update data stored in :attr:`bot_data`
-        from an external source.
+        :attr:`~telegram.ext.Dispatcher.bot_data` to a callback. Can be used to update data stored
+        in :attr:`~telegram.ext.Dispatcher.bot_data` from an external source.
 
         .. versionadded:: 13.6
 

@@ -43,12 +43,12 @@ class InputMedia(TelegramObject):
     Base class for Telegram InputMedia Objects.
 
     .. versionchanged:: 14.0:
-        Added arguments and attributes :attr:`media_type`, :attr:`media`, :attr:`caption`,
-            :attr:`caption_entities`, :attr:`parse_mode`.
+        Added arguments and attributes :attr:`type`, :attr:`media`, :attr:`caption`,
+            :attr:`caption_entities`, :paramref:`parse_mode`.
 
     Args:
         media_type (:obj:`str`) Type of media that the instance represents.
-        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.Animation` |  :class:`telegram.Audio` | \
             :class:`telegram.Document` | :class:`telegram.PhotoSize` | \
             :class:`telegram.Video`):
@@ -114,7 +114,7 @@ class InputMediaAnimation(InputMedia):
         arguments.
 
     Args:
-        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.Animation`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
@@ -127,7 +127,7 @@ class InputMediaAnimation(InputMedia):
             :obj:`tempfile` module.
 
                 .. versionadded:: 13.1
-        thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
+        thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
             the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
@@ -195,7 +195,7 @@ class InputMediaPhoto(InputMedia):
     """Represents a photo to be sent.
 
     Args:
-        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.PhotoSize`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
@@ -253,7 +253,7 @@ class InputMediaVideo(InputMedia):
            by Telegram.
 
     Args:
-        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.Video`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
@@ -279,7 +279,7 @@ class InputMediaVideo(InputMedia):
         duration (:obj:`int`, optional): Video duration in seconds.
         supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
-        thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
+        thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
             the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
@@ -346,7 +346,7 @@ class InputMediaAudio(InputMedia):
         optional arguments.
 
     Args:
-        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.Audio`):
             File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
@@ -372,7 +372,7 @@ class InputMediaAudio(InputMedia):
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`, optional): Title of the audio as defined by sender or by audio tags.
-        thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
+        thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
             the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should
@@ -430,7 +430,7 @@ class InputMediaDocument(InputMedia):
     """Represents a general file to be sent.
 
     Args:
-        media (:obj:`str` | `filelike object` | :obj:`bytes` | :class:`pathlib.Path` | \
+        media (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
             :class:`telegram.Document`): File to send. Pass a
             file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP
             URL for Telegram to get a file from the Internet. Lastly you can pass an existing
@@ -451,7 +451,7 @@ class InputMediaDocument(InputMedia):
             in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of parse_mode.
-        thumb (`filelike object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
+        thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail of
             the file sent; can be ignored if
             thumbnail generation for the file is supported server-side. The thumbnail should be
             in JPEG format and less than 200 kB in size. A thumbnail's width and height should

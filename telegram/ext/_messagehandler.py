@@ -35,16 +35,16 @@ class MessageHandler(Handler[Update, CCT]):
     """Handler class to handle telegram messages. They might contain text, media or status updates.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        filters (:class:`telegram.ext.BaseFilter`): A filter inheriting from
+        filters (:class:`telegram.ext.filters.BaseFilter`): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :mod:`telegram.ext.filters`. Filters can be combined using bitwise
             operators (& for and, | for or, ~ for not). This defaults to all message updates
-            being: :attr:`Update.message`, :attr:`Update.edited_message`,
-            :attr:`Update.channel_post` and :attr:`Update.edited_channel_post`.
+            being: :attr:`telegram.Update.message`, :attr:`telegram.Update.edited_message`,
+            :attr:`telegram.Update.channel_post` and :attr:`telegram.Update.edited_channel_post`.
             If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
             argument.
         callback (:obj:`callable`): The callback function for this handler. Will be called when

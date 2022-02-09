@@ -60,7 +60,7 @@ class Sticker(_BaseThumbedMedium):
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size in bytes.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (obj:`dict`): Arbitrary keyword arguments.
+        _kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file.

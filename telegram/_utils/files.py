@@ -72,7 +72,7 @@ def parse_file_input(
       attribute.
 
     Args:
-        file_input (:obj:`str` | :obj:`bytes` | `filelike object` | Telegram media object): The
+        file_input (:obj:`str` | :obj:`bytes` | :term:`file object` | Telegram media object): The
             input to parse.
         tg_type (:obj:`type`, optional): The Telegram media type the input can be. E.g.
             :class:`telegram.Animation`.

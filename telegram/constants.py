@@ -122,7 +122,7 @@ class CallbackQueryLimit(IntEnum):
 
     ANSWER_CALLBACK_QUERY_TEXT_LENGTH = 200
     """:obj:`int`: Maximum number of characters for the ``text`` parameter of
-    :meth:`Bot.answer_callback_query`."""
+    :meth:`telegram.Bot.answer_callback_query`."""
 
 
 class ChatAction(_StringEnum):
@@ -171,23 +171,23 @@ class ChatID(IntEnum):
     """:obj:`int`: User ID in groups for messages sent by anonymous admins.
 
     Note:
-        :attr:`Message.from_user` will contain this ID for backwards compatibility only. It's
-        recommended to use :attr:`Message.sender_chat` instead.
+        :attr:`telegram.Message.from_user` will contain this ID for backwards compatibility only.
+        It's recommended to use :attr:`telegram.Message.sender_chat` instead.
     """
     SERVICE_CHAT = 777000
     """:obj:`int`: Telegram service chat, that also acts as sender of channel posts forwarded to
     discussion groups.
 
     Note:
-        :attr:`Message.from_user` will contain this ID for backwards compatibility only. It's
-        recommended to use :attr:`Message.sender_chat` instead.
+        :attr:`telegram.Message.from_user` will contain this ID for backwards compatibility only.
+        It's recommended to use :attr:`telegram.Message.sender_chat` instead.
     """
     FAKE_CHANNEL = 136817688
     """:obj:`int`: User ID in groups when message is sent on behalf of a channel.
 
     Note:
-        * :attr:`Message.from_user` will contain this ID for backwards compatibility only. It's
-          recommended to use :attr:`Message.sender_chat` instead.
+        * :attr:`telegram.Message.from_user` will contain this ID for backwards compatibility only.
+          It's recommended to use :attr:`telegram.Message.sender_chat` instead.
         * This value is undocumented and might be changed by Telegram.
     """
 
@@ -377,10 +377,10 @@ class InlineQueryLimit(IntEnum):
 
     RESULTS = 50
     """:obj:`int`: Maximum number of results that can be passed to
-    :meth:`Bot.answer_inline_query`."""
+    :meth:`telegram.Bot.answer_inline_query`."""
     SWITCH_PM_TEXT_LENGTH = 64
     """:obj:`int`: Maximum number of characters for the ``switch_pm_text`` parameter of
-    :meth:`Bot.answer_inline_query`."""
+    :meth:`telegram.Bot.answer_inline_query`."""
 
 
 class InlineQueryResultType(_StringEnum):
@@ -490,39 +490,39 @@ class MessageAttachmentType(_StringEnum):
     # (Enums are not extendable)
 
     ANIMATION = 'animation'
-    """:obj:`str`: Messages with :attr:`Message.animation`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.animation`."""
     AUDIO = 'audio'
-    """:obj:`str`: Messages with :attr:`Message.audio`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.audio`."""
     CONTACT = 'contact'
-    """:obj:`str`: Messages with :attr:`Message.contact`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.contact`."""
     DICE = 'dice'
-    """:obj:`str`: Messages with :attr:`Message.dice`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
     DOCUMENT = 'document'
-    """:obj:`str`: Messages with :attr:`Message.document`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
     GAME = 'game'
-    """:obj:`str`: Messages with :attr:`Message.game`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
     INVOICE = 'invoice'
-    """:obj:`str`: Messages with :attr:`Message.invoice`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LOCATION = 'location'
-    """:obj:`str`: Messages with :attr:`Message.location`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     PASSPORT_DATA = 'passport_data'
-    """:obj:`str`: Messages with :attr:`Message.passport_data`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = 'photo'
-    """:obj:`str`: Messages with :attr:`Message.photo`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.photo`."""
     POLL = 'poll'
-    """:obj:`str`: Messages with :attr:`Message.poll`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     STICKER = 'sticker'
-    """:obj:`str`: Messages with :attr:`Message.sticker`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
     SUCCESSFUL_PAYMENT = 'successful_payment'
-    """:obj:`str`: Messages with :attr:`Message.successful_payment`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
     VIDEO = 'video'
-    """:obj:`str`: Messages with :attr:`Message.video`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.video`."""
     VIDEO_NOTE = 'video_note'
-    """:obj:`str`: Messages with :attr:`Message.video_note`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_note`."""
     VOICE = 'voice'
-    """:obj:`str`: Messages with :attr:`Message.voice`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.voice`."""
     VENUE = 'venue'
-    """:obj:`str`: Messages with :attr:`Message.venue`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
 
 
 class MessageEntityType(_StringEnum):
@@ -607,76 +607,76 @@ class MessageType(_StringEnum):
 
     # -------------------------------------------------- Attachment types
     ANIMATION = 'animation'
-    """:obj:`str`: Messages with :attr:`Message.animation`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.animation`."""
     AUDIO = 'audio'
-    """:obj:`str`: Messages with :attr:`Message.audio`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.audio`."""
     CONTACT = 'contact'
-    """:obj:`str`: Messages with :attr:`Message.contact`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.contact`."""
     DICE = 'dice'
-    """:obj:`str`: Messages with :attr:`Message.dice`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
     DOCUMENT = 'document'
-    """:obj:`str`: Messages with :attr:`Message.document`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
     GAME = 'game'
-    """:obj:`str`: Messages with :attr:`Message.game`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
     INVOICE = 'invoice'
-    """:obj:`str`: Messages with :attr:`Message.invoice`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
     LOCATION = 'location'
-    """:obj:`str`: Messages with :attr:`Message.location`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
     PASSPORT_DATA = 'passport_data'
-    """:obj:`str`: Messages with :attr:`Message.passport_data`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
     PHOTO = 'photo'
-    """:obj:`str`: Messages with :attr:`Message.photo`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.photo`."""
     POLL = 'poll'
-    """:obj:`str`: Messages with :attr:`Message.poll`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
     STICKER = 'sticker'
-    """:obj:`str`: Messages with :attr:`Message.sticker`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
     SUCCESSFUL_PAYMENT = 'successful_payment'
-    """:obj:`str`: Messages with :attr:`Message.successful_payment`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
     VIDEO = 'video'
-    """:obj:`str`: Messages with :attr:`Message.video`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.video`."""
     VIDEO_NOTE = 'video_note'
-    """:obj:`str`: Messages with :attr:`Message.video_note`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_note`."""
     VOICE = 'voice'
-    """:obj:`str`: Messages with :attr:`Message.voice`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.voice`."""
     VENUE = 'venue'
-    """:obj:`str`: Messages with :attr:`Message.venue`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
     # -------------------------------------------------- Other types
     TEXT = 'text'
-    """:obj:`str`: Messages with :attr:`Message.text`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.text`."""
     NEW_CHAT_MEMBERS = 'new_chat_members'
-    """:obj:`str`: Messages with :attr:`Message.new_chat_members`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_members`."""
     LEFT_CHAT_MEMBER = 'left_chat_member'
-    """:obj:`str`: Messages with :attr:`Message.left_chat_member`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
     NEW_CHAT_TITLE = 'new_chat_title'
-    """:obj:`str`: Messages with :attr:`Message.new_chat_title`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
     NEW_CHAT_PHOTO = 'new_chat_photo'
-    """:obj:`str`: Messages with :attr:`Message.new_chat_photo`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
     DELETE_CHAT_PHOTO = 'delete_chat_photo'
-    """:obj:`str`: Messages with :attr:`Message.delete_chat_photo`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.delete_chat_photo`."""
     GROUP_CHAT_CREATED = 'group_chat_created'
-    """:obj:`str`: Messages with :attr:`Message.group_chat_created`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.group_chat_created`."""
     SUPERGROUP_CHAT_CREATED = 'supergroup_chat_created'
-    """:obj:`str`: Messages with :attr:`Message.supergroup_chat_created`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.supergroup_chat_created`."""
     CHANNEL_CHAT_CREATED = 'channel_chat_created'
-    """:obj:`str`: Messages with :attr:`Message.channel_chat_created`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
     MESSAGE_AUTO_DELETE_TIMER_CHANGED = 'message_auto_delete_timer_changed'
-    """:obj:`str`: Messages with :attr:`Message.message_auto_delete_timer_changed`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.message_auto_delete_timer_changed`."""
     MIGRATE_TO_CHAT_ID = 'migrate_to_chat_id'
-    """:obj:`str`: Messages with :attr:`Message.migrate_to_chat_id`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.migrate_to_chat_id`."""
     MIGRATE_FROM_CHAT_ID = 'migrate_from_chat_id'
-    """:obj:`str`: Messages with :attr:`Message.migrate_from_chat_id`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.migrate_from_chat_id`."""
     PINNED_MESSAGE = 'pinned_message'
-    """:obj:`str`: Messages with :attr:`Message.pinned_message`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.pinned_message`."""
     PROXIMITY_ALERT_TRIGGERED = 'proximity_alert_triggered'
-    """:obj:`str`: Messages with :attr:`Message.proximity_alert_triggered`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
     VOICE_CHAT_SCHEDULED = 'voice_chat_scheduled'
-    """:obj:`str`: Messages with :attr:`Message.voice_chat_scheduled`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_scheduled`."""
     VOICE_CHAT_STARTED = 'voice_chat_started'
-    """:obj:`str`: Messages with :attr:`Message.voice_chat_started`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_started`."""
     VOICE_CHAT_ENDED = 'voice_chat_ended'
-    """:obj:`str`: Messages with :attr:`Message.voice_chat_ended`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_ended`."""
     VOICE_CHAT_PARTICIPANTS_INVITED = 'voice_chat_participants_invited'
-    """:obj:`str`: Messages with :attr:`Message.voice_chat_participants_invited`."""
+    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_participants_invited`."""
 
 
 class ParseMode(_StringEnum):

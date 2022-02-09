@@ -66,9 +66,9 @@ class InlineKeyboardButton(TelegramObject):
                You can now mention a user using ``tg://user?id=<user_id>``.
         login_url (:class:`telegram.LoginUrl`, optional): An HTTP URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
-        callback_data (:obj:`str` | :obj:`Any`, optional): Data to be sent in a callback query to
-            the bot when button is pressed, UTF-8 1-64 bytes. If the bot instance allows arbitrary
-            callback data, anything can be passed.
+        callback_data (:obj:`str` | :obj:`object`, optional): Data to be sent in a callback query
+            to the bot when button is pressed, UTF-8 1-64 bytes. If the bot instance allows
+            arbitrary callback data, anything can be passed.
         switch_inline_query (:obj:`str`, optional): If set, pressing the button will prompt the
             user to select one of their chats, open that chat and insert the bot's username and the
             specified inline query in the input field. Can be empty, in which case just the bot's
@@ -170,7 +170,7 @@ class InlineKeyboardButton(TelegramObject):
         .. versionadded:: 13.6
 
         Args:
-            callback_data (:obj:`obj`): The new callback data.
+            callback_data (:class:`object`): The new callback data.
         """
         self.callback_data = callback_data
         self._set_id_attrs()
