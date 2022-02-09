@@ -1,0 +1,39 @@
+name: Test Documentation Build
+on:
+  pull_request:
+    branches:
+      - master
+      - v14
+      - doc-fixes
+  push:
+    branches: 
+      - master
+      - v14
+      - doc-fixes
+
+jobs:
+  test-sphinx-build:
+    name: test-sphinx-build
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        python-version: [3.7]
+        os: [ubuntu-latest]
+      fail-fast: False
+    steps:
+      - uses: actions/checkout@v2
+      - name: Initialize vendored libs
+        run:
+          git submodule update --init --recursive
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -W ignore -m pip install --upgrade pip
+          python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-dev.txt
+          python -W ignore -m pip install -r docs/requirements-docs.txt
+      - name: Build docs
+        run: sphinx-build docs/source docs/build/html -W --keep-going -j auto

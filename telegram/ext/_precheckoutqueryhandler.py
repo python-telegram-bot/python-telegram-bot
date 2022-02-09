@@ -28,7 +28,7 @@ class PreCheckoutQueryHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram PreCheckout callback queries.
 
     Warning:
-        When setting ``block`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:

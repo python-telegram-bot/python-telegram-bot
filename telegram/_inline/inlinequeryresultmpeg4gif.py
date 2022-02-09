@@ -54,7 +54,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
+            :paramref:`parse_mode`.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -80,7 +80,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
+            :paramref:`parse_mode`.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the

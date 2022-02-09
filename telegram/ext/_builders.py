@@ -317,7 +317,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the base URL to be used for :attr:`telegram.ext.Application.bot`. If not called,
         will default to ``'https://api.telegram.org/bot'``.
 
-        .. seealso:: :attr:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
+        .. seealso:: :paramref:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
             :meth:`base_url`
 
@@ -336,8 +336,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the base file URL to be used for :attr:`telegram.ext.Application.bot`. If not
         called, will default to ``'https://api.telegram.org/file/bot'``.
 
-        .. seealso:: :attr:`telegram.Bot.base_file_url`, `Local Bot API Server <https://github.com\
-            /python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+        .. seealso:: :paramref:`telegram.Bot.base_file_url`, `Local Bot API Server <https://\
+            github.com/python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
             :meth:`base_file_url`
 
         Args:
@@ -603,7 +603,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         :meth:`telegram.ext.Application.run_async`, i.e. the number of callbacks that can be run
         asynchronously at the same time.
 
-         .. seealso:: :attr:`telegram.ext.Handler.run_sync`,
+         .. seealso:: :paramref:`telegram.ext.Handler.run_async`,
              :attr:`telegram.ext.Defaults.block`
 
         Args:

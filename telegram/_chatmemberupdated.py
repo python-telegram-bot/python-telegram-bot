@@ -38,7 +38,7 @@ class ChatMemberUpdated(TelegramObject):
     .. versionadded:: 13.4
 
     Note:
-        In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
+        In Python :keyword:`from` is a reserved word, :paramref:`from_user`
 
     Args:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
@@ -148,8 +148,8 @@ class ChatMemberUpdated(TelegramObject):
         .. versionadded:: 13.5
 
         Returns:
-            Dict[:obj:`str`, Tuple[:obj:`obj`, :obj:`obj`]]: A dictionary mapping attribute names
-            to tuples of the form ``(old_value, new_value)``
+            Dict[:obj:`str`, Tuple[:class:`object`, :class:`object`]]: A dictionary mapping
+                attribute names to tuples of the form ``(old_value, new_value)``
         """
         # we first get the names of the attributes that have changed
         # user.to_dict() is unhashable, so that needs some special casing further down

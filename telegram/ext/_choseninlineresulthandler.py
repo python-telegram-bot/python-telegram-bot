@@ -36,7 +36,7 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a chosen inline result.
 
     Warning:
-        When setting ``block`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
@@ -49,7 +49,8 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
-        pattern (:obj:`str` | `Pattern`, optional): Regex pattern. If not :obj:`None`, ``re.match``
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Regex pattern. If not
+            :obj:`None`, :func:`re.match`
             is used on :attr:`telegram.ChosenInlineResult.result_id` to determine if an update
             should be handled by this handler. This is accessible in the callback as
             :attr:`telegram.ext.CallbackContext.matches`.

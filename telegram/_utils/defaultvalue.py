@@ -74,10 +74,10 @@ class DefaultValue(Generic[DVType]):
     ``f'DefaultValue({value})'``.
 
     Args:
-        value (:obj:`obj`): The value of the default argument
+        value (:class:`object`): The value of the default argument
 
     Attributes:
-        value (:obj:`obj`): The value of the default argument
+        value (:class:`object`): The value of the default argument
 
     """
 
