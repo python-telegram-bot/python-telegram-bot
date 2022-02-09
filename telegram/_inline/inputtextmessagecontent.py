@@ -41,7 +41,7 @@ class InputTextMessageContent(InputMessageContent):
             in :class:`telegram.constants.ParseMode` for the available modes.
         entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
+            :paramref:`parse_mode`.
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -55,7 +55,7 @@ class InputTextMessageContent(InputMessageContent):
             in :class:`telegram.constants.ParseMode` for the available modes.
         entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
+            :paramref:`parse_mode`.
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 

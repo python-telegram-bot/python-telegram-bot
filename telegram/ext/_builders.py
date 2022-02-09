@@ -560,7 +560,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         """Sets the base URL to be used for :attr:`telegram.ext.Dispatcher.bot`. If not called,
         will default to ``'https://api.telegram.org/bot'``.
 
-        .. seealso:: :attr:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
+        .. seealso:: :paramref:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
             :meth:`base_url`
 
@@ -576,8 +576,8 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         """Sets the base file URL to be used for :attr:`telegram.ext.Dispatcher.bot`. If not
         called, will default to ``'https://api.telegram.org/file/bot'``.
 
-        .. seealso:: :attr:`telegram.Bot.base_file_url`, `Local Bot API Server <https://github.com\
-            /python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+        .. seealso:: :paramref:`telegram.Bot.base_file_url`, `Local Bot API Server <https://\
+            github.com/python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
             :meth:`base_file_url`
 
         Args:
@@ -589,7 +589,8 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         return self._set_base_file_url(base_file_url)
 
     def request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
-        """Sets keyword arguments that will be passed to the :class:`telegram.utils.Request` object
+        """Sets keyword arguments that will be passed to the
+        :class:`telegram.request.Request` object
         that is created when :attr:`telegram.ext.Dispatcher.bot` is created. If not called, no
         keyword arguments will be passed.
 
@@ -604,13 +605,13 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         return self._set_request_kwargs(request_kwargs)
 
     def request(self: BuilderType, request: Request) -> BuilderType:
-        """Sets a :class:`telegram.utils.Request` object to be used for
+        """Sets a :class:`telegram.request.Request` object to be used for
         :attr:`telegram.ext.Dispatcher.bot`.
 
         .. seealso:: :meth:`request_kwargs`
 
         Args:
-            request (:class:`telegram.utils.Request`): The request object.
+            request (:class:`telegram.request.Request`): The request object.
 
         Returns:
             :class:`DispatcherBuilder`: The same builder with the updated argument.
@@ -718,7 +719,7 @@ class DispatcherBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         :meth:`telegram.ext.Dispatcher.run_async`, i.e. the number of callbacks that can be run
         asynchronously at the same time.
 
-         .. seealso:: :attr:`telegram.ext.Handler.run_sync`,
+         .. seealso:: :paramref:`telegram.ext.Handler.run_async`,
              :attr:`telegram.ext.Defaults.run_async`
 
         Args:
@@ -927,7 +928,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         """Sets the base URL to be used for :attr:`telegram.ext.Updater.bot`. If not called,
         will default to ``'https://api.telegram.org/bot'``.
 
-        .. seealso:: :attr:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
+        .. seealso:: :paramref:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
             :meth:`base_url`
 
@@ -943,8 +944,8 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         """Sets the base file URL to be used for :attr:`telegram.ext.Updater.bot`. If not
         called, will default to ``'https://api.telegram.org/file/bot'``.
 
-        .. seealso:: :attr:`telegram.Bot.base_file_url`, `Local Bot API Server <https://github.com\
-            /python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+        .. seealso:: :paramref:`telegram.Bot.base_file_url`, `Local Bot API Server <https://
+            github.com/python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
             :meth:`base_file_url`
 
         Args:
@@ -956,8 +957,8 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         return self._set_base_file_url(base_file_url)
 
     def request_kwargs(self: BuilderType, request_kwargs: Dict[str, Any]) -> BuilderType:
-        """Sets keyword arguments that will be passed to the :class:`telegram.utils.Request` object
-        that is created when :attr:`telegram.ext.Updater.bot` is created. If not called, no
+        """Sets keyword arguments that will be passed to the :class:`telegram.request.Request`
+        object that is created when :attr:`telegram.ext.Updater.bot` is created. If not called, no
         keyword arguments will be passed.
 
         .. seealso:: :meth:`request`
@@ -971,13 +972,13 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         return self._set_request_kwargs(request_kwargs)
 
     def request(self: BuilderType, request: Request) -> BuilderType:
-        """Sets a :class:`telegram.utils.Request` object to be used for
+        """Sets a :class:`telegram.request.Request` object to be used for
         :attr:`telegram.ext.Updater.bot`.
 
         .. seealso:: :meth:`request_kwargs`
 
         Args:
-            request (:class:`telegram.utils.Request`): The request object.
+            request (:class:`telegram.request.Request`): The request object.
 
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.
@@ -1087,7 +1088,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         :meth:`telegram.ext.Dispatcher.run_async`, i.e. the number of callbacks that can be run
         asynchronously at the same time.
 
-         .. seealso:: :attr:`telegram.ext.Handler.run_sync`,
+         .. seealso:: :paramref:`telegram.ext.Handler.run_async`,
              :attr:`telegram.ext.Defaults.run_async`
 
         Args:
@@ -1229,9 +1230,9 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
         self: BuilderType, user_signal_handler: Callable[[int, object], Any]
     ) -> BuilderType:
         """Sets a callback to be used for :attr:`telegram.ext.Updater.user_signal_handler`.
-        The callback will be called when :meth:`telegram.ext.Updater.idle()` receives a signal.
+        The callback will be called when :meth:`telegram.ext.Updater.idle` receives a signal.
         It will be called with the two arguments ``signum, frame`` as for the
-        :meth:`signal.signal` of the standard library.
+        :func:`signal.signal` of the standard library.
 
         Note:
             Signal handlers are an advanced feature that come with some culprits and are not thread
@@ -1241,7 +1242,7 @@ class UpdaterBuilder(_BaseBuilder[ODT, BT, CCT, UD, CD, BD, JQ, PT]):
             be executed after the updater has shut down.
 
         Args:
-            user_signal_handler (Callable[signum, frame]): The signal handler.
+            user_signal_handler (Callable[`signum, frame`]): The signal handler.
 
         Returns:
             :class:`UpdaterBuilder`: The same builder with the updated argument.

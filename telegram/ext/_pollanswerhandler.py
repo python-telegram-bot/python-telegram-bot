@@ -29,7 +29,7 @@ class PollAnswerHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram updates that contain a poll answer.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:

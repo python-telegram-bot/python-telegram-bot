@@ -38,7 +38,7 @@ class InlineQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        In Python :keyword:`from` is a reserved word, use ``from_user`` instead.
+        In Python :keyword:`from` is a reserved word, :paramref:`from_user`
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -142,11 +142,13 @@ class InlineQuery(TelegramObject):
 
         Args:
             auto_pagination (:obj:`bool`, optional): If set to :obj:`True`, :attr:`offset` will be
-                passed as :attr:`current_offset` to :meth:`telegram.Bot.answer_inline_query`.
+                passed as :paramref:`current_offset` to :meth:`telegram.Bot.answer_inline_query`.
                 Defaults to :obj:`False`.
 
         Raises:
-            ValueError: If both :attr:`current_offset` and :attr:`auto_pagination` are supplied.
+            ValueError: If both
+                :paramref:`~telegram.Bot.answer_inline_query.current_offset` and
+                :paramref:`auto_pagination` are supplied.
         """
         if current_offset and auto_pagination:
             raise ValueError('current_offset and auto_pagination are mutually exclusive!')

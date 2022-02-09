@@ -102,24 +102,24 @@ class File(TelegramObject):
         """
         Download this file. By default, the file is saved in the current working directory with its
         original filename as reported by Telegram. If the file has no filename, it the file ID will
-        be used as filename. If a :attr:`custom_path` is supplied, it will be saved to that path
-        instead. If :attr:`out` is defined, the file contents will be saved to that object using
-        the ``out.write`` method.
+        be used as filename. If a :paramref:`custom_path` is supplied, it will be saved to that
+        path instead. If :paramref:`out` is defined, the file contents will be saved to that object
+        using the ``out.write`` method.
 
         Note:
-            * :attr:`custom_path` and :attr:`out` are mutually exclusive.
-            * If neither :attr:`custom_path` nor :attr:`out` is provided and :attr:`file_path` is
-              the path of a local file (which is the case when a Bot API Server is running in
-              local mode), this method will just return the path.
+            * :paramref:`custom_path` and :paramref:`out` are mutually exclusive.
+            * If neither :paramref:`custom_path` nor :paramref:`out` is provided and
+              :attr:`file_path` is the path of a local file (which is the case when a Bot API
+              Server is running in local mode), this method will just return the path.
 
         .. versionchanged:: 14.0
 
-            * ``custom_path`` parameter now also accepts :obj:`pathlib.Path` as argument.
-            * Returns :obj:`pathlib.Path` object in cases where previously a :obj:`str` was
+            * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
+            * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
               returned.
 
         Args:
-            custom_path (:obj:`pathlib.Path` | :obj:`str`, optional): Custom path.
+            custom_path (:class:`pathlib.Path` | :obj:`str`, optional): Custom path.
             out (:obj:`io.BufferedWriter`, optional): A file-like object. Must be opened for
                 writing in binary mode, if applicable.
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
@@ -127,12 +127,12 @@ class File(TelegramObject):
                 the connection pool).
 
         Returns:
-            :obj:`pathlib.Path` | :obj:`io.BufferedWriter`: The same object as :attr:`out` if
+            :class:`pathlib.Path` | :obj:`io.BufferedWriter`: The same object as :paramref:`out` if
                 specified. Otherwise, returns the filename downloaded to or the file path of the
                 local file.
 
         Raises:
-            ValueError: If both :attr:`custom_path` and :attr:`out` are passed.
+            ValueError: If both :paramref:`custom_path` and :paramref:`out` are passed.
 
         """
         if custom_path is not None and out is not None:
@@ -184,15 +184,15 @@ class File(TelegramObject):
             )
         )
 
-    def download_as_bytearray(self, buf: bytearray = None) -> bytes:
+    def download_as_bytearray(self, buf: bytearray = None) -> bytearray:
         """Download this file and return it as a bytearray.
 
         Args:
             buf (:obj:`bytearray`, optional): Extend the given bytearray with the downloaded data.
 
         Returns:
-            :obj:`bytearray`: The same object as :attr:`buf` if it was specified. Otherwise a newly
-            allocated :obj:`bytearray`.
+            :obj:`bytearray`: The same object as :paramref:`buf` if it was specified. Otherwise a
+                newly allocated :obj:`bytearray`.
 
         """
         if buf is None:

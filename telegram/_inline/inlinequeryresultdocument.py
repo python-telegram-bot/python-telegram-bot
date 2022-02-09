@@ -47,7 +47,7 @@ class InlineQueryResultDocument(InlineQueryResult):
             in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
+            :paramref:`parse_mode`.
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
             or "application/zip".
@@ -73,7 +73,7 @@ class InlineQueryResultDocument(InlineQueryResult):
             in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption, which can be specified instead of
-            :attr:`parse_mode`.
+            :paramref:`parse_mode`.
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
             or "application/zip".

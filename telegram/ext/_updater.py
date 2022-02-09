@@ -76,12 +76,12 @@ class Updater(Generic[BT, DT]):
 
     Attributes:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
-        user_signal_handler (:obj:`function`): Optional. Function to be called when a signal is
+        user_signal_handler (Callable): Optional. Function to be called when a signal is
             received.
 
             .. versionchanged:: 14.0
                 Renamed ``user_sig_handler`` to ``user_signal_handler``.
-        update_queue (:obj:`Queue`): Queue for the updates.
+        update_queue (:class:`queue.Queue`): Queue for the updates.
         dispatcher (:class:`telegram.ext.Dispatcher`): Optional. Dispatcher that handles the
             updates and dispatches them to the handlers.
         running (:obj:`bool`): Indicates if the updater is running.
@@ -188,7 +188,7 @@ class Updater(Generic[BT, DT]):
         """Starts polling updates from Telegram.
 
         .. versionchanged:: 14.0
-            Removed the ``clean`` argument in favor of ``drop_pending_updates``.
+            Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates`.
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -212,7 +212,7 @@ class Updater(Generic[BT, DT]):
                 timeout from server (Default: ``2``).
 
         Returns:
-            :obj:`Queue`: The update queue that can be filled from the main thread.
+            :class:`queue.Queue`: The update queue that can be filled from the main thread.
 
         """
         with self.__lock:
@@ -262,8 +262,8 @@ class Updater(Generic[BT, DT]):
         max_connections: int = 40,
     ) -> Optional[Queue]:
         """
-        Starts a small http server to listen for updates via webhook. If :attr:`cert`
-        and :attr:`key` are not provided, the webhook will be started directly on
+        Starts a small http server to listen for updates via webhook. If :paramref:`cert`
+        and :paramref:`key` are not provided, the webhook will be started directly on
         http://listen:port/url_path, so SSL can be handled by another
         application. Else, the webhook will be started on
         https://listen:port/url_path. Also calls :meth:`telegram.Bot.set_webhook` as required.
@@ -273,8 +273,8 @@ class Updater(Generic[BT, DT]):
             ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.
 
         .. versionchanged:: 14.0
-            Removed the ``clean`` argument in favor of ``drop_pending_updates`` and removed the
-            deprecated argument ``force_event_loop``.
+            Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates` and removed
+            the deprecated argument ``force_event_loop``.
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
@@ -308,7 +308,7 @@ class Updater(Generic[BT, DT]):
                 .. versionadded:: 13.6
 
         Returns:
-            :obj:`Queue`: The update queue that can be filled from the main thread.
+            :class:`queue.Queue`: The update queue that can be filled from the main thread.
 
         """
         with self.__lock:

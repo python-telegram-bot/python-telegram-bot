@@ -41,7 +41,7 @@ class StringCommandHandler(Handler[str, CCT]):
         put in the queue. For example to send messages with the bot using command line or API.
 
     Warning:
-        When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:

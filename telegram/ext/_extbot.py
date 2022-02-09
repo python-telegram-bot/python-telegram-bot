@@ -202,7 +202,7 @@ class ExtBot(Bot):
             *In place*, i.e. the passed :class:`telegram.Message` will be changed!
 
         Args:
-            update (:class`telegram.Update`): The update.
+            update (:class:`telegram.Update`): The update.
 
         """
         # The only incoming updates that can directly contain a message sent by the bot itself are:
