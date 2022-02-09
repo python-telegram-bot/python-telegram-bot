@@ -41,9 +41,10 @@ class JobQueue:
 
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
-            ..versionchanged:: 14.0
-                Use :class:`apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
-                :class:`apscheduler.schedulers.background.BackgroundScheduler`
+
+            .. versionchanged:: 14.0
+                Use :class:`~apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
+                :class:`~apscheduler.schedulers.background.BackgroundScheduler`
 
 
     """

@@ -71,8 +71,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     Attention:
         The interface provided by this class is intended to be accessed exclusively by
-        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
-        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+        :class:`~telegram.ext.Application`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Application`.
 
     All relevant methods must be overwritten. This includes:
 
@@ -114,7 +114,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
             saved.
-        update_interval (:obj:`int` | :obj:`float:, optional): The
+        update_interval (:obj:`int` | :obj:`float`, optional): The
             :class:`~telegram.ext.Application` will update
             the persistence in regular intervals. This parameter specifies the time (in seconds) to
             wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
@@ -607,8 +607,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     @abstractmethod
     async def refresh_user_data(self, user_id: int, user_data: UD) -> None:
         """Will be called by the :class:`telegram.ext.Application` before passing the
-        :attr:`~telegram.ext.Dispatcher.user_data` to a callback. Can be used to update data stored
-        in :attr:`~telegram.ext.Dispatcher.user_data` from an external source.
+        :attr:`~telegram.ext.Application.user_data` to a callback. Can be used to update data
+        stored in :attr:`~telegram.ext.Application.user_data` from an external source.
 
         .. versionadded:: 13.6
 
@@ -616,7 +616,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Args:
-            user_id (:obj:`int`): The user ID this :attr:`~telegram.ext.Dispatcher.user_data` is
+            user_id (:obj:`int`): The user ID this :attr:`~telegram.ext.Application.user_data` is
                 associated with.
             user_data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.user_data`):
                 The ``user_data`` of a single user.
@@ -625,8 +625,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     @abstractmethod
     async def refresh_chat_data(self, chat_id: int, chat_data: CD) -> None:
         """Will be called by the :class:`telegram.ext.Application` before passing the
-        :attr:`~telegram.ext.Dispatcher.chat_data` to a callback. Can be used to update data stored
-        in :attr:`~telegram.ext.Dispatcher.chat_data` from an external source.
+        :attr:`~telegram.ext.Application.chat_data` to a callback. Can be used to update data
+        stored in :attr:`~telegram.ext.Application.chat_data` from an external source.
 
         .. versionadded:: 13.6
 
@@ -634,7 +634,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an ``@abstractmethod``.
 
         Args:
-            chat_id (:obj:`int`): The chat ID this :attr:`~telegram.ext.Dispatcher.chat_data` is
+            chat_id (:obj:`int`): The chat ID this :attr:`~telegram.ext.Application.chat_data` is
                 associated with.
             chat_data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.chat_data`):
                 The ``chat_data`` of a single chat.
@@ -643,8 +643,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     @abstractmethod
     async def refresh_bot_data(self, bot_data: BD) -> None:
         """Will be called by the :class:`telegram.ext.Application` before passing the
-        :attr:`~telegram.ext.Dispatcher.bot_data` to a callback. Can be used to update data stored
-        in :attr:`~telegram.ext.Dispatcher.bot_data` from an external source.
+        :attr:`~telegram.ext.Application.bot_data` to a callback. Can be used to update data stored
+        in :attr:`~telegram.ext.Application.bot_data` from an external source.
 
         .. versionadded:: 13.6
 

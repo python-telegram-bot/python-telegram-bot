@@ -64,7 +64,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
             saved.
-        update_interval (:obj:`int` | :obj:`float:, optional): The
+        update_interval (:obj:`int` | :obj:`float`, optional): The
             :class:`~telegram.ext.Application` will update
             the persistence in regular intervals. This parameter specifies the time (in seconds) to
             wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.

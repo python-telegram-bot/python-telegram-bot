@@ -83,12 +83,12 @@ class RequestData:
 
     def parametrized_url(self, url: str, encode_kwargs: Dict[str, Any] = None) -> str:
         """Shortcut for attaching the return value of :meth:`url_encoded_parameters` to the
-        :attr:`url`.
+        :paramref:`url`.
 
         Args:
             url (:obj:`str`): The URL the parameters will be attached to.
             encode_kwargs (Dict[:obj:`str`, any], optional): Additional keyword arguments to pass
-                along to :meth:`urllib.parse.urlencode`.
+                along to :attr:`urllib.parse.urlencode`.
         """
         url_parameters = self.url_encoded_parameters(encode_kwargs=encode_kwargs)
         return f'{url}?{url_parameters}'
