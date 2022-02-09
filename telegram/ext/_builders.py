@@ -378,8 +378,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             )
 
     def request(self: BuilderType, request: BaseRequest) -> BuilderType:
-        """Sets a :class:`telegram.utils.Request` object to be used for the ``request`` parameter
-        of :attr:`telegram.ext.Application.bot`.
+        """Sets a :class:`telegram.request.BaseRequest` object to be used for the ``request``
+        parameter of :attr:`telegram.ext.Application.bot`.
 
         .. seealso:: :meth:`get_updates_request`
 
@@ -424,7 +424,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def get_updates_request(self: BuilderType, request: BaseRequest) -> BuilderType:
-        """Sets a :class:`telegram.utils.Request` object to be used for the ``get_updates_request``
+        """Sets a :class:`telegram.request.BaseRequest` object to be used for the ``get_updates_request``
         parameter of :attr:`telegram.ext.Application.bot`.
 
         .. seealso:: :meth:`request`
@@ -599,15 +599,18 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def concurrent_updates(self: BuilderType, concurrent_updates: Union[bool, int]) -> BuilderType:
-        """Sets the number of worker threads to be used for
-        :meth:`telegram.ext.Application.run_async`, i.e. the number of callbacks that can be run
-        asynchronously at the same time.
+        """Specifies if and how many updates may be processed concurrently instead of one by one.
 
-         .. seealso:: :paramref:`telegram.ext.Handler.run_async`,
-             :attr:`telegram.ext.Defaults.block`
+        Warning:
+            Processing updates concurrently is not recommended when stateful handlers like
+            :class:`telegram.ext.ConversationHandler` are used.
+
+         .. seealso:: :paramref:`telegram.ext.Application.concurrent_updates`
 
         Args:
-            concurrent_updates (:obj:`int`): The number of worker threads.
+            concurrent_updates (:obj:`bool` | :obj:`int`): Passing :obj:`True` will allow for 4096
+                updates to be processed concurrently. Pass an integer to specify a different number
+                of updates that may be processed concurrently.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.

@@ -35,8 +35,8 @@ class DictPersistence(BasePersistence):
 
     Attention:
         The interface provided by this class is intended to be accessed exclusively by
-        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
-        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+        :class:`~telegram.ext.Application`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Application`.
 
     Note:
         This class does *not* implement a :meth:`flush` method, meaning that data managed by

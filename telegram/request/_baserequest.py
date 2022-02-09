@@ -54,8 +54,7 @@ class BaseRequest(
 ):
     """Abstract interface class that allows python-telegram-bot to make requests to the Bot API.
     Can be implemented via different asyncio HTTP libraries. An implementation of this class
-    must implement all abstract methods and properties. In addition, :attr:`connection_pool_size`
-    can optionally be overridden.
+    must implement all abstract methods and properties.
 
     Instances of this class can be used as asyncio context managers, where
 
@@ -130,9 +129,8 @@ class BaseRequest(
         """Makes a request to the Bot API handles the return code and parses the answer.
 
         Warning:
-            This method will be called by the methods of :class:`Bot` and should *not* be called
-            manually.
-
+            This method will be called by the methods of :class:`telegram.Bot` and should *not* be
+            called manually.
 
         Args:
             url (:obj:`str`): The URL to request.
@@ -181,8 +179,8 @@ class BaseRequest(
         """Retrieve the contents of a file by its URL.
 
         Warning:
-            This method will be called by the methods of :class:`Bot` and should *not* be called
-            manually.
+            This method will be called by the methods of :class:`telegram.Bot` and should *not* be
+            called manually.
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.

@@ -521,24 +521,24 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
             bases[idx] = f':class:`{base}`'
 
         # Now convert `telegram._message.Message` to `telegram.Message` etc
-        match = re.search(pattern=r"(telegram(\.ext|))\.", string=base)
-        if match and '_utils' not in base:
-            base = base.rstrip("'>")
-            parts = base.rsplit(".", maxsplit=2)
+        match = re.search(pattern=r"(telegram(\.ext|))\.[_\w\.]+", string=base)
+        if not match or '_utils' in base:
+            return
 
-            # Replace private base classes with their respective parent
-            parts[-1] = PRIVATE_BASE_CLASSES.get(parts[-1], parts[-1])
+        parts = match.group(0).split(".")
 
-            # To make sure that e.g. `telegram.ext.filters.BaseFilter` keeps the `filters` part
-            if not parts[-2].startswith('_') and '_' not in parts[0]:
-                base = '.'.join(parts[-2:])
-            else:
-                base = parts[-1]
+        # Remove private paths
+        for index, part in enumerate(parts):
+            if part.startswith("_"):
+                parts = parts[:index] + parts[-1:]
+                break
 
-            # add `telegram(.ext).` back in front
-            base = f'{match.group(0)}{base}'
+        # Replace private base classes with their respective parent
+        parts = [PRIVATE_BASE_CLASSES.get(part, part) for part in parts]
 
-            bases[idx] = f':class:`{base}`'
+        base = ".".join(parts)
+
+        bases[idx] = f':class:`{base}`'
 
 
 def setup(app: Sphinx):

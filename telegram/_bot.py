@@ -363,7 +363,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
     async def shutdown(self) -> None:
         """Stop & clear resources used by this class. Currently just calls
-        :meth:`telegram.request.BaseRequest.stop` for :attr:`request`.
+        :meth:`telegram.request.BaseRequest.shutdown` for the request objects used by this bot.
         """
         if self._initialized:
             await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())

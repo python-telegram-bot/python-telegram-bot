@@ -30,8 +30,7 @@ class Defaults:
 
     .. versionchanged:: 14.0
         Removed the argument and attribute ``timeout``. Specify default timeout behavior for the
-        networking backend directly via :class:`telegram.ext.UpdaterBuilder` or
-        :class:`telegram.ext.ApplicationBuilder` instead.
+        networking backend directly via :class:`telegram.ext.ApplicationBuilder` instead.
 
 
     Parameters:
@@ -205,7 +204,7 @@ class Defaults:
 
     @block.setter
     def block(self, value: object) -> NoReturn:
-        raise AttributeError("You can not assign a new value to run_async after initialization.")
+        raise AttributeError("You can not assign a new value to block after initialization.")
 
     @property
     def protect_content(self) -> Optional[bool]:

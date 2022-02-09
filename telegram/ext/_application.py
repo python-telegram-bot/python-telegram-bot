@@ -117,10 +117,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
         update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
             updates.
+        updater (:class:`telegram.ext.Updater`, optional): The updater used by this application.
         job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
             instance to pass onto handler callbacks.
-        concurrent_updates (:obj:`int`, optional): Number of maximum concurrent worker threads for
-            the ``@run_async`` decorator and :meth:`run_async`.
+        concurrent_updates (:obj:`int`, optional): Number updates that may be processed in
+            parallel.
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the chat.
 
@@ -148,11 +149,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             .. seealso::
                 :meth:`add_handler`, :meth:`add_handlers`.
         error_handlers (Dict[:obj:`callable`, :obj:`bool`]): A dict, where the keys are error
-            handlers and the values indicate whether they are to be run asynchronously via
-            :meth:`run_async`.
+            handlers and the values indicate whether they are to be run blocking.
 
             .. seealso::
                 :meth:`add_error_handler`
+        context_types (:class:`telegram.ext.ContextTypes`): Specifies the types used by this
+            dispatcher for the ``context`` argument of handler and job callbacks.
 
     """
 
@@ -385,7 +387,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Note:
             This does *not* start fetching updates from Telegram. You need either start
-            :attr:`updater` manually or use one of :attr:`run_polling` or :attr:`run_webhook`.
+            :attr:`updater` manually or use one of :meth:`run_polling` or :meth:`run_webhook`.
 
         Args:
             ready (:obj:`asyncio.Event`, optional): If specified, the event will be set once the
@@ -478,6 +480,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         drop_pending_updates: bool = None,
         ready: asyncio.Event = None,
     ) -> None:
+        """Temp docstring to make this referencable
+        #TODO: Adda meaningful description
+        """
         if not self.updater:
             raise RuntimeError(
                 'Application.run_polling is only available if the application has an Updater.'
@@ -517,6 +522,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         max_connections: int = 40,
         ready: asyncio.Event = None,
     ) -> None:
+        """Temp docstring to make this referencable
+        #TODO: Adda meaningful description
+        """
         if not self.updater:
             raise RuntimeError(
                 'Application.run_webhook is only available if the application has an Updater.'
@@ -553,7 +561,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             loop.close()
 
     def create_task(self, coroutine: Coroutine, update: object = None) -> asyncio.Task:
-        """Thin wrapper around :meth:`asyncio.create_task` that handles exceptions raised by
+        """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
         the ``coroutine`` with :meth:`dispatch_error`.
 
         Note:
@@ -833,20 +841,23 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self, message: 'Message' = None, old_chat_id: int = None, new_chat_id: int = None
     ) -> None:
         """Moves the contents of :attr:`chat_data` at key old_chat_id to the key new_chat_id.
-        Also updates the persistence by calling :attr:`update_persistence`.
+        Also marks the entries to be updated accordingly in the next run of
+        :meth:`update_persistence`.
+
         Warning:
             * Any data stored in :attr:`chat_data` at key `new_chat_id` will be overridden
             * The key `old_chat_id` of :attr:`chat_data` will be deleted
         Args:
-            message (:class:`Message`, optional): A message with either
-                :attr:`telegram.Message.migrate_from_chat_id` or
-                :attr:`telegram.Message.migrate_to_chat_id`.
-                Mutually exclusive with passing ``old_chat_id`` and ``new_chat_id``
+            message (:class:`telegram.Message`, optional): A message with either
+                :attr:`~telegram.Message.migrate_from_chat_id` or
+                :attr:`~telegram.Message.migrate_to_chat_id`.
+                Mutually exclusive with passing :paramref:`old_chat_id`` and
+                :paramref:`new_chat_id`
                 .. seealso: `telegram.ext.filters.StatusUpdate.MIGRATE`
             old_chat_id (:obj:`int`, optional): The old chat ID.
-                Mutually exclusive with passing ``message``
+                Mutually exclusive with passing :paramref:`message`
             new_chat_id (:obj:`int`, optional): The new chat ID.
-                Mutually exclusive with passing ``message``
+                Mutually exclusive with passing :paramref:`message`
         """
         if message and (old_chat_id or new_chat_id):
             raise ValueError("Message and chat_id pair are mutually exclusive")
@@ -885,7 +896,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     async def update_persistence(self) -> None:
         """Updates :attr:`user_data`, :attr:`chat_data`, :attr:`bot_data` in :attr:`persistence`
-        along with :attr:`~telegram.ExtBot.callback_data_cache` and the conversation states of
+        along with :attr:`~telegram.ext.ExtBot.callback_data_cache` and the conversation states of
         any persistent :class:`~telegram.ext.ConversationHandler` registered for this application.
 
         For :attr:`user_data`, :attr:`chat_data`, only entries accessed since the last run of this

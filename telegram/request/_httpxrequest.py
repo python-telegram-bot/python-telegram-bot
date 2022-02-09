@@ -42,7 +42,7 @@ class HTTPXRequest(BaseRequest):
 
     Args:
         connection_pool_size (:obj:`int`, optional): Number of connections to keep in the
-            connection pool. Defaults to :obj:`1`.
+            connection pool. Defaults to ``1``.
 
             Note:
                 Independent of the value, one additional connection will be reserved for
@@ -73,7 +73,7 @@ class HTTPXRequest(BaseRequest):
             infinite timeout. Defaults to :obj:`None`.
 
             Warning:
-                With a finite pool timeout, you must expect :exc:`telegram.error.TimeOut`
+                With a finite pool timeout, you must expect :exc:`telegram.error.TimedOut`
                 exceptions to be thrown when more requests are made simultaneously than there are
                 connections in the connection pool!
     """
@@ -113,7 +113,7 @@ class HTTPXRequest(BaseRequest):
         """See :meth:`BaseRequest.initialize`."""
 
     async def shutdown(self) -> None:
-        """See :meth:`BaseRequest.stop`."""
+        """See :meth:`BaseRequest.shutdown`."""
         await self._client.aclose()
 
     async def do_request(

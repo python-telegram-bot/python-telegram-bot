@@ -39,8 +39,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
 
     Attention:
         The interface provided by this class is intended to be accessed exclusively by
-        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
-        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+        :class:`~telegram.ext.Application`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Application`.
 
     Warning:
         :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by

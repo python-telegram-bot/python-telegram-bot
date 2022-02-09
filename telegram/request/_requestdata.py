@@ -71,11 +71,11 @@ class RequestData:
         return {param.name: param.json_value for param in self._parameters}
 
     def url_encoded_parameters(self, encode_kwargs: Dict[str, Any] = None) -> str:
-        """Encodes the parameters with :meth:`urllib.parse.urlencode`.
+        """Encodes the parameters with :func:`urllib.parse.urlencode`.
 
         Args:
             encode_kwargs (Dict[:obj:`str`, any], optional): Additional keyword arguments to pass
-                along to :meth:`urllib.parse.urlencode`.
+                along to :func:`urllib.parse.urlencode`.
         """
         if encode_kwargs:
             return urlencode(self.json_parameters, **encode_kwargs)
@@ -88,7 +88,7 @@ class RequestData:
         Args:
             url (:obj:`str`): The URL the parameters will be attached to.
             encode_kwargs (Dict[:obj:`str`, any], optional): Additional keyword arguments to pass
-                along to :attr:`urllib.parse.urlencode`.
+                along to :func:`urllib.parse.urlencode`.
         """
         url_parameters = self.url_encoded_parameters(encode_kwargs=encode_kwargs)
         return f'{url}?{url_parameters}'
