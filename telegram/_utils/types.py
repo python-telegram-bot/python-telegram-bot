@@ -66,6 +66,9 @@ RT = TypeVar("RT")
 SLT = Union[RT, List[RT], Tuple[RT, ...]]
 """Single instance or list/tuple of instances."""
 
+SLTS = Union[RT, List[RT], Tuple[RT, ...]]
+"""Single instance or list/tuple/set of instances."""
+
 ReplyMarkup = Union[
     'InlineKeyboardMarkup', 'ReplyKeyboardMarkup', 'ReplyKeyboardRemove', 'ForceReply'
 ]
