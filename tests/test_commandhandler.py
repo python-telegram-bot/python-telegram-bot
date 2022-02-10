@@ -340,23 +340,23 @@ class TestPrefixHandler(BaseTest):
 
     def test_edit_prefix(self):
         handler = self.make_default_handler()
-        handler.prefix = ['?', '§']
-        assert handler._commands == set(combinations(['?', '§'], self.COMMANDS))
-        handler.prefix = {'!', '%'}
-        assert handler._commands == set(combinations(['!', '%'], self.COMMANDS))
-        handler.prefix = '+'
-        assert handler._commands == set(combinations(['+'], self.COMMANDS))
+        handler.prefixes = ['?', '§']
+        assert handler._combinations == set(combinations(['?', '§'], self.COMMANDS))
+        handler.prefixes = {'!', '%'}
+        assert handler._combinations == set(combinations(['!', '%'], self.COMMANDS))
+        handler.prefixes = '+'
+        assert handler._combinations == set(combinations(['+'], self.COMMANDS))
 
     def test_edit_command(self):
         handler = self.make_default_handler()
-        handler.command = 'foo'
-        assert handler._commands == set(combinations(self.PREFIXES, ['foo']))
+        handler.commands = 'foo'
+        assert handler._combinations == set(combinations(self.PREFIXES, ['foo']))
 
-        handler.command = {'foo', 'bar'}
-        assert handler._commands == set(combinations(self.PREFIXES, ['foo', 'bar']))
+        handler.commands = {'foo', 'bar'}
+        assert handler._combinations == set(combinations(self.PREFIXES, ['foo', 'bar']))
 
-        handler.command = ['foo', 'bar']
-        assert handler._commands == set(combinations(self.PREFIXES, ['foo', 'bar']))
+        handler.commands = ['foo', 'bar']
+        assert handler._combinations == set(combinations(self.PREFIXES, ['foo', 'bar']))
 
     def test_basic_after_editing(self, dp, prefix, command):
         """Test the basic expected response from a prefix handler"""
@@ -365,7 +365,7 @@ class TestPrefixHandler(BaseTest):
         text = prefix + command
 
         assert self.response(dp, make_message_update(text))
-        handler.command = 'foo'
+        handler.commands = 'foo'
         text = prefix + 'foo'
         assert self.response(dp, make_message_update(text))
 

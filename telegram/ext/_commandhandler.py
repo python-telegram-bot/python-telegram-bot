@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Set, Optional, Tuple, Ty
 
 from telegram import MessageEntity, Update
 from telegram.ext import filters as filters_module, Handler
-from telegram._utils.types import SLT
+from telegram._utils.types import SLTS
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
 from telegram.ext._utils.types import CCT
 
@@ -51,7 +51,7 @@ class CommandHandler(Handler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
+        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`] | Set[:obj:`str`]):
             The command or list of commands this handler should listen for.
             Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler. Will be called when
@@ -71,8 +71,8 @@ class CommandHandler(Handler[Update, CCT]):
         ValueError: when command is too long or has illegal chars.
 
     Attributes:
-        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`] | Set[:obj:`str`]):
-            The command or list of commands this handler should listen for.
+        commands (Set[:obj:`str`]):
+            The set of command(s) this handler should listen for.
             Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
@@ -80,11 +80,11 @@ class CommandHandler(Handler[Update, CCT]):
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
     """
 
-    __slots__ = ('command', 'filters')
+    __slots__ = ('_commands', 'filters')
 
     def __init__(
         self,
-        command: SLT[str],
+        command: SLTS[str],
         callback: Callable[[Update, CCT], RT],
         filters: filters_module.BaseFilter = None,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
@@ -92,10 +92,11 @@ class CommandHandler(Handler[Update, CCT]):
         super().__init__(callback, run_async=run_async)
 
         if isinstance(command, str):
-            self.command = [command.lower()]
+            self._commands = {command.lower()}
         else:
-            self.command = [x.lower() for x in command]
-        for comm in self.command:
+            self._commands = {i.lower() for i in command}
+
+        for comm in self._commands:
             if not re.match(r'^[\da-z_]{1,32}$', comm):
                 raise ValueError(f'Command `{comm}` is not a valid bot command')
 
@@ -129,7 +130,7 @@ class CommandHandler(Handler[Update, CCT]):
                 command_parts.append(message.get_bot().username)
 
                 if not (
-                    command_parts[0].lower() in self.command
+                    command_parts[0].lower() in self._commands
                     and command_parts[1].lower() == message.get_bot().username.lower()
                 ):
                     return None
@@ -154,6 +155,23 @@ class CommandHandler(Handler[Update, CCT]):
             context.args = check_result[0]
             if isinstance(check_result[1], dict):
                 context.update(check_result[1])
+
+    @property
+    def commands(self) -> Set[str]:
+        """
+        The set of commands this handler should listen for.
+
+        Returns:
+            Set[:obj:`str`]
+        """
+        return self._commands
+
+    @commands.setter
+    def commands(self, command: Union[str, List[str], Set[str]]) -> None:
+        if isinstance(command, str):
+            self._commands = {command.lower()}
+        else:
+            self._commands = {i.lower() for i in command}
 
 
 class PrefixHandler(CommandHandler):
@@ -198,9 +216,9 @@ class PrefixHandler(CommandHandler):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        prefix (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
+        prefix (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`] | Set[:obj:`str`]):
             The prefix(es) that will precede :attr:`command`.
-        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
+        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`] | Set[:obj:`str`]):
             The command or list of commands this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
@@ -216,6 +234,10 @@ class PrefixHandler(CommandHandler):
             Defaults to :obj:`False`.
 
     Attributes:
+        prefixes (Set[:obj:`str`]):
+            The prefix(es) that will precede :attr:`commands`.
+        commands (Set[:obj:`str`]):
+            The set of command(s) that this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
@@ -223,71 +245,70 @@ class PrefixHandler(CommandHandler):
 
     """
 
-    # 'prefix' is a class property, & 'command' is included in the superclass, so they're left out.
-    __slots__ = ('_prefix', '_command', '_commands')
+    __slots__ = ('_prefixes', '_combinations')
 
     def __init__(
         self,
-        prefix: SLT[str],
-        command: SLT[str],
+        prefix: SLTS[str],
+        command: SLTS[str],
         callback: Callable[[Update, CCT], RT],
         filters: filters_module.BaseFilter = None,
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
-        self._prefix: List[str] = []
-        self._command: List[str] = []
-        self._commands: Set[str] = set()
-
         super().__init__(
-            'nocommand',
+            command,
             callback,
             filters=filters,
             run_async=run_async,
         )
 
-        self.prefix = prefix  # type: ignore[assignment]
-        self.command = command  # type: ignore[assignment]
+        self._prefixes: Set[str] = set()
+        self._combinations: Set[str] = set()
+
+        self.prefixes = prefix  # type: ignore[assignment]
         self._build_commands()
 
     @property
-    def prefix(self) -> List[str]:
+    def prefixes(self) -> Set[str]:
         """
         The prefixes that will precede :attr:`command`.
 
         Returns:
-            List[:obj:`str`]
+            Set[:obj:`str`]
         """
-        return self._prefix
+        return self._prefixes
 
-    @prefix.setter
-    def prefix(self, prefix: Union[str, List[str], Set[str]]) -> None:
+    @prefixes.setter
+    def prefixes(self, prefix: SLTS) -> None:
         if isinstance(prefix, str):
-            self._prefix = [prefix.lower()]
+            self._prefixes = {prefix.lower()}
         else:
-            self._prefix = list(prefix)
+            self._prefixes = set(prefix)
         self._build_commands()
 
-    @property  # type: ignore[override]
-    def command(self) -> List[str]:  # type: ignore[override]
+    @property
+    def commands(self) -> Set[str]:
         """
-        The list of commands this handler should listen for.
+        The set of commands this handler should listen for.
 
         Returns:
-            List[:obj:`str`]
+            Set[:obj:`str`]
         """
-        return self._command
+        return self._commands
 
-    @command.setter
-    def command(self, command: Union[str, List[str], Set[str]]) -> None:
+    @commands.setter
+    def commands(self, command: SLTS) -> None:
         if isinstance(command, str):
-            self._command = [command.lower()]
+            self._commands = {command.lower()}
         else:
-            self._command = list(command)
+            self._commands = {i.lower() for i in command}
         self._build_commands()
 
     def _build_commands(self) -> None:
-        self._commands = {x.lower() + y.lower() for x in self.prefix for y in self.command}
+        self._combinations = {
+            x.lower() + y.lower() for x in self._prefixes for y in self._commands
+        }
 
     def check_update(
         self, update: object
@@ -306,7 +327,7 @@ class PrefixHandler(CommandHandler):
 
             if message.text:
                 text_list = message.text.split()
-                if text_list[0].lower() not in self._commands:
+                if text_list[0].lower() not in self._combinations:
                     return None
                 filter_result = self.filters.check_update(update)
                 if filter_result:
