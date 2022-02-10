@@ -453,10 +453,14 @@ def _git_branch() -> str:
     """Get's the current git sha if available or fall back to `master`"""
     try:
         output = subprocess.check_output(  # skipcq: BAN-B607
-            ["git", "describe", "--tags"], stderr=subprocess.STDOUT
+            ["git", "describe", "--tags", "--always"], stderr=subprocess.STDOUT
         )
         return output.decode().strip()
-    except Exception:
+    except Exception as exc:
+        sphinx_logger.exception(
+            f'Failed to get a description of the current commit. Falling back to `master`.',
+            exc_info=exc
+        )
         return 'master'
 
 
