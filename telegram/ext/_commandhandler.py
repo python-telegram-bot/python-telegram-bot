@@ -78,6 +78,9 @@ class CommandHandler(Handler[Update, CCT]):
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+
+            .. versionchanged:: 14.0
+            :attr:`commands` is now a set and can be assinged after construction of model.
     """
 
     __slots__ = ('_commands', 'filters')
@@ -243,6 +246,9 @@ class PrefixHandler(CommandHandler):
             Filters.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
+            .. versionchanged:: 14.0
+                :attr:`prefix` has been changed to :attr:`prefixes` and accepts sets as well.
+                :attr:`command` has been changed to :attr:`commands` and accepts sets as well.
     """
 
     __slots__ = ('_prefixes', '_combinations')
