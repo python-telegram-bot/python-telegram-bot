@@ -145,7 +145,7 @@ class TestRequestData:
     ):
         assert simple_rqs.parameters == simple_params
         # We don't test these for now since that's a struggle
-        # And the conversation part is already being tested in test_requestparameter.py
+        # And the conversion part is already being tested in test_requestparameter.py
         # assert file_rqs.parameters == file_params
         # assert mixed_rqs.parameters == mixed_params
 
@@ -192,7 +192,7 @@ class TestRequestData:
         expected_params = 'chat_id=123&text=Hello+there%2F%21'
         expected_url = 'https://te.st/method?' + expected_params
         assert data.url_encoded_parameters() == expected_params
-        assert data.build_parametrized_url('https://te.st/method') == expected_url
+        assert data.parametrized_url('https://te.st/method') == expected_url
 
         expected_params = 'chat_id=123&text=Hello%20there/!'
         expected_url = 'https://te.st/method?' + expected_params
@@ -201,7 +201,7 @@ class TestRequestData:
             == expected_params
         )
         assert (
-            data.build_parametrized_url(
+            data.parametrized_url(
                 'https://te.st/method', encode_kwargs={'quote_via': quote, 'safe': '/!'}
             )
             == expected_url

@@ -90,13 +90,12 @@ class HTTPXRequest(BaseRequest):
         pool_timeout: Optional[float] = 1.0,
     ):
         self.__pool_semaphore = asyncio.BoundedSemaphore(connection_pool_size)
-        self._pool_timeout = pool_timeout
 
         timeout = httpx.Timeout(
             connect=connect_timeout,
             read=read_timeout,
             write=write_timeout,
-            pool=1,
+            pool=pool_timeout,
         )
         limits = httpx.Limits(
             max_connections=connection_pool_size,
@@ -128,7 +127,7 @@ class HTTPXRequest(BaseRequest):
     ) -> Tuple[int, bytes]:
         """See :meth:`BaseRequest.do_request`."""
         if isinstance(pool_timeout, DefaultValue):
-            pool_timeout = self._pool_timeout
+            pool_timeout = self._client.timeout.pool
 
         if pool_timeout != 0 and self.__pool_semaphore.locked():
             _logger.debug(

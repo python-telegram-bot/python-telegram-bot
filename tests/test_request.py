@@ -19,6 +19,7 @@
 """Here we run tests directly with HTTPXRequest because that's easier than providing dummy
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import json
+from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Tuple, Any, Coroutine, Callable
 
@@ -26,7 +27,6 @@ import httpx
 import pytest
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import ODVInput
 from telegram.error import (
     TelegramError,
     ChatMigrated,
@@ -69,9 +69,6 @@ async def httpx_request():
         yield rq
 
 
-# TODO: Test timeouts
-
-
 class TestRequest:
     test_flag = None
 
@@ -82,6 +79,8 @@ class TestRequest:
     def test_slot_behaviour(self, mro_slots):
         inst = HTTPXRequest()
         for attr in inst.__slots__:
+            if attr.startswith('__'):
+                attr = f'_{inst.__class__.__name__}{attr}'
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
@@ -90,13 +89,13 @@ class TestRequest:
         async def initialize():
             self.test_flag = ['initialize']
 
-        async def stop():
+        async def shutdown():
             self.test_flag.append('stop')
 
         httpx_request = HTTPXRequest()
 
         monkeypatch.setattr(httpx_request, 'initialize', initialize)
-        monkeypatch.setattr(httpx_request, 'stop', stop)
+        monkeypatch.setattr(httpx_request, 'shutdown', shutdown)
 
         async with httpx_request:
             pass
@@ -108,13 +107,13 @@ class TestRequest:
         async def initialize():
             raise RuntimeError('initialize')
 
-        async def stop():
+        async def shutdown():
             self.test_flag = 'stop'
 
         httpx_request = HTTPXRequest()
 
         monkeypatch.setattr(httpx_request, 'initialize', initialize)
-        monkeypatch.setattr(httpx_request, 'stop', stop)
+        monkeypatch.setattr(httpx_request, 'shutdown', shutdown)
 
         with pytest.raises(RuntimeError, match='initialize'):
             async with httpx_request:
@@ -237,7 +236,11 @@ class TestRequest:
         ['exception', 'catch_class', 'match'],
         [
             (TelegramError('TelegramError'), TelegramError, 'TelegramError'),
-            (RuntimeError('CustomError'), Exception, 'HTTP implementation: CustomError'),
+            (
+                RuntimeError('CustomError'),
+                Exception,
+                "HTTP implementation: RuntimeError\('CustomError'\)",
+            ),
         ],
     )
     async def test_exceptions_in_do_request(
@@ -266,63 +269,65 @@ class TestRequest:
 
         assert await httpx_request.retrieve(None, None) == server_response
 
-    def test_connection_pool_size(self):
-        class Request(BaseRequest):
-            async def do_request(self, *args, **kwargs):
-                pass
-
-            async def initialize(self, *args, **kwargs):
-                pass
-
-            async def shutdown(self, *args, **kwargs):
-                pass
-
-        with pytest.raises(NotImplementedError):
-            Request().connection_pool_size
-
     @pytest.mark.asyncio
     async def test_timeout_propagation(self, monkeypatch, httpx_request):
-        """Here we just test that retrieve gives us the raw bytes instead of trying to parse them
-        as json
-        """
-
-        async def make_assertion(
-            method: str,
-            url: str,
-            request_data: RequestData = None,
-            read_timeout: ODVInput[float] = DEFAULT_NONE,
-            *args,
-            **kwargs,
-        ):
-            self.test_flag = read_timeout
+        async def make_assertion(*args, **kwargs):
+            self.test_flag = (
+                kwargs.get('read_timeout'),
+                kwargs.get('connect_timeout'),
+                kwargs.get('write_timeout'),
+                kwargs.get('pool_timeout'),
+            )
             return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
 
         monkeypatch.setattr(httpx_request, 'do_request', make_assertion)
 
-        await httpx_request.post('url', None, read_timeout=42.314)
-        assert self.test_flag == 42.314
+        await httpx_request.post('url', 'method')
+        assert self.test_flag == (DEFAULT_NONE, DEFAULT_NONE, DEFAULT_NONE, DEFAULT_NONE)
+
+        await httpx_request.post(
+            'url', None, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
+        )
+        assert self.test_flag == (1, 2, 3, 4)
 
 
 class TestHTTPXRequest:
+    # TODO: Properly timeouts
+
     test_flag = None
 
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = None
 
-    def test_init(self):
+    def test_init(self, monkeypatch):
+        @dataclass
+        class Client:
+            timeout: object
+            proxies: object
+            limits: object
+
+        monkeypatch.setattr(httpx, 'AsyncClient', Client)
+
         request = HTTPXRequest()
-        assert request.connection_pool_size == 1
         assert request._client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
+        assert request._client.proxies is None
+        assert request._client.limits == httpx.Limits(
+            max_connections=1, max_keepalive_connections=1
+        )
 
         request = HTTPXRequest(
             connection_pool_size=42,
+            proxy_url='proxy_url',
             connect_timeout=43,
             read_timeout=44,
             write_timeout=45,
             pool_timeout=46,
         )
-        assert request.connection_pool_size == 42
+        assert request._client.proxies == 'proxy_url'
+        assert request._client.limits == httpx.Limits(
+            max_connections=42, max_keepalive_connections=42
+        )
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
 
     @pytest.mark.asyncio
