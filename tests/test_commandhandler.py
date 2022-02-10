@@ -341,14 +341,22 @@ class TestPrefixHandler(BaseTest):
     def test_edit_prefix(self):
         handler = self.make_default_handler()
         handler.prefix = ['?', '§']
-        assert handler._commands == list(combinations(['?', '§'], self.COMMANDS))
+        assert handler._commands == set(combinations(['?', '§'], self.COMMANDS))
+        handler.prefix = {'!', '%'}
+        assert handler._commands == set(combinations(['!', '%'], self.COMMANDS))
         handler.prefix = '+'
-        assert handler._commands == list(combinations(['+'], self.COMMANDS))
+        assert handler._commands == set(combinations(['+'], self.COMMANDS))
 
     def test_edit_command(self):
         handler = self.make_default_handler()
         handler.command = 'foo'
-        assert handler._commands == list(combinations(self.PREFIXES, ['foo']))
+        assert handler._commands == set(combinations(self.PREFIXES, ['foo']))
+
+        handler.command = {'foo', 'bar'}
+        assert handler._commands == set(combinations(self.PREFIXES, ['foo', 'bar']))
+
+        handler.command = ['foo', 'bar']
+        assert handler._commands == set(combinations(self.PREFIXES, ['foo', 'bar']))
 
     def test_basic_after_editing(self, dp, prefix, command):
         """Test the basic expected response from a prefix handler"""

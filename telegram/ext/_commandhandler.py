@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CommandHandler and PrefixHandler classes."""
 import re
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Dict, List, Set, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
 from telegram.ext import filters as filters_module, Handler
@@ -71,7 +71,7 @@ class CommandHandler(Handler[Update, CCT]):
         ValueError: when command is too long or has illegal chars.
 
     Attributes:
-        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
+        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`] | Set[:obj:`str`]):
             The command or list of commands this handler should listen for.
             Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler.
@@ -237,7 +237,7 @@ class PrefixHandler(CommandHandler):
 
         self._prefix: List[str] = []
         self._command: List[str] = []
-        self._commands: List[str] = []
+        self._commands: Set[str] = set()
 
         super().__init__(
             'nocommand',
@@ -261,11 +261,11 @@ class PrefixHandler(CommandHandler):
         return self._prefix
 
     @prefix.setter
-    def prefix(self, prefix: Union[str, List[str]]) -> None:
+    def prefix(self, prefix: Union[str, List[str], Set[str]]) -> None:
         if isinstance(prefix, str):
             self._prefix = [prefix.lower()]
         else:
-            self._prefix = prefix
+            self._prefix = list(prefix)
         self._build_commands()
 
     @property  # type: ignore[override]
@@ -279,15 +279,15 @@ class PrefixHandler(CommandHandler):
         return self._command
 
     @command.setter
-    def command(self, command: Union[str, List[str]]) -> None:
+    def command(self, command: Union[str, List[str], Set[str]]) -> None:
         if isinstance(command, str):
             self._command = [command.lower()]
         else:
-            self._command = command
+            self._command = list(command)
         self._build_commands()
 
     def _build_commands(self) -> None:
-        self._commands = [x.lower() + y.lower() for x in self.prefix for y in self.command]
+        self._commands = {x.lower() + y.lower() for x in self.prefix for y in self.command}
 
     def check_update(
         self, update: object

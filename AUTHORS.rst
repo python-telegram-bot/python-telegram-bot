@@ -76,6 +76,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `LRezende <https://github.com/lrezende>`_
 - `macrojames <https://github.com/macrojames>`_
 - `Matheus Lemos <https://github.com/mlemosf>`_
+- `Mehrshad Firouzian <https://github.com/mehrfirouzian>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
