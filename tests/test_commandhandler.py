@@ -185,6 +185,22 @@ class TestCommandHandler(BaseTest):
         assert is_match(handler, make_command_update('/star'))
         assert not is_match(handler, make_command_update('/stop'))
 
+    def test_edit_commands(self):
+        """A command handler which its commands are changed should change as well"""
+        handler = CommandHandler(['test', 'star'], self.callback_basic)
+        assert is_match(handler, make_command_update('/test'))
+        handler.commands = "help"
+        assert is_match(handler, make_command_update('/help'))
+        handler.commands = ['exit', 'happy']
+        assert is_match(handler, make_command_update('/happy'))
+
+    def test_get_commands(self):
+        """Test if command handler shows its commands"""
+        handler = CommandHandler(['test', 'start'], self.callback_basic)
+        assert handler.commands == {'test', 'start'}
+        handler = CommandHandler('test', self.callback_basic)
+        assert handler.commands == {'test'}
+
     def test_edited(self, command_message):
         """Test that a CH responds to an edited message if its filters allow it"""
         handler_edited = self.make_default_handler()
@@ -338,6 +354,13 @@ class TestPrefixHandler(BaseTest):
         assert not is_match(handler, make_message_update('/test'))
         assert not mock_filter.tested
 
+    def test_get_prefixes(self):
+        handler = self.make_default_handler()
+        handler.prefixes = ['?', '§']
+        assert handler.prefixes == {'?', '§'}
+        handler.prefixes = ('[', '§')
+        assert handler.prefixes != {'?', '['}
+
     def test_edit_prefix(self):
         handler = self.make_default_handler()
         handler.prefixes = ['?', '§']
@@ -346,6 +369,13 @@ class TestPrefixHandler(BaseTest):
         assert handler._combinations == set(combinations(['!', '%'], self.COMMANDS))
         handler.prefixes = '+'
         assert handler._combinations == set(combinations(['+'], self.COMMANDS))
+
+    def test_get_commands(self):
+        handler = self.make_default_handler()
+        handler.commands = ['hello', 'start']
+        assert handler.commands == {'start', 'hello'}
+        handler.commands = 'start'
+        assert handler.commands == {'start'}
 
     def test_edit_command(self):
         handler = self.make_default_handler()
