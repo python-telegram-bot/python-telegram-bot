@@ -28,10 +28,49 @@ from typing import (
     cast,
 )
 
+from telegram import Bot
 from telegram._utils.types import FilePathInput
+from telegram._utils.warnings import warn
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
+
+_REPLACED_KNOWN_BOT = "known_bot"
+_REPLACED_UNKNOWN_BOT = "unknown_bot"
+
+
+class BotPickler(pickle.Pickler):
+    def __init__(self, file, bot):
+        super().__init__(file)
+        self._bot = bot
+
+    def persistent_id(self, obj):
+        # print('in pickle persistent_id')
+        if obj is self._bot:
+            # print("found bot to replace", _REPLACED_KNOWN_BOT)
+            return _REPLACED_KNOWN_BOT
+        elif isinstance(obj, Bot):
+            # TODO: test stacklevel
+            warn('Unknown bot instance found. Will be replaced by `None` during pickling',
+                 stacklevel=3)
+            return _REPLACED_UNKNOWN_BOT
+        return None  # pickles as usual
+
+
+class BotUnpickler(pickle.Unpickler):
+    def __init__(self, file, bot):
+        super().__init__(file)
+        self._bot = bot
+
+    def persistent_load(self, pid):
+        # print('in unpickler persistent_id')
+        # print(pid)
+        if pid == _REPLACED_KNOWN_BOT:
+            # print('pid is bot')
+            return self._bot
+        elif pid == _REPLACED_UNKNOWN_BOT:
+            # print('pid is not bot')
+            return None
 
 
 class PicklePersistence(BasePersistence[UD, CD, BD]):
@@ -41,15 +80,10 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         The interface provided by this class is intended to be accessed exclusively by
         :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
         interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
-
-    Warning:
-        :class:`PicklePersistence` will try to replace :class:`telegram.Bot` instances by
-        :attr:`~telegram.ext.BasePersistence.REPLACED_BOT` and insert the bot set with
-        :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
-        that changes to the bot apply to the saved objects, too. If you change the bots token, this
-        may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
-        :meth:`telegram.ext.BasePersistence.replace_bot` and
-        :meth:`telegram.ext.BasePersistence.insert_bot`.
+    Note:
+        :class:`PicklePersistence` will automatically replace :class:`telegram.Bot` instances with
+        :attr:`~BasePersistence.bot`. So, if you for e.g. change the bot's token, you do *not* need
+        to manually call :meth:`~BasePersistence.set_bot`.
 
     .. versionchanged:: 14.0
 
@@ -151,7 +185,11 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def _load_singlefile(self) -> None:
         try:
             with self.filepath.open("rb") as file:
-                data = pickle.load(file)
+                if self.bot is None:
+                    data = pickle.load(file)
+                else:
+                    data = BotUnpickler(file, self.bot).load()
+
             self.user_data = data['user_data']
             self.chat_data = data['chat_data']
             # For backwards compatibility with files not containing bot data
@@ -170,11 +208,13 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         except Exception as exc:
             raise TypeError(f"Something went wrong unpickling {self.filepath.name}") from exc
 
-    @staticmethod
-    def _load_file(filepath: Path) -> Any:
+    def _load_file(self, filepath: Path) -> Any:
         try:
             with filepath.open("rb") as file:
-                return pickle.load(file)
+                if self.bot is None:
+                    return pickle.load(file)
+                return BotUnpickler(file, self.bot).load()
+
         except OSError:
             return None
         except pickle.UnpicklingError as exc:
@@ -191,12 +231,17 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             'callback_data': self.callback_data,
         }
         with self.filepath.open("wb") as file:
-            pickle.dump(data, file)
+            if self.bot is None:
+                pickle.dump(data, file)
+            else:
+                BotPickler(file, self.bot).dump(data)
 
-    @staticmethod
-    def _dump_file(filepath: Path, data: object) -> None:
+    def _dump_file(self, filepath: Path, data: object) -> None:
         with filepath.open("wb") as file:
-            pickle.dump(data, file)
+            if self.bot is None:
+                pickle.dump(data, file)
+            else:
+                BotPickler(file, self.bot).dump(data)
 
     def get_user_data(self) -> Dict[int, UD]:
         """Returns the user_data from the pickle file if it exists or an empty :obj:`dict`.

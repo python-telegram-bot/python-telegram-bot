@@ -22,6 +22,7 @@
 
 import functools
 import logging
+import pickle
 from datetime import datetime
 
 from typing import (
@@ -5611,6 +5612,9 @@ class Bot(TelegramObject):
 
     def __hash__(self) -> int:
         return hash(self.bot)
+
+    def __reduce__(self):
+        raise pickle.PicklingError('Bot objects cannot be pickled!')
 
     # camelCase aliases
     getMe = get_me

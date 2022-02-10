@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
+from copy import deepcopy
 try:
     import ujson as json
 except ImportError:
@@ -53,15 +54,12 @@ class TelegramObject:
         _bot: Optional['Bot']
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
-    __slots__ = (
-        '_id_attrs',
-        '_bot',
-    )
+    __slots__ = ('_id_attrs', '_bot')
 
     # pylint: disable=unused-argument
     def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':
         # We add _id_attrs in __new__ instead of __init__ since we want to add this to the slots
-        # w/o calling __init__ in all of the subclasses. This is what we also do in BaseFilter.
+        # w/o calling __init__ in all of the subclasses.
         instance = super().__new__(cls)
         instance._id_attrs = ()
         instance._bot = None
@@ -211,3 +209,14 @@ class TelegramObject:
         if self._id_attrs:
             return hash((self.__class__, self._id_attrs))
         return super().__hash__()
+
+    def __getstate__(self):
+        return self.to_dict()
+
+    def __setstate__(self, state):
+        self.__init__(**state)
+
+    def __deepcopy__(self, memodict):
+        copy = self.__class__(**deepcopy(self.__getstate__(), memodict))
+        copy.set_bot(self.get_bot())
+        return copy
