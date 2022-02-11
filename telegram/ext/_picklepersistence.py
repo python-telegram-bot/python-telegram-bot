@@ -35,11 +35,11 @@ from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 
-_REPLACED_KNOWN_BOT = "known_bot"
-_REPLACED_UNKNOWN_BOT = "unknown_bot"
+_REPLACED_KNOWN_BOT = "a known bot replaced by PTB's PicklePersistence"
+_REPLACED_UNKNOWN_BOT = "an unknown bot replaced by PTB's PicklePersistence"
 
 
-class BotPickler(pickle.Pickler):
+class _BotPickler(pickle.Pickler):
     def __init__(self, file, bot):
         super().__init__(file)
         self._bot = bot
@@ -57,7 +57,7 @@ class BotPickler(pickle.Pickler):
         return None  # pickles as usual
 
 
-class BotUnpickler(pickle.Unpickler):
+class _BotUnpickler(pickle.Unpickler):
     def __init__(self, file, bot):
         super().__init__(file)
         self._bot = bot
@@ -80,10 +80,12 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         The interface provided by this class is intended to be accessed exclusively by
         :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
         interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+
     Note:
-        :class:`PicklePersistence` will automatically replace :class:`telegram.Bot` instances with
-        :attr:`~BasePersistence.bot`. So, if you for e.g. change the bot's token, you do *not* need
-        to manually call :meth:`~BasePersistence.set_bot`.
+        This implementation of :class:`BasePersistence` uses the functionality of the pickle module
+        to support serialization of bot instances. Specifically any reference to
+        :attr:`~BasePersistence.bot` will be replaced by a placeholder before pickling and
+        :attr:`~BasePersistence.bot` will be inserted back when loading the data.
 
     .. versionchanged:: 14.0
 
@@ -185,10 +187,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def _load_singlefile(self) -> None:
         try:
             with self.filepath.open("rb") as file:
-                if self.bot is None:
-                    data = pickle.load(file)
-                else:
-                    data = BotUnpickler(file, self.bot).load()
+                data = _BotUnpickler(file, self.bot).load()
 
             self.user_data = data['user_data']
             self.chat_data = data['chat_data']
@@ -211,9 +210,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def _load_file(self, filepath: Path) -> Any:
         try:
             with filepath.open("rb") as file:
-                if self.bot is None:
-                    return pickle.load(file)
-                return BotUnpickler(file, self.bot).load()
+                return _BotUnpickler(file, self.bot).load()
 
         except OSError:
             return None
@@ -231,17 +228,11 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             'callback_data': self.callback_data,
         }
         with self.filepath.open("wb") as file:
-            if self.bot is None:
-                pickle.dump(data, file)
-            else:
-                BotPickler(file, self.bot).dump(data)
+            _BotPickler(file, self.bot).dump(data)
 
     def _dump_file(self, filepath: Path, data: object) -> None:
         with filepath.open("wb") as file:
-            if self.bot is None:
-                pickle.dump(data, file)
-            else:
-                BotPickler(file, self.bot).dump(data)
+            _BotPickler(file, self.bot).dump(data)
 
     def get_user_data(self) -> Dict[int, UD]:
         """Returns the user_data from the pickle file if it exists or an empty :obj:`dict`.

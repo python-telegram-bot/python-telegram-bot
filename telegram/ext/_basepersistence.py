@@ -89,14 +89,23 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     :meth:`update_bot_data` or :meth:`refresh_bot_data`.
 
     Note:
-        You should avoid saving :class:`telegram.Bot` instances, this is because if you change
-        the bots token, this may lead to e.g. ``Chat not found`` errors. To prevent this, the
-        persistence *may* automatically use :attr:`bot` to replace the bot. Otherwise, you must
-        manually set the bot with :meth:`set_bot` upon loading of the data.
+       You should avoid saving :class:`telegram.Bot` instances. This is because if you change e.g.
+       the bots token, this won't propagate to the serialized instances and may lead to exceptions.
+
+       To prevent this, the implementation may use :attr:`bot` to replace bot instances with a
+       placeholder before serialization and insert :attr:`bot` back when loading the data.
+       Since :attr:`bot` will be set when the process starts, this will be the up-to-date bot
+       instance.
+
+       If the persistence implementation does not take care of this, you should make sure not to
+       store any bot instances in the data that will be persisted. E.g. in case of
+       :class:`telegram.TelegramObject`, one may call :meth:`set_bot` to ensure that shortcuts like
+       :meth:`telegram.Message.reply_text` are available.
 
     .. versionchanged:: 14.0
         * The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
-        * ``insert/replace_bot`` was dropped since it was error-prone and had considerable overhead
+        * ``insert/replace_bot`` was dropped. Serialization of bot instances now needs to be
+          handled by the specific implementation - see above note.
 
     Args:
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
@@ -106,6 +115,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.
+        bot (:class:`telegram.Bot`): The bot associated with the persistence.
     """
 
     __slots__ = ('bot', 'store_data')

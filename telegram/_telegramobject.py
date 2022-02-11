@@ -41,6 +41,10 @@ class TelegramObject:
     is equivalent to ``telegram_object.attribute_name``. If the object does not have an attribute
     with the appropriate name, a :exc:`KeyError` will be raised.
 
+    When objects of this type are pickled, the :class:`~telegram.Bot` attribute associated with the
+    object will be removed. However, when deepcopying the object, the :class:`~telegram.Bot`
+    attribute is *not* removed.
+
     .. versionchanged:: 14.0
         ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
         special cases like :attr:`Message.from_user` that deviate from the official Bot API.
@@ -211,12 +215,31 @@ class TelegramObject:
         return super().__hash__()
 
     def __getstate__(self):
-        return self.to_dict()
+        """
+        This method is used for pickling. We remove the bot attribute of the object since those
+        are not pickable.
+        """
+        # Adapted from self.to_dict()
+        data = {}
+        attrs = {attr for cls in self.__class__.__mro__[:-2] for attr in cls.__slots__}
+        for key in attrs:
+            if key == 'bot' or key.startswith('_'):
+                continue
+
+            value = getattr(self, key, None)
+            if value is not None:
+                data[key] = value
+        return data
 
     def __setstate__(self, state):
+        """
+        This method is used for unpickling. The data, which is in the form a dictionary, is
+        converted back into a class.
+        """
         self.__init__(**state)
 
     def __deepcopy__(self, memodict):
+        """This method deepcopies the object and sets the bot on the newly created copy."""
         copy = self.__class__(**deepcopy(self.__getstate__(), memodict))
         copy.set_bot(self.get_bot())
         return copy
