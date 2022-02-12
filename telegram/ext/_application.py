@@ -548,12 +548,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         )
 
     def __run(self, updater_coroutine: Coroutine, ready: asyncio.Event = None) -> None:
-        loop = asyncio.get_event_loop()
+        # TODO: get_event_loop is deprecated - switch to get_running_loop()
+        loop = asyncio.get_event_loop()  # get_running_loop()
         loop.run_until_complete(self.initialize())
         loop.run_until_complete(self.start(ready=ready))
         loop.run_until_complete(updater_coroutine)
         try:
             loop.run_forever()
+        # TODO: maybe allow for custom exception classes to catch here? Or provide a custom one?
         except (KeyboardInterrupt, SystemExit):
             loop.run_until_complete(self.stop())
             loop.run_until_complete(self.shutdown())
