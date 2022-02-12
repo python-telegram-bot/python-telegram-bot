@@ -129,12 +129,13 @@ class HTTPXRequest(BaseRequest):
         if isinstance(pool_timeout, DefaultValue):
             pool_timeout = self._client.timeout.pool
 
-        if pool_timeout != 0 and self.__pool_semaphore.locked():
-            _logger.debug(
-                'All connections in the pool are currently busy. Waiting pool_timeout=%s for '
-                'a connection to become available.',
-                pool_timeout,
-            )
+        # TODO: This doesn't seem to work.
+        # if pool_timeout != 0 and self.__pool_semaphore.locked():
+        #     _logger.debug(
+        #         'All connections in the pool are currently busy. Waiting pool_timeout=%s for '
+        #         'a connection to become available.',
+        #         pool_timeout,
+        #     )
 
         try:
             await asyncio.wait_for(self.__pool_semaphore.acquire(), timeout=pool_timeout)
@@ -145,6 +146,7 @@ class HTTPXRequest(BaseRequest):
             out = await self._do_request(
                 url=url,
                 method=method,
+                pool_timeout=pool_timeout,
                 request_data=request_data,
                 connect_timeout=connect_timeout,
                 read_timeout=read_timeout,
@@ -158,6 +160,7 @@ class HTTPXRequest(BaseRequest):
         self,
         url: str,
         method: str,
+        pool_timeout: Optional[float],
         request_data: RequestData = None,
         connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
@@ -167,7 +170,7 @@ class HTTPXRequest(BaseRequest):
             connect=self._client.timeout.connect,
             read=self._client.timeout.read,
             write=self._client.timeout.write,
-            pool=1,
+            pool=pool_timeout,
         )
         if not isinstance(read_timeout, DefaultValue):
             timeout.read = read_timeout

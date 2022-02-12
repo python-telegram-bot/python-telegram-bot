@@ -18,7 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Here we run tests directly with HTTPXRequest because that's easier than providing dummy
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
+import asyncio
 import json
+import logging
 from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Tuple, Any, Coroutine, Callable
@@ -38,7 +40,6 @@ from telegram.error import (
     Conflict,
     TimedOut,
 )
-from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 
 # We only need the first fixture, but it uses the others, so pytest needs us to import them as well
@@ -239,7 +240,7 @@ class TestRequest:
             (
                 RuntimeError('CustomError'),
                 Exception,
-                "HTTP implementation: RuntimeError\('CustomError'\)",
+                r"HTTP implementation: RuntimeError\('CustomError'\)",
             ),
         ],
     )
@@ -292,8 +293,6 @@ class TestRequest:
 
 
 class TestHTTPXRequest:
-    # TODO: Properly timeouts
-
     test_flag = None
 
     @pytest.fixture(autouse=True)
@@ -368,65 +367,86 @@ class TestHTTPXRequest:
         assert self.test_flag == 'stop'
 
     @pytest.mark.asyncio
-    async def test_do_request_default_timeouts(self, monkeypatch, httpx_request):
-        default_timeouts = httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
+    async def test_do_request_default_timeouts(self, monkeypatch):
+        default_timeouts = httpx.Timeout(connect=42, read=43, write=44, pool=45)
 
-        async def make_assertion(self, method, url, headers, timeout, files, data):
-            self.test_flag = timeout == default_timeouts
+        async def make_assertion(_, **kwargs):
+            self.test_flag = kwargs.get('timeout') == default_timeouts
             return httpx.Response(HTTPStatus.OK)
 
-        monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
-        await httpx_request.do_request('GET', 'URL')
-        assert httpx_request._client.timeout == default_timeouts
+        async with HTTPXRequest(
+            connect_timeout=default_timeouts.connect,
+            read_timeout=default_timeouts.read,
+            write_timeout=default_timeouts.write,
+            pool_timeout=default_timeouts.pool,
+        ) as httpx_request:
+
+            monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
+            await httpx_request.do_request(method='GET', url='URL')
+
+        assert self.test_flag
 
     @pytest.mark.asyncio
     async def test_do_request_manual_timeouts(self, monkeypatch, httpx_request):
-        default_timeouts = httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
+        default_timeouts = httpx.Timeout(connect=42, read=43, write=44, pool=45)
+        manual_timeouts = httpx.Timeout(connect=52, read=53, write=54, pool=55)
 
-        async def make_assertion(self, method, url, headers, timeout, files, data):
-            self.test_flag = timeout == httpx.Timeout(connect=5.0, read=5.5, write=5.6, pool=1.0)
+        async def make_assertion(_, **kwargs):
+            print(kwargs.get('timeout'), manual_timeouts)
+            self.test_flag = kwargs.get('timeout') == manual_timeouts
             return httpx.Response(HTTPStatus.OK)
 
-        monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
-        await httpx_request.do_request('GET', 'URL', read_timeout=5.5, write_timeout=5.6)
-        assert httpx_request._client.timeout == default_timeouts
+        async with HTTPXRequest(
+            connect_timeout=default_timeouts.connect,
+            read_timeout=default_timeouts.read,
+            write_timeout=default_timeouts.write,
+            pool_timeout=default_timeouts.pool,
+        ) as httpx_request:
+
+            monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
+            await httpx_request.do_request(
+                method='GET',
+                url='URL',
+                connect_timeout=manual_timeouts.connect,
+                read_timeout=manual_timeouts.read,
+                write_timeout=manual_timeouts.write,
+                pool_timeout=manual_timeouts.pool,
+            )
+
+        assert self.test_flag
 
     @pytest.mark.asyncio
     async def test_do_request_params_no_data(self, monkeypatch, httpx_request):
-        async def make_assertion(self, method, url, headers, timeout, files, data):
-            method_assertion = method == 'method'
-            url_assertion = url == 'url'
-            files_assertion = files is None
-            data_assertion = data is None
+        async def make_assertion(self, **kwargs):
+            method_assertion = kwargs.get('method') == 'method'
+            url_assertion = kwargs.get('url') == 'url'
+            files_assertion = kwargs.get('files') is None
+            data_assertion = kwargs.get('data') is None
             if method_assertion and url_assertion and files_assertion and data_assertion:
                 return httpx.Response(HTTPStatus.OK)
             return httpx.Response(HTTPStatus.BAD_REQUEST)
 
         monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
-        code, _ = await httpx_request.do_request(
-            'method', 'url', read_timeout=5.5, write_timeout=5.6
-        )
+        code, _ = await httpx_request.do_request(method='method', url='url')
         assert code == HTTPStatus.OK
 
     @pytest.mark.asyncio
     async def test_do_request_params_with_data(
         self, monkeypatch, httpx_request, mixed_rqs  # noqa: 9811
     ):
-        async def make_assertion(self, method, url, headers, timeout, files, data):
-            method_assertion = method == 'method'
-            url_assertion = url == 'url'
-            files_assertion = files == mixed_rqs.multipart_data
-            data_assertion = data == mixed_rqs.json_parameters
+        async def make_assertion(self, **kwargs):
+            method_assertion = kwargs.get('method') == 'method'
+            url_assertion = kwargs.get('url') == 'url'
+            files_assertion = kwargs.get('files') == mixed_rqs.multipart_data
+            data_assertion = kwargs.get('data') == mixed_rqs.json_parameters
             if method_assertion and url_assertion and files_assertion and data_assertion:
                 return httpx.Response(HTTPStatus.OK)
             return httpx.Response(HTTPStatus.BAD_REQUEST)
 
         monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
         code, _ = await httpx_request.do_request(
-            'method',
-            'url',
-            read_timeout=5.5,
-            write_timeout=5.6,
+            method='method',
+            url='url',
             request_data=mixed_rqs,
         )
         assert code == HTTPStatus.OK
@@ -462,3 +482,93 @@ class TestHTTPXRequest:
                 'method',
                 'url',
             )
+
+    @pytest.mark.asyncio
+    async def test_do_request_pool_timeout(self, monkeypatch):
+        async def request(self, **kwargs):
+            await asyncio.sleep(0.05)
+            return httpx.Response(HTTPStatus.OK)
+
+        monkeypatch.setattr(httpx.AsyncClient, 'request', request)
+
+        with pytest.raises(TimedOut, match='Pool timeout'):
+            async with HTTPXRequest(pool_timeout=0.02) as httpx_request:
+                await asyncio.gather(
+                    httpx_request.do_request(method='GET', url='URL'),
+                    httpx_request.do_request(method='GET', url='URL'),
+                )
+
+    @pytest.mark.asyncio
+    async def test_do_request_wait_for_pool(self, monkeypatch, httpx_request):
+        async def request(_, **kwargs):
+            await asyncio.sleep(0.05)
+            if self.test_flag is None:
+                self.test_flag = 1
+            else:
+                self.test_flag += 1
+            return httpx.Response(HTTPStatus.OK)
+
+        monkeypatch.setattr(httpx.AsyncClient, 'request', request)
+
+        task_1 = asyncio.create_task(httpx_request.do_request(method='GET', url='URL'))
+        task_2 = asyncio.create_task(httpx_request.do_request(method='GET', url='URL'))
+        await asyncio.sleep(0.07)
+        assert self.test_flag == 1
+        await asyncio.sleep(0.07)
+        assert self.test_flag == 2
+        await asyncio.gather(task_1, task_2)
+
+    @pytest.mark.asyncio
+    async def test_do_request_wait_for_pool_with_exception(self, monkeypatch, httpx_request):
+        async def request(_, **kwargs):
+            await asyncio.sleep(0.05)
+            if self.test_flag is None:
+                self.test_flag = 1
+                raise RuntimeError('Raising Exception')
+            else:
+                self.test_flag += 1
+            return httpx.Response(HTTPStatus.OK)
+
+        monkeypatch.setattr(httpx.AsyncClient, 'request', request)
+
+        task_1 = asyncio.create_task(httpx_request.do_request(method='GET', url='URL'))
+        task_2 = asyncio.create_task(httpx_request.do_request(method='GET', url='URL'))
+        await asyncio.sleep(0.06)
+        assert self.test_flag == 1
+        await asyncio.sleep(0.06)
+        assert self.test_flag == 2
+        out = await asyncio.gather(task_1, task_2, return_exceptions=True)
+        assert sum(isinstance(entry, RuntimeError) for entry in out) == 1
+
+    @pytest.mark.asyncio
+    async def test_do_request_critical_timeout_logging(self, httpx_request, caplog, monkeypatch):
+        async def request(self, **kwargs):
+            raise httpx.PoolTimeout('pool timeout')
+
+        monkeypatch.setattr(httpx.AsyncClient, 'request', request)
+
+        with pytest.raises(TimedOut):
+            with caplog.at_level(logging.CRITICAL):
+                await httpx_request.do_request(method='GET', url='URL')
+
+        assert len(caplog.records) == 1
+        assert (
+            'All connections in the connection pool are occupied' in caplog.records[0].getMessage()
+        )
+
+    # @pytest.mark.asyncio
+    # async def test_do_request_busy_logging(self, httpx_request, caplog, monkeypatch):
+    #     async def request(self, **kwargs):
+    #         await asyncio.sleep(0.5)
+    #         return httpx.Response(HTTPStatus.OK)
+    #
+    #     monkeypatch.setattr(httpx.AsyncClient, 'request', request)
+    #
+    #     with caplog.at_level(logging.DEBUG):
+    #         await asyncio.gather(
+    #             httpx_request.do_request(method='GET', url='URL'),
+    #             httpx_request.do_request(method='GET', url='URL'),
+    #         )
+    #
+    #     assert len(caplog.records) == 1
+    #     assert 'currently busy. Waiting pool_timeout' in caplog.records[0].getMessage()
