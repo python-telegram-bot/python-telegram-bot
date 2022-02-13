@@ -624,6 +624,11 @@ class Job:
             await self.callback(context)
         except Exception as exc:
             await application.create_task(application.dispatch_error(None, exc, job=self))
+        finally:
+            # This is internal logic of application - let's keep it private for now
+            application._mark_update_for_persistence_update(  # pylint: disable=protected-access
+                job=self
+            )
 
     def schedule_removal(self) -> None:
         """

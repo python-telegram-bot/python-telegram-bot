@@ -58,6 +58,9 @@ _T = TypeVar('_T')
 #   For methods like `pop`, `get`, `setdefault`, we should also check that we have the same
 #   behavior as defaultdict
 
+# TODO: We currently don't use `track_read=True` anywhere. We might want to drop that for
+#  ease of maintenance
+
 
 class TrackingDefaultDict(MutableMapping[_KT, _VT]):
     """DefaultDict that keeps track of which keys where accessed.

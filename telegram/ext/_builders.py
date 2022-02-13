@@ -424,8 +424,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def get_updates_request(self: BuilderType, request: BaseRequest) -> BuilderType:
-        """Sets a :class:`telegram.request.BaseRequest` object to be used for the ``get_updates_request``
-        parameter of :attr:`telegram.ext.Application.bot`.
+        """Sets a :class:`telegram.request.BaseRequest` object to be used for the
+        :paramref:`~telegram.Bot.get_updates_request` parameter of
+        :attr:`telegram.ext.Application.bot`.
 
         .. seealso:: :meth:`request`
 

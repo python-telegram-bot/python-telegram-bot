@@ -41,10 +41,10 @@ from typing import (
     Any,
     Set,
     Mapping,
-    cast,
-    MutableMapping,
+    DefaultDict,
 )
 
+from telegram import Update
 from telegram._utils.types import DVInput, ODVInput
 from telegram.error import TelegramError
 from telegram.ext import BasePersistence, ContextTypes, ExtBot, Updater
@@ -167,12 +167,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         '__update_persistence_task',
         '__weakref__',
         '_chat_data',
+        '_chat_ids_to_be_deleted_in_persistence',
+        '_chat_ids_to_be_updated_in_persistence',
         '_concurrent_updates',
         '_concurrent_updates_sem',
         '_conversation_handler_conversations',
         '_initialized',
         '_running',
         '_user_data',
+        '_user_ids_to_be_deleted_in_persistence',
+        '_user_ids_to_be_updated_in_persistence',
         'bot',
         'bot_data',
         'chat_data',
@@ -224,30 +228,22 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             self.job_queue.set_application(self)
 
         self.bot_data = self.context_types.bot_data()
+        self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
+        self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
+        # Read only mapping
+        self.user_data: Mapping[int, UD] = MappingProxyType(self._user_data)
+        self.chat_data: Mapping[int, CD] = MappingProxyType(self._chat_data)
+
         self.persistence: Optional[BasePersistence] = None
         if persistence and not isinstance(persistence, BasePersistence):
             raise TypeError("persistence must be based on telegram.ext.BasePersistence")
         self.persistence = persistence
-        # Track access to chat_ids only if necessary for the persistence
-        if self.persistence and self.persistence.store_data.user_data:
-            self._user_data: MutableMapping[int, UD] = TrackingDefaultDict(
-                default_factory=self.context_types.user_data, track_read=True, track_write=True
-            )
-        else:
-            self._user_data = defaultdict(self.context_types.user_data)
-        # Track access to user_ids only if necessary for the persistence
-        if self.persistence and self.persistence.store_data.chat_data:
-            self._chat_data: MutableMapping[int, CD] = TrackingDefaultDict(
-                # track_write = True for self.migrate_chat_data
-                default_factory=self.context_types.chat_data,
-                track_read=True,
-                track_write=True,
-            )
-        else:
-            self._chat_data = defaultdict(self.context_types.chat_data)
-        # Read only mapping
-        self.user_data: Mapping[int, UD] = MappingProxyType(self._user_data)
-        self.chat_data: Mapping[int, CD] = MappingProxyType(self._chat_data)
+
+        # Some book keeping for persistence logic
+        self._chat_ids_to_be_updated_in_persistence: Set[int] = set()
+        self._user_ids_to_be_updated_in_persistence: Set[int] = set()
+        self._chat_ids_to_be_deleted_in_persistence: Set[int] = set()
+        self._user_ids_to_be_deleted_in_persistence: Set[int] = set()
 
         # This attribute will hold references to the conversation dicts of all conversation
         # handlers so that we can extract the changed states during `update_persistence`
@@ -339,13 +335,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             return
 
         if self.persistence.store_data.user_data:
-            cast(TrackingDefaultDict, self._user_data).update_no_track(
-                await self.persistence.get_user_data()
-            )
+            self._user_data.update(await self.persistence.get_user_data())
         if self.persistence.store_data.chat_data:
-            cast(TrackingDefaultDict, self._chat_data).update_no_track(
-                await self.persistence.get_chat_data()
-            )
+            self._chat_data.update(await self.persistence.get_chat_data())
         if self.persistence.store_data.bot_data:
             self.bot_data = await self.persistence.get_bot_data()
             if not isinstance(self.bot_data, self.context_types.bot_data):
@@ -564,18 +556,20 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def create_task(self, coroutine: Coroutine, update: object = None) -> asyncio.Task:
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
-        the ``coroutine`` with :meth:`dispatch_error`.
+        the :paramref:`coroutine` with :meth:`dispatch_error`.
 
         Note:
-            * If ``coroutine`` raises an exception, it will be set on the task created by this
-              method even though it's handled by :meth:`dispatch_error`.
+            * If :paramref:`coroutine` raises an exception, it will be set on the task created by
+              this method even though it's handled by :meth:`dispatch_error`.
             * If the application is currently running, tasks created by this methods will be
               awaited by :meth:`stop`.
 
         Args:
             coroutine: The coroutine to run as task.
             update: Optional. If passed, will be passed to :meth:`dispatch_error` as additional
-                information for the error handlers.
+                information for the error handlers. Moreover, the corresponding :attr:`chat_data`
+                and :attr:`user_data` entries will be updated in the next run of
+                :meth:`update_persistence` after the :paramref:`coroutine` is finished.
 
         Returns:
             :class:`asyncio.Task`: The created task.
@@ -632,9 +626,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 # If we arrive here, an exception happened in the task and was neither
                 # ApplicationHandlerStop nor raised by an error handler.
                 # So we can and must handle it
-                self.create_task(self.dispatch_error(update, exception, coroutine=coroutine))
+                await self.dispatch_error(update, exception, coroutine=coroutine)
 
             raise exception
+        finally:
+            self._mark_update_for_persistence_update(update=update)
 
     async def _update_fetcher(self) -> None:
         # Continuously fetch updates from the queue. Exit only once the signal object is found.
@@ -676,11 +672,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 The update to process.
 
         """
-        # An error happened while polling
-        if isinstance(update, TelegramError):
-            await self.dispatch_error(None, update)
-            return
-
         context = None
 
         for handlers in self.handlers.values():
@@ -708,6 +699,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 if await self.dispatch_error(update, exc):
                     _logger.debug('Error handler stopped further handlers.')
                     break
+
+        self._mark_update_for_persistence_update(update=update)
 
     def add_handler(self, handler: Handler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
@@ -817,29 +810,45 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             if not self.handlers[group]:
                 del self.handlers[group]
 
-    async def drop_chat_data(self, chat_id: int) -> None:
-        """Used for deleting a key from the :attr:`chat_data`.
+    def drop_chat_data(self, chat_id: int) -> None:
+        """Drops the corresponding entry from the :attr:`chat_data`. Will also be deleted from
+        the persistence on the next run of :meth:`update_persistence`, if applicable.
+
+        Warning:
+            When using :paramref:`concurrent_updates` or the :attr:`job_queue`,
+            :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create this entry due to
+            the asynchronous nature of these features. Please make sure that your program can
+            avoid or handle such situations.
 
         .. versionadded:: 14.0
 
         Args:
-            chat_id (:obj:`int`): The chat id to delete from the persistence. The entry
-                will be deleted even if it is not empty.
+            chat_id (:obj:`int`): The chat id to delete. The entry will be deleted even if it is
+                not empty.
         """
         self._chat_data.pop(chat_id, None)  # type: ignore[arg-type]
+        self._chat_ids_to_be_deleted_in_persistence.add(chat_id)
 
-    async def drop_user_data(self, user_id: int) -> None:
-        """Used for deleting a key from the :attr:`user_data`.
+    def drop_user_data(self, user_id: int) -> None:
+        """Drops the corresponding entry from the :attr:`user_data`. Will also be deleted from
+        the persistence on the next run of :meth:`update_persistence`, if applicable.
+
+        Warning:
+            When using :paramref:`concurrent_updates` or the :attr:`job_queue`,
+            :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create this entry due to
+            the asynchronous nature of these features. Please make sure that your program can
+            avoid or handle such situations.
 
         .. versionadded:: 14.0
 
         Args:
-            user_id (:obj:`int`): The user id to delete from the persistence. The entry
-                will be deleted even if it is not empty.
+            user_id (:obj:`int`): The user id to delete. The entry will be deleted even if it is
+                not empty.
         """
         self._user_data.pop(user_id, None)  # type: ignore[arg-type]
+        self._user_ids_to_be_deleted_in_persistence.add(user_id)
 
-    async def migrate_chat_data(
+    def migrate_chat_data(
         self, message: 'Message' = None, old_chat_id: int = None, new_chat_id: int = None
     ) -> None:
         """Moves the contents of :attr:`chat_data` at key old_chat_id to the key new_chat_id.
@@ -849,6 +858,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Warning:
             * Any data stored in :attr:`chat_data` at key `new_chat_id` will be overridden
             * The key `old_chat_id` of :attr:`chat_data` will be deleted
+            * This does not update the :attr:`~telegram.ext.Job.chat_id` attribute of any scheduled
+              :class:`telegram.ext.Job`.
+
+        Warning:
+            When using :paramref:`concurrent_updates` or the :attr:`job_queue`,
+            :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create the old entry due
+            to the asynchronous nature of these features. Please make sure that your program can
+            avoid or handle such situations.
+
         Args:
             message (:class:`telegram.Message`, optional): A message with either
                 :attr:`~telegram.Message.migrate_from_chat_id` or
@@ -880,6 +898,28 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             raise ValueError("old_chat_id and new_chat_id must be integers")
 
         self._chat_data[new_chat_id] = self._chat_data[old_chat_id]
+        self.drop_chat_data(old_chat_id)
+
+        self._chat_ids_to_be_updated_in_persistence.add(new_chat_id)
+        self._chat_ids_to_be_deleted_in_persistence.add(old_chat_id)
+
+    def _mark_update_for_persistence_update(
+        self, *, update: object = None, job: 'Job' = None
+    ) -> None:
+        # TODO: This should be at the end of `Application.process_update`, when the task created
+        #  by `Application.create_task` is done and when a `Job` is done. Add tests to make sure
+        #  that this is happening
+        if isinstance(update, Update):
+            if update.effective_chat:
+                self._chat_ids_to_be_updated_in_persistence.add(update.effective_chat.id)
+            if update.effective_user:
+                self._user_ids_to_be_updated_in_persistence.add(update.effective_user.id)
+
+        if job:
+            if job.chat_id:
+                self._chat_ids_to_be_updated_in_persistence.add(job.chat_id)
+            if job.user_id:
+                self._user_ids_to_be_updated_in_persistence.add(job.user_id)
 
     async def _persistence_updater(self) -> None:
         # Update the persistence in regular intervals. Exit only when the stop event has been set
@@ -893,15 +933,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     self.__update_persistence_event.wait(),
                     timeout=self.persistence.update_interval,
                 )
-            except asyncio.TimeoutError:
                 return
+            except asyncio.TimeoutError:
+                pass
 
     async def update_persistence(self) -> None:
         """Updates :attr:`user_data`, :attr:`chat_data`, :attr:`bot_data` in :attr:`persistence`
         along with :attr:`~telegram.ext.ExtBot.callback_data_cache` and the conversation states of
         any persistent :class:`~telegram.ext.ConversationHandler` registered for this application.
 
-        For :attr:`user_data`, :attr:`chat_data`, only entries accessed since the last run of this
+        For :attr:`user_data`, :attr:`chat_data`, only entries used since the last run of this
         method are updated.
 
         Tip:
@@ -936,28 +977,38 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             coroutines.add(self.persistence.update_bot_data(deepcopy(self.bot_data)))
 
         if self.persistence.store_data.chat_data:
-            # Mypy can't handle the conditional assignment in `__init__`
-            chat_data = cast(TrackingDefaultDict, self._chat_data)
-            for chat_id, data in chat_data.pop_accessed_read_items():
-                coroutines.add(self.persistence.update_chat_data(chat_id, deepcopy(data)))
-            for chat_id, data in chat_data.pop_accessed_write_items():
-                if data is not chat_data.DELETED:
-                    _logger.critical('`Application._chat_data[%s]` was written manually', chat_id)
-                    coroutines.add(self.persistence.update_chat_data(chat_id, deepcopy(data)))
-                else:
-                    coroutines.add(self.persistence.drop_chat_data(chat_id))
+            update_ids = self._chat_ids_to_be_updated_in_persistence
+            self._chat_ids_to_be_updated_in_persistence = set()
+            delete_ids = self._chat_ids_to_be_deleted_in_persistence
+            self._chat_ids_to_be_deleted_in_persistence = set()
+
+            # We don't want to update any data that has been deleted!
+            update_ids -= delete_ids
+            print('deleting chat_ids', delete_ids)
+            print('updating chat_ids', update_ids)
+
+            for chat_id in update_ids:
+                coroutines.add(
+                    self.persistence.update_chat_data(chat_id, deepcopy(self.chat_data[chat_id]))
+                )
+            for chat_id in delete_ids:
+                coroutines.add(self.persistence.drop_chat_data(chat_id))
 
         if self.persistence.store_data.user_data:
-            # Mypy can't handle the conditional assignment in `__init__`
-            user_data = cast(TrackingDefaultDict, self._user_data)
-            for user_id, data in user_data.pop_accessed_read_items():
-                coroutines.add(self.persistence.update_user_data(user_id, deepcopy(data)))
-            for user_id, data in user_data.pop_accessed_write_items():
-                if data is not user_data.DELETED:
-                    _logger.critical('`Application._user_data[%s]` was written manually', user_id)
-                    coroutines.add(self.persistence.update_user_data(user_id, deepcopy(data)))
-                else:
-                    coroutines.add(self.persistence.drop_user_data(user_id))
+            update_ids = self._user_ids_to_be_updated_in_persistence
+            self._user_ids_to_be_updated_in_persistence = set()
+            delete_ids = self._user_ids_to_be_deleted_in_persistence
+            self._user_ids_to_be_deleted_in_persistence = set()
+
+            # We don't want to update any data that has been deleted!
+            update_ids -= delete_ids
+
+            for user_id in update_ids:
+                coroutines.add(
+                    self.persistence.update_user_data(user_id, deepcopy(self.user_data[user_id]))
+                )
+            for user_id in delete_ids:
+                coroutines.add(self.persistence.drop_user_data(user_id))
 
         # Unfortunately due to circular imports this has to be here
         # pylint: disable=import-outside-toplevel

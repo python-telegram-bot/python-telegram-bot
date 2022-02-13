@@ -164,7 +164,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.request.BaseRequest` instances. Will be used for all bot methods
             *except* for :attr:`get_updates`. If not passed, an instance of
             :class:`telegram.request.HTTPXRequest` will be used.
-        request (:class:`telegram.request.BaseRequest`, optional): Pre initialized
+        get_updates_request (:class:`telegram.request.BaseRequest`, optional): Pre initialized
             :class:`telegram.request.BaseRequest` instances. Will be used exclusively for
             :attr:`get_updates`. If not passed, an instance of
             :class:`telegram.request.HTTPXRequest` will be used.
