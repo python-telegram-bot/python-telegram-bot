@@ -20,13 +20,13 @@
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
 import json
-import logging
 from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Tuple, Any, Coroutine, Callable
 
 import httpx
 import pytest
+from flaky import flaky
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import (
@@ -485,8 +485,11 @@ class TestHTTPXRequest:
 
     @pytest.mark.asyncio
     async def test_do_request_pool_timeout(self, monkeypatch):
-        async def request(self, **kwargs):
-            await asyncio.sleep(0.05)
+        async def request(_, **kwargs):
+            if self.test_flag is None:
+                self.test_flag = True
+            else:
+                raise httpx.PoolTimeout('pool timeout')
             return httpx.Response(HTTPStatus.OK)
 
         monkeypatch.setattr(httpx.AsyncClient, 'request', request)
@@ -499,76 +502,19 @@ class TestHTTPXRequest:
                 )
 
     @pytest.mark.asyncio
+    @flaky(3, 1)
     async def test_do_request_wait_for_pool(self, monkeypatch, httpx_request):
-        async def request(_, **kwargs):
-            await asyncio.sleep(0.05)
-            if self.test_flag is None:
-                self.test_flag = 1
-            else:
-                self.test_flag += 1
-            return httpx.Response(HTTPStatus.OK)
+        """The pool logic is buried rather deeply in httpxcore, so we make actual requests here
+        instead of mocking"""
 
-        monkeypatch.setattr(httpx.AsyncClient, 'request', request)
-
-        task_1 = asyncio.create_task(httpx_request.do_request(method='GET', url='URL'))
-        task_2 = asyncio.create_task(httpx_request.do_request(method='GET', url='URL'))
-        await asyncio.sleep(0.07)
-        assert self.test_flag == 1
-        await asyncio.sleep(0.07)
-        assert self.test_flag == 2
-        await asyncio.gather(task_1, task_2)
-
-    @pytest.mark.asyncio
-    async def test_do_request_wait_for_pool_with_exception(self, monkeypatch, httpx_request):
-        async def request(_, **kwargs):
-            await asyncio.sleep(0.05)
-            if self.test_flag is None:
-                self.test_flag = 1
-                raise RuntimeError('Raising Exception')
-            else:
-                self.test_flag += 1
-            return httpx.Response(HTTPStatus.OK)
-
-        monkeypatch.setattr(httpx.AsyncClient, 'request', request)
-
-        task_1 = asyncio.create_task(httpx_request.do_request(method='GET', url='URL'))
-        task_2 = asyncio.create_task(httpx_request.do_request(method='GET', url='URL'))
-        await asyncio.sleep(0.06)
-        assert self.test_flag == 1
-        await asyncio.sleep(0.06)
-        assert self.test_flag == 2
-        out = await asyncio.gather(task_1, task_2, return_exceptions=True)
-        assert sum(isinstance(entry, RuntimeError) for entry in out) == 1
-
-    @pytest.mark.asyncio
-    async def test_do_request_critical_timeout_logging(self, httpx_request, caplog, monkeypatch):
-        async def request(self, **kwargs):
-            raise httpx.PoolTimeout('pool timeout')
-
-        monkeypatch.setattr(httpx.AsyncClient, 'request', request)
-
-        with pytest.raises(TimedOut):
-            with caplog.at_level(logging.CRITICAL):
-                await httpx_request.do_request(method='GET', url='URL')
-
-        assert len(caplog.records) == 1
-        assert (
-            'All connections in the connection pool are occupied' in caplog.records[0].getMessage()
+        task_1 = httpx_request.do_request(
+            method='GET', url='https://python-telegram-bot.org/static/testfiles/telegram.mp4'
         )
-
-    # @pytest.mark.asyncio
-    # async def test_do_request_busy_logging(self, httpx_request, caplog, monkeypatch):
-    #     async def request(self, **kwargs):
-    #         await asyncio.sleep(0.5)
-    #         return httpx.Response(HTTPStatus.OK)
-    #
-    #     monkeypatch.setattr(httpx.AsyncClient, 'request', request)
-    #
-    #     with caplog.at_level(logging.DEBUG):
-    #         await asyncio.gather(
-    #             httpx_request.do_request(method='GET', url='URL'),
-    #             httpx_request.do_request(method='GET', url='URL'),
-    #         )
-    #
-    #     assert len(caplog.records) == 1
-    #     assert 'currently busy. Waiting pool_timeout' in caplog.records[0].getMessage()
+        task_2 = httpx_request.do_request(
+            method='GET', url='https://python-telegram-bot.org/static/testfiles/telegram.mp4'
+        )
+        done, pending = await asyncio.wait({task_1, task_2}, return_when=asyncio.FIRST_COMPLETED)
+        assert len(done) == len(pending) == 1
+        done, pending = await asyncio.wait({task_1, task_2}, return_when=asyncio.ALL_COMPLETED)
+        assert len(done) == 2
+        assert len(pending) == 0

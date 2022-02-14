@@ -16,7 +16,6 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
-import asyncio
 import logging
 from typing import Tuple, Optional
 
@@ -78,7 +77,7 @@ class HTTPXRequest(BaseRequest):
                 connections in the connection pool!
     """
 
-    __slots__ = ('_client', '__pool_semaphore')
+    __slots__ = ('_client',)
 
     def __init__(
         self,
@@ -89,8 +88,6 @@ class HTTPXRequest(BaseRequest):
         write_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
     ):
-        self.__pool_semaphore = asyncio.BoundedSemaphore(connection_pool_size)
-
         timeout = httpx.Timeout(
             connect=connect_timeout,
             read=read_timeout,
@@ -126,58 +123,21 @@ class HTTPXRequest(BaseRequest):
         pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
     ) -> Tuple[int, bytes]:
         """See :meth:`BaseRequest.do_request`."""
+        if isinstance(read_timeout, DefaultValue):
+            read_timeout = self._client.timeout.read
+        if isinstance(write_timeout, DefaultValue):
+            write_timeout = self._client.timeout.write
+        if isinstance(connect_timeout, DefaultValue):
+            connect_timeout = self._client.timeout.connect
         if isinstance(pool_timeout, DefaultValue):
             pool_timeout = self._client.timeout.pool
 
-        # TODO: This doesn't seem to work.
-        # if pool_timeout != 0 and self.__pool_semaphore.locked():
-        #     _logger.debug(
-        #         'All connections in the pool are currently busy. Waiting pool_timeout=%s for '
-        #         'a connection to become available.',
-        #         pool_timeout,
-        #     )
-
-        try:
-            await asyncio.wait_for(self.__pool_semaphore.acquire(), timeout=pool_timeout)
-        except asyncio.TimeoutError as exc:
-            raise TimedOut('Pool timeout') from exc
-
-        try:
-            out = await self._do_request(
-                url=url,
-                method=method,
-                pool_timeout=pool_timeout,
-                request_data=request_data,
-                connect_timeout=connect_timeout,
-                read_timeout=read_timeout,
-                write_timeout=write_timeout,
-            )
-            return out
-        finally:
-            self.__pool_semaphore.release()
-
-    async def _do_request(
-        self,
-        url: str,
-        method: str,
-        pool_timeout: Optional[float],
-        request_data: RequestData = None,
-        connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
-        read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
-        write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
-    ) -> Tuple[int, bytes]:
         timeout = httpx.Timeout(
-            connect=self._client.timeout.connect,
-            read=self._client.timeout.read,
-            write=self._client.timeout.write,
+            connect=connect_timeout,
+            read=read_timeout,
+            write=write_timeout,
             pool=pool_timeout,
         )
-        if not isinstance(read_timeout, DefaultValue):
-            timeout.read = read_timeout
-        if not isinstance(write_timeout, DefaultValue):
-            timeout.write = write_timeout
-        if not isinstance(connect_timeout, DefaultValue):
-            timeout.connect = connect_timeout
 
         # TODO p0: On Linux, use setsockopt to properly set socket level keepalive.
         #          (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 120)
@@ -199,11 +159,13 @@ class HTTPXRequest(BaseRequest):
             )
         except httpx.TimeoutException as err:
             if isinstance(err, httpx.PoolTimeout):
-                _logger.critical(
-                    'All connections in the connection pool are occupied. Request was *not* sent '
-                    'to Telegram. Adjust connection pool size!',
-                )
-                raise TimedOut('Pool timeout') from err
+                raise TimedOut(
+                    message=(
+                        'Pool timeout: All connections in the connection pool are occupied. '
+                        'Request was *not* sent to Telegram. Consider adjusting the connection '
+                        'pool size or the pool timeout.'
+                    )
+                ) from err
             raise TimedOut from err
         except httpx.HTTPError as err:
             # HTTPError must come last as its the base httpx exception class
