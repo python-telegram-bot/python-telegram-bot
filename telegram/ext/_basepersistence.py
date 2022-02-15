@@ -18,14 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
 from abc import ABC, abstractmethod
-from copy import copy
-from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, NamedTuple
+from typing import Dict, Optional, Tuple, Generic, NamedTuple
 
 from telegram import Bot
 from telegram.ext import ExtBot
 
-from telegram.warnings import PTBRuntimeWarning
-from telegram._utils.warnings import warn
 from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 
 

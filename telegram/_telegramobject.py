@@ -18,12 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
 from copy import deepcopy
+
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple
+from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple, Dict, Union
 
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -214,16 +215,16 @@ class TelegramObject:
             return hash((self.__class__, self._id_attrs))
         return super().__hash__()
 
-    def __getstate__(self):
+    def __getstate__(self) -> Dict[str, Union[str, object]]:
         """
         This method is used for pickling. We remove the bot attribute of the object since those
         are not pickable.
         """
-        # Adapted from self.to_dict()
+        # Adapted from self.to_dict(), unlike to_dict(), this is not recursive.
         data = {}
-        attrs = {attr for cls in self.__class__.__mro__[:-2] for attr in cls.__slots__}
+        attrs = {attr for cls in self.__class__.__mro__[:-1] for attr in cls.__slots__}
         for key in attrs:
-            if key == 'bot' or key.startswith('_'):
+            if key.startswith('_'):
                 continue
 
             value = getattr(self, key, None)
@@ -231,15 +232,17 @@ class TelegramObject:
                 data[key] = value
         return data
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict) -> None:
         """
         This method is used for unpickling. The data, which is in the form a dictionary, is
         converted back into a class.
         """
-        self.__init__(**state)
+        self.__class__(**state)
+        if '_bot' in state:
+            self._bot = state['_bot']
 
-    def __deepcopy__(self, memodict):
+    def __deepcopy__(self, memodict: dict) -> object:
         """This method deepcopies the object and sets the bot on the newly created copy."""
         copy = self.__class__(**deepcopy(self.__getstate__(), memodict))
-        copy.set_bot(self.get_bot())
+        copy.set_bot(self._bot)
         return copy

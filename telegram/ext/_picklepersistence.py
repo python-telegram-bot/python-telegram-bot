@@ -28,51 +28,93 @@ from typing import (
     Tuple,
     overload,
     cast,
+    Type,
+    Set,
+    Callable,
 )
 
-from telegram import Bot
+from telegram import Bot, TelegramObject
 from telegram._utils.types import FilePathInput
 from telegram._utils.warnings import warn
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 
+
 _REPLACED_KNOWN_BOT = "a known bot replaced by PTB's PicklePersistence"
 _REPLACED_UNKNOWN_BOT = "an unknown bot replaced by PTB's PicklePersistence"
 
 
-class _BotPickler(pickle.Pickler):
-    def __init__(self, file, bot):
-        super().__init__(file)
-        self._bot = bot
+def _all_subclasses(cls: Type[TelegramObject]) -> Set[Type[TelegramObject]]:
+    """Gets all subclasses of the specified object, recursively. from
+    https://stackoverflow.com/a/3862957/9706202
+    """
+    subclasses = cls.__subclasses__()
+    return set(subclasses).union([s for c in subclasses for s in _all_subclasses(c)])
 
-    def persistent_id(self, obj):
-        # print('in pickle persistent_id')
+
+def _reconstruct_to(cls: Type[TelegramObject], kwargs: dict) -> TelegramObject:
+    """
+    This method is used for unpickling. The data, which is in the form a dictionary, is
+    converted back into a class. Functions the same as :meth:`TelegramObject.__setstate__`
+    """
+    obj = cls(**kwargs)
+    if '_bot' in kwargs:
+        obj.set_bot(kwargs['_bot'])
+    return obj
+
+
+def _custom_reduction(cls: TelegramObject) -> Tuple[Callable, Tuple[Type[TelegramObject], dict]]:
+    """
+    This method is used for pickling. The bot attribute is preserved so _BotPickler().persistent_id
+    works as intended.
+    """
+    # Adapted from self.to_dict(), unlike to_dict(), this is not recursive.
+    data = {}
+    attrs = {attr for cls in cls.__class__.__mro__[:-1] for attr in cls.__slots__}
+    for key in attrs:
+        value = getattr(cls, key, None)
+        if value is not None:
+            data[key] = value
+
+    return _reconstruct_to, (cls.__class__, data)
+
+
+class _BotPickler(pickle.Pickler):
+    # Here we define a private dispatch_table, because we want to preserve the bot attribute of
+    # objects so persistent_id works as intended. Otherwise, the bot attribute is deleted in
+    # __getstate__, which used for regular pickling (via pickle.dumps(...))
+    dispatch_table = copyreg.dispatch_table.copy()  # type: ignore[attr-defined]
+    for obj in _all_subclasses(TelegramObject):
+        dispatch_table[obj] = _custom_reduction
+
+    def __init__(self, bot: Bot, *args: Any, **kwargs: Any):
+        self._bot = bot
+        super().__init__(*args, **kwargs)
+
+    def persistent_id(self, obj: object) -> Optional[str]:
+        """Used to 'mark' the Bot, so it can be replaced later. See
+        https://docs.python.org/3/library/pickle.html#pickle.Pickler.persistent_id for more info
+        """
         if obj is self._bot:
-            # print("found bot to replace", _REPLACED_KNOWN_BOT)
             return _REPLACED_KNOWN_BOT
-        elif isinstance(obj, Bot):
-            # TODO: test stacklevel
-            warn('Unknown bot instance found. Will be replaced by `None` during pickling',
-                 stacklevel=3)
+        if isinstance(obj, Bot):
+            warn(
+                'Unknown bot instance found. Will be replaced by `None` during unpickling',
+                stacklevel=7,
+            )
             return _REPLACED_UNKNOWN_BOT
         return None  # pickles as usual
 
 
 class _BotUnpickler(pickle.Unpickler):
-    def __init__(self, file, bot):
-        super().__init__(file)
+    def __init__(self, bot: Bot, *args: Any, **kwargs: Any):
         self._bot = bot
+        super().__init__(*args, **kwargs)
 
-    def persistent_load(self, pid):
-        # print('in unpickler persistent_id')
-        # print(pid)
-        if pid == _REPLACED_KNOWN_BOT:
-            # print('pid is bot')
-            return self._bot
-        elif pid == _REPLACED_UNKNOWN_BOT:
-            # print('pid is not bot')
-            return None
+    def persistent_load(self, pid: str) -> Optional[Bot]:
+        """Replaces the bot with the current bot if known, else it is replaced by :obj:`None`."""
+        return self._bot if pid == _REPLACED_KNOWN_BOT else None
 
 
 class PicklePersistence(BasePersistence[UD, CD, BD]):
@@ -189,7 +231,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def _load_singlefile(self) -> None:
         try:
             with self.filepath.open("rb") as file:
-                data = _BotUnpickler(file, self.bot).load()
+                data = _BotUnpickler(self.bot, file).load()
 
             self.user_data = data['user_data']
             self.chat_data = data['chat_data']
@@ -212,7 +254,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
     def _load_file(self, filepath: Path) -> Any:
         try:
             with filepath.open("rb") as file:
-                return _BotUnpickler(file, self.bot).load()
+                return _BotUnpickler(self.bot, file).load()
 
         except OSError:
             return None
@@ -230,11 +272,11 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             'callback_data': self.callback_data,
         }
         with self.filepath.open("wb") as file:
-            _BotPickler(file, self.bot).dump(data)
+            _BotPickler(self.bot, file).dump(data)
 
     def _dump_file(self, filepath: Path, data: object) -> None:
         with filepath.open("wb") as file:
-            _BotPickler(file, self.bot).dump(data)
+            _BotPickler(self.bot, file).dump(data)
 
     def get_user_data(self) -> Dict[int, UD]:
         """Returns the user_data from the pickle file if it exists or an empty :obj:`dict`.
