@@ -174,6 +174,22 @@ class TestRequest:
         assert exc_info.value.retry_after == 42.0
 
     @pytest.mark.asyncio
+    async def test_unknown_request_params(self, monkeypatch, httpx_request: HTTPXRequest):
+        server_response = b'{"ok": "False", "parameters": {"unknown": "42"}}'
+
+        monkeypatch.setattr(
+            httpx_request,
+            'do_request',
+            mocker_factory(response=server_response, return_code=HTTPStatus.BAD_REQUEST),
+        )
+
+        with pytest.raises(
+            BadRequest,
+            match="{'unknown': '42'}",
+        ):
+            await httpx_request.post(None, None, None)
+
+    @pytest.mark.asyncio
     @pytest.mark.parametrize('description', [True, False])
     async def test_error_description(self, monkeypatch, httpx_request: HTTPXRequest, description):
         response_data = {"ok": "False"}

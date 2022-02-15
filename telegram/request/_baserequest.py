@@ -257,6 +257,12 @@ class BaseRequest(
 
         response_data = self._parse_json_response(payload)
 
+        description = response_data.get('description')
+        if description:
+            message = description
+        else:
+            message = 'Unknown HTTPError'
+
         # In some special cases, we ca raise more informative exceptions:
         # see https://core.telegram.org/bots/api#responseparameters and
         # https://core.telegram.org/bots/api#making-requests
@@ -269,11 +275,7 @@ class BaseRequest(
             if retry_after:
                 raise RetryAfter(retry_after)
 
-        description = response_data.get('description')
-        if description:
-            message = description
-        else:
-            message = 'Unknown HTTPError'
+            message += f'\nThe server response contained unknown parameters: {parameters}'
 
         if code == HTTPStatus.FORBIDDEN:
             raise Forbidden(message)
