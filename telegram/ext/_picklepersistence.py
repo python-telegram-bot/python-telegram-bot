@@ -272,11 +272,11 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             'callback_data': self.callback_data,
         }
         with self.filepath.open("wb") as file:
-            _BotPickler(self.bot, file).dump(data)
+            _BotPickler(self.bot, file, protocol=pickle.HIGHEST_PROTOCOL).dump(data)
 
     def _dump_file(self, filepath: Path, data: object) -> None:
         with filepath.open("wb") as file:
-            _BotPickler(self.bot, file).dump(data)
+            _BotPickler(self.bot, file, protocol=pickle.HIGHEST_PROTOCOL).dump(data)
 
     def get_user_data(self) -> Dict[int, UD]:
         """Returns the user_data from the pickle file if it exists or an empty :obj:`dict`.
