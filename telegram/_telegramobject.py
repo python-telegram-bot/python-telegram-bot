@@ -236,7 +236,7 @@ class TelegramObject:
         This method is used for unpickling. The data, which is in the form a dictionary, is
         converted back into a class.
         """
-        self.__class__(**state)
+        self.__init__(**state)  # type: ignore[misc]
         if '_bot' in state:
             self._bot = state['_bot']
 
