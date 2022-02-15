@@ -51,7 +51,7 @@ from telegram.ext import (
     TypeHandler,
 )
 from telegram._utils.warnings import warn
-from telegram.ext._utils.trackingdefaultdict import TrackingDefaultDict
+from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import ConversationDict
 from telegram.ext._utils.types import CCT
 
@@ -525,7 +525,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     async def _initialize_persistence(
         self, application: 'Application'
-    ) -> TrackingDefaultDict[Tuple[int, ...], object]:
+    ) -> TrackingDict[Tuple[int, ...], object]:
         """Initializes the persistence for this handler. While this method is marked as protected,
         we expect it to be called by the Application/parent conversations. It's just protected to
         hide it from users.
@@ -540,14 +540,9 @@ class ConversationHandler(Handler[Update, CCT]):
                 'persistence!'
             )
 
-        def default_factory() -> NoReturn:
-            raise KeyError
-
         self._conversations = cast(
-            TrackingDefaultDict[Tuple[int, ...], object],
-            TrackingDefaultDict(
-                default_factory=default_factory, track_read=False, track_write=True
-            ),
+            TrackingDict[Tuple[int, ...], object],
+            TrackingDict(),
         )
         self._conversations.update(await application.persistence.get_conversations(self.name))
 

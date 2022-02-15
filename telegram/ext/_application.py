@@ -52,7 +52,7 @@ from telegram.ext._handler import Handler
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_TRUE, DEFAULT_NONE
 from telegram._utils.warnings import warn
-from telegram.ext._utils.trackingdefaultdict import TrackingDefaultDict
+from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import CCT, UD, CD, BD, BT, JQ, HandlerCallback
 from telegram.ext._utils.stack import was_called_by
 
@@ -248,7 +248,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         # This attribute will hold references to the conversation dicts of all conversation
         # handlers so that we can extract the changed states during `update_persistence`
         self._conversation_handler_conversations: Dict[
-            str, TrackingDefaultDict[Tuple[int, ...], object]
+            str, TrackingDict[Tuple[int, ...], object]
         ] = {}
 
         # A number of low-level helpers for the internal logic
@@ -1034,10 +1034,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 else:
                     result = new_state.resolve()
 
-                effective_new_state = None if result is TrackingDefaultDict.DELETED else result
+                effective_new_state = None if result is TrackingDict.DELETED else result
                 print(name, key, effective_new_state)
                 # TODO: Test that we actually pass `None` here in case the conversation had ended,
-                #  i.e. effective_new_state is TrackingDefaultDict.DELETED
+                #  i.e. effective_new_state is TrackingDict.DELETED
                 coroutines.add(
                     self.persistence.update_conversation(
                         name=name, key=key, new_state=effective_new_state
