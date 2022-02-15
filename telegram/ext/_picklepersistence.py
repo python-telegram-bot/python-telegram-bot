@@ -81,6 +81,8 @@ def _custom_reduction(cls: TelegramObject) -> Tuple[Callable, Tuple[Type[Telegra
 
 
 class _BotPickler(pickle.Pickler):
+    __slots__ = ('_bot',)
+
     # Here we define a private dispatch_table, because we want to preserve the bot attribute of
     # objects so persistent_id works as intended. Otherwise, the bot attribute is deleted in
     # __getstate__, which used for regular pickling (via pickle.dumps(...))
@@ -108,6 +110,8 @@ class _BotPickler(pickle.Pickler):
 
 
 class _BotUnpickler(pickle.Unpickler):
+    __slots__ = ('_bot',)
+
     def __init__(self, bot: Bot, *args: Any, **kwargs: Any):
         self._bot = bot
         super().__init__(*args, **kwargs)
