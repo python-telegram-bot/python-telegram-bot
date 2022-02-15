@@ -41,19 +41,16 @@ class DictPersistence(BasePersistence):
         interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
 
     Note:
-        This class does *not* implement a :meth:`flush` method, meaning that data managed by
-        ``DictPersistence`` is in-memory only and will be lost when the bot shuts down. This is,
-        because ``DictPersistence`` is mainly intended as starting point for custom persistence
-        classes that need to JSON-serialize the stored data before writing them to file/database.
+        * This class does *not* implement a :meth:`flush` method, meaning that data managed by
+          ``DictPersistence`` is in-memory only and will be lost when the bot shuts down. This is,
+          because ``DictPersistence`` is mainly intended as starting point for custom persistence
+          classes that need to JSON-serialize the stored data before writing them to file/database.
 
-    Warning:
-        :class:`DictPersistence` will try to replace :class:`telegram.Bot` instances by
-        :attr:`~telegram.ext.BasePersistence.REPLACED_BOT` and insert the bot set with
-        :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
-        that changes to the bot apply to the saved objects, too. If you change the bots token, this
-        may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
-        :meth:`telegram.ext.BasePersistence.replace_bot` and
-        :meth:`telegram.ext.BasePersistence.insert_bot`.
+        * This implementation of :class:`BasePersistence` does **not** replace bot instances with a
+          placeholder before serialization. Hence, you should make sure not to
+          store any bot instances in the data that will be persisted. E.g. in case of
+          :class:`telegram.TelegramObject`, one may call :meth:`BasePersistence.set_bot` to ensure
+          that shortcuts like :meth:`telegram.Message.reply_text` are available.
 
     .. versionchanged:: 14.0
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.

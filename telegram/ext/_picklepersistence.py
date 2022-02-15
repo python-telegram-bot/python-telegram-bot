@@ -141,7 +141,6 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         * The parameter and attribute ``filename`` were replaced by :attr:`filepath`.
         * :attr:`filepath` now also accepts :obj:`pathlib.Path` as argument.
 
-
     Args:
         filepath (:obj:`str` | :obj:`pathlib.Path`): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.

@@ -131,8 +131,6 @@ class TelegramObject:
         converted back into a class.
         """
         self.__init__(**state)  # type: ignore[misc]
-        if '_bot' in state:
-            self._bot = state['_bot']
 
     def __deepcopy__(self, memodict: dict) -> object:
         """This method deepcopies the object and sets the bot on the newly created copy."""
