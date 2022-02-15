@@ -38,6 +38,7 @@ from typing import (
     cast,
     Sequence,
     Any,
+    NoReturn,
 )
 
 try:
@@ -158,7 +159,7 @@ class Bot(TelegramObject):
         'private_key',
         '_bot_user',
         '_request',
-        'logger',
+        '_logger',
     )
 
     def __init__(
@@ -177,7 +178,7 @@ class Bot(TelegramObject):
         self._bot_user: Optional[User] = None
         self._request = request or Request()
         self.private_key = None
-        self.logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger(__name__)
 
         if private_key:
             if not CRYPTO_INSTALLED:
@@ -3000,9 +3001,9 @@ class Bot(TelegramObject):
         )
 
         if result:
-            self.logger.debug('Getting updates: %s', [u['update_id'] for u in result])
+            self._logger.debug('Getting updates: %s', [u['update_id'] for u in result])
         else:
-            self.logger.debug('No new updates found.')
+            self._logger.debug('No new updates found.')
 
         return Update.de_list(result, self)  # type: ignore[return-value]
 
@@ -5613,7 +5614,8 @@ class Bot(TelegramObject):
     def __hash__(self) -> int:
         return hash(self.bot)
 
-    def __reduce__(self):
+    def __reduce__(self) -> NoReturn:
+        """Called by pickle.dumps() and only when bot instance is present in the data structure."""
         raise pickle.PicklingError('Bot objects cannot be pickled!')
 
     # camelCase aliases
