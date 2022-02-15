@@ -190,6 +190,25 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
+    def __eq__(self, other: object) -> bool:
+        return self.bot == other
+
+    def __hash__(self) -> int:
+        return hash(self.bot)
+
+    def __reduce__(self) -> NoReturn:
+        """Called by pickle.dumps() and only when bot instance is present in the data structure."""
+        raise pickle.PicklingError('Bot objects cannot be pickled!')
+
+    def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
+        data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
+
+        if self.last_name:
+            data['last_name'] = self.last_name
+
+        return data
+
     # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
     def _log(func: Any):  # type: ignore[no-untyped-def] # skipcq: PY-D0003
@@ -5598,25 +5617,6 @@ class Bot(TelegramObject):
 
         result = self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
         return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
-
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
-
-        if self.last_name:
-            data['last_name'] = self.last_name
-
-        return data
-
-    def __eq__(self, other: object) -> bool:
-        return self.bot == other
-
-    def __hash__(self) -> int:
-        return hash(self.bot)
-
-    def __reduce__(self) -> NoReturn:
-        """Called by pickle.dumps() and only when bot instance is present in the data structure."""
-        raise pickle.PicklingError('Bot objects cannot be pickled!')
 
     # camelCase aliases
     getMe = get_me

@@ -84,6 +84,62 @@ class TelegramObject:
                 f"`{item}`."
             ) from exc
 
+    def __eq__(self, other: object) -> bool:
+        # pylint: disable=no-member
+        if isinstance(other, self.__class__):
+            if self._id_attrs == ():
+                warn(
+                    f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
+                    " equivalence.",
+                    stacklevel=2,
+                )
+            if other._id_attrs == ():
+                warn(
+                    f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
+                    " for equivalence.",
+                    stacklevel=2,
+                )
+            return self._id_attrs == other._id_attrs
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        # pylint: disable=no-member
+        if self._id_attrs:
+            return hash((self.__class__, self._id_attrs))
+        return super().__hash__()
+
+    def __getstate__(self) -> Dict[str, Union[str, object]]:
+        """
+        This method is used for pickling. We remove the bot attribute of the object since those
+        are not pickable.
+        """
+        # Adapted from self.to_dict(), unlike to_dict(), this is not recursive.
+        data = {}
+        attrs = {attr for cls in self.__class__.__mro__[:-1] for attr in cls.__slots__}
+        for key in attrs:
+            if key.startswith('_'):
+                continue
+
+            value = getattr(self, key, None)
+            if value is not None:
+                data[key] = value
+        return data
+
+    def __setstate__(self, state: dict) -> None:
+        """
+        This method is used for unpickling. The data, which is in the form a dictionary, is
+        converted back into a class.
+        """
+        self.__init__(**state)  # type: ignore[misc]
+        if '_bot' in state:
+            self._bot = state['_bot']
+
+    def __deepcopy__(self, memodict: dict) -> object:
+        """This method deepcopies the object and sets the bot on the newly created copy."""
+        copy = self.__class__(**deepcopy(self.__getstate__(), memodict))
+        copy.set_bot(self._bot)
+        return copy
+
     @staticmethod
     def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
         return None if data is None else data.copy()
@@ -189,59 +245,3 @@ class TelegramObject:
             bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.
         """
         self._bot = bot
-
-    def __eq__(self, other: object) -> bool:
-        # pylint: disable=no-member
-        if isinstance(other, self.__class__):
-            if self._id_attrs == ():
-                warn(
-                    f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
-                    " equivalence.",
-                    stacklevel=2,
-                )
-            if other._id_attrs == ():
-                warn(
-                    f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
-                    " for equivalence.",
-                    stacklevel=2,
-                )
-            return self._id_attrs == other._id_attrs
-        return super().__eq__(other)
-
-    def __hash__(self) -> int:
-        # pylint: disable=no-member
-        if self._id_attrs:
-            return hash((self.__class__, self._id_attrs))
-        return super().__hash__()
-
-    def __getstate__(self) -> Dict[str, Union[str, object]]:
-        """
-        This method is used for pickling. We remove the bot attribute of the object since those
-        are not pickable.
-        """
-        # Adapted from self.to_dict(), unlike to_dict(), this is not recursive.
-        data = {}
-        attrs = {attr for cls in self.__class__.__mro__[:-1] for attr in cls.__slots__}
-        for key in attrs:
-            if key.startswith('_'):
-                continue
-
-            value = getattr(self, key, None)
-            if value is not None:
-                data[key] = value
-        return data
-
-    def __setstate__(self, state: dict) -> None:
-        """
-        This method is used for unpickling. The data, which is in the form a dictionary, is
-        converted back into a class.
-        """
-        self.__init__(**state)  # type: ignore[misc]
-        if '_bot' in state:
-            self._bot = state['_bot']
-
-    def __deepcopy__(self, memodict: dict) -> object:
-        """This method deepcopies the object and sets the bot on the newly created copy."""
-        copy = self.__class__(**deepcopy(self.__getstate__(), memodict))
-        copy.set_bot(self._bot)
-        return copy
