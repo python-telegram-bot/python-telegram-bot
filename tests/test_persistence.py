@@ -16,19 +16,18 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime
 import logging
 import os
 import pickle
 import gzip
 import signal
-import uuid
-from collections.abc import Container
-from collections import defaultdict
 from pathlib import Path
 from time import sleep
-from threading import Lock
 
 import pytest
+
+from telegram.warnings import PTBUserWarning
 
 try:
     import ujson as json
@@ -130,7 +129,7 @@ def base_persistence():
 @pytest.fixture(scope="function")
 def bot_persistence():
     class BotPersistence(BasePersistence):
-        __slots__ = ()
+        __slots__ = ('bot_data', 'chat_data', 'user_data', 'callback_data')
 
         def __init__(self):
             super().__init__()
@@ -252,7 +251,6 @@ class TestBasePersistence:
         inst = bot_persistence
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        # assert not inst.__dict__, f"got missing slot(s): {inst.__dict__}"
         # The below test fails if the child class doesn't define __slots__ (not a cause of concern)
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
@@ -590,292 +588,6 @@ class TestBasePersistence:
             dp.process_update(MyUpdate())
         assert 'An uncaught error was raised while processing the update' not in caplog.text
 
-    def test_bot_replace_insert_bot(self, bot, bot_persistence):
-        class CustomSlottedClass:
-            __slots__ = ('bot', '__dict__')
-
-            def __init__(self):
-                self.bot = bot
-                self.not_in_slots = bot
-
-            def __eq__(self, other):
-                if isinstance(other, CustomSlottedClass):
-                    return self.bot is other.bot and self.not_in_slots is other.not_in_slots
-                return False
-
-        class DictNotInSlots(Container):
-            """This classes parent has slots, but __dict__ is not in those slots."""
-
-            def __init__(self):
-                self.bot = bot
-
-            def __contains__(self, item):
-                return True
-
-            def __eq__(self, other):
-                if isinstance(other, DictNotInSlots):
-                    return self.bot is other.bot
-                return False
-
-        class CustomClass:
-            def __init__(self):
-                self.bot = bot
-                self.slotted_object = CustomSlottedClass()
-                self.dict_not_in_slots_object = DictNotInSlots()
-                self.list_ = [1, 2, bot]
-                self.tuple_ = tuple(self.list_)
-                self.set_ = set(self.list_)
-                self.frozenset_ = frozenset(self.list_)
-                self.dict_ = {item: item for item in self.list_}
-                self.defaultdict_ = defaultdict(dict, self.dict_)
-
-            @staticmethod
-            def replace_bot():
-                cc = CustomClass()
-                cc.bot = BasePersistence.REPLACED_BOT
-                cc.slotted_object.bot = BasePersistence.REPLACED_BOT
-                cc.slotted_object.not_in_slots = BasePersistence.REPLACED_BOT
-                cc.dict_not_in_slots_object.bot = BasePersistence.REPLACED_BOT
-                cc.list_ = [1, 2, BasePersistence.REPLACED_BOT]
-                cc.tuple_ = tuple(cc.list_)
-                cc.set_ = set(cc.list_)
-                cc.frozenset_ = frozenset(cc.list_)
-                cc.dict_ = {item: item for item in cc.list_}
-                cc.defaultdict_ = defaultdict(dict, cc.dict_)
-                return cc
-
-            def __eq__(self, other):
-                if isinstance(other, CustomClass):
-                    return (
-                        self.bot is other.bot
-                        and self.slotted_object == other.slotted_object
-                        and self.dict_not_in_slots_object == other.dict_not_in_slots_object
-                        and self.list_ == other.list_
-                        and self.tuple_ == other.tuple_
-                        and self.set_ == other.set_
-                        and self.frozenset_ == other.frozenset_
-                        and self.dict_ == other.dict_
-                        and self.defaultdict_ == other.defaultdict_
-                    )
-                return False
-
-        persistence = bot_persistence
-        persistence.set_bot(bot)
-        cc = CustomClass()
-
-        persistence.update_bot_data({1: cc})
-        assert persistence.bot_data[1].bot == BasePersistence.REPLACED_BOT
-        assert persistence.bot_data[1] == cc.replace_bot()
-
-        persistence.update_chat_data(123, {1: cc})
-        assert persistence.chat_data[123][1].bot == BasePersistence.REPLACED_BOT
-        assert persistence.chat_data[123][1] == cc.replace_bot()
-
-        persistence.update_user_data(123, {1: cc})
-        assert persistence.user_data[123][1].bot == BasePersistence.REPLACED_BOT
-        assert persistence.user_data[123][1] == cc.replace_bot()
-
-        persistence.update_callback_data(([('1', 2, {0: cc})], {'1': '2'}))
-        assert persistence.callback_data[0][0][2][0].bot == BasePersistence.REPLACED_BOT
-        assert persistence.callback_data[0][0][2][0] == cc.replace_bot()
-
-        assert persistence.get_bot_data()[1] == cc
-        assert persistence.get_bot_data()[1].bot is bot
-        assert persistence.get_chat_data()[123][1] == cc
-        assert persistence.get_chat_data()[123][1].bot is bot
-        assert persistence.get_user_data()[123][1] == cc
-        assert persistence.get_user_data()[123][1].bot is bot
-        assert persistence.get_callback_data()[0][0][2][0].bot is bot
-        assert persistence.get_callback_data()[0][0][2][0] == cc
-
-    def test_bot_replace_insert_bot_unpickable_objects(self, bot, bot_persistence, recwarn):
-        """Here check that unpickable objects are just returned verbatim."""
-        persistence = bot_persistence
-        persistence.set_bot(bot)
-
-        class CustomClass:
-            def __copy__(self):
-                raise TypeError('UnhandledException')
-
-        lock = Lock()
-
-        persistence.update_bot_data({1: lock})
-        assert persistence.bot_data[1] is lock
-        persistence.update_chat_data(123, {1: lock})
-        assert persistence.chat_data[123][1] is lock
-        persistence.update_user_data(123, {1: lock})
-        assert persistence.user_data[123][1] is lock
-        persistence.update_callback_data(([('1', 2, {0: lock})], {'1': '2'}))
-        assert persistence.callback_data[0][0][2][0] is lock
-
-        assert persistence.get_bot_data()[1] is lock
-        assert persistence.get_chat_data()[123][1] is lock
-        assert persistence.get_user_data()[123][1] is lock
-        assert persistence.get_callback_data()[0][0][2][0] is lock
-
-        cc = CustomClass()
-
-        persistence.update_bot_data({1: cc})
-        assert persistence.bot_data[1] is cc
-        persistence.update_chat_data(123, {1: cc})
-        assert persistence.chat_data[123][1] is cc
-        persistence.update_user_data(123, {1: cc})
-        assert persistence.user_data[123][1] is cc
-        persistence.update_callback_data(([('1', 2, {0: cc})], {'1': '2'}))
-        assert persistence.callback_data[0][0][2][0] is cc
-
-        assert persistence.get_bot_data()[1] is cc
-        assert persistence.get_chat_data()[123][1] is cc
-        assert persistence.get_user_data()[123][1] is cc
-        assert persistence.get_callback_data()[0][0][2][0] is cc
-
-        assert len(recwarn) == 2
-        assert str(recwarn[0].message).startswith(
-            "BasePersistence.replace_bot does not handle objects that can not be copied."
-        )
-        assert str(recwarn[1].message).startswith(
-            "BasePersistence.insert_bot does not handle objects that can not be copied."
-        )
-
-    def test_bot_replace_insert_bot_unparsable_objects(self, bot, bot_persistence, recwarn):
-        """Here check that objects in __dict__ or __slots__ that can't
-        be parsed are just returned verbatim."""
-        persistence = bot_persistence
-        persistence.set_bot(bot)
-
-        uuid_obj = uuid.uuid4()
-
-        persistence.update_bot_data({1: uuid_obj})
-        assert persistence.bot_data[1] is uuid_obj
-        persistence.update_chat_data(123, {1: uuid_obj})
-        assert persistence.chat_data[123][1] is uuid_obj
-        persistence.update_user_data(123, {1: uuid_obj})
-        assert persistence.user_data[123][1] is uuid_obj
-        persistence.update_callback_data(([('1', 2, {0: uuid_obj})], {'1': '2'}))
-        assert persistence.callback_data[0][0][2][0] is uuid_obj
-
-        assert persistence.get_bot_data()[1] is uuid_obj
-        assert persistence.get_chat_data()[123][1] is uuid_obj
-        assert persistence.get_user_data()[123][1] is uuid_obj
-        assert persistence.get_callback_data()[0][0][2][0] is uuid_obj
-
-        assert len(recwarn) == 2
-        assert str(recwarn[0].message).startswith(
-            "Parsing of an object failed with the following exception: "
-        )
-        assert str(recwarn[1].message).startswith(
-            "Parsing of an object failed with the following exception: "
-        )
-
-    def test_bot_replace_insert_bot_classes(self, bot, bot_persistence, recwarn):
-        """Here check that classes are just returned verbatim."""
-        persistence = bot_persistence
-        persistence.set_bot(bot)
-
-        class CustomClass:
-            pass
-
-        persistence.update_bot_data({1: CustomClass})
-        assert persistence.bot_data[1] is CustomClass
-        persistence.update_chat_data(123, {1: CustomClass})
-        assert persistence.chat_data[123][1] is CustomClass
-        persistence.update_user_data(123, {1: CustomClass})
-        assert persistence.user_data[123][1] is CustomClass
-
-        assert persistence.get_bot_data()[1] is CustomClass
-        assert persistence.get_chat_data()[123][1] is CustomClass
-        assert persistence.get_user_data()[123][1] is CustomClass
-
-        assert len(recwarn) == 2
-        assert str(recwarn[0].message).startswith(
-            "BasePersistence.replace_bot does not handle classes such as 'CustomClass'"
-        )
-        assert str(recwarn[1].message).startswith(
-            "BasePersistence.insert_bot does not handle classes such as 'CustomClass'"
-        )
-
-    def test_bot_replace_insert_bot_objects_with_faulty_equality(self, bot, bot_persistence):
-        """Here check that trying to compare obj == self.REPLACED_BOT doesn't lead to problems."""
-        persistence = bot_persistence
-        persistence.set_bot(bot)
-
-        class CustomClass:
-            def __init__(self, data):
-                self.data = data
-
-            def __eq__(self, other):
-                raise RuntimeError("Can't be compared")
-
-        cc = CustomClass({1: bot, 2: 'foo'})
-        expected = {1: BasePersistence.REPLACED_BOT, 2: 'foo'}
-
-        persistence.update_bot_data({1: cc})
-        assert persistence.bot_data[1].data == expected
-        persistence.update_chat_data(123, {1: cc})
-        assert persistence.chat_data[123][1].data == expected
-        persistence.update_user_data(123, {1: cc})
-        assert persistence.user_data[123][1].data == expected
-        persistence.update_callback_data(([('1', 2, {0: cc})], {'1': '2'}))
-        assert persistence.callback_data[0][0][2][0].data == expected
-
-        expected = {1: bot, 2: 'foo'}
-
-        assert persistence.get_bot_data()[1].data == expected
-        assert persistence.get_chat_data()[123][1].data == expected
-        assert persistence.get_user_data()[123][1].data == expected
-        assert persistence.get_callback_data()[0][0][2][0].data == expected
-
-    @pytest.mark.filterwarnings('ignore:BasePersistence')
-    def test_replace_insert_bot_item_identity(self, bot, bot_persistence):
-        persistence = bot_persistence
-        persistence.set_bot(bot)
-
-        class CustomSlottedClass:
-            __slots__ = ('value',)
-
-            def __init__(self):
-                self.value = 5
-
-        class CustomClass:
-            pass
-
-        slot_object = CustomSlottedClass()
-        dict_object = CustomClass()
-        lock = Lock()
-        list_ = [slot_object, dict_object, lock]
-        tuple_ = (1, 2, 3)
-        dict_ = {1: slot_object, 2: dict_object}
-
-        data = {
-            'bot_1': bot,
-            'bot_2': bot,
-            'list_1': list_,
-            'list_2': list_,
-            'tuple_1': tuple_,
-            'tuple_2': tuple_,
-            'dict_1': dict_,
-            'dict_2': dict_,
-        }
-
-        def make_assertion(data_):
-            return (
-                data_['bot_1'] is data_['bot_2']
-                and data_['list_1'] is data_['list_2']
-                and data_['list_1'][0] is data_['list_2'][0]
-                and data_['list_1'][1] is data_['list_2'][1]
-                and data_['list_1'][2] is data_['list_2'][2]
-                and data_['tuple_1'] is data_['tuple_2']
-                and data_['dict_1'] is data_['dict_2']
-                and data_['dict_1'][1] is data_['dict_2'][1]
-                and data_['dict_1'][1] is data_['list_1'][0]
-                and data_['dict_1'][2] is data_['list_1'][1]
-                and data_['dict_1'][2] is data_['dict_2'][2]
-            )
-
-        persistence.update_bot_data(data)
-        assert make_assertion(persistence.bot_data)
-        assert make_assertion(persistence.get_bot_data())
-
     def test_set_bot_exception(self, bot):
         non_ext_bot = Bot(bot.token)
         persistence = OwnPersistence()
@@ -1033,7 +745,7 @@ def pickle_files_wo_callback_data(user_data, chat_data, bot_data, conversations)
 def update(bot):
     user = User(id=321, first_name='test_user', is_bot=False)
     chat = Chat(id=123, type='group')
-    message = Message(1, None, chat, from_user=user, text="Hi there", bot=bot)
+    message = Message(1, datetime.datetime.now(), chat, from_user=user, text="Hi there", bot=bot)
     return Update(0, message=message)
 
 
@@ -1046,7 +758,7 @@ class TestPicklePersistence:
 
     def test_pickle_behaviour_with_slots(self, pickle_persistence):
         bot_data = pickle_persistence.get_bot_data()
-        bot_data['message'] = Message(3, None, Chat(2, type='supergroup'))
+        bot_data['message'] = Message(3, datetime.datetime.now(), Chat(2, type='supergroup'))
         pickle_persistence.update_bot_data(bot_data)
         retrieved = pickle_persistence.get_bot_data()
         assert retrieved == bot_data
@@ -1633,6 +1345,50 @@ class TestPicklePersistence:
             conversations_test = dict(pickle.load(f))['conversations']
         assert conversations_test['name1'] == conversation1
 
+    def test_custom_pickler_unpickler(
+        self, bot, update, pickle_persistence, good_pickle_files, recwarn
+    ):
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence).build()
+        dp = u.dispatcher
+        bot_id = None
+
+        def first(update, context):
+            nonlocal bot_id
+            bot_id = update.message.get_bot()
+            assert bot_id
+            # Test pickling a message object, which has the current bot
+            context.user_data['msg'] = update.message
+            # Test pickling a bot, which is not known-
+            new_bot = Bot('1234:abcd')
+            context.chat_data['unknown_bot'] = new_bot
+
+        def second(_, context):
+            msg = context.user_data['msg']
+            assert bot_id is msg.get_bot()  # Tests if the same bot is inserted by the unpickler
+            new_none_bot = context.chat_data['unknown_bot']
+            assert new_none_bot is None
+
+        h1 = MessageHandler(None, first)
+        h2 = MessageHandler(None, second)
+        dp.add_handler(h1)
+
+        assert len(recwarn) == 0
+        dp.process_update(update)
+        assert len(recwarn) == 1
+        assert recwarn[-1].category is PTBUserWarning
+        assert str(recwarn[-1].message).startswith("Unknown bot instance found.")
+        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
+
+        pickle_persistence_2 = PicklePersistence(  # initialize a new persistence for unpickling
+            filepath='pickletest',
+            single_file=False,
+            on_flush=False,
+        )
+        u = UpdaterBuilder().bot(bot).persistence(pickle_persistence_2).build()
+        dp = u.dispatcher
+        dp.add_handler(h2)
+        dp.process_update(update)
+
     def test_with_handler(self, bot, update, bot_data, pickle_persistence, good_pickle_files):
         u = UpdaterBuilder().bot(bot).persistence(pickle_persistence).build()
         dp = u.dispatcher
@@ -1813,7 +1569,7 @@ class TestPicklePersistence:
         assert ch.conversations[ch._get_key(update)] == 0
         assert ch.conversations == pickle_persistence.conversations['name2']
 
-    def test_with_nested_conversationHandler(
+    def test_with_nested_conversation_handler(
         self, dp, update, good_pickle_files, pickle_persistence
     ):
         dp.persistence = pickle_persistence
