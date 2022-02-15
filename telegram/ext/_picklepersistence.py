@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the PicklePersistence class."""
+import copyreg
 import pickle
+from copy import deepcopy
 from pathlib import Path
 from typing import (
     Any,
@@ -249,7 +251,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             self.user_data = data
         else:
             self._load_singlefile()
-        return self.user_data  # type: ignore[return-value]
+        return deepcopy(self.user_data)  # type: ignore[arg-type]
 
     def get_chat_data(self) -> Dict[int, CD]:
         """Returns the chat_data from the pickle file if it exists or an empty :obj:`dict`.
@@ -266,7 +268,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             self.chat_data = data
         else:
             self._load_singlefile()
-        return self.chat_data  # type: ignore[return-value]
+        return deepcopy(self.chat_data)  # type: ignore[arg-type]
 
     def get_bot_data(self) -> BD:
         """Returns the bot_data from the pickle file if it exists or an empty object of type
@@ -284,7 +286,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             self.bot_data = data
         else:
             self._load_singlefile()
-        return self.bot_data  # type: ignore[return-value]
+        return deepcopy(self.bot_data)  # type: ignore[return-value]
 
     def get_callback_data(self) -> Optional[CDCData]:
         """Returns the callback data from the pickle file if it exists or :obj:`None`.
@@ -307,7 +309,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             self._load_singlefile()
         if self.callback_data is None:
             return None
-        return self.callback_data[0], self.callback_data[1].copy()
+        return deepcopy((self.callback_data[0], self.callback_data[1].copy()))
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations from the pickle file if it exists or an empty dict.
@@ -362,7 +364,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             self.user_data = {}
         if self.user_data.get(user_id) == data:
             return
-        self.user_data[user_id] = data
+        self.user_data[user_id] = deepcopy(data)
         if not self.on_flush:
             if not self.single_file:
                 self._dump_file(Path(f"{self.filepath}_user_data"), self.user_data)
@@ -380,7 +382,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             self.chat_data = {}
         if self.chat_data.get(chat_id) == data:
             return
-        self.chat_data[chat_id] = data
+        self.chat_data[chat_id] = deepcopy(data)
         if not self.on_flush:
             if not self.single_file:
                 self._dump_file(Path(f"{self.filepath}_chat_data"), self.chat_data)
@@ -396,7 +398,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """
         if self.bot_data == data:
             return
-        self.bot_data = data
+        self.bot_data = deepcopy(data)
         if not self.on_flush:
             if not self.single_file:
                 self._dump_file(Path(f"{self.filepath}_bot_data"), self.bot_data)
@@ -416,7 +418,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         """
         if self.callback_data == data:
             return
-        self.callback_data = (data[0], data[1].copy())
+        self.callback_data = deepcopy((data[0], data[1].copy()))
         if not self.on_flush:
             if not self.single_file:
                 self._dump_file(Path(f"{self.filepath}_callback_data"), self.callback_data)
