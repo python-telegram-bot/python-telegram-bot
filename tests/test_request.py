@@ -517,17 +517,20 @@ class TestHTTPXRequest:
                     httpx_request.do_request(method='GET', url='URL'),
                 )
 
-    @pytest.mark.asyncio
     @flaky(3, 1)
+    @pytest.mark.asyncio
     async def test_do_request_wait_for_pool(self, monkeypatch, httpx_request):
         """The pool logic is buried rather deeply in httpxcore, so we make actual requests here
         instead of mocking"""
-
-        task_1 = httpx_request.do_request(
-            method='GET', url='https://python-telegram-bot.org/static/testfiles/telegram.mp4'
+        task_1 = asyncio.create_task(
+            httpx_request.do_request(
+                method='GET', url='https://python-telegram-bot.org/static/testfiles/telegram.mp4'
+            )
         )
-        task_2 = httpx_request.do_request(
-            method='GET', url='https://python-telegram-bot.org/static/testfiles/telegram.mp4'
+        task_2 = asyncio.create_task(
+            httpx_request.do_request(
+                method='GET', url='https://python-telegram-bot.org/static/testfiles/telegram.mp4'
+            )
         )
         done, pending = await asyncio.wait({task_1, task_2}, return_when=asyncio.FIRST_COMPLETED)
         assert len(done) == len(pending) == 1
