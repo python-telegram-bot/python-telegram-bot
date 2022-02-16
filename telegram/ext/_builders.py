@@ -77,7 +77,6 @@ if TYPE_CHECKING:
 _BOT_CHECKS = [
     ('updater', 'Updater instance'),
     ('request', 'Request instance'),
-    ('request_kwargs', 'request_kwargs'),
     ('base_file_url', 'base_file_url'),
     ('base_url', 'base_url'),
     ('token', 'token'),

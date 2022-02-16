@@ -82,10 +82,6 @@ class InputFile:
 
         self.filename = filename or self.mimetype.replace('/', '.')
 
-    @property
-    def field_tuple(self) -> FieldTuple:  # skipcq: PY-D0003
-        return self.filename, self.input_file_content, self.mimetype
-
     @staticmethod
     def is_image(stream: bytes) -> Optional[str]:
         """Check if the content file is an image by analyzing its headers.
@@ -109,9 +105,14 @@ class InputFile:
             )
             return None
 
-    @staticmethod
-    def is_file(obj: object) -> bool:  # skipcq: PY-D0003
-        return hasattr(obj, 'read')
+    @property
+    def field_tuple(self) -> FieldTuple:
+        """Field tuple representing the contents of the file for upload to the Telegram servers.
+
+        Returns:
+            Tuple[:obj:`str`, :obj:`bytes`, :obj:`str`]:
+        """
+        return self.filename, self.input_file_content, self.mimetype
 
     @property
     def attach_uri(self) -> str:

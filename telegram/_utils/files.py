@@ -95,9 +95,8 @@ def parse_file_input(
         return out
     if isinstance(file_input, bytes):
         return InputFile(file_input, filename=filename)
-    if InputFile.is_file(file_input):
-        file_input = cast(IO, file_input)
-        return InputFile(file_input, filename=filename)
+    if hasattr(file_input, 'read'):
+        return InputFile(cast(IO, file_input), filename=filename)
     if tg_type and isinstance(file_input, tg_type):
         return file_input.file_id  # type: ignore[attr-defined]
     return file_input
