@@ -16,21 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from pathlib import Path
-
 import pytest
 
-from telegram.request import HTTPXRequest
-from .conftest import PRIVATE_KEY, data_file
+from .conftest import data_file
 
 from telegram.ext import (
     ApplicationBuilder,
-    Defaults,
-    JobQueue,
-    PicklePersistence,
-    ContextTypes,
-    Application,
-    Updater,
 )
 from telegram.ext._builders import _BOT_CHECKS
 
@@ -58,18 +49,57 @@ class TestApplicationBuilder:
         with pytest.raises(RuntimeError, match=f'`{method}` may only be set, if no bot instance'):
             getattr(builder, method)(None)
 
-    # def test_mutually_exclusive_for_request(self, builder):
-    #     builder.request(None)
-    #     with pytest.raises(
-    #         RuntimeError, match='`request_kwargs` may only be set, if no Request instance'
-    #     ):
-    #         builder.request_kwargs(None)
-    #
-    #     builder = builder.__class__()
-    #     builder.request_kwargs(None)
-    #     with pytest.raises(RuntimeError, match='`request` may only be set, if no request_kwargs'):
-    #         builder.request(None)
-    #
+    def test_mutually_exclusive_for_request(self, builder):
+        builder.request(None)
+        methods = (
+            'connection_pool_size',
+            'connect_timeout',
+            'pool_timeout',
+            'read_timeout',
+            'write_timeout',
+            'proxy_url',
+            'bot',
+            'updater',
+        )
+
+        for method in methods:
+            with pytest.raises(
+                RuntimeError, match=f'`{method}` may only be set, if no request instance'
+            ):
+                getattr(builder, method)(None)
+
+        for method in methods:
+            builder = ApplicationBuilder()
+            getattr(builder, method)(1)
+            with pytest.raises(RuntimeError, match='`request` may only be set, if no'):
+                builder.request(None)
+
+    def test_mutually_exclusive_for_get_updates_request(self, builder):
+        builder.get_updates_request(None)
+        methods = (
+            'get_updates_connection_pool_size',
+            'get_updates_connect_timeout',
+            'get_updates_pool_timeout',
+            'get_updates_read_timeout',
+            'get_updates_write_timeout',
+            'get_updates_proxy_url',
+            'bot',
+            'updater',
+        )
+
+        for method in methods:
+            with pytest.raises(
+                RuntimeError,
+                match=f'`{method}` may only be set, if no get_updates_request instance',
+            ):
+                getattr(builder, method)(None)
+
+        for method in methods:
+            builder = ApplicationBuilder()
+            getattr(builder, method)(1)
+            with pytest.raises(RuntimeError, match='`get_updates_request` may only be set, if no'):
+                builder.get_updates_request(None)
+
     # def test_build_without_token(self, builder):
     #     with pytest.raises(RuntimeError, match='No bot token was set.'):
     #         builder.build()

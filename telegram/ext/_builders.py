@@ -76,7 +76,8 @@ if TYPE_CHECKING:
 
 _BOT_CHECKS = [
     ('updater', 'Updater instance'),
-    ('request', 'Request instance'),
+    ('request', 'request instance'),
+    ('get_updates_request', 'get_updates_request instance'),
     ('base_file_url', 'base_file_url'),
     ('base_url', 'base_url'),
     ('token', 'token'),
@@ -351,23 +352,28 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def _request_check(self, get_updates: bool) -> None:
-        name = 'get_updates_request' if get_updates else 'request'
+        prefix = 'get_updates_' if get_updates else ''
+        name = prefix + 'request'
 
         for attr in ('connect_timeout', 'read_timeout', 'write_timeout', 'pool_timeout'):
-            if not isinstance(getattr(self, f"_{attr}"), DefaultValue):
+            if not isinstance(getattr(self, f"_{prefix}{attr}"), DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format(name, attr))
-        if self._connection_pool_size is not None:
+        if getattr(self, f'_{prefix}connection_pool_size') is not None:
             raise RuntimeError(_TWO_ARGS_REQ.format(name, 'connection_pool_size'))
-        if self._proxy_url is not None:
+        if getattr(self, f'_{prefix}proxy_url') is not None:
             raise RuntimeError(_TWO_ARGS_REQ.format(name, 'proxy_url'))
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format(name, 'bot instance'))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format(name, 'updater instance'))
 
-    def _request_param_check(self, get_updates: bool) -> None:
+    def _request_param_check(self, name: str, get_updates: bool) -> None:
         if get_updates and self._get_updates_request is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format('get_updates_request', 'bot instance'))
+            raise RuntimeError(
+                _TWO_ARGS_REQ.format(f'get_updates_{name}', 'get_updates_request instance')
+            )
         if self._request is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format('request', 'bot instance'))
+            raise RuntimeError(_TWO_ARGS_REQ.format(name, 'request instance'))
 
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(
@@ -393,36 +399,36 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def connection_pool_size(self: BuilderType, connection_pool_size: int) -> BuilderType:
-        self._request_param_check(get_updates=False)
+        self._request_param_check(name='connection_pool_size', get_updates=False)
         self._connection_pool_size = connection_pool_size
         return self
 
     def proxy_url(self: BuilderType, proxy_url: str) -> BuilderType:
-        self._request_param_check(get_updates=False)
+        self._request_param_check(name='proxy_url', get_updates=False)
         self._proxy_url = proxy_url
         return self
 
     def connect_timeout(self: BuilderType, connect_timeout: Optional[float]) -> BuilderType:
-        self._request_param_check(get_updates=False)
+        self._request_param_check(name='connect_timeout', get_updates=False)
         self._connect_timeout = connect_timeout
         return self
 
     def read_timeout(self: BuilderType, read_timeout: Optional[float]) -> BuilderType:
-        self._request_param_check(get_updates=False)
+        self._request_param_check(name='read_timeout', get_updates=False)
         self._read_timeout = read_timeout
         return self
 
     def write_timeout(self: BuilderType, write_timeout: Optional[float]) -> BuilderType:
-        self._request_param_check(get_updates=False)
+        self._request_param_check(name='write_timeout', get_updates=False)
         self._write_timeout = write_timeout
         return self
 
     def pool_timeout(self: BuilderType, pool_timeout: Optional[float]) -> BuilderType:
-        self._request_param_check(get_updates=False)
+        self._request_param_check(name='pool_timeout', get_updates=False)
         self._pool_timeout = pool_timeout
         return self
 
-    def get_updates_request(self: BuilderType, request: BaseRequest) -> BuilderType:
+    def get_updates_request(self: BuilderType, get_updates_request: BaseRequest) -> BuilderType:
         """Sets a :class:`telegram.request.BaseRequest` object to be used for the
         :paramref:`~telegram.Bot.get_updates_request` parameter of
         :attr:`telegram.ext.Application.bot`.
@@ -430,52 +436,52 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. seealso:: :meth:`request`
 
         Args:
-            request (:class:`telegram.request.BaseRequest`): The request object.
+            get_updates_request (:class:`telegram.request.BaseRequest`): The request object.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
         self._request_check(get_updates=True)
-        self._request = request
+        self._get_updates_request = get_updates_request
         return self
 
     def get_updates_connection_pool_size(
         self: BuilderType, get_updates_connection_pool_size: int
     ) -> BuilderType:
-        self._request_param_check(get_updates=True)
+        self._request_param_check(name='connection_pool_size', get_updates=True)
         self._get_updates_connection_pool_size = get_updates_connection_pool_size
         return self
 
     def get_updates_proxy_url(self: BuilderType, get_updates_proxy_url: str) -> BuilderType:
-        self._request_param_check(get_updates=True)
+        self._request_param_check(name='proxy_url', get_updates=True)
         self._get_updates_proxy_url = get_updates_proxy_url
         return self
 
     def get_updates_connect_timeout(
         self: BuilderType, get_updates_connect_timeout: Optional[float]
     ) -> BuilderType:
-        self._request_param_check(get_updates=True)
+        self._request_param_check(name='connect_timeout', get_updates=True)
         self._get_updates_connect_timeout = get_updates_connect_timeout
         return self
 
     def get_updates_read_timeout(
         self: BuilderType, get_updates_read_timeout: Optional[float]
     ) -> BuilderType:
-        self._request_param_check(get_updates=True)
+        self._request_param_check(name='read_timeout', get_updates=True)
         self._get_updates_read_timeout = get_updates_read_timeout
         return self
 
     def get_updates_write_timeout(
         self: BuilderType, get_updates_write_timeout: Optional[float]
     ) -> BuilderType:
-        self._request_param_check(get_updates=True)
+        self._request_param_check(name='write_timeout', get_updates=True)
         self._get_updates_write_timeout = get_updates_write_timeout
         return self
 
     def get_updates_pool_timeout(
         self: BuilderType, get_updates_pool_timeout: Optional[float]
     ) -> BuilderType:
-        self._request_param_check(get_updates=True)
+        self._request_param_check(name='pool_timeout', get_updates=True)
         self._get_updates_pool_timeout = get_updates_pool_timeout
         return self
 
@@ -694,7 +700,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def updater(self: BuilderType, updater: Union[Updater, None]) -> BuilderType:
         """Sets a :class:`telegram.ext.Updater` instance to be used for
-        :attr:`telegram.ext.Application.updater`.
+        :attr:`telegram.ext.Application.updater`. The :attr:`telegram.ext.Updater.bot` and
+        :attr:`telegram.ext.Updater.update_queue` be used for :attr:`telegram.ext.Application.bot`
+        and  :attr:`telegram.ext.Application.update_queue`, respectively.
 
         Args:
             updater (:class:`telegram.ext.Updater` | :obj:`None`): The updater instance or
@@ -703,7 +711,12 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        for attr, error in (self._bot, 'bot instance'), (self._update_queue, 'update queue'):
+        for attr, error in (
+            (self._bot, 'bot instance'),
+            (self._request, 'request instance'),
+            (self._get_updates_request, 'get_updates_request instance'),
+            (self._update_queue, 'update queue'),
+        ):
             if not isinstance(attr, DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format('updater', error))
 
