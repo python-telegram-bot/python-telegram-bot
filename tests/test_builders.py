@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from .conftest import data_file
+from telegram.request import HTTPXRequest
+from .conftest import data_file, PRIVATE_KEY
 
 from telegram.ext import (
     ApplicationBuilder,
+    Defaults,
 )
 from telegram.ext._builders import _BOT_CHECKS
 
@@ -100,41 +102,44 @@ class TestApplicationBuilder:
             with pytest.raises(RuntimeError, match='`get_updates_request` may only be set, if no'):
                 builder.get_updates_request(None)
 
-    # def test_build_without_token(self, builder):
-    #     with pytest.raises(RuntimeError, match='No bot token was set.'):
-    #         builder.build()
-    #
-    # def test_build_custom_bot(self, builder, bot):
-    #     builder.bot(bot)
-    #     obj = builder.build()
-    #     assert obj.bot is bot
-    #
-    #     if isinstance(obj, Updater):
-    #         assert obj.dispatcher.bot is bot
-    #         assert obj.dispatcher.job_queue.dispatcher is obj.dispatcher
-    #         assert obj.exception_event is obj.dispatcher.exception_event
-    #
-    # def test_all_bot_args_custom(self, builder, bot):
-    #     defaults = Defaults()
-    #     request = HTTPXRequest(connection_pool_size=8)
-    #     builder.token(bot.token).base_url('base_url').base_file_url('base_file_url').private_key(
-    #         PRIVATE_KEY
-    #     ).defaults(defaults).arbitrary_callback_data(42).request(request)
-    #     built_bot = builder.build().bot
-    #
-    #     assert built_bot.token == bot.token
-    #     assert built_bot.base_url == 'base_url' + bot.token
-    #     assert built_bot.base_file_url == 'base_file_url' + bot.token
-    #     assert built_bot.defaults is defaults
-    #     assert built_bot.request is request
-    #     assert built_bot.callback_data_cache.maxsize == 42
-    #
-    #     builder = builder.__class__()
-    #     builder.token(bot.token).request_kwargs({'connect_timeout': 42})
-    #     built_bot = builder.build().bot
-    #
-    #     assert built_bot.token == bot.token
-    #     assert built_bot.request._connect_timeout == 42
+    def test_build_without_token(self, builder):
+        with pytest.raises(RuntimeError, match='No bot token was set.'):
+            builder.build()
+
+    def test_build_custom_bot(self, builder, bot):
+        builder.bot(bot)
+        app = builder.build()
+        assert app.bot is bot
+        assert app.updater.bot is bot
+
+    def test_all_bot_args_custom(self, builder, bot):
+        defaults = Defaults()
+        request = HTTPXRequest()
+        get_updates_request = HTTPXRequest()
+        builder.token(bot.token).base_url('base_url').base_file_url('base_file_url').private_key(
+            PRIVATE_KEY
+        ).defaults(defaults).arbitrary_callback_data(42).request(request).get_updates_request(
+            get_updates_request
+        )
+        built_bot = builder.build().bot
+
+        assert built_bot.token == bot.token
+        assert built_bot.base_url == 'base_url' + bot.token
+        assert built_bot.base_file_url == 'base_file_url' + bot.token
+        assert built_bot.defaults is defaults
+        assert built_bot.request is request
+        assert built_bot._request[0] is get_updates_request
+        assert built_bot.callback_data_cache.maxsize == 42
+
+        builder = ApplicationBuilder()
+        builder.connection_pool_size(1).connect_timeout(2).pool_timeout(3)
+        # TODO: This test is not finished
+        # builder.token(bot.token).request_kwargs({'connect_timeout': 42})
+        # built_bot = builder.build().bot
+        #
+        # assert built_bot.token == bot.token
+        # assert built_bot.request._connect_timeout == 42
+
     #
     # def test_all_dispatcher_args_custom(self, app, builder):
     #     job_queue = JobQueue()
