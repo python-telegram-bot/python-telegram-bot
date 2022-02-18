@@ -50,10 +50,17 @@ class CommandHandler(Handler[Update, CCT]):
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    .. versionchanged:: 14.0
+        :attr:`commands` is now a set and can be assinged after construction of model.
+
     Args:
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`] | Set[:obj:`str`]):
             The command or list of commands this handler should listen for.
             Limitations are the same as described here https://core.telegram.org/bots#commands
+
+            .. versionchanged:: 14.0
+                Added support for sets.
+
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature: ``def callback(update: Update, context: CallbackContext)``
@@ -71,16 +78,14 @@ class CommandHandler(Handler[Update, CCT]):
         ValueError: when command is too long or has illegal chars.
 
     Attributes:
-        commands (Set[:obj:`str`]):
-            The set of command(s) this handler should listen for.
-            Limitations are the same as described here https://core.telegram.org/bots#commands
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
             .. versionchanged:: 14.0
-            :attr:`commands` is now a set and can be assinged after construction of model.
+                :attr:`commands` is now a set and can be assinged after construction of model.
+
     """
 
     __slots__ = ('_commands', 'filters')
@@ -94,14 +99,8 @@ class CommandHandler(Handler[Update, CCT]):
     ):
         super().__init__(callback, run_async=run_async)
 
-        if isinstance(command, str):
-            self._commands = {command.lower()}
-        else:
-            self._commands = {i.lower() for i in command}
-
-        for comm in self._commands:
-            if not re.match(r'^[\da-z_]{1,32}$', comm):
-                raise ValueError(f'Command `{comm}` is not a valid bot command')
+        self._commands: Set = set()
+        self.commands = command  # type: ignore[assignment]
 
         self.filters = filters if filters is not None else filters_module.UpdateType.MESSAGES
 
@@ -127,7 +126,7 @@ class CommandHandler(Handler[Update, CCT]):
                 and message.text
                 and message.get_bot()
             ):
-                command = message.text[1 : message.entities[0].length]
+                command = message.text[1: message.entities[0].length]
                 args = message.text.split()[1:]
                 command_parts = command.split('@')
                 command_parts.append(message.get_bot().username)
@@ -159,6 +158,12 @@ class CommandHandler(Handler[Update, CCT]):
             if isinstance(check_result[1], dict):
                 context.update(check_result[1])
 
+    def _parse_commands(self, command: SLTS[str]) -> None:
+        if isinstance(command, str):
+            self._commands = {command.lower()}
+        else:
+            self._commands = {i.lower() for i in command}
+
     @property
     def commands(self) -> Set[str]:
         """
@@ -170,11 +175,11 @@ class CommandHandler(Handler[Update, CCT]):
         return self._commands
 
     @commands.setter
-    def commands(self, command: Union[str, List[str], Set[str]]) -> None:
-        if isinstance(command, str):
-            self._commands = {command.lower()}
-        else:
-            self._commands = {i.lower() for i in command}
+    def commands(self, command: SLTS) -> None:
+        self._parse_commands(command)
+        for comm in self._commands:
+            if not re.match(r'^[\da-z_]{1,32}$', comm):
+                raise ValueError(f'Command `{comm}` is not a valid bot command')
 
 
 class PrefixHandler(CommandHandler):
@@ -218,11 +223,23 @@ class PrefixHandler(CommandHandler):
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    .. versionchanged:: 14.0
+        :attr:`prefixes` and :attr:`commands` are always a set and can be
+        assigned with sets as well.
+
     Args:
         prefix (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`] | Set[:obj:`str`]):
             The prefix(es) that will precede :attr:`command`.
+
+            .. versionchanged:: 14.0
+                Added support for sets.
+
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`] | Set[:obj:`str`]):
             The command or list of commands this handler should listen for.
+
+            .. versionchanged:: 14.0
+                Added support for sets.
+
         callback (:obj:`callable`): The callback function for this handler. Will be called when
             :attr:`check_update` has determined that an update should be processed by this handler.
             Callback signature: ``def callback(update: Update, context: CallbackContext)``
@@ -237,18 +254,11 @@ class PrefixHandler(CommandHandler):
             Defaults to :obj:`False`.
 
     Attributes:
-        prefixes (Set[:obj:`str`]):
-            The prefix(es) that will precede :attr:`commands`.
-        commands (Set[:obj:`str`]):
-            The set of command(s) that this handler should listen for.
         callback (:obj:`callable`): The callback function for this handler.
         filters (:class:`telegram.ext.BaseFilter`): Optional. Only allow updates with these
             Filters.
         run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
 
-            .. versionchanged:: 14.0
-                :attr:`prefix` has been changed to :attr:`prefixes` and accepts sets as well.
-                :attr:`command` has been changed to :attr:`commands` and accepts sets as well.
     """
 
     __slots__ = ('_prefixes', '_combinations')
@@ -262,6 +272,9 @@ class PrefixHandler(CommandHandler):
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
 
+        self._prefixes: Set[str] = set()
+        self._combinations: Set[str] = set()
+
         super().__init__(
             command,
             callback,
@@ -269,16 +282,12 @@ class PrefixHandler(CommandHandler):
             run_async=run_async,
         )
 
-        self._prefixes: Set[str] = set()
-        self._combinations: Set[str] = set()
-
         self.prefixes = prefix  # type: ignore[assignment]
-        self._build_commands()
 
     @property
     def prefixes(self) -> Set[str]:
         """
-        The prefixes that will precede :attr:`command`.
+        The prefixes that will precede :attr:`commands`.
 
         Returns:
             Set[:obj:`str`]
@@ -293,22 +302,9 @@ class PrefixHandler(CommandHandler):
             self._prefixes = set(prefix)
         self._build_commands()
 
-    @property
-    def commands(self) -> Set[str]:
-        """
-        The set of commands this handler should listen for.
-
-        Returns:
-            Set[:obj:`str`]
-        """
-        return self._commands
-
-    @commands.setter
+    @CommandHandler.commands.setter  # type: ignore[attr-defined,misc]
     def commands(self, command: SLTS) -> None:
-        if isinstance(command, str):
-            self._commands = {command.lower()}
-        else:
-            self._commands = {i.lower() for i in command}
+        self._parse_commands(command)
         self._build_commands()
 
     def _build_commands(self) -> None:
