@@ -178,6 +178,19 @@ class TestCommandHandler(BaseTest):
         ):
             CommandHandler(cmd, self.callback_basic)
 
+    @pytest.mark.parametrize(
+        'cmd',
+        ['way_too_longcommand1234567yes_way_toooooooLong', 'ïñválídletters', 'invalid #&* chars'],
+        ids=['too long', 'invalid letter', 'invalid characters'],
+    )
+    def test_set_invalid_commands(self, cmd):
+        """A command handler that its new commands contain illegal commands should return error"""
+        handler = CommandHandler('start', self.callback_basic)
+        with pytest.raises(
+            ValueError, match=f'`{re.escape(cmd.lower())}` is not a valid bot command'
+        ):
+            handler.commands = cmd
+
     def test_command_list(self):
         """A command handler with multiple commands registered should respond to all of them."""
         handler = CommandHandler(['test', 'star'], self.callback_basic)
@@ -191,8 +204,10 @@ class TestCommandHandler(BaseTest):
         assert is_match(handler, make_command_update('/test'))
         handler.commands = "help"
         assert is_match(handler, make_command_update('/help'))
+        assert not is_match(handler, make_command_update('/start'))
         handler.commands = ['exit', 'happy']
         assert is_match(handler, make_command_update('/happy'))
+        assert not is_match(handler, make_command_update('/help'))
 
     def test_get_commands(self):
         """Test if command handler shows its commands"""
@@ -369,6 +384,19 @@ class TestPrefixHandler(BaseTest):
         assert handler._combinations == set(combinations(['!', '%'], self.COMMANDS))
         handler.prefixes = '+'
         assert handler._combinations == set(combinations(['+'], self.COMMANDS))
+
+    def test_commandhandler_invalid_commands(self):
+        """as PrefixHandler doesn't have the limitations of CommandHandler this tests shall pass"""
+        handler = self.make_default_handler()
+        commands = [
+            'way_too_longcommand1234567yes_way_toooooooLong',
+            'ïñválídletters',
+            'invalid #&* chars',
+        ]
+        handler.commands = commands
+        assert handler.commands == {i.lower() for i in commands}
+        handler.commands = commands[0]
+        assert handler.commands == {commands[0].lower()}
 
     def test_get_commands(self):
         handler = self.make_default_handler()
