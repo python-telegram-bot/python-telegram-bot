@@ -83,4 +83,4 @@ from ._chatmemberhandler import ChatMemberHandler
 from ._chatjoinrequesthandler import ChatJoinRequestHandler
 from ._defaults import Defaults
 from ._callbackdatacache import CallbackDataCache, InvalidCallbackData
-from ._builders import ApplicationBuilder
+from ._applicationbuilder import ApplicationBuilder

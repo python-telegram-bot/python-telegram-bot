@@ -59,7 +59,7 @@ from telegram.ext._utils.stack import was_called_by
 if TYPE_CHECKING:
     from telegram import Message
     from telegram.ext._jobqueue import Job
-    from telegram.ext._builders import InitApplicationBuilder
+    from telegram.ext._applicationbuilder import InitApplicationBuilder
 
 DEFAULT_GROUP: int = 0
 
@@ -202,7 +202,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         context_types: ContextTypes[CCT, UD, CD, BD],
     ):
         if not was_called_by(
-            inspect.currentframe(), Path(__file__).parent.resolve() / '_builders.py'
+            inspect.currentframe(), Path(__file__).parent.resolve() / '_applicationbuilder.py'
         ):
             warn(
                 '`Application` instances should be built via the `ApplicationBuilder`.',

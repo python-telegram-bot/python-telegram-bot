@@ -35,7 +35,7 @@ from telegram.ext import (
     Updater,
     ExtBot,
 )
-from telegram.ext._builders import _BOT_CHECKS
+from telegram.ext._applicationbuilder import _BOT_CHECKS
 
 
 @pytest.fixture(scope='function')
