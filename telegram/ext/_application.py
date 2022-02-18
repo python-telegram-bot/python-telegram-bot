@@ -222,7 +222,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         if concurrent_updates is True:
             concurrent_updates = 4096
         self._concurrent_updates_sem = asyncio.BoundedSemaphore(concurrent_updates or 1)
-        self._concurrent_updates = bool(concurrent_updates)
+        self._concurrent_updates: int = concurrent_updates or 0
 
         if self.job_queue:
             self.job_queue.set_application(self)
@@ -270,7 +270,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self._running
 
     @property
-    def concurrent_updates(self) -> bool:
+    def concurrent_updates(self) -> int:
+        """0 == not concurrent"""
         return self._concurrent_updates
 
     async def initialize(self) -> None:

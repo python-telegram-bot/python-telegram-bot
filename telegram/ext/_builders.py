@@ -75,13 +75,24 @@ if TYPE_CHECKING:
 
 
 _BOT_CHECKS = [
-    ('updater', 'Updater instance'),
     ('request', 'request instance'),
+    ('connection_pool_size', 'connection_pool_size'),
+    ('proxy_url', 'proxy_url'),
+    ('pool_timeout', 'pool_timeout'),
+    ('connect_timeout', 'connect_timeout'),
+    ('read_timeout', 'read_timeout'),
+    ('write_timeout', 'write_timeout'),
+    ('get_updates_connection_pool_size', 'get_updates_connection_pool_size'),
+    ('get_updates_proxy_url', 'get_updates_proxy_url'),
+    ('get_updates_pool_timeout', 'get_updates_pool_timeout'),
+    ('get_updates_connect_timeout', 'get_updates_connect_timeout'),
+    ('get_updates_read_timeout', 'get_updates_read_timeout'),
+    ('get_updates_write_timeout', 'get_updates_write_timeout'),
     ('get_updates_request', 'get_updates_request instance'),
     ('base_file_url', 'base_file_url'),
     ('base_url', 'base_url'),
     ('token', 'token'),
-    ('defaults', 'Defaults instance'),
+    ('defaults', 'defaults'),
     ('arbitrary_callback_data', 'arbitrary_callback_data'),
     ('private_key', 'private_key'),
 ]
@@ -152,15 +163,15 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._token: DVInput[str] = DefaultValue('')
         self._base_url: DVInput[str] = DefaultValue('https://api.telegram.org/bot')
         self._base_file_url: DVInput[str] = DefaultValue('https://api.telegram.org/file/bot')
-        self._connection_pool_size: Optional[int] = None
-        self._proxy_url: Optional[str] = None
+        self._connection_pool_size: DVInput[int] = DEFAULT_NONE
+        self._proxy_url: DVInput[str] = DEFAULT_NONE
         self._connect_timeout: ODVInput[float] = DEFAULT_NONE
         self._read_timeout: ODVInput[float] = DEFAULT_NONE
         self._write_timeout: ODVInput[float] = DEFAULT_NONE
         self._pool_timeout: ODVInput[float] = DEFAULT_NONE
         self._request: DVInput['BaseRequest'] = DEFAULT_NONE
-        self._get_updates_connection_pool_size: Optional[int] = None
-        self._get_updates_proxy_url: Optional[str] = None
+        self._get_updates_connection_pool_size: DVInput[int] = DEFAULT_NONE
+        self._get_updates_proxy_url: DVInput[str] = DEFAULT_NONE
         self._get_updates_connect_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_read_timeout: ODVInput[float] = DEFAULT_NONE
         self._get_updates_write_timeout: ODVInput[float] = DEFAULT_NONE
@@ -185,11 +196,15 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         if not isinstance(getattr(self, f'{prefix}request'), DefaultValue):
             return getattr(self, f'{prefix}request')
 
-        proxy_url = getattr(self, f'{prefix}proxy_url')
+        proxy_url = DefaultValue.get_value(getattr(self, f'{prefix}proxy_url'))
         if get_updates:
-            connection_pool_size = getattr(self, f'{prefix}connection_pool_size') or 1
+            connection_pool_size = (
+                DefaultValue.get_value(getattr(self, f'{prefix}connection_pool_size')) or 1
+            )
         else:
-            connection_pool_size = getattr(self, f'{prefix}connection_pool_size') or 128
+            connection_pool_size = (
+                DefaultValue.get_value(getattr(self, f'{prefix}connection_pool_size')) or 128
+            )
 
         timeouts = dict(
             connect_timeout=getattr(self, f'{prefix}connect_timeout'),
@@ -248,6 +263,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             updater = self._updater
             bot = self._updater.bot
             update_queue = self._updater.update_queue
+
+        print(self._concurrent_updates)
 
         application: Application[
             BT, CCT, UD, CD, BD, JQ
@@ -310,6 +327,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format('token', 'bot instance'))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format('token', 'updater'))
         self._token = token
         return self
 
@@ -329,6 +348,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format('base_url', 'bot instance'))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format('base_url', 'updater'))
         self._base_url = base_url
         return self
 
@@ -348,6 +369,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format('base_file_url', 'bot instance'))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format('base_file_url', 'updater'))
         self._base_file_url = base_file_url
         return self
 
@@ -358,9 +381,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         for attr in ('connect_timeout', 'read_timeout', 'write_timeout', 'pool_timeout'):
             if not isinstance(getattr(self, f"_{prefix}{attr}"), DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format(name, attr))
-        if getattr(self, f'_{prefix}connection_pool_size') is not None:
+        if not isinstance(getattr(self, f'_{prefix}connection_pool_size'), DefaultValue):
             raise RuntimeError(_TWO_ARGS_REQ.format(name, 'connection_pool_size'))
-        if getattr(self, f'_{prefix}proxy_url') is not None:
+        if not isinstance(getattr(self, f'_{prefix}proxy_url'), DefaultValue):
             raise RuntimeError(_TWO_ARGS_REQ.format(name, 'proxy_url'))
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format(name, 'bot instance'))
@@ -378,8 +401,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(
                 _TWO_ARGS_REQ.format(
-                    'get_updates_request' if get_updates else 'request', 'bot instance'
+                    f'get_updates_{name}' if get_updates else name, 'bot instance'
                 )
+            )
+
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(
+                _TWO_ARGS_REQ.format(f'get_updates_{name}' if get_updates else name, 'updater')
             )
 
     def request(self: BuilderType, request: BaseRequest) -> BuilderType:
@@ -510,6 +538,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format('private_key', 'bot instance'))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format('private_key', 'updater'))
 
         self._private_key = (
             private_key if isinstance(private_key, bytes) else Path(private_key).read_bytes()
@@ -536,6 +566,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format('defaults', 'bot instance'))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format('defaults', 'updater'))
         self._defaults = defaults
         return self
 
@@ -562,6 +594,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format('arbitrary_callback_data', 'bot instance'))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format('arbitrary_callback_data', 'updater'))
         self._arbitrary_callback_data = arbitrary_callback_data
         return self
 
@@ -579,6 +613,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format('bot', 'updater'))
         for attr, error in _BOT_CHECKS:
             if not isinstance(getattr(self, f'_{attr}'), DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format('bot', error))
@@ -599,7 +635,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if isinstance(self._updater, DefaultValue):
+        if self._updater not in (DEFAULT_NONE, None):
             raise RuntimeError(_TWO_ARGS_REQ.format('update_queue', 'updater instance'))
         self._update_queue = update_queue
         return self
@@ -711,13 +747,21 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
+        if updater is None:
+            self._updater = updater
+            return self
+
         for attr, error in (
             (self._bot, 'bot instance'),
             (self._request, 'request instance'),
             (self._get_updates_request, 'get_updates_request instance'),
-            (self._update_queue, 'update queue'),
+            (self._update_queue, 'update_queue'),
         ):
             if not isinstance(attr, DefaultValue):
+                raise RuntimeError(_TWO_ARGS_REQ.format('updater', error))
+
+        for attr_name, error in _BOT_CHECKS:
+            if not isinstance(getattr(self, f'_{attr_name}'), DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format('updater', error))
 
         self._updater = updater

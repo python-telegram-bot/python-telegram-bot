@@ -16,6 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
+from dataclasses import dataclass
+
+import httpx
 import pytest
 
 from telegram.request import HTTPXRequest
@@ -24,6 +28,12 @@ from .conftest import data_file, PRIVATE_KEY
 from telegram.ext import (
     ApplicationBuilder,
     Defaults,
+    Application,
+    JobQueue,
+    PicklePersistence,
+    ContextTypes,
+    Updater,
+    ExtBot,
 )
 from telegram.ext._builders import _BOT_CHECKS
 
@@ -34,6 +44,64 @@ def builder():
 
 
 class TestApplicationBuilder:
+    def test_build_without_token(self, builder):
+        with pytest.raises(RuntimeError, match='No bot token was set.'):
+            builder.build()
+
+    def test_build_custom_bot(self, builder, bot):
+        builder.bot(bot)
+        app = builder.build()
+        assert app.bot is bot
+        assert app.updater.bot is bot
+
+    def test_default_values(self, bot, monkeypatch, builder):
+        @dataclass
+        class Client:
+            timeout: object
+            proxies: object
+            limits: object
+
+        monkeypatch.setattr(httpx, 'AsyncClient', Client)
+
+        app = builder.token(bot.token).build()
+
+        assert isinstance(app, Application)
+        assert app.concurrent_updates == 0
+
+        assert isinstance(app.bot, ExtBot)
+        assert isinstance(app.bot.request, HTTPXRequest)
+        assert 'api.telegram.org' in app.bot.base_url
+        assert bot.token in app.bot.base_url
+        assert 'api.telegram.org' in app.bot.base_file_url
+        assert bot.token in app.bot.base_file_url
+        assert app.bot.private_key is None
+        assert app.bot.arbitrary_callback_data is False
+        assert app.bot.defaults is None
+
+        get_updates_client = app.bot._request[0]._client
+        assert get_updates_client.limits == httpx.Limits(
+            max_connections=1, max_keepalive_connections=1
+        )
+        assert get_updates_client.proxies is None
+        assert get_updates_client.timeout == httpx.Timeout(
+            connect=5.0, read=5.0, write=5.0, pool=1.0
+        )
+
+        client = app.bot.request._client
+        assert client.limits == httpx.Limits(max_connections=128, max_keepalive_connections=128)
+        assert client.proxies is None
+        assert client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
+
+        assert isinstance(app.update_queue, asyncio.Queue)
+        assert isinstance(app.updater, Updater)
+        assert app.updater.bot is app.bot
+        assert app.updater.update_queue is app.update_queue
+
+        assert isinstance(app.job_queue, JobQueue)
+        assert app.job_queue.application is app
+
+        assert app.persistence is None
+
     @pytest.mark.parametrize(
         'method, description', _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
     )
@@ -49,11 +117,11 @@ class TestApplicationBuilder:
         builder = builder.__class__()
         builder.bot(None)
         with pytest.raises(RuntimeError, match=f'`{method}` may only be set, if no bot instance'):
-            getattr(builder, method)(None)
+            getattr(builder, method)(data_file('private.key'))
 
-    def test_mutually_exclusive_for_request(self, builder):
-        builder.request(None)
-        methods = (
+    @pytest.mark.parametrize(
+        'method',
+        (
             'connection_pool_size',
             'connect_timeout',
             'pool_timeout',
@@ -62,23 +130,24 @@ class TestApplicationBuilder:
             'proxy_url',
             'bot',
             'updater',
-        )
+        ),
+    )
+    def test_mutually_exclusive_for_request(self, builder, method):
+        builder.request(1)
 
-        for method in methods:
-            with pytest.raises(
-                RuntimeError, match=f'`{method}` may only be set, if no request instance'
-            ):
-                getattr(builder, method)(None)
+        with pytest.raises(
+            RuntimeError, match=f'`{method}` may only be set, if no request instance'
+        ):
+            getattr(builder, method)(data_file('private.key'))
 
-        for method in methods:
-            builder = ApplicationBuilder()
-            getattr(builder, method)(1)
-            with pytest.raises(RuntimeError, match='`request` may only be set, if no'):
-                builder.request(None)
+        builder = ApplicationBuilder()
+        getattr(builder, method)(1)
+        with pytest.raises(RuntimeError, match='`request` may only be set, if no'):
+            builder.request(1)
 
-    def test_mutually_exclusive_for_get_updates_request(self, builder):
-        builder.get_updates_request(None)
-        methods = (
+    @pytest.mark.parametrize(
+        'method',
+        (
             'get_updates_connection_pool_size',
             'get_updates_connect_timeout',
             'get_updates_pool_timeout',
@@ -87,32 +156,87 @@ class TestApplicationBuilder:
             'get_updates_proxy_url',
             'bot',
             'updater',
-        )
+        ),
+    )
+    def test_mutually_exclusive_for_get_updates_request(self, builder, method):
+        builder.get_updates_request(1)
 
-        for method in methods:
-            with pytest.raises(
-                RuntimeError,
-                match=f'`{method}` may only be set, if no get_updates_request instance',
-            ):
-                getattr(builder, method)(None)
+        with pytest.raises(
+            RuntimeError,
+            match=f'`{method}` may only be set, if no get_updates_request instance',
+        ):
+            getattr(builder, method)(data_file('private.key'))
 
-        for method in methods:
-            builder = ApplicationBuilder()
-            getattr(builder, method)(1)
-            with pytest.raises(RuntimeError, match='`get_updates_request` may only be set, if no'):
-                builder.get_updates_request(None)
+        builder = ApplicationBuilder()
+        getattr(builder, method)(1)
+        with pytest.raises(RuntimeError, match='`get_updates_request` may only be set, if no'):
+            builder.get_updates_request(1)
 
-    def test_build_without_token(self, builder):
-        with pytest.raises(RuntimeError, match='No bot token was set.'):
-            builder.build()
+    @pytest.mark.parametrize(
+        'method',
+        [
+            'get_updates_connection_pool_size',
+            'get_updates_connect_timeout',
+            'get_updates_pool_timeout',
+            'get_updates_read_timeout',
+            'get_updates_write_timeout',
+            'get_updates_proxy_url',
+            'connection_pool_size',
+            'connect_timeout',
+            'pool_timeout',
+            'read_timeout',
+            'write_timeout',
+            'proxy_url',
+            'bot',
+            'update_queue',
+        ]
+        + [entry[0] for entry in _BOT_CHECKS],
+    )
+    def test_mutually_exclusive_for_updater(self, builder, method):
+        builder.updater(1)
 
-    def test_build_custom_bot(self, builder, bot):
-        builder.bot(bot)
-        app = builder.build()
-        assert app.bot is bot
-        assert app.updater.bot is bot
+        with pytest.raises(
+            RuntimeError,
+            match=f'`{method}` may only be set, if no updater',
+        ):
+            getattr(builder, method)(data_file('private.key'))
 
-    def test_all_bot_args_custom(self, builder, bot):
+        builder = ApplicationBuilder()
+        getattr(builder, method)(data_file('private.key'))
+        with pytest.raises(RuntimeError, match=f'`updater` may only be set, if no {method}'):
+            builder.updater(1)
+
+    @pytest.mark.parametrize(
+        'method',
+        [
+            'get_updates_connection_pool_size',
+            'get_updates_connect_timeout',
+            'get_updates_pool_timeout',
+            'get_updates_read_timeout',
+            'get_updates_write_timeout',
+            'get_updates_proxy_url',
+            'connection_pool_size',
+            'connect_timeout',
+            'pool_timeout',
+            'read_timeout',
+            'write_timeout',
+            'proxy_url',
+            'bot',
+        ]
+        + [entry[0] for entry in _BOT_CHECKS],
+    )
+    def test_mutually_non_exclusive_for_updater(self, builder, method):
+        # If no updater is to be used, all these parameters should be settable
+        # Since the parameters themself are tested in the other tests, we here just make sure
+        # that no exception is raised
+        builder.updater(None)
+        getattr(builder, method)(data_file('private.key'))
+
+        builder = ApplicationBuilder()
+        getattr(builder, method)(data_file('private.key'))
+        builder.updater(None)
+
+    def test_all_bot_args_custom(self, builder, bot, monkeypatch):
         defaults = Defaults()
         request = HTTPXRequest()
         get_updates_request = HTTPXRequest()
@@ -123,6 +247,10 @@ class TestApplicationBuilder:
         )
         built_bot = builder.build().bot
 
+        # In the following we access some private attributes of bot and request. this is not
+        # really nice as we want to test the public interface, but here it's hard to ensure by
+        # other means that the parameters are passed correctly
+
         assert built_bot.token == bot.token
         assert built_bot.base_url == 'base_url' + bot.token
         assert built_bot.base_file_url == 'base_file_url' + bot.token
@@ -130,94 +258,99 @@ class TestApplicationBuilder:
         assert built_bot.request is request
         assert built_bot._request[0] is get_updates_request
         assert built_bot.callback_data_cache.maxsize == 42
+        assert built_bot.private_key
 
-        builder = ApplicationBuilder()
-        builder.connection_pool_size(1).connect_timeout(2).pool_timeout(3)
-        # TODO: This test is not finished
-        # builder.token(bot.token).request_kwargs({'connect_timeout': 42})
-        # built_bot = builder.build().bot
-        #
-        # assert built_bot.token == bot.token
-        # assert built_bot.request._connect_timeout == 42
+        @dataclass
+        class Client:
+            timeout: object
+            proxies: object
+            limits: object
 
-    #
-    # def test_all_dispatcher_args_custom(self, app, builder):
-    #     job_queue = JobQueue()
-    #     persistence = PicklePersistence('filename')
-    #     context_types = ContextTypes()
-    #     builder.bot(app.bot).update_queue(app.update_queue).exception_event(
-    #         app.exception_event
-    #     ).job_queue(job_queue).persistence(persistence).context_types(context_types).workers(3)
-    #     dispatcher = builder.build()
-    #
-    #     assert dispatcher.bot is app.bot
-    #     assert dispatcher.update_queue is app.update_queue
-    #     assert dispatcher.exception_event is app.exception_event
-    #     assert dispatcher.job_queue is job_queue
-    #     assert dispatcher.job_queue.dispatcher is dispatcher
-    #     assert dispatcher.persistence is persistence
-    #     assert dispatcher.context_types is context_types
-    #     assert dispatcher.workers == 3
-    #
-    # def test_all_updater_args_custom(self, app, builder):
-    #     updater = (
-    #         builder.bot(app.bot)
-    #         .exception_event(app.exception_event)
-    #         .update_queue(app.update_queue)
-    #         .user_signal_handler(42)
-    #         .build()
-    #     )
-    #
-    #     assert updater.dispatcher is None
-    #     assert updater.bot is app.bot
-    #     assert updater.exception_event is app.exception_event
-    #     assert updater.update_queue is app.update_queue
-    #     assert updater.user_signal_handler == 42
-    #
-    # def test_connection_pool_size_with_workers(self, bot, builder):
-    #     app = builder.token(bot.token).workers(42).build()
-    #     assert app.workers == 42
-    #     assert app.bot.request.con_pool_size == 46
-    #
-    # def test_connection_pool_size_warning(self, bot, builder, recwarn):
-    #     builder.token(bot.token).workers(42).request_kwargs({'con_pool_size': 1})
-    #     app = builder.build()
-    #     assert app.workers == 42
-    #     assert app.bot.request.con_pool_size == 1
-    #
-    #     assert len(recwarn) == 1
-    #     message = str(recwarn[-1].message)
-    #     assert 'smaller (1)' in message
-    #     assert 'recommended value of 46.' in message
-    #     assert recwarn[-1].filename == __file__, "wrong stacklevel"
-    #
-    # def test_custom_classes(self, bot, builder):
-    #     class CustomApplication(Application):
-    #         def __init__(self, arg, **kwargs):
-    #             super().__init__(**kwargs)
-    #             self.arg = arg
-    #
-    #     builder.application_class(CustomApplication, kwargs={'arg': 2}).token(bot.token)
-    #
-    #     obj = builder.build()
-    #     assert isinstance(obj, CustomApplication)
-    #     assert obj.arg == 2
-    #
-    # @pytest.mark.parametrize('input_type', ('bytes', 'str', 'Path'))
-    # def test_all_private_key_input_types(self, builder, bot, input_type):
-    #     private_key = Path('tests/data/private.key')
-    #     password = Path('tests/data/private_key.password')
-    #
-    #     if input_type == 'bytes':
-    #         private_key = private_key.read_bytes()
-    #         password = password.read_bytes()
-    #     if input_type == 'str':
-    #         private_key = str(private_key)
-    #         password = str(password)
-    #
-    #     builder.token(bot.token).private_key(
-    #         private_key=private_key,
-    #         password=password,
-    #     )
-    #     bot = builder.build().bot
-    #     assert bot.private_key
+        monkeypatch.setattr(httpx, 'AsyncClient', Client)
+
+        builder = ApplicationBuilder().token(bot.token)
+        builder.connection_pool_size(1).connect_timeout(2).pool_timeout(3).read_timeout(
+            4
+        ).write_timeout(5).proxy_url('proxy_url')
+        app = builder.build()
+        client = app.bot.request._client
+
+        assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
+        assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
+        assert client.proxies == 'proxy_url'
+
+        builder = ApplicationBuilder().token(bot.token)
+        builder.get_updates_connection_pool_size(1).get_updates_connect_timeout(
+            2
+        ).get_updates_pool_timeout(3).get_updates_read_timeout(4).get_updates_write_timeout(
+            5
+        ).get_updates_proxy_url(
+            'proxy_url'
+        )
+        app = builder.build()
+        client = app.bot._request[0]._client
+
+        assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
+        assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
+        assert client.proxies == 'proxy_url'
+
+    def test_custom_application_class(self, bot, builder):
+        class CustomApplication(Application):
+            def __init__(self, arg, **kwargs):
+                super().__init__(**kwargs)
+                self.arg = arg
+
+        builder.application_class(CustomApplication, kwargs={'arg': 2}).token(bot.token)
+
+        app = builder.build()
+        assert isinstance(app, CustomApplication)
+        assert app.arg == 2
+
+    def test_all_application_args_custom(self, builder, bot, monkeypatch):
+        job_queue = JobQueue()
+        persistence = PicklePersistence('file_path')
+        update_queue = asyncio.Queue()
+        context_types = ContextTypes()
+        concurrent_updates = 123
+        app = (
+            builder.token(bot.token)
+            .job_queue(job_queue)
+            .persistence(persistence)
+            .update_queue(update_queue)
+            .context_types(context_types)
+            .concurrent_updates(concurrent_updates)
+        ).build()
+        assert app.job_queue is job_queue
+        assert app.job_queue.application is app
+        assert app.persistence is persistence
+        assert app.persistence.bot is app.bot
+        assert app.update_queue is update_queue
+        assert app.updater.update_queue is update_queue
+        assert app.updater.bot is app.bot
+        assert app.context_types is context_types
+        assert app.concurrent_updates == concurrent_updates
+
+        updater = Updater(bot=bot, update_queue=update_queue)
+        app = ApplicationBuilder().updater(updater).build()
+        assert app.updater is updater
+        assert app.bot is updater.bot
+        assert app.update_queue is updater.update_queue
+
+    @pytest.mark.parametrize('input_type', ('bytes', 'str', 'Path'))
+    def test_all_private_key_input_types(self, builder, bot, input_type):
+        private_key = data_file('private.key')
+        password = data_file('private_key.password')
+
+        if input_type == 'bytes':
+            private_key = private_key.read_bytes()
+            password = password.read_bytes()
+        if input_type == 'str':
+            private_key = str(private_key)
+            password = str(password)
+
+        builder.token(bot.token).private_key(
+            private_key=private_key,
+            password=password,
+        )
+        bot = builder.build().bot
+        assert bot.private_key
