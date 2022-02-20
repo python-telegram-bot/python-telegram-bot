@@ -202,9 +202,7 @@ class Bot(TelegramObject):
         return hash(self.bot)
 
     def __reduce__(self) -> NoReturn:
-        """
-        Called by pickle.dumps(). Serializing bots is unadvisable, so we try to forbid pickling.
-        """
+        """Called by pickle.dumps(). Serializing bots is unadvisable, so we forbid pickling."""
         raise pickle.PicklingError('Bot objects cannot be pickled!')
 
     def to_dict(self) -> JSONDict:
