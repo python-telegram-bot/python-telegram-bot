@@ -1345,7 +1345,40 @@ class TestPicklePersistence:
             conversations_test = dict(pickle.load(f))['conversations']
         assert conversations_test['name1'] == conversation1
 
-    def test_custom_pickler_unpickler(
+    def test_custom_pickler_unpickler_simple(
+        self, pickle_persistence, update, good_pickle_files, bot, recwarn
+    ):
+        pickle_persistence.bot = bot  # assign the current bot to the persistence
+        data_with_bot = {'current_bot': update.message}
+        pickle_persistence.update_chat_data(12345, data_with_bot)  # also calls BotPickler.dumps()
+
+        # Test that regular pickle load fails -
+        err_msg = (
+            "A load persistent id instruction was encountered,\nbut no persistent_load "
+            "function was specified."
+        )
+        with pytest.raises(pickle.UnpicklingError, match=err_msg):
+            with open('pickletest_chat_data', 'rb') as f:
+                pickle.load(f)
+
+        # Test that our custom unpickler works as intended -- inserts the current bot
+        # We have to create a new instance otherwise unpickling is skipped
+        pp = PicklePersistence("pickletest", single_file=False, on_flush=False)
+        pp.bot = bot  # Set the bot
+        assert pp.get_chat_data()[12345]['current_bot']._bot is bot
+
+        # Now test that pickling of unknown bots will be replaced by None-
+        assert not len(recwarn)
+        data_with_bot['unknown_bot'] = Bot('1234:abcd')
+        pickle_persistence.update_chat_data(12345, data_with_bot)
+        assert len(recwarn) == 1
+        assert recwarn[-1].category is PTBUserWarning
+        assert str(recwarn[-1].message).startswith("Unknown bot instance found.")
+        pp = PicklePersistence("pickletest", single_file=False, on_flush=False)
+        pp.bot = bot
+        assert pp.get_chat_data()[12345]['unknown_bot'] is None
+
+    def test_custom_pickler_unpickler_with_handler_integration(
         self, bot, update, pickle_persistence, good_pickle_files, recwarn
     ):
         u = UpdaterBuilder().bot(bot).persistence(pickle_persistence).build()
@@ -1355,7 +1388,6 @@ class TestPicklePersistence:
         def first(update, context):
             nonlocal bot_id
             bot_id = update.message.get_bot()
-            assert bot_id
             # Test pickling a message object, which has the current bot
             context.user_data['msg'] = update.message
             # Test pickling a bot, which is not known-
@@ -1372,7 +1404,7 @@ class TestPicklePersistence:
         h2 = MessageHandler(None, second)
         dp.add_handler(h1)
 
-        assert len(recwarn) == 0
+        assert not len(recwarn)
         dp.process_update(update)
         assert len(recwarn) == 1
         assert recwarn[-1].category is PTBUserWarning

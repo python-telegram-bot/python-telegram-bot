@@ -125,10 +125,14 @@ class Bot(TelegramObject):
         considered equal, if their :attr:`bot` is equal.
 
     Note:
-        Most bot methods have the argument ``api_kwargs`` which allows to pass arbitrary keywords
-        to the Telegram API. This can be used to access new features of the API before they were
-        incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
-        passing files.
+        * Most bot methods have the argument ``api_kwargs`` which allows passing arbitrary keywords
+          to the Telegram API. This can be used to access new features of the API before they are
+          incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
+          passing files.
+        * Bots should not be serialized since if you for e.g. change the bots token, then your
+          serialized instance will not reflect that change. Hence, we raise a
+          :exc:`pickle.PicklingError` upon serialization.
+
 
     .. versionchanged:: 14.0
 
@@ -138,6 +142,7 @@ class Bot(TelegramObject):
         * Removed the deprecated ``defaults`` parameter. If you want to use
           :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
           instead.
+        * Attempting to pickle a bot instance will now raise :exc:`pickle.PicklingError`.
 
     Args:
         token (:obj:`str`): Bot's unique authentication.
@@ -197,7 +202,9 @@ class Bot(TelegramObject):
         return hash(self.bot)
 
     def __reduce__(self) -> NoReturn:
-        """Called by pickle.dumps() and only when bot instance is present in the data structure."""
+        """
+        Called by pickle.dumps(). Serializing bots is unadvisable, so we try to forbid pickling.
+        """
         raise pickle.PicklingError('Bot objects cannot be pickled!')
 
     def to_dict(self) -> JSONDict:

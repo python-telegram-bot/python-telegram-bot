@@ -21,6 +21,7 @@ import copyreg
 import pickle
 from copy import deepcopy
 from pathlib import Path
+from sys import version_info as py_ver
 from typing import (
     Any,
     Dict,
@@ -31,6 +32,7 @@ from typing import (
     Type,
     Set,
     Callable,
+    TypeVar,
 )
 
 from telegram import Bot, TelegramObject
@@ -41,11 +43,14 @@ from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 
 
+# V13_REPLACED_BOT = 'bot_instance_replaced_by_ptb_persistence'
 _REPLACED_KNOWN_BOT = "a known bot replaced by PTB's PicklePersistence"
 _REPLACED_UNKNOWN_BOT = "an unknown bot replaced by PTB's PicklePersistence"
 
+TO = TypeVar('TO', bound=TelegramObject)
 
-def _all_subclasses(cls: Type[TelegramObject]) -> Set[Type[TelegramObject]]:
+
+def _all_subclasses(cls: Type[TO]) -> Set[Type[TO]]:
     """Gets all subclasses of the specified object, recursively. from
     https://stackoverflow.com/a/3862957/9706202
     """
@@ -53,46 +58,49 @@ def _all_subclasses(cls: Type[TelegramObject]) -> Set[Type[TelegramObject]]:
     return set(subclasses).union([s for c in subclasses for s in _all_subclasses(c)])
 
 
-def _reconstruct_to(cls: Type[TelegramObject], kwargs: dict) -> TelegramObject:
+def _reconstruct_to(cls: Type[TO], kwargs: dict) -> TO:
     """
     This method is used for unpickling. The data, which is in the form a dictionary, is
-    converted back into a class. Functions the same as :meth:`TelegramObject.__setstate__`
+    converted back into a class. Functions the same as :meth:`TelegramObject.__setstate__`.
+    This function should be kept in place for backwards compatibility even if the pickling logic
+    is changed, since `_custom_reduction` places references to this function into the pickled data.
     """
+    bot = kwargs.pop('_bot', None)
     obj = cls(**kwargs)
-    if '_bot' in kwargs:
-        obj.set_bot(kwargs['_bot'])
+    obj.set_bot(bot)
     return obj
 
 
-def _custom_reduction(cls: TelegramObject) -> Tuple[Callable, Tuple[Type[TelegramObject], dict]]:
+def _custom_reduction(cls: TO) -> Tuple[Callable, Tuple[Type[TO], dict]]:
     """
     This method is used for pickling. The bot attribute is preserved so _BotPickler().persistent_id
     works as intended.
     """
-    # Adapted from self.to_dict(), unlike to_dict(), this is not recursive.
-    data = {}
-    attrs = {attr for cls in cls.__class__.__mro__[:-1] for attr in cls.__slots__}
-    for key in attrs:
-        value = getattr(cls, key, None)
-        if value is not None:
-            data[key] = value
-
+    data = cls._get_attrs(include_private=True)  # pylint: disable=protected-access
     return _reconstruct_to, (cls.__class__, data)
 
 
 class _BotPickler(pickle.Pickler):
     __slots__ = ('_bot',)
 
-    # Here we define a private dispatch_table, because we want to preserve the bot attribute of
-    # objects so persistent_id works as intended. Otherwise, the bot attribute is deleted in
-    # __getstate__, which used for regular pickling (via pickle.dumps(...))
-    dispatch_table = copyreg.dispatch_table.copy()  # type: ignore[attr-defined]
-    for obj in _all_subclasses(TelegramObject):
-        dispatch_table[obj] = _custom_reduction
-
     def __init__(self, bot: Bot, *args: Any, **kwargs: Any):
         self._bot = bot
+        # Here we define a private dispatch_table, because we want to preserve the bot attribute of
+        # objects so persistent_id works as intended. Otherwise, the bot attribute is deleted in
+        # __getstate__, which used for regular pickling (via pickle.dumps(...))
+        if py_ver < (3, 8):  # self.reducer_override is used above this version
+            self.dispatch_table = copyreg.dispatch_table.copy()  # type: ignore[attr-defined]
+            for obj in _all_subclasses(TelegramObject):
+                self.dispatch_table[obj] = _custom_reduction  # type: ignore[index]
         super().__init__(*args, **kwargs)
+
+    def reducer_override(  # pylint: disable=no-self-use
+        self, obj: TO
+    ) -> Tuple[Callable, Tuple[Type[TO], dict]]:
+        if not isinstance(obj, TelegramObject):
+            return NotImplemented
+
+        return _custom_reduction(obj)
 
     def persistent_id(self, obj: object) -> Optional[str]:
         """Used to 'mark' the Bot, so it can be replaced later. See
@@ -100,6 +108,8 @@ class _BotPickler(pickle.Pickler):
         """
         if obj is self._bot:
             return _REPLACED_KNOWN_BOT
+        # if isinstance(obj, str) and obj == V13_REPLACED_BOT:  # backwards compatibility with v13
+        #     return _REPLACED_KNOWN_BOT
         if isinstance(obj, Bot):
             warn(
                 'Unknown bot instance found. Will be replaced by `None` during unpickling',

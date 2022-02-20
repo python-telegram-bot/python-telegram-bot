@@ -33,7 +33,7 @@ except ImportError:
 
 
 class DictPersistence(BasePersistence):
-    """Using Python's :obj:`dict` and ``json`` for making your bot persistent.
+    """Using Python's :obj:`dict` and :mod:`json` for making your bot persistent.
 
     Attention:
         The interface provided by this class is intended to be accessed exclusively by
@@ -41,16 +41,13 @@ class DictPersistence(BasePersistence):
         interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
 
     Note:
-        * This class does *not* implement a :meth:`flush` method, meaning that data managed by
-          ``DictPersistence`` is in-memory only and will be lost when the bot shuts down. This is,
-          because ``DictPersistence`` is mainly intended as starting point for custom persistence
-          classes that need to JSON-serialize the stored data before writing them to file/database.
+        * Data managed by :class:`DictPersistence` is in-memory only and will be lost when the bot
+          shuts down. This is, because :class:`DictPersistence` is mainly intended as starting
+          point for custom persistence classes that need to JSON-serialize the stored data before
+          writing them to file/database.
 
-        * This implementation of :class:`BasePersistence` does **not** replace bot instances with a
-          placeholder before serialization. Hence, you should make sure not to
-          store any bot instances in the data that will be persisted. E.g. in case of
-          :class:`telegram.TelegramObject`, one may call :meth:`BasePersistence.set_bot` to ensure
-          that shortcuts like :meth:`telegram.Message.reply_text` are available.
+        * This implementation of :class:`BasePersistence` does not handle data that cannot be
+          serialized by :func:`json.dumps`.
 
     .. versionchanged:: 14.0
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
@@ -59,6 +56,8 @@ class DictPersistence(BasePersistence):
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
             saved.
+
+            .. versionadded:: 14.0
         user_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
@@ -75,6 +74,8 @@ class DictPersistence(BasePersistence):
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.
+
+            .. versionadded:: 14.0
     """
 
     __slots__ = (

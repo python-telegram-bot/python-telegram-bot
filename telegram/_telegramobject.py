@@ -43,8 +43,10 @@ class TelegramObject:
     with the appropriate name, a :exc:`KeyError` will be raised.
 
     When objects of this type are pickled, the :class:`~telegram.Bot` attribute associated with the
-    object will be removed. However, when deepcopying the object, the :class:`~telegram.Bot`
-    attribute is *not* removed.
+    object will be removed. However, when copying the object via :func:`copy.deepcopy`, the copy
+    will have the *same* bot instance associated with it, i.e::
+
+        assert telegram_object.get_bot() is copy.deepcopy(telegram_object).get_bot()
 
     .. versionchanged:: 14.0
         ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
@@ -113,17 +115,7 @@ class TelegramObject:
         This method is used for pickling. We remove the bot attribute of the object since those
         are not pickable.
         """
-        # Adapted from self.to_dict(), unlike to_dict(), this is not recursive.
-        data = {}
-        attrs = {attr for cls in self.__class__.__mro__[:-1] for attr in cls.__slots__}
-        for key in attrs:
-            if key.startswith('_'):
-                continue
-
-            value = getattr(self, key, None)
-            if value is not None:
-                data[key] = value
-        return data
+        return self._get_attrs(include_private=False, recursive=False)
 
     def __setstate__(self, state: dict) -> None:
         """
@@ -132,11 +124,35 @@ class TelegramObject:
         """
         self.__init__(**state)  # type: ignore[misc]
 
-    def __deepcopy__(self, memodict: dict) -> object:
+    def __deepcopy__(self: TO, memodict: dict) -> TO:
         """This method deepcopies the object and sets the bot on the newly created copy."""
         copy = self.__class__(**deepcopy(self.__getstate__(), memodict))
         copy.set_bot(self._bot)
         return copy
+
+    def _get_attrs(
+        self, include_private: bool = False, recursive: bool = False
+    ) -> Dict[str, Union[str, object]]:
+        data = {}
+
+        # We want to get all attributes for the class, using self.__slots__ only includes the
+        # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
+        # and then get their attributes. The `[:-1]` slice excludes the `object` class
+        attrs = {attr for cls in self.__class__.__mro__[:-1] for attr in cls.__slots__}
+        for key in attrs:
+            if not include_private and key.startswith('_'):
+                continue
+
+            value = getattr(self, key, None)
+            if value is not None:
+                if recursive and hasattr(value, 'to_dict'):
+                    data[key] = value.to_dict()
+                else:
+                    data[key] = value
+
+        if recursive and data.get('from_user'):
+            data['from'] = data.pop('from_user', None)
+        return data
 
     @staticmethod
     def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
@@ -194,27 +210,7 @@ class TelegramObject:
         Returns:
             :obj:`dict`
         """
-        data = {}
-
-        # We want to get all attributes for the class, using self.__slots__ only includes the
-        # attributes used by that class itself, and not its superclass(es). Hence we get its MRO
-        # and then get their attributes. The `[:-2]` slice excludes the `object` class & the
-        # TelegramObject class itself.
-        attrs = {attr for cls in self.__class__.__mro__[:-2] for attr in cls.__slots__}
-        for key in attrs:
-            if key == 'bot' or key.startswith('_'):
-                continue
-
-            value = getattr(self, key, None)
-            if value is not None:
-                if hasattr(value, 'to_dict'):
-                    data[key] = value.to_dict()
-                else:
-                    data[key] = value
-
-        if data.get('from_user'):
-            data['from'] = data.pop('from_user', None)
-        return data
+        return self._get_attrs(recursive=True)
 
     def get_bot(self) -> 'Bot':
         """Returns the :class:`telegram.Bot` instance associated with this object.
