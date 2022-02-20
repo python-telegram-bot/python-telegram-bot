@@ -140,7 +140,7 @@ class TelegramObject:
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
         attrs = {attr for cls in self.__class__.__mro__[:-1] for attr in cls.__slots__}
         for key in attrs:
-            if not include_private and key.startswith('_'):
+            if not include_private and (key.startswith('_') or key == "bot"):
                 continue
 
             value = getattr(self, key, None)
