@@ -156,7 +156,7 @@ class DictApplication(Application):
     pass
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 @pytest.mark.asyncio
 async def bot(bot_info):
     async with DictExtBot(

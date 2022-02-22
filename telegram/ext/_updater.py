@@ -35,7 +35,7 @@ from typing import (
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
-from telegram.error import InvalidToken, RetryAfter, TimedOut, Forbidden, TelegramError
+from telegram.error import InvalidToken, RetryAfter, TimedOut, TelegramError
 from telegram.ext._utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
@@ -132,8 +132,6 @@ class Updater:
             self._logger.exception('Unhandled exception in %s.', name)
         self._logger.debug('%s - ended', name)
 
-    # TODO: Probably drop `pool_connect` timeout again, because we probably want to just make
-    #       sure that `getUpdates` always gets a connection without waiting
     async def start_polling(
         self,
         poll_interval: float = 0.0,
@@ -241,7 +239,7 @@ class Updater:
 
         async def polling_action_cb() -> bool:
             updates = await self.bot.get_updates(
-                self.last_update_id,
+                offset=self.last_update_id,
                 timeout=timeout,
                 read_timeout=read_timeout,
                 connect_timeout=connect_timeout,
@@ -511,7 +509,7 @@ class Updater:
         allowed_updates: Optional[List[str]],
         drop_pending_updates: bool = None,
         cert: Union[str, Path] = None,
-        bootstrap_interval: float = 5,
+        bootstrap_interval: float = 1,
         ip_address: str = None,
         max_connections: int = 40,
     ) -> None:
@@ -539,9 +537,7 @@ class Updater:
             return False
 
         def bootstrap_on_err_cb(exc: Exception) -> None:
-            if not isinstance(exc, (Forbidden, InvalidToken)) and (
-                max_retries < 0 or retries[0] < max_retries
-            ):
+            if not isinstance(exc, InvalidToken) and (max_retries < 0 or retries[0] < max_retries):
                 retries[0] += 1
                 self._logger.warning(
                     'Failed bootstrap phase; try=%s max_retries=%s', retries[0], max_retries

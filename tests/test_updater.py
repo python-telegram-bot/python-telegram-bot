@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-from threading import Event
 
 from urllib.request import Request, urlopen
 
@@ -27,17 +26,20 @@ from telegram import (
     Bot,
     Update,
 )
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram.error import InvalidToken, TelegramError, TimedOut, RetryAfter
 from telegram.ext import (
     Updater,
 )
+from telegram.request import HTTPXRequest
 
 
 class TestUpdater:
     message_count = 0
     received = None
     attempts = 0
-    err_handler_called = Event()
-    cb_handler_called = Event()
+    err_handler_called = None
+    cb_handler_called = None
     offset = 0
     test_flag = False
 
@@ -46,12 +48,12 @@ class TestUpdater:
         self.message_count = 0
         self.received = None
         self.attempts = 0
-        self.err_handler_called.clear()
-        self.cb_handler_called.clear()
+        self.err_handler_called = None
+        self.cb_handler_called = None
         self.test_flag = False
 
-    def error_handler(self, update, context):
-        self.received = context.error.message
+    def error_callback(self, error):
+        self.received = error
         self.err_handler_called.set()
 
     def callback(self, update, context):
@@ -166,7 +168,8 @@ class TestUpdater:
         assert self.test_flag == 'stop'
 
     @pytest.mark.asyncio
-    async def test_polling_basic(self, monkeypatch, updater):
+    @pytest.mark.parametrize('drop_pending_updates', (True, False))
+    async def test_polling_basic(self, monkeypatch, updater, drop_pending_updates):
         updates = asyncio.Queue()
         await updates.put(Update(update_id=1))
         await updates.put(Update(update_id=2))
@@ -176,26 +179,42 @@ class TestUpdater:
             updates.task_done()
             return [next_update]
 
+        orig_del_webhook = updater.bot.delete_webhook
+
+        async def delete_webhook(*args, **kwargs):
+            # Dropping pending updates is done by passing the parameter to delete_webhook
+            if kwargs.get('drop_pending_updates'):
+                self.message_count += 1
+            return await orig_del_webhook(*args, **kwargs)
+
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', delete_webhook)
 
         async with updater:
-            await updater.start_polling()
+            await updater.start_polling(drop_pending_updates=drop_pending_updates)
             assert updater.running
             await updates.join()
             await updater.stop()
             assert not updater.running
+            assert not (await updater.bot.get_webhook_info()).url
+            if drop_pending_updates:
+                assert self.message_count == 1
+            else:
+                assert self.message_count == 0
 
             await updates.put(Update(update_id=3))
             await updates.put(Update(update_id=4))
 
             # We call the same logic twice to make sure that restarting the updater works as well
-            await updater.start_polling()
+            await updater.start_polling(drop_pending_updates=drop_pending_updates)
             assert updater.running
             await updates.join()
             await updater.stop()
             assert not updater.running
+            assert not (await updater.bot.get_webhook_info()).url
 
         self.received = []
+        self.message_count = 0
         while not updater.update_queue.empty():
             update = updater.update_queue.get_nowait()
             self.message_count += 1
@@ -204,81 +223,134 @@ class TestUpdater:
         assert self.message_count == 4
         assert self.received == [1, 2, 3, 4]
 
-    # @pytest.mark.parametrize(
-    #     ('error',),
-    #     argvalues=[(TelegramError('Test Error 2'),), (Unauthorized('Test Unauthorized'),)],
-    #     ids=('TelegramError', 'Unauthorized'),
-    # )
-    # def test_get_updates_normal_err(self, monkeypatch, updater, error):
-    #     def test(*args, **kwargs):
-    #         raise error
-    #
-    #     monkeypatch.setattr(updater.bot, 'get_updates', test)
-    #     monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-    #     updater.dispatcher.add_error_handler(self.error_handler)
-    #     updater.start_polling(0.01)
-    #
-    #     # Make sure that the error handler was called
-    #     self.err_handler_called.wait()
-    #     assert self.received == error.message
-    #
-    #     # Make sure that Updater polling thread keeps running
-    #     self.err_handler_called.clear()
-    #     self.err_handler_called.wait()
-    #
-    # @pytest.mark.filterwarnings('ignore:.*:pytest.PytestUnhandledThreadExceptionWarning')
-    # def test_get_updates_bailout_err(self, monkeypatch, updater, caplog):
-    #     error = InvalidToken()
-    #
-    #     def test(*args, **kwargs):
-    #         raise error
-    #
-    #     with caplog.at_level(logging.DEBUG):
-    #         monkeypatch.setattr(updater.bot, 'get_updates', test)
-    #         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-    #         updater.dispatcher.add_error_handler(self.error_handler)
-    #         updater.start_polling(0.01)
-    #         assert self.err_handler_called.wait(1) is not True
-    #
-    #     sleep(1)
-    #     # NOTE: This test might hit a race condition and fail (though the 1 seconds delay above
-    #     #       should work around it).
-    #     # NOTE: Checking Updater.running is problematic because it is not set to False when there's
-    #     #       an unhandled exception.
-    #     # TODO: We should have a way to poll Updater status and decide if it's running or not.
-    #     import pprint
-    #
-    #     pprint.pprint([rec.getMessage() for rec in caplog.get_records('call')])
-    #     assert any(
-    #         f'unhandled exception in Bot:{updater.bot.id}:updater' in rec.getMessage()
-    #         for rec in caplog.get_records('call')
-    #     )
-    #
-    # @pytest.mark.parametrize(
-    #     ('error',), argvalues=[(RetryAfter(0.01),), (TimedOut(),)], ids=('RetryAfter', 'TimedOut')
-    # )
-    # def test_get_updates_retries(self, monkeypatch, updater, error):
-    #     event = Event()
-    #
-    #     def test(*args, **kwargs):
-    #         event.set()
-    #         raise error
-    #
-    #     monkeypatch.setattr(updater.bot, 'get_updates', test)
-    #     monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-    #     updater.dispatcher.add_error_handler(self.error_handler)
-    #     updater.start_polling(0.01)
-    #
-    #     # Make sure that get_updates was called, but not the error handler
-    #     event.wait()
-    #     assert self.err_handler_called.wait(0.5) is not True
-    #     assert self.received != error.message
-    #
-    #     # Make sure that Updater polling thread keeps running
-    #     event.clear()
-    #     event.wait()
-    #     assert self.err_handler_called.wait(0.5) is not True
-    #
+    @pytest.mark.asyncio
+    async def test_start_polling_already_running(self, updater):
+        async with updater:
+            await updater.start_polling()
+            task = asyncio.create_task(updater.start_polling())
+            with pytest.raises(RuntimeError, match='already running'):
+                await task
+            await updater.stop()
+
+    @pytest.mark.asyncio
+    async def test_start_polling_get_updates_parameters(self, updater, monkeypatch):
+        update_queue = asyncio.Queue()
+        await update_queue.put(Update(update_id=1))
+
+        expected = dict(
+            timeout=10,
+            read_timeout=2,
+            write_timeout=DEFAULT_NONE,
+            connect_timeout=DEFAULT_NONE,
+            pool_timeout=DEFAULT_NONE,
+            allowed_updates=None,
+        )
+
+        async def get_updates(*args, **kwargs):
+            for key, value in expected.items():
+                assert kwargs.get(key) == value
+            await update_queue.get()
+            update_queue.task_done()
+            return []
+
+        monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
+
+        async with updater:
+            await updater.start_polling()
+            await update_queue.join()
+            await updater.stop()
+
+            expected = dict(
+                timeout=42,
+                read_timeout=43,
+                write_timeout=44,
+                connect_timeout=45,
+                pool_timeout=46,
+                allowed_updates=['message'],
+            )
+
+            await update_queue.put(Update(update_id=1))
+            await updater.start_polling(
+                timeout=42,
+                read_timeout=43,
+                write_timeout=44,
+                connect_timeout=45,
+                pool_timeout=46,
+                allowed_updates=['message'],
+            )
+            await update_queue.join()
+            await updater.stop()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('exception_class', (InvalidToken, TelegramError))
+    @pytest.mark.parametrize('retries', (3, 0))
+    async def test_start_polling_bootstrap_retries(
+        self, updater, monkeypatch, exception_class, retries
+    ):
+        async def do_request(*args, **kwargs):
+            self.message_count += 1
+            raise exception_class(str(self.message_count))
+
+        monkeypatch.setattr(HTTPXRequest, 'do_request', do_request)
+
+        async with updater:
+            if exception_class == InvalidToken:
+                with pytest.raises(InvalidToken, match='1'):
+                    await updater.start_polling(bootstrap_retries=retries)
+            else:
+                with pytest.raises(TelegramError, match=str(retries + 1)):
+                    await updater.start_polling(
+                        bootstrap_retries=retries,
+                    )
+
+    @pytest.mark.parametrize(
+        'error,callback',
+        argvalues=[
+            (TelegramError('TestMessage'), True),
+            (RetryAfter(1), False),
+            (TimedOut('TestMessage'), False),
+        ],
+        ids=('TelegramError', 'RetryAfter', 'TimedOut'),
+    )
+    @pytest.mark.asyncio
+    async def test_start_polling_exceptions_and_error_callback(
+        self, monkeypatch, updater, error, callback
+    ):
+        get_updates_event = asyncio.Event()
+
+        async def get_updates(*args, **kwargs):
+            # So that the main task has a chance to be called
+            await asyncio.sleep(0)
+
+            get_updates_event.set()
+            raise error
+
+        monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
+        monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
+
+        async with updater:
+            self.err_handler_called = asyncio.Event()
+
+            await updater.start_polling(error_callback=self.error_callback)
+            await asyncio.sleep(1)
+
+            if callback:
+                # Make sure that the error handler was called
+                assert self.err_handler_called.is_set()
+                assert self.received == error
+            # Make sure that get_updates was called
+            assert get_updates_event.is_set()
+
+            # Make sure that Updater polling keeps running
+            self.err_handler_called.clear()
+            get_updates_event.clear()
+            await get_updates_event.wait()
+            if callback:
+                # Make sure that the error handler was called
+                assert self.err_handler_called.is_set()
+                assert self.received == error
+            await updater.stop()
+
     # @pytest.mark.parametrize('ext_bot', [True, False])
     # def test_webhook(self, monkeypatch, updater, ext_bot):
     #     # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
@@ -444,7 +516,7 @@ class TestUpdater:
     #     # Now, we send an update to the server via urlopen
     #     update = Update(
     #         1,
-    #         message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
+    #      message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
     #     )
     #     self._send_webhook_msg(ip, port, update.to_json())
     #     sleep(0.2)
@@ -479,7 +551,7 @@ class TestUpdater:
     #     # Now, we send an update to the server via urlopen
     #     update = Update(
     #         1,
-    #         message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
+    #      message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
     #     )
     #     self._send_webhook_msg(ip, port, update.to_json())
     #     sleep(0.2)
@@ -515,7 +587,7 @@ class TestUpdater:
     #     # Now, we send an update to the server via urlopen
     #     update = Update(
     #         1,
-    #         message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
+    #      message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook 2'),
     #     )
     #     self._send_webhook_msg(ip, port, update.to_json())
     #     sleep(0.2)
@@ -523,7 +595,7 @@ class TestUpdater:
     #     updater.stop()
     #     assert self.test_flag is True
     #
-    # @pytest.mark.parametrize(('error',), argvalues=[(TelegramError(''),)], ids=('TelegramError',))
+    # @pytest.mark.parametrize(('error',),argvalues=[(TelegramError(''),)], ids=('TelegramError',))
     # def test_bootstrap_retries_success(self, monkeypatch, updater, error):
     #     retries = 2
     #
