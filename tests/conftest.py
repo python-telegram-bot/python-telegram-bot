@@ -259,11 +259,12 @@ def app(_app):
 
 
 @pytest.fixture(scope='function')
-def updater(bot):
+@pytest.mark.asyncio
+async def updater(bot):
     up = Updater(bot=bot, update_queue=asyncio.Queue())
     yield up
     if up.running:
-        up.stop()
+        await up.stop()
 
 
 PROJECT_ROOT_PATH = Path(__file__).parent.parent.resolve()

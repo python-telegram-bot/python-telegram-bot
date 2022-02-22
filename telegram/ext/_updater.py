@@ -75,7 +75,7 @@ class Updater:
         '_running',
         '_httpd',
         '__lock',
-        '__asyncio_tasks',
+        '__polling_task',
     )
 
     def __init__(
@@ -90,7 +90,7 @@ class Updater:
         self._running = False
         self._httpd: Optional[WebhookServer] = None
         self.__lock = asyncio.Lock()
-        self.__asyncio_tasks: List[asyncio.Task] = []
+        self.__polling_task: Optional[asyncio.Task] = None
         self._logger = logging.getLogger(__name__)
 
     @property
@@ -121,16 +121,6 @@ class Updater:
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
-
-    def _init_task(
-        self, target: Callable[..., Coroutine], name: str, *args: object, **kwargs: object
-    ) -> None:
-        task = asyncio.create_task(
-            coro=self._task_wrapper(target, name, *args, **kwargs),
-            # TODO: Add this once we drop py3.7
-            # name=f"Updater:{self.bot.id}:{name}",
-        )
-        self.__asyncio_tasks.append(task)
 
     async def _task_wrapper(
         self, target: Callable, name: str, *args: object, **kwargs: object
@@ -190,28 +180,29 @@ class Updater:
         Returns:
             :class:`asyncio.Queue`: The update queue that can be filled from the main thread.
 
+        Raises:
+            :exc:`RuntimeError`: If the updater is already running.
+
         """
         async with self.__lock:
             if self.running:
-                return self.update_queue
+                raise RuntimeError('This Updater is already running!')
 
             self._running = True
 
             # Create & start tasks
             polling_ready = asyncio.Event()
 
-            self._init_task(
-                self._start_polling,
-                "Polling Background task",
-                poll_interval,
-                timeout,
-                read_timeout,
-                write_timeout,
-                connect_timeout,
-                pool_timeout,
-                bootstrap_retries,
-                drop_pending_updates,
-                allowed_updates,
+            await self._start_polling(
+                poll_interval=poll_interval,
+                timeout=timeout,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                bootstrap_retries=bootstrap_retries,
+                drop_pending_updates=drop_pending_updates,
+                allowed_updates=allowed_updates,
                 ready=polling_ready,
                 error_callback=error_callback,
             )
@@ -227,18 +218,15 @@ class Updater:
         poll_interval: float,
         timeout: int,
         read_timeout: Optional[float],
-        write_timeout: Optional[float],
-        connect_timeout: Optional[float],
-        pool_timeout: Optional[float],
+        write_timeout: ODVInput[float],
+        connect_timeout: ODVInput[float],
+        pool_timeout: ODVInput[float],
         bootstrap_retries: int,
-        drop_pending_updates: bool,
+        drop_pending_updates: Optional[bool],
         allowed_updates: Optional[List[str]],
-        ready: asyncio.Event = None,
-        error_callback: Callable[[TelegramError], None] = None,
+        ready: asyncio.Event,
+        error_callback: Optional[Callable[[TelegramError], None]],
     ) -> None:
-        # Target of task 'updater.start_polling()'. Runs in background, pulls
-        # updates from Telegram and inserts them in the update queue of the
-        # Application.
 
         self._logger.debug('Updater started (polling)')
 
@@ -275,15 +263,20 @@ class Updater:
         def default_error_callback(exc: TelegramError) -> None:
             self._logger.exception('Exception happened while polling for updates.', exc_info=exc)
 
+        # Start task that runs in background, pulls
+        # updates from Telegram and inserts them in the update queue of the
+        # Application.
+        self.__polling_task = asyncio.create_task(
+            self._network_loop_retry(
+                action_cb=polling_action_cb,
+                on_err_cb=error_callback or default_error_callback,
+                description='getting Updates',
+                interval=poll_interval,
+            )
+        )
+
         if ready is not None:
             ready.set()
-
-        await self._network_loop_retry(
-            action_cb=polling_action_cb,
-            onerr_cb=error_callback or default_error_callback,
-            description='getting Updates',
-            interval=poll_interval,
-        )
 
     async def start_webhook(
         self,
@@ -341,10 +334,13 @@ class Updater:
                 .. versionadded:: 13.6
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.
+
+        Raises:
+            :exc:`RuntimeError`: If the updater is already running.
         """
         async with self.__lock:
             if self.running:
-                return self.update_queue
+                raise RuntimeError('This Updater is already running!')
 
             self._running = True
 
@@ -448,7 +444,7 @@ class Updater:
     async def _network_loop_retry(
         self,
         action_cb: Callable[..., Coroutine],
-        onerr_cb: Callable[[TelegramError], None],
+        on_err_cb: Callable[[TelegramError], None],
         description: str,
         interval: float,
     ) -> None:
@@ -459,8 +455,8 @@ class Updater:
 
         Args:
             action_cb (:obj:`callable`): Network oriented callback function to call.
-            onerr_cb (:obj:`callable`): Callback to call when TelegramError is caught. Receives the
-                exception object as a parameter.
+            on_err_cb (:obj:`callable`): Callback to call when TelegramError is caught. Receives
+                the exception object as a parameter.
             description (:obj:`str`): Description text to use for logs and exception raised.
             interval (:obj:`float` | :obj:`int`): Interval to sleep between each call to
                 `action_cb`.
@@ -485,7 +481,7 @@ class Updater:
                     raise pex
                 except TelegramError as telegram_exc:
                     self._logger.error('Error while %s: %s', description, telegram_exc)
-                    onerr_cb(telegram_exc)
+                    on_err_cb(telegram_exc)
                     cur_interval = self._increase_poll_interval(cur_interval)
                 else:
                     cur_interval = interval
@@ -542,8 +538,10 @@ class Updater:
             )
             return False
 
-        def bootstrap_onerr_cb(exc: Exception) -> None:
-            if not isinstance(exc, Forbidden) and (max_retries < 0 or retries[0] < max_retries):
+        def bootstrap_on_err_cb(exc: Exception) -> None:
+            if not isinstance(exc, (Forbidden, InvalidToken)) and (
+                max_retries < 0 or retries[0] < max_retries
+            ):
                 retries[0] += 1
                 self._logger.warning(
                     'Failed bootstrap phase; try=%s max_retries=%s', retries[0], max_retries
@@ -559,7 +557,7 @@ class Updater:
         if drop_pending_updates or not webhook_url:
             await self._network_loop_retry(
                 bootstrap_del_webhook,
-                bootstrap_onerr_cb,
+                bootstrap_on_err_cb,
                 'bootstrap del webhook',
                 bootstrap_interval,
             )
@@ -570,7 +568,7 @@ class Updater:
         if webhook_url:
             await self._network_loop_retry(
                 bootstrap_set_webhook,
-                bootstrap_onerr_cb,
+                bootstrap_on_err_cb,
                 'bootstrap set webhook',
                 bootstrap_interval,
             )
@@ -584,7 +582,7 @@ class Updater:
                 self._running = False
 
                 await self._stop_httpd()
-                await self._join_tasks()
+                await self._stop_polling()
 
                 self._logger.debug('Updater.stop() is complete')
 
@@ -594,9 +592,9 @@ class Updater:
             await self._httpd.shutdown()
             self._httpd = None
 
-    async def _join_tasks(self) -> None:
-        self._logger.debug('Stopping Background tasks')
-        for task in self.__asyncio_tasks:
-            task.cancel()
-        await asyncio.gather(*self.__asyncio_tasks)
-        self.__asyncio_tasks = []
+    async def _stop_polling(self) -> None:
+        if self.__polling_task:
+            self._logger.debug('Waiting background polling task to join.')
+            self.__polling_task.cancel()
+            await self.__polling_task
+            self.__polling_task = None

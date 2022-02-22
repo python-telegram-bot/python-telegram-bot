@@ -25,6 +25,7 @@ import pytest
 
 from telegram import (
     Bot,
+    Update,
 )
 from telegram.ext import (
     Updater,
@@ -164,32 +165,44 @@ class TestUpdater:
 
         assert self.test_flag == 'stop'
 
-    # @pytest.mark.asyncio
-    # async def test_polling(self, updater, monkeypatch):
-    #     updates = asyncio.Queue()
-    #     await updates.put(Update(update_id=1))
-    #     await updates.put(Update(update_id=2))
-    #     await updates.put(Update(update_id=3))
-    #     await updates.put(Update(update_id=4))
-    #
-    #     async def get_updates(*args, **kwargs):
-    #         if not updates.empty():
-    #             return [updates.get_nowait()]
-    #         return []
-    #
-    #     monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
-    #
-    #     async with updater:
-    #         await updater.start_polling()
-    #         assert updater.running
-    #         await asyncio.sleep(1)
-    #         await updater.stop()
-    #
-    #     while not updater.update_queue.empty():
-    #         update = updater.update_queue.get_nowait()
-    #         self.message_count += update.update_id
-    #
-    #     assert self.message_count == 10
+    @pytest.mark.asyncio
+    async def test_polling_basic(self, monkeypatch, updater):
+        updates = asyncio.Queue()
+        await updates.put(Update(update_id=1))
+        await updates.put(Update(update_id=2))
+
+        async def get_updates(*args, **kwargs):
+            next_update = await updates.get()
+            updates.task_done()
+            return [next_update]
+
+        monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
+
+        async with updater:
+            await updater.start_polling()
+            assert updater.running
+            await updates.join()
+            await updater.stop()
+            assert not updater.running
+
+            await updates.put(Update(update_id=3))
+            await updates.put(Update(update_id=4))
+
+            # We call the same logic twice to make sure that restarting the updater works as well
+            await updater.start_polling()
+            assert updater.running
+            await updates.join()
+            await updater.stop()
+            assert not updater.running
+
+        self.received = []
+        while not updater.update_queue.empty():
+            update = updater.update_queue.get_nowait()
+            self.message_count += 1
+            self.received.append(update.update_id)
+
+        assert self.message_count == 4
+        assert self.received == [1, 2, 3, 4]
 
     # @pytest.mark.parametrize(
     #     ('error',),
