@@ -312,7 +312,7 @@ CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
 DATE = datetime.datetime.now()
 
 
-async def make_message(text, **kwargs):
+def make_message(text, **kwargs):
     """
     Testing utility factory to create a fake ``telegram.Message`` with
     reasonable defaults for mimicking a real message.

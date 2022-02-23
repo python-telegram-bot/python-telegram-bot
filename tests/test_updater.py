@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
-
-from urllib.request import Request, urlopen
+from http import HTTPStatus
+from random import randrange
+from typing import Optional
 
 import pytest
+from httpx import AsyncClient, Response
 
 from telegram import (
     Bot,
@@ -30,8 +32,10 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import InvalidToken, TelegramError, TimedOut, RetryAfter
 from telegram.ext import (
     Updater,
+    ExtBot,
 )
 from telegram.request import HTTPXRequest
+from tests.conftest import make_message_update, make_message, DictBot
 
 
 class TestUpdater:
@@ -60,16 +64,16 @@ class TestUpdater:
         self.received = update.message.text
         self.cb_handler_called.set()
 
-    def _send_webhook_msg(
-        self,
-        ip,
-        port,
-        payload_str,
-        url_path='',
-        content_len=-1,
-        content_type='application/json',
-        get_method=None,
-    ):
+    @staticmethod
+    async def _send_webhook_message(
+        ip: str,
+        port: int,
+        payload_str: Optional[str],
+        url_path: str = '',
+        content_len: int = -1,
+        content_type: str = 'application/json',
+        get_method: str = None,
+    ) -> Response:
         headers = {
             'content-type': content_type,
         }
@@ -88,12 +92,10 @@ class TestUpdater:
 
         url = f'http://{ip}:{port}/{url_path}'
 
-        req = Request(url, data=payload, headers=headers)
-
-        if get_method is not None:
-            req.get_method = get_method
-
-        return urlopen(req)
+        async with AsyncClient() as client:
+            return await client.request(
+                url=url, method=get_method or 'POST', data=payload, headers=headers
+            )
 
     def test_slot_behaviour(self, updater, mro_slots):
         for at in updater.__slots__:
@@ -351,6 +353,82 @@ class TestUpdater:
                 assert self.received == error
             await updater.stop()
 
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('ext_bot', [True, False])
+    @pytest.mark.parametrize('drop_pending_updates', (True, False))
+    async def test_webhook_basic(self, monkeypatch, updater, drop_pending_updates, ext_bot):
+        # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
+        # that depends on this distinction works
+        if ext_bot and not isinstance(updater.bot, ExtBot):
+            updater.bot = ExtBot(updater.bot.token)
+        if not ext_bot and not type(updater.bot) is Bot:
+            updater.bot = DictBot(updater.bot.token)
+
+        async def delete_webhook(*args, **kwargs):
+            # Dropping pending updates is done by passing the parameter to delete_webhook
+            if kwargs.get('drop_pending_updates'):
+                self.message_count += 1
+            return True
+
+        async def set_webhook(*args, **kwargs):
+            return True
+
+        monkeypatch.setattr(updater.bot, 'set_webhook', set_webhook)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', delete_webhook)
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+
+        async with updater:
+            await updater.start_webhook(
+                drop_pending_updates=drop_pending_updates,
+                ip_address=ip,
+                port=port,
+                url_path='TOKEN',
+            )
+            assert updater.running
+
+            # Now, we send an update to the server
+            update = make_message_update('Webhook', message_factory=make_message)
+            await self._send_webhook_message(ip, port, update.to_json(), 'TOKEN')
+            assert (await updater.update_queue.get()).to_dict() == update.to_dict()
+
+            # Returns Forbidden if wrong content types
+            response = await self._send_webhook_message(
+                ip, port, None, 'TOKEN', content_type='invalid'
+            )
+            assert response.status_code == HTTPStatus.FORBIDDEN
+
+            # Returns Not Found if path is incorrect
+            response = await self._send_webhook_message(ip, port, '123456', 'webhook_handler.py')
+            assert response.status_code == HTTPStatus.NOT_FOUND
+
+            # Returns METHOD_NOT_ALLOWED if method is not allowed
+            response = await self._send_webhook_message(ip, port, None, 'TOKEN', get_method='HEAD')
+            assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
+
+            await updater.stop()
+            assert not updater.running
+
+            if drop_pending_updates:
+                assert self.message_count == 1
+            else:
+                assert self.message_count == 0
+
+            # We call the same logic twice to make sure that restarting the updater works as well
+            await updater.start_webhook(
+                drop_pending_updates=drop_pending_updates,
+                ip_address=ip,
+                port=port,
+                url_path='TOKEN',
+            )
+            assert updater.running
+            update = make_message_update('Webhook', message_factory=make_message)
+            await self._send_webhook_message(ip, port, update.to_json(), 'TOKEN')
+            assert (await updater.update_queue.get()).to_dict() == update.to_dict()
+            await updater.stop()
+            assert not updater.running
+
     # @pytest.mark.parametrize('ext_bot', [True, False])
     # def test_webhook(self, monkeypatch, updater, ext_bot):
     #     # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
@@ -399,6 +477,7 @@ class TestUpdater:
     #         sleep(0.2)
     #         assert not updater.httpd.is_running
     #         updater.stop()
+
     #
     # @pytest.mark.parametrize('invalid_data', [True, False])
     # def test_webhook_arbitrary_callback_data(self, monkeypatch, updater, invalid_data):
