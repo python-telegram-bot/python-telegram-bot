@@ -251,14 +251,24 @@ class TestUpdater:
             connect_timeout=DEFAULT_NONE,
             pool_timeout=DEFAULT_NONE,
             allowed_updates=None,
+            api_kwargs=None,
         )
 
         async def get_updates(*args, **kwargs):
             for key, value in expected.items():
-                assert kwargs.get(key) == value
-            await update_queue.get()
+                assert kwargs.pop(key, None) == value
+
+            offset = kwargs.pop('offset', None)
+            # Check that we don't get any unexpected kwargs
+            assert kwargs == {}
+
+            if offset is not None and self.message_count != 0:
+                assert offset == self.message_count + 1, "get_updates got wrong `offset` parameter"
+
+            update = await update_queue.get()
+            self.message_count = update.update_id
             update_queue.task_done()
-            return []
+            return [update]
 
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
 
@@ -274,9 +284,10 @@ class TestUpdater:
                 connect_timeout=45,
                 pool_timeout=46,
                 allowed_updates=['message'],
+                api_kwargs=None,
             )
 
-            await update_queue.put(Update(update_id=1))
+            await update_queue.put(Update(update_id=2))
             await updater.start_polling(
                 timeout=42,
                 read_timeout=43,
@@ -449,6 +460,68 @@ class TestUpdater:
             task = asyncio.create_task(updater.start_webhook(ip, port, url_path='TOKEN'))
             with pytest.raises(RuntimeError, match='already running'):
                 await task
+            await updater.stop()
+
+    @pytest.mark.asyncio
+    async def test_start_webhook_parameters_passing(self, updater, monkeypatch):
+        expected_delete_webhook = dict(
+            drop_pending_updates=None,
+        )
+
+        expected_set_webhook = dict(
+            certificate=None,
+            max_connections=40,
+            allowed_updates=None,
+            ip_address=None,
+            **expected_delete_webhook,
+        )
+
+        async def set_webhook(*args, **kwargs):
+            for key, value in expected_set_webhook.items():
+                assert kwargs.pop(key, None) == value, f"set, {key}, {value}"
+
+            # TODO: double check if this should be https
+            assert kwargs in ({'url': 'https://127.0.0.1:80/'}, {'url': 'https://listen:80/'})
+            return True
+
+        async def delete_webhook(*args, **kwargs):
+            for key, value in expected_delete_webhook.items():
+                assert kwargs.pop(key, None) == value, f"delete, {key}, {value}"
+
+            assert kwargs == {}
+            return True
+
+        async def serve_forever(*args, **kwargs):
+            kwargs.get('ready').set()
+
+        monkeypatch.setattr(updater.bot, 'set_webhook', set_webhook)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', delete_webhook)
+        monkeypatch.setattr(WebhookServer, 'serve_forever', serve_forever)
+
+        async with updater:
+            await updater.start_webhook()
+            await updater.stop()
+            expected_delete_webhook = dict(
+                drop_pending_updates=True,
+                api_kwargs=None,
+            )
+
+            expected_set_webhook = dict(
+                certificate='certificate',
+                max_connections=47,
+                allowed_updates=['message'],
+                ip_address='123.456.789',
+                **expected_delete_webhook,
+            )
+
+            await updater.start_webhook(
+                listen='listen',
+                allowed_updates=['message'],
+                drop_pending_updates=True,
+                ip_address='123.456.789',
+                max_connections=47,
+                cert='certificate',
+            )
             await updater.stop()
 
     @pytest.mark.parametrize('invalid_data', [True, False], ids=('invalid data', 'valid data'))

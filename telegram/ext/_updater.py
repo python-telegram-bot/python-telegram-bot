@@ -437,6 +437,8 @@ class Updater:
 
     @staticmethod
     def _gen_webhook_url(listen: str, port: int, url_path: str) -> str:
+        # TODO: double check if this should be https in any case - the docs of start_webhook
+        # say differently!
         return f'https://{listen}:{port}{url_path}'
 
     async def _network_loop_retry(
