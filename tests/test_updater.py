@@ -27,12 +27,15 @@ from httpx import AsyncClient, Response
 from telegram import (
     Bot,
     Update,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
 )
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import InvalidToken, TelegramError, TimedOut, RetryAfter
 from telegram.ext import (
     Updater,
     ExtBot,
+    InvalidCallbackData,
 )
 from telegram.request import HTTPXRequest
 from tests.conftest import make_message_update, make_message, DictBot
@@ -429,109 +432,61 @@ class TestUpdater:
             await updater.stop()
             assert not updater.running
 
-    # @pytest.mark.parametrize('ext_bot', [True, False])
-    # def test_webhook(self, monkeypatch, updater, ext_bot):
-    #     # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
-    #     # that depends on this distinction works
-    #     if ext_bot and not isinstance(updater.bot, ExtBot):
-    #         updater.bot = ExtBot(updater.bot.token)
-    #     if not ext_bot and not type(updater.bot) is Bot:
-    #         updater.bot = DictBot(updater.bot.token)
-    #
-    #     q = Queue()
-    #     monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-    #     monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-    #     monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
-    #
-    #     ip = '127.0.0.1'
-    #     port = randrange(1024, 49152)  # Select random port
-    #     updater.start_webhook(ip, port, url_path='TOKEN')
-    #     sleep(0.2)
-    #     try:
-    #         # Now, we send an update to the server via urlopen
-    #         update = Update(
-    #             1,
-    #             message=Message(
-    #                 1, None, Chat(1, ''), from_user=User(1, '', False), text='Webhook'
-    #             ),
-    #         )
-    #         self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
-    #         sleep(0.2)
-    #         assert q.get(False) == update
-    #
-    #         # Returns 404 if path is incorrect
-    #         with pytest.raises(HTTPError) as excinfo:
-    #             self._send_webhook_msg(ip, port, None, 'webookhandler.py')
-    #         assert excinfo.value.code == 404
-    #
-    #         with pytest.raises(HTTPError) as excinfo:
-    #             self._send_webhook_msg(
-    #                 ip, port, None, 'webookhandler.py', get_method=lambda: 'HEAD'
-    #             )
-    #         assert excinfo.value.code == 404
-    #
-    #         # Test multiple shutdown() calls
-    #         updater.httpd.shutdown()
-    #     finally:
-    #         updater.httpd.shutdown()
-    #         sleep(0.2)
-    #         assert not updater.httpd.is_running
-    #         updater.stop()
+    @pytest.mark.parametrize('invalid_data', [True, False], ids=('invalid data', 'valid data'))
+    @pytest.mark.asyncio
+    async def test_webhook_arbitrary_callback_data(
+        self, monkeypatch, updater, invalid_data, chat_id
+    ):
+        """Here we only test one simple setup. telegram.ext.ExtBot.insert_callback_data is tested
+        extensively in test_bot.py in conjunction with get_updates."""
+        updater.bot.arbitrary_callback_data = True
 
-    #
-    # @pytest.mark.parametrize('invalid_data', [True, False])
-    # def test_webhook_arbitrary_callback_data(self, monkeypatch, updater, invalid_data):
-    #     """Here we only test one simple setup. telegram.ext.ExtBot.insert_callback_data is tested
-    #     extensively in test_bot.py in conjunction with get_updates."""
-    #     updater.bot.arbitrary_callback_data = True
-    #     try:
-    #         q = Queue()
-    #         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
-    #         monkeypatch.setattr(updater.bot, 'delete_webhook', lambda *args, **kwargs: True)
-    #         monkeypatch.setattr('telegram.ext.Dispatcher.process_update', lambda _, u: q.put(u))
-    #
-    #         ip = '127.0.0.1'
-    #         port = randrange(1024, 49152)  # Select random port
-    #         updater.start_webhook(ip, port, url_path='TOKEN')
-    #         sleep(0.2)
-    #         try:
-    #             # Now, we send an update to the server via urlopen
-    #             reply_markup = InlineKeyboardMarkup.from_button(
-    #                 InlineKeyboardButton(text='text', callback_data='callback_data')
-    #             )
-    #             if not invalid_data:
-    #                 reply_markup = updater.bot.callback_data_cache.process_keyboard(reply_markup)
-    #
-    #             message = Message(
-    #                 1,
-    #                 None,
-    #                 None,
-    #                 reply_markup=reply_markup,
-    #             )
-    #             update = Update(1, message=message)
-    #             self._send_webhook_msg(ip, port, update.to_json(), 'TOKEN')
-    #             sleep(0.2)
-    #             received_update = q.get(False)
-    #             assert received_update == update
-    #
-    #             button = received_update.message.reply_markup.inline_keyboard[0][0]
-    #             if invalid_data:
-    #                 assert isinstance(button.callback_data, InvalidCallbackData)
-    #             else:
-    #                 assert button.callback_data == 'callback_data'
-    #
-    #             # Test multiple shutdown() calls
-    #             updater.httpd.shutdown()
-    #         finally:
-    #             updater.httpd.shutdown()
-    #             sleep(0.2)
-    #             assert not updater.httpd.is_running
-    #             updater.stop()
-    #     finally:
-    #         updater.bot.arbitrary_callback_data = False
-    #         updater.bot.callback_data_cache.clear_callback_data()
-    #         updater.bot.callback_data_cache.clear_callback_queries()
-    #
+        async def return_true(*args, **kwargs):
+            return True
+
+        try:
+            monkeypatch.setattr(updater.bot, 'set_webhook', return_true)
+            monkeypatch.setattr(updater.bot, 'delete_webhook', return_true)
+
+            ip = '127.0.0.1'
+            port = randrange(1024, 49152)  # Select random port
+
+            async with updater:
+                await updater.start_webhook(ip, port, url_path='TOKEN')
+                # Now, we send an update to the server
+                reply_markup = InlineKeyboardMarkup.from_button(
+                    InlineKeyboardButton(text='text', callback_data='callback_data')
+                )
+                if not invalid_data:
+                    reply_markup = updater.bot.callback_data_cache.process_keyboard(reply_markup)
+
+                update = make_message_update(
+                    message='test_webhook_arbitrary_callback_data',
+                    message_factory=make_message,
+                    reply_markup=reply_markup,
+                    user=updater.bot.bot,
+                )
+
+                await self._send_webhook_message(ip, port, update.to_json(), 'TOKEN')
+                received_update = await updater.update_queue.get()
+
+                assert received_update.update_id == update.update_id
+                message_dict = update.message.to_dict()
+                received_dict = received_update.message.to_dict()
+                message_dict.pop('reply_markup')
+                received_dict.pop('reply_markup')
+                assert message_dict == received_dict
+
+                button = received_update.message.reply_markup.inline_keyboard[0][0]
+                if invalid_data:
+                    assert isinstance(button.callback_data, InvalidCallbackData)
+                else:
+                    assert button.callback_data == 'callback_data'
+        finally:
+            updater.bot.arbitrary_callback_data = False
+            updater.bot.callback_data_cache.clear_callback_data()
+            updater.bot.callback_data_cache.clear_callback_queries()
+
     # @pytest.mark.parametrize('use_dispatcher', (True, False))
     # def test_start_webhook_no_warning_or_error_logs(
     #     self, caplog, updater, monkeypatch, use_dispatcher

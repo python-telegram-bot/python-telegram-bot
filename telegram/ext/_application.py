@@ -631,7 +631,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             raise exception
         finally:
-            self._mark_update_for_persistence_update(update=update)
+            self._mark_for_persistence_update(update=update)
 
     async def _update_fetcher(self) -> None:
         # Continuously fetch updates from the queue. Exit only once the signal object is found.
@@ -701,7 +701,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     _logger.debug('Error handler stopped further handlers.')
                     break
 
-        self._mark_update_for_persistence_update(update=update)
+        self._mark_for_persistence_update(update=update)
 
     def add_handler(self, handler: Handler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
@@ -904,9 +904,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._chat_ids_to_be_updated_in_persistence.add(new_chat_id)
         self._chat_ids_to_be_deleted_in_persistence.add(old_chat_id)
 
-    def _mark_update_for_persistence_update(
-        self, *, update: object = None, job: 'Job' = None
-    ) -> None:
+    def _mark_for_persistence_update(self, *, update: object = None, job: 'Job' = None) -> None:
         # TODO: This should be at the end of `Application.process_update`, when the task created
         #  by `Application.create_task` is done and when a `Job` is done. Add tests to make sure
         #  that this is happening

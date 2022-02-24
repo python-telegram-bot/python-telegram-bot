@@ -626,9 +626,7 @@ class Job:
             await application.create_task(application.dispatch_error(None, exc, job=self))
         finally:
             # This is internal logic of application - let's keep it private for now
-            application._mark_update_for_persistence_update(  # pylint: disable=protected-access
-                job=self
-            )
+            application._mark_for_persistence_update(job=self)  # pylint: disable=protected-access
 
     def schedule_removal(self) -> None:
         """
