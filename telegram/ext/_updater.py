@@ -122,16 +122,6 @@ class Updater:
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
 
-    async def _task_wrapper(
-        self, target: Callable, name: str, *args: object, **kwargs: object
-    ) -> None:
-        self._logger.debug('%s - started', name)
-        try:
-            await target(*args, **kwargs)
-        except Exception:
-            self._logger.exception('Unhandled exception in %s.', name)
-        self._logger.debug('%s - ended', name)
-
     async def start_polling(
         self,
         poll_interval: float = 0.0,
@@ -250,7 +240,10 @@ class Updater:
 
             if updates:
                 if not self.running:
-                    self._logger.debug('Updates ignored and will be pulled again on restart')
+                    self._logger.critical(
+                        'Updater stopped unexpectedly. Pulled updates will be ignored and again '
+                        'on restart.'
+                    )
                 else:
                     for update in updates:
                         await self.update_queue.put(update)
