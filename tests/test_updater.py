@@ -40,7 +40,7 @@ from telegram.ext import (
 )
 from telegram.ext._utils.webhookhandler import WebhookServer
 from telegram.request import HTTPXRequest
-from tests.conftest import make_message_update, make_message, DictBot
+from tests.conftest import make_message_update, make_message, DictBot, data_file
 
 
 class TestUpdater:
@@ -480,8 +480,11 @@ class TestUpdater:
             for key, value in expected_set_webhook.items():
                 assert kwargs.pop(key, None) == value, f"set, {key}, {value}"
 
-            # TODO: double check if this should be https
-            assert kwargs in ({'url': 'https://127.0.0.1:80/'}, {'url': 'https://listen:80/'})
+            assert kwargs in (
+                {'url': 'http://127.0.0.1:80/'},
+                {'url': 'http://listen:80/'},
+                {'url': 'https://listen-ssl:42/ssl-path'},
+            )
             return True
 
         async def delete_webhook(*args, **kwargs):
@@ -521,6 +524,20 @@ class TestUpdater:
                 ip_address='123.456.789',
                 max_connections=47,
                 cert='certificate',
+            )
+            await updater.stop()
+
+            expected_set_webhook['certificate'] = data_file('sslcert.pem')
+            await updater.start_webhook(
+                listen='listen-ssl',
+                port=42,
+                url_path='ssl-path',
+                allowed_updates=['message'],
+                drop_pending_updates=True,
+                ip_address='123.456.789',
+                max_connections=47,
+                cert=data_file('sslcert.pem'),
+                key=data_file('sslcert.key'),
             )
             await updater.stop()
 

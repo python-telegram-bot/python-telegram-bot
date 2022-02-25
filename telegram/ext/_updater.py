@@ -410,7 +410,12 @@ class Updater:
         self._httpd = WebhookServer(listen, port, app, ssl_ctx)
 
         if not webhook_url:
-            webhook_url = self._gen_webhook_url(listen, port, url_path)
+            webhook_url = self._gen_webhook_url(
+                protocol='https' if ssl_ctx else 'http',
+                listen=listen,
+                port=port,
+                url_path=url_path,
+            )
 
         # We pass along the cert to the webhook if present.
         if cert is not None:
@@ -436,10 +441,10 @@ class Updater:
         await self._httpd.serve_forever(ready=ready)
 
     @staticmethod
-    def _gen_webhook_url(listen: str, port: int, url_path: str) -> str:
+    def _gen_webhook_url(protocol: str, listen: str, port: int, url_path: str) -> str:
         # TODO: double check if this should be https in any case - the docs of start_webhook
         # say differently!
-        return f'https://{listen}:{port}{url_path}'
+        return f'{protocol}://{listen}:{port}{url_path}'
 
     async def _network_loop_retry(
         self,
