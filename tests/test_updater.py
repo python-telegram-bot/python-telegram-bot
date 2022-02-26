@@ -466,7 +466,7 @@ class TestUpdater:
             assert updater.running
 
             # Now, we send an update to the server
-            update = make_message_update('Webhook', message_factory=make_message)
+            update = make_message_update('Webhook')
             await self._send_webhook_message(ip, port, update.to_json(), 'TOKEN')
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
 
@@ -494,7 +494,7 @@ class TestUpdater:
                 url_path='TOKEN',
             )
             assert updater.running
-            update = make_message_update('Webhook', message_factory=make_message)
+            update = make_message_update('Webhook')
             await self._send_webhook_message(ip, port, update.to_json(), 'TOKEN')
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
             await updater.stop()
@@ -705,7 +705,7 @@ class TestUpdater:
             await updater.start_webhook(ip, port, webhook_url=None, cert=Path(__file__).as_posix())
 
             # Now, we send an update to the server
-            update = make_message_update(message='test_message', message_factory=make_message)
+            update = make_message_update(message='test_message')
             await self._send_webhook_message(ip, port, update.to_json())
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
             assert self.test_flag == [True, True]

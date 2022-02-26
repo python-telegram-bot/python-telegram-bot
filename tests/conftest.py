@@ -23,13 +23,8 @@ import inspect
 
 import os
 import re
-from collections import defaultdict
 from pathlib import Path
-from queue import Queue
-from threading import Thread, Event
-from time import sleep
 from typing import Callable, List, Iterable, Any, Dict
-from types import MappingProxyType
 
 import pytest
 import pytz
@@ -211,46 +206,17 @@ def provider_token(bot_info):
     return bot_info['payment_provider_token']
 
 
-def create_dp(bot):
-    # Application is heavy to init (due to many threads and such) so we have a single session
-    # scoped one here, but before each test, reset it (app fixture below)
-    application = (
-        ApplicationBuilder().bot(bot).workers(2).application_class(DictApplication).build()
-    )
-    # TODO: Do we need the thread?
-    thr = Thread(target=application.start)
-    thr.start()
-    sleep(2)
-    yield application
-    sleep(1)
-    if application.running:
-        application.stop()
-    thr.join()
-
-
-@pytest.fixture(scope='session')
-def _app(bot):
-    yield from create_dp(bot)
-
-
 @pytest.fixture(scope='function')
-def app(_app):
-    # Reset the application first
-    # TODO: consider just using the builder pattern to build a new object
-    while not _app.update_queue.empty():
-        _app.update_queue.get(False)
-    _app._chat_data = defaultdict(dict)
-    _app._user_data = defaultdict(dict)
-    _app.chat_data = MappingProxyType(_app._chat_data)  # Rebuild the mapping so it updates
-    _app.user_data = MappingProxyType(_app._user_data)
-    _app.bot_data = {}
-    _app.handlers = {}
-    _app.error_handlers = {}
-    _app.__stop_event = Event()
-    _app.__async_queue = Queue()
-    _app.__async_threads = set()
-    _app.persistence = None
-    yield _app
+@pytest.mark.asyncio
+async def app(bot_info):
+    # We build a new bot each time so that we use `app` in a context manager without problems
+    application = (
+        ApplicationBuilder().bot(make_bot(bot_info)).application_class(DictApplication).build()
+    )
+    yield application
+    if application.running:
+        await application.stop()
+        await application.shutdown()
 
 
 @pytest.fixture(scope='function')
@@ -261,6 +227,7 @@ async def updater(bot_info):
     yield up
     if up.running:
         await up.stop()
+        await up.shutdown()
 
 
 PROJECT_ROOT_PATH = Path(__file__).parent.parent.resolve()

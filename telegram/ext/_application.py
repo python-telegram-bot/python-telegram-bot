@@ -222,9 +222,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._concurrent_updates_sem = asyncio.BoundedSemaphore(concurrent_updates or 1)
         self._concurrent_updates: int = concurrent_updates or 0
 
-        if self.job_queue:
-            self.job_queue.set_application(self)
-
         self.bot_data = self.context_types.bot_data()
         self._user_data: DefaultDict[int, UD] = defaultdict(self.context_types.user_data)
         self._chat_data: DefaultDict[int, CD] = defaultdict(self.context_types.chat_data)
