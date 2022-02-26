@@ -156,15 +156,10 @@ class DictApplication(Application):
     pass
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 @pytest.mark.asyncio
 async def bot(bot_info):
-    async with DictExtBot(
-        bot_info['token'],
-        private_key=PRIVATE_KEY,
-        request=TestHttpxRequest(8),
-        get_updates_request=TestHttpxRequest(1),
-    ) as _bot:
+    async with make_bot(bot_info) as _bot:
         yield _bot
 
 
@@ -260,8 +255,9 @@ def app(_app):
 
 @pytest.fixture(scope='function')
 @pytest.mark.asyncio
-async def updater(bot):
-    up = Updater(bot=bot, update_queue=asyncio.Queue())
+async def updater(bot_info):
+    # We build a new bot each time so that we use `updater` in a context manager without problems
+    up = Updater(bot=make_bot(bot_info), update_queue=asyncio.Queue())
     yield up
     if up.running:
         await up.stop()
@@ -298,7 +294,7 @@ def make_bot(bot_info, **kwargs):
     """
     Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
     """
-    _bot = ExtBot(
+    _bot = DictExtBot(
         bot_info['token'],
         private_key=PRIVATE_KEY,
         request=TestHttpxRequest(8),

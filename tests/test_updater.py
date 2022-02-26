@@ -103,11 +103,13 @@ class TestUpdater:
                 url=url, method=get_method or 'POST', data=payload, headers=headers
             )
 
-    def test_slot_behaviour(self, updater, mro_slots):
-        for at in updater.__slots__:
-            at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
-            assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
+    @pytest.mark.asyncio
+    async def test_slot_behaviour(self, updater, mro_slots):
+        async with updater:
+            for at in updater.__slots__:
+                at = f"_Updater{at}" if at.startswith('__') and not at.endswith('__') else at
+                assert getattr(updater, at, 'err') != 'err', f"got extra slot '{at}'"
+            assert len(mro_slots(updater)) == len(set(mro_slots(updater))), "duplicate slot"
 
     def test_init(self, bot):
         queue = asyncio.Queue()
@@ -310,9 +312,11 @@ class TestUpdater:
             self.message_count += 1
             raise exception_class(str(self.message_count))
 
-        monkeypatch.setattr(HTTPXRequest, 'do_request', do_request)
-
         async with updater:
+            # Patch within the context so that updater.bot.initialize can still be called
+            # by the context manager
+            monkeypatch.setattr(HTTPXRequest, 'do_request', do_request)
+
             if exception_class == InvalidToken:
                 with pytest.raises(InvalidToken, match='1'):
                     await updater.start_polling(bootstrap_retries=retries)
@@ -716,9 +720,11 @@ class TestUpdater:
             self.message_count += 1
             raise exception_class(str(self.message_count))
 
-        monkeypatch.setattr(HTTPXRequest, 'do_request', do_request)
-
         async with updater:
+            # Patch within the context so that updater.bot.initialize can still be called
+            # by the context manager
+            monkeypatch.setattr(HTTPXRequest, 'do_request', do_request)
+
             if exception_class == InvalidToken:
                 with pytest.raises(InvalidToken, match='1'):
                     await updater.start_webhook(bootstrap_retries=retries)

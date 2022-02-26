@@ -162,8 +162,9 @@ class TestBot:
     def reset(self):
         self.test_flag = None
 
-    @pytest.mark.parametrize('inst', ['bot', "default_bot"], indirect=True)
-    def test_slot_behaviour(self, inst, mro_slots):
+    @pytest.mark.parametrize('bot_class', [Bot, ExtBot])
+    def test_slot_behaviour(self, bot_class, bot, mro_slots):
+        inst = bot_class(bot.token)
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -1660,34 +1661,29 @@ class TestBot:
     @pytest.mark.parametrize('use_ip', [True, False])
     async def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot, use_ip):
         url = 'https://python-telegram-bot.org/test/webhook'
+        # Get the ip address of the website - dynamically just in case it ever changes
+        ip = socket.gethostbyname('python-telegram-bot.org')
         max_connections = 7
         allowed_updates = ['message']
-        if use_ip:
-            # Get the ip address of the website - dynamically just in case it ever changes
-            ip = socket.gethostbyname('python-telegram-bot.org')
-            await bot.set_webhook(
-                url,
-                max_connections=max_connections,
-                allowed_updates=allowed_updates,
-                ip_address=ip,
-            )
-        else:
-            await bot.set_webhook(
-                url,
-                max_connections=max_connections,
-                allowed_updates=allowed_updates,
-            )
-        await asyncio.sleep(2)
+        await bot.set_webhook(
+            url,
+            max_connections=max_connections,
+            allowed_updates=allowed_updates,
+            ip_address=ip if use_ip else None,
+        )
+
+        await asyncio.sleep(1)
         live_info = await bot.get_webhook_info()
-        await asyncio.sleep(6)
-        await bot.delete_webhook()
-        await asyncio.sleep(2)
-        info = await bot.get_webhook_info()
-        assert info.url == ''
         assert live_info.url == url
         assert live_info.max_connections == max_connections
         assert live_info.allowed_updates == allowed_updates
         assert live_info.ip_address == ip
+
+        await bot.delete_webhook()
+        await asyncio.sleep(1)
+        info = await bot.get_webhook_info()
+        assert info.url == ''
+        assert info.ip_address is None
 
     @pytest.mark.parametrize('drop_pending_updates', [True, False])
     @pytest.mark.asyncio

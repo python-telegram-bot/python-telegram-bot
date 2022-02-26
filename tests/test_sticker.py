@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import os
 from pathlib import Path
-from time import sleep
 
 import pytest
 from flaky import flaky
@@ -62,13 +62,13 @@ async def animated_sticker(bot, chat_id):
 
 @pytest.fixture(scope='function')
 def video_sticker_file():
-    with Path('tests/data/telegram_video_sticker.webm').open('rb') as f:
+    with data_file('telegram_video_sticker.webm').open('rb') as f:
         yield f
 
 
 @pytest.fixture(scope='class')
 def video_sticker(bot, chat_id):
-    with Path('tests/data/telegram_video_sticker.webm').open('rb') as f:
+    with data_file('telegram_video_sticker.webm').open('rb') as f:
         return bot.send_sticker(chat_id, sticker=f, timeout=50).sticker
 
 
@@ -517,7 +517,7 @@ class TestStickerSet:
     @flaky(3, 1)
     @pytest.mark.asyncio
     async def test_bot_methods_1_webm(self, bot, chat_id):
-        with Path('tests/data/telegram_video_sticker.webm').open('rb') as f:
+        with data_file('telegram_video_sticker.webm').open('rb') as f:
             assert await bot.add_sticker_to_set(
                 chat_id, f'video_test_by_{bot.username}', webm_sticker=f, emojis='🤔'
             )
@@ -554,7 +554,7 @@ class TestStickerSet:
     @flaky(10, 1)
     @pytest.mark.asyncio
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
-        sleep(1)
+        await asyncio.sleep(1)
         assert await bot.set_sticker_set_thumb(
             f'test_by_{bot.username}', chat_id, sticker_set_thumb_file
         )
@@ -564,7 +564,7 @@ class TestStickerSet:
     async def test_bot_methods_3_tgs(
         self, bot, chat_id, animated_sticker_file, animated_sticker_set
     ):
-        sleep(1)
+        await asyncio.sleep(1)
         animated_test = f'animated_test_by_{bot.username}'
         assert await bot.set_sticker_set_thumb(animated_test, chat_id, animated_sticker_file)
         file_id = animated_sticker_set.stickers[-1].file_id
@@ -582,21 +582,21 @@ class TestStickerSet:
     @flaky(10, 1)
     @pytest.mark.asyncio
     async def test_bot_methods_4_png(self, bot, sticker_set):
-        sleep(1)
+        await asyncio.sleep(1)
         file_id = sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     @flaky(10, 1)
     @pytest.mark.asyncio
     async def test_bot_methods_4_tgs(self, bot, animated_sticker_set):
-        sleep(1)
+        await asyncio.sleep(1)
         file_id = animated_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     @flaky(10, 1)
     @pytest.mark.asyncio
     async def test_bot_methods_4_webm(self, bot, video_sticker_set):
-        sleep(1)
+        await asyncio.sleep(1)
         file_id = video_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
