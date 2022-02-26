@@ -264,8 +264,6 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             bot = self._updater.bot
             update_queue = self._updater.update_queue
 
-        print(self._concurrent_updates)
-
         application: Application[
             BT, CCT, UD, CD, BD, JQ
         ] = DefaultValue.get_value(  # type: ignore[call-arg]  # pylint: disable=not-callable

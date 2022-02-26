@@ -73,6 +73,7 @@ class Updater:
         'update_queue',
         'last_update_id',
         '_running',
+        '_initialized',
         '_httpd',
         '__lock',
         '__polling_task',
@@ -88,6 +89,7 @@ class Updater:
 
         self.last_update_id = 0
         self._running = False
+        self._initialized = False
         self._httpd: Optional[WebhookServer] = None
         self.__lock = asyncio.Lock()
         self.__polling_task: Optional[asyncio.Task] = None
@@ -98,10 +100,30 @@ class Updater:
         return self._running
 
     async def initialize(self) -> None:
+        if self._initialized:
+            self._logger.warning('This Updater is already initialized.')
+            return
+
         await self.bot.initialize()
+        self._initialized = True
 
     async def shutdown(self) -> None:
+        """
+
+        Returns:
+
+        Raises:
+            :exc:`RuntimeError`: If the updater is still :attr:`running`.
+        """
+        if self.running:
+            raise RuntimeError('This Updater is still running!')
+
+        if not self._initialized:
+            self._logger.warning('This Updater is already shut down.')
+            return
+
         await self.bot.shutdown()
+        self._initialized = False
         self._logger.debug('Shut down of Updater complete')
 
     async def __aenter__(self: _UpdaterType) -> _UpdaterType:
@@ -175,31 +197,37 @@ class Updater:
         async with self.__lock:
             if self.running:
                 raise RuntimeError('This Updater is already running!')
+            if not self._initialized:
+                raise RuntimeError('This Updater is not initialized!')
 
             self._running = True
 
-            # Create & start tasks
-            polling_ready = asyncio.Event()
+            try:
+                # Create & start tasks
+                polling_ready = asyncio.Event()
 
-            await self._start_polling(
-                poll_interval=poll_interval,
-                timeout=timeout,
-                read_timeout=read_timeout,
-                write_timeout=write_timeout,
-                connect_timeout=connect_timeout,
-                pool_timeout=pool_timeout,
-                bootstrap_retries=bootstrap_retries,
-                drop_pending_updates=drop_pending_updates,
-                allowed_updates=allowed_updates,
-                ready=polling_ready,
-                error_callback=error_callback,
-            )
+                await self._start_polling(
+                    poll_interval=poll_interval,
+                    timeout=timeout,
+                    read_timeout=read_timeout,
+                    write_timeout=write_timeout,
+                    connect_timeout=connect_timeout,
+                    pool_timeout=pool_timeout,
+                    bootstrap_retries=bootstrap_retries,
+                    drop_pending_updates=drop_pending_updates,
+                    allowed_updates=allowed_updates,
+                    ready=polling_ready,
+                    error_callback=error_callback,
+                )
 
-            self._logger.debug('Waiting for polling to start')
-            await polling_ready.wait()
-            self._logger.debug('Polling to started')
+                self._logger.debug('Waiting for polling to start')
+                await polling_ready.wait()
+                self._logger.debug('Polling to started')
 
-            return self.update_queue
+                return self.update_queue
+            except Exception as exc:
+                self._running = False
+                raise exc
 
     async def _start_polling(
         self,
@@ -332,30 +360,36 @@ class Updater:
         async with self.__lock:
             if self.running:
                 raise RuntimeError('This Updater is already running!')
+            if not self._initialized:
+                raise RuntimeError('This Updater is not initialized!')
 
             self._running = True
 
-            # Create & start tasks
-            webhook_ready = asyncio.Event()
+            try:
+                # Create & start tasks
+                webhook_ready = asyncio.Event()
 
-            await self._start_webhook(
-                listen=listen,
-                port=port,
-                url_path=url_path,
-                cert=cert,
-                key=key,
-                bootstrap_retries=bootstrap_retries,
-                drop_pending_updates=drop_pending_updates,
-                webhook_url=webhook_url,
-                allowed_updates=allowed_updates,
-                ready=webhook_ready,
-                ip_address=ip_address,
-                max_connections=max_connections,
-            )
+                await self._start_webhook(
+                    listen=listen,
+                    port=port,
+                    url_path=url_path,
+                    cert=cert,
+                    key=key,
+                    bootstrap_retries=bootstrap_retries,
+                    drop_pending_updates=drop_pending_updates,
+                    webhook_url=webhook_url,
+                    allowed_updates=allowed_updates,
+                    ready=webhook_ready,
+                    ip_address=ip_address,
+                    max_connections=max_connections,
+                )
 
-            self._logger.debug('Waiting for webhook server to start')
-            await webhook_ready.wait()
-            self._logger.debug('Webhook server started')
+                self._logger.debug('Waiting for webhook server to start')
+                await webhook_ready.wait()
+                self._logger.debug('Webhook server started')
+            except Exception as exc:
+                self._running = False
+                raise exc
 
             # Return the update queue so the main thread can insert updates
             return self.update_queue
@@ -592,5 +626,8 @@ class Updater:
         if self.__polling_task:
             self._logger.debug('Waiting background polling task to join.')
             self.__polling_task.cancel()
-            await self.__polling_task
+            try:
+                await self.__polling_task
+            except asyncio.CancelledError:
+                pass
             self.__polling_task = None

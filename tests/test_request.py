@@ -346,6 +346,21 @@ class TestHTTPXRequest:
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
 
     @pytest.mark.asyncio
+    async def test_multiple_shutdowns(self, httpx_request, monkeypatch):
+        self.test_flag = 0
+
+        async def aclose(*args, **kwargs):
+            self.test_flag += 1
+
+        await httpx_request.shutdown()
+        # only mock after the first run so that AsyncClient can still set the `is_closed` flag
+        monkeypatch.setattr(httpx.AsyncClient, 'aclose', aclose)
+        await httpx_request.shutdown()
+        await httpx_request.shutdown()
+
+        assert self.test_flag == 0
+
+    @pytest.mark.asyncio
     async def test_context_manager(self, monkeypatch):
         async def initialize():
             self.test_flag = ['initialize']
@@ -408,7 +423,6 @@ class TestHTTPXRequest:
         manual_timeouts = httpx.Timeout(connect=52, read=53, write=54, pool=55)
 
         async def make_assertion(_, **kwargs):
-            print(kwargs.get('timeout'), manual_timeouts)
             self.test_flag = kwargs.get('timeout') == manual_timeouts
             return httpx.Response(HTTPStatus.OK)
 

@@ -60,7 +60,7 @@ from telegram.error import BadRequest, InvalidToken, NetworkError, TelegramError
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
 from telegram.helpers import escape_markdown
-from telegram.request import RequestData, BaseRequest
+from telegram.request import RequestData, BaseRequest, HTTPXRequest
 from tests.conftest import (
     expect_bad_request,
     check_defaults_handling,
@@ -187,7 +187,7 @@ class TestBot:
             Bot(token)
 
     @pytest.mark.asyncio
-    async def test_initialize_and_stop(self, bot, monkeypatch):
+    async def test_initialize_and_shutdown(self, bot, monkeypatch):
         async def initialize(*args, **kwargs):
             self.test_flag = ['initialize']
 
@@ -208,6 +208,31 @@ class TestBot:
             assert self.test_flag == ['initialize', 'stop']
         finally:
             await orig_stop()
+
+    @pytest.mark.asyncio
+    async def test_multiple_inits_and_shutdowns(self, bot, monkeypatch):
+        self.received = defaultdict(int)
+
+        async def initialize(*args, **kwargs):
+            self.received['init'] += 1
+
+        async def shutdown(*args, **kwargs):
+            self.received['shutdown'] += 1
+
+        monkeypatch.setattr(HTTPXRequest, 'initialize', initialize)
+        monkeypatch.setattr(HTTPXRequest, 'shutdown', shutdown)
+
+        test_bot = Bot(bot.token)
+        await test_bot.initialize()
+        await test_bot.initialize()
+        await test_bot.initialize()
+        await test_bot.shutdown()
+        await test_bot.shutdown()
+        await test_bot.shutdown()
+
+        # 2 instead of 1 since we have to request objects for each bot
+        assert self.received['init'] == 2
+        assert self.received['shutdown'] == 2
 
     @pytest.mark.asyncio
     async def test_context_manager(self, monkeypatch, bot):

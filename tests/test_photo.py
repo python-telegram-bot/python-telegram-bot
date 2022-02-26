@@ -62,7 +62,6 @@ def thumb(_photo):
 
 @pytest.fixture(scope='class')
 def photo(_photo):
-    print([ps.to_json() for ps in _photo])
     return _photo[-1]
 
 

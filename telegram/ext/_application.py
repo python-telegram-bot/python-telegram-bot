@@ -270,6 +270,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self._concurrent_updates
 
     async def initialize(self) -> None:
+        if self._initialized:
+            _logger.warning('This Application is already initialized.')
+            return
+
         await self.bot.initialize()
         if self.updater:
             await self.updater.initialize()
@@ -296,6 +300,20 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._initialized = True
 
     async def shutdown(self) -> None:
+        """
+
+        Returns:
+
+        Raises:
+            :exc:`RuntimeError`: If the application is still :attr:`running`.
+        """
+        if self.running:
+            raise RuntimeError('This Application is still running!')
+
+        if not self._initialized:
+            _logger.warning('This Application is already shut down.')
+            return
+
         await self.bot.shutdown()
         if self.updater:
             await self.updater.shutdown()
@@ -381,36 +399,42 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             ready (:obj:`asyncio.Event`, optional): If specified, the event will be set once the
                 application is ready.
 
+        Raises:
+            :exc:`RuntimeError`: If the application is already running or was not initialized.
         """
         if self.running:
-            _logger.warning('already running')
+            raise RuntimeError('This Application is already running!')
+        if not self._initialized:
+            raise RuntimeError('This Application is not initialized!')
+
+        self._running = True
+        self.__update_persistence_event.clear()
+
+        try:
+            if self.persistence:
+                self.__update_persistence_task = asyncio.create_task(
+                    self._persistence_updater()
+                    # TODO: Add this once we drop py3.7
+                    # name=f'Application:{self.bot.id}:persistence_updater'
+                )
+                _logger.debug('Loop for updating persistence started')
+
+            if self.job_queue:
+                self.job_queue.start()
+                _logger.debug('JobQueue started')
+
+            self.__update_fetcher_task = asyncio.create_task(
+                self._update_fetcher(),
+                # TODO: Add this once we drop py3.7
+                # name=f'Application:{self.bot.id}:update_fetcher'
+            )
+            _logger.info('Application started')
+
             if ready is not None:
                 ready.set()
-            return
-
-        self.__update_persistence_event.clear()
-        if self.persistence:
-            self.__update_persistence_task = asyncio.create_task(
-                self._persistence_updater()
-                # TODO: Add this once we drop py3.7
-                # name=f'Application:{self.bot.id}:persistence_updater'
-            )
-            _logger.debug('Loop for updating persistence started')
-
-        if self.job_queue:
-            self.job_queue.start()
-            _logger.debug('JobQueue started')
-
-        self.__update_fetcher_task = asyncio.create_task(
-            self._update_fetcher(),
-            # TODO: Add this once we drop py3.7
-            # name=f'Application:{self.bot.id}:update_fetcher'
-        )
-        self._running = True
-        _logger.info('Application started')
-
-        if ready is not None:
-            ready.set()
+        except Exception as exc:
+            self._running = False
+            raise exc
 
     async def stop(self) -> None:
         """Stops the process after processing any pending updates or tasks created by
@@ -452,6 +476,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 _logger.debug('Waiting for persistence loop to finish')
                 self.__update_persistence_event.set()
                 await self.__update_persistence_task
+                self.__update_persistence_event.clear()
 
             _logger.info('Application.stop() complete')
 
@@ -978,8 +1003,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             # We don't want to update any data that has been deleted!
             update_ids -= delete_ids
-            print('deleting chat_ids', delete_ids)
-            print('updating chat_ids', update_ids)
 
             for chat_id in update_ids:
                 coroutines.add(
@@ -1029,7 +1052,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     result = new_state.resolve()
 
                 effective_new_state = None if result is TrackingDict.DELETED else result
-                print(name, key, effective_new_state)
                 # TODO: Test that we actually pass `None` here in case the conversation had ended,
                 #  i.e. effective_new_state is TrackingDict.DELETED
                 coroutines.add(

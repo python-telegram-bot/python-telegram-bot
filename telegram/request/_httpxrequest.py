@@ -110,6 +110,10 @@ class HTTPXRequest(BaseRequest):
 
     async def shutdown(self) -> None:
         """See :meth:`BaseRequest.shutdown`."""
+        if self._client.is_closed:
+            _logger.warning('This HTTPXRequest is already shut down.')
+            return
+
         await self._client.aclose()
 
     async def do_request(

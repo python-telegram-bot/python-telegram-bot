@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+from collections import defaultdict
 from queue import Queue
 
 import pytest
@@ -41,7 +42,7 @@ class CustomContext(CallbackContext):
     pass
 
 
-class TestDispatcher:
+class TestApplication:
     message_update = make_message_update(message='Text')
     received = None
     count = 0
@@ -187,8 +188,57 @@ class TestDispatcher:
         monkeypatch.setattr(Bot, 'shutdown', shutdown_bot)
         monkeypatch.setattr(Updater, 'shutdown', shutdown_updater)
 
-        await ApplicationBuilder().token(bot.token).build().shutdown()
+        async with ApplicationBuilder().token(bot.token).build():
+            pass
         assert self.test_flag == {'bot', 'updater'}
+
+    @pytest.mark.asyncio
+    async def test_multiple_inits_and_shutdowns(self, app, monkeypatch):
+        self.received = defaultdict(int)
+
+        async def initialize(*args, **kargs):
+            self.received['init'] += 1
+
+        async def shutdown(*args, **kwargs):
+            self.received['shutdown'] += 1
+
+        monkeypatch.setattr(app.bot, 'initialize', initialize)
+        monkeypatch.setattr(app.bot, 'shutdown', shutdown)
+
+        await app.initialize()
+        await app.initialize()
+        await app.initialize()
+        await app.shutdown()
+        await app.shutdown()
+        await app.shutdown()
+
+        # 2 instead of 1 since `Updater.initialize` also calls bot.init/shutdown
+        assert self.received['init'] == 2
+        assert self.received['shutdown'] == 2
+
+    @pytest.mark.asyncio
+    async def test_start_without_initialize(self, app):
+        with pytest.raises(RuntimeError, match='not initialized'):
+            await app.start()
+
+    @pytest.mark.asyncio
+    async def test_shutdown_while_running(self, app):
+        async with app:
+            await app.start()
+            with pytest.raises(RuntimeError, match='still running'):
+                await app.shutdown()
+            await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_start_not_running_after_failure(self, app):
+        class Event(asyncio.Event):
+            def set(self) -> None:
+                raise Exception('Test Exception')
+
+        async with app:
+            with pytest.raises(Exception, match='Test Exception'):
+                await app.start(ready=Event())
+            assert app.running is False
 
     @pytest.mark.asyncio
     async def test_context_manager(self, monkeypatch, app):
@@ -365,14 +415,14 @@ class TestDispatcher:
     #         app.bot._defaults = None
     #
     # def test_run_async_multiple(self, bot, app, dp2):
-    #     def get_dispatcher_name(q):
+    #     def get_application_name(q):
     #         q.put(current_thread().name)
     #
     #     q1 = Queue()
     #     q2 = Queue()
     #
-    #     app.block(get_dispatcher_name, q1)
-    #     dp2.block(get_dispatcher_name, q2)
+    #     app.block(get_application_name, q1)
+    #     dp2.block(get_application_name, q2)
     #
     #     sleep(0.1)
     #
@@ -381,7 +431,7 @@ class TestDispatcher:
     #
     #     assert name1 != name2
     #
-    # def test_async_raises_dispatcher_handler_stop(self, app, recwarn):
+    # def test_async_raises_application_handler_stop(self, app, recwarn):
     #     def callback(update, context):
     #         raise ApplicationHandlerStop()
     #
@@ -833,7 +883,7 @@ class TestDispatcher:
     #     assert passed[2] is err
     #
     # def test_sensible_worker_thread_names(self, dp2):
-    #     thread_names = [thread.name for thread in dp2._Dispatcher__async_threads]
+    #     thread_names = [thread.name for thread in dp2._Application__async_threads]
     #     for thread_name in thread_names:
     #         assert thread_name.startswith(f"Bot:{dp2.bot.id}:worker:")
     #

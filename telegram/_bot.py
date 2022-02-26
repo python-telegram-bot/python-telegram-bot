@@ -356,18 +356,24 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         cache :attr:`bot` and calls :meth:`telegram.request.BaseRequest.initialize` for
         :attr:`request`.
         """
-        if not self._initialized:
-            await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
-            await self.get_me()
-            self._initialized = True
+        if self._initialized:
+            self._logger.warning('This Bot is already initialized.')
+            return
+
+        await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
+        await self.get_me()
+        self._initialized = True
 
     async def shutdown(self) -> None:
         """Stop & clear resources used by this class. Currently just calls
         :meth:`telegram.request.BaseRequest.shutdown` for the request objects used by this bot.
         """
-        if self._initialized:
-            await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
-            self._initialized = False
+        if not self._initialized:
+            self._logger.warning('This Bot is already shut down.')
+            return
+
+        await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
+        self._initialized = False
 
     async def __aenter__(self: BT) -> BT:
         try:
