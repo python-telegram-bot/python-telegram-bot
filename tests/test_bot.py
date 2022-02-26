@@ -20,6 +20,7 @@ import datetime
 import asyncio
 import inspect
 import logging
+import socket
 import time
 import datetime as dtm
 from collections import defaultdict
@@ -1656,16 +1657,26 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.asyncio
-    async def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot):
+    @pytest.mark.parametrize('use_ip', [True, False])
+    async def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot, use_ip):
         url = 'https://python-telegram-bot.org/test/webhook'
         max_connections = 7
         allowed_updates = ['message']
-        await bot.set_webhook(
-            url,
-            max_connections=max_connections,
-            allowed_updates=allowed_updates,
-            ip_address='198.51.100.127',
-        )
+        if use_ip:
+            # Get the ip address of the website - dynamically just in case it ever changes
+            ip = socket.gethostbyname('python-telegram-bot.org')
+            await bot.set_webhook(
+                url,
+                max_connections=max_connections,
+                allowed_updates=allowed_updates,
+                ip_address=ip,
+            )
+        else:
+            await bot.set_webhook(
+                url,
+                max_connections=max_connections,
+                allowed_updates=allowed_updates,
+            )
         await asyncio.sleep(2)
         live_info = await bot.get_webhook_info()
         await asyncio.sleep(6)
@@ -1676,7 +1687,7 @@ class TestBot:
         assert live_info.url == url
         assert live_info.max_connections == max_connections
         assert live_info.allowed_updates == allowed_updates
-        assert live_info.ip_address == '198.51.100.142'
+        assert live_info.ip_address == ip
 
     @pytest.mark.parametrize('drop_pending_updates', [True, False])
     @pytest.mark.asyncio

@@ -120,8 +120,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         updater (:class:`telegram.ext.Updater`, optional): The updater used by this application.
         job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
             instance to pass onto handler callbacks.
-        concurrent_updates (:obj:`int`, optional): Number updates that may be processed in
-            parallel.
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the chat.
 
