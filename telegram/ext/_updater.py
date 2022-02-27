@@ -113,7 +113,7 @@ class Updater:
         Returns:
 
         Raises:
-            :exc:`RuntimeError`: If the updater is still :attr:`running`.
+            :exc:`RuntimeError`: If the updater is still running.
         """
         if self.running:
             raise RuntimeError('This Updater is still running!')

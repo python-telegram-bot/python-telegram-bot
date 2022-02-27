@@ -268,7 +268,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
     async def _post(
         self,
-        endpoint: str,  # 'sendMessage', 'sendPhoto', 'getMe'
+        endpoint: str,
         data: JSONDict = None,  # {'chat_id': 123, 'text': 'Hello there!'}
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,

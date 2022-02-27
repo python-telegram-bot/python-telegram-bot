@@ -20,6 +20,7 @@
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
 import json
+from collections import defaultdict
 from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Tuple, Any, Coroutine, Callable
@@ -346,19 +347,52 @@ class TestHTTPXRequest:
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
 
     @pytest.mark.asyncio
-    async def test_multiple_shutdowns(self, httpx_request, monkeypatch):
-        self.test_flag = 0
+    async def test_multiple_inits_and_shutdowns(self, monkeypatch):
+        self.test_flag = defaultdict(int)
 
-        async def aclose(*args, **kwargs):
-            self.test_flag += 1
+        orig_init = httpx.AsyncClient.__init__
+        orig_aclose = httpx.AsyncClient.aclose
 
+        class Client(httpx.AsyncClient):
+            def __init__(*args, **kwargs):
+                print('this is init')
+                orig_init(*args, **kwargs)
+                self.test_flag['init'] += 1
+
+            async def aclose(*args, **kwargs):
+                print('this is aclose')
+                await orig_aclose(*args, **kwargs)
+                self.test_flag['shutdown'] += 1
+
+        monkeypatch.setattr(httpx, 'AsyncClient', Client)
+
+        # Create a new one instead of using the fixture so that the mocking can work
+        httpx_request = HTTPXRequest()
+
+        await httpx_request.initialize()
+        await httpx_request.initialize()
+        await httpx_request.initialize()
         await httpx_request.shutdown()
-        # only mock after the first run so that AsyncClient can still set the `is_closed` flag
-        monkeypatch.setattr(httpx.AsyncClient, 'aclose', aclose)
         await httpx_request.shutdown()
         await httpx_request.shutdown()
 
-        assert self.test_flag == 0
+        assert self.test_flag['init'] == 1
+        assert self.test_flag['shutdown'] == 1
+
+    @pytest.mark.asyncio
+    async def test_multiple_init_cycles(self):
+        # nothing really to assert - this should just not fail
+        httpx_request = HTTPXRequest()
+        async with httpx_request:
+            await httpx_request.do_request(url='https://python-telegram-bot.org', method='GET')
+        async with httpx_request:
+            await httpx_request.do_request(url='https://python-telegram-bot.org', method='GET')
+
+    @pytest.mark.asyncio
+    async def test_do_request_after_shutdown(self, httpx_request):
+        await httpx_request.shutdown()
+        with pytest.raises(RuntimeError, match='not initialized'):
+            await httpx_request.do_request(url='url', method='GET')
 
     @pytest.mark.asyncio
     async def test_context_manager(self, monkeypatch):

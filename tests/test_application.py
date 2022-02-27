@@ -217,6 +217,14 @@ class TestApplication:
         assert self.received['shutdown'] == 2
 
     @pytest.mark.asyncio
+    async def test_multiple_init_cycles(self, app):
+        # nothing really to assert - this should just not fail
+        async with app:
+            await app.bot.get_me()
+        async with app:
+            await app.bot.get_me()
+
+    @pytest.mark.asyncio
     async def test_start_without_initialize(self, app):
         with pytest.raises(RuntimeError, match='not initialized'):
             await app.start()

@@ -77,7 +77,7 @@ class HTTPXRequest(BaseRequest):
                 connections in the connection pool!
     """
 
-    __slots__ = ('_client',)
+    __slots__ = ('_client', '_client_kwargs')
 
     def __init__(
         self,
@@ -98,15 +98,21 @@ class HTTPXRequest(BaseRequest):
             max_connections=connection_pool_size,
             max_keepalive_connections=connection_pool_size,
         )
-
-        self._client = httpx.AsyncClient(
+        self._client_kwargs = dict(
             timeout=timeout,
             proxies=proxy_url,
             limits=limits,
         )
 
+        self._client = self._build_client()
+
+    def _build_client(self) -> httpx.AsyncClient:
+        return httpx.AsyncClient(**self._client_kwargs)  # type: ignore[arg-type]
+
     async def initialize(self) -> None:
         """See :meth:`BaseRequest.initialize`."""
+        if self._client.is_closed:
+            self._client = self._build_client()
 
     async def shutdown(self) -> None:
         """See :meth:`BaseRequest.shutdown`."""
@@ -127,6 +133,9 @@ class HTTPXRequest(BaseRequest):
         pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
     ) -> Tuple[int, bytes]:
         """See :meth:`BaseRequest.do_request`."""
+        if self._client.is_closed:
+            raise RuntimeError('This HTTPXRequest is not initialized!')
+
         if isinstance(read_timeout, DefaultValue):
             read_timeout = self._client.timeout.read
         if isinstance(write_timeout, DefaultValue):

@@ -169,6 +169,14 @@ class TestUpdater:
         assert self.test_flag['shutdown'] == 1
 
     @pytest.mark.asyncio
+    async def test_multiple_init_cycles(self, updater):
+        # nothing really to assert - this should just not fail
+        async with updater:
+            await updater.bot.get_me()
+        async with updater:
+            await updater.bot.get_me()
+
+    @pytest.mark.asyncio
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
     async def test_start_without_initialize(self, updater, method):
         with pytest.raises(RuntimeError, match='not initialized'):

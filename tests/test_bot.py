@@ -235,6 +235,15 @@ class TestBot:
         assert self.received['shutdown'] == 2
 
     @pytest.mark.asyncio
+    async def test_multiple_init_cycles(self, bot):
+        # nothing really to assert - this should just not fail
+        test_bot = Bot(bot.token)
+        async with test_bot:
+            await test_bot.get_me()
+        async with test_bot:
+            await test_bot.get_me()
+
+    @pytest.mark.asyncio
     async def test_context_manager(self, monkeypatch, bot):
         async def initialize():
             self.test_flag = ['initialize']
