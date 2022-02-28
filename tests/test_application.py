@@ -31,6 +31,8 @@ from telegram.ext import (
     ContextTypes,
     PicklePersistence,
     Updater,
+    filters,
+    MessageHandler,
 )
 
 from telegram.error import TelegramError
@@ -144,6 +146,10 @@ class TestApplication:
         with pytest.raises(RuntimeError, match='No application was set'):
             app.job_queue.application
 
+        assert isinstance(app.bot_data, dict)
+        assert isinstance(app.chat_data[1], dict)
+        assert isinstance(app.user_data[1], dict)
+
         with pytest.raises(ValueError, match='must be a non-negative'):
             Application(
                 bot=bot,
@@ -154,6 +160,20 @@ class TestApplication:
                 updater=updater,
                 concurrent_updates=-1,
             )
+
+    def test_custom_context_init(self, bot):
+        cc = ContextTypes(
+            context=CustomContext,
+            user_data=int,
+            chat_data=float,
+            bot_data=complex,
+        )
+
+        application = ApplicationBuilder().bot(bot).context_types(cc).build()
+
+        assert isinstance(application.user_data[1], int)
+        assert isinstance(application.chat_data[1], float)
+        assert isinstance(application.bot_data, complex)
 
     @pytest.mark.asyncio
     async def test_initialize(self, bot, monkeypatch):
@@ -304,26 +324,257 @@ class TestApplication:
         builder_1.token(app.bot.token)
         builder_2.token(app.bot.token)
 
+    @pytest.mark.asyncio
+    async def test_one_context_per_update(self, app):
+        self.received = None
+
+        async def one(update, context):
+            print('handler one for messag', repr(update.message.text))
+            self.received = context
+
+        def two(update, context):
+            if update.message.text == 'test':
+                if context is not self.received:
+                    pytest.fail('Expected same context object, got different')
+            else:
+                if context is self.received:
+                    print(context, self.received)
+                    pytest.fail('First handler was wrongly called')
+
+        app.add_handler(MessageHandler(filters.Regex('test'), one), group=1)
+        app.add_handler(MessageHandler(filters.ALL, two), group=2)
+        u = make_message_update(message='test')
+        await app.process_update(u)
+        self.received = None
+        u.message.text = 'something'
+        await app.process_update(u)
+
+    @pytest.mark.asyncio
+    async def test_error_in_handler(self, app):
+        app.add_handler(MessageHandler(filters.ALL, self.callback_raise_error))
+        app.add_error_handler(self.error_handler_context)
+
+        async with app:
+            await app.start()
+            await app.update_queue.put(self.message_update)
+            await asyncio.sleep(0.1)
+            await app.stop()
+
+        assert self.received == self.message_update.message.text
+
+    @pytest.mark.asyncio
+    async def test_add_remove_handler(self, app):
+        handler = MessageHandler(filters.ALL, self.callback_increase_count)
+        app.add_handler(handler)
+
+        async with app:
+            await app.start()
+            await app.update_queue.put(self.message_update)
+            await asyncio.sleep(0.1)
+            assert self.count == 1
+            app.remove_handler(handler)
+            await app.update_queue.put(self.message_update)
+            assert self.count == 1
+            await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_add_remove_handler_non_default_group(self, app):
+        handler = MessageHandler(filters.ALL, self.callback_increase_count)
+        app.add_handler(handler, group=2)
+        with pytest.raises(KeyError):
+            app.remove_handler(handler)
+        app.remove_handler(handler, group=2)
+
     #
-    # def test_one_context_per_update(self, app):
-    #     def one(update, context):
-    #         if update.message.text == 'test':
-    #             context.my_flag = True
+    @pytest.mark.asyncio
+    async def test_handler_order_in_group(self, app):
+        app.add_handler(MessageHandler(filters.PHOTO, self.callback_set_count(1)))
+        app.add_handler(MessageHandler(filters.ALL, self.callback_set_count(2)))
+        app.add_handler(MessageHandler(filters.TEXT, self.callback_set_count(3)))
+        async with app:
+            await app.start()
+            await app.update_queue.put(self.message_update)
+            await asyncio.sleep(0.1)
+            assert self.count == 2
+            await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_groups(self, app):
+        app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count))
+        app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count), group=2)
+        app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count), group=-1)
+
+        async with app:
+            await app.start()
+            await app.update_queue.put(self.message_update)
+            await asyncio.sleep(0.1)
+            assert self.count == 3
+            await app.stop()
+
     #
-    #     def two(update, context):
-    #         if update.message.text == 'test':
-    #             if not hasattr(context, 'my_flag'):
-    #                 pytest.fail()
-    #         else:
-    #             if hasattr(context, 'my_flag'):
-    #                 pytest.fail()
+    # @pytest.mark.asyncio
+    # async def test_add_handlers_complex(self, app):
+    #     """Tests both add_handler & add_handlers together & confirms the correct insertion
+    #     order"""
+    #     msg_handler_set_count = MessageHandler(filters.TEXT, self.callback_set_count(1))
+    #     msg_handler_inc_count = MessageHandler(filters.PHOTO, self.callback_increase_count)
     #
-    #     app.add_handler(MessageHandler(filters.Regex('test'), one), group=1)
-    #     app.add_handler(MessageHandler(None, two), group=2)
-    #     u = Update(1, Message(1, None, None, None, text='test'))
-    #     app.process_update(u)
-    #     u.message.text = 'something'
-    #     app.process_update(u)
+    #     app.add_handler(msg_handler_set_count, 1)
+    #     app.add_handlers((msg_handler_inc_count, msg_handler_inc_count), 1)
+    #
+    #     photo_update = Update(2, message=Message(2, None, None, photo=True))
+    #     # Putting updates in the queue calls the callback
+    #     app.update_queue.put(self.message_update)
+    #     app.update_queue.put(photo_update)
+    #     sleep(0.1)  # sleep is required otherwise there is random behaviour
+    #
+    #     # Test if handler was added to correct group with correct order-
+    #     assert (
+    #         self.count == 2
+    #         and len(app.handlers[1]) == 3
+    #         and app.handlers[1][0] is msg_handler_set_count
+    #     )
+    #
+    #     # Now lets test add_handlers when `handlers` is a dict-
+    #     voice_filter_handler_to_check = MessageHandler(filters.VOICE,
+    #     self.callback_increase_count)
+    #     app.add_handlers(
+    #         handlers={
+    #             1: [
+    #                 MessageHandler(filters.USER, self.callback_increase_count),
+    #                 voice_filter_handler_to_check,
+    #             ],
+    #             -1: [MessageHandler(filters.CAPTION, self.callback_set_count(2))],
+    #         }
+    #     )
+    #
+    #     user_update = Update(3, message=Message(3, None, None, from_user=User(1, 's', True)))
+    #     voice_update = Update(4, message=Message(4, None, None, voice=True))
+    #     app.update_queue.put(user_update)
+    #     app.update_queue.put(voice_update)
+    #     sleep(0.1)
+    #
+    #     assert (
+    #         self.count == 4
+    #         and len(app.handlers[1]) == 5
+    #         and app.handlers[1][-1] is voice_filter_handler_to_check
+    #     )
+    #
+    #     app.update_queue.put(Update(5, message=Message(5, None, None, caption='cap')))
+    #     sleep(0.1)
+    #
+    #     assert self.count == 2 and len(app.handlers[-1]) == 1
+    #
+    #     # Now lets test the errors which can be produced-
+    #     with pytest.raises(ValueError, match="The `group` argument"):
+    #         app.add_handlers({2: [msg_handler_set_count]}, group=0)
+    #     with pytest.raises(ValueError, match="Handlers for group 3"):
+    #         app.add_handlers({3: msg_handler_set_count})
+    #     with pytest.raises(ValueError, match="The `handlers` argument must be a sequence"):
+    #         app.add_handlers({msg_handler_set_count})
+    #
+    # @pytest.mark.asyncio
+    # async def test_add_handler_errors(self, app):
+    #     handler = 'not a handler'
+    #     with pytest.raises(TypeError, match='handler is not an instance of'):
+    #         app.add_handler(handler)
+    #
+    #     handler = MessageHandler(filters.PHOTO, self.callback_set_count(1))
+    #     with pytest.raises(TypeError, match='group is not int'):
+    #         app.add_handler(handler, 'one')
+    #
+    # @pytest.mark.asyncio
+    # async def test_flow_stop(self, app, bot):
+    #     passed = []
+    #
+    #     def start1(b, u):
+    #         passed.append('start1')
+    #         raise ApplicationHandlerStop
+    #
+    #     def start2(b, u):
+    #         passed.append('start2')
+    #
+    #     def start3(b, u):
+    #         passed.append('start3')
+    #
+    #     def error(b, u, e):
+    #         passed.append('error')
+    #         passed.append(e)
+    #
+    #     update = Update(
+    #         1,
+    #         message=Message(
+    #             1,
+    #             None,
+    #             None,
+    #             None,
+    #             text='/start',
+    #             entities=[
+    #                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+    #             ],
+    #             bot=bot,
+    #         ),
+    #     )
+    #
+    #     # If Stop raised handlers in other groups should not be called.
+    #     passed = []
+    #     app.add_handler(CommandHandler('start', start1), 1)
+    #     app.add_handler(CommandHandler('start', start3), 1)
+    #     app.add_handler(CommandHandler('start', start2), 2)
+    #     app.process_update(update)
+    #     assert passed == ['start1']
+    #
+    # @pytest.mark.asyncio
+    # async def test_exception_in_handler(self, app, bot):
+    #     passed = []
+    #     err = Exception('General exception')
+    #
+    #     def start1(u, c):
+    #         passed.append('start1')
+    #         raise err
+    #
+    #     def start2(u, c):
+    #         passed.append('start2')
+    #
+    #     def start3(u, c):
+    #         passed.append('start3')
+    #
+    #     def error(u, c):
+    #         passed.append('error')
+    #         passed.append(c.error)
+    #
+    #     update = Update(
+    #         1,
+    #         message=Message(
+    #             1,
+    #             None,
+    #             None,
+    #             None,
+    #             text='/start',
+    #             entities=[
+    #                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+    #             ],
+    #             bot=bot,
+    #         ),
+    #     )
+    #
+    #     # If an unhandled exception was caught, no further handlers from the same group should be
+    #     # called. Also, the error handler should be called and receive the exception
+    #     passed = []
+    #     app.add_handler(CommandHandler('start', start1), 1)
+    #     app.add_handler(CommandHandler('start', start2), 1)
+    #     app.add_handler(CommandHandler('start', start3), 2)
+    #     app.add_error_handler(error)
+    #     app.process_update(update)
+    #     assert passed == ['start1', 'error', err, 'start3']
+
+    #
+
+    # TODProperly test app.start!
+    # @pytest.mark.asyncio
+    # async def test_error_start_twice(self, app):
+    #     assert app.running
+    #     app.start()
     #
     # def test_error_handler(self, app):
     #     app.add_error_handler(self.error_handler_context)
@@ -1216,20 +1467,6 @@ class TestApplication:
     #         assert self.count == expected
     #     finally:
     #         app.bot._defaults = None
-    #
-    # def test_custom_context_init(self, bot):
-    #     cc = ContextTypes(
-    #         context=CustomContext,
-    #         user_data=int,
-    #         chat_data=float,
-    #         bot_data=complex,
-    #     )
-    #
-    #     application = ApplicationBuilder().bot(bot).context_types(cc).build()
-    #
-    #     assert isinstance(application.user_data[1], int)
-    #     assert isinstance(application.chat_data[1], float)
-    #     assert isinstance(application.bot_data, complex)
     #
     # def test_custom_context_error_handler(self, bot):
     #     def error_handler(_, context):

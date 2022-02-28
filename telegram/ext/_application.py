@@ -699,7 +699,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             try:
                 for handler in handlers:
                     check = handler.check_update(update)
-                    if check is not None and check is not False:
+                    if bool(check):
                         if not context:
                             context = self.context_types.context.from_update(update, self)
                             await context.refresh_data()
