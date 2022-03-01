@@ -604,17 +604,23 @@ class Updater:
             )
 
     async def stop(self) -> None:
-        """Stops the polling/webhook."""
+        """Stops the polling/webhook.
+
+        Raises:
+            :exc:`RuntimeError`: If the updater is not running.
+        """
         async with self.__lock:
-            if self.running:
-                self._logger.debug('Stopping Updater')
+            if not self.running:
+                raise RuntimeError('This Updater is not running!')
 
-                self._running = False
+            self._logger.debug('Stopping Updater')
 
-                await self._stop_httpd()
-                await self._stop_polling()
+            self._running = False
 
-                self._logger.debug('Updater.stop() is complete')
+            await self._stop_httpd()
+            await self._stop_polling()
+
+            self._logger.debug('Updater.stop() is complete')
 
     async def _stop_httpd(self) -> None:
         if self._httpd:

@@ -22,7 +22,7 @@ from queue import Queue
 
 import pytest
 
-from telegram import Bot
+from telegram import Bot, Message, User, MessageEntity
 from telegram.ext import (
     JobQueue,
     CallbackContext,
@@ -33,6 +33,10 @@ from telegram.ext import (
     Updater,
     filters,
     MessageHandler,
+    Handler,
+    ApplicationHandlerStop,
+    CommandHandler,
+    TypeHandler,
 )
 
 from telegram.error import TelegramError
@@ -325,11 +329,55 @@ class TestApplication:
         builder_2.token(app.bot.token)
 
     @pytest.mark.asyncio
+    async def test_start_stop_processing_updates(self, app):
+        # TODO: repeat a similar test for create_task, persistence processing and job queue
+        async def callback(u, c):
+            self.received = u
+
+        assert not app.running
+        assert not app.updater.running
+        app.add_handler(TypeHandler(object, callback))
+
+        await app.update_queue.put(1)
+        await asyncio.sleep(0.05)
+        assert not app.update_queue.empty()
+        assert self.received is None
+
+        async with app:
+            await app.start()
+            assert app.running
+            assert not app.updater.running
+            await asyncio.sleep(0.05)
+            assert app.update_queue.empty()
+            assert self.received == 1
+
+            await app.stop()
+            assert not app.running
+            assert not app.updater.running
+            await app.update_queue.put(2)
+            await asyncio.sleep(0.05)
+            assert not app.update_queue.empty()
+            assert self.received != 2
+            assert self.received == 1
+
+    @pytest.mark.asyncio
+    async def test_error_start_stop_twice(self, app):
+        async with app:
+            await app.start()
+            assert app.running
+            with pytest.raises(RuntimeError, match='already running'):
+                await app.start()
+
+            await app.stop()
+            assert not app.running
+            with pytest.raises(RuntimeError, match='not running'):
+                await app.stop()
+
+    @pytest.mark.asyncio
     async def test_one_context_per_update(self, app):
         self.received = None
 
         async def one(update, context):
-            print('handler one for messag', repr(update.message.text))
             self.received = context
 
         def two(update, context):
@@ -349,18 +397,14 @@ class TestApplication:
         u.message.text = 'something'
         await app.process_update(u)
 
-    @pytest.mark.asyncio
-    async def test_error_in_handler(self, app):
-        app.add_handler(MessageHandler(filters.ALL, self.callback_raise_error))
-        app.add_error_handler(self.error_handler_context)
+    def test_add_handler_errors(self, app):
+        handler = 'not a handler'
+        with pytest.raises(TypeError, match='handler is not an instance of'):
+            app.add_handler(handler)
 
-        async with app:
-            await app.start()
-            await app.update_queue.put(self.message_update)
-            await asyncio.sleep(0.1)
-            await app.stop()
-
-        assert self.received == self.message_update.message.text
+        handler = MessageHandler(filters.PHOTO, self.callback_set_count(1))
+        with pytest.raises(TypeError, match='group is not int'):
+            app.add_handler(handler, 'one')
 
     @pytest.mark.asyncio
     async def test_add_remove_handler(self, app):
@@ -370,7 +414,7 @@ class TestApplication:
         async with app:
             await app.start()
             await app.update_queue.put(self.message_update)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.05)
             assert self.count == 1
             app.remove_handler(handler)
             await app.update_queue.put(self.message_update)
@@ -394,7 +438,7 @@ class TestApplication:
         async with app:
             await app.start()
             await app.update_queue.put(self.message_update)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.05)
             assert self.count == 2
             await app.stop()
 
@@ -407,188 +451,217 @@ class TestApplication:
         async with app:
             await app.start()
             await app.update_queue.put(self.message_update)
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.05)
             assert self.count == 3
             await app.stop()
 
-    #
-    # @pytest.mark.asyncio
-    # async def test_add_handlers_complex(self, app):
-    #     """Tests both add_handler & add_handlers together & confirms the correct insertion
-    #     order"""
-    #     msg_handler_set_count = MessageHandler(filters.TEXT, self.callback_set_count(1))
-    #     msg_handler_inc_count = MessageHandler(filters.PHOTO, self.callback_increase_count)
-    #
-    #     app.add_handler(msg_handler_set_count, 1)
-    #     app.add_handlers((msg_handler_inc_count, msg_handler_inc_count), 1)
-    #
-    #     photo_update = Update(2, message=Message(2, None, None, photo=True))
-    #     # Putting updates in the queue calls the callback
-    #     app.update_queue.put(self.message_update)
-    #     app.update_queue.put(photo_update)
-    #     sleep(0.1)  # sleep is required otherwise there is random behaviour
-    #
-    #     # Test if handler was added to correct group with correct order-
-    #     assert (
-    #         self.count == 2
-    #         and len(app.handlers[1]) == 3
-    #         and app.handlers[1][0] is msg_handler_set_count
-    #     )
-    #
-    #     # Now lets test add_handlers when `handlers` is a dict-
-    #     voice_filter_handler_to_check = MessageHandler(filters.VOICE,
-    #     self.callback_increase_count)
-    #     app.add_handlers(
-    #         handlers={
-    #             1: [
-    #                 MessageHandler(filters.USER, self.callback_increase_count),
-    #                 voice_filter_handler_to_check,
-    #             ],
-    #             -1: [MessageHandler(filters.CAPTION, self.callback_set_count(2))],
-    #         }
-    #     )
-    #
-    #     user_update = Update(3, message=Message(3, None, None, from_user=User(1, 's', True)))
-    #     voice_update = Update(4, message=Message(4, None, None, voice=True))
-    #     app.update_queue.put(user_update)
-    #     app.update_queue.put(voice_update)
-    #     sleep(0.1)
-    #
-    #     assert (
-    #         self.count == 4
-    #         and len(app.handlers[1]) == 5
-    #         and app.handlers[1][-1] is voice_filter_handler_to_check
-    #     )
-    #
-    #     app.update_queue.put(Update(5, message=Message(5, None, None, caption='cap')))
-    #     sleep(0.1)
-    #
-    #     assert self.count == 2 and len(app.handlers[-1]) == 1
-    #
-    #     # Now lets test the errors which can be produced-
-    #     with pytest.raises(ValueError, match="The `group` argument"):
-    #         app.add_handlers({2: [msg_handler_set_count]}, group=0)
-    #     with pytest.raises(ValueError, match="Handlers for group 3"):
-    #         app.add_handlers({3: msg_handler_set_count})
-    #     with pytest.raises(ValueError, match="The `handlers` argument must be a sequence"):
-    #         app.add_handlers({msg_handler_set_count})
-    #
-    # @pytest.mark.asyncio
-    # async def test_add_handler_errors(self, app):
-    #     handler = 'not a handler'
-    #     with pytest.raises(TypeError, match='handler is not an instance of'):
-    #         app.add_handler(handler)
-    #
-    #     handler = MessageHandler(filters.PHOTO, self.callback_set_count(1))
-    #     with pytest.raises(TypeError, match='group is not int'):
-    #         app.add_handler(handler, 'one')
-    #
-    # @pytest.mark.asyncio
-    # async def test_flow_stop(self, app, bot):
-    #     passed = []
-    #
-    #     def start1(b, u):
-    #         passed.append('start1')
-    #         raise ApplicationHandlerStop
-    #
-    #     def start2(b, u):
-    #         passed.append('start2')
-    #
-    #     def start3(b, u):
-    #         passed.append('start3')
-    #
-    #     def error(b, u, e):
-    #         passed.append('error')
-    #         passed.append(e)
-    #
-    #     update = Update(
-    #         1,
-    #         message=Message(
-    #             1,
-    #             None,
-    #             None,
-    #             None,
-    #             text='/start',
-    #             entities=[
-    #                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #             ],
-    #             bot=bot,
-    #         ),
-    #     )
-    #
-    #     # If Stop raised handlers in other groups should not be called.
-    #     passed = []
-    #     app.add_handler(CommandHandler('start', start1), 1)
-    #     app.add_handler(CommandHandler('start', start3), 1)
-    #     app.add_handler(CommandHandler('start', start2), 2)
-    #     app.process_update(update)
-    #     assert passed == ['start1']
-    #
-    # @pytest.mark.asyncio
-    # async def test_exception_in_handler(self, app, bot):
-    #     passed = []
-    #     err = Exception('General exception')
-    #
-    #     def start1(u, c):
-    #         passed.append('start1')
-    #         raise err
-    #
-    #     def start2(u, c):
-    #         passed.append('start2')
-    #
-    #     def start3(u, c):
-    #         passed.append('start3')
-    #
-    #     def error(u, c):
-    #         passed.append('error')
-    #         passed.append(c.error)
-    #
-    #     update = Update(
-    #         1,
-    #         message=Message(
-    #             1,
-    #             None,
-    #             None,
-    #             None,
-    #             text='/start',
-    #             entities=[
-    #                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #             ],
-    #             bot=bot,
-    #         ),
-    #     )
-    #
-    #     # If an unhandled exception was caught, no further handlers from the same group should be
-    #     # called. Also, the error handler should be called and receive the exception
-    #     passed = []
-    #     app.add_handler(CommandHandler('start', start1), 1)
-    #     app.add_handler(CommandHandler('start', start2), 1)
-    #     app.add_handler(CommandHandler('start', start3), 2)
-    #     app.add_error_handler(error)
-    #     app.process_update(update)
-    #     assert passed == ['start1', 'error', err, 'start3']
+    @pytest.mark.asyncio
+    async def test_add_handlers(self, app):
+        """Tests both add_handler & add_handlers together & confirms the correct insertion
+        order"""
+        msg_handler_set_count = MessageHandler(filters.TEXT, self.callback_set_count(1))
+        msg_handler_inc_count = MessageHandler(filters.PHOTO, self.callback_increase_count)
 
-    #
+        app.add_handler(msg_handler_set_count, 1)
+        app.add_handlers((msg_handler_inc_count, msg_handler_inc_count), 1)
 
-    # TODProperly test app.start!
-    # @pytest.mark.asyncio
-    # async def test_error_start_twice(self, app):
-    #     assert app.running
-    #     app.start()
+        photo_update = make_message_update(message=Message(2, None, None, photo=True))
+
+        async with app:
+            await app.start()
+            # Putting updates in the queue calls the callback
+            await app.update_queue.put(self.message_update)
+            await app.update_queue.put(photo_update)
+            await asyncio.sleep(0.05)  # sleep is required otherwise there is random behaviour
+
+            # Test if handler was added to correct group with correct order-
+            assert (
+                self.count == 2
+                and len(app.handlers[1]) == 3
+                and app.handlers[1][0] is msg_handler_set_count
+            )
+
+            # Now lets test add_handlers when `handlers` is a dict-
+            voice_filter_handler_to_check = MessageHandler(
+                filters.VOICE, self.callback_increase_count
+            )
+            app.add_handlers(
+                handlers={
+                    1: [
+                        MessageHandler(filters.USER, self.callback_increase_count),
+                        voice_filter_handler_to_check,
+                    ],
+                    -1: [MessageHandler(filters.CAPTION, self.callback_set_count(2))],
+                }
+            )
+
+            user_update = make_message_update(
+                message=Message(3, None, None, from_user=User(1, 's', True))
+            )
+            voice_update = make_message_update(message=Message(4, None, None, voice=True))
+            await app.update_queue.put(user_update)
+            await app.update_queue.put(voice_update)
+            await asyncio.sleep(0.05)
+
+            assert (
+                self.count == 4
+                and len(app.handlers[1]) == 5
+                and app.handlers[1][-1] is voice_filter_handler_to_check
+            )
+
+            await app.update_queue.put(
+                make_message_update(message=Message(5, None, None, caption='cap'))
+            )
+            await asyncio.sleep(0.05)
+
+            assert self.count == 2 and len(app.handlers[-1]) == 1
+
+            # Now lets test the errors which can be produced-
+            with pytest.raises(ValueError, match="The `group` argument"):
+                app.add_handlers({2: [msg_handler_set_count]}, group=0)
+            with pytest.raises(ValueError, match="Handlers for group 3"):
+                app.add_handlers({3: msg_handler_set_count})
+            with pytest.raises(ValueError, match="The `handlers` argument must be a sequence"):
+                app.add_handlers({msg_handler_set_count})
+
+            await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_check_update(self, app):
+        class TestHandler(Handler):
+            def check_update(_, update: object):
+                self.received = object()
+
+            def handle_update(
+                _,
+                update,
+                application,
+                check_result,
+                context,
+            ):
+                assert application is app
+                assert check_result is not self.received
+
+        async with app:
+            app.add_handler(TestHandler('callback'))
+            await app.start()
+            await app.update_queue.put(object())
+            await asyncio.sleep(0.05)
+            await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_flow_stop(self, app, bot):
+        passed = []
+
+        def start1(b, u):
+            passed.append('start1')
+            raise ApplicationHandlerStop
+
+        def start2(b, u):
+            passed.append('start2')
+
+        def start3(b, u):
+            passed.append('start3')
+
+        def error(b, u, e):
+            passed.append('error')
+            passed.append(e)
+
+        update = make_message_update(
+            message=Message(
+                1,
+                None,
+                None,
+                None,
+                text='/start',
+                entities=[
+                    MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                ],
+                bot=bot,
+            ),
+        )
+
+        # If ApplicationHandlerStop raised handlers in other groups should not be called.
+        passed = []
+        app.add_handler(CommandHandler('start', start1), 1)
+        app.add_handler(CommandHandler('start', start3), 1)
+        app.add_handler(CommandHandler('start', start2), 2)
+        await app.process_update(update)
+        assert passed == ['start1']
+
+    @pytest.mark.asyncio
+    async def test_error_in_handler_part_1(self, app):
+        app.add_handler(MessageHandler(filters.ALL, self.callback_raise_error))
+        app.add_handler(MessageHandler(filters.ALL, self.callback_set_count(42)), group=1)
+        app.add_error_handler(self.error_handler_context)
+
+        async with app:
+            await app.start()
+            await app.update_queue.put(self.message_update)
+            await asyncio.sleep(0.05)
+            await app.stop()
+
+        assert self.received == self.message_update.message.text
+        # Higher groups should still be called
+        assert self.count == 42
+
+    @pytest.mark.asyncio
+    async def test_error_in_handler_part_2(self, app, bot):
+        passed = []
+        err = Exception('General exception')
+
+        async def start1(u, c):
+            passed.append('start1')
+            raise err
+
+        async def start2(u, c):
+            passed.append('start2')
+
+        async def start3(u, c):
+            passed.append('start3')
+
+        async def error(u, c):
+            passed.append('error')
+            passed.append(c.error)
+
+        update = make_message_update(
+            message=Message(
+                1,
+                None,
+                None,
+                None,
+                text='/start',
+                entities=[
+                    MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+                ],
+                bot=bot,
+            ),
+        )
+
+        # If an unhandled exception was caught, no further handlers from the same group should be
+        # called. Also, the error handler should be called and receive the exception
+        passed = []
+        app.add_handler(CommandHandler('start', start1), 1)
+        app.add_handler(CommandHandler('start', start2), 1)
+        app.add_handler(CommandHandler('start', start3), 2)
+        app.add_error_handler(error)
+        await app.process_update(update)
+        assert passed == ['start1', 'error', err, 'start3']
+
     #
     # def test_error_handler(self, app):
     #     app.add_error_handler(self.error_handler_context)
     #     error = TelegramError('Unauthorized.')
-    #     app.update_queue.put(error)
-    #     sleep(0.1)
+    #     await app.update_queue.put(error)
+    #     await asyncio.sleep(0.05)
     #     assert self.received == 'Unauthorized.'
     #
     #     # Remove handler
     #     app.remove_error_handler(self.error_handler_context)
     #     self.reset()
     #
-    #     app.update_queue.put(error)
-    #     sleep(0.1)
+    #     await app.update_queue.put(error)
+    #     await asyncio.sleep(0.05)
     #     assert self.received is None
     #
     # def test_double_add_error_handler(self, app, caplog):
@@ -622,15 +695,15 @@ class TestApplication:
     #
     #     # From errors caused by handlers
     #     app.add_handler(handler_raise_error)
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #
     #     # From errors in the update_queue
     #     app.remove_handler(handler_raise_error)
     #     app.add_handler(handler_increase_count)
-    #     app.update_queue.put(error)
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(error)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #
     #     assert self.count == 1
     #
@@ -683,7 +756,7 @@ class TestApplication:
     #     app.block(get_application_name, q1)
     #     dp2.block(get_application_name, q2)
     #
-    #     sleep(0.1)
+    #     await asyncio.sleep(0.05)
     #
     #     name1 = q1.get()
     #     name2 = q2.get()
@@ -696,8 +769,8 @@ class TestApplication:
     #
     #     app.add_handler(MessageHandler(filters.ALL, callback, block=True))
     #
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #     assert len(recwarn) == 1
     #     assert str(recwarn[-1].message).startswith(
     #         'ApplicationHandlerStop is not supported with async functions'
@@ -712,8 +785,8 @@ class TestApplication:
     #         )
     #     )
     #
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #     assert self.received == self.message_update.message
     #
     # def test_run_async_no_error_handler(self, app, caplog):
@@ -722,7 +795,7 @@ class TestApplication:
     #
     #     with caplog.at_level(logging.ERROR):
     #         app.block(func)
-    #         sleep(0.1)
+    #         await asyncio.sleep(0.05)
     #         assert len(caplog.records) == 1
     #         assert caplog.records[-1].getMessage().startswith('No error handlers are registered')
     #
@@ -730,7 +803,7 @@ class TestApplication:
     #     app.add_handler(MessageHandler(filters.ALL, self.callback_raise_error, block=True))
     #     app.add_error_handler(self.error_handler_context, block=True)
     #
-    #     app.update_queue.put(self.message_update)
+    #     await app.update_queue.put(self.message_update)
     #     sleep(2)
     #     assert self.received == self.message_update.message.text
     #
@@ -740,8 +813,8 @@ class TestApplication:
     #     app.add_error_handler(self.error_handler_raise_error, block=False)
     #
     #     with caplog.at_level(logging.ERROR):
-    #         app.update_queue.put(self.message_update)
-    #         sleep(0.1)
+    #         await app.update_queue.put(self.message_update)
+    #         await asyncio.sleep(0.05)
     #         assert len(caplog.records) == 1
     #         assert (
     #             caplog.records[-1].getMessage().startswith('An error was raised and an uncaught')
@@ -750,8 +823,8 @@ class TestApplication:
     #     # Make sure that the main loop still runs
     #     app.remove_handler(handler)
     #     app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count, block=True))
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #     assert self.count == 1
     #
     # def test_async_handler_async_error_handler_that_raises_error(self, app, caplog):
@@ -760,8 +833,8 @@ class TestApplication:
     #     app.add_error_handler(self.error_handler_raise_error, block=True)
     #
     #     with caplog.at_level(logging.ERROR):
-    #         app.update_queue.put(self.message_update)
-    #         sleep(0.1)
+    #         await app.update_queue.put(self.message_update)
+    #         await asyncio.sleep(0.05)
     #         assert len(caplog.records) == 1
     #         assert (
     #             caplog.records[-1].getMessage().startswith('An error was raised and an uncaught')
@@ -770,26 +843,26 @@ class TestApplication:
     #     # Make sure that the main loop still runs
     #     app.remove_handler(handler)
     #     app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count, block=True))
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #     assert self.count == 1
     #
     # def test_error_in_handler(self, app):
     #     app.add_handler(MessageHandler(filters.ALL, self.callback_raise_error))
     #     app.add_error_handler(self.error_handler_context)
     #
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #     assert self.received == self.message_update.message.text
     #
     # def test_add_remove_handler(self, app):
     #     handler = MessageHandler(filters.ALL, self.callback_increase_count)
     #     app.add_handler(handler)
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #     assert self.count == 1
     #     app.remove_handler(handler)
-    #     app.update_queue.put(self.message_update)
+    #     await app.update_queue.put(self.message_update)
     #     assert self.count == 1
     #
     # def test_add_remove_handler_non_default_group(self, app):
@@ -807,8 +880,8 @@ class TestApplication:
     #     app.add_handler(MessageHandler(filters.PHOTO, self.callback_set_count(1)))
     #     app.add_handler(MessageHandler(filters.ALL, self.callback_set_count(2)))
     #     app.add_handler(MessageHandler(filters.TEXT, self.callback_set_count(3)))
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #     assert self.count == 2
     #
     # def test_groups(self, app):
@@ -816,8 +889,8 @@ class TestApplication:
     #     app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count), group=2)
     #     app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count), group=-1)
     #
-    #     app.update_queue.put(self.message_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(self.message_update)
+    #     await asyncio.sleep(0.05)
     #     assert self.count == 3
     #
     # def test_add_handlers_complex(self, app):
@@ -831,9 +904,9 @@ class TestApplication:
     #
     #     photo_update = Update(2, message=Message(2, None, None, photo=True))
     #     # Putting updates in the queue calls the callback
-    #     app.update_queue.put(self.message_update)
-    #     app.update_queue.put(photo_update)
-    #     sleep(0.1)  # sleep is required otherwise there is random behaviour
+    #     await app.update_queue.put(self.message_update)
+    #     await app.update_queue.put(photo_update)
+    #     await asyncio.sleep(0.05)  # sleep is required otherwise there is random behaviour
     #
     #     # Test if handler was added to correct group with correct order-
     #     assert (
@@ -857,9 +930,9 @@ class TestApplication:
     #
     #     user_update = Update(3, message=Message(3, None, None, from_user=User(1, 's', True)))
     #     voice_update = Update(4, message=Message(4, None, None, voice=True))
-    #     app.update_queue.put(user_update)
-    #     app.update_queue.put(voice_update)
-    #     sleep(0.1)
+    #     await app.update_queue.put(user_update)
+    #     await app.update_queue.put(voice_update)
+    #     await asyncio.sleep(0.05)
     #
     #     assert (
     #         self.count == 4
@@ -867,8 +940,8 @@ class TestApplication:
     #         and app.handlers[1][-1] is voice_filter_handler_to_check
     #     )
     #
-    #     app.update_queue.put(Update(5, message=Message(5, None, None, caption='cap')))
-    #     sleep(0.1)
+    #     await app.update_queue.put(Update(5, message=Message(5, None, None, caption='cap')))
+    #     await asyncio.sleep(0.05)
     #
     #     assert self.count == 2 and len(app.handlers[-1]) == 1
     #
@@ -1491,7 +1564,7 @@ class TestApplication:
     #     application.add_handler(MessageHandler(filters.ALL, self.callback_raise_error))
     #
     #     application.process_update(self.message_update)
-    #     sleep(0.1)
+    #     await asyncio.sleep(0.05)
     #     assert self.received == (CustomContext, float, complex, int)
     #
     # def test_custom_context_handler_callback(self, bot):
@@ -1516,5 +1589,5 @@ class TestApplication:
     #     application.add_handler(MessageHandler(filters.ALL, callback))
     #
     #     application.process_update(self.message_update)
-    #     sleep(0.1)
+    #     await asyncio.sleep(0.05)
     #     assert self.received == (CustomContext, float, complex, int)

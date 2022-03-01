@@ -446,39 +446,44 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Warning:
             Once this method is called, no more updates will be fetched from :attr:`update_queue`,
             even if it's not empty.
+
+        Raises:
+            :exc:`RuntimeError`: If the application is not running.
         """
-        if self.running:
-            self._running = False
-            _logger.info('Application is stopping. This might take a moment.')
+        if not self.running:
+            raise RuntimeError('This Application is not running!')
 
-            if self.updater and self.updater.running:
-                _logger.debug('Waiting for updater to stop fetching updates')
-                await self.updater.stop()
+        self._running = False
+        _logger.info('Application is stopping. This might take a moment.')
 
-            # Stop listening for new updates and handle all pending ones
-            await self.update_queue.put(_STOP_SIGNAL)
-            _logger.debug('Waiting for update_queue to join')
-            await self.update_queue.join()
-            if self.__update_fetcher_task:
-                await self.__update_fetcher_task
-            _logger.debug("Application stopped fetching of updates.")
+        if self.updater and self.updater.running:
+            _logger.debug('Waiting for updater to stop fetching updates')
+            await self.updater.stop()
 
-            if self.job_queue:
-                _logger.debug('Waiting for running jobs to finish')
-                await self.job_queue.stop(wait=True)
-                _logger.debug('JobQueue stopped')
+        # Stop listening for new updates and handle all pending ones
+        await self.update_queue.put(_STOP_SIGNAL)
+        _logger.debug('Waiting for update_queue to join')
+        await self.update_queue.join()
+        if self.__update_fetcher_task:
+            await self.__update_fetcher_task
+        _logger.debug("Application stopped fetching of updates.")
 
-            _logger.debug('Waiting for `create_task` calls to be processed')
-            await asyncio.gather(*self.__create_task_tasks, return_exceptions=True)
+        if self.job_queue:
+            _logger.debug('Waiting for running jobs to finish')
+            await self.job_queue.stop(wait=True)
+            _logger.debug('JobQueue stopped')
 
-            # Make sure that this is the *last* step of stopping the application!
-            if self.persistence and self.__update_persistence_task:
-                _logger.debug('Waiting for persistence loop to finish')
-                self.__update_persistence_event.set()
-                await self.__update_persistence_task
-                self.__update_persistence_event.clear()
+        _logger.debug('Waiting for `create_task` calls to be processed')
+        await asyncio.gather(*self.__create_task_tasks, return_exceptions=True)
 
-            _logger.info('Application.stop() complete')
+        # Make sure that this is the *last* step of stopping the application!
+        if self.persistence and self.__update_persistence_task:
+            _logger.debug('Waiting for persistence loop to finish')
+            self.__update_persistence_event.set()
+            await self.__update_persistence_task
+            self.__update_persistence_event.clear()
+
+        _logger.info('Application.stop() complete')
 
     def run_polling(
         self,

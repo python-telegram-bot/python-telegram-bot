@@ -304,6 +304,8 @@ class TestUpdater:
             with pytest.raises(RuntimeError, match='already running'):
                 await task
             await updater.stop()
+            with pytest.raises(RuntimeError, match='not running'):
+                await updater.stop()
 
     @pytest.mark.asyncio
     async def test_start_polling_get_updates_parameters(self, updater, monkeypatch):
@@ -593,6 +595,8 @@ class TestUpdater:
             with pytest.raises(RuntimeError, match='already running'):
                 await task
             await updater.stop()
+            with pytest.raises(RuntimeError, match='not running'):
+                await updater.stop()
 
     @pytest.mark.asyncio
     async def test_start_webhook_parameters_passing(self, updater, monkeypatch):
