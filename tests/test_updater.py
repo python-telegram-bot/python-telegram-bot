@@ -390,7 +390,6 @@ class TestUpdater:
                     await updater.start_polling(
                         bootstrap_retries=retries,
                     )
-            await updater.stop()
 
     @pytest.mark.parametrize(
         'error,callback_should_be_called',
@@ -818,7 +817,6 @@ class TestUpdater:
                     await updater.start_webhook(
                         bootstrap_retries=retries,
                     )
-            await updater.stop()
 
     @pytest.mark.asyncio
     async def test_webhook_invalid_posts(self, updater, monkeypatch):

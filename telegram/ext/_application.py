@@ -617,7 +617,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         if self.running:
             self.__create_task_tasks.add(task)
-            task.add_done_callback(self.__create_task_tasks.discard)
+            task.add_done_callback(self.__create_task_done_callback)
         else:
             _logger.warning(
                 "Tasks created via `Application.create_task` while the application is not "
@@ -625,6 +625,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             )
 
         return task
+
+    def __create_task_done_callback(self, task: asyncio.Task) -> None:
+        # We just retrieve the eventual exception so that asyncio doesn't complain in case
+        # it's not retrieved somewhere else
+        task.exception()
+        self.__create_task_tasks.discard(task)
 
     async def __create_task_callback(
         self,
@@ -637,7 +643,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
-                    'ApplicationHandlerStop is not supported with asynchronously running handlers.'
+                    'ApplicationHandlerStop is not supported with asynchronously '
+                    'running handlers.',
+                    stacklevel=1,
                 )
 
             # Avoid infinite recursion of error handlers.
@@ -654,6 +662,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 # So we can and must handle it
                 await self.dispatch_error(update, exception, coroutine=coroutine)
 
+            # Raise exception so that it can be set on the task
             raise exception
         finally:
             self._mark_for_persistence_update(update=update)
@@ -704,7 +713,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             try:
                 for handler in handlers:
                     check = handler.check_update(update)
-                    if bool(check):
+                    if not (check is None or check is False):
                         if not context:
                             context = self.context_types.context.from_update(update, self)
                             await context.refresh_data()
