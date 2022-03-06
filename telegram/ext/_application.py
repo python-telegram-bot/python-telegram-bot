@@ -1109,14 +1109,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             _logger.warning('The callback is already registered as an error handler. Ignoring.')
             return
 
-        if (
-            block is DEFAULT_TRUE
-            and isinstance(self.bot, ExtBot)
-            and self.bot.defaults
-            and not self.bot.defaults.block
-        ):
-            block = False
-
         self.error_handlers[callback] = block
 
     def remove_error_handler(self, callback: Callable[[object, CCT], None]) -> None:
@@ -1170,7 +1162,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     job=job,
                     coroutine=coroutine,
                 )
-                if not block:
+                if not block or (
+                    block is DEFAULT_TRUE
+                    and isinstance(self.bot, ExtBot)
+                    and self.bot.defaults
+                    and not self.bot.defaults.block
+                ):
                     self.__create_task(
                         callback(update, context), update=update, is_error_handler=True
                     )

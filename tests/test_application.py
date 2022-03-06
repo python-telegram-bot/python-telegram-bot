@@ -41,6 +41,7 @@ from telegram.ext import (
     ApplicationHandlerStop,
     CommandHandler,
     TypeHandler,
+    Defaults,
 )
 
 from telegram.error import TelegramError
@@ -693,9 +694,10 @@ class TestApplication:
         assert passed == ['start1', 'error', err, 'start3']
 
     @pytest.mark.asyncio
-    async def test_error_handler(self, app):
+    @pytest.mark.parametrize('block', (True, False))
+    async def test_error_handler(self, app, block):
         app.add_error_handler(self.error_handler_context)
-        app.add_handler(TypeHandler(object, self.callback_raise_error('TestError')))
+        app.add_handler(TypeHandler(object, self.callback_raise_error('TestError'), block=block))
 
         async with app:
             await app.start()
@@ -895,7 +897,7 @@ class TestApplication:
         ), "incorrect stacklevel!"
 
     @pytest.mark.asyncio
-    async def test_run_async_no_error_handler(self, app, caplog):
+    async def test_non_blocking_no_error_handler(self, app, caplog):
         app.add_handler(TypeHandler(object, self.callback_raise_error, block=False))
 
         with caplog.at_level(logging.ERROR):
@@ -909,35 +911,80 @@ class TestApplication:
                 )
                 await app.stop()
 
-    #
-    # def test_async_handler_async_error_handler_context(self, app):
-    #     app.add_handler(MessageHandler(filters.ALL, self.callback_raise_error, block=True))
-    #     app.add_error_handler(self.error_handler_context, block=True)
-    #
-    #     await app.update_queue.put(self.message_update)
-    #     sleep(2)
-    #     assert self.received == self.message_update.message.text
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('handler_block', (True, False))
+    async def test_non_blocking_error_handler(self, app, handler_block):
+        event = asyncio.Event()
 
-    #
-    # @pytest.mark.parametrize(['block', 'expected_output'], [(True, 5), (False, 0)])
-    # def test_default_run_async_error_handler(self, app, monkeypatch, block, expected_output):
-    #     def mock_async_err_handler(*args, **kwargs):
-    #         self.count = 5
-    #
-    #     # set defaults value to app.bot
-    #     app.bot._defaults = Defaults(block=block)
-    #     try:
-    #         app.add_handler(MessageHandler(filters.ALL, self.callback_raise_error))
-    #         app.add_error_handler(self.error_handler_context)
-    #
-    #         monkeypatch.setattr(app, 'block', mock_async_err_handler)
-    #         app.process_update(self.message_update)
-    #
-    #         assert self.count == expected_output
-    #
-    #     finally:
-    #         # reset app.bot.defaults values
-    #         app.bot._defaults = None
+        async def async_error_handler(update, context):
+            await event.wait()
+            self.received = 'done'
+
+        async def normal_error_handler(update, context):
+            self.count = 42
+
+        app.add_error_handler(async_error_handler, block=False)
+        app.add_error_handler(normal_error_handler)
+        app.add_handler(TypeHandler(object, self.callback_raise_error, block=handler_block))
+
+        async with app:
+            await app.start()
+            await app.update_queue.put(self.message_update)
+            task = asyncio.create_task(app.stop())
+            await asyncio.sleep(0.05)
+            assert self.count == 42
+            assert self.received is None
+            event.set()
+            await asyncio.sleep(0.05)
+            assert self.received == 'done'
+            assert task.done()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('handler_block', (True, False))
+    async def test_non_blocking_error_handler_applicationhandlerstop(
+        self, app, recwarn, handler_block
+    ):
+        async def callback(update, context):
+            raise RuntimeError()
+
+        async def error_handler(update, context):
+            raise ApplicationHandlerStop
+
+        app.add_handler(TypeHandler(object, callback, block=handler_block))
+        app.add_error_handler(error_handler, block=False)
+
+        async with app:
+            await app.start()
+            await app.update_queue.put(1)
+            await asyncio.sleep(0.05)
+            await app.stop()
+
+        assert len(recwarn) == 1
+        assert recwarn[0].category is PTBUserWarning
+        assert (
+            str(recwarn[0].message)
+            == 'ApplicationHandlerStop is not supported with asynchronously running handlers.'
+        )
+        assert (
+            Path(recwarn[0].filename) == PROJECT_ROOT_PATH / 'telegram' / 'ext' / '_application.py'
+        ), "incorrect stacklevel!"
+
+    @pytest.mark.parametrize(['block', 'expected_output'], [(False, 0), (True, 5)])
+    @pytest.mark.asyncio
+    async def test_default_block_error_handler(self, bot, monkeypatch, block, expected_output):
+        async def error_handler(*args, **kwargs):
+            await asyncio.sleep(0.1)
+            self.count = 5
+
+        app = Application.builder().token(bot.token).defaults(Defaults(block=block)).build()
+        app.add_handler(TypeHandler(object, self.callback_raise_error))
+        app.add_error_handler(error_handler)
+        await app.process_update(1)
+        await asyncio.sleep(0.05)
+        assert self.count == expected_output
+        await asyncio.sleep(0.1)
+        assert self.count == 5
+
     #
     # @pytest.mark.parametrize(
     #     ['block', 'expected_output'], [(True, 'running async'), (False, None)]
