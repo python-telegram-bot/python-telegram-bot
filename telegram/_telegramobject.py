@@ -126,7 +126,7 @@ class TelegramObject:
             setattr(self, key, val)
 
     def __deepcopy__(self: TO, memodict: dict) -> TO:
-        """ This method deepcopies the object and sets the bot on the newly created copy."""
+        """This method deepcopies the object and sets the bot on the newly created copy."""
         bot = self._bot  # Save bot so we can set it after copying
         self._bot = None  # set to None so it is not deepcopied
         cls = self.__class__
