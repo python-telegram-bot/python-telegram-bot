@@ -371,7 +371,6 @@ class TestApplication:
             await app.stop()
             assert not app.running
             assert not app.updater.running
-            print(app.job_queue.scheduler.running)
             assert not app.job_queue.scheduler.running
             await app.update_queue.put(2)
             await asyncio.sleep(0.05)
@@ -405,7 +404,6 @@ class TestApplication:
                     pytest.fail('Expected same context object, got different')
             else:
                 if context is self.received:
-                    print(context, self.received)
                     pytest.fail('First handler was wrongly called')
 
         app.add_handler(MessageHandler(filters.Regex('test'), one), group=1)
@@ -1214,7 +1212,7 @@ class TestApplication:
     @pytest.mark.asyncio
     @pytest.mark.parametrize('concurrent_updates', (True, 15, 50, 256))
     async def test_concurrent_updates(self, bot, concurrent_updates):
-        app = Application.builder().bot(bot).concurrent_updates(concurrent_updates).build()
+        app = Application.builder().token(bot.token).concurrent_updates(concurrent_updates).build()
         events = {i: asyncio.Event() for i in range(app.concurrent_updates + 10)}
         queue = asyncio.Queue()
         for event in events.values():
