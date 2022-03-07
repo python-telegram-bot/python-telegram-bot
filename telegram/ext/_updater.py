@@ -101,7 +101,7 @@ class Updater:
 
     async def initialize(self) -> None:
         if self._initialized:
-            self._logger.warning('This Updater is already initialized.')
+            self._logger.debug('This Updater is already initialized.')
             return
 
         await self.bot.initialize()

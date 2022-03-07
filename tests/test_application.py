@@ -351,6 +351,7 @@ class TestApplication:
 
         assert not app.running
         assert not app.updater.running
+        assert not app.job_queue.scheduler.running
         app.add_handler(TypeHandler(object, callback))
 
         await app.update_queue.put(1)
@@ -361,6 +362,7 @@ class TestApplication:
         async with app:
             await app.start()
             assert app.running
+            assert app.job_queue.scheduler.running
             assert not app.updater.running
             await asyncio.sleep(0.05)
             assert app.update_queue.empty()
@@ -369,6 +371,8 @@ class TestApplication:
             await app.stop()
             assert not app.running
             assert not app.updater.running
+            print(app.job_queue.scheduler.running)
+            assert not app.job_queue.scheduler.running
             await app.update_queue.put(2)
             await asyncio.sleep(0.05)
             assert not app.update_queue.empty()
@@ -971,7 +975,7 @@ class TestApplication:
 
     @pytest.mark.parametrize(['block', 'expected_output'], [(False, 0), (True, 5)])
     @pytest.mark.asyncio
-    async def test_default_block_error_handler(self, bot, monkeypatch, block, expected_output):
+    async def test_default_block_error_handler(self, bot, block, expected_output):
         async def error_handler(*args, **kwargs):
             await asyncio.sleep(0.1)
             self.count = 5
@@ -985,65 +989,47 @@ class TestApplication:
         await asyncio.sleep(0.1)
         assert self.count == 5
 
-    #
-    # @pytest.mark.parametrize(
-    #     ['block', 'expected_output'], [(True, 'running async'), (False, None)]
-    # )
-    # def test_default_run_async(self, monkeypatch, app, block, expected_output):
-    #     def mock_run_async(*args, **kwargs):
-    #         self.received = 'running async'
-    #
-    #     # set defaults value to app.bot
-    #     app.bot._defaults = Defaults(block=block)
-    #     try:
-    #         app.add_handler(MessageHandler(filters.ALL, lambda u, c: None))
-    #         monkeypatch.setattr(app, 'block', mock_run_async)
-    #         app.process_update(self.message_update)
-    #         assert self.received == expected_output
-    #
-    #     finally:
-    #         # reset defaults value
-    #         app.bot._defaults = None
-    #
-    # def test_async_handler_error_handler_that_raises_error(self, app, caplog):
-    #     handler = MessageHandler(filters.ALL, self.callback_raise_error, block=True)
-    #     app.add_handler(handler)
-    #     app.add_error_handler(self.error_handler_raise_error, block=False)
-    #
-    #     with caplog.at_level(logging.ERROR):
-    #         await app.update_queue.put(self.message_update)
-    #         await asyncio.sleep(0.05)
-    #         assert len(caplog.records) == 1
-    #         assert (
-    #             caplog.records[-1].getMessage().startswith('An error was raised and an uncaught')
-    #         )
-    #
-    #     # Make sure that the main loop still runs
-    #     app.remove_handler(handler)
-    #     app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count, block=True))
-    #     await app.update_queue.put(self.message_update)
-    #     await asyncio.sleep(0.05)
-    #     assert self.count == 1
-    #
-    # def test_async_handler_async_error_handler_that_raises_error(self, app, caplog):
-    #     handler = MessageHandler(filters.ALL, self.callback_raise_error, block=True)
-    #     app.add_handler(handler)
-    #     app.add_error_handler(self.error_handler_raise_error, block=True)
-    #
-    #     with caplog.at_level(logging.ERROR):
-    #         await app.update_queue.put(self.message_update)
-    #         await asyncio.sleep(0.05)
-    #         assert len(caplog.records) == 1
-    #         assert (
-    #             caplog.records[-1].getMessage().startswith('An error was raised and an uncaught')
-    #         )
-    #
-    #     # Make sure that the main loop still runs
-    #     app.remove_handler(handler)
-    #     app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count, block=True))
-    #     await app.update_queue.put(self.message_update)
-    #     await asyncio.sleep(0.05)
-    #     assert self.count == 1
+    @pytest.mark.parametrize(['block', 'expected_output'], [(False, 0), (True, 5)])
+    @pytest.mark.asyncio
+    async def test_default_block_handler(self, bot, block, expected_output):
+        app = Application.builder().token(bot.token).defaults(Defaults(block=block)).build()
+        app.add_handler(TypeHandler(object, self.callback_set_count(5, sleep=0.1)))
+        await app.process_update(1)
+        await asyncio.sleep(0.05)
+        assert self.count == expected_output
+        await asyncio.sleep(0.15)
+        assert self.count == 5
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('handler_block', (True, False))
+    @pytest.mark.parametrize('error_handler_block', (True, False))
+    async def test_nonblocking_handler_raises_and_non_blocking_error_handler_raises(
+        self, app, caplog, handler_block, error_handler_block
+    ):
+        handler = TypeHandler(object, self.callback_raise_error, block=handler_block)
+        app.add_handler(handler)
+        app.add_error_handler(self.error_handler_raise_error, block=error_handler_block)
+
+        async with app:
+            await app.start()
+            with caplog.at_level(logging.ERROR):
+                await app.update_queue.put(1)
+                await asyncio.sleep(0.05)
+                assert len(caplog.records) == 1
+                assert (
+                    caplog.records[-1]
+                    .getMessage()
+                    .startswith('An error was raised and an uncaught')
+                )
+
+            # Make sure that the main loop still runs
+            app.remove_handler(handler)
+            app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count, block=True))
+            await app.update_queue.put(self.message_update)
+            await asyncio.sleep(0.05)
+            assert self.count == 1
+
+            await app.stop()
 
     @pytest.mark.parametrize(
         'message',
@@ -1110,8 +1096,154 @@ class TestApplication:
         app.drop_user_data(u_id)
         assert app.user_data == expected
 
+    @pytest.mark.asyncio
+    async def test_create_task_basic(self, app):
+        async def callback():
+            await asyncio.sleep(0.05)
+            self.count = 42
+            return 43
+
+        task = app.create_task(callback())
+        await asyncio.sleep(0.01)
+        assert not task.done()
+        out = await task
+        assert task.done()
+        assert self.count == 42
+        assert out == 43
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('running', (True, False))
+    async def test_create_task_awaiting_warning(self, app, running, caplog):
+        async def callback():
+            await asyncio.sleep(0.1)
+            return 43
+
+        async with app:
+            if running:
+                await app.start()
+
+            with caplog.at_level(logging.WARNING):
+                task = app.create_task(callback())
+
+            if running:
+                assert len(caplog.records) == 0
+                assert not task.done()
+                await app.stop()
+                assert task.done()
+                assert task.result() == 43
+            else:
+                assert len(caplog.records) == 1
+                assert "won't be automatically awaited" in caplog.records[-1].getMessage()
+                assert not task.done()
+                await task
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('update', (None, object()))
+    async def test_create_task_error_handling(self, app, update):
+        exception = RuntimeError('TestError')
+
+        async def callback():
+            raise exception
+
+        async def error(update_arg, context):
+            self.received = update_arg, context.error
+
+        app.add_error_handler(error)
+        if update:
+            task = app.create_task(callback(), update=update)
+        else:
+            task = app.create_task(callback())
+
+        with pytest.raises(RuntimeError, match='TestError'):
+            await task
+        assert task.exception() is exception
+        assert isinstance(self.received, tuple)
+        assert self.received[0] is update
+        assert self.received[1] is exception
+
+    @pytest.mark.asyncio
+    async def test_await_create_task_tasks_on_stop(self, app):
+        async def callback_1():
+            await asyncio.sleep(0.5)
+
+        async def callback_2():
+            await asyncio.sleep(0.1)
+
+        async with app:
+            await app.start()
+            task_1 = app.create_task(callback_1())
+            task_2 = app.create_task(callback_2())
+            await task_2
+            assert not task_1.done()
+            stop_task = asyncio.create_task(app.stop())
+            assert not stop_task.done()
+            await asyncio.sleep(0.3)
+            assert not stop_task.done()
+            await asyncio.sleep(0.15)
+            assert stop_task.done()
+
+    @pytest.mark.asyncio
+    async def test_no_concurrent_updates(self, app):
+        queue = asyncio.Queue()
+        event_1 = asyncio.Event()
+        event_2 = asyncio.Event()
+        await queue.put(event_1)
+        await queue.put(event_2)
+
+        async def callback(u, c):
+            await asyncio.sleep(0.1)
+            event = await queue.get()
+            event.set()
+
+        app.add_handler(TypeHandler(object, callback))
+        async with app:
+            await app.start()
+            await app.update_queue.put(1)
+            await app.update_queue.put(2)
+            assert not event_1.is_set()
+            assert not event_2.is_set()
+            await asyncio.sleep(0.15)
+            assert event_1.is_set()
+            assert not event_2.is_set()
+            await asyncio.sleep(0.1)
+            assert event_1.is_set()
+            assert event_2.is_set()
+
+            await app.stop()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('concurrent_updates', (True, 15, 50, 256))
+    async def test_concurrent_updates(self, bot, concurrent_updates):
+        app = Application.builder().bot(bot).concurrent_updates(concurrent_updates).build()
+        events = {i: asyncio.Event() for i in range(app.concurrent_updates + 10)}
+        queue = asyncio.Queue()
+        for event in events.values():
+            await queue.put(event)
+
+        async def callback(u, c):
+            await asyncio.sleep(0.5)
+            (await queue.get()).set()
+
+        app.add_handler(TypeHandler(object, callback))
+        async with app:
+            await app.start()
+            for i in range(app.concurrent_updates + 10):
+                await app.update_queue.put(i)
+
+            for i in range(app.concurrent_updates + 10):
+                assert not events[i].is_set()
+
+            await asyncio.sleep(0.9)
+            for i in range(app.concurrent_updates):
+                assert events[i].is_set()
+            for i in range(app.concurrent_updates, app.concurrent_updates + 10):
+                assert not events[i].is_set()
+
+            await asyncio.sleep(0.5)
+            for i in range(app.concurrent_updates + 10):
+                assert events[i].is_set()
+
+            await app.stop()
+
     # TODO:
-    #  * Test stop() with updater running
     #  * Test run_polling/webhook
-    #  * Test concurrent updates
-    #  * Test create_task

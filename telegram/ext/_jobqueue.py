@@ -502,6 +502,9 @@ class JobQueue:
                 have finished. Defaults to :obj:`True`.
 
         """
+        # the interface methods of AsyncIOExecutor are currently not really asyncio-compatible
+        # so we apply some small tweaks here to try and smoothen the integration into PTB
+        # TODO: When APS 4.0 hits, we should be able to remove the tweaks
         if wait:
             # Unfortunately AsyncIOExecutor just cancels them all ...
             await asyncio.gather(
@@ -510,6 +513,9 @@ class JobQueue:
             )
         if self.scheduler.running:
             self.scheduler.shutdown(wait=wait)
+            # scheduler.shutdown schedules a task in the event loop but immediatel returns
+            # so give it a tiny bit of time to actually shut down.
+            await asyncio.sleep(0.01)
 
     def jobs(self) -> Tuple['Job', ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`."""

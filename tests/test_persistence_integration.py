@@ -30,6 +30,7 @@ class TestPersistenceIntegration:
     #  * Test migrate_chat_data
     #  * Test drop_chat/user_data
     #  * Test update_persistence & flush getting called on shutdown
+    #  * Test the update parameter of create_task
 
     def test_construction_with_bad_persistence(self, caplog, bot):
         class MyPersistence:

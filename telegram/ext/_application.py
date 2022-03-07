@@ -271,7 +271,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     async def initialize(self) -> None:
         if self._initialized:
-            _logger.warning('This Application is already initialized.')
+            _logger.debug('This Application is already initialized.')
             return
 
         await self.bot.initialize()
@@ -392,7 +392,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
           :attr:`persistence` is set.
 
         Note:
-            This does *not* start fetching updates from Telegram. You need either start
+            This does *not* start fetching updates from Telegram. You need to either start
             :attr:`updater` manually or use one of :meth:`run_polling` or :meth:`run_webhook`.
 
         Args:
@@ -438,14 +438,18 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     async def stop(self) -> None:
         """Stops the process after processing any pending updates or tasks created by
-        :meth:`create_task`. Also stops :attr:`job_queue`, if set and :attr:`updater`, if set and
-        running.
+        :meth:`create_task`. Also stops :attr:`job_queue`, if set.
         Finally, calls :meth:`update_persistence` and :meth:`BasePersistence.flush` on
         :attr:`persistence`, if set.
 
         Warning:
             Once this method is called, no more updates will be fetched from :attr:`update_queue`,
             even if it's not empty.
+
+        Note:
+            This does *not* stop :attr:`updater`. You need to either manually call
+            :meth:`telegram.ext.Updater.stop` or use one of :meth:`run_polling` or
+            :meth:`run_webhook`.
 
         Raises:
             :exc:`RuntimeError`: If the application is not running.
@@ -718,10 +722,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                             context = self.context_types.context.from_update(update, self)
                             await context.refresh_data()
                         coroutine: Coroutine = handler.handle_update(update, self, check, context)
-                        if handler.block:
-                            await coroutine
-                        else:
+
+                        if not handler.block or (
+                            handler.block is DEFAULT_TRUE
+                            and isinstance(self.bot, ExtBot)
+                            and self.bot.defaults
+                            and not self.bot.defaults.block
+                        ):
                             self.create_task(coroutine, update=update)
+                        else:
+                            await coroutine
                         break
 
             # Stop processing with any other handler.

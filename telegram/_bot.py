@@ -357,7 +357,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :attr:`request`.
         """
         if self._initialized:
-            self._logger.warning('This Bot is already initialized.')
+            self._logger.debug('This Bot is already initialized.')
             return
 
         await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
