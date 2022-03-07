@@ -43,7 +43,6 @@ from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 
 
-# V13_REPLACED_BOT = 'bot_instance_replaced_by_ptb_persistence'
 _REPLACED_KNOWN_BOT = "a known bot replaced by PTB's PicklePersistence"
 _REPLACED_UNKNOWN_BOT = "an unknown bot replaced by PTB's PicklePersistence"
 
@@ -58,7 +57,7 @@ def _all_subclasses(cls: Type[TO]) -> Set[Type[TO]]:
     return set(subclasses).union([s for c in subclasses for s in _all_subclasses(c)])
 
 
-def _reconstruct_to(cls: Type[TO], kwargs: dict) -> TO:
+def _reconstruct_to(cls: TO, kwargs: dict) -> TO:
     """
     This method is used for unpickling. The data, which is in the form a dictionary, is
     converted back into a class. Functions the same as :meth:`TelegramObject.__setstate__`.
@@ -66,9 +65,11 @@ def _reconstruct_to(cls: Type[TO], kwargs: dict) -> TO:
     is changed, since `_custom_reduction` places references to this function into the pickled data.
     """
     bot = kwargs.pop('_bot', None)
-    obj = cls(**kwargs)
+    obj = cls.__new__(cls)  # type: ignore[arg-type]
+    for key, val in kwargs.items():
+        setattr(obj, key, val)
     obj.set_bot(bot)
-    return obj
+    return obj  # type: ignore[return-value]
 
 
 def _custom_reduction(cls: TO) -> Tuple[Callable, Tuple[Type[TO], dict]]:
@@ -87,7 +88,7 @@ class _BotPickler(pickle.Pickler):
         self._bot = bot
         # Here we define a private dispatch_table, because we want to preserve the bot attribute of
         # objects so persistent_id works as intended. Otherwise, the bot attribute is deleted in
-        # __getstate__, which used for regular pickling (via pickle.dumps(...))
+        # __getstate__, which is used during regular pickling (via pickle.dumps(...))
         if py_ver < (3, 8):  # self.reducer_override is used above this version
             self.dispatch_table = copyreg.dispatch_table.copy()  # type: ignore[attr-defined]
             for obj in _all_subclasses(TelegramObject):
@@ -108,8 +109,6 @@ class _BotPickler(pickle.Pickler):
         """
         if obj is self._bot:
             return _REPLACED_KNOWN_BOT
-        # if isinstance(obj, str) and obj == V13_REPLACED_BOT:  # backwards compatibility with v13
-        #     return _REPLACED_KNOWN_BOT
         if isinstance(obj, Bot):
             warn(
                 'Unknown bot instance found. Will be replaced by `None` during unpickling',

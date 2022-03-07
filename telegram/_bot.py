@@ -205,6 +205,10 @@ class Bot(TelegramObject):
         """Called by pickle.dumps(). Serializing bots is unadvisable, so we forbid pickling."""
         raise pickle.PicklingError('Bot objects cannot be pickled!')
 
+    def __deepcopy__(self, memodict: dict) -> 'Bot':
+        """Bot objects can't be deepcopied since they are not pickable, so just return self."""
+        return self
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}

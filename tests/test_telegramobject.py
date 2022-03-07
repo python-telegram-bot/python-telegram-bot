@@ -32,6 +32,12 @@ from telegram import TelegramObject, Message, Chat, User, PhotoSize
 
 
 class TestTelegramObject:
+    class Sub(TelegramObject):
+        def __init__(self, private, normal, b):
+            self._private = private
+            self.normal = normal
+            self._bot = b
+
     def test_to_json_native(self, monkeypatch):
         if ujson:
             monkeypatch.setattr('ujson.dumps', json_lib.dumps)
@@ -167,7 +173,7 @@ class TestTelegramObject:
         assert unpickled.date == date
         assert unpickled.photo[0] == photo
 
-    def test_deepcopy(self, bot):
+    def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, 'first_name', False)
         date = datetime.datetime.now()
@@ -183,3 +189,11 @@ class TestTelegramObject:
         assert new_msg.chat == chat and new_msg.chat is not chat
         assert new_msg.from_user == user and new_msg.from_user is not user
         assert new_msg.photo[0] == photo and new_msg.photo[0] is not photo
+
+    def test_deepcopy_subclass_telegram_obj(self, bot):
+        s = self.Sub("private", 'normal', bot)
+        d = deepcopy(s)
+        assert d is not s
+        assert d._private == s._private  # Can't test for identity since two equal strings is True
+        assert d._bot == s._bot and d._bot is s._bot
+        assert d.normal == s.normal

@@ -34,7 +34,7 @@ try:
 except ImportError:
     import json
 
-from telegram import Update, Message, User, Chat, MessageEntity, Bot
+from telegram import Update, Message, User, Chat, MessageEntity, Bot, TelegramObject
 from telegram.ext import (
     BasePersistence,
     ConversationHandler,
@@ -750,6 +750,23 @@ def update(bot):
 
 
 class TestPicklePersistence:
+    class DictSub(TelegramObject):  # Used for testing our custom (Un)Pickler.
+        def __init__(self, private, normal, b):
+            self._private = private
+            self.normal = normal
+            self._bot = b
+
+    class SlotsSub(TelegramObject):
+        __slots__ = ('new_var', '_private')
+
+        def __init__(self, new_var, private):
+            self.new_var = new_var
+            self._private = private
+
+    class NormalClass:
+        def __init__(self, my_var):
+            self.my_var = my_var
+
     def test_slot_behaviour(self, mro_slots, pickle_persistence):
         inst = pickle_persistence
         for attr in inst.__slots__:
@@ -1377,6 +1394,32 @@ class TestPicklePersistence:
         pp = PicklePersistence("pickletest", single_file=False, on_flush=False)
         pp.bot = bot
         assert pp.get_chat_data()[12345]['unknown_bot'] is None
+
+    def test_custom_pickler_unpickler_with_custom_objects(
+        self, bot, pickle_persistence, good_pickle_files
+    ):
+
+        dict_s = self.DictSub("private", 'normal', bot)
+        slot_s = self.SlotsSub("new_var", 'private_var')
+        regular = self.NormalClass(12)
+
+        pickle_persistence.bot = bot
+        pickle_persistence.update_user_data(
+            1232, {'sub_dict': dict_s, 'sub_slots': slot_s, 'r': regular}
+        )
+        pp = PicklePersistence("pickletest", single_file=False, on_flush=False)
+        pp.bot = bot  # Set the bot
+        data = pp.get_user_data()[1232]
+        sub_dict = data['sub_dict']
+        sub_slots = data['sub_slots']
+        sub_regular = data['r']
+        assert sub_dict._bot is bot
+        assert sub_dict.normal == dict_s.normal
+        assert sub_dict._private == dict_s._private
+        assert sub_slots.new_var == slot_s.new_var
+        assert sub_slots._private == slot_s._private
+        assert sub_slots._bot is None  # We didn't set the bot, so it shouldn't have it here.
+        assert sub_regular.my_var == regular.my_var
 
     def test_custom_pickler_unpickler_with_handler_integration(
         self, bot, update, pickle_persistence, good_pickle_files, recwarn

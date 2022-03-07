@@ -115,43 +115,79 @@ class TelegramObject:
         This method is used for pickling. We remove the bot attribute of the object since those
         are not pickable.
         """
-        return self._get_attrs(include_private=False, recursive=False)
+        return self._get_attrs(include_private=True, recursive=False, remove_bot=True)
 
     def __setstate__(self, state: dict) -> None:
         """
         This method is used for unpickling. The data, which is in the form a dictionary, is
-        converted back into a class.
+        converted back into a class. Should be modified in place.
         """
-        self.__init__(**state)  # type: ignore[misc]
+        for key, val in state.items():
+            setattr(self, key, val)
 
     def __deepcopy__(self: TO, memodict: dict) -> TO:
-        """This method deepcopies the object and sets the bot on the newly created copy."""
-        copy = self.__class__(**deepcopy(self.__getstate__(), memodict))
-        copy.set_bot(self._bot)
-        return copy
+        """ This method deepcopies the object and sets the bot on the newly created copy."""
+        bot = self._bot  # Save bot so we can set it after copying
+        self._bot = None  # set to None so it is not deepcopied
+        cls = self.__class__
+        result = cls.__new__(cls)  # create a new instance
+        memodict[id(self)] = result  # save the id of the object in the dict
+
+        attrs = self._get_attrs(include_private=True)  # get all its attributes
+
+        for k in attrs:  # now we set the attributes in the deepcopied object
+            setattr(result, k, deepcopy(getattr(self, k), memodict))
+
+        result.set_bot(bot)  # Assign the bots back
+        self._bot = bot
+        return result  # type: ignore[return-value]
 
     def _get_attrs(
-        self, include_private: bool = False, recursive: bool = False
+        self,
+        include_private: bool = False,
+        recursive: bool = False,
+        remove_bot: bool = False,
     ) -> Dict[str, Union[str, object]]:
+        """This method is used for obtaining the attributes of the object.
+
+        Args:
+            include_private (:obj:`bool`): Whether the result should include private variables.
+            recursive (:obj:`bool`): If :obj:`True`, will convert any TelegramObjects (if found) in
+                the attributes to a dictionary. Else, preserves it as an object itself.
+            remove_bot (:obj:`bool`): Whether the bot should be included in the result.
+
+        Returns:
+            :obj:`dict`: A dict where the keys are attribute names and values are their values.
+        """
         data = {}
 
+        if not recursive:
+            try:
+                # __dict__ has attrs from superclasses, so no need to put in the for loop below
+                data.update(self.__dict__)
+            except AttributeError:
+                pass
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
-        attrs = {attr for cls in self.__class__.__mro__[:-1] for attr in cls.__slots__}
-        for key in attrs:
-            if not include_private and (key.startswith('_') or key == "bot"):
-                continue
+        for cls in self.__class__.__mro__[:-1]:
+            for key in cls.__slots__:
+                if not include_private and (key.startswith('_') or key == "bot"):
+                    continue
 
-            value = getattr(self, key, None)
-            if value is not None:
-                if recursive and hasattr(value, 'to_dict'):
-                    data[key] = value.to_dict()
-                else:
+                value = getattr(self, key, None)
+                if value is not None:
+                    if recursive and hasattr(value, 'to_dict'):
+                        data[key] = value.to_dict()
+                    else:
+                        data[key] = value
+                elif not recursive:
                     data[key] = value
 
         if recursive and data.get('from_user'):
             data['from'] = data.pop('from_user', None)
+        if remove_bot:
+            data.pop('_bot', None)
         return data
 
     @staticmethod
