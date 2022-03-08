@@ -60,7 +60,7 @@ def _all_subclasses(cls: Type[TO]) -> Set[Type[TO]]:
 def _reconstruct_to(cls: Type[TO], kwargs: dict) -> TO:
     """
     This method is used for unpickling. The data, which is in the form a dictionary, is
-    converted back into a class. Functions the same as :meth:`TelegramObject.__setstate__`.
+    converted back into a class. Works mostly the same as :meth:`TelegramObject.__setstate__`.
     This function should be kept in place for backwards compatibility even if the pickling logic
     is changed, since `_custom_reduction` places references to this function into the pickled data.
     """
