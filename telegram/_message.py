@@ -716,7 +716,7 @@ class Message(TelegramObject):
             # logic into ExtBot
             if hasattr(self.get_bot(), 'defaults') and self.get_bot().defaults:  # type: ignore
                 default_quote = (
-                    self.get_bot().defaults.quote  # type: ignore[union-attr, attr-defined]
+                    self.get_bot().defaults.quote  # type: ignore[attr-defined]
                 )
             else:
                 default_quote = None
