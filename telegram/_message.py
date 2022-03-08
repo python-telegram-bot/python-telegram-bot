@@ -715,9 +715,7 @@ class Message(TelegramObject):
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
             # logic into ExtBot
             if hasattr(self.get_bot(), 'defaults') and self.get_bot().defaults:  # type: ignore
-                default_quote = (
-                    self.get_bot().defaults.quote  # type: ignore[attr-defined]
-                )
+                default_quote = self.get_bot().defaults.quote  # type: ignore[attr-defined]
             else:
                 default_quote = None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:

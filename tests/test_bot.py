@@ -778,7 +778,7 @@ class TestBot:
         )
         # Sometimes there can be a few seconds delay, so don't let the test fail due to that-
         msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
-        assert abs(msg.poll.close_date - aware_close_date) <= datetime.timedelta(seconds=5)
+        assert abs(msg.poll.close_date - aware_close_date) <= dtm.timedelta(seconds=5)
 
         time.sleep(5.1)
 
