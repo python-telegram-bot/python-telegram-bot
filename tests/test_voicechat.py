@@ -147,7 +147,7 @@ class TestVoiceChatParticipantsInvited:
 
 
 class TestVoiceChatScheduled:
-    start_date = dtm.datetime.utcnow()
+    start_date = dtm.datetime.now(dtm.timezone.utc)
 
     def test_slot_behaviour(self, mro_slots):
         inst = VoiceChatScheduled(self.start_date)
@@ -156,7 +156,7 @@ class TestVoiceChatScheduled:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self):
-        assert pytest.approx(VoiceChatScheduled(start_date=self.start_date) == self.start_date)
+        assert VoiceChatScheduled(self.start_date).start_date == self.start_date
 
     def test_de_json(self, bot):
         assert VoiceChatScheduled.de_json({}, bot=bot) is None
@@ -164,7 +164,7 @@ class TestVoiceChatScheduled:
         json_dict = {'start_date': to_timestamp(self.start_date)}
         voice_chat_scheduled = VoiceChatScheduled.de_json(json_dict, bot)
 
-        assert pytest.approx(voice_chat_scheduled.start_date == self.start_date)
+        assert voice_chat_scheduled.start_date - self.start_date < dtm.timedelta(seconds=1)
 
     def test_to_dict(self):
         voice_chat_scheduled = VoiceChatScheduled(self.start_date)

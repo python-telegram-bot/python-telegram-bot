@@ -72,7 +72,7 @@ class TestChatJoinRequest:
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user
-        assert pytest.approx(chat_join_request.date == time)
+        assert chat_join_request.date - time < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
 
         json_dict.update({'bio': self.bio, 'invite_link': self.invite_link.to_dict()})
@@ -80,7 +80,7 @@ class TestChatJoinRequest:
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user
-        assert pytest.approx(chat_join_request.date == time)
+        assert chat_join_request.date - time < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
         assert chat_join_request.bio == self.bio
         assert chat_join_request.invite_link == self.invite_link

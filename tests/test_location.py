@@ -82,8 +82,8 @@ class TestLocation:
             protect_content=True,
         )
         assert message.location
-        assert pytest.approx(52.223880, message.location.latitude)
-        assert pytest.approx(5.166146, message.location.longitude)
+        assert 52.223880 == pytest.approx(message.location.latitude, rel=1e-5)
+        assert 5.166146 == pytest.approx(message.location.longitude, rel=1e-5)
         assert message.location.live_period == 80
         assert message.location.horizontal_accuracy == 50
         assert message.location.heading == 90
@@ -100,8 +100,8 @@ class TestLocation:
             proximity_alert_radius=500,
         )
 
-        assert pytest.approx(52.223098, message2.location.latitude)
-        assert pytest.approx(5.164306, message2.location.longitude)
+        assert 52.223098 == pytest.approx(message2.location.latitude, rel=1e-5)
+        assert 5.164306 == pytest.approx(message2.location.longitude, rel=1e-5)
         assert message2.location.horizontal_accuracy == 30
         assert message2.location.heading == 10
         assert message2.location.proximity_alert_radius == 500
