@@ -82,7 +82,7 @@ class TestDatetime:
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.
         """
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         assert tg_dtm.to_float_timestamp(datetime) == 1573431976.1
 
     def test_to_float_timestamp_absolute_naive_no_pytz(self, monkeypatch):
@@ -90,14 +90,14 @@ class TestDatetime:
         Naive datetimes should be assumed to be in UTC.
         """
         monkeypatch.setattr(tg_dtm, 'UTC', tg_dtm.DTM_UTC)
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         assert tg_dtm.to_float_timestamp(datetime) == 1573431976.1
 
     def test_to_float_timestamp_absolute_aware(self, timezone):
         """Conversion from timezone-aware datetime to timestamp"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
-        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         datetime = timezone.localize(test_datetime)
         assert (
             tg_dtm.to_float_timestamp(datetime)
@@ -173,7 +173,7 @@ class TestDatetime:
     def test_from_timestamp_aware(self, timezone):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
-        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         datetime = timezone.localize(test_datetime)
         assert (
             tg_dtm.from_timestamp(1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
