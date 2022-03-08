@@ -130,9 +130,8 @@ class Bot(TelegramObject):
           incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
           passing files.
         * Bots should not be serialized since if you for e.g. change the bots token, then your
-          serialized instance will not reflect that change. Hence, we raise a
-          :exc:`pickle.PicklingError` upon serialization.
-
+          serialized instance will not reflect that change. Trying to pickle a bot instance will
+          raise :exc:`pickle.PicklingError`.
 
     .. versionchanged:: 14.0
 
@@ -195,28 +194,9 @@ class Bot(TelegramObject):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
-    def __eq__(self, other: object) -> bool:
-        return self.bot == other
-
-    def __hash__(self) -> int:
-        return hash(self.bot)
-
     def __reduce__(self) -> NoReturn:
         """Called by pickle.dumps(). Serializing bots is unadvisable, so we forbid pickling."""
         raise pickle.PicklingError('Bot objects cannot be pickled!')
-
-    def __deepcopy__(self, memodict: dict) -> 'Bot':
-        """Bot objects can't be deepcopied since they are not pickable, so just return self."""
-        return self
-
-    def to_dict(self) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
-
-        if self.last_name:
-            data['last_name'] = self.last_name
-
-        return data
 
     # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround
@@ -5626,6 +5606,21 @@ class Bot(TelegramObject):
 
         result = self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
         return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
+
+    def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
+        data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
+
+        if self.last_name:
+            data['last_name'] = self.last_name
+
+        return data
+
+    def __eq__(self, other: object) -> bool:
+        return self.bot == other
+
+    def __hash__(self) -> int:
+        return hash(self.bot)
 
     # camelCase aliases
     getMe = get_me

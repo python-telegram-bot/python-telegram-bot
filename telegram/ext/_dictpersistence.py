@@ -56,8 +56,6 @@ class DictPersistence(BasePersistence):
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
             saved.
-
-            .. versionadded:: 14.0
         user_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
@@ -74,8 +72,6 @@ class DictPersistence(BasePersistence):
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.
-
-            .. versionadded:: 14.0
     """
 
     __slots__ = (

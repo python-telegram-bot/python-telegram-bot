@@ -64,11 +64,9 @@ def _reconstruct_to(cls: Type[TO], kwargs: dict) -> TO:
     This function should be kept in place for backwards compatibility even if the pickling logic
     is changed, since `_custom_reduction` places references to this function into the pickled data.
     """
-    bot = kwargs.pop('_bot', None)
     obj = cls.__new__(cls)
     for key, val in kwargs.items():
         setattr(obj, key, val)
-    obj.set_bot(bot)
     return obj  # type: ignore[return-value]
 
 
@@ -86,10 +84,10 @@ class _BotPickler(pickle.Pickler):
 
     def __init__(self, bot: Bot, *args: Any, **kwargs: Any):
         self._bot = bot
-        # Here we define a private dispatch_table, because we want to preserve the bot attribute of
-        # objects so persistent_id works as intended. Otherwise, the bot attribute is deleted in
-        # __getstate__, which is used during regular pickling (via pickle.dumps(...))
         if py_ver < (3, 8):  # self.reducer_override is used above this version
+            # Here we define a private dispatch_table, because we want to preserve the bot
+            # attribute of objects so persistent_id works as intended. Otherwise, the bot attribute
+            # is deleted in __getstate__, which is used during regular pickling (via pickle.dumps)
             self.dispatch_table = copyreg.dispatch_table.copy()  # type: ignore[attr-defined]
             for obj in _all_subclasses(TelegramObject):
                 self.dispatch_table[obj] = _custom_reduction  # type: ignore[index]
@@ -127,7 +125,11 @@ class _BotUnpickler(pickle.Unpickler):
 
     def persistent_load(self, pid: str) -> Optional[Bot]:
         """Replaces the bot with the current bot if known, else it is replaced by :obj:`None`."""
-        return self._bot if pid == _REPLACED_KNOWN_BOT else None
+        if pid == _REPLACED_KNOWN_BOT:
+            return self._bot
+        if pid == _REPLACED_UNKNOWN_BOT:
+            return None
+        raise pickle.UnpicklingError("Found unknown persistent id when unpickling!")
 
 
 class PicklePersistence(BasePersistence[UD, CD, BD]):

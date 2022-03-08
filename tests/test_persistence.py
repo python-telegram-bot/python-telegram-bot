@@ -1382,18 +1382,18 @@ class TestPicklePersistence:
         # We have to create a new instance otherwise unpickling is skipped
         pp = PicklePersistence("pickletest", single_file=False, on_flush=False)
         pp.bot = bot  # Set the bot
-        assert pp.get_chat_data()[12345]['current_bot']._bot is bot
+        assert pp.get_chat_data()[12345]['current_bot'].get_bot() is bot
 
-        # Now test that pickling of unknown bots will be replaced by None-
+        # Now test that pickling of unknown bots in TelegramObjects will be replaced by None-
         assert not len(recwarn)
-        data_with_bot['unknown_bot'] = Bot('1234:abcd')
+        data_with_bot['unknown_bot_in_user'] = User(1, 'Dev', False, bot=Bot('1234:abcd'))
         pickle_persistence.update_chat_data(12345, data_with_bot)
         assert len(recwarn) == 1
         assert recwarn[-1].category is PTBUserWarning
         assert str(recwarn[-1].message).startswith("Unknown bot instance found.")
         pp = PicklePersistence("pickletest", single_file=False, on_flush=False)
         pp.bot = bot
-        assert pp.get_chat_data()[12345]['unknown_bot'] is None
+        assert pp.get_chat_data()[12345]['unknown_bot_in_user']._bot is None
 
     def test_custom_pickler_unpickler_with_custom_objects(
         self, bot, pickle_persistence, good_pickle_files
@@ -1433,14 +1433,14 @@ class TestPicklePersistence:
             bot_id = update.message.get_bot()
             # Test pickling a message object, which has the current bot
             context.user_data['msg'] = update.message
-            # Test pickling a bot, which is not known-
-            new_bot = Bot('1234:abcd')
-            context.chat_data['unknown_bot'] = new_bot
+            # Test pickling a bot, which is not known. Directly serializing bots will fail.
+            new_chat = Chat(1, 'private', bot=Bot('1234:abcd'))
+            context.chat_data['unknown_bot_in_chat'] = new_chat
 
         def second(_, context):
             msg = context.user_data['msg']
             assert bot_id is msg.get_bot()  # Tests if the same bot is inserted by the unpickler
-            new_none_bot = context.chat_data['unknown_bot']
+            new_none_bot = context.chat_data['unknown_bot_in_chat']._bot
             assert new_none_bot is None
 
         h1 = MessageHandler(None, first)

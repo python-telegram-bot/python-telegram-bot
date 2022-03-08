@@ -86,30 +86,6 @@ class TelegramObject:
                 f"`{item}`."
             ) from exc
 
-    def __eq__(self, other: object) -> bool:
-        # pylint: disable=no-member
-        if isinstance(other, self.__class__):
-            if self._id_attrs == ():
-                warn(
-                    f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
-                    " equivalence.",
-                    stacklevel=2,
-                )
-            if other._id_attrs == ():
-                warn(
-                    f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
-                    " for equivalence.",
-                    stacklevel=2,
-                )
-            return self._id_attrs == other._id_attrs
-        return super().__eq__(other)
-
-    def __hash__(self) -> int:
-        # pylint: disable=no-member
-        if self._id_attrs:
-            return hash((self.__class__, self._id_attrs))
-        return super().__hash__()
-
     def __getstate__(self) -> Dict[str, Union[str, object]]:
         """
         This method is used for pickling. We remove the bot attribute of the object since those
@@ -128,7 +104,7 @@ class TelegramObject:
     def __deepcopy__(self: TO, memodict: dict) -> TO:
         """This method deepcopies the object and sets the bot on the newly created copy."""
         bot = self._bot  # Save bot so we can set it after copying
-        self._bot = None  # set to None so it is not deepcopied
+        self.set_bot(None)  # set to None so it is not deepcopied
         cls = self.__class__
         result = cls.__new__(cls)  # create a new instance
         memodict[id(self)] = result  # save the id of the object in the dict
@@ -139,7 +115,7 @@ class TelegramObject:
             setattr(result, k, deepcopy(getattr(self, k), memodict))
 
         result.set_bot(bot)  # Assign the bots back
-        self._bot = bot
+        self.set_bot(bot)
         return result  # type: ignore[return-value]
 
     def _get_attrs(
@@ -275,3 +251,27 @@ class TelegramObject:
             bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.
         """
         self._bot = bot
+
+    def __eq__(self, other: object) -> bool:
+        # pylint: disable=no-member
+        if isinstance(other, self.__class__):
+            if self._id_attrs == ():
+                warn(
+                    f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
+                    " equivalence.",
+                    stacklevel=2,
+                )
+            if other._id_attrs == ():
+                warn(
+                    f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
+                    " for equivalence.",
+                    stacklevel=2,
+                )
+            return self._id_attrs == other._id_attrs
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        # pylint: disable=no-member
+        if self._id_attrs:
+            return hash((self.__class__, self._id_attrs))
+        return super().__hash__()
