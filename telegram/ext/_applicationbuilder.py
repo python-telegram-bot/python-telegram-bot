@@ -335,7 +335,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         will default to ``'https://api.telegram.org/bot'``.
 
         .. seealso:: :paramref:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_
+            python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+            :meth:`base_file_url`
 
         Args:
             base_url (:obj:`str`): The URL.
@@ -355,7 +356,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         called, will default to ``'https://api.telegram.org/file/bot'``.
 
         .. seealso:: :paramref:`telegram.Bot.base_file_url`, `Local Bot API Server <https://\
-            github.com/python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_
+            github.com/python-telegram-bot/python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+            :meth:`base_url`
 
         Args:
             base_file_url (:obj:`str`): The URL.
