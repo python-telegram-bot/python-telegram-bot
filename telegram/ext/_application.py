@@ -501,6 +501,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
         ready: asyncio.Event = None,
+        close_loop: bool = True,
     ) -> None:
         """Temp docstring to make this referencable
         #TODO: Adda meaningful description
@@ -527,6 +528,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 error_callback=error_callback,
             ),
             ready=ready,
+            close_loop=close_loop,
         )
 
     def run_webhook(
@@ -543,6 +545,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         ip_address: str = None,
         max_connections: int = 40,
         ready: asyncio.Event = None,
+        close_loop: bool = True,
     ) -> None:
         """Temp docstring to make this referencable
         #TODO: Adda meaningful description
@@ -567,22 +570,32 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 max_connections=max_connections,
             ),
             ready=ready,
+            close_loop=close_loop,
         )
 
-    def __run(self, updater_coroutine: Coroutine, ready: asyncio.Event = None) -> None:
-        # TODO: get_event_loop is deprecated - switch to get_running_loop()
-        loop = asyncio.get_event_loop()  # get_running_loop()
+    def __run(
+        self, updater_coroutine: Coroutine, ready: asyncio.Event = None, close_loop: bool = True
+    ) -> None:
+        # Calling get_event_loop() should still be okay even in py3.10+ as long as there is a
+        # running event loop or we are in the main thread, which are the intended use cases.
+        # See the docs of get_event_loop() and get_running_loop() for more info
+        loop = asyncio.get_event_loop()
         loop.run_until_complete(self.initialize())
-        loop.run_until_complete(self.start(ready=ready))
         loop.run_until_complete(updater_coroutine)
+        loop.run_until_complete(self.start(ready=ready))
         try:
             loop.run_forever()
         # TODO: maybe allow for custom exception classes to catch here? Or provide a custom one?
         except (KeyboardInterrupt, SystemExit):
-            loop.run_until_complete(self.stop())
-            loop.run_until_complete(self.shutdown())
+            pass
         finally:
-            loop.close()
+            # We arrive here either by catching the exceptions above or if the loop gets stopped
+            try:
+                loop.run_until_complete(self.stop())
+                loop.run_until_complete(self.shutdown())
+            finally:
+                if close_loop:
+                    loop.close()
 
     def create_task(self, coroutine: Coroutine, update: object = None) -> asyncio.Task:
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by

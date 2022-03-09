@@ -24,10 +24,11 @@ import inspect
 import os
 import re
 from pathlib import Path
-from typing import Callable, List, Iterable, Any, Dict
+from typing import Callable, List, Iterable, Any, Dict, Optional
 
 import pytest
 import pytz
+from httpx import AsyncClient, Response
 
 from telegram import (
     Message,
@@ -775,3 +776,36 @@ async def check_defaults_handling(
         bot._defaults = None
 
     return True
+
+
+async def send_webhook_message(
+    ip: str,
+    port: int,
+    payload_str: Optional[str],
+    url_path: str = '',
+    content_len: int = -1,
+    content_type: str = 'application/json',
+    get_method: str = None,
+) -> Response:
+    headers = {
+        'content-type': content_type,
+    }
+
+    if not payload_str:
+        content_len = None
+        payload = None
+    else:
+        payload = bytes(payload_str, encoding='utf-8')
+
+    if content_len == -1:
+        content_len = len(payload)
+
+    if content_len is not None:
+        headers['content-length'] = str(content_len)
+
+    url = f'http://{ip}:{port}/{url_path}'
+
+    async with AsyncClient() as client:
+        return await client.request(
+            url=url, method=get_method or 'POST', data=payload, headers=headers
+        )
