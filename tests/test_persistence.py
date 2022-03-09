@@ -1398,7 +1398,6 @@ class TestPicklePersistence:
     def test_custom_pickler_unpickler_with_custom_objects(
         self, bot, pickle_persistence, good_pickle_files
     ):
-
         dict_s = self.DictSub("private", 'normal', bot)
         slot_s = self.SlotsSub("new_var", 'private_var')
         regular = self.NormalClass(12)
@@ -1452,7 +1451,6 @@ class TestPicklePersistence:
         assert len(recwarn) == 1
         assert recwarn[-1].category is PTBUserWarning
         assert str(recwarn[-1].message).startswith("Unknown bot instance found.")
-        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
         pickle_persistence_2 = PicklePersistence(  # initialize a new persistence for unpickling
             filepath='pickletest',
@@ -1470,7 +1468,7 @@ class TestPicklePersistence:
         bot.callback_data_cache.clear_callback_data()
         bot.callback_data_cache.clear_callback_queries()
 
-        def first(update, context):
+        def first(_, context):
             if not context.user_data == {}:
                 pytest.fail()
             if not context.chat_data == {}:
@@ -1484,7 +1482,7 @@ class TestPicklePersistence:
             context.bot_data['test1'] = 'test0'
             context.bot.callback_data_cache._callback_queries['test1'] = 'test0'
 
-        def second(update, context):
+        def second(_, context):
             if not context.user_data['test1'] == 'test2':
                 pytest.fail()
             if not context.chat_data['test3'] == 'test4':

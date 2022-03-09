@@ -65,8 +65,7 @@ def _reconstruct_to(cls: Type[TO], kwargs: dict) -> TO:
     is changed, since `_custom_reduction` places references to this function into the pickled data.
     """
     obj = cls.__new__(cls)
-    for key, val in kwargs.items():
-        setattr(obj, key, val)
+    obj.__setstate__(kwargs)
     return obj  # type: ignore[return-value]
 
 
@@ -108,10 +107,7 @@ class _BotPickler(pickle.Pickler):
         if obj is self._bot:
             return _REPLACED_KNOWN_BOT
         if isinstance(obj, Bot):
-            warn(
-                'Unknown bot instance found. Will be replaced by `None` during unpickling',
-                stacklevel=7,
-            )
+            warn('Unknown bot instance found. Will be replaced by `None` during unpickling')
             return _REPLACED_UNKNOWN_BOT
         return None  # pickles as usual
 
