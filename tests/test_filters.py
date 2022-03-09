@@ -833,9 +833,11 @@ class TestFilters:
         update.message.sticker.is_animated = True
         assert filters.Sticker.ANIMATED.check_update(update)
         assert not filters.Sticker.VIDEO.check_update(update)
+        assert not filters.Sticker.STATIC.check_update(update)
         update.message.sticker.is_animated = False
         update.message.sticker.is_video = True
         assert not filters.Sticker.ANIMATED.check_update(update)
+        assert not filters.Sticker.STATIC.check_update(update)
         assert filters.Sticker.VIDEO.check_update(update)
 
     def test_filters_video(self, update):
