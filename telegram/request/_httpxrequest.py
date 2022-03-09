@@ -1,20 +1,21 @@
+#!/usr/bin/env python
 #
-#  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2022
-#  Leandro Toledo de Souza <devs@python-telegram-bot.org>
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2022
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
-#  This program is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU Lesser Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU Lesser Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser Public License
-#  along with this program.  If not, see [http://www.gnu.org/licenses/].
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
 import logging
 from typing import Tuple, Optional
@@ -66,7 +67,7 @@ class HTTPXRequest(BaseRequest):
             ``5.0``.
         write_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait for
             a write operation to complete (in terms of a network socket; i.e. POSTing a request or
-            uploading a file).:obj:`None` will set an infinite timeout. Defaults to ``5.0``.
+            uploading a file). :obj:`None` will set an infinite timeout. Defaults to ``5.0``.
         pool_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait for
             a connection from the connection pool becoming available. :obj:`None` will set an
             infinite timeout. Defaults to :obj:`None`.
