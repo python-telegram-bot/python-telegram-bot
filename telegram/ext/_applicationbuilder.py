@@ -732,7 +732,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._context_types = context_types
         return self  # type: ignore[return-value]
 
-    def updater(self: BuilderType, updater: Union[Updater, None]) -> BuilderType:
+    def updater(self: BuilderType, updater: Optional[Updater]) -> BuilderType:
         """Sets a :class:`telegram.ext.Updater` instance to be used for
         :attr:`telegram.ext.Application.updater`. The :attr:`telegram.ext.Updater.bot` and
         :attr:`telegram.ext.Updater.update_queue` be used for :attr:`telegram.ext.Application.bot`
