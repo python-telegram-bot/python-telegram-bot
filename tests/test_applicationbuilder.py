@@ -354,3 +354,19 @@ class TestApplicationBuilder:
         )
         bot = builder.build().bot
         assert bot.private_key
+
+    def test_no_updater(self, bot, builder):
+        app = builder.token(bot.token).updater(None).build()
+        assert app.bot.token == bot.token
+        assert app.updater is None
+        assert isinstance(app.update_queue, asyncio.Queue)
+        assert isinstance(app.job_queue, JobQueue)
+        assert app.job_queue.application is app
+
+    def test_no_job_queue(self, bot, builder):
+        app = builder.token(bot.token).job_queue(None).build()
+        assert app.bot.token == bot.token
+        assert app.bot.token == bot.token
+        assert app.job_queue is None
+        assert isinstance(app.update_queue, asyncio.Queue)
+        assert isinstance(app.updater, Updater)

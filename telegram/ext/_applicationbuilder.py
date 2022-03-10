@@ -258,7 +258,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             else:
                 bot = self._bot
             update_queue = DefaultValue.get_value(self._update_queue)
-            updater = Updater(bot=bot, update_queue=update_queue)
+
+            if self._updater is None:
+                updater = None
+            else:
+                updater = Updater(bot=bot, update_queue=update_queue)
         else:
             updater = self._updater
             bot = self._updater.bot
