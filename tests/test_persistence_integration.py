@@ -16,12 +16,176 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import collections
+import time
+from typing import NamedTuple
+
 import pytest
 
 from telegram.ext import (
     ApplicationBuilder,
     PersistenceInput,
+    BasePersistence,
+    Application,
 )
+
+
+class TrackingPersistence(BasePersistence):
+    """A dummy implementation of BasePersistence that will help us a great deal in keeping
+    the individual tests as short as reasonably possible."""
+
+    def __init__(
+        self,
+        store_data: PersistenceInput = None,
+        update_interval: float = 60,
+        fill_data: bool = False,
+    ):
+        super().__init__(store_data=store_data, update_interval=update_interval)
+        self.updated_chat_ids = collections.Counter()
+        self.updated_user_ids = collections.Counter()
+        self.refreshed_chat_ids = collections.Counter()
+        self.refreshed_user_ids = collections.Counter()
+        self.updated_conversations = collections.defaultdict(collections.Counter)
+        self.updated_bot_data: bool = False
+        self.refreshed_bot_data: bool = False
+        self.updated_callback_data: bool = False
+        self.flushed = False
+
+        self.chat_data = dict()
+        self.user_data = dict()
+        self.conversations = collections.defaultdict(dict)
+        self.bot_data = dict()
+        self.callback_data = ([], {})
+
+        if fill_data:
+            self.fill()
+
+    def fill(self):
+        self.chat_data[1]['key'] = 'entry'
+        self.chat_data[2]['foo'] = 'bar'
+        self.user_data[1]['key'] = 'entry'
+        self.user_data[2]['foo'] = 'bar'
+        self.bot_data['key'] = 'entry'
+        self.conversations['conv_1'][(1, 1, 1)] = 'STATE_1'
+        self.conversations['conv_1'][(2, 2, 2)] = 'STATE_2'
+        self.conversations['conv_2'][(3, 3, 3)] = 'STATE_3'
+        self.conversations['conv_2'][(4, 4, 4)] = 'STATE_4'
+        self.callback_data = (
+            [('uuid', time.time(), {'uuid4': 'callback_data'})],
+            {'query_id', 'keyboard_id'},
+        )
+
+    def reset_tracking(self):
+        self.updated_user_ids.clear()
+        self.updated_chat_ids.clear()
+        self.refreshed_chat_ids = collections.Counter()
+        self.refreshed_user_ids = collections.Counter()
+        self.updated_conversations.clear()
+        self.updated_bot_data = False
+        self.refreshed_bot_data = False
+        self.updated_callback_data = False
+        self.flushed = False
+
+        self.chat_data = dict()
+        self.user_data = dict()
+        self.conversations = collections.defaultdict(dict)
+        self.bot_data = None
+        self.callback_data = None
+
+    async def update_bot_data(self, data):
+        self.updated_bot_data = True
+        self.bot_data = data
+
+    async def update_chat_data(self, chat_id: int, data):
+        self.updated_chat_ids[chat_id] += 1
+        self.chat_data[chat_id] = data
+
+    async def update_user_data(self, user_id: int, data):
+        self.updated_user_ids[user_id] += 1
+        self.user_data[user_id] = data
+
+    async def update_conversation(self, name: str, key, new_state):
+        self.updated_conversations[name][key] += 1
+        self.conversations[name][key] = new_state
+
+    async def update_callback_data(self, data):
+        self.updated_callback_data = True
+        self.callback_data = data
+
+    async def get_conversations(self, name):
+        return self.conversations[name]
+
+    async def get_bot_data(self):
+        return self.bot_data
+
+    async def get_chat_data(self):
+        return self.chat_data
+
+    async def get_user_data(self):
+        return self.user_data
+
+    async def get_callback_data(self):
+        return self.callback_data
+
+    async def drop_chat_data(self, chat_id):
+        self.chat_data.pop(chat_id, None)
+
+    async def drop_user_data(self, user_id):
+        self.user_data.pop(user_id, None)
+
+    async def refresh_user_data(self, user_id: int, user_data: dict):
+        self.refreshed_user_ids[user_id] += 1
+        user_data['refreshed'] = True
+
+    async def refresh_chat_data(self, chat_id: int, chat_data: dict):
+        self.refreshed_chat_ids[chat_id] += 1
+        chat_data['refreshed'] = True
+
+    async def refresh_bot_data(self, bot_data: dict):
+        self.refreshed_bot_data = True
+        bot_data['refreshed'] = True
+
+    async def flush(self) -> None:
+        self.flushed = True
+
+
+class PappInput(NamedTuple):
+    bot_data: bool = None
+    chat_data: bool = None
+    user_data: bool = None
+    callback_data: bool = None
+    update_interval: float = None
+    fill_data: bool = False
+
+
+def build_papp(
+    token: str, store_data: dict = None, update_interval: float = None, fill_data: bool = False
+) -> Application:
+    store_data = PersistenceInput(**store_data)
+    if update_interval is not None:
+        persistence = TrackingPersistence(
+            store_data=store_data, update_interval=update_interval, fill_data=fill_data
+        )
+    else:
+        persistence = TrackingPersistence(store_data=store_data, fill_data=fill_data)
+
+    return ApplicationBuilder().token(token).persistence(persistence).build()
+
+
+@pytest.fixture(scope='function')
+def papp(request, bot) -> Application:
+    papp_input = request.param
+    store_data = dict()
+    if papp_input.bot_data is not None:
+        store_data['bot_data'] = papp_input.bot_data
+    if papp_input.chat_data is not None:
+        store_data['chat_data'] = papp_input.chat_data
+    if papp_input.user_data is not None:
+        store_data['user_data'] = papp_input.user_data
+    if papp_input.callback_data is not None:
+        store_data['callback_data'] = papp_input.callback_data
+
+    return build_papp(bot.token, store_data=store_data, update_interval=papp_input.update_interval)
 
 
 class TestPersistenceIntegration:
@@ -41,6 +205,32 @@ class TestPersistenceIntegration:
             TypeError, match='persistence must be based on telegram.ext.BasePersistence'
         ):
             ApplicationBuilder().bot(bot).persistence(MyPersistence()).build()
+
+    @pytest.mark.parametrize(
+        'papp',
+        [PappInput(fill_data=True), PappInput(False, False, False, False, fill_data=True)],
+        indirect=True,
+    )
+    @pytest.mark.asyncio
+    async def test_initialization_basic(self, papp: Application):
+        assert not papp.chat_data
+        assert not papp.user_data
+        assert not papp.bot_data
+        assert papp.bot.callback_data_cache.persistence_data == ([], {})
+        async with papp:
+            # We check just bot_data because we set all to the same value
+            if papp.persistence.store_data.bot_data:
+                assert papp.chat_data == papp.persistence.chat_data
+                assert papp.user_data == papp.persistence.user_data
+                assert papp.bot_data == papp.persistence.bot_data
+                assert (
+                    papp.bot.callback_data_cache.persistence_data == papp.persistence.callback_data
+                )
+            else:
+                assert not papp.chat_data
+                assert not papp.user_data
+                assert not papp.bot_data
+                assert papp.bot.callback_data_cache.persistence_data == ([], {})
 
     #
     # def test_error_while_saving_chat_data(self, bot):
