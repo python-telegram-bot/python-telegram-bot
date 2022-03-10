@@ -20,6 +20,7 @@ import collections
 import enum
 import functools
 import time
+from pathlib import Path
 from typing import NamedTuple
 
 import pytest
@@ -35,7 +36,8 @@ from telegram.ext import (
     filters,
     Handler,
 )
-from tests.conftest import make_message_update
+from telegram.warnings import PTBUserWarning
+from tests.conftest import make_message_update, PROJECT_ROOT_PATH
 
 
 class HandlerStates(int, enum.Enum):
@@ -347,6 +349,61 @@ class TestPersistenceIntegration:
                 assert not papp.handlers[0][1].check_update(
                     TrackingConversationHandler.build_update(HandlerStates.STATE_4, chat_id=4)
                 )
+
+    @pytest.mark.parametrize(
+        'papp',
+        [PappInput(fill_data=True)],
+        indirect=True,
+    )
+    @pytest.mark.asyncio
+    async def test_initialization_invalid_bot_data(self, papp: Application, monkeypatch):
+        async def get_bot_data(*args, **kwargs):
+            return 'invalid'
+
+        monkeypatch.setattr(papp.persistence, 'get_bot_data', get_bot_data)
+
+        with pytest.raises(ValueError, match='bot_data must be'):
+            await papp.initialize()
+
+    @pytest.mark.parametrize(
+        'papp',
+        [PappInput(fill_data=True)],
+        indirect=True,
+    )
+    @pytest.mark.parametrize('callback_data', ('invalid', (1, 2, 3)))
+    @pytest.mark.asyncio
+    async def test_initialization_invalid_callback_data(
+        self, papp: Application, callback_data, monkeypatch
+    ):
+        async def get_callback_data(*args, **kwargs):
+            return callback_data
+
+        monkeypatch.setattr(papp.persistence, 'get_callback_data', get_callback_data)
+
+        with pytest.raises(ValueError, match='callback_data must be'):
+            await papp.initialize()
+
+    @pytest.mark.parametrize(
+        'papp',
+        [PappInput()],
+        indirect=True,
+    )
+    @pytest.mark.asyncio
+    async def test_add_conversation_handler_after_init(self, papp: Application, recwarn):
+        async with papp:
+            papp.add_handler(build_conversation_handler('name', persistent=True))
+
+            assert len(recwarn) == 1
+            assert recwarn[0].category is PTBUserWarning
+            assert 'after `Application.initialize` was called' in str(recwarn[-1].message)
+            assert (
+                Path(recwarn[-1].filename)
+                == PROJECT_ROOT_PATH / 'telegram' / 'ext' / '_application.py'
+            ), "incorrect stacklevel!"
+
+    def test_add_conversation_without_persistence(self, app):
+        with pytest.raises(ValueError, match='if application has no persistence'):
+            app.add_handler(build_conversation_handler('name', persistent=True))
 
     #
     # def test_error_while_saving_chat_data(self, bot):
