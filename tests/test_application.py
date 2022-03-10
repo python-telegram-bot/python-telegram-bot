@@ -1309,6 +1309,10 @@ class TestApplication:
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
 
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason="Can't send signals without stopping whole process on windows",
+    )
     def test_run_polling_parameters_passing(self, app, monkeypatch):
         ready_event = threading.Event()
 
@@ -1424,6 +1428,10 @@ class TestApplication:
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
 
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason="Can't send signals without stopping whole process on windows",
+    )
     def test_run_webhook_parameters_passing(self, bot, monkeypatch):
         # Check that we pass them correctly
 
