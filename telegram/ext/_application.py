@@ -361,7 +361,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         if self.persistence.store_data.callback_data:
             persistent_data = await self.persistence.get_callback_data()
             if persistent_data is not None:
-                if not isinstance(persistent_data, tuple) and len(persistent_data) != 2:
+                if not isinstance(persistent_data, tuple) or len(persistent_data) != 2:
                     raise ValueError('callback_data must be a tuple of length 2')
                 # Mypy doesn't know that persistence.set_bot (see above) already checks that
                 # self.bot is an instance of ExtBot if callback_data should be stored ...
@@ -803,7 +803,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 warn(
                     'A persistent `ConversationHandler` was passed to `add_handler`, '
                     'after `Application.initialize` was called. Conversation states will not be '
-                    'loaded from persistence! '
+                    'loaded from persistence!',
+                    stacklevel=1,
                 )
 
         if group not in self.handlers:
