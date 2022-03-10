@@ -366,7 +366,6 @@ class TestApplicationBuilder:
     def test_no_job_queue(self, bot, builder):
         app = builder.token(bot.token).job_queue(None).build()
         assert app.bot.token == bot.token
-        assert app.bot.token == bot.token
         assert app.job_queue is None
         assert isinstance(app.update_queue, asyncio.Queue)
         assert isinstance(app.updater, Updater)
