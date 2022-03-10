@@ -17,17 +17,41 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import collections
+import enum
+import functools
 import time
 from typing import NamedTuple
 
 import pytest
 
+from telegram import User, Chat
 from telegram.ext import (
     ApplicationBuilder,
     PersistenceInput,
     BasePersistence,
     Application,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+    Handler,
 )
+from tests.conftest import make_message_update
+
+
+class HandlerStates(int, enum.Enum):
+    END = ConversationHandler.END
+    STATE_1 = 1
+    STATE_2 = 2
+    STATE_3 = 3
+    STATE_4 = 4
+
+    def next(self):
+        cls = self.__class__
+        members = list(cls)
+        index = members.index(self) + 1
+        if index >= len(members):
+            index = 0
+        return members[index]
 
 
 class TrackingPersistence(BasePersistence):
@@ -51,14 +75,19 @@ class TrackingPersistence(BasePersistence):
         self.updated_callback_data: bool = False
         self.flushed = False
 
-        self.chat_data = dict()
-        self.user_data = dict()
+        self.chat_data = collections.defaultdict(dict)
+        self.user_data = collections.defaultdict(dict)
         self.conversations = collections.defaultdict(dict)
         self.bot_data = dict()
-        self.callback_data = ([], {})
+        self.callback_data = ([], dict())
 
         if fill_data:
             self.fill()
+
+    CALLBACK_DATA = (
+        [('uuid', time.time(), {'uuid4': 'callback_data'})],
+        {'query_id': 'keyboard_id'},
+    )
 
     def fill(self):
         self.chat_data[1]['key'] = 'entry'
@@ -66,14 +95,11 @@ class TrackingPersistence(BasePersistence):
         self.user_data[1]['key'] = 'entry'
         self.user_data[2]['foo'] = 'bar'
         self.bot_data['key'] = 'entry'
-        self.conversations['conv_1'][(1, 1, 1)] = 'STATE_1'
-        self.conversations['conv_1'][(2, 2, 2)] = 'STATE_2'
-        self.conversations['conv_2'][(3, 3, 3)] = 'STATE_3'
-        self.conversations['conv_2'][(4, 4, 4)] = 'STATE_4'
-        self.callback_data = (
-            [('uuid', time.time(), {'uuid4': 'callback_data'})],
-            {'query_id', 'keyboard_id'},
-        )
+        self.conversations['conv_1'][(1, 1)] = HandlerStates.STATE_1
+        self.conversations['conv_1'][(2, 2)] = HandlerStates.STATE_2
+        self.conversations['conv_2'][(3, 3)] = HandlerStates.STATE_3
+        self.conversations['conv_2'][(4, 4)] = HandlerStates.STATE_4
+        self.callback_data = self.CALLBACK_DATA
 
     def reset_tracking(self):
         self.updated_user_ids.clear()
@@ -113,7 +139,7 @@ class TrackingPersistence(BasePersistence):
         self.callback_data = data
 
     async def get_conversations(self, name):
-        return self.conversations[name]
+        return self.conversations.get(name, {})
 
     async def get_bot_data(self):
         return self.bot_data
@@ -149,11 +175,39 @@ class TrackingPersistence(BasePersistence):
         self.flushed = True
 
 
+class TrackingConversationHandler(ConversationHandler):
+    def __init__(self, *args, **kwargs):
+        fallbacks = []
+        states = {state.value: [self.build_handler(state)] for state in HandlerStates}
+        entry_points = [self.build_handler(HandlerStates.END)]
+        super().__init__(
+            *args, **kwargs, fallbacks=fallbacks, states=states, entry_points=entry_points
+        )
+
+    @staticmethod
+    async def callback(update, context, state):
+        return state.next()
+
+    @staticmethod
+    def build_update(state: HandlerStates, chat_id: int):
+        user = User(id=chat_id, first_name='', is_bot=False)
+        chat = Chat(id=chat_id, type='')
+        return make_message_update(message=str(state.value), user=user, chat=chat)
+
+    @classmethod
+    def build_handler(cls, state: HandlerStates):
+        return MessageHandler(
+            filters.Regex(f'^{state.value}$'),
+            functools.partial(cls.callback, state=state.value),
+        )
+
+
 class PappInput(NamedTuple):
     bot_data: bool = None
     chat_data: bool = None
     user_data: bool = None
     callback_data: bool = None
+    conversations: bool = True
     update_interval: float = None
     fill_data: bool = False
 
@@ -172,6 +226,10 @@ def build_papp(
     return ApplicationBuilder().token(token).persistence(persistence).build()
 
 
+def build_conversation_handler(name: str, persistent: bool = True) -> Handler:
+    return TrackingConversationHandler(name=name, persistent=persistent)
+
+
 @pytest.fixture(scope='function')
 def papp(request, bot) -> Application:
     papp_input = request.param
@@ -185,7 +243,21 @@ def papp(request, bot) -> Application:
     if papp_input.callback_data is not None:
         store_data['callback_data'] = papp_input.callback_data
 
-    return build_papp(bot.token, store_data=store_data, update_interval=papp_input.update_interval)
+    app = build_papp(
+        bot.token,
+        store_data=store_data,
+        update_interval=papp_input.update_interval,
+        fill_data=papp_input.fill_data,
+    )
+
+    app.add_handlers(
+        [
+            build_conversation_handler(name='conv_1', persistent=papp_input.conversations),
+            build_conversation_handler(name='conv_2', persistent=papp_input.conversations),
+        ]
+    )
+
+    return app
 
 
 class TestPersistenceIntegration:
@@ -208,29 +280,73 @@ class TestPersistenceIntegration:
 
     @pytest.mark.parametrize(
         'papp',
-        [PappInput(fill_data=True), PappInput(False, False, False, False, fill_data=True)],
+        [PappInput(fill_data=True), PappInput(False, False, False, False, False, fill_data=True)],
         indirect=True,
     )
     @pytest.mark.asyncio
     async def test_initialization_basic(self, papp: Application):
+        # Check that no data is there before init
         assert not papp.chat_data
         assert not papp.user_data
         assert not papp.bot_data
         assert papp.bot.callback_data_cache.persistence_data == ([], {})
+        assert not papp.handlers[0][0].check_update(
+            TrackingConversationHandler.build_update(HandlerStates.STATE_1, chat_id=1)
+        )
+        assert not papp.handlers[0][0].check_update(
+            TrackingConversationHandler.build_update(HandlerStates.STATE_2, chat_id=2)
+        )
+        assert not papp.handlers[0][1].check_update(
+            TrackingConversationHandler.build_update(HandlerStates.STATE_3, chat_id=3)
+        )
+        assert not papp.handlers[0][1].check_update(
+            TrackingConversationHandler.build_update(HandlerStates.STATE_4, chat_id=4)
+        )
+
         async with papp:
+            # Check that data is loaded on init
+
             # We check just bot_data because we set all to the same value
             if papp.persistence.store_data.bot_data:
-                assert papp.chat_data == papp.persistence.chat_data
-                assert papp.user_data == papp.persistence.user_data
-                assert papp.bot_data == papp.persistence.bot_data
+                assert papp.chat_data[1]['key'] == 'entry'
+                assert papp.chat_data[2]['foo'] == 'bar'
+                assert papp.user_data[1]['key'] == 'entry'
+                assert papp.user_data[2]['foo'] == 'bar'
+                assert papp.bot_data == {'key': 'entry'}
                 assert (
-                    papp.bot.callback_data_cache.persistence_data == papp.persistence.callback_data
+                    papp.bot.callback_data_cache.persistence_data
+                    == TrackingPersistence.CALLBACK_DATA
+                )
+
+                assert papp.handlers[0][0].check_update(
+                    TrackingConversationHandler.build_update(HandlerStates.STATE_1, chat_id=1)
+                )
+                assert papp.handlers[0][0].check_update(
+                    TrackingConversationHandler.build_update(HandlerStates.STATE_2, chat_id=2)
+                )
+                assert papp.handlers[0][1].check_update(
+                    TrackingConversationHandler.build_update(HandlerStates.STATE_3, chat_id=3)
+                )
+                assert papp.handlers[0][1].check_update(
+                    TrackingConversationHandler.build_update(HandlerStates.STATE_4, chat_id=4)
                 )
             else:
                 assert not papp.chat_data
                 assert not papp.user_data
                 assert not papp.bot_data
                 assert papp.bot.callback_data_cache.persistence_data == ([], {})
+                assert not papp.handlers[0][0].check_update(
+                    TrackingConversationHandler.build_update(HandlerStates.STATE_1, chat_id=1)
+                )
+                assert not papp.handlers[0][0].check_update(
+                    TrackingConversationHandler.build_update(HandlerStates.STATE_2, chat_id=2)
+                )
+                assert not papp.handlers[0][1].check_update(
+                    TrackingConversationHandler.build_update(HandlerStates.STATE_3, chat_id=3)
+                )
+                assert not papp.handlers[0][1].check_update(
+                    TrackingConversationHandler.build_update(HandlerStates.STATE_4, chat_id=4)
+                )
 
     #
     # def test_error_while_saving_chat_data(self, bot):
