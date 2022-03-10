@@ -203,9 +203,9 @@ class TestApplication:
         assert isinstance(application.bot_data, complex)
 
     @pytest.mark.asyncio
-    async def test_initialize(self, bot, monkeypatch):
-        """Initialization of persistence is tested eslewhere"""
-        # TODO: do this!
+    @pytest.mark.asyncio('updater', (True, False))
+    async def test_initialize(self, bot, monkeypatch, updater):
+        """Initialization of persistence is tested test_persistence_integration"""
         self.test_flag = set()
 
         async def initialize_bot(*args, **kwargs):
@@ -217,13 +217,17 @@ class TestApplication:
         monkeypatch.setattr(Bot, 'initialize', initialize_bot)
         monkeypatch.setattr(Updater, 'initialize', initialize_updater)
 
-        await ApplicationBuilder().token(bot.token).build().initialize()
-        assert self.test_flag == {'bot', 'updater'}
+        if updater:
+            await ApplicationBuilder().token(bot.token).build().initialize()
+            assert self.test_flag == {'bot', 'updater'}
+        else:
+            await ApplicationBuilder().token(bot.token).updater(None).build().initialize()
+            assert self.test_flag == {'bot'}
 
     @pytest.mark.asyncio
-    async def test_shutdown(self, bot, monkeypatch):
-        """Studown of persistence is tested eslewhere"""
-        # TODO: do this!
+    @pytest.mark.parametrize('updater', (True, False))
+    async def test_shutdown(self, bot, monkeypatch, updater):
+        """Shutdown of persistence is tested in test_persistence_integration"""
         self.test_flag = set()
 
         async def shutdown_bot(*args, **kwargs):
@@ -235,9 +239,14 @@ class TestApplication:
         monkeypatch.setattr(Bot, 'shutdown', shutdown_bot)
         monkeypatch.setattr(Updater, 'shutdown', shutdown_updater)
 
-        async with ApplicationBuilder().token(bot.token).build():
-            pass
-        assert self.test_flag == {'bot', 'updater'}
+        if updater:
+            async with ApplicationBuilder().token(bot.token).build():
+                pass
+            assert self.test_flag == {'bot', 'updater'}
+        else:
+            async with ApplicationBuilder().token(bot.token).updater(None).build():
+                pass
+            assert self.test_flag == {'bot'}
 
     @pytest.mark.asyncio
     async def test_multiple_inits_and_shutdowns(self, app, monkeypatch):
@@ -352,14 +361,23 @@ class TestApplication:
         builder_2.token(app.bot.token)
 
     @pytest.mark.asyncio
-    async def test_start_stop_processing_updates(self, app):
+    @pytest.mark.parametrize('job_queue', (True, False))
+    async def test_start_stop_processing_updates(self, bot, job_queue):
         # TODO: repeat a similar test for create_task, persistence processing and job queue
+        if job_queue:
+            app = ApplicationBuilder().token(bot.token).build()
+        else:
+            app = ApplicationBuilder().token(bot.token).job_queue(None).build()
+
         async def callback(u, c):
             self.received = u
 
         assert not app.running
         assert not app.updater.running
-        assert not app.job_queue.scheduler.running
+        if job_queue:
+            assert not app.job_queue.scheduler.running
+        else:
+            assert app.job_queue is None
         app.add_handler(TypeHandler(object, callback))
 
         await app.update_queue.put(1)
@@ -370,7 +388,10 @@ class TestApplication:
         async with app:
             await app.start()
             assert app.running
-            assert app.job_queue.scheduler.running
+            if job_queue:
+                assert app.job_queue.scheduler.running
+            else:
+                assert app.job_queue is None
             assert not app.updater.running
             await asyncio.sleep(0.05)
             assert app.update_queue.empty()
@@ -379,7 +400,10 @@ class TestApplication:
             await app.stop()
             assert not app.running
             assert not app.updater.running
-            assert not app.job_queue.scheduler.running
+            if job_queue:
+                assert not app.job_queue.scheduler.running
+            else:
+                assert app.job_queue is None
             await app.update_queue.put(2)
             await asyncio.sleep(0.05)
             assert not app.update_queue.empty()
@@ -432,9 +456,12 @@ class TestApplication:
             app.add_handler(handler, 'one')
 
     @pytest.mark.asyncio
-    async def test_add_remove_handler(self, app):
+    @pytest.mark.parametrize('group_empty', (True, False))
+    async def test_add_remove_handler(self, app, group_empty):
         handler = MessageHandler(filters.ALL, self.callback_increase_count)
         app.add_handler(handler)
+        if not group_empty:
+            app.add_handler(handler)
 
         async with app:
             await app.start()
@@ -442,6 +469,7 @@ class TestApplication:
             await asyncio.sleep(0.05)
             assert self.count == 1
             app.remove_handler(handler)
+            assert (0 in app.handlers) == (not group_empty)
             await app.update_queue.put(self.message_update)
             assert self.count == 1
             await app.stop()
@@ -1481,3 +1509,12 @@ class TestApplication:
 
         assert set(self.received.keys()) == set(expected.keys())
         assert self.received == expected
+
+    def test_run_without_updater(self, bot):
+        app = ApplicationBuilder().token(bot.token).updater(None).build()
+
+        with pytest.raises(RuntimeError, match='only available if the application has an Updater'):
+            app.run_webhook()
+
+        with pytest.raises(RuntimeError, match='only available if the application has an Updater'):
+            app.run_polling()
