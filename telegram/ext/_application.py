@@ -76,7 +76,7 @@ class ApplicationHandlerStop(Exception):
     different group).
 
     In order to use this exception in a :class:`telegram.ext.ConversationHandler`, pass the
-    optional ``state`` parameter instead of returning the next state:
+    optional :paramref:`state` parameter instead of returning the next state:
 
     .. code-block:: python
 
@@ -113,12 +113,31 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         * Initialization is now done through the :class:`telegram.ext.ApplicationBuilder`.
         * Removed the attribute ``groups``.
 
+    Args:
+        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
+        update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
+            updates.
+        updater (:class:`telegram.ext.Updater`): The updater used by this application.
+        job_queue (:class:`telegram.ext.JobQueue`): The :class:`telegram.ext.JobQueue`
+            instance to pass onto handler callbacks.
+        concurrent_updates (:obj:`int` | :obj:`bool): If :obj:`True`, updates will be processed
+            concurrently instead of one by one. Defaults to ``4096``. Pass an integer to specify a
+            different number of updates that may be processed concurrently.
+
+            Warning:
+                Processing updates concurrently is not recommended when stateful handlers like
+                :class:`telegram.ext.ConversationHandler` are used.
+        persistence (:class:`telegram.ext.BasePersistence`): The persistence class to store data
+            that should be persistent over restarts.
+        context_types (:class:`telegram.ext.ContextTypes`): Specifies the types used by this
+            :class:`Application` for the ``context`` argument of handler and job callbacks.
+
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
         update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
             updates.
-        updater (:class:`telegram.ext.Updater`, optional): The updater used by this application.
-        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
+        updater (:class:`telegram.ext.Updater`): The updater used by this application.
+        job_queue (:class:`telegram.ext.JobQueue`): The :class:`telegram.ext.JobQueue`
             instance to pass onto handler callbacks.
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the chat.
@@ -139,7 +158,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                Manually modifying :attr:`user_data` is almost never needed and unadvisable.
 
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
-        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+        persistence (:class:`telegram.ext.BasePersistence`): The persistence class to
             store data that should be persistent over restarts.
         handlers (Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]): A dictionary mapping each
             handler group to the list of handlers registered to that group.
@@ -234,7 +253,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             raise TypeError("persistence must be based on telegram.ext.BasePersistence")
         self.persistence = persistence
 
-        # Some book keeping for persistence logic
+        # Some bookkeeping for persistence logic
         self._chat_ids_to_be_updated_in_persistence: Set[int] = set()
         self._user_ids_to_be_updated_in_persistence: Set[int] = set()
         self._chat_ids_to_be_deleted_in_persistence: Set[int] = set()
@@ -266,10 +285,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     @property
     def concurrent_updates(self) -> int:
-        """0 == not concurrent"""
+        """:obj:`int`: Indicates the number of concurrent updates set. A value of ``0`` indicates
+        updates are *not* being processed concurrently.
+        """
         return self._concurrent_updates
 
     async def initialize(self) -> None:
+        """TODO.."""
         if self._initialized:
             _logger.debug('This Application is already initialized.')
             return
@@ -385,10 +407,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
     async def start(self, ready: Event = None) -> None:
         """Starts
 
-        * a background task that fetches updates from :attr:`update_queue` and
-          processes them.
-        * :attr:`job_queue`, if set
-        * a background tasks that calls :meth:`update_persistence` in regular intervals, if
+        * a background task that fetches updates from :attr:`update_queue` and processes them.
+        * :attr:`job_queue`, if set.
+        * a background task that calls :meth:`update_persistence` in regular intervals, if
           :attr:`persistence` is set.
 
         Note:
@@ -688,6 +709,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             _logger.debug('Processing update %s', update)
 
             if self._concurrent_updates:
+                # We don't await the below because it has to be run concurrently
                 asyncio.create_task(self.__process_update_wrapper(update))
             else:
                 await self.__process_update_wrapper(update)
@@ -971,6 +993,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 return
 
             await self.update_persistence()
+
+            # asyncio synchronization primitives don't accept a timeout argument, it is recommended
+            # to use wait_for instead
             try:
                 await asyncio.wait_for(
                     self.__update_persistence_event.wait(),
