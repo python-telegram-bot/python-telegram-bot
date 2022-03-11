@@ -490,6 +490,8 @@ class JobQueue:
         return job
 
     def start(self) -> None:
+        # TODO: Make this async - not needed yet, but it's probably saver to have it async already
+        # in case future versions need that
         """Starts the job_queue thread."""
         if not self.scheduler.running:
             self.scheduler.start()

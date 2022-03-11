@@ -258,10 +258,14 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                 bot: Bot = self._build_ext_bot()  # build a bot
             else:
                 bot = self._bot
-            # now also build an updater for them
+            # now also build an updater/update_queue for them
             update_queue = DefaultValue.get_value(self._update_queue)
-            updater = Updater(bot=bot, update_queue=update_queue)
-        else:  # if they set an updater, get all necessary attributes for Application from Updater-
+
+            if self._updater is None:
+                updater = None
+            else:
+                updater = Updater(bot=bot, update_queue=update_queue)
+        else:  # if they set an updater, get all necessary attributes for Application from Updater:
             updater = self._updater
             bot = self._updater.bot
             update_queue = self._updater.update_queue
@@ -864,7 +868,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._context_types = context_types
         return self  # type: ignore[return-value]
 
-    def updater(self: BuilderType, updater: Union[Updater, None]) -> BuilderType:
+    def updater(self: BuilderType, updater: Optional[Updater]) -> BuilderType:
         """Sets a :class:`telegram.ext.Updater` instance to be used for
         :attr:`telegram.ext.Application.updater`. The :attr:`telegram.ext.Updater.bot` and
         :attr:`telegram.ext.Updater.update_queue` will be used for

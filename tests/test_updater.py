@@ -22,10 +22,8 @@ from collections import defaultdict
 from http import HTTPStatus
 from pathlib import Path
 from random import randrange
-from typing import Optional
 
 import pytest
-from httpx import AsyncClient, Response
 
 from telegram import (
     Bot,
@@ -42,7 +40,13 @@ from telegram.ext import (
 )
 from telegram.ext._utils.webhookhandler import WebhookServer
 from telegram.request import HTTPXRequest
-from tests.conftest import make_message_update, make_message, DictBot, data_file
+from tests.conftest import (
+    make_message_update,
+    make_message,
+    DictBot,
+    data_file,
+    send_webhook_message,
+)
 
 
 class TestUpdater:
@@ -70,39 +74,6 @@ class TestUpdater:
     def callback(self, update, context):
         self.received = update.message.text
         self.cb_handler_called.set()
-
-    @staticmethod
-    async def _send_webhook_message(
-        ip: str,
-        port: int,
-        payload_str: Optional[str],
-        url_path: str = '',
-        content_len: int = -1,
-        content_type: str = 'application/json',
-        get_method: str = None,
-    ) -> Response:
-        headers = {
-            'content-type': content_type,
-        }
-
-        if not payload_str:
-            content_len = None
-            payload = None
-        else:
-            payload = bytes(payload_str, encoding='utf-8')
-
-        if content_len == -1:
-            content_len = len(payload)
-
-        if content_len is not None:
-            headers['content-length'] = str(content_len)
-
-        url = f'http://{ip}:{port}/{url_path}'
-
-        async with AsyncClient() as client:
-            return await client.request(
-                url=url, method=get_method or 'POST', data=payload, headers=headers
-            )
 
     @pytest.mark.asyncio
     async def test_slot_behaviour(self, updater, mro_slots):
@@ -545,15 +516,15 @@ class TestUpdater:
 
             # Now, we send an update to the server
             update = make_message_update('Webhook')
-            await self._send_webhook_message(ip, port, update.to_json(), 'TOKEN')
+            await send_webhook_message(ip, port, update.to_json(), 'TOKEN')
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
 
             # Returns Not Found if path is incorrect
-            response = await self._send_webhook_message(ip, port, '123456', 'webhook_handler.py')
+            response = await send_webhook_message(ip, port, '123456', 'webhook_handler.py')
             assert response.status_code == HTTPStatus.NOT_FOUND
 
             # Returns METHOD_NOT_ALLOWED if method is not allowed
-            response = await self._send_webhook_message(ip, port, None, 'TOKEN', get_method='HEAD')
+            response = await send_webhook_message(ip, port, None, 'TOKEN', get_method='HEAD')
             assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
             await updater.stop()
@@ -573,7 +544,7 @@ class TestUpdater:
             )
             assert updater.running
             update = make_message_update('Webhook')
-            await self._send_webhook_message(ip, port, update.to_json(), 'TOKEN')
+            await send_webhook_message(ip, port, update.to_json(), 'TOKEN')
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
             await updater.stop()
             assert not updater.running
@@ -711,7 +682,7 @@ class TestUpdater:
                     user=updater.bot.bot,
                 )
 
-                await self._send_webhook_message(ip, port, update.to_json(), 'TOKEN')
+                await send_webhook_message(ip, port, update.to_json(), 'TOKEN')
                 received_update = await updater.update_queue.get()
 
                 assert received_update.update_id == update.update_id
@@ -789,7 +760,7 @@ class TestUpdater:
 
             # Now, we send an update to the server
             update = make_message_update(message='test_message')
-            await self._send_webhook_message(ip, port, update.to_json())
+            await send_webhook_message(ip, port, update.to_json())
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
             assert self.test_flag == [True, True]
             await updater.stop()
@@ -832,10 +803,10 @@ class TestUpdater:
         async with updater:
             await updater.start_webhook(listen=ip, port=port)
 
-            response = await self._send_webhook_message(ip, port, None, content_type='invalid')
+            response = await send_webhook_message(ip, port, None, content_type='invalid')
             assert response.status_code == HTTPStatus.FORBIDDEN
 
-            response = await self._send_webhook_message(
+            response = await send_webhook_message(
                 ip,
                 port,
                 payload_str='<root><bla>data</bla></root>',
@@ -843,18 +814,16 @@ class TestUpdater:
             )
             assert response.status_code == HTTPStatus.FORBIDDEN
 
-            response = await self._send_webhook_message(
-                ip, port, 'dummy-payload', content_len=None
-            )
+            response = await send_webhook_message(ip, port, 'dummy-payload', content_len=None)
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
             # httpx already complains about bad content length in _send_webhook_message
             # before the requests below reach the webhook, but not testing this is probably
             # okay
-            # response = await self._send_webhook_message(
+            # response = await send_webhook_message(
             #   ip, port, 'dummy-payload', content_len=-2)
             # assert response.status_code == HTTPStatus.FORBIDDEN
-            # response = await self._send_webhook_message(
+            # response = await send_webhook_message(
             #   ip, port, 'dummy-payload', content_len='not-a-number')
             # assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 

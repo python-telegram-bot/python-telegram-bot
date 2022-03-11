@@ -19,10 +19,18 @@
 """The integration of persistence into the application is tested in test_persistence_integration.
 """
 import asyncio
+import inspect
 import logging
+import os
+import platform
+import signal
+import threading
+import time
 from collections import defaultdict
 from pathlib import Path
 from queue import Queue
+from random import randrange
+from threading import Thread
 
 import pytest
 
@@ -47,7 +55,7 @@ from telegram.ext import (
 from telegram.error import TelegramError
 from telegram.warnings import PTBUserWarning
 
-from tests.conftest import make_message_update, PROJECT_ROOT_PATH
+from tests.conftest import make_message_update, PROJECT_ROOT_PATH, send_webhook_message
 
 
 class CustomContext(CallbackContext):
@@ -1243,5 +1251,233 @@ class TestApplication:
 
             await app.stop()
 
-    # TODO:
-    #  * Test run_polling/webhook
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason="Can't send signals without stopping whole process on windows",
+    )
+    def test_run_polling_basic(self, app, monkeypatch):
+        ready_event = threading.Event()
+        exception_event = threading.Event()
+        update_event = threading.Event()
+        exception = TelegramError('This is a test error')
+        assertions = {}
+
+        async def get_updates(*args, **kwargs):
+            if exception_event.is_set():
+                raise exception
+            # This makes sure that other coroutines have a chance of running as well
+            await asyncio.sleep(0)
+            update_event.set()
+            return [self.message_update]
+
+        def thread_target():
+            ready_event.wait()
+
+            # Check that everything's running
+            assertions['app_running'] = app.running
+            assertions['updater_running'] = app.updater.running
+            assertions['job_queue_running'] = app.job_queue.scheduler.running
+
+            # Check that we're getting updates
+            update_event.wait()
+            time.sleep(0.05)
+            assertions['getting_updates'] = self.count == 42
+
+            # Check that errors are properly handled during polling
+            exception_event.set()
+            time.sleep(0.05)
+            assertions['exception_handling'] = self.received == exception.message
+
+            os.kill(os.getpid(), signal.SIGINT)
+            time.sleep(0.1)
+
+            # # Assert that everything has stopped running
+            assertions['app_not_running'] = not app.running
+            assertions['updater_not_running'] = not app.updater.running
+            assertions['job_queue_not_running'] = not app.job_queue.scheduler.running
+
+        monkeypatch.setattr(app.bot, 'get_updates', get_updates)
+        app.add_error_handler(self.error_handler_context)
+        app.add_handler(TypeHandler(object, self.callback_set_count(42)))
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        app.run_polling(drop_pending_updates=True, ready=ready_event, close_loop=False)
+        thread.join()
+
+        assert len(assertions) == 8
+        for key, value in assertions.items():
+            assert value, f"assertion '{key}' failed!"
+
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason="Can't send signals without stopping whole process on windows",
+    )
+    def test_run_polling_parameters_passing(self, app, monkeypatch):
+        ready_event = threading.Event()
+
+        # First check that the default values match and that we have all arguments there
+        updater_signature = inspect.signature(app.updater.start_polling)
+        app_signature = inspect.signature(app.run_polling)
+
+        for name, param in updater_signature.parameters.items():
+            if name == 'error_callback':
+                assert name not in app_signature.parameters
+                continue
+            assert name in app_signature.parameters
+            assert param.kind == app_signature.parameters[name].kind
+            assert param.default == app_signature.parameters[name].default
+
+        # Check that we pass them correctly
+        async def start_polling(_, **kwargs):
+            self.received = kwargs
+            return True
+
+        def thread_target():
+            ready_event.wait()
+            time.sleep(0.1)
+            os.kill(os.getpid(), signal.SIGINT)
+
+        monkeypatch.setattr(Updater, 'start_polling', start_polling)
+        thread = Thread(target=thread_target)
+        thread.start()
+        app.run_polling(ready=ready_event, close_loop=False)
+        thread.join()
+        ready_event.clear()
+
+        assert set(self.received.keys()) == set(updater_signature.parameters.keys())
+        for name, param in updater_signature.parameters.items():
+            if name == 'error_callback':
+                assert self.received[name] is not None
+            else:
+                assert self.received[name] == param.default
+
+        expected = {
+            name: name for name in updater_signature.parameters if name != 'error_callback'
+        }
+        thread = Thread(target=thread_target)
+        thread.start()
+        app.run_polling(ready=ready_event, close_loop=False, **expected)
+        thread.join()
+        ready_event.clear()
+
+        assert set(self.received.keys()) == set(updater_signature.parameters.keys())
+        assert self.received.pop('error_callback', None)
+        assert self.received == expected
+
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason="Can't send signals without stopping whole process on windows",
+    )
+    def test_run_webhook_basic(self, app, monkeypatch):
+        ready_event = threading.Event()
+        assertions = {}
+
+        async def delete_webhook(*args, **kwargs):
+            return True
+
+        async def set_webhook(*args, **kwargs):
+            return True
+
+        def thread_target():
+            ready_event.wait()
+
+            # Check that everything's running
+            assertions['app_running'] = app.running
+            assertions['updater_running'] = app.updater.running
+            assertions['job_queue_running'] = app.job_queue.scheduler.running
+
+            # Check that we're getting updates
+            loop = asyncio.new_event_loop()
+            loop.run_until_complete(
+                send_webhook_message(ip, port, self.message_update.to_json(), 'TOKEN')
+            )
+            loop.close()
+            time.sleep(0.05)
+            assertions['getting_updates'] = self.count == 42
+
+            os.kill(os.getpid(), signal.SIGINT)
+            time.sleep(0.1)
+
+            # # Assert that everything has stopped running
+            assertions['app_not_running'] = not app.running
+            assertions['updater_not_running'] = not app.updater.running
+            assertions['job_queue_not_running'] = not app.job_queue.scheduler.running
+
+        monkeypatch.setattr(app.bot, 'set_webhook', set_webhook)
+        monkeypatch.setattr(app.bot, 'delete_webhook', delete_webhook)
+        app.add_handler(TypeHandler(object, self.callback_set_count(42)))
+
+        thread = Thread(target=thread_target)
+        thread.start()
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)
+
+        app.run_webhook(
+            ip_address=ip,
+            port=port,
+            url_path='TOKEN',
+            drop_pending_updates=True,
+            ready=ready_event,
+            close_loop=False,
+        )
+        thread.join()
+
+        assert len(assertions) == 7
+        for key, value in assertions.items():
+            assert value, f"assertion '{key}' failed!"
+
+    @pytest.mark.skipif(
+        platform.system() == 'Windows',
+        reason="Can't send signals without stopping whole process on windows",
+    )
+    def test_run_webhook_parameters_passing(self, bot, monkeypatch):
+        # Check that we pass them correctly
+
+        async def start_webhook(_, **kwargs):
+            self.received = kwargs
+            return True
+
+        ready_event = threading.Event()
+
+        # First check that the default values match and that we have all arguments there
+        updater_signature = inspect.signature(Updater.start_webhook)
+
+        monkeypatch.setattr(Updater, 'start_webhook', start_webhook)
+        app = ApplicationBuilder().token(bot.token).build()
+        app_signature = inspect.signature(app.run_webhook)
+
+        for name, param in updater_signature.parameters.items():
+            if name == 'self':
+                continue
+            assert name in app_signature.parameters
+            assert param.kind == app_signature.parameters[name].kind
+            assert param.default == app_signature.parameters[name].default
+
+        def thread_target():
+            ready_event.wait()
+            time.sleep(0.1)
+            os.kill(os.getpid(), signal.SIGINT)
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        app.run_webhook(ready=ready_event, close_loop=False)
+        thread.join()
+        ready_event.clear()
+
+        assert set(self.received.keys()) == set(updater_signature.parameters.keys()) - {'self'}
+        for name, param in updater_signature.parameters.items():
+            if name == 'self':
+                continue
+            assert self.received[name] == param.default
+
+        expected = {name: name for name in updater_signature.parameters if name != 'self'}
+        thread = Thread(target=thread_target)
+        thread.start()
+        app.run_webhook(ready=ready_event, close_loop=False, **expected)
+        thread.join()
+        ready_event.clear()
+
+        assert set(self.received.keys()) == set(expected.keys())
+        assert self.received == expected

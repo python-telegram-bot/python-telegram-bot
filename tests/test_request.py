@@ -355,12 +355,10 @@ class TestHTTPXRequest:
 
         class Client(httpx.AsyncClient):
             def __init__(*args, **kwargs):
-                print('this is init')
                 orig_init(*args, **kwargs)
                 self.test_flag['init'] += 1
 
             async def aclose(*args, **kwargs):
-                print('this is aclose')
                 await orig_aclose(*args, **kwargs)
                 self.test_flag['shutdown'] += 1
 
