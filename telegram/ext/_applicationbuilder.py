@@ -49,7 +49,7 @@ if TYPE_CHECKING:
 # leveraging generics and therefore need a number of type variables.
 OAppT = TypeVar('OAppT', bound=Union[None, Application])
 AppT = TypeVar('AppT', bound=Application)
-InBT = TypeVar('InBT', bound=Bot)
+InBT = TypeVar('InBT', bound=Bot)  # 'In' stands for input - used in parameters of methods below
 InJQ = TypeVar('InJQ', bound=Union[None, JobQueue])
 InPT = TypeVar('InPT', bound=Union[None, 'BasePersistence'])
 InAppT = TypeVar('InAppT', bound=Union[None, Application])
@@ -212,6 +212,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             write_timeout=getattr(self, f'{prefix}write_timeout'),
             pool_timeout=getattr(self, f'{prefix}pool_timeout'),
         )
+        # Get timeouts that were actually set-
         effective_timeouts = {
             key: value for key, value in timeouts.items() if not isinstance(value, DefaultValue)
         }
@@ -251,15 +252,16 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         job_queue = DefaultValue.get_value(self._job_queue)
         persistence = DefaultValue.get_value(self._persistence)
-
+        # If user didn't set updater
         if isinstance(self._updater, DefaultValue) or self._updater is None:
-            if isinstance(self._bot, DefaultValue):
-                bot: Bot = self._build_ext_bot()
+            if isinstance(self._bot, DefaultValue):  # and didn't set a bot
+                bot: Bot = self._build_ext_bot()  # build a bot
             else:
                 bot = self._bot
+            # now also build an updater for them
             update_queue = DefaultValue.get_value(self._update_queue)
             updater = Updater(bot=bot, update_queue=update_queue)
-        else:
+        else:  # if they set an updater, get all necessary attributes for Application from Updater-
             updater = self._updater
             bot = self._updater.bot
             update_queue = self._updater.update_queue
@@ -376,6 +378,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         prefix = 'get_updates_' if get_updates else ''
         name = prefix + 'request'
 
+        # Code below tests if it's okay to set a Request object. Only okay if no other request args
+        # or instances containing a Request were set previously
         for attr in ('connect_timeout', 'read_timeout', 'write_timeout', 'pool_timeout'):
             if not isinstance(getattr(self, f"_{prefix}{attr}"), DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format(name, attr))
@@ -390,20 +394,20 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def _request_param_check(self, name: str, get_updates: bool) -> None:
         if get_updates and self._get_updates_request is not DEFAULT_NONE:
-            raise RuntimeError(
+            raise RuntimeError(  # disallow request args for get_updates if Request for that is set
                 _TWO_ARGS_REQ.format(f'get_updates_{name}', 'get_updates_request instance')
             )
-        if self._request is not DEFAULT_NONE:
+        if self._request is not DEFAULT_NONE:  # disallow request args if request is set
             raise RuntimeError(_TWO_ARGS_REQ.format(name, 'request instance'))
 
-        if self._bot is not DEFAULT_NONE:
+        if self._bot is not DEFAULT_NONE:  # disallow request args if bot is set (has Request)
             raise RuntimeError(
                 _TWO_ARGS_REQ.format(
                     f'get_updates_{name}' if get_updates else name, 'bot instance'
                 )
             )
 
-        if self._updater not in (DEFAULT_NONE, None):
+        if self._updater not in (DEFAULT_NONE, None):  # disallow request args for updater(has bot)
             raise RuntimeError(
                 _TWO_ARGS_REQ.format(f'get_updates_{name}' if get_updates else name, 'updater')
             )
@@ -427,7 +431,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def connection_pool_size(self: BuilderType, connection_pool_size: int) -> BuilderType:
         """Sets the size of the connection pool to be used for the
         :paramref:`~telegram.request.HTTPXRequest.connection_pool_size` parameter of
-        :attr:`telegram.Bot.request`. Will default to ``1``.
+        :attr:`telegram.Bot.request`. Defaults to ``128``.
 
         Args:
             connection_pool_size (:obj:`int`): The size of the connection pool.
@@ -441,7 +445,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def proxy_url(self: BuilderType, proxy_url: str) -> BuilderType:
         """Sets the proxy to be used for the :paramref:`~telegram.request.HTTPXRequest.proxy_url`
-        parameter of :attr:`telegram.Bot.request`. Will default to :obj:`None`.
+        parameter of :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
 
         Args:
             proxy_url (:obj:`str`): The URL to the proxy server. See
@@ -457,7 +461,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def connect_timeout(self: BuilderType, connect_timeout: Optional[float]) -> BuilderType:
         """Sets the connection attempt timeout to be used for the
         :paramref:`~telegram.request.HTTPXRequest.connect_timeout` parameter of
-        :attr:`telegram.Bot.request`. Will default to ``5.0``.
+        :attr:`telegram.Bot.request`. Defaults to ``5.0``.
 
         Args:
             connect_timeout (:obj:`float`): See
@@ -473,7 +477,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def read_timeout(self: BuilderType, read_timeout: Optional[float]) -> BuilderType:
         """Sets the waiting timeout to be used for the
         :paramref:`~telegram.request.HTTPXRequest.read_timeout` parameter of
-        :attr:`telegram.Bot.request`. Will default to ``5.0``.
+        :attr:`telegram.Bot.request`. Defaults to ``5.0``.
 
         Args:
             read_timeout (:obj:`float`): See
@@ -489,7 +493,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def write_timeout(self: BuilderType, write_timeout: Optional[float]) -> BuilderType:
         """Sets the write operation timeout to be used for the
         :paramref:`~telegram.request.HTTPXRequest.write_timeout` parameter of
-        :attr:`telegram.Bot.request`. Will default to ``5.0``.
+        :attr:`telegram.Bot.request`. Defaults to ``5.0``.
 
         Args:
             write_timeout (:obj:`float`): See
@@ -505,7 +509,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def pool_timeout(self: BuilderType, pool_timeout: Optional[float]) -> BuilderType:
         """Sets the connection pool's connection freeing timeout to be used for the
         :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter of
-        :attr:`telegram.Bot.request`. Will default to :obj:`None`.
+        :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
 
         Args:
             pool_timeout (:obj:`float`): See
@@ -538,11 +542,32 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_connection_pool_size(
         self: BuilderType, get_updates_connection_pool_size: int
     ) -> BuilderType:
+        """Sets the size of the connection pool to be used for the
+        :paramref:`~telegram.request.HTTPXRequest.connection_pool_size` parameter of
+        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to ``1``.
+
+        Args:
+            get_updates_connection_pool_size (:obj:`int`): The size of the connection pool.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
         self._request_param_check(name='connection_pool_size', get_updates=True)
         self._get_updates_connection_pool_size = get_updates_connection_pool_size
         return self
 
     def get_updates_proxy_url(self: BuilderType, get_updates_proxy_url: str) -> BuilderType:
+        """Sets the proxy to be used for the :paramref:`~telegram.request.HTTPXRequest.proxy_url`
+        parameter of :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`.
+        Defaults to :obj:`None`.
+
+        Args:
+            get_updates_proxy_url (:obj:`str`): The URL to the proxy server. See
+                :paramref:`telegram.request.HTTPXRequest.proxy_url` for more information.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
         self._request_param_check(name='proxy_url', get_updates=True)
         self._get_updates_proxy_url = get_updates_proxy_url
         return self
@@ -550,6 +575,17 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_connect_timeout(
         self: BuilderType, get_updates_connect_timeout: Optional[float]
     ) -> BuilderType:
+        """Sets the connection attempt timeout to be used for the
+        :paramref:`~telegram.request.HTTPXRequest.connect_timeout` parameter of
+        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
+
+        Args:
+            get_updates_connect_timeout (:obj:`float`): See
+                :paramref:`telegram.request.HTTPXRequest.connect_timeout` for more information.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
         self._request_param_check(name='connect_timeout', get_updates=True)
         self._get_updates_connect_timeout = get_updates_connect_timeout
         return self
@@ -557,6 +593,17 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_read_timeout(
         self: BuilderType, get_updates_read_timeout: Optional[float]
     ) -> BuilderType:
+        """Sets the waiting timeout to be used for the
+        :paramref:`~telegram.request.HTTPXRequest.read_timeout` parameter of
+        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
+
+        Args:
+            get_updates_read_timeout (:obj:`float`): See
+                :paramref:`telegram.request.HTTPXRequest.read_timeout` for more information.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
         self._request_param_check(name='read_timeout', get_updates=True)
         self._get_updates_read_timeout = get_updates_read_timeout
         return self
@@ -564,6 +611,17 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_write_timeout(
         self: BuilderType, get_updates_write_timeout: Optional[float]
     ) -> BuilderType:
+        """Sets the write operation timeout to be used for the
+        :paramref:`~telegram.request.HTTPXRequest.write_timeout` parameter of
+        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
+
+        Args:
+            get_updates_write_timeout (:obj:`float`): See
+                :paramref:`telegram.request.HTTPXRequest.write_timeout` for more information.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
         self._request_param_check(name='write_timeout', get_updates=True)
         self._get_updates_write_timeout = get_updates_write_timeout
         return self
@@ -571,6 +629,17 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_pool_timeout(
         self: BuilderType, get_updates_pool_timeout: Optional[float]
     ) -> BuilderType:
+        """Sets the connection pool's connection freeing timeout to be used for the
+        :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter of
+        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to :obj:`None`.
+
+        Args:
+            get_updates_pool_timeout (:obj:`float`): See
+                :paramref:`telegram.request.HTTPXRequest.pool_timeout` for more information.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
         self._request_param_check(name='pool_timeout', get_updates=True)
         self._get_updates_pool_timeout = get_updates_pool_timeout
         return self
@@ -712,9 +781,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
          .. seealso:: :paramref:`telegram.ext.Application.concurrent_updates`
 
         Args:
-            concurrent_updates (:obj:`bool` | :obj:`int`): Passing :obj:`True` will allow for 4096
-                updates to be processed concurrently. Pass an integer to specify a different number
-                of updates that may be processed concurrently.
+            concurrent_updates (:obj:`bool` | :obj:`int`): Passing :obj:`True` will allow for
+                ``4096`` updates to be processed concurrently. Pass an integer to specify a
+                different number of updates that may be processed concurrently.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -745,8 +814,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
               this uses :attr:`telegram.ext.Application.job_queue` internally.
 
         Args:
-            job_queue (:class:`telegram.ext.JobQueue`, optional): The job queue. Pass :obj:`None`
-                if you don't want to use a job queue.
+            job_queue (:class:`telegram.ext.JobQueue`): The job queue. Pass :obj:`None` if you
+                don't want to use a job queue.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -768,8 +837,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             the persistence instance must use the same types!
 
         Args:
-            persistence (:class:`telegram.ext.BasePersistence`, optional): The persistence
-                instance.
+            persistence (:class:`telegram.ext.BasePersistence`): The persistence instance.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -788,7 +856,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             /python-telegram-bot/tree/master/examples#contexttypesbotpy>`_
 
         Args:
-            context_types (:class:`telegram.ext.ContextTypes`, optional): The context types.
+            context_types (:class:`telegram.ext.ContextTypes`): The context types.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
