@@ -725,6 +725,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         """
         context = None
+        any_blocking = False
 
         for handlers in self.handlers.values():
             try:
@@ -744,6 +745,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                         ):
                             self.create_task(coroutine, update=update)
                         else:
+                            any_blocking = True
                             await coroutine
                         break
 
@@ -758,7 +760,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     _logger.debug('Error handler stopped further handlers.')
                     break
 
-        self._mark_for_persistence_update(update=update)
+        if any_blocking:
+            # Only need to mark the update for persistence if there was at least one
+            # blocking handler - the non-blocking handlers mark the update again when finished
+            self._mark_for_persistence_update(update=update)
 
     def add_handler(self, handler: Handler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
@@ -1088,15 +1093,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     result = new_state.old_state
                 else:
                     result = new_state.resolve()
+            else:
+                result = new_state
 
-                effective_new_state = None if result is TrackingDict.DELETED else result
-                # TODO: Test that we actually pass `None` here in case the conversation had ended,
-                #  i.e. effective_new_state is TrackingDict.DELETED
-                coroutines.add(
-                    self.persistence.update_conversation(
-                        name=name, key=key, new_state=effective_new_state
-                    )
+            effective_new_state = None if result is TrackingDict.DELETED else result
+            # TODO: Test that we actually pass `None` here in case the conversation had ended,
+            #  i.e. effective_new_state is TrackingDict.DELETED
+            coroutines.add(
+                self.persistence.update_conversation(
+                    name=name, key=key, new_state=effective_new_state
                 )
+            )
 
         results = await asyncio.gather(*coroutines, return_exceptions=True)
         _logger.debug('Finished updating persistence.')
