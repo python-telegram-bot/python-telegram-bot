@@ -39,6 +39,8 @@ from typing import (  # pylint: disable=unused-import  # for the "Any" import
 )
 
 from telegram import Update
+from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.types import DVInput
 from telegram.ext import (
     CallbackContext,
     CallbackQueryHandler,
@@ -221,7 +223,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
             .. versionadded:: 13.2
             .. versionchanged:: 14.0
-                No longer overrides the handlers settings
+                No longer *overrides* the handlers settings.
 
     Raises:
         ValueError
@@ -278,7 +280,7 @@ class ConversationHandler(Handler[Update, CCT]):
         name: str = None,
         persistent: bool = False,
         map_to_parent: Dict[object, object] = None,
-        block: bool = False,
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
         # these imports need to be here because of circular import error otherwise
         from telegram.ext import (  # pylint: disable=import-outside-toplevel
