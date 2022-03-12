@@ -24,7 +24,7 @@ from uuid import uuid4
 import pytest
 import pytz
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message, User
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message, User, Chat
 from telegram.ext._callbackdatacache import (
     CallbackDataCache,
     _KeyboardData,
@@ -159,7 +159,8 @@ class TestCallbackDataCache:
         if invalid:
             callback_data_cache.clear_callback_data()
 
-        effective_message = Message(message_id=1, date=None, chat=None, reply_markup=out)
+        chat = Chat(1, 'private')
+        effective_message = Message(message_id=1, date=datetime.now(), chat=chat, reply_markup=out)
         effective_message.reply_to_message = deepcopy(effective_message)
         effective_message.pinned_message = deepcopy(effective_message)
         cq_id = uuid4().hex
