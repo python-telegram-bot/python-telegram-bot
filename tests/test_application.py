@@ -1249,8 +1249,10 @@ class TestApplication:
             await app.stop()
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize('concurrent_updates', (True, 15, 50, 256))
+    @pytest.mark.parametrize('concurrent_updates', (15, 50, 100))
     async def test_concurrent_updates(self, bot, concurrent_updates):
+        # We don't test with `True` since the large number of parallel coroutines quickly leads
+        # to test instabilities
         app = Application.builder().token(bot.token).concurrent_updates(concurrent_updates).build()
         events = {i: asyncio.Event() for i in range(app.concurrent_updates + 10)}
         queue = asyncio.Queue()
@@ -1384,12 +1386,16 @@ class TestApplication:
             self.received = kwargs
             return True
 
+        async def stop(_, **kwargs):
+            return True
+
         def thread_target():
             ready_event.wait()
             time.sleep(0.1)
             os.kill(os.getpid(), signal.SIGINT)
 
         monkeypatch.setattr(Updater, 'start_polling', start_polling)
+        monkeypatch.setattr(Updater, 'stop', stop)
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(ready=ready_event, close_loop=False)
@@ -1490,12 +1496,16 @@ class TestApplication:
             self.received = kwargs
             return True
 
+        async def stop(_, **kwargs):
+            return True
+
         ready_event = threading.Event()
 
         # First check that the default values match and that we have all arguments there
         updater_signature = inspect.signature(Updater.start_webhook)
 
         monkeypatch.setattr(Updater, 'start_webhook', start_webhook)
+        monkeypatch.setattr(Updater, 'stop', stop)
         app = ApplicationBuilder().token(bot.token).build()
         app_signature = inspect.signature(app.run_webhook)
 
