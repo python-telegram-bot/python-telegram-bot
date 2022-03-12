@@ -23,7 +23,6 @@ import inspect
 
 included = {  # These modules/classes intentionally have __dict__.
     'CallbackContext',
-    'BasePersistence',
 }
 
 
