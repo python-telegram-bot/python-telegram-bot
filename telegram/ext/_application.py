@@ -658,6 +658,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
     ) -> _RT:
         try:
             return await coroutine
+        except asyncio.CancelledError as cancel:
+            # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
+            #   close when we drop py3.7
+            raise cancel
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(

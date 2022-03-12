@@ -1175,7 +1175,7 @@ class TestApplication:
     @pytest.mark.asyncio
     async def test_create_task_cancel_task(self, app):
         async def callback():
-            await asyncio.sleep(1)
+            await asyncio.sleep(10)
 
         async def error(update_arg, context):
             self.received = update_arg, context.error
@@ -1200,23 +1200,28 @@ class TestApplication:
 
     @pytest.mark.asyncio
     async def test_await_create_task_tasks_on_stop(self, app):
+        event_1 = asyncio.Event()
+        event_2 = asyncio.Event()
+
         async def callback_1():
-            await asyncio.sleep(0.5)
+            await event_1.wait()
 
         async def callback_2():
-            await asyncio.sleep(0.1)
+            await event_2.wait()
 
         async with app:
             await app.start()
             task_1 = app.create_task(callback_1())
             task_2 = app.create_task(callback_2())
+            event_2.set()
             await task_2
             assert not task_1.done()
             stop_task = asyncio.create_task(app.stop())
             assert not stop_task.done()
-            await asyncio.sleep(0.3)
+            await asyncio.sleep(0.1)
             assert not stop_task.done()
-            await asyncio.sleep(0.15)
+            event_1.set()
+            await asyncio.sleep(0.05)
             assert stop_task.done()
 
     @pytest.mark.asyncio
