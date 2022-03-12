@@ -51,7 +51,7 @@ class _BaseMedium(TelegramObject):
 
     """
 
-    __slots__ = ('bot', 'file_id', 'file_size', 'file_unique_id')
+    __slots__ = ('file_id', 'file_size', 'file_unique_id')
 
     def __init__(
         self, file_id: str, file_unique_id: str, file_size: int = None, bot: 'Bot' = None

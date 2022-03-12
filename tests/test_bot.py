@@ -21,6 +21,7 @@ import asyncio
 import inspect
 import logging
 import socket
+import pickle
 import time
 import datetime as dtm
 from collections import defaultdict
@@ -383,6 +384,10 @@ class TestBot:
         assert to_dict_bot["first_name"] == bot.first_name
         if bot.last_name:
             assert to_dict_bot["last_name"] == bot.last_name
+
+    def test_bot_pickling_error(self, bot):
+        with pytest.raises(pickle.PicklingError, match="Bot objects cannot be pickled"):
+            pickle.dumps(bot)
 
     @pytest.mark.parametrize(
         'bot_method_name',

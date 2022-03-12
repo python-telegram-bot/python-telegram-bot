@@ -23,8 +23,6 @@ from typing import (
     TypeVar,
     Generic,
     TYPE_CHECKING,
-    Callable,
-    Any,
     Dict,
     Union,
     Type,
@@ -47,18 +45,13 @@ if TYPE_CHECKING:
 
 # Type hinting is a bit complicated here because we try to get to a sane level of
 # leveraging generics and therefore need a number of type variables.
-OAppT = TypeVar('OAppT', bound=Union[None, Application])
-AppT = TypeVar('AppT', bound=Application)
 InBT = TypeVar('InBT', bound=Bot)
 InJQ = TypeVar('InJQ', bound=Union[None, JobQueue])
-InPT = TypeVar('InPT', bound=Union[None, 'BasePersistence'])
-InAppT = TypeVar('InAppT', bound=Union[None, Application])
 InCCT = TypeVar('InCCT', bound='CallbackContext')
 InUD = TypeVar('InUD')
 InCD = TypeVar('InCD')
 InBD = TypeVar('InBD')
 BuilderType = TypeVar('BuilderType', bound='ApplicationBuilder')
-CT = TypeVar('CT', bound=Callable[..., Any])
 
 if TYPE_CHECKING:
     DEF_CCT = CallbackContext.DEFAULT_TYPE  # type: ignore[misc]
@@ -76,6 +69,7 @@ if TYPE_CHECKING:
 
 _BOT_CHECKS = [
     ('request', 'request instance'),
+    ('get_updates_request', 'get_updates_request instance'),
     ('connection_pool_size', 'connection_pool_size'),
     ('proxy_url', 'proxy_url'),
     ('pool_timeout', 'pool_timeout'),
@@ -88,7 +82,6 @@ _BOT_CHECKS = [
     ('get_updates_connect_timeout', 'get_updates_connect_timeout'),
     ('get_updates_read_timeout', 'get_updates_read_timeout'),
     ('get_updates_write_timeout', 'get_updates_write_timeout'),
-    ('get_updates_request', 'get_updates_request instance'),
     ('base_file_url', 'base_file_url'),
     ('base_url', 'base_url'),
     ('token', 'token'),
@@ -755,8 +748,6 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         for attr, error in (
             (self._bot, 'bot instance'),
-            (self._request, 'request instance'),
-            (self._get_updates_request, 'get_updates_request instance'),
             (self._update_queue, 'update_queue'),
         ):
             if not isinstance(attr, DefaultValue):
