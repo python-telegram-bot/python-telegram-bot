@@ -371,20 +371,25 @@ class TestApplication:
             await app.start()
             assert app.running
             assert app.job_queue.scheduler.running
+            # app.start() should not start the updater!
             assert not app.updater.running
             await asyncio.sleep(0.05)
             assert app.update_queue.empty()
             assert self.received == 1
 
+            await app.updater.start_polling()
             await app.stop()
             assert not app.running
-            assert not app.updater.running
+            # app.stop() should not stop the updater!
+            assert app.updater.running
             assert not app.job_queue.scheduler.running
             await app.update_queue.put(2)
             await asyncio.sleep(0.05)
             assert not app.update_queue.empty()
             assert self.received != 2
             assert self.received == 1
+
+            await app.updater.stop()
 
     @pytest.mark.asyncio
     async def test_error_start_stop_twice(self, app):
@@ -1168,6 +1173,32 @@ class TestApplication:
         assert self.received[1] is exception
 
     @pytest.mark.asyncio
+    async def test_create_task_cancel_task(self, app):
+        async def callback():
+            await asyncio.sleep(1)
+
+        async def error(update_arg, context):
+            self.received = update_arg, context.error
+
+        app.add_error_handler(error)
+        async with app:
+            await app.start()
+            task = app.create_task(callback())
+            await asyncio.sleep(0.05)
+            task.cancel()
+
+            with pytest.raises(asyncio.CancelledError):
+                await task
+            with pytest.raises(asyncio.CancelledError):
+                assert task.exception()
+
+            # Error handlers should not be called if task was cancelled
+            assert self.received is None
+
+            # make sure that the cancelled task doesn't block the stopping of the app
+            await app.stop()
+
+    @pytest.mark.asyncio
     async def test_await_create_task_tasks_on_stop(self, app):
         async def callback_1():
             await asyncio.sleep(0.5)
@@ -1250,6 +1281,26 @@ class TestApplication:
                 assert events[i].is_set()
 
             await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_concurrent_updates_done_on_shutdown(self, bot):
+        app = Application.builder().token(bot.token).concurrent_updates(True).build()
+        event = asyncio.Event()
+
+        async def callback(update, context):
+            await event.wait()
+
+        app.add_handler(TypeHandler(object, callback))
+
+        async with app:
+            await app.start()
+            await app.update_queue.put(1)
+            stop_task = asyncio.create_task(app.stop())
+            await asyncio.sleep(0.1)
+            assert not stop_task.done()
+            event.set()
+            await asyncio.sleep(0.05)
+            assert stop_task.done()
 
     @pytest.mark.skipif(
         platform.system() == 'Windows',
