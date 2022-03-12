@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
+from copy import deepcopy
+
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple
+from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple, Dict, Union
 
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -40,6 +42,12 @@ class TelegramObject:
     is equivalent to ``telegram_object.attribute_name``. If the object does not have an attribute
     with the appropriate name, a :exc:`KeyError` will be raised.
 
+    When objects of this type are pickled, the :class:`~telegram.Bot` attribute associated with the
+    object will be removed. However, when copying the object via :func:`copy.deepcopy`, the copy
+    will have the *same* bot instance associated with it, i.e::
+
+        assert telegram_object.get_bot() is copy.deepcopy(telegram_object).get_bot()
+
     .. versionchanged:: 14.0
         ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
         special cases like :attr:`Message.from_user` that deviate from the official Bot API.
@@ -53,15 +61,12 @@ class TelegramObject:
         _bot: Optional['Bot']
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
-    __slots__ = (
-        '_id_attrs',
-        '_bot',
-    )
+    __slots__ = ('_id_attrs', '_bot')
 
     # pylint: disable=unused-argument
     def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':
         # We add _id_attrs in __new__ instead of __init__ since we want to add this to the slots
-        # w/o calling __init__ in all of the subclasses. This is what we also do in BaseFilter.
+        # w/o calling __init__ in all of the subclasses.
         instance = super().__new__(cls)
         instance._id_attrs = ()
         instance._bot = None
@@ -80,6 +85,86 @@ class TelegramObject:
                 f"Objects of type {self.__class__.__name__} don't have an attribute called "
                 f"`{item}`."
             ) from exc
+
+    def __getstate__(self) -> Dict[str, Union[str, object]]:
+        """
+        This method is used for pickling. We remove the bot attribute of the object since those
+        are not pickable.
+        """
+        return self._get_attrs(include_private=True, recursive=False, remove_bot=True)
+
+    def __setstate__(self, state: dict) -> None:
+        """
+        This method is used for unpickling. The data, which is in the form a dictionary, is
+        converted back into a class. Should be modified in place.
+        """
+        for key, val in state.items():
+            setattr(self, key, val)
+
+    def __deepcopy__(self: TO, memodict: dict) -> TO:
+        """This method deepcopies the object and sets the bot on the newly created copy."""
+        bot = self._bot  # Save bot so we can set it after copying
+        self.set_bot(None)  # set to None so it is not deepcopied
+        cls = self.__class__
+        result = cls.__new__(cls)  # create a new instance
+        memodict[id(self)] = result  # save the id of the object in the dict
+
+        attrs = self._get_attrs(include_private=True)  # get all its attributes
+
+        for k in attrs:  # now we set the attributes in the deepcopied object
+            setattr(result, k, deepcopy(getattr(self, k), memodict))
+
+        result.set_bot(bot)  # Assign the bots back
+        self.set_bot(bot)
+        return result  # type: ignore[return-value]
+
+    def _get_attrs(
+        self,
+        include_private: bool = False,
+        recursive: bool = False,
+        remove_bot: bool = False,
+    ) -> Dict[str, Union[str, object]]:
+        """This method is used for obtaining the attributes of the object.
+
+        Args:
+            include_private (:obj:`bool`): Whether the result should include private variables.
+            recursive (:obj:`bool`): If :obj:`True`, will convert any TelegramObjects (if found) in
+                the attributes to a dictionary. Else, preserves it as an object itself.
+            remove_bot (:obj:`bool`): Whether the bot should be included in the result.
+
+        Returns:
+            :obj:`dict`: A dict where the keys are attribute names and values are their values.
+        """
+        data = {}
+
+        if not recursive:
+            try:
+                # __dict__ has attrs from superclasses, so no need to put in the for loop below
+                data.update(self.__dict__)
+            except AttributeError:
+                pass
+        # We want to get all attributes for the class, using self.__slots__ only includes the
+        # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
+        # and then get their attributes. The `[:-1]` slice excludes the `object` class
+        for cls in self.__class__.__mro__[:-1]:
+            for key in cls.__slots__:
+                if not include_private and key.startswith('_'):
+                    continue
+
+                value = getattr(self, key, None)
+                if value is not None:
+                    if recursive and hasattr(value, 'to_dict'):
+                        data[key] = value.to_dict()
+                    else:
+                        data[key] = value
+                elif not recursive:
+                    data[key] = value
+
+        if recursive and data.get('from_user'):
+            data['from'] = data.pop('from_user', None)
+        if remove_bot:
+            data.pop('_bot', None)
+        return data
 
     @staticmethod
     def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
@@ -137,27 +222,7 @@ class TelegramObject:
         Returns:
             :obj:`dict`
         """
-        data = {}
-
-        # We want to get all attributes for the class, using self.__slots__ only includes the
-        # attributes used by that class itself, and not its superclass(es). Hence we get its MRO
-        # and then get their attributes. The `[:-2]` slice excludes the `object` class & the
-        # TelegramObject class itself.
-        attrs = {attr for cls in self.__class__.__mro__[:-2] for attr in cls.__slots__}
-        for key in attrs:
-            if key == 'bot' or key.startswith('_'):
-                continue
-
-            value = getattr(self, key, None)
-            if value is not None:
-                if hasattr(value, 'to_dict'):
-                    data[key] = value.to_dict()
-                else:
-                    data[key] = value
-
-        if data.get('from_user'):
-            data['from'] = data.pop('from_user', None)
-        return data
+        return self._get_attrs(recursive=True)
 
     def get_bot(self) -> 'Bot':
         """Returns the :class:`telegram.Bot` instance associated with this object.
@@ -171,8 +236,7 @@ class TelegramObject:
         """
         if self._bot is None:
             raise RuntimeError(
-                'This object has no bot associated with it. \
-                Shortcuts cannot be used.'
+                'This object has no bot associated with it. Shortcuts cannot be used.'
             )
         return self._bot
 

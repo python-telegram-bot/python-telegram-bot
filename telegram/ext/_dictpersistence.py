@@ -20,6 +20,8 @@
 
 from typing import Dict, Optional, Tuple, cast
 
+from copy import deepcopy
+
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram._utils.types import JSONDict
 from telegram.ext._utils.types import ConversationDict, CDCData
@@ -31,7 +33,7 @@ except ImportError:
 
 
 class DictPersistence(BasePersistence):
-    """Using Python's :obj:`dict` and ``json`` for making your bot persistent.
+    """Using Python's :obj:`dict` and :mod:`json` for making your bot persistent.
 
     Attention:
         The interface provided by this class is intended to be accessed exclusively by
@@ -39,19 +41,13 @@ class DictPersistence(BasePersistence):
         interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
 
     Note:
-        This class does *not* implement a :meth:`flush` method, meaning that data managed by
-        ``DictPersistence`` is in-memory only and will be lost when the bot shuts down. This is,
-        because ``DictPersistence`` is mainly intended as starting point for custom persistence
-        classes that need to JSON-serialize the stored data before writing them to file/database.
+        * Data managed by :class:`DictPersistence` is in-memory only and will be lost when the bot
+          shuts down. This is, because :class:`DictPersistence` is mainly intended as starting
+          point for custom persistence classes that need to JSON-serialize the stored data before
+          writing them to file/database.
 
-    Warning:
-        :class:`DictPersistence` will try to replace :class:`telegram.Bot` instances by
-        :attr:`~telegram.ext.BasePersistence.REPLACED_BOT` and insert the bot set with
-        :meth:`telegram.ext.BasePersistence.set_bot` upon loading of the data. This is to ensure
-        that changes to the bot apply to the saved objects, too. If you change the bots token, this
-        may lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
-        :meth:`telegram.ext.BasePersistence.replace_bot` and
-        :meth:`telegram.ext.BasePersistence.insert_bot`.
+        * This implementation of :class:`BasePersistence` does not handle data that cannot be
+          serialized by :func:`json.dumps`.
 
     .. versionchanged:: 14.0
         The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
@@ -244,7 +240,7 @@ class DictPersistence(BasePersistence):
         """
         if self.user_data is None:
             self._user_data = {}
-        return self.user_data  # type: ignore[return-value]
+        return deepcopy(self.user_data)  # type: ignore[arg-type]
 
     def get_chat_data(self) -> Dict[int, Dict[object, object]]:
         """Returns the chat_data created from the ``chat_data_json`` or an empty :obj:`dict`.
@@ -254,7 +250,7 @@ class DictPersistence(BasePersistence):
         """
         if self.chat_data is None:
             self._chat_data = {}
-        return self.chat_data  # type: ignore[return-value]
+        return deepcopy(self.chat_data)  # type: ignore[arg-type]
 
     def get_bot_data(self) -> Dict[object, object]:
         """Returns the bot_data created from the ``bot_data_json`` or an empty :obj:`dict`.
@@ -264,7 +260,7 @@ class DictPersistence(BasePersistence):
         """
         if self.bot_data is None:
             self._bot_data = {}
-        return self.bot_data  # type: ignore[return-value]
+        return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
     def get_callback_data(self) -> Optional[CDCData]:
         """Returns the callback_data created from the ``callback_data_json`` or :obj:`None`.
@@ -279,7 +275,7 @@ class DictPersistence(BasePersistence):
         if self.callback_data is None:
             self._callback_data = None
             return None
-        return self.callback_data[0], self.callback_data[1].copy()
+        return deepcopy((self.callback_data[0], self.callback_data[1].copy()))
 
     def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations created from the ``conversations_json`` or an empty
@@ -320,7 +316,7 @@ class DictPersistence(BasePersistence):
             self._user_data = {}
         if self._user_data.get(user_id) == data:
             return
-        self._user_data[user_id] = data
+        self._user_data[user_id] = deepcopy(data)
         self._user_data_json = None
 
     def update_chat_data(self, chat_id: int, data: Dict) -> None:
@@ -334,7 +330,7 @@ class DictPersistence(BasePersistence):
             self._chat_data = {}
         if self._chat_data.get(chat_id) == data:
             return
-        self._chat_data[chat_id] = data
+        self._chat_data[chat_id] = deepcopy(data)
         self._chat_data_json = None
 
     def update_bot_data(self, data: Dict) -> None:
@@ -345,7 +341,7 @@ class DictPersistence(BasePersistence):
         """
         if self._bot_data == data:
             return
-        self._bot_data = data
+        self._bot_data = deepcopy(data)
         self._bot_data_json = None
 
     def update_callback_data(self, data: CDCData) -> None:
@@ -360,7 +356,7 @@ class DictPersistence(BasePersistence):
         """
         if self._callback_data == data:
             return
-        self._callback_data = (data[0], data[1].copy())
+        self._callback_data = deepcopy((data[0], data[1].copy()))
         self._callback_data_json = None
 
     def drop_chat_data(self, chat_id: int) -> None:

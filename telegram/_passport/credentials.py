@@ -210,14 +210,14 @@ class Credentials(TelegramObject):
         nonce (:obj:`str`): Bot-specified nonce
     """
 
-    __slots__ = ('bot', 'nonce', 'secure_data')
+    __slots__ = ('nonce', 'secure_data')
 
     def __init__(self, secure_data: 'SecureData', nonce: str, bot: 'Bot' = None, **_kwargs: Any):
         # Required
         self.secure_data = secure_data
         self.nonce = nonce
 
-        self.bot = bot
+        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Credentials']:
@@ -261,7 +261,6 @@ class SecureData(TelegramObject):
     """
 
     __slots__ = (
-        'bot',
         'utility_bill',
         'personal_details',
         'temporary_registration',
@@ -304,7 +303,7 @@ class SecureData(TelegramObject):
         self.passport = passport
         self.personal_details = personal_details
 
-        self.bot = bot
+        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureData']:
@@ -360,7 +359,7 @@ class SecureValue(TelegramObject):
 
     """
 
-    __slots__ = ('data', 'front_side', 'reverse_side', 'selfie', 'files', 'translation', 'bot')
+    __slots__ = ('data', 'front_side', 'reverse_side', 'selfie', 'files', 'translation')
 
     def __init__(
         self,
@@ -380,7 +379,7 @@ class SecureValue(TelegramObject):
         self.files = files
         self.translation = translation
 
-        self.bot = bot
+        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureValue']:
@@ -412,17 +411,17 @@ class SecureValue(TelegramObject):
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
 
-    __slots__ = ('hash', 'secret', 'file_hash', 'data_hash', 'bot')
+    __slots__ = ('hash', 'secret', 'file_hash', 'data_hash')
 
     def __init__(self, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
         self.hash = hash
         self.secret = secret
 
-        # Aliases just be be sure
+        # Aliases just to be sure
         self.file_hash = self.hash
         self.data_hash = self.hash
 
-        self.bot = bot
+        self.set_bot(bot)
 
 
 class DataCredentials(_CredentialsBase):

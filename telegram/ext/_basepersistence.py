@@ -18,14 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
 from abc import ABC, abstractmethod
-from copy import copy
-from typing import Dict, Optional, Tuple, cast, ClassVar, Generic, NamedTuple
+from typing import Dict, Optional, Tuple, Generic, NamedTuple
 
 from telegram import Bot
 from telegram.ext import ExtBot
 
-from telegram.warnings import PTBRuntimeWarning
-from telegram._utils.warnings import warn
 from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
 
 
@@ -73,33 +70,39 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     * :meth:`get_chat_data`
     * :meth:`update_chat_data`
     * :meth:`refresh_chat_data`
+    * :meth:`drop_chat_data`
     * :meth:`get_user_data`
     * :meth:`update_user_data`
     * :meth:`refresh_user_data`
+    * :meth:`drop_user_data`
     * :meth:`get_callback_data`
     * :meth:`update_callback_data`
     * :meth:`get_conversations`
     * :meth:`update_conversation`
     * :meth:`flush`
 
-    If you don't actually need one of those methods, a simple ``pass`` is enough. For example, if
-    you don't store ``bot_data``, you don't need :meth:`get_bot_data`, :meth:`update_bot_data` or
-    :meth:`refresh_bot_data`.
-
-    Warning:
-        Persistence will try to replace :class:`telegram.Bot` instances by :attr:`REPLACED_BOT` and
-        insert the bot set with :meth:`set_bot` upon loading of the data. This is to ensure that
-        changes to the bot apply to the saved objects, too. If you change the bots token, this may
-        lead to e.g. ``Chat not found`` errors. For the limitations on replacing bots see
-        :meth:`replace_bot` and :meth:`insert_bot`.
+    If you don't actually need one of those methods, a simple :keyword:`pass` is enough.
+    For example, if you don't store ``bot_data``, you don't need :meth:`get_bot_data`,
+    :meth:`update_bot_data` or :meth:`refresh_bot_data`.
 
     Note:
-         :meth:`replace_bot` and :meth:`insert_bot` are used *independently* of the implementation
-         of the ``update/get_*`` methods, i.e. you don't need to worry about it while
-         implementing a custom persistence subclass.
+       You should avoid saving :class:`telegram.Bot` instances. This is because if you change e.g.
+       the bots token, this won't propagate to the serialized instances and may lead to exceptions.
+
+       To prevent this, the implementation may use :attr:`bot` to replace bot instances with a
+       placeholder before serialization and insert :attr:`bot` back when loading the data.
+       Since :attr:`bot` will be set when the process starts, this will be the up-to-date bot
+       instance.
+
+       If the persistence implementation does not take care of this, you should make sure not to
+       store any bot instances in the data that will be persisted. E.g. in case of
+       :class:`telegram.TelegramObject`, one may call :meth:`set_bot` to ensure that shortcuts like
+       :meth:`telegram.Message.reply_text` are available.
 
     .. versionchanged:: 14.0
-        The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
+        * The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
+        * ``insert/replace_bot`` was dropped. Serialization of bot instances now needs to be
+          handled by the specific implementation - see above note.
 
     Args:
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
@@ -109,72 +112,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.
+        bot (:class:`telegram.Bot`): The bot associated with the persistence.
     """
 
-    __slots__ = (
-        'bot',
-        'store_data',
-        '__dict__',  # __dict__ is included because we replace methods in the __new__
-    )
-
-    def __new__(
-        cls, *args: object, **kwargs: object  # pylint: disable=unused-argument
-    ) -> 'BasePersistence':
-        """This overrides the get_* and update_* methods to use insert/replace_bot.
-        That has the side effect that we always pass deepcopied data to those methods, so in
-        Pickle/DictPersistence we don't have to worry about copying the data again.
-
-        Note: This doesn't hold for second tuple-entry of callback_data. That's a Dict[str, str],
-        so no bots to replace anyway.
-        """
-        instance = super().__new__(cls)
-        get_user_data = instance.get_user_data
-        get_chat_data = instance.get_chat_data
-        get_bot_data = instance.get_bot_data
-        get_callback_data = instance.get_callback_data
-        update_user_data = instance.update_user_data
-        update_chat_data = instance.update_chat_data
-        update_bot_data = instance.update_bot_data
-        update_callback_data = instance.update_callback_data
-
-        def get_user_data_insert_bot() -> Dict[int, UD]:
-            return instance.insert_bot(get_user_data())
-
-        def get_chat_data_insert_bot() -> Dict[int, CD]:
-            return instance.insert_bot(get_chat_data())
-
-        def get_bot_data_insert_bot() -> BD:
-            return instance.insert_bot(get_bot_data())
-
-        def get_callback_data_insert_bot() -> Optional[CDCData]:
-            cdc_data = get_callback_data()
-            if cdc_data is None:
-                return None
-            return instance.insert_bot(cdc_data[0]), cdc_data[1]
-
-        def update_user_data_replace_bot(user_id: int, data: UD) -> None:
-            return update_user_data(user_id, instance.replace_bot(data))
-
-        def update_chat_data_replace_bot(chat_id: int, data: CD) -> None:
-            return update_chat_data(chat_id, instance.replace_bot(data))
-
-        def update_bot_data_replace_bot(data: BD) -> None:
-            return update_bot_data(instance.replace_bot(data))
-
-        def update_callback_data_replace_bot(data: CDCData) -> None:
-            obj_data, queue = data
-            return update_callback_data((instance.replace_bot(obj_data), queue))
-
-        # Adds to __dict__
-        setattr(instance, 'get_user_data', get_user_data_insert_bot)
-        setattr(instance, 'get_chat_data', get_chat_data_insert_bot)
-        setattr(instance, 'get_bot_data', get_bot_data_insert_bot)
-        setattr(instance, 'get_callback_data', get_callback_data_insert_bot)
-        setattr(instance, 'update_user_data', update_user_data_replace_bot)
-        setattr(instance, 'update_chat_data', update_chat_data_replace_bot)
-        setattr(instance, 'update_bot_data', update_bot_data_replace_bot)
-        setattr(instance, 'update_callback_data', update_callback_data_replace_bot)
-        return instance
+    __slots__ = ('bot', 'store_data')
 
     def __init__(self, store_data: PersistenceInput = None):
         self.store_data = store_data or PersistenceInput()
@@ -191,215 +132,6 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             raise TypeError('callback_data can only be stored when using telegram.ext.ExtBot.')
 
         self.bot = bot
-
-    @classmethod
-    def replace_bot(cls, obj: object) -> object:
-        """
-        Replaces all instances of :class:`telegram.Bot` that occur within the passed object with
-        :attr:`REPLACED_BOT`. Currently, this handles objects of type :class:`list`,
-        :class:`tuple`, :class:`set`, :class:`frozenset`, :class:`dict`,
-        :class:`collections.defaultdict` and objects that have a :attr:`~object.__dict__` or
-        :data:`~object.__slots__` attribute, excluding classes and objects that can't be copied
-        with :func:`copy.copy`. If the parsing of an object fails, the object will be returned
-        unchanged and the error will be logged.
-
-        Args:
-            obj (:obj:`object`): The object
-
-        Returns:
-            :class:`object`: Copy of the object with Bot instances replaced.
-        """
-        return cls._replace_bot(obj, {})
-
-    @classmethod
-    def _replace_bot(  # pylint: disable=too-many-return-statements
-        cls, obj: object, memo: Dict[int, object]
-    ) -> object:
-        obj_id = id(obj)
-        if obj_id in memo:
-            return memo[obj_id]
-
-        if isinstance(obj, Bot):
-            memo[obj_id] = cls.REPLACED_BOT
-            return cls.REPLACED_BOT
-        if isinstance(obj, (list, set)):
-            # We copy the iterable here for thread safety, i.e. make sure the object we iterate
-            # over doesn't change its length during the iteration
-            temp_iterable = obj.copy()
-            new_iterable = obj.__class__(cls._replace_bot(item, memo) for item in temp_iterable)
-            memo[obj_id] = new_iterable
-            return new_iterable
-        if isinstance(obj, (tuple, frozenset)):
-            # tuples and frozensets are immutable so we don't need to worry about thread safety
-            new_immutable = obj.__class__(cls._replace_bot(item, memo) for item in obj)
-            memo[obj_id] = new_immutable
-            return new_immutable
-        if isinstance(obj, type):
-            # classes usually do have a __dict__, but it's not writable
-            warn(
-                f'BasePersistence.replace_bot does not handle classes such as {obj.__name__!r}. '
-                'See the docs of BasePersistence.replace_bot for more information.',
-                PTBRuntimeWarning,
-            )
-            return obj
-
-        try:
-            new_obj = copy(obj)
-            memo[obj_id] = new_obj
-        except Exception:
-            warn(
-                'BasePersistence.replace_bot does not handle objects that can not be copied. See '
-                'the docs of BasePersistence.replace_bot for more information.',
-                PTBRuntimeWarning,
-            )
-            memo[obj_id] = obj
-            return obj
-
-        if isinstance(obj, dict):
-            # We handle dicts via copy(obj) so we don't have to make a
-            # difference between dict and defaultdict
-            new_obj = cast(dict, new_obj)
-            # We can't iterate over obj.items() due to thread safety, i.e. the dicts length may
-            # change during the iteration
-            temp_dict = new_obj.copy()
-            new_obj.clear()
-            for k, val in temp_dict.items():
-                new_obj[cls._replace_bot(k, memo)] = cls._replace_bot(val, memo)
-            memo[obj_id] = new_obj
-            return new_obj
-        try:
-            if hasattr(obj, '__slots__'):
-                for attr_name in new_obj.__slots__:
-                    setattr(
-                        new_obj,
-                        attr_name,
-                        cls._replace_bot(
-                            cls._replace_bot(getattr(new_obj, attr_name), memo), memo
-                        ),
-                    )
-                if '__dict__' in obj.__slots__:
-                    # In this case, we have already covered the case that obj has __dict__
-                    # Note that obj may have a __dict__ even if it's not in __slots__!
-                    memo[obj_id] = new_obj
-                    return new_obj
-            if hasattr(obj, '__dict__'):
-                for attr_name, attr in new_obj.__dict__.items():
-                    setattr(new_obj, attr_name, cls._replace_bot(attr, memo))
-                memo[obj_id] = new_obj
-                return new_obj
-        except Exception as exception:
-            warn(
-                f'Parsing of an object failed with the following exception: {exception}. '
-                f'See the docs of BasePersistence.replace_bot for more information.',
-                PTBRuntimeWarning,
-            )
-
-        memo[obj_id] = obj
-        return obj
-
-    def insert_bot(self, obj: object) -> object:
-        """
-        Replaces all instances of :attr:`REPLACED_BOT` that occur within the passed object with
-        :paramref:`bot`. Currently, this handles objects of type :class:`list`,
-        :class:`tuple`, :class:`set`, :class:`frozenset`, :class:`dict`,
-        :class:`collections.defaultdict` and objects that have a :attr:`~object.__dict__` or
-        :data:`~object.__slots__` attribute, excluding classes and objects that can't be copied
-        with :func:`copy.copy`. If the parsing of an object fails, the object will be returned
-        unchanged and the error will be logged.
-
-        Args:
-            obj (:obj:`object`): The object
-
-        Returns:
-            :class:`object`: Copy of the object with Bot instances inserted.
-        """
-        return self._insert_bot(obj, {})
-
-    # pylint: disable=too-many-return-statements
-    def _insert_bot(self, obj: object, memo: Dict[int, object]) -> object:
-        obj_id = id(obj)
-        if obj_id in memo:
-            return memo[obj_id]
-
-        if isinstance(obj, Bot):
-            memo[obj_id] = self.bot
-            return self.bot
-        if isinstance(obj, str) and obj == self.REPLACED_BOT:
-            memo[obj_id] = self.bot
-            return self.bot
-        if isinstance(obj, (list, set)):
-            # We copy the iterable here for thread safety, i.e. make sure the object we iterate
-            # over doesn't change its length during the iteration
-            temp_iterable = obj.copy()
-            new_iterable = obj.__class__(self._insert_bot(item, memo) for item in temp_iterable)
-            memo[obj_id] = new_iterable
-            return new_iterable
-        if isinstance(obj, (tuple, frozenset)):
-            # tuples and frozensets are immutable so we don't need to worry about thread safety
-            new_immutable = obj.__class__(self._insert_bot(item, memo) for item in obj)
-            memo[obj_id] = new_immutable
-            return new_immutable
-        if isinstance(obj, type):
-            # classes usually do have a __dict__, but it's not writable
-            warn(
-                f'BasePersistence.insert_bot does not handle classes such as {obj.__name__!r}. '
-                'See the docs of BasePersistence.insert_bot for more information.',
-                PTBRuntimeWarning,
-            )
-            return obj
-
-        try:
-            new_obj = copy(obj)
-        except Exception:
-            warn(
-                'BasePersistence.insert_bot does not handle objects that can not be copied. See '
-                'the docs of BasePersistence.insert_bot for more information.',
-                PTBRuntimeWarning,
-            )
-            memo[obj_id] = obj
-            return obj
-
-        if isinstance(obj, dict):
-            # We handle dicts via copy(obj) so we don't have to make a
-            # difference between dict and defaultdict
-            new_obj = cast(dict, new_obj)
-            # We can't iterate over obj.items() due to thread safety, i.e. the dicts length may
-            # change during the iteration
-            temp_dict = new_obj.copy()
-            new_obj.clear()
-            for k, val in temp_dict.items():
-                new_obj[self._insert_bot(k, memo)] = self._insert_bot(val, memo)
-            memo[obj_id] = new_obj
-            return new_obj
-        try:
-            if hasattr(obj, '__slots__'):
-                for attr_name in obj.__slots__:
-                    setattr(
-                        new_obj,
-                        attr_name,
-                        self._insert_bot(
-                            self._insert_bot(getattr(new_obj, attr_name), memo), memo
-                        ),
-                    )
-                if '__dict__' in obj.__slots__:
-                    # In this case, we have already covered the case that obj has __dict__
-                    # Note that obj may have a __dict__ even if it's not in __slots__!
-                    memo[obj_id] = new_obj
-                    return new_obj
-            if hasattr(obj, '__dict__'):
-                for attr_name, attr in new_obj.__dict__.items():
-                    setattr(new_obj, attr_name, self._insert_bot(attr, memo))
-                memo[obj_id] = new_obj
-                return new_obj
-        except Exception as exception:
-            warn(
-                f'Parsing of an object failed with the following exception: {exception}. '
-                f'See the docs of BasePersistence.insert_bot for more information.',
-                PTBRuntimeWarning,
-            )
-
-        memo[obj_id] = obj
-        return obj
 
     @abstractmethod
     def get_user_data(self) -> Dict[int, UD]:
@@ -628,6 +360,3 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionchanged:: 14.0
            Changed this method into an ``@abstractmethod``.
         """
-
-    REPLACED_BOT: ClassVar[str] = 'bot_instance_replaced_by_ptb_persistence'
-    """:obj:`str`: Placeholder for :class:`telegram.Bot` instances replaced in saved data."""
