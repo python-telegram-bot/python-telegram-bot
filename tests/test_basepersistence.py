@@ -277,7 +277,10 @@ def papp(request, bot) -> Application:
     return app
 
 
-class TestPersistenceIntegration:
+class TestBasePersistence:
+    """Tests basic bahvior of BasePersistence and (most importantly) the integration of persistence
+    into the Application."""
+
     # TODO:
     #  * Test add_handler with persistent conversationhandler
     #  * Test migrate_chat_data

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""The integration of persistence into the application is tested in test_persistence_integration.
+"""The integration of persistence into the application is tested in test_basepersistence.
 """
 import asyncio
 import inspect
@@ -64,7 +64,7 @@ class CustomContext(CallbackContext):
 
 class TestApplication:
     """The integration of persistence into the application is tested in
-    test_persistence_integration.
+    test_basepersistence.
     """
 
     message_update = make_message_update(message='Text')
@@ -205,7 +205,7 @@ class TestApplication:
     @pytest.mark.asyncio
     @pytest.mark.asyncio('updater', (True, False))
     async def test_initialize(self, bot, monkeypatch, updater):
-        """Initialization of persistence is tested test_persistence_integration"""
+        """Initialization of persistence is tested test_basepersistence"""
         self.test_flag = set()
 
         async def initialize_bot(*args, **kwargs):
@@ -227,7 +227,7 @@ class TestApplication:
     @pytest.mark.asyncio
     @pytest.mark.parametrize('updater', (True, False))
     async def test_shutdown(self, bot, monkeypatch, updater):
-        """Shutdown of persistence is tested in test_persistence_integration"""
+        """Shutdown of persistence is tested in test_basepersistence"""
         self.test_flag = set()
 
         async def shutdown_bot(*args, **kwargs):
