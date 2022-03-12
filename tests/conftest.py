@@ -400,10 +400,15 @@ def timezone(tzinfo):
 
 @pytest.fixture()
 def mro_slots():
-    def _mro_slots(_class):
+    def _mro_slots(_class, only_parents: bool = False):
+        if only_parents:
+            classes = _class.__class__.__mro__[1:-1]
+        else:
+            classes = _class.__class__.__mro__[:-1]
+
         return [
             attr
-            for cls in _class.__class__.__mro__[:-1]
+            for cls in classes
             if hasattr(cls, '__slots__')  # The Exception class doesn't have slots
             for attr in cls.__slots__
             if attr != '__dict__'  # left here for classes which still has __dict__

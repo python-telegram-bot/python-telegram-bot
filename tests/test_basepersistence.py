@@ -18,8 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import collections
+import copy
 import enum
 import functools
+import logging
 import time
 from pathlib import Path
 from typing import NamedTuple
@@ -150,16 +152,16 @@ class TrackingPersistence(BasePersistence):
         return self.conversations.get(name, {})
 
     async def get_bot_data(self):
-        return self.bot_data
+        return copy.deepcopy(self.bot_data)
 
     async def get_chat_data(self):
-        return self.chat_data
+        return copy.deepcopy(self.chat_data)
 
     async def get_user_data(self):
-        return self.user_data
+        return copy.deepcopy(self.user_data)
 
     async def get_callback_data(self):
-        return self.callback_data
+        return copy.deepcopy(self.callback_data)
 
     async def drop_chat_data(self, chat_id):
         self.dropped_chat_ids[chat_id] += 1
@@ -313,6 +315,45 @@ class TestBasePersistence:
 
         return callback
 
+    def test_slot_behaviour(self, mro_slots):
+        inst = TrackingPersistence()
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        # We're interested in BasePersistence, not in the implementation
+        slots = mro_slots(inst, only_parents=True)
+        print(slots)
+        assert len(slots) == len(set(slots)), "duplicate slot"
+
+    @pytest.mark.parametrize('bot_data', (True, False))
+    @pytest.mark.parametrize('chat_data', (True, False))
+    @pytest.mark.parametrize('user_data', (True, False))
+    @pytest.mark.parametrize('callback_data', (True, False))
+    def test_init_store_data_update_interval(self, bot_data, chat_data, user_data, callback_data):
+        store_data = PersistenceInput(
+            bot_data=bot_data,
+            chat_data=chat_data,
+            user_data=user_data,
+            callback_data=callback_data,
+        )
+        persistence = TrackingPersistence(store_data=store_data, update_interval=3.14)
+        assert persistence.store_data.bot_data == bot_data
+        assert persistence.store_data.chat_data == chat_data
+        assert persistence.store_data.user_data == user_data
+        assert persistence.store_data.callback_data == callback_data
+
+    def test_abstract_methods(self):
+        with pytest.raises(
+            TypeError,
+            match=(
+                'drop_chat_data, drop_user_data, flush, get_bot_data, get_callback_data, '
+                'get_chat_data, get_conversations, '
+                'get_user_data, refresh_bot_data, refresh_chat_data, '
+                'refresh_user_data, update_bot_data, update_callback_data, '
+                'update_chat_data, update_conversation, update_user_data'
+            ),
+        ):
+            BasePersistence()
+
     def test_construction_with_bad_persistence(self, caplog, bot):
         class MyPersistence:
             def __init__(self):
@@ -448,6 +489,16 @@ class TestBasePersistence:
         with pytest.raises(ValueError, match='if application has no persistence'):
             app.add_handler(build_conversation_handler('name', persistent=True))
 
+    @pytest.mark.parametrize(
+        'papp',
+        [PappInput()],
+        indirect=True,
+    )
+    @pytest.mark.asyncio
+    async def test_add_conversation_handler_without_name(self, papp: Application):
+        with pytest.raises(ValueError, match="when handler is unnamed"):
+            papp.add_handler(build_conversation_handler(name=None, persistent=True))
+
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         'papp',
@@ -493,7 +544,9 @@ class TestBasePersistence:
         indirect=True,
     )
     @pytest.mark.asyncio
-    async def test_update_persistence_loop_call_count_update_handling(self, papp: Application):
+    async def test_update_persistence_loop_call_count_update_handling(
+        self, papp: Application, caplog
+    ):
         async with papp:
             for _ in range(5):
                 # second pass processes update in conv_2
@@ -530,7 +583,11 @@ class TestBasePersistence:
 
             # Nothing should have been updated after handling nothing
             papp.persistence.reset_tracking()
-            await papp.update_persistence()
+            with caplog.at_level(logging.ERROR):
+                await papp.update_persistence()
+            # Make sure that "nothing updated" is not just due to an error
+            assert not caplog.text
+
             assert papp.persistence.updated_bot_data == papp.persistence.store_data.bot_data
             assert (
                 papp.persistence.updated_callback_data == papp.persistence.store_data.callback_data
@@ -545,7 +602,10 @@ class TestBasePersistence:
             # user/chat_data
             papp.persistence.reset_tracking()
             await papp.process_update('string_update')
-            await papp.update_persistence()
+            with caplog.at_level(logging.ERROR):
+                await papp.update_persistence()
+            # Make sure that "nothing updated" is not just due to an error
+            assert not caplog.text
             assert papp.persistence.updated_bot_data == papp.persistence.store_data.bot_data
             assert (
                 papp.persistence.updated_callback_data == papp.persistence.store_data.callback_data
@@ -577,7 +637,7 @@ class TestBasePersistence:
         indirect=True,
     )
     @pytest.mark.asyncio
-    async def test_update_persistence_loop_call_count_job(self, papp: Application):
+    async def test_update_persistence_loop_call_count_job(self, papp: Application, caplog):
         async with papp:
             papp.job_queue.start()
             papp.job_queue.run_once(self.job_callback, when=0.05, chat_id=1, user_id=1)
@@ -609,7 +669,10 @@ class TestBasePersistence:
 
             # Nothing should have been updated after no job ran
             papp.persistence.reset_tracking()
-            await papp.update_persistence()
+            with caplog.at_level(logging.ERROR):
+                await papp.update_persistence()
+            # Make sure that "nothing updated" is not just due to an error
+            assert not caplog.text
             assert papp.persistence.updated_bot_data == papp.persistence.store_data.bot_data
             assert (
                 papp.persistence.updated_callback_data == papp.persistence.store_data.callback_data
@@ -624,7 +687,10 @@ class TestBasePersistence:
             papp.persistence.reset_tracking()
             papp.job_queue.run_once(self.job_callback, when=0.1)
             await asyncio.sleep(0.2)
-            await papp.update_persistence()
+            with caplog.at_level(logging.ERROR):
+                await papp.update_persistence()
+            # Make sure that "nothing updated" is not just due to an error
+            assert not caplog.text
             assert papp.persistence.updated_bot_data == papp.persistence.store_data.bot_data
             assert (
                 papp.persistence.updated_callback_data == papp.persistence.store_data.callback_data
@@ -689,32 +755,48 @@ class TestBasePersistence:
                 TrackingConversationHandler.build_update(HandlerStates.STATE_1, chat_id=1)
             )
             assert not papp.persistence.bot_data
+            assert papp.persistence.bot_data is not papp.bot_data
             assert not papp.persistence.chat_data
+            assert papp.persistence.chat_data is not papp.chat_data
             assert not papp.persistence.user_data
+            assert papp.persistence.user_data is not papp.user_data
             assert papp.persistence.callback_data == ([], {})
+            assert (
+                papp.persistence.callback_data is not papp.bot.callback_data_cache.persistence_data
+            )
             assert not papp.persistence.conversations
 
             await papp.update_persistence()
+
+            assert papp.persistence.bot_data is not papp.bot_data
             if papp.persistence.store_data.bot_data:
                 assert papp.persistence.bot_data == {'key': 'value', 'refreshed': True}
             else:
                 assert not papp.persistence.bot_data
+
+            assert papp.persistence.chat_data is not papp.chat_data
+            if papp.persistence.store_data.chat_data:
+                assert papp.persistence.chat_data == {1: {'key': 'value', 'refreshed': True}}
+                assert papp.persistence.chat_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.chat_data
+
+            assert papp.persistence.user_data is not papp.user_data
+            if papp.persistence.store_data.user_data:
+                assert papp.persistence.user_data == {1: {'key': 'value', 'refreshed': True}}
+                assert papp.persistence.user_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.user_data
+
+            assert (
+                papp.persistence.callback_data is not papp.bot.callback_data_cache.persistence_data
+            )
             if papp.persistence.store_data.callback_data:
                 assert papp.persistence.callback_data[1] == {}
                 assert len(papp.persistence.callback_data[0]) == 1
             else:
                 assert papp.persistence.callback_data == ([], {})
-            assert (
-                papp.persistence.updated_callback_data == papp.persistence.store_data.callback_data
-            )
-            if papp.persistence.store_data.user_data:
-                assert papp.persistence.user_data == {1: {'key': 'value', 'refreshed': True}}
-            else:
-                assert not papp.persistence.user_data
-            if papp.persistence.store_data.chat_data:
-                assert papp.persistence.chat_data == {1: {'key': 'value', 'refreshed': True}}
-            else:
-                assert not papp.persistence.chat_data
+
             assert not papp.persistence.conversations
 
     @pytest.mark.parametrize('papp', [PappInput()], indirect=True)
