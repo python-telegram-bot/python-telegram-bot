@@ -16,20 +16,28 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-
+import datetime
 import json as json_lib
+import pickle
 
 import pytest
+from copy import deepcopy
 
 try:
     import ujson
 except ImportError:
     ujson = None
 
-from telegram import TelegramObject, Message, Chat, User
+from telegram import TelegramObject, Message, Chat, User, PhotoSize
 
 
 class TestTelegramObject:
+    class Sub(TelegramObject):
+        def __init__(self, private, normal, b):
+            self._private = private
+            self.normal = normal
+            self._bot = b
+
     def test_to_json_native(self, monkeypatch):
         if ujson:
             monkeypatch.setattr('ujson.dumps', json_lib.dumps)
@@ -145,3 +153,47 @@ class TestTelegramObject:
         assert message['from_user'] is user
         with pytest.raises(KeyError, match="Message don't have an attribute called `no_key`"):
             message['no_key']
+
+    def test_pickle(self, bot):
+        chat = Chat(2, Chat.PRIVATE)
+        user = User(3, 'first_name', False)
+        date = datetime.datetime.now()
+        photo = PhotoSize('file_id', 'unique', 21, 21, bot=bot)
+        msg = Message(1, date, chat, from_user=user, text='foobar', bot=bot, photo=[photo])
+
+        # Test pickling of TGObjects, we choose Message since it's contains the most subclasses.
+        assert msg.get_bot()
+        unpickled = pickle.loads(pickle.dumps(msg))
+
+        with pytest.raises(RuntimeError):
+            unpickled.get_bot()  # There should be no bot when we pickle TGObjects
+
+        assert unpickled.chat == chat
+        assert unpickled.from_user == user
+        assert unpickled.date == date
+        assert unpickled.photo[0] == photo
+
+    def test_deepcopy_telegram_obj(self, bot):
+        chat = Chat(2, Chat.PRIVATE)
+        user = User(3, 'first_name', False)
+        date = datetime.datetime.now()
+        photo = PhotoSize('file_id', 'unique', 21, 21, bot=bot)
+        msg = Message(1, date, chat, from_user=user, text='foobar', bot=bot, photo=[photo])
+
+        new_msg = deepcopy(msg)
+
+        # The same bot should be present when deepcopying.
+        assert new_msg.get_bot() == bot and new_msg.get_bot() is bot
+
+        assert new_msg.date == date and new_msg.date is not date
+        assert new_msg.chat == chat and new_msg.chat is not chat
+        assert new_msg.from_user == user and new_msg.from_user is not user
+        assert new_msg.photo[0] == photo and new_msg.photo[0] is not photo
+
+    def test_deepcopy_subclass_telegram_obj(self, bot):
+        s = self.Sub("private", 'normal', bot)
+        d = deepcopy(s)
+        assert d is not s
+        assert d._private == s._private  # Can't test for identity since two equal strings is True
+        assert d._bot == s._bot and d._bot is s._bot
+        assert d.normal == s.normal

@@ -481,10 +481,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._running = False
         _logger.info('Application is stopping. This might take a moment.')
 
-        if self.updater and self.updater.running:
-            _logger.debug('Waiting for updater to stop fetching updates')
-            await self.updater.stop()
-
         # Stop listening for new updates and handle all pending ones
         await self.update_queue.put(_STOP_SIGNAL)
         _logger.debug('Waiting for update_queue to join')
@@ -612,6 +608,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         finally:
             # We arrive here either by catching the exceptions above or if the loop gets stopped
             try:
+                # Mypy doesn't know that we already check if updater is None
+                loop.run_until_complete(self.updater.stop())  # type: ignore[union-attr]
                 loop.run_until_complete(self.stop())
                 loop.run_until_complete(self.shutdown())
             finally:
@@ -665,10 +663,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         return task
 
     def __create_task_done_callback(self, task: asyncio.Task) -> None:
+        self.__create_task_tasks.discard(task)
         # We just retrieve the eventual exception so that asyncio doesn't complain in case
         # it's not retrieved somewhere else
-        task.exception()
-        self.__create_task_tasks.discard(task)
+        try:
+            task.exception()
+        except (asyncio.CancelledError, asyncio.InvalidStateError):
+            pass
 
     async def __create_task_callback(
         self,
@@ -678,6 +679,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
     ) -> _RT:
         try:
             return await coroutine
+        except asyncio.CancelledError as cancel:
+            # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
+            #   close when we drop py3.7
+            raise cancel
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
@@ -723,7 +728,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             if self._concurrent_updates:
                 # We don't await the below because it has to be run concurrently
-                asyncio.create_task(self.__process_update_wrapper(update))
+                self.create_task(self.__process_update_wrapper(update), update=update)
             else:
                 await self.__process_update_wrapper(update)
 

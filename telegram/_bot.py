@@ -23,6 +23,7 @@ import asyncio
 import functools
 import logging
 from contextlib import AbstractAsyncContextManager
+import pickle
 from datetime import datetime
 from types import TracebackType
 
@@ -39,6 +40,7 @@ from typing import (
     cast,
     Sequence,
     Any,
+    NoReturn,
     Type,
 )
 
@@ -138,10 +140,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             await request_object.shutdown()
 
     Note:
-        Most bot methods have the argument ``api_kwargs`` which allows to pass arbitrary keywords
-        to the Telegram API. This can be used to access new features of the API before they were
-        incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
-        passing files.
+        * Most bot methods have the argument ``api_kwargs`` which allows passing arbitrary keywords
+          to the Telegram API. This can be used to access new features of the API before they are
+          incorporated into PTB. However, this is not guaranteed to work, i.e. it will fail for
+          passing files.
+        * Bots should not be serialized since if you for e.g. change the bots token, then your
+          serialized instance will not reflect that change. Trying to pickle a bot instance will
+          raise :exc:`pickle.PicklingError`.
 
     .. versionadded:: 13.2
         Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -155,6 +160,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         * Removed the deprecated ``defaults`` parameter. If you want to use
           :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
           instead.
+        * Attempting to pickle a bot instance will now raise :exc:`pickle.PicklingError`.
 
     Args:
         token (:obj:`str`): Bot's unique authentication.
@@ -219,6 +225,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             self.private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
             )
+
+    def __reduce__(self) -> NoReturn:
+        """Called by pickle.dumps(). Serializing bots is unadvisable, so we forbid pickling."""
+        raise pickle.PicklingError('Bot objects cannot be pickled!')
 
     # TODO: After https://youtrack.jetbrains.com/issue/PY-50952 is fixed, we can revisit this and
     # consider adding Paramspec from typing_extensions to properly fix this. Currently a workaround

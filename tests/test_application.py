@@ -371,20 +371,25 @@ class TestApplication:
             await app.start()
             assert app.running
             assert app.job_queue.scheduler.running
+            # app.start() should not start the updater!
             assert not app.updater.running
             await asyncio.sleep(0.05)
             assert app.update_queue.empty()
             assert self.received == 1
 
+            await app.updater.start_polling()
             await app.stop()
             assert not app.running
-            assert not app.updater.running
+            # app.stop() should not stop the updater!
+            assert app.updater.running
             assert not app.job_queue.scheduler.running
             await app.update_queue.put(2)
             await asyncio.sleep(0.05)
             assert not app.update_queue.empty()
             assert self.received != 2
             assert self.received == 1
+
+            await app.updater.stop()
 
     @pytest.mark.asyncio
     async def test_error_start_stop_twice(self, app):
@@ -1168,24 +1173,55 @@ class TestApplication:
         assert self.received[1] is exception
 
     @pytest.mark.asyncio
+    async def test_create_task_cancel_task(self, app):
+        async def callback():
+            await asyncio.sleep(10)
+
+        async def error(update_arg, context):
+            self.received = update_arg, context.error
+
+        app.add_error_handler(error)
+        async with app:
+            await app.start()
+            task = app.create_task(callback())
+            await asyncio.sleep(0.05)
+            task.cancel()
+
+            with pytest.raises(asyncio.CancelledError):
+                await task
+            with pytest.raises(asyncio.CancelledError):
+                assert task.exception()
+
+            # Error handlers should not be called if task was cancelled
+            assert self.received is None
+
+            # make sure that the cancelled task doesn't block the stopping of the app
+            await app.stop()
+
+    @pytest.mark.asyncio
     async def test_await_create_task_tasks_on_stop(self, app):
+        event_1 = asyncio.Event()
+        event_2 = asyncio.Event()
+
         async def callback_1():
-            await asyncio.sleep(0.5)
+            await event_1.wait()
 
         async def callback_2():
-            await asyncio.sleep(0.1)
+            await event_2.wait()
 
         async with app:
             await app.start()
             task_1 = app.create_task(callback_1())
             task_2 = app.create_task(callback_2())
+            event_2.set()
             await task_2
             assert not task_1.done()
             stop_task = asyncio.create_task(app.stop())
             assert not stop_task.done()
-            await asyncio.sleep(0.3)
+            await asyncio.sleep(0.1)
             assert not stop_task.done()
-            await asyncio.sleep(0.15)
+            event_1.set()
+            await asyncio.sleep(0.05)
             assert stop_task.done()
 
     @pytest.mark.asyncio
@@ -1218,8 +1254,10 @@ class TestApplication:
             await app.stop()
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize('concurrent_updates', (True, 15, 50, 256))
+    @pytest.mark.parametrize('concurrent_updates', (15, 50, 100))
     async def test_concurrent_updates(self, bot, concurrent_updates):
+        # We don't test with `True` since the large number of parallel coroutines quickly leads
+        # to test instabilities
         app = Application.builder().token(bot.token).concurrent_updates(concurrent_updates).build()
         events = {i: asyncio.Event() for i in range(app.concurrent_updates + 10)}
         queue = asyncio.Queue()
@@ -1250,6 +1288,26 @@ class TestApplication:
                 assert events[i].is_set()
 
             await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_concurrent_updates_done_on_shutdown(self, bot):
+        app = Application.builder().token(bot.token).concurrent_updates(True).build()
+        event = asyncio.Event()
+
+        async def callback(update, context):
+            await event.wait()
+
+        app.add_handler(TypeHandler(object, callback))
+
+        async with app:
+            await app.start()
+            await app.update_queue.put(1)
+            stop_task = asyncio.create_task(app.stop())
+            await asyncio.sleep(0.1)
+            assert not stop_task.done()
+            event.set()
+            await asyncio.sleep(0.05)
+            assert stop_task.done()
 
     @pytest.mark.skipif(
         platform.system() == 'Windows',
@@ -1333,12 +1391,16 @@ class TestApplication:
             self.received = kwargs
             return True
 
+        async def stop(_, **kwargs):
+            return True
+
         def thread_target():
             ready_event.wait()
             time.sleep(0.1)
             os.kill(os.getpid(), signal.SIGINT)
 
         monkeypatch.setattr(Updater, 'start_polling', start_polling)
+        monkeypatch.setattr(Updater, 'stop', stop)
         thread = Thread(target=thread_target)
         thread.start()
         app.run_polling(ready=ready_event, close_loop=False)
@@ -1439,12 +1501,16 @@ class TestApplication:
             self.received = kwargs
             return True
 
+        async def stop(_, **kwargs):
+            return True
+
         ready_event = threading.Event()
 
         # First check that the default values match and that we have all arguments there
         updater_signature = inspect.signature(Updater.start_webhook)
 
         monkeypatch.setattr(Updater, 'start_webhook', start_webhook)
+        monkeypatch.setattr(Updater, 'stop', stop)
         app = ApplicationBuilder().token(bot.token).build()
         app_signature = inspect.signature(app.run_webhook)
 
