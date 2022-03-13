@@ -417,6 +417,39 @@ def mro_slots():
     return _mro_slots
 
 
+def call_after(function: Callable, after: Callable):
+    """Run a callable after another has executed. Useful when trying to make sure that a function
+    did actually run, but just monkeypatching it doesn't work because this would break some other
+    functionality.
+
+    Example usage:
+
+    def test_stuff(self, bot, monkeypatch):
+
+        def after(arg):
+            # arg is the return value of `send_message`
+            self.received = arg
+
+        monkeypatch.setattr(bot, 'send_message', call_after(bot.send_message, after)
+
+    """
+    if asyncio.iscoroutinefunction(function):
+
+        async def wrapped(*args, **kwargs):
+            out = await function(*args, **kwargs)
+            after(out)
+            return out
+
+    else:
+
+        def wrapped(*args, **kwargs):
+            out = function(*args, **kwargs)
+            after(out)
+            return out
+
+    return wrapped
+
+
 async def expect_bad_request(func, message, reason):
     """
     Wrapper for testing bot functions expected to result in an :class:`telegram.error.BadRequest`.

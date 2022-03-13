@@ -55,7 +55,7 @@ from telegram.ext import (
 from telegram.error import TelegramError
 from telegram.warnings import PTBUserWarning
 
-from tests.conftest import make_message_update, PROJECT_ROOT_PATH, send_webhook_message
+from tests.conftest import make_message_update, PROJECT_ROOT_PATH, send_webhook_message, call_after
 
 
 class CustomContext(CallbackContext):
@@ -230,14 +230,16 @@ class TestApplication:
         """Shutdown of persistence is tested in test_basepersistence"""
         self.test_flag = set()
 
-        async def shutdown_bot(*args, **kwargs):
+        def after_bot_shutdown(*args, **kwargs):
             self.test_flag.add('bot')
 
-        async def shutdown_updater(*args, **kwargs):
+        def after_updater_shutdown(*args, **kwargs):
             self.test_flag.add('updater')
 
-        monkeypatch.setattr(Bot, 'shutdown', shutdown_bot)
-        monkeypatch.setattr(Updater, 'shutdown', shutdown_updater)
+        monkeypatch.setattr(Bot, 'shutdown', call_after(Bot.shutdown, after_bot_shutdown))
+        monkeypatch.setattr(
+            Updater, 'shutdown', call_after(Updater.shutdown, after_updater_shutdown)
+        )
 
         if updater:
             async with ApplicationBuilder().token(bot.token).build():
