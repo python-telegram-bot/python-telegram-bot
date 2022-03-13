@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 import pytest
+from flaky import flaky
 
 from telegram import User, Chat, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import (
@@ -477,6 +478,8 @@ class TestBasePersistence:
         async with papp:
             papp.add_handler(build_conversation_handler('name', persistent=True))
 
+            # For debugging if this test fails in CI
+            print([rec.message for rec in recwarn])
             assert len(recwarn) == 1
             assert recwarn[0].category is PTBUserWarning
             assert 'after `Application.initialize` was called' in str(recwarn[-1].message)
@@ -499,6 +502,7 @@ class TestBasePersistence:
         with pytest.raises(ValueError, match="when handler is unnamed"):
             papp.add_handler(build_conversation_handler(name=None, persistent=True))
 
+    @flaky(3, 1)
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         'papp',
@@ -508,6 +512,8 @@ class TestBasePersistence:
         indirect=True,
     )
     async def test_update_interval(self, papp: Application, monkeypatch):
+        """If we don't want this test to take much longer to run, the accuracy will be a bit low.
+        A few tenths of seconds are easy to go astray ... That's why it's flaky."""
         call_times = []
 
         async def update_persistence(*args, **kwargs):
@@ -640,8 +646,8 @@ class TestBasePersistence:
     async def test_update_persistence_loop_call_count_job(self, papp: Application, caplog):
         async with papp:
             papp.job_queue.start()
-            papp.job_queue.run_once(self.job_callback, when=0.05, chat_id=1, user_id=1)
-            await asyncio.sleep(0.1)
+            papp.job_queue.run_once(self.job_callback, when=0.1, chat_id=1, user_id=1)
+            await asyncio.sleep(0.2)
             assert not papp.persistence.updated_bot_data
             assert not papp.persistence.updated_chat_ids
             assert not papp.persistence.updated_user_ids
@@ -833,7 +839,7 @@ class TestBasePersistence:
             assert papp.persistence.updated_callback_data
             assert not papp.persistence.updated_conversations
 
-            await asyncio.sleep(sleep + 0.05)
+            await asyncio.sleep(sleep + 0.1)
             await papp.update_persistence()
             assert not papp.persistence.dropped_chat_ids
             assert not papp.persistence.dropped_user_ids
