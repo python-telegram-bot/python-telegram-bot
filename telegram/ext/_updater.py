@@ -199,7 +199,7 @@ class Updater:
             :class:`asyncio.Queue`: The update queue that can be filled from the main thread.
 
         Raises:
-            :exc:`RuntimeError`: If the updater is already running.
+            :exc:`RuntimeError`: If the updater is already running or was not initialized.
 
         """
         async with self.__lock:
@@ -363,7 +363,7 @@ class Updater:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.
 
         Raises:
-            :exc:`RuntimeError`: If the updater is already running.
+            :exc:`RuntimeError`: If the updater is already running or was not initialized.
         """
         async with self.__lock:
             if self.running:
