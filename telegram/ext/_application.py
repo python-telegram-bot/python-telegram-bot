@@ -104,7 +104,7 @@ class ApplicationHandlerStop(Exception):
 class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
     """This class dispatches all kinds of updates to its registered handlers.
 
-    Note:
+    Tip:
          This class may not be initialized directly. Use :class:`telegram.ext.ApplicationBuilder`
          or :meth:`builder` (for convenience).
 
@@ -113,31 +113,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         * Initialization is now done through the :class:`telegram.ext.ApplicationBuilder`.
         * Removed the attribute ``groups``.
 
-    Args:
-        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
-        update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
-            updates.
-        updater (:class:`telegram.ext.Updater`): The updater used by this application.
-        job_queue (:class:`telegram.ext.JobQueue`): The :class:`telegram.ext.JobQueue`
-            instance to pass onto handler callbacks.
-        concurrent_updates (:obj:`int` | :obj:`bool): If :obj:`True`, updates will be processed
-            concurrently instead of one by one. Defaults to ``4096``. Pass an integer to specify a
-            different number of updates that may be processed concurrently.
-
-            Warning:
-                Processing updates concurrently is not recommended when stateful handlers like
-                :class:`telegram.ext.ConversationHandler` are used.
-        persistence (:class:`telegram.ext.BasePersistence`): The persistence class to store data
-            that should be persistent over restarts.
-        context_types (:class:`telegram.ext.ContextTypes`): Specifies the types used by this
-            :class:`Application` for the ``context`` argument of handler and job callbacks.
-
     Attributes:
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
         update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
             updates.
-        updater (:class:`telegram.ext.Updater`): The updater used by this application.
-        job_queue (:class:`telegram.ext.JobQueue`): The :class:`telegram.ext.JobQueue`
+        updater (:class:`telegram.ext.Updater`): Optional. The updater used by this application.
+        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
             instance to pass onto handler callbacks.
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the chat.
@@ -291,7 +272,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self._concurrent_updates
 
     async def initialize(self) -> None:
-        """TODO.."""
+        """Initializes the Application by initializing:
+
+        * The :attr:`bot`, by calling :meth:`telegram.Bot.initialize`.
+        * The :attr:`updater`, by calling :meth:`telegram.ext.Updater.initialize`.
+        * The :attr:`persistence`, by loading persistent conversations and data.
+
+        .. seealso::
+            :meth:`shutdown`
+        """
         if self._initialized:
             _logger.debug('This Application is already initialized.')
             return
@@ -322,9 +311,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._initialized = True
 
     async def shutdown(self) -> None:
-        """
+        """Shuts down the Application by shutting down:
 
-        Returns:
+        * :attr:`bot` by calling :meth:`telegram.Bot.shutdown`
+        * :attr:`updater` by calling :meth:`telegram.ext.Updater.shutdown`
+        * :attr:`persistence` by calling :meth:`update_persistence` and :meth`persistence.flush`
+
+        .. seealso::
+            :meth:`initialize`
 
         Raises:
             :exc:`RuntimeError`: If the application is still :attr:`running`.
@@ -349,6 +343,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._initialized = False
 
     async def __aenter__(self: _DispType) -> _DispType:
+        """Simple context manager which initializes the App"""
         try:
             await self.initialize()
             return self
@@ -362,6 +357,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
+        """Shutdown the App from the context manager"""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
@@ -416,6 +412,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             This does *not* start fetching updates from Telegram. You need to either start
             :attr:`updater` manually or use one of :meth:`run_polling` or :meth:`run_webhook`.
 
+        .. seealso::
+            :meth:`stop`
+
         Args:
             ready (:obj:`asyncio.Event`, optional): If specified, the event will be set once the
                 application is ready.
@@ -466,6 +465,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Warning:
             Once this method is called, no more updates will be fetched from :attr:`update_queue`,
             even if it's not empty.
+
+        .. seealso::
+            :meth:`start`
 
         Note:
             This does *not* stop :attr:`updater`. You need to either manually call
@@ -623,14 +625,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Note:
             * If :paramref:`coroutine` raises an exception, it will be set on the task created by
               this method even though it's handled by :meth:`dispatch_error`.
-            * If the application is currently running, tasks created by this methods will be
+            * If the application is currently running, tasks created by this method will be
               awaited by :meth:`stop`.
 
         Args:
-            coroutine: The coroutine to run as task.
-            update: Optional. If passed, will be passed to :meth:`dispatch_error` as additional
-                information for the error handlers. Moreover, the corresponding :attr:`chat_data`
-                and :attr:`user_data` entries will be updated in the next run of
+            coroutine (:term:`coroutine`): The coroutine to run as task.
+            update (:obj:`object`, optional): If passed, will be passed to :meth:`dispatch_error`
+                as additional information for the error handlers. Moreover, the corresponding
+                :attr:`chat_data` and :attr:`user_data` entries will be updated in the next run of
                 :meth:`update_persistence` after the :paramref:`coroutine` is finished.
 
         Returns:
@@ -681,7 +683,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             return await coroutine
         except asyncio.CancelledError as cancel:
             # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
-            #   close when we drop py3.7
+            #  clause when we drop py3.7
             raise cancel
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
@@ -738,33 +740,31 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             self.update_queue.task_done()
 
     async def process_update(self, update: object) -> None:
-        """Processes a single update and updates the persistence.
+        """Processes a single update and marks the update to be updated by the persistence later.
 
         .. versionchanged:: 14.0
-            This calls :meth:`update_persistence` exactly once after handling of the update was
-            finished by *all* handlers that handled the update, including asynchronously running
-            handlers.
+            Persistence is now updated in an interval set by
+            :attr:`telegram.ext.BasePersistence.update_interval`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object` | \
-                :class:`telegram.error.TelegramError`):
-                The update to process.
+                :class:`telegram.error.TelegramError`): The update to process.
 
         """
         context = None
-        any_blocking = False
+        any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
         for handlers in self.handlers.values():
             try:
                 for handler in handlers:
-                    check = handler.check_update(update)
-                    if not (check is None or check is False):
-                        if not context:
+                    check = handler.check_update(update)  # Should the handler handle this update?
+                    if not (check is None or check is False):  # if yes,
+                        if not context:  # build a context if not already built
                             context = self.context_types.context.from_update(update, self)
                             await context.refresh_data()
                         coroutine: Coroutine = handler.handle_update(update, self, check, context)
 
-                        if not handler.block or (
+                        if not handler.block or (  # if handler is running with block=False,
                             handler.block is DEFAULT_TRUE
                             and isinstance(self.bot, ExtBot)
                             and self.bot.defaults
@@ -774,7 +774,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                         else:
                             any_blocking = True
                             await coroutine
-                        break
+                        break  # Only a max of 1 handler per group is handled
 
             # Stop processing with any other handler.
             except ApplicationHandlerStop:
@@ -859,8 +859,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. seealso:: :meth:`add_handler`
 
         Args:
-            handlers (List[:obj:`telegram.ext.Handler`] | \
-                Dict[int, List[:obj:`telegram.ext.Handler`]]): \
+            handlers (List[:class:`telegram.ext.Handler`] | \
+                Dict[int, List[:class:`telegram.ext.Handler`]]): \
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
             group (:obj:`int`, optional): Specify which group the sequence of ``handlers``
@@ -892,8 +892,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Remove a handler from the specified group.
 
         Args:
-            handler (:class:`telegram.ext.Handler`): A Handler instance.
-            group (:obj:`object`, optional): The group identifier. Default is 0.
+            handler (:class:`telegram.ext.Handler`): A :class:`telegram.ext.Handler` instance.
+            group (:obj:`object`, optional): The group identifier. Default is ``0``.
 
         """
         if handler in self.handlers[group]:

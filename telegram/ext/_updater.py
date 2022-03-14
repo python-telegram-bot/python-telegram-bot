@@ -100,6 +100,12 @@ class Updater:
         return self._running
 
     async def initialize(self) -> None:
+        """Initialize the Updater & the associated :attr:`bot` by calling
+        :meth:`telegram.Bot.initialize`.
+
+        .. seealso::
+            :meth:`shutdown`
+        """
         if self._initialized:
             self._logger.debug('This Updater is already initialized.')
             return
@@ -109,8 +115,10 @@ class Updater:
 
     async def shutdown(self) -> None:
         """
+        Shutdown the Updater & the associated :attr:`bot` by calling :meth:`telegram.Bot.shutdown`.
 
-        Returns:
+        .. seealso::
+            :meth:`initialize`
 
         Raises:
             :exc:`RuntimeError`: If the updater is still running.

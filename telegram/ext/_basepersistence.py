@@ -146,7 +146,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     @property
     def update_interval(self) -> float:
-        """:obj:`int`, optional): Time (in seconds) that the :class:`~telegram.ext.Application`
+        """:obj:`int`, optional: Time (in seconds) that the :class:`~telegram.ext.Application`
         will wait between two consecutive runs of updating the persistence.
 
         .. versionadded:: 14.0

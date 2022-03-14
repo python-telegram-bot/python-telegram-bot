@@ -540,8 +540,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: BuilderType, get_updates_connection_pool_size: int
     ) -> BuilderType:
         """Sets the size of the connection pool to be used for the
-        :paramref:`~telegram.request.HTTPXRequest.connection_pool_size` parameter of
-        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to ``1``.
+        :paramref:`telegram.request.HTTPXRequest.connection_pool_size` parameter which is used
+        for :meth:`telegram.Bot.get_updates`. Defaults to ``1``.
 
         Args:
             get_updates_connection_pool_size (:obj:`int`): The size of the connection pool.
@@ -554,9 +554,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def get_updates_proxy_url(self: BuilderType, get_updates_proxy_url: str) -> BuilderType:
-        """Sets the proxy to be used for the :paramref:`~telegram.request.HTTPXRequest.proxy_url`
-        parameter of :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`.
-        Defaults to :obj:`None`.
+        """Sets the proxy to be used for the :paramref:`telegram.request.HTTPXRequest.proxy_url`
+        parameter which is used for :meth:`telegram.Bot.get_updates`. Defaults to :obj:`None`.
 
         Args:
             get_updates_proxy_url (:obj:`str`): The URL to the proxy server. See
@@ -573,8 +572,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: BuilderType, get_updates_connect_timeout: Optional[float]
     ) -> BuilderType:
         """Sets the connection attempt timeout to be used for the
-        :paramref:`~telegram.request.HTTPXRequest.connect_timeout` parameter of
-        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
+        :paramref:`telegram.request.HTTPXRequest.connect_timeout` parameter which is used for
+        :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
 
         Args:
             get_updates_connect_timeout (:obj:`float`): See
@@ -591,8 +590,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: BuilderType, get_updates_read_timeout: Optional[float]
     ) -> BuilderType:
         """Sets the waiting timeout to be used for the
-        :paramref:`~telegram.request.HTTPXRequest.read_timeout` parameter of
-        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
+        :paramref:`telegram.request.HTTPXRequest.read_timeout` parameter which is used for
+        :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
 
         Args:
             get_updates_read_timeout (:obj:`float`): See
@@ -609,8 +608,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: BuilderType, get_updates_write_timeout: Optional[float]
     ) -> BuilderType:
         """Sets the write operation timeout to be used for the
-        :paramref:`~telegram.request.HTTPXRequest.write_timeout` parameter of
-        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
+        :paramref:`telegram.request.HTTPXRequest.write_timeout` parameter which is used for
+        :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
 
         Args:
             get_updates_write_timeout (:obj:`float`): See
@@ -627,8 +626,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: BuilderType, get_updates_pool_timeout: Optional[float]
     ) -> BuilderType:
         """Sets the connection pool's connection freeing timeout to be used for the
-        :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter of
-        :attr:`telegram.Bot.request` for :meth:`telegram.Bot.get_updates`. Defaults to :obj:`None`.
+        :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter which is used for
+        :meth:`telegram.Bot.get_updates`. Defaults to :obj:`None`.
 
         Args:
             get_updates_pool_timeout (:obj:`float`): See
