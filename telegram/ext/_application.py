@@ -253,7 +253,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self.__update_persistence_task: Optional[asyncio.Task] = None
         self.__update_persistence_event = asyncio.Event()
         self.__update_persistence_lock = asyncio.Lock()
-        self.__create_task_tasks: Set[asyncio.Task] = set()
+        self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
 
     @property
     def running(self) -> bool:
@@ -343,7 +343,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._initialized = False
 
     async def __aenter__(self: _DispType) -> _DispType:
-        """Simple context manager which initializes the App"""
+        """Simple context manager which initializes the App."""
         try:
             await self.initialize()
             return self
@@ -357,12 +357,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
-        """Shutdown the App from the context manager"""
+        """Shutdown the App from the context manager."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
 
     async def _initialize_persistence(self) -> None:
+        """This method basically just loads all the data by awaiting the BP methods"""
         if not self.persistence:
             return
 
@@ -522,8 +523,50 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         ready: asyncio.Event = None,
         close_loop: bool = True,
     ) -> None:
-        """Temp docstring to make this referencable
-        #TODO: Adda meaningful description
+        """Starts polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling`.
+
+        .. seealso::
+            :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`
+
+        Args:
+            poll_interval (:obj:`float`, optional): Time to wait between polling updates from
+                Telegram in seconds. Default is ``0.0``.
+            timeout (:obj:`float`, optional): Passed to :meth:`telegram.Bot.get_updates`.
+                Default is ``10`` seconds.
+            bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
+                :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
+
+                * < 0 - retry indefinitely (default)
+                *   0 - no retries
+                * > 0 - retry up to X times
+
+            read_timeout (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
+                the reply from server. Will be added to the :paramref:`timeout` value and used as
+                the read timeout from server. Default is ``2``.
+            write_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to
+                wait for a write operation to complete (in terms of a network socket;
+                i.e. POSTing a request or uploading a file). :obj:`None` will set an infinite
+                timeout. Defaults to :obj:`None`.
+            connect_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to
+                wait for a connection attempt to a server to succeed. :obj:`None` will set an
+                infinite timeout for connection attempts. Defaults to :obj:`None`.
+            pool_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait
+                for a connection from the connection pool becoming available. :obj:`None` will set
+                an infinite timeout. Defaults to :obj:`None`.
+            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
+                Telegram servers before actually starting to poll. Default is :obj:`False`.
+            allowed_updates (List[:obj:`str`], optional): Passed to
+                :meth:`telegram.Bot.get_updates`.
+            ready (:class:`asyncio.Event`, optional): If passed, the event will be set when the
+                application is ready and has started. Defaults to :obj:`None`.
+            close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
+                closed upon shutdown.
+
+                .. seealso::
+                    :meth:`asyncio.loop.close`
+
+        Raises:
+            :exc:`RuntimeError`: If the Application does not have an :class:`telegram.ext.Updater`.
         """
         if not self.updater:
             raise RuntimeError(
@@ -544,7 +587,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 pool_timeout=pool_timeout,
                 allowed_updates=allowed_updates,
                 drop_pending_updates=drop_pending_updates,
-                error_callback=error_callback,
+                error_callback=error_callback,  # if there is an error in fetching updates
             ),
             ready=ready,
             close_loop=close_loop,
@@ -566,8 +609,47 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         ready: asyncio.Event = None,
         close_loop: bool = True,
     ) -> None:
-        """Temp docstring to make this referencable
-        #TODO: Adda meaningful description
+        """
+        Starts a small http server to listen for updates via webhook using
+        :meth:`telegram.ext.Updater.start_webhook`. If :paramref:`cert`
+        and :paramref:`key` are not provided, the webhook will be started directly on
+        http://listen:port/url_path, so SSL can be handled by another
+        application. Else, the webhook will be started on
+        https://listen:port/url_path. Also calls :meth:`telegram.Bot.set_webhook` as required.
+
+        .. seealso::
+            :meth:`telegram.ext.Updater.start_webhook`, :meth:`run_polling`
+
+        Args:
+            listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
+            port (:obj:`int`, optional): Port the bot should be listening on. Must be one of
+                :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`. Defaults to ``80``.
+            url_path (:obj:`str`, optional): Path inside url. Defaults to `` '' ``
+            cert (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL certificate file.
+            key (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL key file.
+            bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
+                :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
+
+                * < 0 - retry indefinitely
+                *   0 - no retries (default)
+                * > 0 - retry up to X times
+            webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
+                NAT, reverse proxy, etc. Default is derived from :paramref:`listen`,
+                :paramref:`port` & :paramref:`url_path`.
+            allowed_updates (List[:obj:`str`], optional): Passed to
+                :meth:`telegram.Bot.set_webhook`.
+            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
+                Telegram servers before actually starting to poll. Default is :obj:`False`.
+            ip_address (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
+            max_connections (:obj:`int`, optional): Passed to
+                :meth:`telegram.Bot.set_webhook`. Defaults to ``40``.
+            ready (:class:`asyncio.Event`, optional): If passed, the event will be set when the
+                application is ready and has started. Defaults to :obj:`None`.
+            close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
+                closed upon shutdown. Defaults to :obj:`True`.
+
+                .. seealso::
+                    :meth:`asyncio.loop.close`
         """
         if not self.updater:
             raise RuntimeError(
@@ -600,7 +682,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         # See the docs of get_event_loop() and get_running_loop() for more info
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.initialize())
-        loop.run_until_complete(updater_coroutine)
+        loop.run_until_complete(updater_coroutine)  # one of updater.start_webhook/polling
         loop.run_until_complete(self.start(ready=ready))
         try:
             loop.run_forever()
@@ -665,7 +747,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         return task
 
     def __create_task_done_callback(self, task: asyncio.Task) -> None:
-        self.__create_task_tasks.discard(task)
+        """Used for handling asyncio exceptions. Unretrieved exceptions will be raised on exit"""
+        self.__create_task_tasks.discard(task)  # Discard from our set since we are done with it
         # We just retrieve the eventual exception so that asyncio doesn't complain in case
         # it's not retrieved somewhere else
         try:
@@ -707,7 +790,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 # So we can and must handle it
                 await self.dispatch_error(update, exception, coroutine=coroutine)
 
-            # Raise exception so that it can be set on the task
+            # Raise exception so that it can be set on the task and retrieved by task.exception()
             raise exception
         finally:
             self._mark_for_persistence_update(update=update)
@@ -790,6 +873,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         if any_blocking:
             # Only need to mark the update for persistence if there was at least one
             # blocking handler - the non-blocking handlers mark the update again when finished
+            # (in __create_task_callback)
             self._mark_for_persistence_update(update=update)
 
     def add_handler(self, handler: Handler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
@@ -1223,7 +1307,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     job=job,
                     coroutine=coroutine,
                 )
-                if not block or (
+                if not block or (  # If error handler has `block=False`, create a Task to run cb
                     block is DEFAULT_TRUE
                     and isinstance(self.bot, ExtBot)
                     and self.bot.defaults

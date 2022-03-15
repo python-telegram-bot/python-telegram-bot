@@ -57,13 +57,14 @@ class Updater:
           the sole purpose of this class is to fetch updates. The entry point to a PTB application
           is now :class:`telegram.ext.Application`.
 
+    Args:
+        bot (:class:`telegram.Bot`): The bot used with this Updater.
+        update_queue (:class:`asyncio.Queue`): Queue for the updates.
+
     Attributes:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
         update_queue (:class:`asyncio.Queue`): Queue for the updates.
 
-    Args:
-        bot (:class:`telegram.Bot`): The bot used with this Updater.
-        update_queue (:class:`asyncio.Queue`): Queue for the updates.
 
     """
 
@@ -135,6 +136,7 @@ class Updater:
         self._logger.debug('Shut down of Updater complete')
 
     async def __aenter__(self: _UpdaterType) -> _UpdaterType:
+        """Simple context manager which initializes the Updater."""
         try:
             await self.initialize()
             return self
@@ -148,6 +150,7 @@ class Updater:
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
+        """Shutdown the Updater from the context manager."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
@@ -174,22 +177,31 @@ class Updater:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
             timeout (:obj:`float`, optional): Passed to :meth:`telegram.Bot.get_updates`.
-            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
-                Telegram servers before actually starting to poll. Default is :obj:`False`.
-
-                .. versionadded :: 13.4
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
                 * < 0 - retry indefinitely (default)
                 *   0 - no retries
                 * > 0 - retry up to X times
-
+            read_timeout (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
+                the reply from server. Will be added to the :paramref:`timeout` value and used as
+                the read timeout from server. Default is ``2``.
+            write_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to
+                wait for a write operation to complete (in terms of a network socket;
+                i.e. POSTing a request or uploading a file). :obj:`None` will set an infinite
+                timeout. Defaults to :obj:`None`.
+            connect_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to
+                wait for a connection attempt to a server to succeed. :obj:`None` will set an
+                infinite timeout for connection attempts. Defaults to :obj:`None`.
+            pool_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait
+                for a connection from the connection pool becoming available. :obj:`None` will set
+                an infinite timeout. Defaults to :obj:`None`.
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
-            read_timeout (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
-                the reply from server. Will be added to the ``timeout`` value and used as the read
-                timeout from server (Default: ``2``).
+            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
+                Telegram servers before actually starting to poll. Default is :obj:`False`.
+
+                .. versionadded :: 13.4
             error_callback (Callable[[:exc:`telegram.error.TelegramError`], :obj:`None`], \
                 optional): Callback to handle :exc:`telegram.error.TelegramError` s that occur
                 while calling :meth:`telegram.Bot.get_updates` during polling. Defaults to
@@ -199,7 +211,7 @@ class Updater:
             :class:`asyncio.Queue`: The update queue that can be filled from the main thread.
 
         Raises:
-            :exc:`RuntimeError`: If the updater is already running.
+            :exc:`RuntimeError`: If the updater is already running or is not initialized.
 
         """
         async with self.__lock:
@@ -283,7 +295,7 @@ class Updater:
                 else:
                     for update in updates:
                         await self.update_queue.put(update)
-                    self.last_update_id = updates[-1].update_id + 1
+                    self.last_update_id = updates[-1].update_id + 1  # Add one to 'confirm' it
 
             return True
 
@@ -337,7 +349,7 @@ class Updater:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
             port (:obj:`int`, optional): Port the bot should be listening on. Must be one of
                 :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`. Defaults to ``80``.
-            url_path (:obj:`str`, optional): Path inside url.
+            url_path (:obj:`str`, optional): Path inside url. Defaults to `` '' ``
             cert (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL certificate file.
             key (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL key file.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
@@ -346,18 +358,19 @@ class Updater:
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
-                * < 0 - retry indefinitely (default)
-                *   0 - no retries
+                * < 0 - retry indefinitely
+                *   0 - no retries (default)
                 * > 0 - retry up to X times
             webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
-                NAT, reverse proxy, etc. Default is derived from ``listen``, ``port`` &
-                ``url_path``.
+                NAT, reverse proxy, etc. Default is derived from :paramref:`listen`,
+                :paramref:`port` & :paramref:`url_path`.
             ip_address (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
+                Defaults to :obj:`None`.
                 .. versionadded :: 13.4
             allowed_updates (List[:obj:`str`], optional): Passed to
-                :meth:`telegram.Bot.set_webhook`.
+                :meth:`telegram.Bot.set_webhook`. Defaults to :obj:`None`.
             max_connections (:obj:`int`, optional): Passed to
-                :meth:`telegram.Bot.set_webhook`.
+                :meth:`telegram.Bot.set_webhook`. Defaults to ``40``.
                 .. versionadded:: 13.6
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.
