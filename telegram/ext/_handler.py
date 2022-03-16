@@ -38,10 +38,15 @@ class Handler(Generic[UT, CCT], ABC):
         When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    .. versionchanged:: 14.0
+        The attribute ``run_async`` is now :paramref:`block`.
+
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``async def callback(update: Update, context: CallbackContext)``
+            :meth:`check_update` has determined that an update should be processed by this handler.
+            Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -105,7 +110,7 @@ class Handler(Generic[UT, CCT], ABC):
         Args:
             update (:obj:`str` | :class:`telegram.Update`): The update to be handled.
             application (:class:`telegram.ext.Application`): The calling application.
-            check_result (:class:`object`): The result from :attr:`check_update`.
+            check_result (:class:`object`): The result from :meth:`check_update`.
             context (:class:`telegram.ext.CallbackContext`): The context as provided by
                 the application.
 
@@ -126,6 +131,6 @@ class Handler(Generic[UT, CCT], ABC):
             context (:class:`telegram.ext.CallbackContext`): The context object.
             update (:class:`telegram.Update`): The update to gather chat/user id from.
             application (:class:`telegram.ext.Application`): The calling application.
-            check_result: The result (return value) from :attr:`check_update`.
+            check_result: The result (return value) from :meth:`check_update`.
 
         """

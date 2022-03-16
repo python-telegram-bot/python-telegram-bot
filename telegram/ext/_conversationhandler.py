@@ -176,16 +176,16 @@ class ConversationHandler(Handler[Update, CCT]):
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
-            trigger the start of the conversation. The first handler which :attr:`check_update`
+            trigger the start of the conversation. The first handler which :meth:`check_update`
             method returns :obj:`True` will be used. If all return :obj:`False`, the update is not
             handled.
         states (Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]): A :obj:`dict` that
             defines the different states of conversation a user can be in and one or more
             associated ``Handler`` objects that should be used in that state. The first handler
-            which :attr:`check_update` method returns :obj:`True` will be used.
+            which :meth:`check_update` method returns :obj:`True` will be used.
         fallbacks (List[:class:`telegram.ext.Handler`]): A list of handlers that might be used if
             the user is in a conversation, but every handler for their current state returned
-            :obj:`False` on :attr:`check_update`. The first handler which :attr:`check_update`
+            :obj:`False` on :meth:`check_update`. The first handler which :meth:`check_update`
             method returns :obj:`True` will be used. If all return :obj:`False`, the update is not
             handled.
         allow_reentry (:obj:`bool`, optional): If set to :obj:`True`, a user that is currently in a
@@ -200,11 +200,11 @@ class ConversationHandler(Handler[Update, CCT]):
             handler is inactive more than this timeout (in seconds), it will be automatically
             ended. If this value is 0 or :obj:`None` (default), there will be no timeout. The last
             received update and the corresponding ``context`` will be handled by ALL the handler's
-            who's :attr:`check_update` method returns :obj:`True` that are in the state
+            whose :meth:`check_update` method returns :obj:`True` that are in the state
             :attr:`ConversationHandler.TIMEOUT`.
 
             Note:
-                 Using `conversation_timeout` with nested conversations is currently not
+                 Using :paramref:`conversation_timeout` with nested conversations is currently not
                  supported. You can still try to use it, but it will likely behave differently
                  from what you expect.
 
@@ -440,7 +440,7 @@ class ConversationHandler(Handler[Update, CCT]):
     def fallbacks(self) -> List[Handler]:
         """List[:class:`telegram.ext.Handler`]: A list of handlers that might be used if
         the user is in a conversation, but every handler for their current state returned
-        :obj:`False` on :attr:`check_update`.
+        :obj:`False` on :meth:`check_update`.
         """
         return self._fallbacks
 

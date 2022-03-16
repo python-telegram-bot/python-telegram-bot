@@ -33,7 +33,7 @@ RT = TypeVar('RT')
 
 
 class MessageHandler(Handler[Update, CCT]):
-    """Handler class to handle telegram messages. They might contain text, media or status updates.
+    """Handler class to handle Telegram messages. They might contain text, media or status updates.
 
     Warning:
         When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
@@ -49,17 +49,16 @@ class MessageHandler(Handler[Update, CCT]):
             If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
             argument.
         callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``async def callback(update: Update, context: CallbackContext)``
+            :meth:`check_update` has determined that an update should be processed by this handler.
+            Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
-
-    Raises:
-        ValueError
 
     Attributes:
         filters (:class:`telegram.ext.filters.BaseFilter`): Only allow updates with these Filters.
@@ -84,7 +83,7 @@ class MessageHandler(Handler[Update, CCT]):
         self.filters = filters if filters is not None else filters_module.ALL
 
     def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.

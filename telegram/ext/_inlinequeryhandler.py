@@ -55,27 +55,29 @@ class InlineQueryHandler(Handler[Update, CCT]):
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``async def callback(update: Update, context: CallbackContext)``
+            :meth:`check_update` has determined that an update should be processed by this handler.
+            Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`, optional): Regex pattern.
             If not :obj:`None`, :func:`re.match` is used on :attr:`telegram.InlineQuery.query`
             to determine if an update should be handled by this handler.
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
         chat_types (List[:obj:`str`], optional): List of allowed chat types. If passed, will only
             handle inline queries with the appropriate :attr:`telegram.InlineQuery.chat_type`.
 
             .. versionadded:: 13.5
-        block (:obj:`bool`, optional): Determines whether the return value of the callback should
-            be awaited before processing the next handler in
-            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
         callback (:obj:`callable`): The callback function for this handler.
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): Optional. Regex pattern to test
             :attr:`telegram.InlineQuery.query` against.
-        chat_types (List[:obj:`str`], optional): List of allowed chat types.
+        chat_types (List[:obj:`str`]): Optional. List of allowed chat types.
 
             .. versionadded:: 13.5
         block (:obj:`bool`): Determines whether the return value of the callback should be
@@ -103,13 +105,13 @@ class InlineQueryHandler(Handler[Update, CCT]):
 
     def check_update(self, update: object) -> Optional[Union[bool, Match]]:
         """
-        Determines whether an update should be passed to this handlers :attr:`callback`.
+        Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
-            :obj:`bool`
+            :obj:`bool` | :obj:`re.match`
 
         """
         if isinstance(update, Update) and update.inline_query:

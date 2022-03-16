@@ -228,10 +228,11 @@ class CallbackDataCache:
 
     @staticmethod
     def extract_uuids(callback_data: str) -> Tuple[str, str]:
-        """Extracts the keyboard uuid and the button uuid from the given ``callback_data``.
+        """Extracts the keyboard uuid and the button uuid from the given :paramref:`callback_data`.
 
         Args:
-            callback_data (:obj:`str`): The ``callback_data`` as present in the button.
+            callback_data (:obj:`str`): The
+                :paramref:`~telegram.InlineKeyboardButton.callback_data` as present in the button.
 
         Returns:
             (:obj:`str`, :obj:`str`): Tuple of keyboard and button uuid

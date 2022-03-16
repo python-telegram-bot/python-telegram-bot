@@ -43,7 +43,8 @@ RT = TypeVar('RT')
 
 
 class CallbackQueryHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram callback queries. Optionally based on a regex.
+    """Handler class to handle Telegram :attr:`callback queries <telegram.Update.callback_query>`.
+    Optionally based on a regex.
 
     Read the documentation of the :mod:`re` module for more information.
 
@@ -65,8 +66,10 @@ class CallbackQueryHandler(Handler[Update, CCT]):
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``async def callback(update: Update, context: CallbackContext)``
+            :meth:`check_update` has determined that an update should be processed by this handler.
+            Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -74,8 +77,8 @@ class CallbackQueryHandler(Handler[Update, CCT]):
             Pattern to test :attr:`telegram.CallbackQuery.data` against. If a string or a regex
             pattern is passed, :func:`re.match` is used on :attr:`telegram.CallbackQuery.data` to
             determine if an update should be handled by this handler. If your bot allows arbitrary
-            objects as ``callback_data``, non-strings will be accepted. To filter arbitrary
-            objects you may pass
+            objects as :paramref:`~telegram.InlineKeyboardButton.callback_data`, non-strings will
+            be accepted. To filter arbitrary objects you may pass:
 
                 * a callable, accepting exactly one argument, namely the
                   :attr:`telegram.CallbackQuery.data`. It must return :obj:`True` or
@@ -121,7 +124,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         self.pattern = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.

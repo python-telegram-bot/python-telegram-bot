@@ -25,7 +25,7 @@ from telegram.ext._utils.types import CCT
 
 
 class PreCheckoutQueryHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram PreCheckout callback queries.
+    """Handler class to handle Telegram :attr:`telegram.Update.pre_checkout_query`.
 
     Warning:
         When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
@@ -33,8 +33,10 @@ class PreCheckoutQueryHandler(Handler[Update, CCT]):
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``async def callback(update: Update, context: CallbackContext)``
+            :meth:`check_update` has determined that an update should be processed by this handler.
+            Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -51,7 +53,7 @@ class PreCheckoutQueryHandler(Handler[Update, CCT]):
     __slots__ = ()
 
     def check_update(self, update: object) -> bool:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.

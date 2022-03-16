@@ -37,24 +37,28 @@ class TypeHandler(Handler[UT, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        type (:obj:`type`): The ``type`` of updates this handler should process, as
-            determined by ``isinstance``
+        type (:external:class:`type`): The :external:class:`type` of updates this handler should
+            process, as determined by :obj:`isinstance`
         callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``async def callback(update: Update, context: CallbackContext)``
+            :meth:`check_update` has determined that an update should be processed by this handler.
+            Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        strict (:obj:`bool`, optional): Use ``type`` instead of ``isinstance``.
-            Default is :obj:`False`
+        strict (:obj:`bool`, optional): Use ``type`` instead of :obj:`isinstance`.
+            Default is :obj:`False`.
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        type (:obj:`type`): The ``type`` of updates this handler should process.
+        type (:external:class:`type`): The :external:class:`type` of updates this handler should
+            process.
         callback (:obj:`callable`): The callback function for this handler.
-        strict (:obj:`bool`): Use ``type`` instead of ``isinstance``. Default is :obj:`False`.
+        strict (:obj:`bool`): Use :external:class:`type` instead of :obj:`isinstance`. Default is
+            :obj:`False`.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
@@ -71,11 +75,11 @@ class TypeHandler(Handler[UT, CCT]):
         block: DVInput[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
-        self.type = type  # pylint: disable=assigning-non-slot
-        self.strict = strict  # pylint: disable=assigning-non-slot
+        self.type = type
+        self.strict = strict
 
     def check_update(self, update: object) -> bool:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:obj:`object`): Incoming update.

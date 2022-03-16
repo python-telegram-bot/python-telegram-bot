@@ -33,7 +33,8 @@ if TYPE_CHECKING:
 
 
 class ChosenInlineResultHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain a chosen inline result.
+    """Handler class to handle Telegram updates that contain
+    :attr:`telegram.Update.chosen_inline_result`.
 
     Warning:
         When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
@@ -41,8 +42,10 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
 
     Args:
         callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``async def callback(update: Update, context: CallbackContext)``
+            :meth:`check_update` has determined that an update should be processed by this handler.
+            Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -85,13 +88,13 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
         self.pattern = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.
 
         Returns:
-            :obj:`bool`
+            :obj:`bool` | :obj:`re.match`
 
         """
         if isinstance(update, Update) and update.chosen_inline_result:
