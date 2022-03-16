@@ -635,7 +635,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 * > 0 - retry up to X times
             webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
                 NAT, reverse proxy, etc. Default is derived from :paramref:`listen`,
-                :paramref:`port` & :paramref:`url_path`.
+                :paramref:`port`, :paramref:`url_path`, :paramref:`cert`, and :paramref:`key`.
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
@@ -747,7 +747,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         return task
 
     def __create_task_done_callback(self, task: asyncio.Task) -> None:
-        """Used for handling asyncio exceptions. Unretrieved exceptions will be raised on exit"""
         self.__create_task_tasks.discard(task)  # Discard from our set since we are done with it
         # We just retrieve the eventual exception so that asyncio doesn't complain in case
         # it's not retrieved somewhere else

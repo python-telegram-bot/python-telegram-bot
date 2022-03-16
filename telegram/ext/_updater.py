@@ -65,7 +65,6 @@ class Updater:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
         update_queue (:class:`asyncio.Queue`): Queue for the updates.
 
-
     """
 
     __slots__ = (
@@ -266,7 +265,7 @@ class Updater:
 
         self._logger.debug('Updater started (polling)')
 
-        await self._bootstrap(
+        await self._bootstrap(  # Makes sure no webhook is set by calling delete_webhook
             bootstrap_retries,
             drop_pending_updates=drop_pending_updates,
             webhook_url='',
@@ -297,7 +296,7 @@ class Updater:
                         await self.update_queue.put(update)
                     self.last_update_id = updates[-1].update_id + 1  # Add one to 'confirm' it
 
-            return True
+            return True  # Keep fetching updates & don't quit. Polls with poll_interval.
 
         def default_error_callback(exc: TelegramError) -> None:
             self._logger.exception('Exception happened while polling for updates.', exc_info=exc)
@@ -349,7 +348,8 @@ class Updater:
             listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
             port (:obj:`int`, optional): Port the bot should be listening on. Must be one of
                 :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`. Defaults to ``80``.
-            url_path (:obj:`str`, optional): Path inside url. Defaults to `` '' ``
+            url_path (:obj:`str`, optional): Path inside url (http(s)://listen:port/<url_path>).
+                Defaults to ``''``.
             cert (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL certificate file.
             key (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL key file.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
@@ -363,7 +363,7 @@ class Updater:
                 * > 0 - retry up to X times
             webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
                 NAT, reverse proxy, etc. Default is derived from :paramref:`listen`,
-                :paramref:`port` & :paramref:`url_path`.
+                :paramref:`port`, :paramref:`url_path`, :paramref:`cert`, and :paramref:`key`.
             ip_address (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
                 Defaults to :obj:`None`.
                 .. versionadded :: 13.4
@@ -568,6 +568,11 @@ class Updater:
         ip_address: str = None,
         max_connections: int = 40,
     ) -> None:
+        """Entry point for handling webhooks. :meth:`start_polling` calls this to delete any
+        present webhook. :meth:`start_webhook` calls this to set a webhook using
+        :meth:`telegram.Bot.set_webhook. If there are unsuccessful attempts, it will be retried as
+        specified by :paramref:`max_retries`.
+        """
         retries = [0]
 
         async def bootstrap_del_webhook() -> bool:
@@ -602,7 +607,7 @@ class Updater:
                 raise exc
 
         # Dropping pending updates from TG can be efficiently done with the drop_pending_updates
-        # parameter of delete/start_webhook, even in the case of polling. Also we want to make
+        # parameter of delete/start_webhook, even in the case of polling. Also, we want to make
         # sure that no webhook is configured in case of polling, so we just always call
         # delete_webhook for polling
         if drop_pending_updates or not webhook_url:
@@ -627,6 +632,9 @@ class Updater:
     async def stop(self) -> None:
         """Stops the polling/webhook.
 
+        .. seealso::
+            :meth:`start_polling`, :meth:`start_webhook`
+
         Raises:
             :exc:`RuntimeError`: If the updater is not running.
         """
@@ -644,12 +652,14 @@ class Updater:
             self._logger.debug('Updater.stop() is complete')
 
     async def _stop_httpd(self) -> None:
+        """Stops the Webhook server by calling ``WebhookServer.shutdown()``"""
         if self._httpd:
             self._logger.debug('Waiting for current webhook connection to be closed.')
             await self._httpd.shutdown()
             self._httpd = None
 
     async def _stop_polling(self) -> None:
+        """Stops the polling task by awaiting it."""
         if self.__polling_task:
             self._logger.debug('Waiting background polling task to join.')
             self.__polling_task.cancel()

@@ -146,7 +146,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     @property
     def update_interval(self) -> float:
-        """:obj:`int`, optional: Time (in seconds) that the :class:`~telegram.ext.Application`
+        """:obj:`int`: Time (in seconds) that the :class:`~telegram.ext.Application`
         will wait between two consecutive runs of updating the persistence.
 
         .. versionadded:: 14.0
@@ -164,6 +164,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             bot (:class:`telegram.Bot`): The bot.
+
+        Raises:
+            :exc:`TypeError`: If :attr:`PersistenceInput.callback_data` is :obj:`True` and the
+                :paramref:`bot` is not an instance of :class:`telegram.ext.ExtBot`.
         """
         if self.store_data.callback_data and not isinstance(bot, ExtBot):
             raise TypeError('callback_data can only be stored when using telegram.ext.ExtBot.')
@@ -237,7 +241,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
                 Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]]:
-                The restored meta data or :obj:`None`, if no data was stored.
+                The restored metadata or :obj:`None`, if no data was stored.
         """
 
     @abstractmethod
@@ -245,7 +249,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """Will be called by :class:`telegram.ext.Application` when a
         :class:`telegram.ext.ConversationHandler` is added if
         :attr:`telegram.ext.ConversationHandler.persistent` is :obj:`True`.
-        It should return the conversations for the handler with `name` or an empty :obj:`dict`
+        It should return the conversations for the handler with :paramref:`name` or an empty
+        :obj:`dict`.
 
         Args:
             name (:obj:`str`): The handlers name.
@@ -264,7 +269,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
-            new_state (:obj:`tuple` | :class:`object`): The new state for the given key.
+            new_state (:class:`object`): The new state for the given key.
         """
 
     @abstractmethod

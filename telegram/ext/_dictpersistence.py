@@ -56,24 +56,24 @@ class DictPersistence(BasePersistence):
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
             saved.
-        update_interval (:obj:`int` | :obj:`float`, optional): The
-            :class:`~telegram.ext.Application` will update
-            the persistence in regular intervals. This parameter specifies the time (in seconds) to
-            wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
-
-            .. versionadded:: 14.0
         user_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             user_data on creating this persistence. Default is ``""``.
         chat_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             chat_data on creating this persistence. Default is ``""``.
         bot_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             bot_data on creating this persistence. Default is ``""``.
+        conversations_json (:obj:`str`, optional): JSON string that will be used to reconstruct
+            conversation on creating this persistence. Default is ``""``.
         callback_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             callback_data on creating this persistence. Default is ``""``.
 
             .. versionadded:: 13.6
-        conversations_json (:obj:`str`, optional): JSON string that will be used to reconstruct
-            conversation on creating this persistence. Default is ``""``.
+        update_interval (:obj:`int` | :obj:`float`, optional): The
+            :class:`~telegram.ext.Application` will update
+            the persistence in regular intervals. This parameter specifies the time (in seconds) to
+            wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
+
+            .. versionadded:: 14.0
 
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
