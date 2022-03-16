@@ -80,7 +80,7 @@ class ApplicationHandlerStop(Exception):
 
     .. code-block:: python
 
-        def callback(update, context):
+        async def callback(update, context):
             ...
             raise ApplicationHandlerStop(next_state)
 
@@ -1243,7 +1243,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
                 called when an error is raised. Callback signature:
-                ``def callback(update: object, context: CallbackContext)``.
+                ``async def callback(update: object, context: CallbackContext)``.
                 The error that happened will be present in ``context.error``.
             block (:obj:`bool`, optional): Determines whether the return value of the callback
                 should be awaited before processing the next error handler in

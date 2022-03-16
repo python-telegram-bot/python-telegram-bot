@@ -107,7 +107,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Example:
             .. code:: python
 
-                def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
+                async def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
                     ...
 
         .. versionadded: 14.0
