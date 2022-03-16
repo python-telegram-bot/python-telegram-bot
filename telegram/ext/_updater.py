@@ -507,7 +507,7 @@ class Updater:
         `action_cb` evaluates :obj:`False`.
 
         Args:
-            action_cb (:obj:`callable`): Network oriented callback function to call.
+            action_cb (:term:`coroutine`): Network oriented callback function to call.
             on_err_cb (:obj:`callable`): Callback to call when TelegramError is caught. Receives
                 the exception object as a parameter.
             description (:obj:`str`): Description text to use for logs and exception raised.

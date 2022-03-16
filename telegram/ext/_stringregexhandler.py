@@ -48,7 +48,7 @@ class StringRegexHandler(Handler[str, CCT]):
 
     Args:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
+        callback (:term:`coroutine`): The callback function for this handler. Will be called when
             :meth:`check_update` has determined that an update should be processed by this handler.
             Callback signature::
 
@@ -62,7 +62,7 @@ class StringRegexHandler(Handler[str, CCT]):
 
     Attributes:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
-        callback (:obj:`callable`): The callback function for this handler.
+        callback (:term:`coroutine`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.

@@ -146,7 +146,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             .. seealso::
                 :meth:`add_handler`, :meth:`add_handlers`.
-        error_handlers (Dict[:obj:`callable`, :obj:`bool`]): A dict, where the keys are error
+        error_handlers (Dict[:term:`coroutine`, :obj:`bool`]): A dict, where the keys are error
             handlers and the values indicate whether they are to be run blocking.
 
             .. seealso::
@@ -1241,7 +1241,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             Attempts to add the same callback multiple times will be ignored.
 
         Args:
-            callback (:obj:`callable`): The callback function for this error handler. Will be
+            callback (:term:`coroutine`): The callback function for this error handler. Will be
                 called when an error is raised. Callback signature::
 
                     async def callback(update: object, context: CallbackContext)
@@ -1262,7 +1262,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Removes an error handler.
 
         Args:
-            callback (:obj:`callable`): The error handler to remove.
+            callback (:term:`coroutine`): The error handler to remove.
 
         """
         self.error_handlers.pop(callback, None)

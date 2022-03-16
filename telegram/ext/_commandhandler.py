@@ -55,7 +55,7 @@ class CommandHandler(Handler[Update, CCT]):
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
             Limitations are the same as described here https://core.telegram.org/bots#commands
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
+        callback (:term:`coroutine`): The callback function for this handler. Will be called when
             :meth:`check_update` has determined that an update should be processed by this handler.
             Callback signature::
 
@@ -78,7 +78,7 @@ class CommandHandler(Handler[Update, CCT]):
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
             Limitations are the same as described here https://core.telegram.org/bots#commands
-        callback (:obj:`callable`): The callback function for this handler.
+        callback (:term:`coroutine`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
         block (:obj:`bool`): Determines whether the return value of the callback should be
@@ -209,7 +209,7 @@ class PrefixHandler(CommandHandler):
             The prefix(es) that will precede :attr:`command`.
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
+        callback (:term:`coroutine`): The callback function for this handler. Will be called when
             :meth:`check_update` has determined that an update should be processed by this handler.
             Callback signature::
 
@@ -226,7 +226,7 @@ class PrefixHandler(CommandHandler):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
+        callback (:term:`coroutine`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
         block (:obj:`bool`): Determines whether the return value of the callback should be

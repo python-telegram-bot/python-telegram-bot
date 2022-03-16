@@ -39,7 +39,7 @@ class TypeHandler(Handler[UT, CCT]):
     Args:
         type (:external:class:`type`): The :external:class:`type` of updates this handler should
             process, as determined by :obj:`isinstance`
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
+        callback (:term:`coroutine`): The callback function for this handler. Will be called when
             :meth:`check_update` has determined that an update should be processed by this handler.
             Callback signature::
 
@@ -56,7 +56,7 @@ class TypeHandler(Handler[UT, CCT]):
     Attributes:
         type (:external:class:`type`): The :external:class:`type` of updates this handler should
             process.
-        callback (:obj:`callable`): The callback function for this handler.
+        callback (:term:`coroutine`): The callback function for this handler.
         strict (:obj:`bool`): Use :external:class:`type` instead of :obj:`isinstance`. Default is
             :obj:`False`.
         block (:obj:`bool`): Determines whether the return value of the callback should be

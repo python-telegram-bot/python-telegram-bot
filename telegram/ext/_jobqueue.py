@@ -128,7 +128,7 @@ class JobQueue:
         """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
         Args:
-            callback (:obj:`callable`): The callback function that should be executed by the new
+            callback (:term:`coroutine`): The callback function that should be executed by the new
                 job. Callback signature::
 
                     async def callback(context: CallbackContext)
@@ -216,7 +216,7 @@ class JobQueue:
                            #daylight-saving-time-behavior
 
         Args:
-            callback (:obj:`callable`): The callback function that should be executed by the new
+            callback (:term:`coroutine`): The callback function that should be executed by the new
                 job. Callback signature::
 
                     async def callback(context: CallbackContext)
@@ -323,7 +323,7 @@ class JobQueue:
             parameter to have the job run on the last day of the month.
 
         Args:
-            callback (:obj:`callable`):  The callback function that should be executed by the new
+            callback (:term:`coroutine`):  The callback function that should be executed by the new
                 job. Callback signature::
 
                     async def callback(context: CallbackContext)
@@ -399,7 +399,7 @@ class JobQueue:
                            #daylight-saving-time-behavior
 
         Args:
-            callback (:obj:`callable`): The callback function that should be executed by the new
+            callback (:term:`coroutine`): The callback function that should be executed by the new
                 job. Callback signature::
 
                     async def callback(context: CallbackContext)
@@ -467,7 +467,7 @@ class JobQueue:
         """Creates a new custom defined :class:`Job`.
 
         Args:
-            callback (:obj:`callable`): The callback function that should be executed by the new
+            callback (:term:`coroutine`): The callback function that should be executed by the new
                 job. Callback signature::
 
                     async def callback(context: CallbackContext)
@@ -568,7 +568,7 @@ class Job:
         Removed argument and attribute ``job_queue``.
 
     Args:
-        callback (:obj:`callable`): The callback function that should be executed by the new job.
+        callback (:term:`coroutine`): The callback function that should be executed by the new job.
             Callback signature::
 
                 async def callback(context: CallbackContext)
@@ -585,7 +585,7 @@ class Job:
             ..versionadded:: 14.0
 
     Attributes:
-        callback (:obj:`callable`): The callback function that should be executed by the new job.
+        callback (:term:`coroutine`): The callback function that should be executed by the new job.
         context (:obj:`object`): Optional. Additional data needed for the callback function.
         name (:obj:`str`): Optional. The name of the new job.
         job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
