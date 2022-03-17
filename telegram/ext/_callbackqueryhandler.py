@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackQueryHandler class."""
-
+import asyncio
 import re
 from typing import (
     TYPE_CHECKING,
@@ -114,6 +114,11 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         block: DVInput[bool] = DEFAULT_TRUE,
     ):
         super().__init__(callback, block=block)
+
+        if callable(pattern) and asyncio.iscoroutinefunction(pattern):
+            raise ValueError(
+                'The `pattern` must not be a coroutine function! Use an ordinary function instead.'
+            )
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)

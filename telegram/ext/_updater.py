@@ -71,7 +71,7 @@ class Updater:
         'bot',
         '_logger',
         'update_queue',
-        'last_update_id',
+        '_last_update_id',
         '_running',
         '_initialized',
         '_httpd',
@@ -87,7 +87,7 @@ class Updater:
         self.bot = bot
         self.update_queue = update_queue
 
-        self.last_update_id = 0
+        self._last_update_id = 0
         self._running = False
         self._initialized = False
         self._httpd: Optional[WebhookServer] = None
@@ -187,6 +187,11 @@ class Updater:
                 while calling :meth:`telegram.Bot.get_updates` during polling. Defaults to
                 :obj:`None`, in which case errors will be logged.
 
+                Note:
+                    The :paramref:`error_callback` must *not* be a coroutine function! If
+                    asynchorous behavior of the callback is wanted, please schedule a task from
+                    within the callback.
+
         Returns:
             :class:`asyncio.Queue`: The update queue that can be filled from the main thread.
 
@@ -198,7 +203,7 @@ class Updater:
             if self.running:
                 raise RuntimeError('This Updater is already running!')
             if not self._initialized:
-                raise RuntimeError('This Updater is not initialized!')
+                raise RuntimeError('This Updater was not initialized via `Updater.initialize`!')
 
             self._running = True
 
@@ -222,7 +227,7 @@ class Updater:
 
                 self._logger.debug('Waiting for polling to start')
                 await polling_ready.wait()
-                self._logger.debug('Polling to started')
+                self._logger.debug('Polling updates from Telegram started')
 
                 return self.update_queue
             except Exception as exc:
@@ -257,7 +262,7 @@ class Updater:
 
         async def polling_action_cb() -> bool:
             updates = await self.bot.get_updates(
-                offset=self.last_update_id,
+                offset=self._last_update_id,
                 timeout=timeout,
                 read_timeout=read_timeout,
                 connect_timeout=connect_timeout,
@@ -275,7 +280,7 @@ class Updater:
                 else:
                     for update in updates:
                         await self.update_queue.put(update)
-                    self.last_update_id = updates[-1].update_id + 1
+                    self._last_update_id = updates[-1].update_id + 1
 
             return True
 
@@ -445,25 +450,15 @@ class Updater:
             )
 
         # We pass along the cert to the webhook if present.
-        if cert is not None:
-            await self._bootstrap(
-                cert=cert,
-                max_retries=bootstrap_retries,
-                drop_pending_updates=drop_pending_updates,
-                webhook_url=webhook_url,
-                allowed_updates=allowed_updates,
-                ip_address=ip_address,
-                max_connections=max_connections,
-            )
-        else:
-            await self._bootstrap(
-                max_retries=bootstrap_retries,
-                drop_pending_updates=drop_pending_updates,
-                webhook_url=webhook_url,
-                allowed_updates=allowed_updates,
-                ip_address=ip_address,
-                max_connections=max_connections,
-            )
+        await self._bootstrap(
+            cert=cert,
+            max_retries=bootstrap_retries,
+            drop_pending_updates=drop_pending_updates,
+            webhook_url=webhook_url,
+            allowed_updates=allowed_updates,
+            ip_address=ip_address,
+            max_connections=max_connections,
+        )
 
         await self._httpd.serve_forever(ready=ready)
 
@@ -514,7 +509,9 @@ class Updater:
                 except TelegramError as telegram_exc:
                     self._logger.error('Error while %s: %s', description, telegram_exc)
                     on_err_cb(telegram_exc)
-                    cur_interval = self._increase_poll_interval(cur_interval)
+
+                    # increase waiting times on subsequent errors up to 30secs
+                    cur_interval = 1 if cur_interval == 0 else min(30, 1.5 * cur_interval)
                 else:
                     cur_interval = interval
 
@@ -524,17 +521,6 @@ class Updater:
             except asyncio.CancelledError:
                 self._logger.debug('Network loop retry %s was cancelled', description)
                 break
-
-    @staticmethod
-    def _increase_poll_interval(current_interval: float) -> float:
-        # increase waiting times on subsequent errors up to 30secs
-        if current_interval == 0:
-            current_interval = 1
-        elif current_interval < 30:
-            current_interval *= 1.5
-        else:
-            current_interval = min(30.0, current_interval)
-        return current_interval
 
     async def _bootstrap(
         self,
@@ -547,7 +533,7 @@ class Updater:
         ip_address: str = None,
         max_connections: int = 40,
     ) -> None:
-        retries = [0]
+        retries = 0
 
         async def bootstrap_del_webhook() -> bool:
             self._logger.debug('Deleting webhook')
@@ -571,13 +557,17 @@ class Updater:
             return False
 
         def bootstrap_on_err_cb(exc: Exception) -> None:
-            if not isinstance(exc, InvalidToken) and (max_retries < 0 or retries[0] < max_retries):
-                retries[0] += 1
+            # We need this since retries is an immutable object otherwise and the changes
+            # wouldn't propagate outside of thi function
+            nonlocal retries
+
+            if not isinstance(exc, InvalidToken) and (max_retries < 0 or retries < max_retries):
+                retries += 1
                 self._logger.warning(
-                    'Failed bootstrap phase; try=%s max_retries=%s', retries[0], max_retries
+                    'Failed bootstrap phase; try=%s max_retries=%s', retries, max_retries
                 )
             else:
-                self._logger.error('Failed bootstrap phase after %s retries (%s)', retries[0], exc)
+                self._logger.error('Failed bootstrap phase after %s retries (%s)', retries, exc)
                 raise exc
 
         # Dropping pending updates from TG can be efficiently done with the drop_pending_updates
@@ -591,7 +581,9 @@ class Updater:
                 'bootstrap del webhook',
                 bootstrap_interval,
             )
-            retries[0] = 0
+
+            # Reset the retries counter for the next _network_loop_retry call
+            retries = 0
 
         # Restore/set webhook settings, if needed. Again, we don't know ahead if a webhook is set,
         # so we set it anyhow.
@@ -630,7 +622,7 @@ class Updater:
 
     async def _stop_polling(self) -> None:
         if self.__polling_task:
-            self._logger.debug('Waiting background polling task to join.')
+            self._logger.debug('Waiting background polling task to finish up.')
             self.__polling_task.cancel()
             try:
                 await self.__polling_task
