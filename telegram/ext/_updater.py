@@ -624,8 +624,5 @@ class Updater:
         if self.__polling_task:
             self._logger.debug('Waiting background polling task to finish up.')
             self.__polling_task.cancel()
-            try:
-                await self.__polling_task
-            except asyncio.CancelledError:
-                pass
+            await self.__polling_task
             self.__polling_task = None
