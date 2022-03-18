@@ -421,7 +421,7 @@ class DictPersistence(BasePersistence):
         """
 
     @staticmethod
-    def _encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, object]]) -> str:
+    def _encode_conversations_to_json(conversations: Dict[str, ConversationDict]) -> str:
         """Helper method to encode a conversations dict (that uses tuples as keys) to a
         JSON-serializable way. Use :meth:`self._decode_conversations_from_json` to decode.
 
@@ -450,12 +450,12 @@ class DictPersistence(BasePersistence):
             :obj:`dict`: The conversations dict after decoding
         """
         tmp = json.loads(json_string)
-        conversations: Dict[str, Dict[Tuple, object]] = {}
+        conversations: Dict[str, ConversationDict] = {}
         for handler, states in tmp.items():
             conversations[handler] = {}
             for key, state in states.items():
                 conversations[handler][tuple(json.loads(key))] = state
-        return conversations  # type: ignore[return-value]
+        return conversations
 
     @staticmethod
     def _decode_user_chat_data_from_json(data: str) -> Dict[int, Dict[object, object]]:

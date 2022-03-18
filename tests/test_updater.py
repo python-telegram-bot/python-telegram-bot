@@ -235,7 +235,8 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, 'delete_webhook', delete_webhook)
 
         async with updater:
-            await updater.start_polling(drop_pending_updates=drop_pending_updates)
+            return_value = await updater.start_polling(drop_pending_updates=drop_pending_updates)
+            assert return_value is updater.update_queue
             assert updater.running
             await updates.join()
             await updater.stop()
@@ -506,12 +507,13 @@ class TestUpdater:
         port = randrange(1024, 49152)  # Select random port
 
         async with updater:
-            await updater.start_webhook(
+            return_value = await updater.start_webhook(
                 drop_pending_updates=drop_pending_updates,
                 ip_address=ip,
                 port=port,
                 url_path='TOKEN',
             )
+            assert return_value is updater.update_queue
             assert updater.running
 
             # Now, we send an update to the server

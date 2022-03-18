@@ -542,11 +542,19 @@ class ConversationHandler(Handler[Update, CCT]):
                 'persistence!'
             )
 
-        self._conversations = cast(
-            TrackingDict[Tuple[int, ...], object],
-            TrackingDict(),
-        )
-        self._conversations.update(await application.persistence.get_conversations(self.name))
+        with self._conversations_lock:
+            current_conversations = self._conversations
+            self._conversations = cast(
+                TrackingDict[Tuple[int, ...], object],
+                TrackingDict(),
+            )
+            # In the conversation already processed updates
+            self._conversations.update(current_conversations)
+            # above might be partly overridden but that's okay since we warn about that in
+            # add_handler
+            self._conversations.update_no_track(
+                await application.persistence.get_conversations(self.name)
+            )
 
         for handler in self._child_conversations:
             await handler._initialize_persistence(  # pylint: disable=protected-access

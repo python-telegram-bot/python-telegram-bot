@@ -21,7 +21,6 @@ import asyncio
 import inspect
 import itertools
 import logging
-from asyncio import Event
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -60,10 +59,11 @@ if TYPE_CHECKING:
     from telegram import Message
     from telegram.ext._jobqueue import Job
     from telegram.ext._applicationbuilder import InitApplicationBuilder
+    from telegram.ext import ConversationHandler
 
 DEFAULT_GROUP: int = 0
 
-_DispType = TypeVar('_DispType', bound="Application")
+_AppType = TypeVar('_AppType', bound="Application")
 _RT = TypeVar('_RT')
 _STOP_SIGNAL = object()
 
@@ -326,7 +326,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         self._initialized = False
 
-    async def __aenter__(self: _DispType) -> _DispType:
+    async def __aenter__(self: _AppType) -> _AppType:
         try:
             await self.initialize()
             return self
@@ -382,7 +382,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         return ApplicationBuilder()
 
-    async def start(self, ready: Event = None) -> None:
+    async def start(self) -> None:
         """Starts
 
         * a background task that fetches updates from :attr:`update_queue` and
@@ -395,17 +395,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             This does *not* start fetching updates from Telegram. You need to either start
             :attr:`updater` manually or use one of :meth:`run_polling` or :meth:`run_webhook`.
 
-        Args:
-            ready (:obj:`asyncio.Event`, optional): If specified, the event will be set once the
-                application is ready.
-
         Raises:
             :exc:`RuntimeError`: If the application is already running or was not initialized.
         """
         if self.running:
             raise RuntimeError('This Application is already running!')
         if not self._initialized:
-            raise RuntimeError('This Application is not initialized!')
+            raise RuntimeError(
+                'This Application was not initialized via `Application.initialize`!'
+            )
 
         self._running = True
         self.__update_persistence_event.clear()
@@ -430,8 +428,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             )
             _logger.info('Application started')
 
-            if ready is not None:
-                ready.set()
         except Exception as exc:
             self._running = False
             raise exc
@@ -496,7 +492,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
-        ready: asyncio.Event = None,
         close_loop: bool = True,
     ) -> None:
         """Temp docstring to make this referencable
@@ -523,7 +518,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 drop_pending_updates=drop_pending_updates,
                 error_callback=error_callback,
             ),
-            ready=ready,
             close_loop=close_loop,
         )
 
@@ -540,7 +534,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         drop_pending_updates: bool = None,
         ip_address: str = None,
         max_connections: int = 40,
-        ready: asyncio.Event = None,
         close_loop: bool = True,
     ) -> None:
         """Temp docstring to make this referencable
@@ -565,20 +558,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 ip_address=ip_address,
                 max_connections=max_connections,
             ),
-            ready=ready,
             close_loop=close_loop,
         )
 
-    def __run(
-        self, updater_coroutine: Coroutine, ready: asyncio.Event = None, close_loop: bool = True
-    ) -> None:
+    def __run(self, updater_coroutine: Coroutine, close_loop: bool = True) -> None:
         # Calling get_event_loop() should still be okay even in py3.10+ as long as there is a
         # running event loop or we are in the main thread, which are the intended use cases.
         # See the docs of get_event_loop() and get_running_loop() for more info
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.initialize())
         loop.run_until_complete(updater_coroutine)
-        loop.run_until_complete(self.start(ready=ready))
+        loop.run_until_complete(self.start())
         try:
             loop.run_forever()
         # TODO: maybe allow for custom exception classes to catch here? Or provide a custom one?
@@ -770,6 +760,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             # blocking handler - the non-blocking handlers mark the update again when finished
             self._mark_for_persistence_update(update=update)
 
+    async def _add_ch_after_init(self, handler: 'ConversationHandler') -> None:
+        self._conversation_handler_conversations[
+            handler.name  # type: ignore[index]
+        ] = await handler._initialize_persistence(  # pylint: disable=protected-access
+            self
+        )
+
     def add_handler(self, handler: Handler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
 
@@ -789,6 +786,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             :attr:`telegram.ext.Handler.check_update`) will be used. Other handlers from the
             group will not be used. The order in which handlers were added to the group defines the
             priority.
+
+        Warning:
+            Adding persistent :class:`telegram.ext.ConversationHandler` after the application has
+            been initialized is discouraged. This is because the persisted conversation states need
+            to be loaded into memory while the application is already processing updates, which
+            might lead to race conditions and undesired behavior. In particular, current
+            conversation states may be overridden by the loaded data.
 
         Args:
             handler (:class:`telegram.ext.Handler`): A Handler instance.
@@ -810,10 +814,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     f"can not be persistent if application has no persistence"
                 )
             if self._initialized:
+                self.create_task(self._add_ch_after_init(handler))
                 warn(
                     'A persistent `ConversationHandler` was passed to `add_handler`, '
-                    'after `Application.initialize` was called. Conversation states will not be '
-                    'loaded from persistence!',
+                    'after `Application.initialize` was called. This is discouraged.'
+                    'See the docs of `Application.add_handler` for details.',
                     stacklevel=1,
                 )
 
@@ -970,7 +975,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self.drop_chat_data(old_chat_id)
 
         self._chat_ids_to_be_updated_in_persistence.add(new_chat_id)
-        self._chat_ids_to_be_deleted_in_persistence.add(old_chat_id)
+        # old_chat_id is marked for deletion by drop_chat_data above
 
     def _mark_for_persistence_update(self, *, update: object = None, job: 'Job' = None) -> None:
         # TODO: This should be at the end of `Application.process_update`, when the task created
