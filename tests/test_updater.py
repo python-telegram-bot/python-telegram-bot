@@ -171,7 +171,6 @@ class TestUpdater:
                     port=port,
                 )
             else:
-                await asyncio.sleep(1)
                 await getattr(updater, method)()
 
             with pytest.raises(RuntimeError, match='still running'):
