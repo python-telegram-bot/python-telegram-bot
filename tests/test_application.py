@@ -115,12 +115,13 @@ class TestApplication:
         ):
             self.received = context.error.message
 
-    def test_slot_behaviour(self, bot, mro_slots):
-        app = ApplicationBuilder().bot(bot).build()
-        for at in app.__slots__:
-            at = f"_Application{at}" if at.startswith('__') and not at.endswith('__') else at
-            assert getattr(app, at, 'err') != 'err', f"got extra slot '{at}'"
-        assert len(mro_slots(app)) == len(set(mro_slots(app))), "duplicate slot"
+    @pytest.mark.asyncio
+    async def test_slot_behaviour(self, bot, mro_slots):
+        async with ApplicationBuilder().token(bot.token).build() as app:
+            for at in app.__slots__:
+                at = f"_Application{at}" if at.startswith('__') and not at.endswith('__') else at
+                assert getattr(app, at, 'err') != 'err', f"got extra slot '{at}'"
+            assert len(mro_slots(app)) == len(set(mro_slots(app))), "duplicate slot"
 
     def test_manual_init_warning(self, recwarn, updater):
         Application(
@@ -196,7 +197,7 @@ class TestApplication:
             bot_data=complex,
         )
 
-        application = ApplicationBuilder().bot(bot).context_types(cc).build()
+        application = ApplicationBuilder().token(bot.token).context_types(cc).build()
 
         assert isinstance(application.user_data[1], int)
         assert isinstance(application.chat_data[1], float)
@@ -447,13 +448,14 @@ class TestApplication:
                 if context is self.received:
                     pytest.fail('First handler was wrongly called')
 
-        app.add_handler(MessageHandler(filters.Regex('test'), one), group=1)
-        app.add_handler(MessageHandler(filters.ALL, two), group=2)
-        u = make_message_update(message='test')
-        await app.process_update(u)
-        self.received = None
-        u.message.text = 'something'
-        await app.process_update(u)
+        async with app:
+            app.add_handler(MessageHandler(filters.Regex('test'), one), group=1)
+            app.add_handler(MessageHandler(filters.ALL, two), group=2)
+            u = make_message_update(message='test')
+            await app.process_update(u)
+            self.received = None
+            u.message.text = 'something'
+            await app.process_update(u)
 
     def test_add_handler_errors(self, app):
         handler = 'not a handler'
@@ -639,13 +641,14 @@ class TestApplication:
             ),
         )
 
-        # If ApplicationHandlerStop raised handlers in other groups should not be called.
-        passed = []
-        app.add_handler(CommandHandler('start', start1), 1)
-        app.add_handler(CommandHandler('start', start3), 1)
-        app.add_handler(CommandHandler('start', start2), 2)
-        await app.process_update(update)
-        assert passed == ['start1']
+        async with app:
+            # If ApplicationHandlerStop raised handlers in other groups should not be called.
+            passed = []
+            app.add_handler(CommandHandler('start', start1), 1)
+            app.add_handler(CommandHandler('start', start3), 1)
+            app.add_handler(CommandHandler('start', start2), 2)
+            await app.process_update(update)
+            assert passed == ['start1']
 
     @pytest.mark.asyncio
     async def test_flow_stop_by_error_handler(self, app, bot):
@@ -667,14 +670,15 @@ class TestApplication:
             passed.append(c.error)
             raise ApplicationHandlerStop
 
-        # If ApplicationHandlerStop raised handlers in other groups should not be called.
-        passed = []
-        app.add_error_handler(error)
-        app.add_handler(TypeHandler(object, start1), 1)
-        app.add_handler(TypeHandler(object, start2), 1)
-        app.add_handler(TypeHandler(object, start3), 2)
-        await app.process_update(1)
-        assert passed == ['start1', 'error', exception]
+        async with app:
+            # If ApplicationHandlerStop raised handlers in other groups should not be called.
+            passed = []
+            app.add_error_handler(error)
+            app.add_handler(TypeHandler(object, start1), 1)
+            app.add_handler(TypeHandler(object, start2), 1)
+            app.add_handler(TypeHandler(object, start3), 2)
+            await app.process_update(1)
+            assert passed == ['start1', 'error', exception]
 
     @pytest.mark.asyncio
     async def test_error_in_handler_part_1(self, app):
@@ -730,15 +734,16 @@ class TestApplication:
             ),
         )
 
-        # If an unhandled exception was caught, no further handlers from the same group should be
-        # called. Also, the error handler should be called and receive the exception
-        passed = []
-        app.add_handler(CommandHandler('start', start1), 1)
-        app.add_handler(CommandHandler('start', start2), 1)
-        app.add_handler(CommandHandler('start', start3), 2)
-        app.add_error_handler(error)
-        await app.process_update(update)
-        assert passed == ['start1', 'error', err, 'start3']
+        async with app:
+            # If an unhandled exception was caught, no further handlers from the same group should
+            # be called. Also, the error handler should be called and receive the exception
+            passed = []
+            app.add_handler(CommandHandler('start', start1), 1)
+            app.add_handler(CommandHandler('start', start2), 1)
+            app.add_handler(CommandHandler('start', start3), 2)
+            app.add_error_handler(error)
+            await app.process_update(update)
+            assert passed == ['start1', 'error', err, 'start3']
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize('block', (True, False))
@@ -820,7 +825,7 @@ class TestApplication:
 
         application = (
             ApplicationBuilder()
-            .bot(bot)
+            .token(bot.token)
             .context_types(
                 ContextTypes(
                     context=CustomContext, bot_data=int, user_data=float, chat_data=complex
@@ -833,9 +838,10 @@ class TestApplication:
             MessageHandler(filters.ALL, self.callback_raise_error('TestError'))
         )
 
-        await application.process_update(self.message_update)
-        await asyncio.sleep(0.05)
-        assert self.received == (CustomContext, float, complex, int)
+        async with application:
+            await application.process_update(self.message_update)
+            await asyncio.sleep(0.05)
+            assert self.received == (CustomContext, float, complex, int)
 
     @pytest.mark.asyncio
     async def test_custom_context_handler_callback(self, bot):
@@ -849,7 +855,7 @@ class TestApplication:
 
         application = (
             ApplicationBuilder()
-            .bot(bot)
+            .token(bot.token)
             .context_types(
                 ContextTypes(
                     context=CustomContext, bot_data=int, user_data=float, chat_data=complex
@@ -859,9 +865,10 @@ class TestApplication:
         )
         application.add_handler(MessageHandler(filters.ALL, callback))
 
-        await application.process_update(self.message_update)
-        await asyncio.sleep(0.05)
-        assert self.received == (CustomContext, float, complex, int)
+        async with application:
+            await application.process_update(self.message_update)
+            await asyncio.sleep(0.05)
+            assert self.received == (CustomContext, float, complex, int)
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
@@ -888,13 +895,14 @@ class TestApplication:
                 )
                 self.received = check_result
 
-        app.add_handler(MyHandler(self.callback_increase_count))
-        await app.process_update(1)
-        assert self.count == (1 if expected else 0)
-        if expected:
-            assert self.received == check
-        else:
-            assert self.received is None
+        async with app:
+            app.add_handler(MyHandler(self.callback_increase_count))
+            await app.process_update(1)
+            assert self.count == (1 if expected else 0)
+            if expected:
+                assert self.received == check
+            else:
+                assert self.received is None
 
     @pytest.mark.asyncio
     async def test_non_blocking_handler(self, app):
@@ -1024,24 +1032,26 @@ class TestApplication:
             self.count = 5
 
         app = Application.builder().token(bot.token).defaults(Defaults(block=block)).build()
-        app.add_handler(TypeHandler(object, self.callback_raise_error))
-        app.add_error_handler(error_handler)
-        await app.process_update(1)
-        await asyncio.sleep(0.05)
-        assert self.count == expected_output
-        await asyncio.sleep(0.1)
-        assert self.count == 5
+        async with app:
+            app.add_handler(TypeHandler(object, self.callback_raise_error))
+            app.add_error_handler(error_handler)
+            await app.process_update(1)
+            await asyncio.sleep(0.05)
+            assert self.count == expected_output
+            await asyncio.sleep(0.1)
+            assert self.count == 5
 
     @pytest.mark.parametrize(['block', 'expected_output'], [(False, 0), (True, 5)])
     @pytest.mark.asyncio
     async def test_default_block_handler(self, bot, block, expected_output):
         app = Application.builder().token(bot.token).defaults(Defaults(block=block)).build()
-        app.add_handler(TypeHandler(object, self.callback_set_count(5, sleep=0.1)))
-        await app.process_update(1)
-        await asyncio.sleep(0.05)
-        assert self.count == expected_output
-        await asyncio.sleep(0.15)
-        assert self.count == 5
+        async with app:
+            app.add_handler(TypeHandler(object, self.callback_set_count(5, sleep=0.1)))
+            await app.process_update(1)
+            await asyncio.sleep(0.05)
+            assert self.count == expected_output
+            await asyncio.sleep(0.15)
+            assert self.count == 5
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize('handler_block', (True, False))
