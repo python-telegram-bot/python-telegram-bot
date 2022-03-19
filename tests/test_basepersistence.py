@@ -40,6 +40,7 @@ from telegram.ext import (
     filters,
     Handler,
     ApplicationHandlerStop,
+    CallbackContext,
 )
 from telegram.warnings import PTBUserWarning
 from tests.conftest import make_message_update, PROJECT_ROOT_PATH, DictApplication
@@ -480,11 +481,42 @@ class TestBasePersistence:
         with pytest.raises(ValueError, match='callback_data must be'):
             await papp.initialize()
 
-    @default_papp
+    @filled_papp
     @pytest.mark.asyncio
     async def test_add_conversation_handler_after_init(self, papp: Application, recwarn):
+        context = CallbackContext(application=papp)
+
+        # Set it up such that the handler has a conversation in progress that's not persisted
+        papp.persistence.conversations['conv_1'].pop((2, 2))
+        conversation = build_conversation_handler('conv_1', persistent=True)
+        update = TrackingConversationHandler.build_update(state=HandlerStates.END, chat_id=2)
+        check = conversation.check_update(update=update)
+        await conversation.handle_update(
+            update=update, check_result=check, application=papp, context=context
+        )
+
+        assert conversation.check_update(
+            TrackingConversationHandler.build_update(state=HandlerStates.STATE_1, chat_id=2)
+        )
+
+        # and another one that will be overridden
+        update = TrackingConversationHandler.build_update(state=HandlerStates.END, chat_id=1)
+        check = conversation.check_update(update=update)
+        await conversation.handle_update(
+            update=update, check_result=check, application=papp, context=context
+        )
+        update = TrackingConversationHandler.build_update(state=HandlerStates.STATE_1, chat_id=1)
+        check = conversation.check_update(update=update)
+        await conversation.handle_update(
+            update=update, check_result=check, application=papp, context=context
+        )
+
+        assert conversation.check_update(
+            TrackingConversationHandler.build_update(state=HandlerStates.STATE_2, chat_id=1)
+        )
+
         async with papp:
-            papp.add_handler(build_conversation_handler('name', persistent=True))
+            papp.add_handler(conversation)
 
             assert len(recwarn) >= 1
             found = False
@@ -498,6 +530,20 @@ class TestBasePersistence:
                     ), "incorrect stacklevel!"
 
             assert found
+
+            await asyncio.sleep(0.05)
+            # conversation with chat_id 2 must not have been overridden
+            assert conversation.check_update(
+                TrackingConversationHandler.build_update(HandlerStates.STATE_1, chat_id=2)
+            )
+
+            # conversation with chat_id 1 must have been overridden
+            assert not conversation.check_update(
+                TrackingConversationHandler.build_update(state=HandlerStates.STATE_2, chat_id=1)
+            )
+            assert conversation.check_update(
+                TrackingConversationHandler.build_update(state=HandlerStates.STATE_1, chat_id=1)
+            )
 
     def test_add_conversation_without_persistence(self, app):
         with pytest.raises(ValueError, match='if application has no persistence'):
