@@ -255,6 +255,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self.__update_persistence_lock = asyncio.Lock()
         self.__create_task_tasks: Set[asyncio.Task] = set()
 
+    def _check_initialized(self) -> None:
+        if not self._initialized:
+            raise RuntimeError(
+                'This Application was not initialized via `Application.initialize`!'
+            )
+
     @property
     def running(self) -> bool:
         """:obj:`bool`: Indicates if this application is running.
@@ -400,10 +406,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         if self.running:
             raise RuntimeError('This Application is already running!')
-        if not self._initialized:
-            raise RuntimeError(
-                'This Application was not initialized via `Application.initialize`!'
-            )
+        self._check_initialized()
 
         self._running = True
         self.__update_persistence_event.clear()
@@ -718,7 +721,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 :class:`telegram.error.TelegramError`):
                 The update to process.
 
+        Raises:
+            :exc:`RuntimeError`: If the application was not initialized.
         """
+        # Processing updates before initialize() is a problem e.g. if persistence is used
+        self._check_initialized()
+
         context = None
         any_blocking = False
 
