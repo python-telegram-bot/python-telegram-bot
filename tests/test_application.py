@@ -1356,7 +1356,6 @@ class TestApplication:
         reason="Can't send signals without stopping whole process on windows",
     )
     def test_run_polling_basic(self, app, monkeypatch):
-        ready_event = threading.Event()
         exception_event = threading.Event()
         update_event = threading.Event()
         exception = TelegramError('This is a test error')
@@ -1371,7 +1370,12 @@ class TestApplication:
             return [self.message_update]
 
         def thread_target():
-            ready_event.wait()
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
 
             # Check that everything's running
             assertions['app_running'] = app.running
@@ -1402,7 +1406,7 @@ class TestApplication:
 
         thread = Thread(target=thread_target)
         thread.start()
-        app.run_polling(drop_pending_updates=True, ready=ready_event, close_loop=False)
+        app.run_polling(drop_pending_updates=True, close_loop=False)
         thread.join()
 
         assert len(assertions) == 8
@@ -1414,8 +1418,6 @@ class TestApplication:
         reason="Can't send signals without stopping whole process on windows",
     )
     def test_run_polling_parameters_passing(self, app, monkeypatch):
-        ready_event = threading.Event()
-
         # First check that the default values match and that we have all arguments there
         updater_signature = inspect.signature(app.updater.start_polling)
         app_signature = inspect.signature(app.run_polling)
@@ -1437,7 +1439,13 @@ class TestApplication:
             return True
 
         def thread_target():
-            ready_event.wait()
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
             time.sleep(0.1)
             os.kill(os.getpid(), signal.SIGINT)
 
@@ -1445,9 +1453,8 @@ class TestApplication:
         monkeypatch.setattr(Updater, 'stop', stop)
         thread = Thread(target=thread_target)
         thread.start()
-        app.run_polling(ready=ready_event, close_loop=False)
+        app.run_polling(close_loop=False)
         thread.join()
-        ready_event.clear()
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys())
         for name, param in updater_signature.parameters.items():
@@ -1461,9 +1468,8 @@ class TestApplication:
         }
         thread = Thread(target=thread_target)
         thread.start()
-        app.run_polling(ready=ready_event, close_loop=False, **expected)
+        app.run_polling(close_loop=False, **expected)
         thread.join()
-        ready_event.clear()
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys())
         assert self.received.pop('error_callback', None)
@@ -1474,7 +1480,6 @@ class TestApplication:
         reason="Can't send signals without stopping whole process on windows",
     )
     def test_run_webhook_basic(self, app, monkeypatch):
-        ready_event = threading.Event()
         assertions = {}
 
         async def delete_webhook(*args, **kwargs):
@@ -1484,7 +1489,12 @@ class TestApplication:
             return True
 
         def thread_target():
-            ready_event.wait()
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
 
             # Check that everything's running
             assertions['app_running'] = app.running
@@ -1523,7 +1533,6 @@ class TestApplication:
             port=port,
             url_path='TOKEN',
             drop_pending_updates=True,
-            ready=ready_event,
             close_loop=False,
         )
         thread.join()
@@ -1546,8 +1555,6 @@ class TestApplication:
         async def stop(_, **kwargs):
             return True
 
-        ready_event = threading.Event()
-
         # First check that the default values match and that we have all arguments there
         updater_signature = inspect.signature(Updater.start_webhook)
 
@@ -1564,15 +1571,20 @@ class TestApplication:
             assert param.default == app_signature.parameters[name].default
 
         def thread_target():
-            ready_event.wait()
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
             time.sleep(0.1)
             os.kill(os.getpid(), signal.SIGINT)
 
         thread = Thread(target=thread_target)
         thread.start()
-        app.run_webhook(ready=ready_event, close_loop=False)
+        app.run_webhook(close_loop=False)
         thread.join()
-        ready_event.clear()
 
         assert set(self.received.keys()) == set(updater_signature.parameters.keys()) - {'self'}
         for name, param in updater_signature.parameters.items():
@@ -1583,9 +1595,8 @@ class TestApplication:
         expected = {name: name for name in updater_signature.parameters if name != 'self'}
         thread = Thread(target=thread_target)
         thread.start()
-        app.run_webhook(ready=ready_event, close_loop=False, **expected)
+        app.run_webhook(close_loop=False, **expected)
         thread.join()
-        ready_event.clear()
 
         assert set(self.received.keys()) == set(expected.keys())
         assert self.received == expected
