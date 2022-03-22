@@ -388,6 +388,9 @@ class TestUpdater:
         monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
         monkeypatch.setattr(updater.bot, 'set_webhook', lambda *args, **kwargs: True)
 
+        with pytest.raises(TypeError, match='`error_callback` must not be a coroutine function'):
+            await updater.start_polling(error_callback=get_updates)
+
         async with updater:
             self.err_handler_called = asyncio.Event()
 

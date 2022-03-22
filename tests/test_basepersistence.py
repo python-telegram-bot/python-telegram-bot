@@ -43,7 +43,7 @@ from telegram.ext import (
     CallbackContext,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import make_message_update, PROJECT_ROOT_PATH, DictApplication
+from tests.conftest import make_message_update, DictApplication
 
 
 class HandlerStates(int, enum.Enum):
@@ -524,10 +524,7 @@ class TestBasePersistence:
                 if 'after `Application.initialize` was called' in str(warning.message):
                     found = True
                     assert warning.category is PTBUserWarning
-                    assert (
-                        Path(warning.filename)
-                        == PROJECT_ROOT_PATH / 'telegram' / 'ext' / '_application.py'
-                    ), "incorrect stacklevel!"
+                    assert Path(warning.filename) == Path(__file__), "incorrect stacklevel!"
 
             assert found
 
