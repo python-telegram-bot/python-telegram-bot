@@ -555,8 +555,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
-            ready (:class:`asyncio.Event`, optional): If passed, the event will be set when the
-                application is ready and has started. Defaults to :obj:`None`.
             close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
                 closed upon shutdown.
 
@@ -639,8 +637,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             ip_address (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
             max_connections (:obj:`int`, optional): Passed to
                 :meth:`telegram.Bot.set_webhook`. Defaults to ``40``.
-            ready (:class:`asyncio.Event`, optional): If passed, the event will be set when the
-                application is ready and has started. Defaults to :obj:`None`.
             close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
                 closed upon shutdown. Defaults to :obj:`True`.
 
