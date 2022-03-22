@@ -285,14 +285,16 @@ class TestApplication:
             await app.stop()
 
     @pytest.mark.asyncio
-    async def test_start_not_running_after_failure(self, app):
-        class Event(asyncio.Event):
-            def set(self) -> None:
-                raise Exception('Test Exception')
+    async def test_start_not_running_after_failure(self, bot, monkeypatch):
+        def start(_):
+            raise Exception('Test Exception')
+
+        monkeypatch.setattr(JobQueue, 'start', start)
+        app = ApplicationBuilder().token(bot.token).job_queue(JobQueue()).build()
 
         async with app:
             with pytest.raises(Exception, match='Test Exception'):
-                await app.start(ready=Event())
+                await app.start()
             assert app.running is False
 
     @pytest.mark.asyncio
