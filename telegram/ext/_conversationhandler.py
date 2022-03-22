@@ -76,8 +76,8 @@ class _ConversationTimeoutContext(Generic[CCT]):
 
 @dataclass
 class PendingState:
-    """Thin wrapper around asyncio.Task to handle block=False handlers. Note that this is a
-    public class of this module, since `Application.update_persistence` needs to access it.
+    """Thin wrapper around :class:`asyncio.Task` to handle block=False handlers. Note that this is
+    a public class of this module, since :meth:`Application.update_persistence` needs to access it.
     It's still hidden from users, since this module itself is private.
     """
 

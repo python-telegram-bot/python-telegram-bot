@@ -106,7 +106,7 @@ class CallbackDataCache:
     Args:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
         maxsize (:obj:`int`, optional): Maximum number of items in each of the internal mappings.
-            Defaults to 1024.
+            Defaults to ``1024``.
 
         persistent_data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
         Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
@@ -248,7 +248,7 @@ class CallbackDataCache:
 
         Note:
             Checks :attr:`telegram.Message.via_bot` and :attr:`telegram.Message.from_user` to check
-            if the reply markup (if any) was actually sent by this caches bot. If it was not, the
+            if the reply markup (if any) was actually sent by this bot cache. If it was not, the
             message will be returned unchanged.
 
             Note that this will fail for channel posts, as :attr:`telegram.Message.from_user` is
@@ -257,7 +257,7 @@ class CallbackDataCache:
 
         Warning:
             * Does *not* consider :attr:`telegram.Message.reply_to_message` and
-              :attr:`telegram.Message.pinned_message`. Pass them to these method separately.
+              :attr:`telegram.Message.pinned_message`. Pass them to this method separately.
             * *In place*, i.e. the passed :class:`telegram.Message` will be changed!
 
         Args:
@@ -356,7 +356,7 @@ class CallbackDataCache:
 
         Note:
             Will *not* raise exceptions in case the callback data is not found in the cache.
-            *Will* raise :class:`KeyError` in case the callback query can not be found in the
+            *Will* raise :exc:`KeyError` in case the callback query can not be found in the
             cache.
 
         Args:

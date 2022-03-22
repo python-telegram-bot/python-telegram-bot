@@ -56,11 +56,11 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     Note:
         :class:`telegram.ext.Application` will create a single context for an entire update. This
         means that if you got 2 handlers in different groups and they both get called, they will
-        get passed the same `CallbackContext` object (of course with proper attributes like
-        `.matches` differing). This allows you to add custom attributes in a lower handler group
-        callback, and then subsequently access those attributes in a higher handler group callback.
-        Note that the attributes on `CallbackContext` might change in the future, so make sure to
-        use a fairly unique name for the attributes.
+        receive the same :class:`CallbackContext` object (of course with proper attributes like
+        :attr:`matches` differing). This allows you to add custom attributes in a lower handler
+        group callback, and then subsequently access those attributes in a higher handler group
+        callback. Note that the attributes on :class:`CallbackContext` might change in the future,
+        so make sure to use a fairly unique name for the attributes.
 
     Warning:
          Do not combine custom attributes with :paramref:`telegram.ext.Handler.block` set to
@@ -74,16 +74,15 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     Attributes:
         matches (List[:meth:`re.Match <re.Match.expand>`]): Optional. If the associated update
-            originated from
-            a :class:`filters.Regex`, this will contain a list of match objects for every pattern
-            where ``re.search(pattern, string)`` returned a match. Note that filters short circuit,
-            so combined regex filters will not always be evaluated.
+            originated from a :class:`filters.Regex`, this will contain a list of match objects for
+            every pattern where ``re.search(pattern, string)`` returned a match. Note that filters
+            short circuit, so combined regex filters will not always be evaluated.
         args (List[:obj:`str`]): Optional. Arguments passed to a command if the associated update
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
             text after the command, using any whitespace string as a delimiter.
-        error (:obj:`Exception`): Optional. The error that was raised. Only present when passed
-            to a error handler registered with :attr:`telegram.ext.Application.add_error_handler`.
+        error (:exc:`Exception`): Optional. The error that was raised. Only present when passed
+            to an error handler registered with :attr:`telegram.ext.Application.add_error_handler`.
         job (:class:`telegram.ext.Job`): Optional. The job which originated this callback.
             Only present when passed to the callback of :class:`telegram.ext.Job` or in error
             handlers if the error is caused by a job.
@@ -126,10 +125,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     )
 
     def __init__(self: 'CCT', application: 'Application[BT, CCT, UD, CD, BD, JQ]'):
-        """
-        Args:
-            application (:class:`telegram.ext.Application`):
-        """
         self._application = application
         self._chat_id_and_data: Optional[Tuple[int, CD]] = None
         self._user_id_and_data: Optional[Tuple[int, UD]] = None
@@ -146,8 +141,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @property
     def bot_data(self) -> BD:
-        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
-        update it will be the same ``dict``.
+        """:obj:`ContextTypes.bot_data`: Optional. An object that can be used to keep any data in.
+        For each update it will be the same :attr:`ContextTypes.bot_data`. Defaults to :obj:`dict`.
         """
         return self.application.bot_data
 
@@ -159,8 +154,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @property
     def chat_data(self) -> Optional[CD]:
-        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
-        update from the same chat id it will be the same ``dict``.
+        """:obj:`ContextTypes.chat_data`: Optional. An object that can be used to keep any data in.
+        For each update from the same chat id it will be the same :obj:`ContextTypes.chat_data`.
+        Defaults to :obj:`dict`.
 
         Warning:
             When a group chat migrates to a supergroup, its chat id will change and the
@@ -180,8 +176,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @property
     def user_data(self) -> Optional[UD]:
-        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
-        update from the same user it will be the same ``dict``.
+        """:obj:`ContextTypes.user_data`: Optional. An object that can be used to keep any data in.
+        For each update from the same user it will be the same :obj:`ContextTypes.user_data`.
+        Defaults to :obj:`dict`.
         """
         if self._user_id_and_data:
             return self._user_id_and_data[1]
@@ -227,15 +224,14 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
         Note:
             Will *not* raise exceptions in case the data is not found in the cache.
-            *Will* raise :class:`KeyError` in case the callback query can not be found in the
-            cache.
+            *Will* raise :exc:`KeyError` in case the callback query can not be found in the cache.
 
         Args:
             callback_query (:class:`telegram.CallbackQuery`): The callback query.
 
         Raises:
-            KeyError | RuntimeError: :class:`KeyError`, if the callback query can not be found in
-                the cache and :class:`RuntimeError`, if the bot doesn't allow for arbitrary
+            KeyError | RuntimeError: :exc:`KeyError`, if the callback query can not be found in
+                the cache and :exc:`RuntimeError`, if the bot doesn't allow for arbitrary
                 callback data.
         """
         if isinstance(self.bot, ExtBot):
@@ -374,9 +370,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @property
     def job_queue(self) -> Optional['JobQueue']:
         """
-        :class:`telegram.ext.JobQueue`: The ``JobQueue`` used by the
-            :class:`telegram.ext.Application` and (usually) the :class:`telegram.ext.Updater`
-            associated with this context.
+        :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
+            :class:`telegram.ext.Application`.
 
         """
         return self._application.job_queue
@@ -384,7 +379,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @property
     def update_queue(self) -> 'Queue[object]':
         """
-        :class:`asyncio.Queue`: The ``Queue`` instance used by the
+        :class:`asyncio.Queue`: The :class:`asyncio.Queue` instance used by the
             :class:`telegram.ext.Application` and (usually) the :class:`telegram.ext.Updater`
             associated with this context.
 
@@ -394,9 +389,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @property
     def match(self) -> Optional[Match[str]]:
         """
-        `Regex match type`: The first match from :attr:`matches`.
+        :meth:`re.Match <re.Match.expand>`: The first match from :attr:`matches`.
             Useful if you are only filtering using a single regex filter.
-            Returns `None` if :attr:`matches` is empty.
+            Returns :obj:`None` if :attr:`matches` is empty.
         """
         try:
             return self.matches[0]  # type: ignore[index] # pylint: disable=unsubscriptable-object
