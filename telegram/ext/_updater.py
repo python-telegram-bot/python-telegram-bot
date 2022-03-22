@@ -366,7 +366,7 @@ class Updater:
             if self.running:
                 raise RuntimeError('This Updater is already running!')
             if not self._initialized:
-                raise RuntimeError('This Updater is not initialized!')
+                raise RuntimeError('This Updater was not initialized via `Updater.initialize`!')
 
             self._running = True
 

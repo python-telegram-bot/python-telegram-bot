@@ -827,7 +827,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     'A persistent `ConversationHandler` was passed to `add_handler`, '
                     'after `Application.initialize` was called. This is discouraged.'
                     'See the docs of `Application.add_handler` for details.',
-                    stacklevel=1,
+                    stacklevel=2,
                 )
 
         if group not in self.handlers:
