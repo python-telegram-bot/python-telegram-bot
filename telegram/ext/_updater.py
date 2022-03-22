@@ -119,7 +119,7 @@ class Updater:
             raise RuntimeError('This Updater is still running!')
 
         if not self._initialized:
-            self._logger.warning('This Updater is already shut down.')
+            self._logger.debug('This Updater is already shut down. Returning.')
             return
 
         await self.bot.shutdown()
@@ -199,6 +199,12 @@ class Updater:
             :exc:`RuntimeError`: If the updater is already running.
 
         """
+        if error_callback and asyncio.iscoroutinefunction(error_callback):
+            raise ValueError(
+                'The `error_callback` must not be a coroutine function! Use an ordinary function '
+                'instead. '
+            )
+
         async with self.__lock:
             if self.running:
                 raise RuntimeError('This Updater is already running!')
@@ -366,7 +372,7 @@ class Updater:
             if self.running:
                 raise RuntimeError('This Updater is already running!')
             if not self._initialized:
-                raise RuntimeError('This Updater is not initialized!')
+                raise RuntimeError('This Updater was not initialized via `Updater.initialize`!')
 
             self._running = True
 

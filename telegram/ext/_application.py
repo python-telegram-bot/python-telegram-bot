@@ -317,7 +317,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             raise RuntimeError('This Application is still running!')
 
         if not self._initialized:
-            _logger.warning('This Application is already shut down.')
+            _logger.debug('This Application is already shut down. Returning.')
             return
 
         await self.bot.shutdown()
@@ -827,7 +827,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     'A persistent `ConversationHandler` was passed to `add_handler`, '
                     'after `Application.initialize` was called. This is discouraged.'
                     'See the docs of `Application.add_handler` for details.',
-                    stacklevel=1,
+                    stacklevel=2,
                 )
 
         if group not in self.handlers:
