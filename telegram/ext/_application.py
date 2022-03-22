@@ -102,7 +102,8 @@ class ApplicationHandlerStop(Exception):
 
 
 class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
-    """This class dispatches all kinds of updates to its registered handlers.
+    """This class dispatches all kinds of updates to its registered handlers, and is the entry
+    point to a PTB application.
 
     Tip:
          This class may not be initialized directly. Use :class:`telegram.ext.ApplicationBuilder`
@@ -146,8 +147,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             .. seealso::
                 :meth:`add_handler`, :meth:`add_handlers`.
-        error_handlers (Dict[:term:`coroutine`, :obj:`bool`]): A dict, where the keys are error
-            handlers and the values indicate whether they are to be run blocking.
+        error_handlers (Dict[:term:`coroutine function`, :obj:`bool`]): A dict, where the keys are
+            error handlers and the values indicate whether they are to be run blocking.
 
             .. seealso::
                 :meth:`add_error_handler`
@@ -607,15 +608,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Starts a small http server to listen for updates via webhook using
         :meth:`telegram.ext.Updater.start_webhook`. If :paramref:`cert`
         and :paramref:`key` are not provided, the webhook will be started directly on
-        http://listen:port/url_path, so SSL can be handled by another
+        ``http://listen:port/url_path``, so SSL can be handled by another
         application. Else, the webhook will be started on
-        https://listen:port/url_path. Also calls :meth:`telegram.Bot.set_webhook` as required.
+        ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as required.
 
         .. seealso::
             :meth:`telegram.ext.Updater.start_webhook`, :meth:`run_polling`
 
         Args:
-            listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
+            listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
+                `127.0.0.1 <https://en.wikipedia.org/wiki/Localhost>`_.
             port (:obj:`int`, optional): Port the bot should be listening on. Must be one of
                 :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`. Defaults to ``80``.
             url_path (:obj:`str`, optional): Path inside url. Defaults to `` '' ``
@@ -700,7 +702,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
               awaited by :meth:`stop`.
 
         Args:
-            coroutine (:term:`coroutine`): The coroutine to run as task.
+            coroutine (:term:`coroutine function`): The coroutine to run as task.
             update (:obj:`object`, optional): If passed, will be passed to :meth:`dispatch_error`
                 as additional information for the error handlers. Moreover, the corresponding
                 :attr:`chat_data` and :attr:`user_data` entries will be updated in the next run of
@@ -905,7 +907,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Args:
             handler (:class:`telegram.ext.Handler`): A Handler instance.
-            group (:obj:`int`, optional): The group identifier. Default is 0.
+            group (:obj:`int`, optional): The group identifier. Default is ``0``.
 
         """
         # Unfortunately due to circular imports this has to be here
@@ -955,8 +957,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 Dict[int, List[:class:`telegram.ext.Handler`]]): \
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
-            group (:obj:`int`, optional): Specify which group the sequence of ``handlers``
+            group (:obj:`int`, optional): Specify which group the sequence of :paramref:`handlers`
                 should be added to. Defaults to ``0``.
+
+        Example::
+
+            app.add_handlers(handlers={
+                -1: [MessageHandler(...)],
+                1: [CallbackQueryHandler(...), CommandHandler(...)]
+            }
 
         """
         if isinstance(handlers, dict) and not isinstance(group, DefaultValue):
@@ -1045,7 +1054,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
               :class:`telegram.ext.Job`.
 
         Warning:
-            When using :paramref:`concurrent_updates` or the :attr:`job_queue`,
+            When using :attr:`concurrent_updates` or the :attr:`job_queue`,
             :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create the old entry due
             to the asynchronous nature of these features. Please make sure that your program can
             avoid or handle such situations.
@@ -1054,9 +1063,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             message (:class:`telegram.Message`, optional): A message with either
                 :attr:`~telegram.Message.migrate_from_chat_id` or
                 :attr:`~telegram.Message.migrate_to_chat_id`.
-                Mutually exclusive with passing :paramref:`old_chat_id`` and
-                :paramref:`new_chat_id`
-                .. seealso: `telegram.ext.filters.StatusUpdate.MIGRATE`
+                Mutually exclusive with passing :paramref:`old_chat_id` and
+                :paramref:`new_chat_id`.
+
+                .. seealso::
+                    :attr:`telegram.ext.filters.StatusUpdate.MIGRATE`
+
             old_chat_id (:obj:`int`, optional): The old chat ID.
                 Mutually exclusive with passing :paramref:`message`
             new_chat_id (:obj:`int`, optional): The new chat ID.
@@ -1250,8 +1262,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             Attempts to add the same callback multiple times will be ignored.
 
         Args:
-            callback (:term:`coroutine`): The callback function for this error handler. Will be
-                called when an error is raised. Callback signature::
+            callback (:term:`coroutine function`): The callback function for this error handler.
+                Will be called when an error is raised. Callback signature::
 
                     async def callback(update: object, context: CallbackContext)
 
@@ -1271,7 +1283,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Removes an error handler.
 
         Args:
-            callback (:term:`coroutine`): The error handler to remove.
+            callback (:term:`coroutine function`): The error handler to remove.
 
         """
         self.error_handlers.pop(callback, None)
@@ -1303,8 +1315,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 .. versionadded:: 14.0
 
         Returns:
-            :obj:`bool`: :obj:`True` if one of the error handlers raised
-                :class:`telegram.ext.ApplicationHandlerStop`. :obj:`False`, otherwise.
+            :obj:`bool`: :obj:`True`, if one of the error handlers raised
+            :class:`telegram.ext.ApplicationHandlerStop`. :obj:`False`, otherwise.
         """
         if self.error_handlers:
             for (

@@ -54,10 +54,10 @@ class CommandHandler(Handler[Update, CCT]):
     Args:
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-            Limitations are the same as described here https://core.telegram.org/bots#commands
-        callback (:term:`coroutine`): The callback function for this handler. Will be called when
-            :meth:`check_update` has determined that an update should be processed by this handler.
-            Callback signature::
+            Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
 
@@ -77,8 +77,8 @@ class CommandHandler(Handler[Update, CCT]):
     Attributes:
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-            Limitations are the same as described here https://core.telegram.org/bots#commands
-        callback (:term:`coroutine`): The callback function for this handler.
+            Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
+        callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
         block (:obj:`bool`): Determines whether the return value of the callback should be
@@ -209,9 +209,9 @@ class PrefixHandler(CommandHandler):
             The prefix(es) that will precede :attr:`command`.
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-        callback (:term:`coroutine`): The callback function for this handler. Will be called when
-            :meth:`check_update` has determined that an update should be processed by this handler.
-            Callback signature::
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
 
@@ -226,7 +226,7 @@ class PrefixHandler(CommandHandler):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:term:`coroutine`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
         block (:obj:`bool`): Determines whether the return value of the callback should be

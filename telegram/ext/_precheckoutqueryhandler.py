@@ -32,9 +32,9 @@ class PreCheckoutQueryHandler(Handler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        callback (:term:`coroutine`): The callback function for this handler. Will be called when
-            :meth:`check_update` has determined that an update should be processed by this handler.
-            Callback signature::
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
 
@@ -45,7 +45,7 @@ class PreCheckoutQueryHandler(Handler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:term:`coroutine`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """

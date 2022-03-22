@@ -36,9 +36,9 @@ class ChatJoinRequestHandler(Handler[Update, CCT]):
     .. versionadded:: 13.8
 
     Args:
-        callback (:term:`coroutine`): The callback function for this handler. Will be called when
-            :meth:`check_update` has determined that an update should be processed by this handler.
-            Callback signature::
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
 
@@ -49,7 +49,7 @@ class ChatJoinRequestHandler(Handler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:term:`coroutine`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the callback will run asynchronously.
 
     """

@@ -38,9 +38,9 @@ class ChatMemberHandler(Handler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        callback (:term:`coroutine`): The callback function for this handler. Will be called when
-            :meth:`check_update` has determined that an update should be processed by this handler.
-            Callback signature::
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
 
@@ -55,7 +55,7 @@ class ChatMemberHandler(Handler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:term:`coroutine`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         chat_member_types (:obj:`int`, optional): Specifies if this handler should handle
             only updates with :attr:`telegram.Update.my_chat_member`,
             :attr:`telegram.Update.chat_member` or both.

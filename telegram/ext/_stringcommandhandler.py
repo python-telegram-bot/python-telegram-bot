@@ -45,9 +45,9 @@ class StringCommandHandler(Handler[str, CCT]):
 
     Args:
         command (:obj:`str`): The command this handler should listen for.
-        callback (:term:`coroutine`): The callback function for this handler. Will be called when
-            :meth:`check_update` has determined that an update should be processed by this handler.
-            Callback signature::
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
 
@@ -59,7 +59,7 @@ class StringCommandHandler(Handler[str, CCT]):
 
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
-        callback (:term:`coroutine`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.

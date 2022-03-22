@@ -65,15 +65,16 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        callback (:term:`coroutine`): The callback function for this handler. Will be called when
-            :meth:`check_update` has determined that an update should be processed by this handler.
-            Callback signature::
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pattern (:obj:`str` | `Pattern` | :term:`coroutine` | :obj:`type`, optional):
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`, \
+            optional):
             Pattern to test :attr:`telegram.CallbackQuery.data` against. If a string or a regex
             pattern is passed, :func:`re.match` is used on :attr:`telegram.CallbackQuery.data` to
             determine if an update should be handled by this handler. If your bot allows arbitrary
@@ -96,9 +97,9 @@ class CallbackQueryHandler(Handler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:term:`coroutine`): The callback function for this handler.
-        pattern (`Pattern` | :term:`coroutine` | :obj:`type`): Optional. Regex pattern, callback or
-            type to test :attr:`telegram.CallbackQuery.data` against.
+        callback (:term:`coroutine function`): The callback function for this handler.
+        pattern (:func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`): Optional.
+            Regex pattern, callback or type to test :attr:`telegram.CallbackQuery.data` against.
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.

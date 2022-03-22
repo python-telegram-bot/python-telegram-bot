@@ -146,7 +146,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     @property
     def update_interval(self) -> float:
-        """:obj:`int`: Time (in seconds) that the :class:`~telegram.ext.Application`
+        """:obj:`float`: Time (in seconds) that the :class:`~telegram.ext.Application`
         will wait between two consecutive runs of updating the persistence.
 
         .. versionadded:: 14.0
@@ -236,7 +236,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
@@ -312,7 +312,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Args:
             data (Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
@@ -351,7 +351,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Args:
             user_id (:obj:`int`): The user ID this :attr:`~telegram.ext.Application.user_data` is
@@ -369,7 +369,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`~telegram.ext.Application.chat_data` is
@@ -387,7 +387,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Args:
             bot_data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`):
@@ -400,5 +400,5 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         persistence a chance to finish up saving or close a database connection gracefully.
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
         """

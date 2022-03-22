@@ -48,9 +48,9 @@ class MessageHandler(Handler[Update, CCT]):
             :attr:`telegram.Update.channel_post` and :attr:`telegram.Update.edited_channel_post`.
             If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
             argument.
-        callback (:term:`coroutine`): The callback function for this handler. Will be called when
-            :meth:`check_update` has determined that an update should be processed by this handler.
-            Callback signature::
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
 
@@ -63,7 +63,7 @@ class MessageHandler(Handler[Update, CCT]):
     Attributes:
         filters (:class:`telegram.ext.filters.BaseFilter`): Only allow updates with these Filters.
             See :mod:`telegram.ext.filters` for a full list of all available filters.
-        callback (:term:`coroutine`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.

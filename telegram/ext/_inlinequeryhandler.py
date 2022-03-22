@@ -54,9 +54,9 @@ class InlineQueryHandler(Handler[Update, CCT]):
           updates won't be handled, if :attr:`chat_types` is passed.
 
     Args:
-        callback (:term:`coroutine`): The callback function for this handler. Will be called when
-            :meth:`check_update` has determined that an update should be processed by this handler.
-            Callback signature::
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
                 async def callback(update: Update, context: CallbackContext)
 
@@ -74,7 +74,7 @@ class InlineQueryHandler(Handler[Update, CCT]):
             .. versionadded:: 13.5
 
     Attributes:
-        callback (:term:`coroutine`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): Optional. Regex pattern to test
             :attr:`telegram.InlineQuery.query` against.
         chat_types (List[:obj:`str`]): Optional. List of allowed chat types.

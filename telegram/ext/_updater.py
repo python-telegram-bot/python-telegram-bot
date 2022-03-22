@@ -207,8 +207,8 @@ class Updater:
                 :obj:`None`, in which case errors will be logged.
 
                 Note:
-                    The :paramref:`error_callback` must *not* be a coroutine function! If
-                    asynchorous behavior of the callback is wanted, please schedule a task from
+                    The :paramref:`error_callback` must *not* be a :term:`coroutine function`! If
+                    asynchronous behavior of the callback is wanted, please schedule a task from
                     within the callback.
 
         Returns:
@@ -270,7 +270,10 @@ class Updater:
 
         self._logger.debug('Updater started (polling)')
 
-        await self._bootstrap(  # Makes sure no webhook is set by calling delete_webhook
+        # the bootstrapping phase does two things:
+        # 1) make sure there is no webhook set
+        # 2) apply drop_pending_updates
+        await self._bootstrap(
             bootstrap_retries,
             drop_pending_updates=drop_pending_updates,
             webhook_url='',
@@ -350,7 +353,8 @@ class Updater:
             the deprecated argument ``force_event_loop``.
 
         Args:
-            listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
+            listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
+                `127.0.0.1 <https://en.wikipedia.org/wiki/Localhost>`_.
             port (:obj:`int`, optional): Port the bot should be listening on. Must be one of
                 :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`. Defaults to ``80``.
             url_path (:obj:`str`, optional): Path inside url (http(s)://listen:port/<url_path>).
@@ -502,7 +506,7 @@ class Updater:
         `action_cb` evaluates :obj:`False`.
 
         Args:
-            action_cb (:term:`coroutine`): Network oriented callback function to call.
+            action_cb (:term:`coroutine function`): Network oriented callback function to call.
             on_err_cb (:obj:`callable`): Callback to call when TelegramError is caught. Receives
                 the exception object as a parameter.
             description (:obj:`str`): Description text to use for logs and exception raised.
@@ -554,10 +558,9 @@ class Updater:
         ip_address: str = None,
         max_connections: int = 40,
     ) -> None:
-        """Entry point for handling webhooks. :meth:`start_polling` calls this to delete any
-        present webhook. :meth:`start_webhook` calls this to set a webhook using
-        :meth:`telegram.Bot.set_webhook. If there are unsuccessful attempts, it will be retried as
-        specified by :paramref:`max_retries`.
+        """Prepares the setup for fetching updates: delete or set the webhook and drop pending
+        updates if appropriate. If there are unsuccessful attempts, this will retry as specified by
+        :paramref:`max_retries`.
         """
         retries = 0
 
