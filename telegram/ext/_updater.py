@@ -200,7 +200,7 @@ class Updater:
 
         """
         if error_callback and asyncio.iscoroutinefunction(error_callback):
-            raise ValueError(
+            raise TypeError(
                 'The `error_callback` must not be a coroutine function! Use an ordinary function '
                 'instead. '
             )
