@@ -650,11 +650,12 @@ class ConversationHandler(Handler[Update, CCT]):
                         "Ignoring `conversation_timeout` because the Dispatcher has no JobQueue."
                     )
 
-        if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
+        new_state_str = self._resolve_promise((new_state, new_state)) if isinstance(new_state, Promise) else new_state
+        if isinstance(self.map_to_parent, dict) and new_state_str in self.map_to_parent:
             self._update_state(self.END, conversation_key)
             if raise_dp_handler_stop:
-                raise DispatcherHandlerStop(self.map_to_parent.get(new_state))
-            return self.map_to_parent.get(new_state)
+                raise DispatcherHandlerStop(self.map_to_parent.get(new_state_str))
+            return self.map_to_parent.get(new_state_str)
 
         self._update_state(new_state, conversation_key)
         if raise_dp_handler_stop:
