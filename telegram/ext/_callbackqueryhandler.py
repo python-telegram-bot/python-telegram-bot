@@ -116,7 +116,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         super().__init__(callback, block=block)
 
         if callable(pattern) and asyncio.iscoroutinefunction(pattern):
-            raise ValueError(
+            raise TypeError(
                 'The `pattern` must not be a coroutine function! Use an ordinary function instead.'
             )
 
