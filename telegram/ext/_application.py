@@ -317,7 +317,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             raise RuntimeError('This Application is still running!')
 
         if not self._initialized:
-            _logger.warning('This Application is already shut down.')
+            _logger.debug('This Application is already shut down. Returning.')
             return
 
         await self.bot.shutdown()

@@ -379,7 +379,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :meth:`telegram.request.BaseRequest.shutdown` for the request objects used by this bot.
         """
         if not self._initialized:
-            self._logger.warning('This Bot is already shut down.')
+            self._logger.debug('This Bot is already shut down. Returning.')
             return
 
         await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
