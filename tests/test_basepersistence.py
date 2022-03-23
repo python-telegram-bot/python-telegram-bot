@@ -1057,25 +1057,71 @@ class TestBasePersistence:
             message = record.getMessage()
             assert message.startswith('An error was raised and an uncaught')
 
-    # @pytest.mark.parametrize('block,expected', [(DEFAULT_FALSE, 1), (False, 1), (True, 0)])
-    # def test_update_persistence_defaults_async(self, monkeypatch, app, block, expected):
-    #     def update_persistence(*args, **kwargs):
-    #         self.count += 1
-    #
-    #     def dummy_callback(*args, **kwargs):
-    #         pass
-    #
-    #     monkeypatch.setattr(app, 'update_persistence', update_persistence)
-    #     monkeypatch.setattr(app, 'block', dummy_callback)
-    #     app.bot._defaults = Defaults(block=block)
-    #
-    #     try:
-    #         for group in range(5):
-    #             app.add_handler(MessageHandler(filters.TEXT, dummy_callback), group=group)
-    #
-    #         update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None,
-    #         text='Text'))
-    #         app.process_update(update)
-    #         assert self.count == expected
-    #     finally:
-    #         app.bot._defaults = None
+    @default_papp
+    @pytest.mark.parametrize(
+        'delay_type', ('job', 'blocking_handler', 'nonblocking_handler', 'task')
+    )
+    @pytest.mark.asyncio
+    async def test_update_persistence_after_exception(
+        self, papp: Application, delay_type: str, chat_id
+    ):
+        """Makes sure that persistence is updated even if an exception happened in a callback."""
+        sleep = 1.5
+        update = TrackingConversationHandler.build_update(HandlerStates.STATE_1, chat_id=1)
+        errors = 0
+
+        async def error(_, __):
+            nonlocal errors
+            errors += 1
+
+        async def raise_error(*args, **kwargs):
+            raise Exception
+
+        async with papp:
+            papp.add_error_handler(error)
+
+            await papp.update_persistence()
+            assert papp.persistence.updated_bot_data
+            assert not papp.persistence.updated_chat_ids
+            assert not papp.persistence.updated_user_ids
+            assert not papp.persistence.dropped_chat_ids
+            assert not papp.persistence.dropped_user_ids
+            assert papp.persistence.updated_callback_data
+            assert not papp.persistence.updated_conversations
+            assert errors == 0
+
+            if delay_type == 'job':
+                papp.job_queue.start()
+                papp.job_queue.run_once(raise_error, when=sleep, chat_id=1, user_id=1)
+            elif delay_type.endswith('_handler'):
+                papp.add_handler(
+                    MessageHandler(
+                        filters.ALL,
+                        raise_error,
+                        block=delay_type.startswith('blocking'),
+                    )
+                )
+                await papp.process_update(update)
+            else:
+                papp.create_task(raise_error(), update=update)
+
+            # Wait for the asyncio process to be done
+            await asyncio.sleep(sleep + 1)
+
+            assert errors == 1
+            await papp.update_persistence()
+            assert not papp.persistence.dropped_chat_ids
+            assert not papp.persistence.dropped_user_ids
+            assert papp.persistence.updated_bot_data == papp.persistence.store_data.bot_data
+            assert (
+                papp.persistence.updated_callback_data == papp.persistence.store_data.callback_data
+            )
+            if papp.persistence.store_data.user_data:
+                assert papp.persistence.updated_user_ids == {1: 1}
+            else:
+                assert not papp.persistence.updated_user_ids
+            if papp.persistence.store_data.chat_data:
+                assert papp.persistence.updated_chat_ids == {1: 1}
+            else:
+                assert not papp.persistence.updated_chat_ids
+            assert not papp.persistence.updated_conversations
