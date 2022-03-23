@@ -54,12 +54,12 @@ from telegram.ext import (
 )
 from telegram._utils.warnings import warn
 from telegram.ext._utils.trackingdict import TrackingDict
-from telegram.ext._utils.types import ConversationDict
+from telegram.ext._utils.types import ConversationDict, ConversationKey
 from telegram.ext._utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
-CheckUpdateType = Tuple[object, Tuple[int, ...], Handler, object]
+CheckUpdateType = Tuple[object, ConversationKey, Handler, object]
 
 _logger = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ _logger = logging.getLogger(__name__)
 class _ConversationTimeoutContext(Generic[CCT]):
     __slots__ = ('conversation_key', 'update', 'application', 'callback_context')
 
-    conversation_key: Tuple[int, ...]
+    conversation_key: ConversationKey
     update: Update
     application: 'Application[Any, CCT, Any, Any, Any, JobQueue]'
     callback_context: CallbackContext
@@ -238,7 +238,6 @@ class ConversationHandler(Handler[Update, CCT]):
     """
 
     __slots__ = (
-        '__aplication',
         '_allow_reentry',
         '_child_conversations',
         '_conversation_timeout',
@@ -246,13 +245,11 @@ class ConversationHandler(Handler[Update, CCT]):
         '_conversations_lock',
         '_entry_points',
         '_fallbacks',
-        '_logger',
         '_map_to_parent',
         '_name',
         '_per_chat',
         '_per_message',
         '_per_user',
-        '_persistence',
         '_states',
         '_timeout_jobs_lock',
         'persistent',
@@ -304,7 +301,7 @@ class ConversationHandler(Handler[Update, CCT]):
         self._name = name
         self._map_to_parent = map_to_parent
 
-        self.timeout_jobs: Dict[Tuple[int, ...], 'Job'] = {}
+        self.timeout_jobs: Dict[ConversationKey, 'Job'] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
         # TODO: Do we still need this lock?
@@ -527,7 +524,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     async def _initialize_persistence(
         self, application: 'Application'
-    ) -> TrackingDict[Tuple[int, ...], object]:
+    ) -> TrackingDict[ConversationKey, object]:
         """Initializes the persistence for this handler. While this method is marked as protected,
         we expect it to be called by the Application/parent conversations. It's just protected to
         hide it from users.
@@ -545,7 +542,7 @@ class ConversationHandler(Handler[Update, CCT]):
         with self._conversations_lock:
             current_conversations = self._conversations
             self._conversations = cast(
-                TrackingDict[Tuple[int, ...], object],
+                TrackingDict[ConversationKey, object],
                 TrackingDict(),
             )
             # In the conversation already processed updates
@@ -563,23 +560,28 @@ class ConversationHandler(Handler[Update, CCT]):
 
         return self._conversations
 
-    def _get_key(self, update: Update) -> Tuple[int, ...]:
+    def _get_key(self, update: Update) -> ConversationKey:
         chat = update.effective_chat
         user = update.effective_user
 
-        key = []
+        key: List[Union[int, str]] = []
 
         if self.per_chat:
-            key.append(chat.id)  # type: ignore[union-attr]
+            if chat is None:
+                raise RuntimeError("Can't build key for update without effective chat!")
+            key.append(chat.id)
 
-        if self.per_user and user is not None:
+        if self.per_user:
+            if user is None:
+                raise RuntimeError("Can't build key for update without effective user!")
             key.append(user.id)
 
         if self.per_message:
-            key.append(
-                update.callback_query.inline_message_id  # type: ignore[union-attr]
-                or update.callback_query.message.message_id  # type: ignore[union-attr]
-            )
+            if update.callback_query is None:
+                raise RuntimeError("Can't build key for update without CallbackQuery!")
+            if update.callback_query.inline_message_id:
+                key.append(update.callback_query.inline_message_id)
+            key.append(update.callback_query.message.message_id)  # type: ignore[union-attr]
 
         return tuple(key)
 
@@ -589,7 +591,7 @@ class ConversationHandler(Handler[Update, CCT]):
         application: 'Application[Any, CCT, Any, Any, Any, JobQueue]',
         update: Update,
         context: CallbackContext,
-        conversation_key: Tuple[int, ...],
+        conversation_key: ConversationKey,
     ) -> None:
         try:
             effective_new_state = await new_state
@@ -614,7 +616,7 @@ class ConversationHandler(Handler[Update, CCT]):
         application: 'Application[Any, CCT, Any, Any, Any, JobQueue]',
         update: Update,
         context: CallbackContext,
-        conversation_key: Tuple[int, ...],
+        conversation_key: ConversationKey,
     ) -> None:
         if new_state == self.END:
             return
@@ -799,7 +801,7 @@ class ConversationHandler(Handler[Update, CCT]):
             raise ApplicationHandlerStop()
         return None
 
-    def _update_state(self, new_state: object, key: Tuple[int, ...]) -> None:
+    def _update_state(self, new_state: object, key: ConversationKey) -> None:
         if new_state == self.END:
             with self._conversations_lock:
                 if key in self._conversations:

@@ -40,8 +40,7 @@ from telegram._utils.types import FilePathInput
 from telegram._utils.warnings import warn
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._contexttypes import ContextTypes
-from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
-
+from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData, ConversationKey
 
 _REPLACED_KNOWN_BOT = "a known bot replaced by PTB's PicklePersistence"
 _REPLACED_UNKNOWN_BOT = "an unknown bot replaced by PTB's PicklePersistence"
@@ -393,7 +392,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
     async def update_conversation(
-        self, name: str, key: Tuple[int, ...], new_state: Optional[object]
+        self, name: str, key: ConversationKey, new_state: Optional[object]
     ) -> None:
         """Will update the conversations for the given handler and depending on :attr:`on_flush`
         save the pickle file.
