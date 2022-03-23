@@ -836,7 +836,9 @@ class TestBasePersistence:
 
         async with papp:
             papp.job_queue.start()
-            papp.job_queue.run_once(self.job_callback(), when=1.5, chat_id=1, user_id=1)
+            papp.job_queue.run_once(
+                self.job_callback(chat_id=chat_id), when=1.5, chat_id=1, user_id=1
+            )
             await asyncio.sleep(2.5)
 
             assert not papp.persistence.bot_data
