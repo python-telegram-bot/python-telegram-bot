@@ -80,7 +80,7 @@ class ApplicationHandlerStop(Exception):
 
     .. code-block:: python
 
-        async def callback(update, context):
+        async def conversation_callback(update, context):
             ...
             raise ApplicationHandlerStop(next_state)
 

@@ -161,8 +161,8 @@ class CallbackDataCache:
     def process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
         """Registers the reply markup to the cache. If any of the buttons have
         :attr:`~telegram.InlineKeyboardButton.callback_data`, stores that data and builds a new
-        keyboard with the correspondingly
-        replaced buttons. Otherwise does nothing and returns the original reply markup.
+        keyboard with the correspondingly replaced buttons. Otherwise, does nothing and returns
+        the original reply markup.
 
         Args:
             reply_markup (:class:`telegram.InlineKeyboardMarkup`): The keyboard.
@@ -248,7 +248,7 @@ class CallbackDataCache:
 
         Note:
             Checks :attr:`telegram.Message.via_bot` and :attr:`telegram.Message.from_user` to check
-            if the reply markup (if any) was actually sent by this bot cache. If it was not, the
+            if the reply markup (if any) was actually sent by this cache's bot. If it was not, the
             message will be returned unchanged.
 
             Note that this will fail for channel posts, as :attr:`telegram.Message.from_user` is

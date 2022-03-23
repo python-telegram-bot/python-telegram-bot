@@ -49,7 +49,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
     Read-access is not tracked.
 
     Note:
-        * ``setdefault()`` and ``pop`` are considered writing only depending on whether or not the
+        * ``setdefault()`` and ``pop`` are considered writing only depending on whether the
             key is present
         * deleting values is considered writing
     """
