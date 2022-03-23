@@ -1128,9 +1128,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         # dispatch any errors
         await asyncio.gather(
-            self.dispatch_error(update=None, error=result)
-            for result in results
-            if isinstance(result, Exception)
+            *(
+                self.dispatch_error(update=None, error=result)
+                for result in results
+                if isinstance(result, Exception)
+            )
         )
 
     def add_error_handler(

@@ -305,8 +305,24 @@ class TestBasePersistence:
     # TODO:
     #  * conversations: pending states, ending conversations, unresolved pending states
 
-    async def job_callback(self, context):
-        pass
+    def job_callback(self, chat_id: int = None):
+        async def callback(context):
+            if context.user_data:
+                context.user_data['key'] = 'value'
+            if context.chat_data:
+                context.chat_data['key'] = 'value'
+            context.bot_data['key'] = 'value'
+
+            if chat_id:
+                await context.bot.send_message(
+                    chat_id=chat_id,
+                    text='text',
+                    reply_markup=InlineKeyboardMarkup.from_button(
+                        InlineKeyboardButton(text='text', callback_data='callback_data')
+                    ),
+                )
+
+        return callback
 
     def handler_callback(self, chat_id: int = None, sleep: float = None):
         async def callback(update, context):
@@ -660,7 +676,7 @@ class TestBasePersistence:
     async def test_update_persistence_loop_call_count_job(self, papp: Application, caplog):
         async with papp:
             papp.job_queue.start()
-            papp.job_queue.run_once(self.job_callback, when=1.5, chat_id=1, user_id=1)
+            papp.job_queue.run_once(self.job_callback(), when=1.5, chat_id=1, user_id=1)
             await asyncio.sleep(2.5)
             assert not papp.persistence.updated_bot_data
             assert not papp.persistence.updated_chat_ids
@@ -705,7 +721,7 @@ class TestBasePersistence:
 
             # Nothing should have been updated after running job without associated user/chat_data
             papp.persistence.reset_tracking()
-            papp.job_queue.run_once(self.job_callback, when=0.1)
+            papp.job_queue.run_once(self.job_callback(), when=0.1)
             await asyncio.sleep(0.2)
             with caplog.at_level(logging.ERROR):
                 await papp.update_persistence()
@@ -811,19 +827,78 @@ class TestBasePersistence:
 
             assert not papp.persistence.conversations
 
+    @papp_store_all_or_none
+    @pytest.mark.asyncio
+    async def test_update_persistence_loop_saved_data_job(self, papp: Application, chat_id):
+        papp.add_handler(
+            MessageHandler(filters.ALL, callback=self.handler_callback(chat_id=chat_id)), group=-1
+        )
+
+        async with papp:
+            papp.job_queue.start()
+            papp.job_queue.run_once(self.job_callback(), when=1.5, chat_id=1, user_id=1)
+            await asyncio.sleep(2.5)
+
+            assert not papp.persistence.bot_data
+            assert papp.persistence.bot_data is not papp.bot_data
+            assert not papp.persistence.chat_data
+            assert papp.persistence.chat_data is not papp.chat_data
+            assert not papp.persistence.user_data
+            assert papp.persistence.user_data is not papp.user_data
+            assert papp.persistence.callback_data == ([], {})
+            assert (
+                papp.persistence.callback_data is not papp.bot.callback_data_cache.persistence_data
+            )
+            assert not papp.persistence.conversations
+
+            await papp.update_persistence()
+
+            assert papp.persistence.bot_data is not papp.bot_data
+            if papp.persistence.store_data.bot_data:
+                assert papp.persistence.bot_data == {'key': 'value', 'refreshed': True}
+            else:
+                assert not papp.persistence.bot_data
+
+            assert papp.persistence.chat_data is not papp.chat_data
+            if papp.persistence.store_data.chat_data:
+                assert papp.persistence.chat_data == {1: {'key': 'value', 'refreshed': True}}
+                assert papp.persistence.chat_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.chat_data
+
+            assert papp.persistence.user_data is not papp.user_data
+            if papp.persistence.store_data.user_data:
+                assert papp.persistence.user_data == {1: {'key': 'value', 'refreshed': True}}
+                assert papp.persistence.user_data[1] is not papp.chat_data[1]
+            else:
+                assert not papp.persistence.user_data
+
+            assert (
+                papp.persistence.callback_data is not papp.bot.callback_data_cache.persistence_data
+            )
+            if papp.persistence.store_data.callback_data:
+                assert papp.persistence.callback_data[1] == {}
+                assert len(papp.persistence.callback_data[0]) == 1
+            else:
+                assert papp.persistence.callback_data == ([], {})
+
+            assert not papp.persistence.conversations
+
     @default_papp
     @pytest.mark.parametrize('delay_type', ('job', 'handler', 'task'))
     @pytest.mark.asyncio
     async def test_update_persistence_loop_async_logic(
         self, papp: Application, delay_type: str, chat_id
     ):
+        """All three kinds of 'asyncio background processes' should mark things for update once
+        they're done."""
         sleep = 1.5
         update = TrackingConversationHandler.build_update(HandlerStates.STATE_1, chat_id=1)
 
         async with papp:
             if delay_type == 'job':
                 papp.job_queue.start()
-                papp.job_queue.run_once(self.job_callback, when=sleep, chat_id=1, user_id=1)
+                papp.job_queue.run_once(self.job_callback(), when=sleep, chat_id=1, user_id=1)
             elif delay_type == 'handler':
                 papp.add_handler(
                     MessageHandler(
@@ -845,6 +920,7 @@ class TestBasePersistence:
             assert papp.persistence.updated_callback_data
             assert not papp.persistence.updated_conversations
 
+            # Wait for the asyncio process to be done
             await asyncio.sleep(sleep + 1)
             await papp.update_persistence()
             assert not papp.persistence.dropped_chat_ids
@@ -923,301 +999,62 @@ class TestBasePersistence:
             assert papp.persistence.dropped_chat_ids == {1: 1}
             assert papp.persistence.updated_chat_ids == {2: 1}
 
-    # def test_error_while_saving_chat_data(self, bot):
-    #     increment = []
-    #
-    #     class OwnPersistence(BasePersistence):
-    #         def get_callback_data(self):
-    #             return None
-    #
-    #         def update_callback_data(self, data):
-    #             raise Exception
-    #
-    #         def get_bot_data(self):
-    #             return {}
-    #
-    #         def update_bot_data(self, data):
-    #             raise Exception
-    #
-    #         def drop_chat_data(self, chat_id):
-    #             pass
-    #
-    #         def drop_user_data(self, user_id):
-    #             pass
-    #
-    #         def get_chat_data(self):
-    #             return defaultdict(dict)
-    #
-    #         def update_chat_data(self, chat_id, data):
-    #             raise Exception
-    #
-    #         def get_user_data(self):
-    #             return defaultdict(dict)
-    #
-    #         def update_user_data(self, user_id, data):
-    #             raise Exception
-    #
-    #         def get_conversations(self, name):
-    #             pass
-    #
-    #         def update_conversation(self, name, key, new_state):
-    #             pass
-    #
-    #         def refresh_user_data(self, user_id, user_data):
-    #             pass
-    #
-    #         def refresh_chat_data(self, chat_id, chat_data):
-    #             pass
-    #
-    #         def refresh_bot_data(self, bot_data):
-    #             pass
-    #
-    #         def flush(self):
-    #             pass
-    #
-    #     def start1(u, c):
-    #         pass
-    #
-    #     def error(u, c):
-    #         increment.append("error")
-    #
-    #     # If updating a user_data or chat_data from a persistence object throws an error,
-    #     # the error handler should catch it
-    #
-    #     update = Update(
-    #         1,
-    #         message=Message(
-    #             1,
-    #             None,
-    #             Chat(1, "lala"),
-    #             from_user=User(1, "Test", False),
-    #             text='/start',
-    #             entities=[
-    #                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #             ],
-    #             bot=bot,
-    #         ),
-    #     )
-    #     my_persistence = OwnPersistence()
-    #     app = ApplicationBuilder().bot(bot).persistence(my_persistence).build()
-    #     app.add_handler(CommandHandler('start', start1))
-    #     app.add_error_handler(error)
-    #     app.process_update(update)
-    #     assert increment == ["error", "error", "error", "error"]
-    #
-    # def test_error_while_persisting(self, app, caplog):
-    #     class OwnPersistence(BasePersistence):
-    #         def update(self, data):
-    #             raise Exception('PersistenceError')
-    #
-    #         def update_callback_data(self, data):
-    #             self.update(data)
-    #
-    #         def update_bot_data(self, data):
-    #             self.update(data)
-    #
-    #         def update_chat_data(self, chat_id, data):
-    #             self.update(data)
-    #
-    #         def update_user_data(self, user_id, data):
-    #             self.update(data)
-    #
-    #         def drop_user_data(self, user_id):
-    #             pass
-    #
-    #         def drop_chat_data(self, chat_id):
-    #             pass
-    #
-    #         def get_chat_data(self):
-    #             pass
-    #
-    #         def get_bot_data(self):
-    #             pass
-    #
-    #         def get_user_data(self):
-    #             pass
-    #
-    #         def get_callback_data(self):
-    #             pass
-    #
-    #         def get_conversations(self, name):
-    #             pass
-    #
-    #         def update_conversation(self, name, key, new_state):
-    #             pass
-    #
-    #         def refresh_bot_data(self, bot_data):
-    #             pass
-    #
-    #         def refresh_user_data(self, user_id, user_data):
-    #             pass
-    #
-    #         def refresh_chat_data(self, chat_id, chat_data):
-    #             pass
-    #
-    #         def flush(self):
-    #             pass
-    #
-    #     def callback(update, context):
-    #         pass
-    #
-    #     test_flag = []
-    #
-    #     def error(update, context):
-    #         nonlocal test_flag
-    #         test_flag.append(str(context.error) == 'PersistenceError')
-    #         raise Exception('ErrorHandlingError')
-    #
-    #     update = Update(
-    #         1, message=Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
-    #     )
-    #     handler = MessageHandler(filters.ALL, callback)
-    #     app.add_handler(handler)
-    #     app.add_error_handler(error)
-    #
-    #     app.persistence = OwnPersistence()
-    #
-    #     with caplog.at_level(logging.ERROR):
-    #         app.process_update(update)
-    #
-    #     assert test_flag == [True, True, True, True]
-    #     assert len(caplog.records) == 4
-    #     for record in caplog.records:
-    #         message = record.getMessage()
-    #         assert message.startswith('An error was raised and an uncaught')
-    #
-    # def test_persisting_no_user_no_chat(self, app):
-    #     class OwnPersistence(BasePersistence):
-    #         def __init__(self):
-    #             super().__init__()
-    #             self.test_flag_bot_data = False
-    #             self.test_flag_chat_data = False
-    #             self.test_flag_user_data = False
-    #
-    #         def update_bot_data(self, data):
-    #             self.test_flag_bot_data = True
-    #
-    #         def update_chat_data(self, chat_id, data):
-    #             self.test_flag_chat_data = True
-    #
-    #         def update_user_data(self, user_id, data):
-    #             self.test_flag_user_data = True
-    #
-    #         def update_conversation(self, name, key, new_state):
-    #             pass
-    #
-    #         def drop_chat_data(self, chat_id):
-    #             pass
-    #
-    #         def drop_user_data(self, user_id):
-    #             pass
-    #
-    #         def get_conversations(self, name):
-    #             pass
-    #
-    #         def get_user_data(self):
-    #             pass
-    #
-    #         def get_bot_data(self):
-    #             pass
-    #
-    #         def get_chat_data(self):
-    #             pass
-    #
-    #         def refresh_bot_data(self, bot_data):
-    #             pass
-    #
-    #         def refresh_user_data(self, user_id, user_data):
-    #             pass
-    #
-    #         def refresh_chat_data(self, chat_id, chat_data):
-    #             pass
-    #
-    #         def get_callback_data(self):
-    #             pass
-    #
-    #         def update_callback_data(self, data):
-    #             pass
-    #
-    #         def flush(self):
-    #             pass
-    #
-    #     def callback(update, context):
-    #         pass
-    #
-    #     handler = MessageHandler(filters.ALL, callback)
-    #     app.add_handler(handler)
-    #     app.persistence = OwnPersistence()
-    #
-    #     update = Update(
-    #         1, message=Message(1, None, None, from_user=User(1, '', False), text='Text')
-    #     )
-    #     app.process_update(update)
-    #     assert app.persistence.test_flag_bot_data
-    #     assert app.persistence.test_flag_user_data
-    #     assert not app.persistence.test_flag_chat_data
-    #
-    #     app.persistence.test_flag_bot_data = False
-    #     app.persistence.test_flag_user_data = False
-    #     app.persistence.test_flag_chat_data = False
-    #     update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
-    #     app.process_update(update)
-    #     assert app.persistence.test_flag_bot_data
-    #     assert not app.persistence.test_flag_user_data
-    #     assert app.persistence.test_flag_chat_data
-    #
-    # def test_update_persistence_all_async(self, monkeypatch, app):
-    #     def update_persistence(*args, **kwargs):
-    #         self.count += 1
-    #
-    #     def dummy_callback(*args, **kwargs):
-    #         pass
-    #
-    #     monkeypatch.setattr(app, 'update_persistence', update_persistence)
-    #     monkeypatch.setattr(app, 'block', dummy_callback)
-    #
-    #     for group in range(5):
-    #         app.add_handler(
-    #             MessageHandler(filters.TEXT, dummy_callback, block=True), group=group
-    #         )
-    #
-    #     update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
-    #     app.process_update(update)
-    #     assert self.count == 0
-    #
-    #     app.bot._defaults = Defaults(block=True)
-    #     try:
-    #         for group in range(5):
-    #             app.add_handler(MessageHandler(filters.TEXT, dummy_callback), group=group)
-    #
-    #         update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None,
-    #         text='Text'))
-    #         app.process_update(update)
-    #         assert self.count == 0
-    #     finally:
-    #         app.bot._defaults = None
-    #
-    # @pytest.mark.parametrize('block', [DEFAULT_FALSE, False])
-    # def test_update_persistence_one_sync(self, monkeypatch, app, block):
-    #     def update_persistence(*args, **kwargs):
-    #         self.count += 1
-    #
-    #     def dummy_callback(*args, **kwargs):
-    #         pass
-    #
-    #     monkeypatch.setattr(app, 'update_persistence', update_persistence)
-    #     monkeypatch.setattr(app, 'block', dummy_callback)
-    #
-    #     for group in range(5):
-    #         app.add_handler(
-    #             MessageHandler(filters.TEXT, dummy_callback, block=True), group=group
-    #         )
-    #     app.add_handler(MessageHandler(filters.TEXT, dummy_callback, block=block),group=5)
-    #
-    #     update = Update(1, message=Message(1, None, Chat(1, ''), from_user=None, text='Text'))
-    #     app.process_update(update)
-    #     assert self.count == 1
-    #
+    @pytest.mark.asyncio
+    async def test_errors_while_persisting(self, bot, caplog):
+        class ErrorPersistence(TrackingPersistence):
+            def raise_error(self):
+                raise Exception('PersistenceError')
+
+            async def update_callback_data(self, data):
+                self.raise_error()
+
+            async def update_bot_data(self, data):
+                self.raise_error()
+
+            async def update_chat_data(self, chat_id, data):
+                self.raise_error()
+
+            async def update_user_data(self, user_id, data):
+                self.raise_error()
+
+            async def drop_user_data(self, user_id):
+                self.raise_error()
+
+            async def drop_chat_data(self, chat_id):
+                self.raise_error()
+
+            async def update_conversation(self, name, key, new_state):
+                self.raise_error()
+
+        test_flag = []
+
+        async def error(update, context):
+            test_flag.append(str(context.error) == 'PersistenceError')
+            raise Exception('ErrorHandlingError')
+
+        app = ApplicationBuilder().token(bot.token).persistence(ErrorPersistence()).build()
+
+        async with app:
+            app.add_error_handler(error)
+            for _ in range(5):
+                # second pass processes update in conv_2
+                await app.process_update(
+                    TrackingConversationHandler.build_update(HandlerStates.END, chat_id=1)
+                )
+                app.drop_chat_data(7)
+                app.drop_user_data(42)
+
+            assert not caplog.records
+
+            with caplog.at_level(logging.ERROR):
+                await app.update_persistence()
+
+        assert len(caplog.records) == 6
+        assert test_flag == [True, True, True, True, True, True]
+        for record in caplog.records:
+            message = record.getMessage()
+            assert message.startswith('An error was raised and an uncaught')
+
     # @pytest.mark.parametrize('block,expected', [(DEFAULT_FALSE, 1), (False, 1), (True, 0)])
     # def test_update_persistence_defaults_async(self, monkeypatch, app, block, expected):
     #     def update_persistence(*args, **kwargs):
