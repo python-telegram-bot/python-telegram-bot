@@ -302,8 +302,12 @@ class TestBasePersistence:
     """Tests basic behavior of BasePersistence and (most importantly) the integration of
     persistence into the Application."""
 
-    # TODO:
-    #  * conversations: pending states, ending conversations, unresolved pending states
+    # TODO: Test integration of the more intricate ConversationHandler things once CH itself is
+    #  tested. This includes:
+    #  * pending states, i.e. non-blocking handlers
+    #  * pending states being unresolved on shutdown
+    #  * conversation timeouts
+    #  * nested conversations (can conversations be persistent if their parents aren't?)
 
     def job_callback(self, chat_id: int = None):
         async def callback(context):
