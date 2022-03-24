@@ -61,8 +61,9 @@ JobCallback = Callable[[CCT], Coroutine[Any, Any, Any]]
     .. versionadded:: 14.0
 """
 
-ConversationDict = MutableMapping[Tuple[int, ...], object]
-"""Dict[Tuple[:obj:`int`, ...], Optional[:obj:`object`]]:
+ConversationKey = Tuple[Union[int, str], ...]
+ConversationDict = MutableMapping[ConversationKey, object]
+"""Dict[Tuple[:obj:`int` | :obj:`str`, ...], Optional[:obj:`object`]]:
     Dicts as maintained by the :class:`telegram.ext.ConversationHandler`.
 
     .. versionadded:: 13.6

@@ -21,7 +21,6 @@ from abc import ABC, abstractmethod
 from typing import (
     Dict,
     Optional,
-    Tuple,
     Generic,
     NamedTuple,
     NoReturn,
@@ -30,7 +29,7 @@ from typing import (
 from telegram import Bot
 from telegram.ext import ExtBot
 
-from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData
+from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData, ConversationKey
 
 
 class PersistenceInput(NamedTuple):  # skipcq: PYL-E0239
@@ -256,7 +255,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     @abstractmethod
     async def update_conversation(
-        self, name: str, key: Tuple[int, ...], new_state: Optional[object]
+        self, name: str, key: ConversationKey, new_state: Optional[object]
     ) -> None:
         """Will be called when a :class:`telegram.ext.ConversationHandler` changes states.
         This allows the storage of the new state in the persistence.
