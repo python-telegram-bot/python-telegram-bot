@@ -679,7 +679,7 @@ class TestBasePersistence:
     @pytest.mark.asyncio
     async def test_update_persistence_loop_call_count_job(self, papp: Application, caplog):
         async with papp:
-            papp.job_queue.start()
+            await papp.job_queue.start()
             papp.job_queue.run_once(self.job_callback(), when=1.5, chat_id=1, user_id=1)
             await asyncio.sleep(2.5)
             assert not papp.persistence.updated_bot_data
@@ -839,7 +839,7 @@ class TestBasePersistence:
         )
 
         async with papp:
-            papp.job_queue.start()
+            await papp.job_queue.start()
             papp.job_queue.run_once(
                 self.job_callback(chat_id=chat_id), when=1.5, chat_id=1, user_id=1
             )
@@ -903,7 +903,7 @@ class TestBasePersistence:
 
         async with papp:
             if delay_type == 'job':
-                papp.job_queue.start()
+                await papp.job_queue.start()
                 papp.job_queue.run_once(self.job_callback(), when=sleep, chat_id=1, user_id=1)
             elif delay_type == 'handler':
                 papp.add_handler(
@@ -1095,7 +1095,7 @@ class TestBasePersistence:
             assert errors == 0
 
             if delay_type == 'job':
-                papp.job_queue.start()
+                await papp.job_queue.start()
                 papp.job_queue.run_once(raise_error, when=sleep, chat_id=1, user_id=1)
             elif delay_type.endswith('_handler'):
                 papp.add_handler(
