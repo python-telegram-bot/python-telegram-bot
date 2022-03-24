@@ -421,7 +421,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 _logger.debug('Loop for updating persistence started')
 
             if self.job_queue:
-                self.job_queue.start()
+                await self.job_queue.start()
                 _logger.debug('JobQueue started')
 
             self.__update_fetcher_task = asyncio.create_task(
