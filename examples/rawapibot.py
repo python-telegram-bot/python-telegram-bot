@@ -15,6 +15,7 @@ from telegram.error import NetworkError, Forbidden
 
 
 UPDATE_ID = None
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 async def main() -> NoReturn:
@@ -29,8 +30,6 @@ async def main() -> NoReturn:
         UPDATE_ID = (await bot.get_updates())[0].update_id
     except IndexError:
         UPDATE_ID = None
-
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     while True:
         try:

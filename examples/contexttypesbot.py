@@ -88,7 +88,7 @@ async def count_click(update: Update, context: CustomContext) -> None:
     """Update the click count for the message."""
     context.message_clicks += 1
     await update.callback_query.answer()
-    update.effective_message.edit_text(
+    await update.effective_message.edit_text(
         f'This button was clicked <i>{context.message_clicks}</i> times.',
         reply_markup=InlineKeyboardMarkup.from_button(
             InlineKeyboardButton(text='Click me!', callback_data='button')
