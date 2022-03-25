@@ -113,6 +113,20 @@ Telegram API support
 
 All types and methods of the Telegram Bot API **5.7** are supported.
 
+===========
+Concurrency
+===========
+
+Since v14.0, ``python-telegram-bot`` is built on top of Pythons ``asyncio`` module.
+Because ``asyncio`` is in general single-threaded, ``python-telegram-bot`` does currently not aim to be thread-safe.
+Noteworthy parts of ``python-telegram-bots`` API that are likely to cause issues (e.g. race conditions) when used in a multi-threaded setting include:
+
+* ``telegram.ext.Application/Updater.update_queue``
+* ``telegram.ext.ConversationHandler.check/handle_update``
+* ``telegram.ext.CallbackDataCache``
+* ``telegram.ext.BasePersistence``
+* all classes in the ``telegram.ext.filters`` module that allow to add/remove allowed users/chats at runtime
+
 ==========
 Installing
 ==========

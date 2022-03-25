@@ -103,7 +103,10 @@ class JobQueue:
         """
         self._application = weakref.ref(application)
         if isinstance(application.bot, ExtBot) and application.bot.defaults:
-            self.scheduler.configure(timezone=application.bot.defaults.tzinfo or pytz.utc)
+            self.scheduler.configure(
+                timezone=application.bot.defaults.tzinfo or pytz.utc,
+                executors={'default': self._executor},
+            )
 
     @property
     def application(self) -> 'Application':
@@ -484,7 +487,7 @@ class JobQueue:
         name = name or callback.__name__
         job = Job(callback=callback, context=context, name=name, chat_id=chat_id, user_id=user_id)
 
-        j = self.scheduler.add_job(job, args=(self.application,), name=name, **job_kwargs)
+        j = self.scheduler.add_job(job.run, args=(self.application,), name=name, **job_kwargs)
 
         job.job = j
         return job
@@ -514,7 +517,7 @@ class JobQueue:
             )
         if self.scheduler.running:
             self.scheduler.shutdown(wait=wait)
-            # scheduler.shutdown schedules a task in the event loop but immediatel returns
+            # scheduler.shutdown schedules a task in the event loop but immediately returns
             # so give it a tiny bit of time to actually shut down.
             await asyncio.sleep(0.01)
 

@@ -21,7 +21,6 @@
 import asyncio
 import logging
 import datetime
-import threading
 from dataclasses import dataclass
 from typing import (  # pylint: disable=unused-import  # for the "Any" import
     TYPE_CHECKING,
@@ -242,7 +241,6 @@ class ConversationHandler(Handler[Update, CCT]):
         '_child_conversations',
         '_conversation_timeout',
         '_conversations',
-        '_conversations_lock',
         '_entry_points',
         '_fallbacks',
         '_map_to_parent',
@@ -304,8 +302,6 @@ class ConversationHandler(Handler[Update, CCT]):
         self.timeout_jobs: Dict[ConversationKey, 'Job'] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
-        # TODO: Do we still need this lock?
-        self._conversations_lock = threading.Lock()
         self._child_conversations: Set['ConversationHandler'] = set()
 
         if persistent and not self.name:
@@ -539,19 +535,18 @@ class ConversationHandler(Handler[Update, CCT]):
                 'persistence!'
             )
 
-        with self._conversations_lock:
-            current_conversations = self._conversations
-            self._conversations = cast(
-                TrackingDict[ConversationKey, object],
-                TrackingDict(),
-            )
-            # In the conversation already processed updates
-            self._conversations.update(current_conversations)
-            # above might be partly overridden but that's okay since we warn about that in
-            # add_handler
-            self._conversations.update_no_track(
-                await application.persistence.get_conversations(self.name)
-            )
+        current_conversations = self._conversations
+        self._conversations = cast(
+            TrackingDict[ConversationKey, object],
+            TrackingDict(),
+        )
+        # In the conversation already processed updates
+        self._conversations.update(current_conversations)
+        # above might be partly overridden but that's okay since we warn about that in
+        # add_handler
+        self._conversations.update_no_track(
+            await application.persistence.get_conversations(self.name)
+        )
 
         for handler in self._child_conversations:
             await handler._initialize_persistence(  # pylint: disable=protected-access
@@ -660,8 +655,7 @@ class ConversationHandler(Handler[Update, CCT]):
             return None
 
         key = self._get_key(update)
-        with self._conversations_lock:
-            state = self._conversations.get(key)
+        state = self._conversations.get(key)
 
         # Resolve promises
         if isinstance(state, PendingState):
@@ -671,8 +665,7 @@ class ConversationHandler(Handler[Update, CCT]):
             if state.done():
                 res = state.resolve()
                 self._update_state(res, key)
-                with self._conversations_lock:
-                    state = self._conversations.get(key)
+                state = self._conversations.get(key)
 
             # if not then handle WAITING state instead
             else:
@@ -803,16 +796,14 @@ class ConversationHandler(Handler[Update, CCT]):
 
     def _update_state(self, new_state: object, key: ConversationKey) -> None:
         if new_state == self.END:
-            with self._conversations_lock:
-                if key in self._conversations:
-                    # If there is no key in conversations, nothing is done.
-                    del self._conversations[key]
+            if key in self._conversations:
+                # If there is no key in conversations, nothing is done.
+                del self._conversations[key]
 
         elif isinstance(new_state, asyncio.Task):
-            with self._conversations_lock:
-                self._conversations[key] = PendingState(
-                    old_state=self._conversations.get(key), task=new_state
-                )
+            self._conversations[key] = PendingState(
+                old_state=self._conversations.get(key), task=new_state
+            )
 
         elif new_state is not None:
             if new_state not in self.states:
@@ -821,8 +812,7 @@ class ConversationHandler(Handler[Update, CCT]):
                     f"ConversationHandler{' ' + self.name if self.name is not None else ''}.",
                     stacklevel=2,
                 )
-            with self._conversations_lock:
-                self._conversations[key] = new_state
+            self._conversations[key] = new_state
 
     async def _trigger_timeout(self, context: CallbackContext) -> None:
         job = cast('Job', context.job)
