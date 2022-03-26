@@ -104,7 +104,7 @@ class TestJobQueue:
 
     def test_application_weakref(self, bot):
         jq = JobQueue()
-        application = ApplicationBuilder().bot(bot).job_queue(None).build()
+        application = ApplicationBuilder().token(bot.token).job_queue(None).build()
         with pytest.raises(RuntimeError, match='No application was set'):
             jq.application
         jq.set_application(application)
@@ -262,7 +262,7 @@ class TestJobQueue:
 
     @pytest.mark.asyncio
     async def test_in_application(self, bot):
-        app = ApplicationBuilder().bot(bot).build()
+        app = ApplicationBuilder().token(bot.token).build()
         async with app:
             assert not app.job_queue.scheduler.running
             await app.start()
@@ -516,7 +516,7 @@ class TestJobQueue:
     async def test_custom_context(self, bot, job_queue):
         application = (
             ApplicationBuilder()
-            .bot(bot)
+            .token(bot.token)
             .context_types(
                 ContextTypes(
                     context=CustomContext, bot_data=int, user_data=float, chat_data=complex
