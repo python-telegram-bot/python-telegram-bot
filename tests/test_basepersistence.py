@@ -29,7 +29,7 @@ from typing import NamedTuple
 import pytest
 from flaky import flaky
 
-from telegram import User, Chat, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import User, Chat, InlineKeyboardMarkup, InlineKeyboardButton, Bot
 from telegram.ext import (
     ApplicationBuilder,
     PersistenceInput,
@@ -387,6 +387,16 @@ class TestBasePersistence:
             ),
         ):
             BasePersistence()
+
+    @default_papp
+    def test_update_interval_immutable(self, papp):
+        with pytest.raises(AttributeError, match='can not assign a new value to update_interval'):
+            papp.persistence.update_interval = 7
+
+    @default_papp
+    def test_set_bot_error(self, papp):
+        with pytest.raises(TypeError, match='when using telegram.ext.ExtBot'):
+            papp.persistence.set_bot(Bot(papp.bot.token))
 
     def test_construction_with_bad_persistence(self, caplog, bot):
         class MyPersistence:

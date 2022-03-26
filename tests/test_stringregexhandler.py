@@ -19,6 +19,7 @@
 import asyncio
 
 import pytest
+import re
 
 from telegram import (
     Bot,
@@ -97,8 +98,12 @@ class TestStringRegexHandler:
             self.test_flag = context.matches[0].groupdict() == {'begin': 't', 'end': ' message'}
 
     @pytest.mark.asyncio
-    async def test_basic(self, app):
-        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback)
+    @pytest.mark.parametrize('compile', (True, False))
+    async def test_basic(self, app, compile):
+        pattern = '(?P<begin>.*)est(?P<end>.*)'
+        if compile:
+            pattern = re.compile('(?P<begin>.*)est(?P<end>.*)')
+        handler = StringRegexHandler(pattern, self.callback)
         app.add_handler(handler)
 
         assert handler.check_update('test message')
