@@ -237,7 +237,9 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The conversations serialized as a JSON-string."""
         if self._conversations_json:
             return self._conversations_json
-        return self._encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
+        if self.conversations:
+            return self._encode_conversations_to_json(self.conversations)
+        return json.dumps(self.conversations)
 
     async def get_user_data(self) -> Dict[int, Dict[object, object]]:
         """Returns the user_data created from the ``user_data_json`` or an empty :obj:`dict`.
