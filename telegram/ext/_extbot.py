@@ -275,7 +275,7 @@ class ExtBot(Bot):
         offset: int = None,
         limit: int = 100,
         timeout: int = 0,
-        read_timeout: ODVInput[float] = 2,
+        read_timeout: float = 2,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
