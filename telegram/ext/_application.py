@@ -1145,6 +1145,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             This method will be called in regular intervals by the application. There is usually
             no need to call it manually.
 
+        Note:
+            Any data is deep copied with :func:`copy.deepcopy` before handing it over to the
+            persistence in order to avoid race conditions, so all persisted data must be copyable.
+
         .. seealso:: :attr:`telegram.ext.BasePersistence.update_interval`.
         """
         async with self.__update_persistence_lock:

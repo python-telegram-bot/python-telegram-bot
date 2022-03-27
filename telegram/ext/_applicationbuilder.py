@@ -772,9 +772,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Warning:
             Processing updates concurrently is not recommended when stateful handlers like
-            :class:`telegram.ext.ConversationHandler` are used.
+            :class:`telegram.ext.ConversationHandler` are used. Only use this, when you are sure
+            that your bot does not (explicitly or implicitly) rely on updates being processed
+            sequentially.
 
-         .. seealso:: :paramref:`telegram.ext.Application.concurrent_updates`
+        .. seealso:: :paramref:`telegram.ext.Application.concurrent_updates`
 
         Args:
             concurrent_updates (:obj:`bool` | :obj:`int`): Passing :obj:`True` will allow for
@@ -822,6 +824,15 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def persistence(self: BuilderType, persistence: 'BasePersistence') -> BuilderType:
         """Sets a :class:`telegram.ext.BasePersistence` instance to be used for
         :attr:`telegram.ext.Application.persistence`.
+
+        Note:
+            When using a persistence, note that all
+            data stored in :attr:`context.user_data <telegram.ext.CallbackContext.user_data>`,
+            :attr:`context.chat_data <telegram.ext.CallbackContext.chat_data>`,
+            :attr:`context.bot_data <telegram.ext.CallbackContext.bot_data>` and
+            in :attr:`telegram.ext.ExtBot.callback_data_cache` must be copyable with
+            :func:`copy.deepcopy`. This is due to the data being deep copied before handing it over
+            to the persistence in order to avoid race conditions.
 
         .. seealso:: `Making your bot persistent <https://github.com/python-telegram-bot\
             /python-telegram-bot/wiki/Making-your-bot-persistent>`_,
