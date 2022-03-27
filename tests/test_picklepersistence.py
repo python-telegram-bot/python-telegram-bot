@@ -988,3 +988,28 @@ class TestPicklePersistence:
         assert (await persistence.get_chat_data())[1] == 1
         assert isinstance(await persistence.get_bot_data(), bd)
         assert await persistence.get_bot_data() == 1
+
+    @pytest.mark.asyncio
+    async def test_no_write_if_data_did_not_change(
+        self, pickle_persistence, bot_data, user_data, chat_data, conversations, callback_data
+    ):
+        pickle_persistence.single_file = True
+        pickle_persistence.on_flush = False
+
+        await pickle_persistence.update_bot_data(bot_data)
+        await pickle_persistence.update_user_data(12345, user_data[12345])
+        await pickle_persistence.update_chat_data(-12345, chat_data[-12345])
+        await pickle_persistence.update_conversation('name', (1, 1), 'new_state')
+        await pickle_persistence.update_callback_data(callback_data)
+
+        assert pickle_persistence.filepath.is_file()
+        pickle_persistence.filepath.unlink()
+        assert not pickle_persistence.filepath.is_file()
+
+        await pickle_persistence.update_bot_data(bot_data)
+        await pickle_persistence.update_user_data(12345, user_data[12345])
+        await pickle_persistence.update_chat_data(-12345, chat_data[-12345])
+        await pickle_persistence.update_conversation('name', (1, 1), 'new_state')
+        await pickle_persistence.update_callback_data(callback_data)
+
+        assert not pickle_persistence.filepath.is_file()

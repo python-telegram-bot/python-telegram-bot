@@ -16,9 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import os
-from pathlib import Path
-
 import pytest
 
 
@@ -28,16 +25,6 @@ except ImportError:
     import json
 
 from telegram.ext import DictPersistence
-
-
-@pytest.fixture(autouse=True)
-def change_directory(tmp_path: Path):
-    orig_dir = Path.cwd()
-    # Switch to a temporary directory, so we don't have to worry about cleaning up files
-    os.chdir(tmp_path)
-    yield
-    # Go back to original directory
-    os.chdir(orig_dir)
 
 
 @pytest.fixture(autouse=True)
@@ -347,3 +334,70 @@ class TestDictPersistence:
             dict_persistence.conversations_json
             == DictPersistence._encode_conversations_to_json({"name1": {(123, 123): 5}})
         )
+
+    @pytest.mark.asyncio
+    async def test_no_data_on_init(
+        self, bot_data, user_data, chat_data, conversations, callback_data
+    ):
+        dict_persistence = DictPersistence()
+
+        assert dict_persistence.user_data is None
+        assert dict_persistence.chat_data is None
+        assert dict_persistence.bot_data is None
+        assert dict_persistence.conversations is None
+        assert dict_persistence.callback_data is None
+        assert dict_persistence.user_data_json == 'null'
+        assert dict_persistence.chat_data_json == 'null'
+        assert dict_persistence.bot_data_json == 'null'
+        assert dict_persistence.conversations_json == 'null'
+        assert dict_persistence.callback_data_json == 'null'
+
+        await dict_persistence.update_bot_data(bot_data)
+        await dict_persistence.update_user_data(12345, user_data[12345])
+        await dict_persistence.update_chat_data(-12345, chat_data[-12345])
+        await dict_persistence.update_conversation('name', (1, 1), 'new_state')
+        await dict_persistence.update_callback_data(callback_data)
+
+        assert dict_persistence.user_data[12345] == user_data[12345]
+        assert dict_persistence.chat_data[-12345] == chat_data[-12345]
+        assert dict_persistence.bot_data == bot_data
+        assert dict_persistence.conversations['name'] == {(1, 1): 'new_state'}
+        assert dict_persistence.callback_data == callback_data
+
+    @pytest.mark.asyncio
+    async def test_no_json_dumping_if_data_did_not_change(
+        self, bot_data, user_data, chat_data, conversations, callback_data, monkeypatch
+    ):
+        dict_persistence = DictPersistence()
+
+        await dict_persistence.update_bot_data(bot_data)
+        await dict_persistence.update_user_data(12345, user_data[12345])
+        await dict_persistence.update_chat_data(-12345, chat_data[-12345])
+        await dict_persistence.update_conversation('name', (1, 1), 'new_state')
+        await dict_persistence.update_callback_data(callback_data)
+
+        assert dict_persistence.user_data_json == json.dumps({12345: user_data[12345]})
+        assert dict_persistence.chat_data_json == json.dumps({-12345: chat_data[-12345]})
+        assert dict_persistence.bot_data_json == json.dumps(bot_data)
+        assert (
+            dict_persistence.conversations_json
+            == DictPersistence._encode_conversations_to_json({'name': {(1, 1): 'new_state'}})
+        )
+        assert dict_persistence.callback_data_json == json.dumps(callback_data)
+
+        flag = False
+
+        def dumps(*args, **kwargs):
+            nonlocal flag
+            flag = True
+
+        # Since the data doesn't change, json.dumps shoduln't be called beyond this point!
+        monkeypatch.setattr(json, 'dumps', dumps)
+
+        await dict_persistence.update_bot_data(bot_data)
+        await dict_persistence.update_user_data(12345, user_data[12345])
+        await dict_persistence.update_chat_data(-12345, chat_data[-12345])
+        await dict_persistence.update_conversation('name', (1, 1), 'new_state')
+        await dict_persistence.update_callback_data(callback_data)
+
+        assert not flag
