@@ -58,19 +58,20 @@ class HTTPXRequest(BaseRequest):
                 * Socks5 proxies can not be set via environment variables.
 
             .. _the docs: https://www.python-httpx.org/environment_variables/#proxies
-        connect_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait
-            for a connection attempt to a server to succeed. :obj:`None` will set an infinite
-            timeout for connection attempts. Defaults to ``5.0``.
-        read_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait for
-            a response from Telegram's server. :obj:`None` will set an infinite timeout. This value
-            is usually overridden by the various methods of :class:`telegram.Bot`. Defaults to
-            ``5.0``.
-        write_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait for
-            a write operation to complete (in terms of a network socket; i.e. POSTing a request or
-            uploading a file). :obj:`None` will set an infinite timeout. Defaults to ``5.0``.
-        pool_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait for
-            a connection from the connection pool becoming available. :obj:`None` will set an
-            infinite timeout. Defaults to :obj:`None`.
+        connect_timeout (:obj:`float` | :obj:`None`, optional): The maximum amount of time
+            (in seconds) to wait for a connection attempt to a server to succeed. :obj:`None` will
+            set an infinite timeout for connection attempts. Defaults to ``5.0``.
+        read_timeout (:obj:`float` | :obj:`None`, optional): The maximum amount of time
+            (in seconds) to wait for a response from Telegram's server. :obj:`None` will set an
+            infinite timeout. This value is usually overridden by the various methods of
+            :class:`telegram.Bot`. Defaults to ``5.0``.
+        write_timeout (:obj:`float` | :obj:`None`, optional): The maximum amount of time
+            (in seconds) to wait for a write operation to complete (in terms of a network socket;
+            i.e. POSTing a request or uploading a file). :obj:`None` will set an infinite timeout.
+            Defaults to ``5.0``.
+        pool_timeout (:obj:`float` | :obj:`None`, optional): The maximum amount of time
+            (in seconds) to wait for a connection from the connection pool becoming available.
+            :obj:`None` will set an infinite timeout. Defaults to :obj:`None`.
 
             Warning:
                 With a finite pool timeout, you must expect :exc:`telegram.error.TimedOut`

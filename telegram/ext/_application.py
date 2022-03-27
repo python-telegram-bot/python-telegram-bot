@@ -541,13 +541,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             read_timeout (:obj:`float`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to ``2``.
-            write_timeout (:obj:`float`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
                 :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            connect_timeout (:obj:`float`, optional): Value to pass to
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
                 :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
