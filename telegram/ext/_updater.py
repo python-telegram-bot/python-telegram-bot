@@ -175,26 +175,25 @@ class Updater:
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
-            timeout (:obj:`float`, optional): Passed to :meth:`telegram.Bot.get_updates`.
+            timeout (:obj:`float`, optional): Passed to
+                :paramref:`telegram.Bot.get_updates.timeout`. Defaults to ``10`` seconds.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
                 * < 0 - retry indefinitely (default)
                 *   0 - no retries
                 * > 0 - retry up to X times
-            read_timeout (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
-                the reply from server. Will be added to the :paramref:`timeout` value and used as
-                the read timeout from server. Default is ``2``.
-            write_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to
-                wait for a write operation to complete (in terms of a network socket;
-                i.e. POSTing a request or uploading a file). :obj:`None` will set an infinite
-                timeout. Defaults to :obj:`None`.
-            connect_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to
-                wait for a connection attempt to a server to succeed. :obj:`None` will set an
-                infinite timeout for connection attempts. Defaults to :obj:`None`.
-            pool_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait
-                for a connection from the connection pool becoming available. :obj:`None` will set
-                an infinite timeout. Defaults to :obj:`None`.
+            read_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to ``2``.
+            write_timeout (:obj:`float`, optional):  Value to pass to
+                :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float`, optional):  Value to pass to
+                :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on

@@ -102,8 +102,8 @@ class File(TelegramObject):
         custom_path: FilePathInput = None,
         out: IO = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[Path, IO]:
         """
@@ -129,9 +129,18 @@ class File(TelegramObject):
             custom_path (:class:`pathlib.Path` | :obj:`str`, optional): Custom path.
             out (:obj:`io.BufferedWriter`, optional): A file-like object. Must be opened for
                 writing in binary mode, if applicable.
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
+            read_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
         Returns:
             :class:`pathlib.Path` | :obj:`io.BufferedWriter`: The same object as :paramref:`out` if
