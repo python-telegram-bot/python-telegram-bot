@@ -92,7 +92,6 @@ import mimetypes
 import re
 
 from abc import ABC, abstractmethod
-from threading import Lock
 from typing import (
     Dict,
     FrozenSet,
@@ -584,7 +583,6 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         '_chat_id_name',
         '_username_name',
         'allow_empty',
-        '__lock',
         '_chat_ids',
         '_usernames',
     )
@@ -599,7 +597,6 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         self._chat_id_name = 'chat_id'
         self._username_name = 'username'
         self.allow_empty = allow_empty
-        self.__lock = Lock()
 
         self._chat_ids: Set[int] = set()
         self._usernames: Set[str] = set()
@@ -628,27 +625,24 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         return {chat[1:] if chat.startswith('@') else chat for chat in username}
 
     def _set_chat_ids(self, chat_id: Optional[SLT[int]]) -> None:
-        with self.__lock:
-            if chat_id and self._usernames:
-                raise RuntimeError(
-                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
-                    f"{self._username_name}s."
-                )
-            self._chat_ids = self._parse_chat_id(chat_id)
+        if chat_id and self._usernames:
+            raise RuntimeError(
+                f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                f"{self._username_name}s."
+            )
+        self._chat_ids = self._parse_chat_id(chat_id)
 
     def _set_usernames(self, username: Optional[SLT[str]]) -> None:
-        with self.__lock:
-            if username and self._chat_ids:
-                raise RuntimeError(
-                    f"Can't set {self._username_name} in conjunction with (already set) "
-                    f"{self._chat_id_name}s."
-                )
-            self._usernames = self._parse_username(username)
+        if username and self._chat_ids:
+            raise RuntimeError(
+                f"Can't set {self._username_name} in conjunction with (already set) "
+                f"{self._chat_id_name}s."
+            )
+        self._usernames = self._parse_username(username)
 
     @property
     def chat_ids(self) -> FrozenSet[int]:
-        with self.__lock:
-            return frozenset(self._chat_ids)
+        return frozenset(self._chat_ids)
 
     @chat_ids.setter
     def chat_ids(self, chat_id: SLT[int]) -> None:
@@ -668,8 +662,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         Returns:
             frozenset(:obj:`str`)
         """
-        with self.__lock:
-            return frozenset(self._usernames)
+        return frozenset(self._usernames)
 
     @usernames.setter
     def usernames(self, username: SLT[str]) -> None:
@@ -683,27 +676,25 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
             username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
                 allow through. Leading ``'@'`` s in usernames will be discarded.
         """
-        with self.__lock:
-            if self._chat_ids:
-                raise RuntimeError(
-                    f"Can't set {self._username_name} in conjunction with (already set) "
-                    f"{self._chat_id_name}s."
-                )
+        if self._chat_ids:
+            raise RuntimeError(
+                f"Can't set {self._username_name} in conjunction with (already set) "
+                f"{self._chat_id_name}s."
+            )
 
-            parsed_username = self._parse_username(username)
-            self._usernames |= parsed_username
+        parsed_username = self._parse_username(username)
+        self._usernames |= parsed_username
 
     def _add_chat_ids(self, chat_id: SLT[int]) -> None:
-        with self.__lock:
-            if self._usernames:
-                raise RuntimeError(
-                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
-                    f"{self._username_name}s."
-                )
+        if self._usernames:
+            raise RuntimeError(
+                f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                f"{self._username_name}s."
+            )
 
-            parsed_chat_id = self._parse_chat_id(chat_id)
+        parsed_chat_id = self._parse_chat_id(chat_id)
 
-            self._chat_ids |= parsed_chat_id
+        self._chat_ids |= parsed_chat_id
 
     def remove_usernames(self, username: SLT[str]) -> None:
         """
@@ -713,25 +704,23 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
             username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
                 disallow through. Leading ``'@'`` s in usernames will be discarded.
         """
-        with self.__lock:
-            if self._chat_ids:
-                raise RuntimeError(
-                    f"Can't set {self._username_name} in conjunction with (already set) "
-                    f"{self._chat_id_name}s."
-                )
+        if self._chat_ids:
+            raise RuntimeError(
+                f"Can't set {self._username_name} in conjunction with (already set) "
+                f"{self._chat_id_name}s."
+            )
 
-            parsed_username = self._parse_username(username)
-            self._usernames -= parsed_username
+        parsed_username = self._parse_username(username)
+        self._usernames -= parsed_username
 
     def _remove_chat_ids(self, chat_id: SLT[int]) -> None:
-        with self.__lock:
-            if self._usernames:
-                raise RuntimeError(
-                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
-                    f"{self._username_name}s."
-                )
-            parsed_chat_id = self._parse_chat_id(chat_id)
-            self._chat_ids -= parsed_chat_id
+        if self._usernames:
+            raise RuntimeError(
+                f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                f"{self._username_name}s."
+            )
+        parsed_chat_id = self._parse_chat_id(chat_id)
+        self._chat_ids -= parsed_chat_id
 
     def filter(self, message: Message) -> bool:
         chat_or_user = self.get_chat_or_user(message)

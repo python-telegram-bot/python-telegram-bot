@@ -400,16 +400,54 @@ def timezone(tzinfo):
 
 @pytest.fixture()
 def mro_slots():
-    def _mro_slots(_class):
+    def _mro_slots(_class, only_parents: bool = False):
+        if only_parents:
+            classes = _class.__class__.__mro__[1:-1]
+        else:
+            classes = _class.__class__.__mro__[:-1]
+
         return [
             attr
-            for cls in _class.__class__.__mro__[:-1]
+            for cls in classes
             if hasattr(cls, '__slots__')  # The Exception class doesn't have slots
             for attr in cls.__slots__
             if attr != '__dict__'  # left here for classes which still has __dict__
         ]
 
     return _mro_slots
+
+
+def call_after(function: Callable, after: Callable):
+    """Run a callable after another has executed. Useful when trying to make sure that a function
+    did actually run, but just monkeypatching it doesn't work because this would break some other
+    functionality.
+
+    Example usage:
+
+    def test_stuff(self, bot, monkeypatch):
+
+        def after(arg):
+            # arg is the return value of `send_message`
+            self.received = arg
+
+        monkeypatch.setattr(bot, 'send_message', call_after(bot.send_message, after)
+
+    """
+    if asyncio.iscoroutinefunction(function):
+
+        async def wrapped(*args, **kwargs):
+            out = await function(*args, **kwargs)
+            after(out)
+            return out
+
+    else:
+
+        def wrapped(*args, **kwargs):
+            out = function(*args, **kwargs)
+            after(out)
+            return out
+
+    return wrapped
 
 
 async def expect_bad_request(func, message, reason):

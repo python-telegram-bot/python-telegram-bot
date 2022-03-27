@@ -52,7 +52,7 @@ from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_TRUE, DEFAULT_NONE
 from telegram._utils.warnings import warn
 from telegram.ext._utils.trackingdict import TrackingDict
-from telegram.ext._utils.types import CCT, UD, CD, BD, BT, JQ, HandlerCallback
+from telegram.ext._utils.types import CCT, UD, CD, BD, BT, JQ, HandlerCallback, ConversationKey
 from telegram.ext._utils.stack import was_called_by
 
 if TYPE_CHECKING:
@@ -244,7 +244,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         # This attribute will hold references to the conversation dicts of all conversation
         # handlers so that we can extract the changed states during `update_persistence`
         self._conversation_handler_conversations: Dict[
-            str, TrackingDict[Tuple[int, ...], object]
+            str, TrackingDict[ConversationKey, object]
         ] = {}
 
         # A number of low-level helpers for the internal logic
@@ -334,7 +334,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             raise RuntimeError('This Application is still running!')
 
         if not self._initialized:
-            _logger.warning('This Application is already shut down.')
+            _logger.debug('This Application is already shut down. Returning.')
             return
 
         await self.bot.shutdown()
@@ -443,7 +443,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 _logger.debug('Loop for updating persistence started')
 
             if self.job_queue:
-                self.job_queue.start()
+                await self.job_queue.start()
                 _logger.debug('JobQueue started')
 
             self.__update_fetcher_task = asyncio.create_task(
@@ -928,7 +928,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     'A persistent `ConversationHandler` was passed to `add_handler`, '
                     'after `Application.initialize` was called. This is discouraged.'
                     'See the docs of `Application.add_handler` for details.',
-                    stacklevel=1,
+                    stacklevel=2,
                 )
 
         if group not in self.handlers:
@@ -1246,9 +1246,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         # dispatch any errors
         await asyncio.gather(
-            self.dispatch_error(update=None, error=result)
-            for result in results
-            if isinstance(result, Exception)
+            *(
+                self.dispatch_error(update=None, error=result)
+                for result in results
+                if isinstance(result, Exception)
+            )
         )
 
     def add_error_handler(

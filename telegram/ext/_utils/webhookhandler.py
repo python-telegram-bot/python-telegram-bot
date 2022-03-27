@@ -76,7 +76,7 @@ class WebhookServer:
     async def shutdown(self) -> None:
         async with self._shutdown_lock:
             if not self.is_running:
-                self._logger.warning('Webhook Server already stopped.')
+                self._logger.debug('Webhook Server is already shut down. Returning')
                 return
             self.is_running = False
             self._http_server.stop()

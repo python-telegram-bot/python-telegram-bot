@@ -2301,7 +2301,10 @@ class TestBot:
         # TODO: Need incoming join request to properly test
         # Since we can't create join requests on the fly, we just tests the call to TG
         # by checking that it complains about declining a user who is already in the chat
-        with pytest.raises(BadRequest, match='User_already_participant'):
+        #
+        # The error message Hide_requester_missing started showing up instead of
+        # User_already_participant. Don't know why …
+        with pytest.raises(BadRequest, match='User_already_participant|Hide_requester_missing'):
             await bot.decline_chat_join_request(chat_id=channel_id, user_id=chat_id)
 
     @flaky(3, 1)

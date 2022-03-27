@@ -18,13 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
 
-from typing import Dict, Optional, Tuple, cast
+from typing import Dict, Optional, cast
 
 from copy import deepcopy
 
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram._utils.types import JSONDict
-from telegram.ext._utils.types import ConversationDict, CDCData
+from telegram.ext._utils.types import ConversationDict, CDCData, ConversationKey
 
 try:
     import ujson as json
@@ -237,7 +237,9 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The conversations serialized as a JSON-string."""
         if self._conversations_json:
             return self._conversations_json
-        return self._encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
+        if self.conversations:
+            return self._encode_conversations_to_json(self.conversations)
+        return json.dumps(self.conversations)
 
     async def get_user_data(self) -> Dict[int, Dict[object, object]]:
         """Returns the user_data created from the ``user_data_json`` or an empty :obj:`dict`.
@@ -296,7 +298,7 @@ class DictPersistence(BasePersistence):
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
     async def update_conversation(
-        self, name: str, key: Tuple[int, ...], new_state: Optional[object]
+        self, name: str, key: ConversationKey, new_state: Optional[object]
     ) -> None:
         """Will update the conversations for the given handler.
 
