@@ -39,8 +39,8 @@ logger = logging.getLogger(__name__)
 async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
-    await update.message.reply_markdown_v2(
-        fr'Hi {user.mention_markdown_v2()}\!',
+    await update.message.reply_html(
+        fr'Hi {user.mention_html()}\!',
         reply_markup=ForceReply(selective=True),
     )
 

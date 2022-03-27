@@ -17,7 +17,7 @@ from uuid import uuid4
 
 from telegram import InlineQueryResultArticle, InputTextMessageContent, Update
 from telegram.constants import ParseMode
-from telegram.helpers import escape_markdown
+from html import escape
 from telegram.ext import Application, InlineQueryHandler, CommandHandler, CallbackContext
 
 # Enable logging
@@ -56,14 +56,14 @@ async def inlinequery(update: Update, context: CallbackContext.DEFAULT_TYPE) -> 
             id=str(uuid4()),
             title="Bold",
             input_message_content=InputTextMessageContent(
-                f"*{escape_markdown(query)}*", parse_mode=ParseMode.MARKDOWN
+                f"*{escape(query)}*", parse_mode=ParseMode.HTML
             ),
         ),
         InlineQueryResultArticle(
             id=str(uuid4()),
             title="Italic",
             input_message_content=InputTextMessageContent(
-                f"_{escape_markdown(query)}_", parse_mode=ParseMode.MARKDOWN
+                f"_{escape(query)}_", parse_mode=ParseMode.MARKDOWN
             ),
         ),
     ]
