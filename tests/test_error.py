@@ -178,3 +178,17 @@ class TestErrors:
         )
 
         make_assertion(TelegramError)
+
+    def test_string_representations(self):
+        """We just randomly test a few of the subclasses - should suffice"""
+        e = TelegramError('This is a message')
+        assert repr(e) == "TelegramError('This is a message')"
+        assert str(e) == "This is a message"
+
+        e = RetryAfter(42)
+        assert repr(e) == "RetryAfter('Flood control exceeded. Retry in 42.0 seconds')"
+        assert str(e) == 'Flood control exceeded. Retry in 42.0 seconds'
+
+        e = BadRequest('This is a message')
+        assert repr(e) == "BadRequest('This is a message')"
+        assert str(e) == "This is a message"
