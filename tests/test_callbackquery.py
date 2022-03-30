@@ -127,7 +127,6 @@ class TestCallbackQuery:
         assert await check_defaults_handling(callback_query.answer, callback_query.get_bot())
 
         monkeypatch.setattr(callback_query.get_bot(), 'answer_callback_query', make_assertion)
-        # TODO: PEP8
         assert await callback_query.answer()
 
     @pytest.mark.asyncio
