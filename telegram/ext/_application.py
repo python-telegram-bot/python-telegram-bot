@@ -574,7 +574,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         loop.run_until_complete(self.start())
         try:
             loop.run_forever()
-        # TODO: maybe allow for custom exception classes to catch here? Or provide a custom one?
         except (KeyboardInterrupt, SystemExit):
             pass
         finally:
@@ -986,9 +985,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         # old_chat_id is marked for deletion by drop_chat_data above
 
     def _mark_for_persistence_update(self, *, update: object = None, job: 'Job' = None) -> None:
-        # TODO: This should be at the end of `Application.process_update`, when the task created
-        #  by `Application.create_task` is done and when a `Job` is done. Add tests to make sure
-        #  that this is happening
         if isinstance(update, Update):
             if update.effective_chat:
                 self._chat_ids_to_be_updated_in_persistence.add(update.effective_chat.id)
