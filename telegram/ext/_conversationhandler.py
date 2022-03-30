@@ -219,7 +219,7 @@ class ConversationHandler(Handler[Update, CCT]):
         block (:obj:`bool`, optional): Pass :obj:`False` to *overrule* the
             :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
             :attr:`states` and :attr:`fallbacks`).
-            By default the handlers setting and :attr:`telegram.ext.Defaults.bock` will be
+            By default the handlers setting and :attr:`telegram.ext.Defaults.block` will be
             respected (in that order).
 
             .. versionadded:: 13.2
