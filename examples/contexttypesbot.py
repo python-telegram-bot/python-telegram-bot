@@ -116,7 +116,6 @@ def main() -> None:
     context_types = ContextTypes(context=CustomContext, chat_data=ChatData)
     application = Application.builder().token("TOKEN").context_types(context_types).build()
 
-    application = application.application
     # run track_users in its own group to not interfere with the user handlers
     application.add_handler(TypeHandler(Update, track_users), group=-1)
     application.add_handler(CommandHandler("start", start))
