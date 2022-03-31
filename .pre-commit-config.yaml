@@ -44,6 +44,18 @@ repos:
           - APScheduler==3.6.3
           - cachetools==4.2.2
           - . # this basically does `pip install -e .`n
+    - id: mypy
+      name: mypy-examples
+      files: ^examples/.*\.py$
+      args:
+        - --no-strict-optional
+        - --follow-imports=silent
+      additional_dependencies:
+        - certifi
+        - tornado>=6.1
+        - APScheduler==3.6.3
+        - cachetools==4.2.2
+        - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.29.0
     hooks:
