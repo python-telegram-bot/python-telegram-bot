@@ -63,7 +63,7 @@ async def inlinequery(update: Update, context: CallbackContext.DEFAULT_TYPE) -> 
             id=str(uuid4()),
             title="Italic",
             input_message_content=InputTextMessageContent(
-                f"_{escape(query)}_", parse_mode=ParseMode.MARKDOWN
+                f"{escape(query)}", parse_mode=ParseMode.HTML
             ),
         ),
     ]
