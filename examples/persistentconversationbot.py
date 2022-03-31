@@ -135,9 +135,6 @@ def main() -> None:
     persistence = PicklePersistence(filepath='conversationbot')
     application = Application.builder().token("TOKEN").persistence(persistence).build()
 
-    # Get the application to register handlers
-    application = application.application
-
     # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],

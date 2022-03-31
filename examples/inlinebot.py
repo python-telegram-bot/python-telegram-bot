@@ -14,10 +14,10 @@ bot.
 """
 import logging
 from uuid import uuid4
+from html import escape
 
 from telegram import InlineQueryResultArticle, InputTextMessageContent, Update
 from telegram.constants import ParseMode
-from html import escape
 from telegram.ext import Application, InlineQueryHandler, CommandHandler, CallbackContext
 
 # Enable logging

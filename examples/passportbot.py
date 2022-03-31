@@ -109,9 +109,6 @@ def main() -> None:
         Application.builder().token("TOKEN").private_key(private_key.read_bytes()).build()
     )
 
-    # Get the application to register handlers
-    application = application.application
-
     # On messages that include passport data call msg
     application.add_handler(MessageHandler(filters.PASSPORT_DATA, msg))
 

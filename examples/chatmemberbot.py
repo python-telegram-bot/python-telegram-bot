@@ -153,7 +153,7 @@ def main() -> None:
     # Run the bot until the user presses Ctrl-C
     # We pass 'allowed_updates' handle *all* updates including `chat_member` updates
     # To reset this, simply pass `allowed_updates=[]`
-    application.run_polling()(allowed_updates=Update.ALL_TYPES)
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":

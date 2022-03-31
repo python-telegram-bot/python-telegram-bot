@@ -72,9 +72,6 @@ def main() -> None:
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(BOT_TOKEN).build()
 
-    # Get the application to register handlers
-    application = application.application
-
     # Register the commands...
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('bad_command', bad_command))
