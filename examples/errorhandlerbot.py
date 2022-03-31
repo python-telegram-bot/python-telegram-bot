@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # This can be your own ID, or one for a developer group/channel.
 # You can use the /start command of this bot to see your chat id.
-DEVELOPER_CHAT_ID = 476269395
+DEVELOPER_CHAT_ID = 123456789
 
 
 async def error_handler(update: object, context: CallbackContext.DEFAULT_TYPE) -> None:
