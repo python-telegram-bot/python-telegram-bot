@@ -134,7 +134,9 @@ async def show_data(update: Update, context: CallbackContext.DEFAULT_TYPE) -> st
 
             for person in data[level]:
                 gender = female if person[GENDER] == FEMALE else male
-                return_str += f"\n{gender}: Name: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
+                return_str += (
+                    f"\n{gender}: Name: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
+                )
         return return_str
 
     user_data = context.user_data
