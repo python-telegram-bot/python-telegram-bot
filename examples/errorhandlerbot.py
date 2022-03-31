@@ -18,12 +18,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# The token you got from @botfather when you created the bot
-BOT_TOKEN = "TOKEN"
-
 # This can be your own ID, or one for a developer group/channel.
 # You can use the /start command of this bot to see your chat id.
-DEVELOPER_CHAT_ID = 123456789
+DEVELOPER_CHAT_ID = 476269395
 
 
 async def error_handler(update: object, context: CallbackContext.DEFAULT_TYPE) -> None:
@@ -70,7 +67,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
 def main() -> None:
     """Run the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(BOT_TOKEN).build()
+    application = Application.builder().token("TOKEN").build()
 
     # Register the commands...
     application.add_handler(CommandHandler('start', start))

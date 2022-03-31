@@ -10,6 +10,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
+import logging
 from collections import defaultdict
 from typing import DefaultDict, Optional, Set
 
@@ -24,6 +25,12 @@ from telegram.ext import (
     ExtBot,
     Application,
 )
+
+# Enable logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 
 class ChatData:
