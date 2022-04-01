@@ -209,10 +209,10 @@ class TrackingConversationHandler(ConversationHandler):
         return make_message_update(message=str(state.value), user=user, chat=chat)
 
     @classmethod
-    def build_handler(cls, state: HandlerStates):
+    def build_handler(cls, state: HandlerStates, callback=None):
         return MessageHandler(
             filters.Regex(f'^{state.value}$'),
-            functools.partial(cls.callback, state=state),
+            callback or functools.partial(cls.callback, state=state),
         )
 
 
@@ -229,7 +229,7 @@ class PappInput(NamedTuple):
 def build_papp(
     token: str, store_data: dict = None, update_interval: float = None, fill_data: bool = False
 ) -> Application:
-    store_data = PersistenceInput(**store_data)
+    store_data = PersistenceInput(**(store_data or {}))
     if update_interval is not None:
         persistence = TrackingPersistence(
             store_data=store_data, update_interval=update_interval, fill_data=fill_data
@@ -1139,3 +1139,45 @@ class TestBasePersistence:
             else:
                 assert not papp.persistence.updated_chat_ids
             assert not papp.persistence.updated_conversations
+
+    @pytest.mark.asyncio
+    async def test_non_blocking_conversations(self, bot):
+        papp = build_papp(token=bot.token)
+        event = asyncio.Event()
+
+        async def callback(_, __):
+            await event.wait()
+            return HandlerStates.STATE_1
+
+        conversation = ConversationHandler(
+            entry_points=[
+                TrackingConversationHandler.build_handler(HandlerStates.END, callback=callback)
+            ],
+            states={},
+            fallbacks=[],
+            persistent=True,
+            name='conv',
+            block=False,
+        )
+        papp.add_handler(conversation)
+
+        async with papp:
+            assert papp.persistence.updated_conversations == {}
+
+            await papp.process_update(
+                TrackingConversationHandler.build_update(HandlerStates.END, 1)
+            )
+            assert papp.persistence.updated_conversations == {}
+
+            await papp.update_persistence()
+            await asyncio.sleep(0.01)
+            # Conversation should have been updated with the current state, i.e. None
+            assert papp.persistence.updated_conversations == {'conv': ({(1, 1): 1})}
+            assert papp.persistence.conversations == {'conv': {(1, 1): None}}
+
+            papp.persistence.reset_tracking()
+            event.set()
+            await asyncio.sleep(0.01)
+            await papp.update_persistence()
+            assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
+            assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}

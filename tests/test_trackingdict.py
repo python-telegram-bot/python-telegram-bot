@@ -159,3 +159,10 @@ class TestTrackingDict:
         td.update_no_track({2: 2, 3: 3, 4: 4})
         assert not td.pop_accessed_keys()
         assert list(iter(td)) == list(iter(data))
+
+    def test_mark_as_accessed(self, td):
+        td[1] = 2
+        assert td.pop_accessed_keys() == {1}
+        assert td.pop_accessed_keys() == set()
+        td.mark_as_accessed(1)
+        assert td.pop_accessed_keys() == {1}
