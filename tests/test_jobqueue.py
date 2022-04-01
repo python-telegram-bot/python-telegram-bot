@@ -453,7 +453,7 @@ class TestJobQueue:
         assert not job < job
 
     @pytest.mark.asyncio
-    async def test_dispatch_error_context(self, job_queue, app):
+    async def test_process_error_context(self, job_queue, app):
         app.add_error_handler(self.error_handler_context)
 
         job = job_queue.run_once(self.job_with_exception, 0.1)
@@ -476,7 +476,7 @@ class TestJobQueue:
         assert self.received_error is None
 
     @pytest.mark.asyncio
-    async def test_dispatch_error_that_raises_errors(self, job_queue, app, caplog):
+    async def test_process_error_that_raises_errors(self, job_queue, app, caplog):
         app.add_error_handler(self.error_handler_raise_error)
 
         with caplog.at_level(logging.ERROR):

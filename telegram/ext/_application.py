@@ -506,7 +506,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             )
 
         def error_callback(exc: TelegramError) -> None:
-            self.create_task(self.dispatch_error(update=None, error=exc))
+            self.create_task(self.process_error(error=exc, update=None))
 
         return self.__run(
             updater_coroutine=self.updater.start_polling(
@@ -574,7 +574,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         loop.run_until_complete(self.start())
         try:
             loop.run_forever()
-        # TODO: maybe allow for custom exception classes to catch here? Or provide a custom one?
         except (KeyboardInterrupt, SystemExit):
             pass
         finally:
@@ -590,17 +589,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     def create_task(self, coroutine: Coroutine, update: object = None) -> asyncio.Task:
         """Thin wrapper around :func:`asyncio.create_task` that handles exceptions raised by
-        the :paramref:`coroutine` with :meth:`dispatch_error`.
+        the :paramref:`coroutine` with :meth:`process_error`.
 
         Note:
             * If :paramref:`coroutine` raises an exception, it will be set on the task created by
-              this method even though it's handled by :meth:`dispatch_error`.
+              this method even though it's handled by :meth:`process_error`.
             * If the application is currently running, tasks created by this methods will be
               awaited by :meth:`stop`.
 
         Args:
             coroutine: The coroutine to run as task.
-            update: Optional. If passed, will be passed to :meth:`dispatch_error` as additional
+            update: Optional. If passed, will be passed to :meth:`process_error` as additional
                 information for the error handlers. Moreover, the corresponding :attr:`chat_data`
                 and :attr:`user_data` entries will be updated in the next run of
                 :meth:`update_persistence` after the :paramref:`coroutine` is finished.
@@ -614,7 +613,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self, coroutine: Coroutine, update: object = None, is_error_handler: bool = False
     ) -> asyncio.Task:
         # Unfortunately, we can't know if `coroutine` runs one of the error handler functions
-        # but by passing `is_error_handler=True` from `dispatch_error`, we can make sure that we
+        # but by passing `is_error_handler=True` from `process_error`, we can make sure that we
         # get at most one recursion of the user calls `create_task` manually with an error handler
         # function
         task = asyncio.create_task(
@@ -675,7 +674,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 # If we arrive here, an exception happened in the task and was neither
                 # ApplicationHandlerStop nor raised by an error handler.
                 # So we can and must handle it
-                await self.dispatch_error(update, exception, coroutine=coroutine)
+                await self.process_error(update=update, error=exception, coroutine=coroutine)
 
             # Raise exception so that it can be set on the task
             raise exception
@@ -710,6 +709,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     async def process_update(self, update: object) -> None:
         """Processes a single update and updates the persistence.
+        Exceptions raised by handler callbacks will be processed by :meth:`process_update`.
 
         .. versionchanged:: 14.0
             This calls :meth:`update_persistence` exactly once after handling of the update was
@@ -759,7 +759,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
             # Dispatch any error.
             except Exception as exc:
-                if await self.dispatch_error(update, exc):
+                if await self.process_error(update=update, error=exc):
                     _logger.debug('Error handler stopped further handlers.')
                     break
 
@@ -986,9 +986,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         # old_chat_id is marked for deletion by drop_chat_data above
 
     def _mark_for_persistence_update(self, *, update: object = None, job: 'Job' = None) -> None:
-        # TODO: This should be at the end of `Application.process_update`, when the task created
-        #  by `Application.create_task` is done and when a `Job` is done. Add tests to make sure
-        #  that this is happening
         if isinstance(update, Update):
             if update.effective_chat:
                 self._chat_ids_to_be_updated_in_persistence.add(update.effective_chat.id)
@@ -1129,7 +1126,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         # dispatch any errors
         await asyncio.gather(
             *(
-                self.dispatch_error(update=None, error=result)
+                self.process_error(error=result, update=None)
                 for result in results
                 if isinstance(result, Exception)
             )
@@ -1141,7 +1138,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         block: DVInput[bool] = DEFAULT_TRUE,
     ) -> None:
         """Registers an error handler in the Application. This handler will receive every error
-        which happens in your bot. See the docs of :meth:`dispatch_error` for more details on how
+        which happens in your bot. See the docs of :meth:`process_error` for more details on how
         errors are handled.
 
         Note:
@@ -1150,11 +1147,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Args:
             callback (:obj:`callable`): The callback function for this error handler. Will be
                 called when an error is raised. Callback signature:
-                ``def callback(update: object, context: CallbackContext)``.
+                ``def callback(update: Optional[object], context: CallbackContext)``.
                 The error that happened will be present in ``context.error``.
             block (:obj:`bool`, optional): Determines whether the return value of the callback
                 should be awaited before processing the next error handler in
-                :meth:`dispatch_error`. Defaults to :obj:`True`.
+                :meth:`process_error`. Defaults to :obj:`True`.
         """
         if callback in self.error_handlers:
             _logger.warning('The callback is already registered as an error handler. Ignoring.')
@@ -1171,17 +1168,19 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         """
         self.error_handlers.pop(callback, None)
 
-    async def dispatch_error(
+    async def process_error(
         self,
         update: Optional[object],
         error: Exception,
         job: 'Job' = None,
         coroutine: Coroutine = None,
     ) -> bool:
-        """Dispatches an error by passing it to all error handlers registered with
+        """Processes an error by passing it to all error handlers registered with
         :meth:`add_error_handler`. If one of the error handlers raises
-        :class:`telegram.ext.ApplicationHandlerStop`, the update will not be handled by other error
-        handlers or handlers (even in other groups). All other exceptions raised by an error
+        :class:`telegram.ext.ApplicationHandlerStop`, the error will not be handled by other error
+        handlers. Raising :class:`telegram.ext.ApplicationHandlerStop` also stops processing of
+        the update when this method is called by :meth:`process_update`, i.e. no further handlers
+        (even in other groups) will handle the update. All other exceptions raised by an error
         handler will just be logged.
 
         .. versionchanged:: 14.0
