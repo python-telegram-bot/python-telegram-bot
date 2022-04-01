@@ -1106,6 +1106,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                         'persistence with the current state.'
                     )
                     result = new_state.old_state
+                    # We need to check again on the next run if the state is done
+                    self._conversation_handler_conversations[name].mark_as_accessed(key)
                 else:
                     result = new_state.resolve()
             else:
