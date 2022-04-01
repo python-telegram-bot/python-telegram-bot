@@ -93,8 +93,6 @@ class MessageHandler(Handler[Update, CCT]):
 
         """
         if isinstance(update, Update):
-            # The `or False` makes sure that we don't return empty dicts
-            # TODO: add a test for this to MessageHandler
             return self.filters.check_update(update) or False
         return None
 

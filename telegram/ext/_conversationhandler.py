@@ -38,7 +38,7 @@ from typing import (  # pylint: disable=unused-import  # for the "Any" import
 )
 
 from telegram import Update
-from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
 from telegram._utils.types import DVInput
 from telegram.ext import (
     CallbackContext,
@@ -50,6 +50,7 @@ from telegram.ext import (
     StringCommandHandler,
     StringRegexHandler,
     TypeHandler,
+    ExtBot,
 )
 from telegram._utils.warnings import warn
 from telegram.ext._utils.trackingdict import TrackingDict
@@ -230,7 +231,8 @@ class ConversationHandler(Handler[Update, CCT]):
         block (:obj:`bool`, optional): Pass :obj:`False` to *overrule* the
             :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
             :attr:`states` and :attr:`fallbacks`).
-            Defaults to :obj:`True`, in which case the handlers setting will be respected.
+            By default the handlers setting and :attr:`telegram.ext.Defaults.block` will be
+            respected (in that order).
 
             .. versionadded:: 13.2
             .. versionchanged:: 14.0
@@ -244,7 +246,8 @@ class ConversationHandler(Handler[Update, CCT]):
         persistent (:obj:`bool`): Optional. If the conversation's dict for this handler should be
             saved. :attr:`name` is required and persistence has to be set in
             :attr:`Application <.Application.persistence>`.
-        block (:obj:`bool`): Determines whether the callback will run asynchronously.
+        block (:obj:`bool`): Determines whether the callback will run asynchronously. Always
+            :obj:`True` since conversation handlers handle any non-blocking callbacks internally.
 
             .. versionadded:: 13.2
 
@@ -252,6 +255,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     __slots__ = (
         '_allow_reentry',
+        '_block',
         '_child_conversations',
         '_conversation_timeout',
         '_conversations',
@@ -301,7 +305,11 @@ class ConversationHandler(Handler[Update, CCT]):
             PollAnswerHandler,
         )
 
-        self.block = block
+        # self.block is what the Application checks and we want it to always run CH in a blocking
+        # way so that CH can take care of any non-blocking logic internally
+        self.block = True
+        # Store the actual setting in a protected variable instead
+        self._block = block
 
         self._entry_points = entry_points
         self._states = states
@@ -757,9 +765,23 @@ class ConversationHandler(Handler[Update, CCT]):
 
             if timeout_job is not None:
                 timeout_job.schedule_removal()
+
+        # Resolution order of "block":
+        # 1. Setting of the ConversationHandler
+        # 2. Setting of the selected handler
+        # 3. Default values of the bot
+        if self._block is not DEFAULT_TRUE:
+            # CHs block-setting has highest priority
+            block = self._block
+        else:
+            if handler.block is not DEFAULT_TRUE:
+                block = handler.block
+            elif isinstance(application.bot, ExtBot) and application.bot.defaults is not None:
+                block = application.bot.defaults.block
+            else:
+                block = DefaultValue.get_value(handler.block)
+
         try:
-            # TODO handle non-blocking handlers correctly
-            block = self.block and handler.block
             if block:
                 new_state: object = await handler.handle_update(
                     update, application, handler_check_result, context
@@ -808,6 +830,7 @@ class ConversationHandler(Handler[Update, CCT]):
             # Don't pass the new state here. If we're in a nested conversation, the parent is
             # expecting None as return value.
             raise ApplicationHandlerStop()
+        # Signals a possible parent conversation to stay in the current state
         return None
 
     def _update_state(self, new_state: object, key: ConversationKey) -> None:

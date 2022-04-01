@@ -652,7 +652,7 @@ class Job:
             await context.refresh_data()
             await self.callback(context)
         except Exception as exc:
-            await application.create_task(application.dispatch_error(None, exc, job=self))
+            await application.create_task(application.process_error(None, exc, job=self))
         finally:
             # This is internal logic of application - let's keep it private for now
             application._mark_for_persistence_update(job=self)  # pylint: disable=protected-access
