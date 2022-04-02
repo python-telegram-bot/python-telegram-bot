@@ -42,7 +42,7 @@ async def main() -> NoReturn:
                 update_id += 1
 
 
-async def echo(bot: Bot, update_id: int) -> None:
+async def echo(bot: Bot, update_id: int) -> int:
     """Echo the message the user sent."""
     # Request updates after the last update_id
     updates = await bot.get_updates(offset=update_id, timeout=10)
@@ -56,6 +56,7 @@ async def echo(bot: Bot, update_id: int) -> None:
             logger.info("Found message %s!", update.message.text)
             await update.message.reply_text(update.message.text)
         return next_update_id
+    return update_id
 
 
 if __name__ == '__main__':
