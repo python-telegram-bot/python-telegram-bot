@@ -46,7 +46,7 @@ def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
         caller (:obj:`pathlib.Path`): File that should be the caller.
 
     Returns:
-        :obj:`bool`: Whether or not the frame was called by the specified file.
+        :obj:`bool`: Whether the frame was called by the specified file.
     """
     if frame is None:
         return False

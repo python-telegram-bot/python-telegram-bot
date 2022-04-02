@@ -66,6 +66,9 @@ _logger = logging.getLogger(__name__)
 
 @dataclass
 class _ConversationTimeoutContext(Generic[CCT]):
+    """Used as a datastore for conversation timeouts. Passed in the
+    :paramref:`JobQueue.run_once.context` parameter. See :meth:`_trigger_timeout`."""
+
     __slots__ = ('conversation_key', 'update', 'application', 'callback_context')
 
     conversation_key: ConversationKey
@@ -228,15 +231,13 @@ class ConversationHandler(Handler[Update, CCT]):
         map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
             used to instruct a child conversation handler to transition into a mapped state on
             its parent conversation handler in place of a specified nested state.
-        block (:obj:`bool`, optional): Pass :obj:`False` to *overrule* the
+        block (:obj:`bool`, optional): Pass :obj:`False` or :obj:`True` to *overrule* the
             :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
             :attr:`states` and :attr:`fallbacks`).
             By default the handlers setting and :attr:`telegram.ext.Defaults.block` will be
             respected (in that order).
 
             .. versionadded:: 13.2
-            .. versionchanged:: 14.0
-                No longer *overrides* the handlers settings.
 
     Raises:
         :exc:`ValueError`: If :paramref:`persistent` is used but :paramref:`name` was not set, or
@@ -323,7 +324,9 @@ class ConversationHandler(Handler[Update, CCT]):
         self._name = name
         self._map_to_parent = map_to_parent
 
-        self.timeout_jobs: Dict[ConversationKey, 'Job'] = {}  # TODO: figure out purpose of this
+        # if conversation_timeout is used, this dict is used to schedule a job which runs when the
+        # conv has timed out.
+        self.timeout_jobs: Dict[ConversationKey, 'Job'] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
         self._child_conversations: Set['ConversationHandler'] = set()
@@ -579,7 +582,7 @@ class ConversationHandler(Handler[Update, CCT]):
         return self._conversations
 
     def _get_key(self, update: Update) -> ConversationKey:
-        """Gets the chat/user/(inline)message id of the chat this update is associated with."""
+        """Builds the conversation key associated with the update."""
         chat = update.effective_chat
         user = update.effective_user
 
@@ -637,6 +640,7 @@ class ConversationHandler(Handler[Update, CCT]):
         context: CallbackContext,
         conversation_key: ConversationKey,
     ) -> None:
+        """Schedules a job which executes :meth:`_trigger_timeout` upon conversation timeout."""
         if new_state == self.END:
             return
 
@@ -681,11 +685,11 @@ class ConversationHandler(Handler[Update, CCT]):
         key = self._get_key(update)
         state = self._conversations.get(key)
 
-        # Resolve promises
+        # Resolve futures
         if isinstance(state, PendingState):
             _logger.debug('Waiting for asyncio Task to finish ...')
 
-            # check if promise is finished or not
+            # check if future is finished or not
             if state.done():
                 res = state.resolve()
                 self._update_state(res, key)
@@ -747,8 +751,8 @@ class ConversationHandler(Handler[Update, CCT]):
         """Send the update to the callback for the current state and Handler
 
         Args:
-            check_result: The result from check_update. For this handler it's a tuple of the
-                conversation state, key, handler, and the handler's check result.
+            check_result: The result from :meth:`check_update`. For this handler it's a tuple of
+                the conversation state, key, handler, and the handler's check result.
             update (:class:`telegram.Update`): Incoming telegram update.
             application (:class:`telegram.ext.Application`): Application that originated the
                 update.
@@ -771,7 +775,7 @@ class ConversationHandler(Handler[Update, CCT]):
         # 2. Setting of the selected handler
         # 3. Default values of the bot
         if self._block is not DEFAULT_TRUE:
-            # CHs block-setting has highest priority
+            # CHs block-setting has the highest priority
             block = self._block
         else:
             if handler.block is not DEFAULT_TRUE:
@@ -781,7 +785,7 @@ class ConversationHandler(Handler[Update, CCT]):
             else:
                 block = DefaultValue.get_value(handler.block)
 
-        try:
+        try:  # Now determine if the handler in the current state should be handled asynchronously
             if block:
                 new_state: object = await handler.handle_update(
                     update, application, handler_check_result, context
@@ -854,6 +858,9 @@ class ConversationHandler(Handler[Update, CCT]):
             self._conversations[key] = new_state
 
     async def _trigger_timeout(self, context: CallbackContext) -> None:
+        """This is run whenever a conversation has timed out. Also makes sure that all handlers
+        which are in the :attr:`TIMEOUT` state and whose :meth:`Handler.check_update` returns
+        :obj:`True` is handled."""
         job = cast('Job', context.job)
         ctxt = cast(_ConversationTimeoutContext, job.context)
 
@@ -870,6 +877,7 @@ class ConversationHandler(Handler[Update, CCT]):
                 return
             del self.timeout_jobs[ctxt.conversation_key]
 
+        # Now run all handlers which are in TIMEOUT state
         handlers = self.states.get(self.TIMEOUT, [])
         for handler in handlers:
             check = handler.check_update(ctxt.update)

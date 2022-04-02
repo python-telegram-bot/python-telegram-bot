@@ -91,7 +91,6 @@ class JobQueue:
             if shift_day and date_time <= datetime.datetime.now(pytz.utc):
                 date_time += datetime.timedelta(days=1)
             return date_time
-        # isinstance(time, datetime.datetime):
         return time
 
     def set_application(self, application: 'Application') -> None:
@@ -168,7 +167,7 @@ class JobQueue:
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
@@ -259,7 +258,7 @@ class JobQueue:
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
@@ -341,7 +340,7 @@ class JobQueue:
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
@@ -416,7 +415,7 @@ class JobQueue:
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
@@ -481,7 +480,7 @@ class JobQueue:
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
@@ -517,7 +516,7 @@ class JobQueue:
         """Shuts down the :class:`~telegram.ext.JobQueue`.
 
         Args:
-            wait (:obj:`bool`, optional): Whether or not to wait until all currently running jobs
+            wait (:obj:`bool`, optional): Whether to wait until all currently running jobs
                 have finished. Defaults to :obj:`True`.
 
         """
@@ -561,8 +560,6 @@ class Job:
     Note:
         * All attributes and instance methods of :attr:`job` are also directly available as
           attributes/methods of the corresponding :class:`telegram.ext.Job` object.
-        * Two instances of :class:`telegram.ext.Job` are considered equal, if their corresponding
-          :attr:`job` attributes have the same ``id``.
         * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
           this :class:`telegram.ext.Job` to be useful.
 
@@ -577,7 +574,8 @@ class Job:
 
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
             accessed through :attr:`Job.context` in the callback. Defaults to :obj:`None`.
-        name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
+        name (:obj:`str`, optional): The name of the new job. Defaults to
+            :external:obj:`callback.__name__ <definition.__name__>`.
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
         chat_id (:obj:`int`, optional): Chat id of the chat that this job is associated with.
 

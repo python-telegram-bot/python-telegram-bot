@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=no-self-use
-"""This module contains the class Defaults, which allows to pass default values to Updater."""
+"""This module contains the class Defaults, which allows passing default values to Application."""
 from typing import NoReturn, Optional, Dict, Any
 
 import pytz
@@ -34,7 +34,8 @@ class Defaults:
 
 
     Parameters:
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+        parse_mode (:obj:`str`, optional): Send :attr:`~telegram.constants.ParseMode.MARKDOWN` or
+            :attr:`~telegram.constants.ParseMode.HTML`, if you want Telegram apps to show
             bold, italic, fixed-width text or URLs in your bot's message.
         disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
             receive a notification with no sound.
@@ -47,10 +48,10 @@ class Defaults:
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
         tzinfo (:obj:`tzinfo`, optional): A timezone to be used for all date(time) inputs
             appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
-            somewhere, it will be assumed to be in ``tzinfo``. Must be a timezone provided by the
-            ``pytz`` module. Defaults to UTC.
-        block (:obj:`bool`, optional): Default setting for the ``block`` parameter of
-            handlers and error handlers registered through :meth:`Application.add_handler` and
+            somewhere, it will be assumed to be in :paramref:`tzinfo`. Must be a timezone provided
+            by the ``pytz`` module. Defaults to UTC.
+        block (:obj:`bool`, optional): Default setting for the :paramref:`Handler.block` parameter
+            of handlers and error handlers registered through :meth:`Application.add_handler` and
             :meth:`Application.add_error_handler`. Defaults to :obj:`True`.
         protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
             forwarding and saving.
@@ -196,7 +197,7 @@ class Defaults:
 
     @property
     def block(self) -> bool:
-        """:obj:`bool`: Optional. Default setting for the ``block`` parameter of
+        """:obj:`bool`: Optional. Default setting for the :paramref:`Handler.block` parameter of
         handlers and error handlers registered through :meth:`Application.add_handler` and
         :meth:`Application.add_error_handler`.
         """
