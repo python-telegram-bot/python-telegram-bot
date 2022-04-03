@@ -59,7 +59,7 @@ from telegram.ext._utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
-CheckUpdateType = Tuple[object, ConversationKey, Handler, object]
+_CheckUpdateType = Tuple[object, ConversationKey, Handler, object]
 
 _logger = logging.getLogger(__name__)
 
@@ -547,13 +547,17 @@ class ConversationHandler(Handler[Update, CCT]):
 
     async def _initialize_persistence(
         self, application: 'Application'
-    ) -> TrackingDict[ConversationKey, object]:
+    ) -> Dict[str, TrackingDict[ConversationKey, object]]:
         """Initializes the persistence for this handler and its child conversations.
         While this method is marked as protected, we expect it to be called by the
         Application/parent conversations. It's just protected to hide it from users.
 
         Args:
             application (:class:`telegram.ext.Application`): The application.
+
+        Returns:
+            A dict {conversation.name -> TrackingDict}, which contains all dict of this
+            conversation and possible child conversations.
 
         """
         if not (self.persistent and self.name and application.persistence):
@@ -575,12 +579,16 @@ class ConversationHandler(Handler[Update, CCT]):
             await application.persistence.get_conversations(self.name)
         )
 
+        out = {self.name: self._conversations}
+
         for handler in self._child_conversations:
-            await handler._initialize_persistence(  # pylint: disable=protected-access
-                application=application
+            out.update(
+                await handler._initialize_persistence(  # pylint: disable=protected-access
+                    application=application
+                )
             )
 
-        return self._conversations
+        return out
 
     def _get_key(self, update: Update) -> ConversationKey:
         """Builds the conversation key associated with the update."""
@@ -659,7 +667,7 @@ class ConversationHandler(Handler[Update, CCT]):
             _logger.exception("Failed to schedule timeout.", exc_info=exc)
 
     # pylint: disable=too-many-return-statements
-    def check_update(self, update: object) -> Optional[CheckUpdateType]:
+    def check_update(self, update: object) -> Optional[_CheckUpdateType]:
         """
         Determines whether an update should be handled by this conversation handler, and if so in
         which state the conversation currently is.
@@ -685,6 +693,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
         key = self._get_key(update)
         state = self._conversations.get(key)
+        check: Optional[object] = None
 
         # Resolve futures
         if isinstance(state, PendingState):
@@ -722,7 +731,7 @@ class ConversationHandler(Handler[Update, CCT]):
                     return None
 
         # Get the handler list for current state, if we didn't find one yet and we're still here
-        if state is not None and not handler:
+        if state is not None and handler is None:
             for candidate in self.states.get(state, []):
                 check = candidate.check_update(update)
                 if check is not None and check is not False:
@@ -746,7 +755,7 @@ class ConversationHandler(Handler[Update, CCT]):
         self,
         update: Update,
         application: 'Application',
-        check_result: CheckUpdateType,
+        check_result: _CheckUpdateType,
         context: CallbackContext,
     ) -> Optional[object]:
         """Send the update to the callback for the current state and Handler

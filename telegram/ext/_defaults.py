@@ -22,8 +22,6 @@ from typing import NoReturn, Optional, Dict, Any
 
 import pytz
 
-from telegram._utils.defaultvalue import DEFAULT_NONE
-
 
 class Defaults:
     """Convenience Class to gather all parameters with a (user defined) default value
@@ -102,7 +100,7 @@ class Defaults:
             'protect_content',
         ):
             value = getattr(self, kwarg)
-            if value not in [None, DEFAULT_NONE]:
+            if value is not None:
                 self._api_defaults[kwarg] = value
 
     @property
@@ -232,7 +230,6 @@ class Defaults:
                 self._quote,
                 self._tzinfo,
                 self._block,
-                self._protect_content,
                 self._protect_content,
             )
         )

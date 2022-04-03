@@ -84,6 +84,11 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
         keys = self.pop_accessed_keys()
         return [(key, self[key] if key in self else self.DELETED) for key in keys]
 
+    def mark_as_accessed(self, key: _KT) -> None:
+        """Use this method have the key returned again in the next call to
+        :meth:`pop_accessed_write_items` or :meth:`pop_accessed_keys"""
+        self._write_access_keys.add(key)
+
     # Override methods to track access
 
     def __setitem__(self, key: _KT, value: _VT) -> None:

@@ -309,13 +309,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         # Initialize the persistent conversation handlers with the stored states
         for handler in itertools.chain.from_iterable(self.handlers.values()):
             if isinstance(handler, ConversationHandler) and handler.persistent and handler.name:
-                self._conversation_handler_conversations[
-                    handler.name
-                ] = await handler._initialize_persistence(  # pylint: disable=protected-access
-                    self
-                )
+                await self._add_ch_to_persistence(handler)
 
         self._initialized = True
+
+    async def _add_ch_to_persistence(self, handler: 'ConversationHandler') -> None:
+        self._conversation_handler_conversations.update(
+            await handler._initialize_persistence(self)  # pylint: disable=protected-access
+        )
 
     async def shutdown(self) -> None:
         """Shuts down the Application by shutting down:
@@ -869,13 +870,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             # (in __create_task_callback)
             self._mark_for_persistence_update(update=update)
 
-    async def _add_ch_after_init(self, handler: 'ConversationHandler') -> None:
-        self._conversation_handler_conversations[
-            handler.name  # type: ignore[index]
-        ] = await handler._initialize_persistence(  # pylint: disable=protected-access
-            self
-        )
-
     def add_handler(self, handler: Handler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
 
@@ -923,7 +917,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     f"can not be persistent if application has no persistence"
                 )
             if self._initialized:
-                self.create_task(self._add_ch_after_init(handler))
+                self.create_task(self._add_ch_to_persistence(handler))
                 warn(
                     'A persistent `ConversationHandler` was passed to `add_handler`, '
                     'after `Application.initialize` was called. This is discouraged.'
@@ -1115,8 +1109,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             if not self.persistence:
                 return
 
-            await self.update_persistence()
-
             # asyncio synchronization primitives don't accept a timeout argument, it is recommended
             # to use wait_for instead
             try:
@@ -1127,6 +1119,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 return
             except asyncio.TimeoutError:
                 pass
+
+            # putting this *after* the wait_for so we don't immediately update on startup as
+            # that would make little sense
+            await self.update_persistence()
 
     async def update_persistence(self) -> None:
         """Updates :attr:`user_data`, :attr:`chat_data`, :attr:`bot_data` in :attr:`persistence`
@@ -1218,20 +1214,26 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 # Note that when updating the persistence one last time during self.stop(),
                 # *all* tasks will be done.
                 if not new_state.done():
-                    # TODO: Try to test that this doesn't happen on shutdown
-                    _logger.warning(
-                        'A ConversationHandlers state was not yet resolved. Updating the '
-                        'persistence with the current state.'
-                    )
+                    if self.running:
+                        _logger.debug(
+                            'A ConversationHandlers state was not yet resolved. Updating the '
+                            'persistence with the current state. Will check again on next run of '
+                            'Application.update_persistence.'
+                        )
+                    else:
+                        _logger.warning(
+                            'A ConversationHandlers state was not yet resolved. Updating the '
+                            'persistence with the current state.'
+                        )
                     result = new_state.old_state
+                    # We need to check again on the next run if the state is done
+                    self._conversation_handler_conversations[name].mark_as_accessed(key)
                 else:
                     result = new_state.resolve()
             else:
                 result = new_state
 
             effective_new_state = None if result is TrackingDict.DELETED else result
-            # TODO: Test that we actually pass `None` here in case the conversation had ended,
-            #  i.e. effective_new_state is TrackingDict.DELETED
             coroutines.add(
                 self.persistence.update_conversation(
                     name=name, key=key, new_state=effective_new_state
