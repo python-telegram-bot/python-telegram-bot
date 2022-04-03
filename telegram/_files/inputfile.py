@@ -40,17 +40,15 @@ class InputFile:
             bytes.
 
             Note:
-                If ``obj`` is a string, it will be encoded as bytes via ``obj.encode('utf-8')``.
+                If :paramref:`obj` is a string, it will be encoded as bytes via
+                :external:obj:`obj.encode('utf-8') <str.encode>`.
         filename (:obj:`str`, optional): Filename for this InputFile.
-
-    Raises:
-        TelegramError
 
     Attributes:
         input_file_content (:obj:`bytes`): The binary content of the file to send.
         attach_name (:obj:`str`): Attach name.
-        filename (:obj:`str`): Optional. Filename for the file to be sent.
-        mimetype (:obj:`str`): Optional. The mimetype inferred from the file to be sent.
+        filename (:obj:`str`): Filename for the file to be sent.
+        mimetype (:obj:`str`): The mimetype inferred from the file to be sent.
 
     """
 

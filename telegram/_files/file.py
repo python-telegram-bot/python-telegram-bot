@@ -46,7 +46,7 @@ class File(TelegramObject):
         * Maximum file size to download is
             :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD`.
         * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
-          then it will automatically be decrypted as it downloads when you call :attr:`download()`.
+          then it will automatically be decrypted as it downloads when you call :meth:`download()`.
 
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -65,7 +65,7 @@ class File(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`str`): Optional. File size in bytes.
-        file_path (:obj:`str`): Optional. File path. Use :attr:`download` to get the file.
+        file_path (:obj:`str`): Optional. File path. Use :meth:`download` to get the file.
 
     """
 
