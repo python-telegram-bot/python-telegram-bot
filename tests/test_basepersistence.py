@@ -1181,3 +1181,156 @@ class TestBasePersistence:
             await papp.update_persistence()
             assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
             assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
+
+    @pytest.mark.asyncio
+    async def test_non_blocking_conversations_raises_Exception(self, bot):
+        papp = build_papp(token=bot.token)
+
+        async def callback_1(_, __):
+            return HandlerStates.STATE_1
+
+        async def callback_2(_, __):
+            raise Exception('Test Exception')
+
+        conversation = ConversationHandler(
+            entry_points=[
+                TrackingConversationHandler.build_handler(HandlerStates.END, callback=callback_1)
+            ],
+            states={
+                HandlerStates.STATE_1: [
+                    TrackingConversationHandler.build_handler(
+                        HandlerStates.STATE_1, callback=callback_2
+                    )
+                ]
+            },
+            fallbacks=[],
+            persistent=True,
+            name='conv',
+            block=False,
+        )
+        papp.add_handler(conversation)
+
+        async with papp:
+            assert papp.persistence.updated_conversations == {}
+
+            await papp.process_update(
+                TrackingConversationHandler.build_update(HandlerStates.END, 1)
+            )
+            assert papp.persistence.updated_conversations == {}
+
+            await papp.update_persistence()
+            await asyncio.sleep(0.05)
+            assert papp.persistence.updated_conversations == {'conv': ({(1, 1): 1})}
+            # The result of the pending state wasn't retrieved by the CH yet, so we must be in
+            # state `None`
+            assert papp.persistence.conversations == {'conv': {(1, 1): None}}
+
+            await papp.process_update(
+                TrackingConversationHandler.build_update(HandlerStates.STATE_1, 1)
+            )
+
+            papp.persistence.reset_tracking()
+            await asyncio.sleep(0.01)
+            await papp.update_persistence()
+            assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
+            # since the second callback raised an exception, the state must be the previous one!
+            assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
+
+    @pytest.mark.asyncio
+    async def test_non_blocking_conversations_on_stop(self, bot):
+        papp = build_papp(token=bot.token, update_interval=100)
+        event = asyncio.Event()
+
+        async def callback(_, __):
+            await event.wait()
+            return HandlerStates.STATE_1
+
+        conversation = ConversationHandler(
+            entry_points=[
+                TrackingConversationHandler.build_handler(HandlerStates.END, callback=callback)
+            ],
+            states={},
+            fallbacks=[],
+            persistent=True,
+            name='conv',
+            block=False,
+        )
+        papp.add_handler(conversation)
+
+        await papp.initialize()
+        assert papp.persistence.updated_conversations == {}
+        await papp.start()
+
+        await papp.process_update(TrackingConversationHandler.build_update(HandlerStates.END, 1))
+        assert papp.persistence.updated_conversations == {}
+
+        stop_task = asyncio.create_task(papp.stop())
+        assert not stop_task.done()
+        event.set()
+        await asyncio.sleep(0.05)
+        assert stop_task.done()
+        assert papp.persistence.updated_conversations == {}
+
+        await papp.shutdown()
+        await asyncio.sleep(0.01)
+        # The pending state must have been resolved on shutdown!
+        assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
+        assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
+
+    @pytest.mark.asyncio
+    async def test_non_blocking_conversations_on_improper_stop(self, bot, caplog):
+        papp = build_papp(token=bot.token, update_interval=100)
+        event = asyncio.Event()
+
+        async def callback(_, __):
+            await event.wait()
+            return HandlerStates.STATE_1
+
+        conversation = ConversationHandler(
+            entry_points=[
+                TrackingConversationHandler.build_handler(HandlerStates.END, callback=callback)
+            ],
+            states={},
+            fallbacks=[],
+            persistent=True,
+            name='conv',
+            block=False,
+        )
+        papp.add_handler(conversation)
+
+        await papp.initialize()
+        assert papp.persistence.updated_conversations == {}
+
+        await papp.process_update(TrackingConversationHandler.build_update(HandlerStates.END, 1))
+        assert papp.persistence.updated_conversations == {}
+
+        with caplog.at_level(logging.WARNING):
+            await papp.shutdown()
+            await asyncio.sleep(0.01)
+            # Because the app wasn't running, the pending state isn't ensured to be done on
+            # shutdown - hence we expect the persistence to be updated with state `None`
+            assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
+            assert papp.persistence.conversations == {'conv': {(1, 1): None}}
+
+        # Ensure that we warn the user about this!
+        found_record = None
+        for record in caplog.records:
+            if record.getMessage().startswith('A ConversationHandlers state was not yet resolved'):
+                found_record = record
+                break
+        assert found_record is not None
+
+    @default_papp
+    @pytest.mark.asyncio
+    async def test_conversation_ends(self, papp):
+        async with papp:
+            assert papp.persistence.updated_conversations == {}
+
+            for state in HandlerStates:
+                await papp.process_update(TrackingConversationHandler.build_update(state, 1))
+            assert papp.persistence.updated_conversations == {}
+
+            await papp.update_persistence()
+            assert papp.persistence.updated_conversations == {'conv_1': ({(1, 1): 1})}
+            # This is the important part: the persistence is updated with `None` when the conv ends
+            assert papp.persistence.conversations == {'conv_1': {(1, 1): None}}
