@@ -83,15 +83,6 @@ class WebhookServer:
             await self._http_server.close_all_connections()
             self._logger.debug('Webhook Server stopped')
 
-    # pylint: disable=unused-argument
-    def handle_error(self, request: object, client_address: str) -> None:
-        """Handle an error gracefully."""
-        self._logger.debug(
-            'Exception happened during processing of request from %s',
-            client_address,
-            exc_info=True,
-        )
-
 
 class WebhookAppClass(tornado.web.Application):
     """Application used in the Webserver"""
