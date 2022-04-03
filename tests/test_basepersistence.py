@@ -29,7 +29,7 @@ from typing import NamedTuple
 import pytest
 from flaky import flaky
 
-from telegram import User, Chat, InlineKeyboardMarkup, InlineKeyboardButton, Bot
+from telegram import User, Chat, InlineKeyboardMarkup, InlineKeyboardButton, Bot, Update
 from telegram.ext import (
     ApplicationBuilder,
     PersistenceInput,
@@ -301,13 +301,6 @@ papp_store_all_or_none = pytest.mark.parametrize(
 class TestBasePersistence:
     """Tests basic behavior of BasePersistence and (most importantly) the integration of
     persistence into the Application."""
-
-    # TODO: Test integration of the more intricate ConversationHandler things once CH itself is
-    #  tested. This includes:
-    #  * pending states, i.e. non-blocking handlers
-    #  * pending states being unresolved on shutdown
-    #  * conversation timeouts
-    #  * nested conversations (can conversations be persistent if their parents aren't?)
 
     def job_callback(self, chat_id: int = None):
         async def callback(context):
@@ -1334,3 +1327,167 @@ class TestBasePersistence:
             assert papp.persistence.updated_conversations == {'conv_1': ({(1, 1): 1})}
             # This is the important part: the persistence is updated with `None` when the conv ends
             assert papp.persistence.conversations == {'conv_1': {(1, 1): None}}
+
+    @pytest.mark.asyncio
+    async def test_conversation_timeout(self, bot):
+        # high update_interval so that we can instead manually call it
+        papp = build_papp(token=bot.token, update_interval=150)
+
+        async def callback(_, __):
+            return HandlerStates.STATE_1
+
+        conversation = ConversationHandler(
+            entry_points=[
+                TrackingConversationHandler.build_handler(HandlerStates.END, callback=callback)
+            ],
+            states={HandlerStates.STATE_1: []},
+            fallbacks=[],
+            persistent=True,
+            name='conv',
+            conversation_timeout=3,
+        )
+        papp.add_handler(conversation)
+
+        async with papp:
+            await papp.start()
+            assert papp.persistence.updated_conversations == {}
+
+            await papp.process_update(
+                TrackingConversationHandler.build_update(HandlerStates.END, 1)
+            )
+            assert papp.persistence.updated_conversations == {}
+            await papp.update_persistence()
+            assert papp.persistence.updated_conversations == {'conv': ({(1, 1): 1})}
+            assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
+
+            papp.persistence.reset_tracking()
+            await asyncio.sleep(4)
+            # After the timeout the conversation should run the entry point again …
+            assert conversation.check_update(
+                TrackingConversationHandler.build_update(HandlerStates.END, 1)
+            )
+            await papp.update_persistence()
+            # … and persistence should be updated with `None`
+            assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
+            assert papp.persistence.conversations == {'conv': {(1, 1): None}}
+
+            await papp.stop()
+
+    @pytest.mark.asyncio
+    async def test_persistent_nested_conversations(self, bot):
+        papp = build_papp(token=bot.token, update_interval=150)
+
+        def build_callback(
+            state: HandlerStates,
+        ):
+            async def callback(_: Update, __: CallbackContext) -> HandlerStates:
+                return state
+
+            return callback
+
+        grand_child = ConversationHandler(
+            entry_points=[TrackingConversationHandler.build_handler(HandlerStates.END)],
+            states={
+                HandlerStates.STATE_1: [
+                    TrackingConversationHandler.build_handler(
+                        HandlerStates.STATE_1, callback=build_callback(HandlerStates.END)
+                    )
+                ]
+            },
+            fallbacks=[],
+            persistent=True,
+            name='grand_child',
+            map_to_parent={HandlerStates.END: HandlerStates.STATE_2},
+        )
+
+        child = ConversationHandler(
+            entry_points=[TrackingConversationHandler.build_handler(HandlerStates.END)],
+            states={
+                HandlerStates.STATE_1: [grand_child],
+                HandlerStates.STATE_2: [
+                    TrackingConversationHandler.build_handler(HandlerStates.STATE_2)
+                ],
+            },
+            fallbacks=[],
+            persistent=True,
+            name='child',
+            map_to_parent={HandlerStates.STATE_3: HandlerStates.STATE_2},
+        )
+
+        parent = ConversationHandler(
+            entry_points=[TrackingConversationHandler.build_handler(HandlerStates.END)],
+            states={
+                HandlerStates.STATE_1: [child],
+                HandlerStates.STATE_2: [
+                    TrackingConversationHandler.build_handler(
+                        HandlerStates.STATE_2, callback=build_callback(HandlerStates.END)
+                    )
+                ],
+            },
+            fallbacks=[],
+            persistent=True,
+            name='parent',
+        )
+
+        papp.add_handler(parent)
+        papp.persistence.conversations['grand_child'][(1, 1)] = HandlerStates.STATE_1
+        papp.persistence.conversations['child'][(1, 1)] = HandlerStates.STATE_1
+        papp.persistence.conversations['parent'][(1, 1)] = HandlerStates.STATE_1
+
+        # Should load the stored data into the persistence so that the updates below are handled
+        # accordingly
+        await papp.initialize()
+        assert papp.persistence.updated_conversations == {}
+
+        assert not parent.check_update(
+            TrackingConversationHandler.build_update(HandlerStates.STATE_2, 1)
+        )
+        assert not parent.check_update(
+            TrackingConversationHandler.build_update(HandlerStates.END, 1)
+        )
+        assert parent.check_update(
+            TrackingConversationHandler.build_update(HandlerStates.STATE_1, 1)
+        )
+
+        await papp.process_update(
+            TrackingConversationHandler.build_update(HandlerStates.STATE_1, 1)
+        )
+        assert papp.persistence.updated_conversations == {}
+        await papp.update_persistence()
+        assert papp.persistence.updated_conversations == {
+            'grand_child': {(1, 1): 1},
+            'child': {(1, 1): 1},
+        }
+        assert papp.persistence.conversations == {
+            'grand_child': {(1, 1): None},
+            'child': {(1, 1): HandlerStates.STATE_2},
+            'parent': {(1, 1): HandlerStates.STATE_1},
+        }
+
+        papp.persistence.reset_tracking()
+        await papp.process_update(
+            TrackingConversationHandler.build_update(HandlerStates.STATE_2, 1)
+        )
+        await papp.update_persistence()
+        assert papp.persistence.updated_conversations == {
+            'parent': {(1, 1): 1},
+            'child': {(1, 1): 1},
+        }
+        assert papp.persistence.conversations == {
+            'child': {(1, 1): None},
+            'parent': {(1, 1): HandlerStates.STATE_2},
+        }
+
+        papp.persistence.reset_tracking()
+        await papp.process_update(
+            TrackingConversationHandler.build_update(HandlerStates.STATE_2, 1)
+        )
+        await papp.update_persistence()
+        assert papp.persistence.updated_conversations == {
+            'parent': {(1, 1): 1},
+        }
+        assert papp.persistence.conversations == {
+            'parent': {(1, 1): None},
+        }
+
+        await papp.shutdown()
