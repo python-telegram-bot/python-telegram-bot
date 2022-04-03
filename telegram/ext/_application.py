@@ -1317,8 +1317,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             job (:class:`telegram.ext.Job`, optional): The job that caused the error.
 
                 .. versionadded:: 14.0
-            coroutine (:term:`coroutine function`): The coroutine that caused the error. Only
-                present if the coroutine was run with :attr:`block=False <Handler.block>`.
+            coroutine (:term:`coroutine function`, optional): The coroutine that caused the error.
 
         Returns:
             :obj:`bool`: :obj:`True`, if one of the error handlers raised

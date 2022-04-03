@@ -786,7 +786,7 @@ class ConversationHandler(Handler[Update, CCT]):
             else:
                 block = DefaultValue.get_value(handler.block)
 
-        try:  # Now determine if the handler in the current state should be handled asynchronously
+        try:  # Now create task or await the callback
             if block:
                 new_state: object = await handler.handle_update(
                     update, application, handler_check_result, context

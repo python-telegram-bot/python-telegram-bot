@@ -73,6 +73,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             context.
 
     Attributes:
+        coroutine (:term:`coroutine function`): Optional. Only present in error handlers if the
+            error was caused by a coroutine run with :meth:`Application.create_task` or a handler
+            callback with :attr:`block=False <Handler.block>`.
         matches (List[:meth:`re.Match <re.Match.expand>`]): Optional. If the associated update
             originated from a :class:`filters.Regex`, this will contain a list of match objects for
             every pattern where ``re.search(pattern, string)`` returned a match. Note that filters
