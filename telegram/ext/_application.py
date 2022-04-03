@@ -1306,6 +1306,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. versionchanged:: 14.0
 
+            * ``dispatch_error`` was renamed to :meth:`process_error`.
             * Exceptions raised by error handlers are now properly logged.
             * :class:`telegram.ext.ApplicationHandlerStop` is no longer reraised but converted into
               the return value.

@@ -136,8 +136,6 @@ class BaseRequest(
             url (:obj:`str`): The URL to request.
             request_data (:class:`telegram.request.RequestData`, optional): An object containing
                 information about parameters and files to upload for the request.
-            request_data (:class:`telegram.request.RequestData`, optional): An object containing
-                information about parameters and files to upload for the request.
             connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
                 maximum amount of time (in seconds) to wait for a connection attempt to a server
                 to succeed instead of the time specified during creating of this object. Defaults
@@ -238,10 +236,24 @@ class BaseRequest(
         Args:
             url (:obj:`str`): The URL to request.
             method (:obj:`str`): HTTP method (i.e. 'POST', 'GET', etc.).
-            url (:obj:`str`): The request's URL.
             request_data (:class:`telegram.request.RequestData`, optional): An object containing
                 information about parameters and files to upload for the request.
-            read_timeout: Timeout for waiting to server's response.
+            read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
+                amount of time (in seconds) to wait for a response from Telegram's server instead
+                of the time specified during creating of this object. Defaults to
+                :attr:`DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
+                maximum amount of time (in seconds) to wait for a connection attempt to a server
+                to succeed instead of the time specified during creating of this object. Defaults
+                to :attr:`DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
+                amount of time (in seconds) to wait for a write operation to complete (in terms of
+                a network socket; i.e. POSTing a request or uploading a file) instead of the time
+                specified during creating of this object. Defaults to :attr:`DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
+                amount of time (in seconds) to wait for a connection to become available instead
+                of the time specified during creating of this object. Defaults to
+                :attr:`DEFAULT_NONE`.
 
         Returns:
             bytes: The payload part of the HTTP server response.
@@ -281,7 +293,7 @@ class BaseRequest(
         else:
             message = 'Unknown HTTPError'
 
-        # In some special cases, we ca raise more informative exceptions:
+        # In some special cases, we can raise more informative exceptions:
         # see https://core.telegram.org/bots/api#responseparameters and
         # https://core.telegram.org/bots/api#making-requests
         parameters = response_data.get('parameters')

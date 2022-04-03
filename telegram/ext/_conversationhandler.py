@@ -67,7 +67,8 @@ _logger = logging.getLogger(__name__)
 @dataclass
 class _ConversationTimeoutContext(Generic[CCT]):
     """Used as a datastore for conversation timeouts. Passed in the
-    :paramref:`JobQueue.run_once.context` parameter. See :meth:`_trigger_timeout`."""
+    :paramref:`JobQueue.run_once.context` parameter. See :meth:`_trigger_timeout`.
+    """
 
     __slots__ = ('conversation_key', 'update', 'application', 'callback_context')
 
@@ -860,7 +861,8 @@ class ConversationHandler(Handler[Update, CCT]):
     async def _trigger_timeout(self, context: CallbackContext) -> None:
         """This is run whenever a conversation has timed out. Also makes sure that all handlers
         which are in the :attr:`TIMEOUT` state and whose :meth:`Handler.check_update` returns
-        :obj:`True` is handled."""
+        :obj:`True` is handled.
+        """
         job = cast('Job', context.job)
         ctxt = cast(_ConversationTimeoutContext, job.context)
 

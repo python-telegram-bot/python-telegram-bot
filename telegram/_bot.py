@@ -163,16 +163,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         * Attempting to pickle a bot instance will now raise :exc:`pickle.PicklingError`.
 
     Args:
-        token (:obj:`str`): Bot's unique authentication.
+        token (:obj:`str`): Bot's unique authentication token.
         base_url (:obj:`str`, optional): Telegram Bot API service URL.
         base_file_url (:obj:`str`, optional): Telegram Bot API file URL.
         request (:class:`telegram.request.BaseRequest`, optional): Pre initialized
             :class:`telegram.request.BaseRequest` instances. Will be used for all bot methods
-            *except* for :attr:`get_updates`. If not passed, an instance of
+            *except* for :meth:`get_updates`. If not passed, an instance of
             :class:`telegram.request.HTTPXRequest` will be used.
         get_updates_request (:class:`telegram.request.BaseRequest`, optional): Pre initialized
             :class:`telegram.request.BaseRequest` instances. Will be used exclusively for
-            :attr:`get_updates`. If not passed, an instance of
+            :meth:`get_updates`. If not passed, an instance of
             :class:`telegram.request.HTTPXRequest` will be used.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
@@ -1239,18 +1239,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.

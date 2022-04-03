@@ -85,10 +85,11 @@ class Update(TelegramObject):
             .. versionadded:: 13.4
         chat_member (:class:`telegram.ChatMemberUpdated`, optional): A chat member's status was
             updated in a chat. The bot must be an administrator in the chat and must explicitly
-            specify ``'chat_member'`` in the list of ``'allowed_updates'`` to receive these
+            specify :attr:`CHAT_MEMBER` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
             updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
-            :meth:`telegram.ext.Updater.start_polling` and
-            :meth:`telegram.ext.Updater.start_webhook`).
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`).
 
             .. versionadded:: 13.4
         chat_join_request (:class:`telegram.ChatJoinRequest`, optional): A request to join the
@@ -124,15 +125,17 @@ class Update(TelegramObject):
             .. versionadded:: 13.4
         chat_member (:class:`telegram.ChatMemberUpdated`): Optional. A chat member's status was
             updated in a chat. The bot must be an administrator in the chat and must explicitly
-            specify ``'chat_member'`` in the list of ``'allowed_updates'`` to receive these
+            specify :attr:`CHAT_MEMBER` in the list of
+            :paramref:`telegram.ext.Application.run_polling.allowed_updates` to receive these
             updates (see :meth:`telegram.Bot.get_updates`, :meth:`telegram.Bot.set_webhook`,
-            :meth:`telegram.ext.Updater.start_polling` and
-            :meth:`telegram.ext.Updater.start_webhook`).
+            :meth:`telegram.ext.Application.run_polling` and
+            :meth:`telegram.ext.Application.run_webhook`).
 
             .. versionadded:: 13.4
         chat_join_request (:class:`telegram.ChatJoinRequest`): Optional. A request to join the
-            chat has been sent. The bot must have the ``'can_invite_users'`` administrator
-            right in the chat to receive these updates.
+            chat has been sent. The bot must have the
+            :attr:`telegram.ChatPermissions.can_invite_users` administrator right in the chat to
+            receive these updates.
 
             .. versionadded:: 13.8
 
