@@ -59,7 +59,7 @@ from telegram.ext._utils.types import CCT
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
-CheckUpdateType = Tuple[object, ConversationKey, Handler, object]
+_CheckUpdateType = Tuple[object, ConversationKey, Handler, object]
 
 _logger = logging.getLogger(__name__)
 
@@ -638,7 +638,7 @@ class ConversationHandler(Handler[Update, CCT]):
             _logger.exception("Failed to schedule timeout.", exc_info=exc)
 
     # pylint: disable=too-many-return-statements
-    def check_update(self, update: object) -> Optional[CheckUpdateType]:
+    def check_update(self, update: object) -> Optional[_CheckUpdateType]:
         """
         Determines whether an update should be handled by this conversation handler, and if so in
         which state the conversation currently is.
@@ -664,6 +664,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
         key = self._get_key(update)
         state = self._conversations.get(key)
+        check: Optional[object] = None
 
         # Resolve promises
         if isinstance(state, PendingState):
@@ -701,7 +702,7 @@ class ConversationHandler(Handler[Update, CCT]):
                     return None
 
         # Get the handler list for current state, if we didn't find one yet and we're still here
-        if state is not None and not handler:
+        if state is not None and handler is None:
             for candidate in self.states.get(state, []):
                 check = candidate.check_update(update)
                 if check is not None and check is not False:
@@ -725,7 +726,7 @@ class ConversationHandler(Handler[Update, CCT]):
         self,
         update: Update,
         application: 'Application',
-        check_result: CheckUpdateType,
+        check_result: _CheckUpdateType,
         context: CallbackContext,
     ) -> Optional[object]:
         """Send the update to the callback for the current state and Handler
