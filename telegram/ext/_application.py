@@ -1004,7 +1004,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             if not self.persistence:
                 return
 
-            await self.update_persistence()
             try:
                 await asyncio.wait_for(
                     self.__update_persistence_event.wait(),
@@ -1013,6 +1012,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 return
             except asyncio.TimeoutError:
                 pass
+
+            # putting this *after* the wait_for so we don't immediately update on startup as
+            # that would make little sense
+            await self.update_persistence()
 
     async def update_persistence(self) -> None:
         """Updates :attr:`user_data`, :attr:`chat_data`, :attr:`bot_data` in :attr:`persistence`
@@ -1100,11 +1103,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 # Note that when updating the persistence one last time during self.stop(),
                 # *all* tasks will be done.
                 if not new_state.done():
-                    # TODO: Try to test that this doesn't happen on shutdown
-                    _logger.warning(
-                        'A ConversationHandlers state was not yet resolved. Updating the '
-                        'persistence with the current state.'
-                    )
+                    if self.running:
+                        _logger.debug(
+                            'A ConversationHandlers state was not yet resolved. Updating the '
+                            'persistence with the current state. Will check again on next run of '
+                            'Application.update_persistence.'
+                        )
+                    else:
+                        _logger.warning(
+                            'A ConversationHandlers state was not yet resolved. Updating the '
+                            'persistence with the current state.'
+                        )
                     result = new_state.old_state
                     # We need to check again on the next run if the state is done
                     self._conversation_handler_conversations[name].mark_as_accessed(key)
