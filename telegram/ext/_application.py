@@ -297,13 +297,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         # Initialize the persistent conversation handlers with the stored states
         for handler in itertools.chain.from_iterable(self.handlers.values()):
             if isinstance(handler, ConversationHandler) and handler.persistent and handler.name:
-                self._conversation_handler_conversations[
-                    handler.name
-                ] = await handler._initialize_persistence(  # pylint: disable=protected-access
-                    self
-                )
+                await self._add_ch_to_persistence(handler)
 
         self._initialized = True
+
+    async def _add_ch_to_persistence(self, handler: 'ConversationHandler') -> None:
+        self._conversation_handler_conversations.update(
+            await handler._initialize_persistence(self)  # pylint: disable=protected-access
+        )
 
     async def shutdown(self) -> None:
         """
@@ -768,13 +769,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             # blocking handler - the non-blocking handlers mark the update again when finished
             self._mark_for_persistence_update(update=update)
 
-    async def _add_ch_after_init(self, handler: 'ConversationHandler') -> None:
-        self._conversation_handler_conversations[
-            handler.name  # type: ignore[index]
-        ] = await handler._initialize_persistence(  # pylint: disable=protected-access
-            self
-        )
-
     def add_handler(self, handler: Handler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
 
@@ -822,7 +816,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     f"can not be persistent if application has no persistence"
                 )
             if self._initialized:
-                self.create_task(self._add_ch_after_init(handler))
+                self.create_task(self._add_ch_to_persistence(handler))
                 warn(
                     'A persistent `ConversationHandler` was passed to `add_handler`, '
                     'after `Application.initialize` was called. This is discouraged.'
@@ -1123,8 +1117,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 result = new_state
 
             effective_new_state = None if result is TrackingDict.DELETED else result
-            # TODO: Test that we actually pass `None` here in case the conversation had ended,
-            #  i.e. effective_new_state is TrackingDict.DELETED
             coroutines.add(
                 self.persistence.update_conversation(
                     name=name, key=key, new_state=effective_new_state

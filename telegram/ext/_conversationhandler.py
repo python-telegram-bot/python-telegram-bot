@@ -528,13 +528,17 @@ class ConversationHandler(Handler[Update, CCT]):
 
     async def _initialize_persistence(
         self, application: 'Application'
-    ) -> TrackingDict[ConversationKey, object]:
+    ) -> Dict[str, TrackingDict[ConversationKey, object]]:
         """Initializes the persistence for this handler. While this method is marked as protected,
         we expect it to be called by the Application/parent conversations. It's just protected to
         hide it from users.
 
         Args:
             application (:class:`telegram.ext.Application`): The application.
+
+        Returns:
+            A dict {conversation.name -> TrackingDict}, which contains all dict of this
+            conversation and possible child conversations.
 
         """
         if not (self.persistent and self.name and application.persistence):
@@ -556,12 +560,16 @@ class ConversationHandler(Handler[Update, CCT]):
             await application.persistence.get_conversations(self.name)
         )
 
+        out = {self.name: self._conversations}
+
         for handler in self._child_conversations:
-            await handler._initialize_persistence(  # pylint: disable=protected-access
-                application=application
+            out.update(
+                await handler._initialize_persistence(  # pylint: disable=protected-access
+                    application=application
+                )
             )
 
-        return self._conversations
+        return out
 
     def _get_key(self, update: Update) -> ConversationKey:
         chat = update.effective_chat
