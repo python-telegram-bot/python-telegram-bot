@@ -218,7 +218,7 @@ class InputMediaPhoto(InputMedia):
             in :class:`telegram.constants.ParseMode` for the available modes.
         caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of
-            :paramref:parse_mode`.
+            :paramref:`parse_mode`.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
