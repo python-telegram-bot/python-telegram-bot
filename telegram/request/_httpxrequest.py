@@ -85,9 +85,9 @@ class HTTPXRequest(BaseRequest):
         self,
         connection_pool_size: int = 1,
         proxy_url: str = None,
-        connect_timeout: Optional[float] = 5.0,
         read_timeout: Optional[float] = 5.0,
         write_timeout: Optional[float] = 5.0,
+        connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
     ):
         timeout = httpx.Timeout(
