@@ -127,9 +127,9 @@ class HTTPXRequest(BaseRequest):
         url: str,
         method: str,
         request_data: RequestData = None,
-        connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
     ) -> Tuple[int, bytes]:
         """See :meth:`BaseRequest.do_request`."""
