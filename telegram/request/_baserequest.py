@@ -136,10 +136,6 @@ class BaseRequest(
             url (:obj:`str`): The URL to request.
             request_data (:class:`telegram.request.RequestData`, optional): An object containing
                 information about parameters and files to upload for the request.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
-                maximum amount of time (in seconds) to wait for a connection attempt to a server
-                to succeed instead of the time specified during creating of this object. Defaults
-                to :attr:`DEFAULT_NONE`.
             read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
                 amount of time (in seconds) to wait for a response from Telegram's server instead
                 of the time specified during creating of this object. Defaults to
@@ -148,6 +144,10 @@ class BaseRequest(
                 amount of time (in seconds) to wait for a write operation to complete (in terms of
                 a network socket; i.e. POSTing a request or uploading a file) instead of the time
                 specified during creating of this object. Defaults to :attr:`DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
+                maximum amount of time (in seconds) to wait for a connection attempt to a server
+                to succeed instead of the time specified during creating of this object. Defaults
+                to :attr:`DEFAULT_NONE`.
             pool_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
                 amount of time (in seconds) to wait for a connection to become available instead
                 of the time specified during creating of this object. Defaults to
@@ -187,10 +187,6 @@ class BaseRequest(
 
         Args:
             url (:obj:`str`): The web location we want to retrieve.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
-                maximum amount of time (in seconds) to wait for a connection attempt to a server
-                to succeed instead of the time specified during creating of this object. Defaults
-                to :attr:`DEFAULT_NONE`.
             read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
                 amount of time (in seconds) to wait for a response from Telegram's server instead
                 of the time specified during creating of this object. Defaults to
@@ -199,6 +195,10 @@ class BaseRequest(
                 amount of time (in seconds) to wait for a write operation to complete (in terms of
                 a network socket; i.e. POSTing a request or uploading a file) instead of the time
                 specified during creating of this object. Defaults to :attr:`DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
+                maximum amount of time (in seconds) to wait for a connection attempt to a server
+                to succeed instead of the time specified during creating of this object. Defaults
+                to :attr:`DEFAULT_NONE`.
             pool_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
                 amount of time (in seconds) to wait for a connection to become available instead
                 of the time specified during creating of this object. Defaults to
@@ -242,14 +242,14 @@ class BaseRequest(
                 amount of time (in seconds) to wait for a response from Telegram's server instead
                 of the time specified during creating of this object. Defaults to
                 :attr:`DEFAULT_NONE`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
-                maximum amount of time (in seconds) to wait for a connection attempt to a server
-                to succeed instead of the time specified during creating of this object. Defaults
-                to :attr:`DEFAULT_NONE`.
             write_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
                 amount of time (in seconds) to wait for a write operation to complete (in terms of
                 a network socket; i.e. POSTing a request or uploading a file) instead of the time
                 specified during creating of this object. Defaults to :attr:`DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
+                maximum amount of time (in seconds) to wait for a connection attempt to a server
+                to succeed instead of the time specified during creating of this object. Defaults
+                to :attr:`DEFAULT_NONE`.
             pool_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
                 amount of time (in seconds) to wait for a connection to become available instead
                 of the time specified during creating of this object. Defaults to
@@ -362,10 +362,6 @@ class BaseRequest(
             method (:obj:`str`): HTTP method (i.e. ``'POST'``, ``'GET'``, etc.).
             request_data (:class:`telegram.request.RequestData`, optional): An object containing
                 information about parameters and files to upload for the request.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
-                maximum amount of time (in seconds) to wait for a connection attempt to a server
-                to succeed instead of the time specified during creating of this object. Defaults
-                to :attr:`DEFAULT_NONE`.
             read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
                 amount of time (in seconds) to wait for a response from Telegram's server instead
                 of the time specified during creating of this object. Defaults to
@@ -374,6 +370,10 @@ class BaseRequest(
                 amount of time (in seconds) to wait for a write operation to complete (in terms of
                 a network socket; i.e. POSTing a request or uploading a file) instead of the time
                 specified during creating of this object. Defaults to :attr:`DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
+                maximum amount of time (in seconds) to wait for a connection attempt to a server
+                to succeed instead of the time specified during creating of this object. Defaults
+                to :attr:`DEFAULT_NONE`.
             pool_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
                 amount of time (in seconds) to wait for a connection to become available instead
                 of the time specified during creating of this object. Defaults to

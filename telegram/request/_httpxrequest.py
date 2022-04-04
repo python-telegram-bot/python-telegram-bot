@@ -58,10 +58,6 @@ class HTTPXRequest(BaseRequest):
                 * Socks5 proxies can not be set via environment variables.
 
             .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
-        connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
-            maximum amount of time (in seconds) to wait for a connection attempt to a server
-            to succeed instead of the time specified during creating of this object. Defaults
-            to ``5``.
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a response from Telegram's server instead
             of the time specified during creating of this object. Defaults to ``5``.
@@ -69,6 +65,10 @@ class HTTPXRequest(BaseRequest):
             amount of time (in seconds) to wait for a write operation to complete (in terms of
             a network socket; i.e. POSTing a request or uploading a file) instead of the time
             specified during creating of this object. Defaults to ``5``.
+        connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
+            maximum amount of time (in seconds) to wait for a connection attempt to a server
+            to succeed instead of the time specified during creating of this object. Defaults
+            to ``5``.
         pool_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a connection to become available instead
             of the time specified during creating of this object. Defaults to ``1``.
