@@ -121,9 +121,9 @@ class BaseRequest(
         self,
         url: str,
         request_data: RequestData = None,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[JSONDict, bool]:
         """Makes a request to the Bot API handles the return code and parses the answer.
@@ -172,8 +172,8 @@ class BaseRequest(
         self,
         url: str,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> bytes:
         """Retrieve the contents of a file by its URL.
@@ -207,8 +207,8 @@ class BaseRequest(
         method: str,
         request_data: RequestData = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> bytes:
         """Wraps the real implementation request method.
@@ -316,9 +316,9 @@ class BaseRequest(
         url: str,
         method: str,
         request_data: RequestData = None,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Tuple[int, bytes]:
         """Makes a request to the Bot API. Must be implemented by a subclass.

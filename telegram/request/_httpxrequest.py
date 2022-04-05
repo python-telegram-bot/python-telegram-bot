@@ -83,9 +83,9 @@ class HTTPXRequest(BaseRequest):
         self,
         connection_pool_size: int = 1,
         proxy_url: str = None,
-        connect_timeout: Optional[float] = 5.0,
         read_timeout: Optional[float] = 5.0,
         write_timeout: Optional[float] = 5.0,
+        connect_timeout: Optional[float] = 5.0,
         pool_timeout: Optional[float] = 1.0,
     ):
         timeout = httpx.Timeout(
@@ -127,9 +127,9 @@ class HTTPXRequest(BaseRequest):
         url: str,
         method: str,
         request_data: RequestData = None,
-        connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         read_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         write_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
         pool_timeout: ODVInput[float] = BaseRequest.DEFAULT_NONE,
     ) -> Tuple[int, bytes]:
         """See :meth:`BaseRequest.do_request`."""
