@@ -204,7 +204,7 @@ class TestApplication:
         assert isinstance(application.bot_data, complex)
 
     @pytest.mark.asyncio
-    @pytest.mark.asyncio('updater', (True, False))
+    @pytest.mark.parametrize('updater', (True, False))
     async def test_initialize(self, bot, monkeypatch, updater):
         """Initialization of persistence is tested test_basepersistence"""
         self.test_flag = set()
