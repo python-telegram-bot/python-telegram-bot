@@ -230,8 +230,6 @@ class ConversationHandler(Handler[Update, CCT]):
         ValueError
 
     Attributes:
-        persistent (:obj:`bool`): Optional. If the conversations dict for this handler should be
-            saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
         block (:obj:`bool`): Determines whether the callback will run asynchronously. Always
             :obj:`True` since conversation handlers handle any non-blocking callbacks internally.
 
@@ -252,9 +250,9 @@ class ConversationHandler(Handler[Update, CCT]):
         '_per_chat',
         '_per_message',
         '_per_user',
+        '_persistent',
         '_states',
         '_timeout_jobs_lock',
-        'persistent',
         'timeout_jobs',
     )
 
@@ -314,7 +312,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
-        self.persistent: bool = persistent
+        self._persistent: bool = persistent
 
         if not any((self.per_user, self.per_chat, self.per_message)):
             raise ValueError("'per_user', 'per_chat' and 'per_message' can't all be 'False'")
@@ -511,6 +509,16 @@ class ConversationHandler(Handler[Update, CCT]):
     @name.setter
     def name(self, value: object) -> NoReturn:
         raise AttributeError("You can not assign a new value to name after initialization.")
+
+    @property
+    def persistent(self) -> bool:
+        """:obj:`bool`: Optional. If the conversations dict for this handler should be
+        saved."""
+        return self._persistent
+
+    @persistent.setter
+    def persistent(self, value: object) -> NoReturn:
+        raise AttributeError("You can not assign a new value to persistent after initialization.")
 
     @property
     def map_to_parent(self) -> Optional[Dict[object, object]]:
