@@ -342,7 +342,7 @@ class ConversationHandler(Handler[Update, CCT]):
         per_faq_link = (
             " Read this FAQ entry to learn more about the per_* settings: "
             "https://github.com/python-telegram-bot/python-telegram-bot/wiki"
-            "/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversation handler-do."
+            "/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do."
         )
 
         for handler in all_handlers:
@@ -784,9 +784,12 @@ class ConversationHandler(Handler[Update, CCT]):
 
         try:
             if block:
-                new_state: object = await handler.handle_update(
-                    update, application, handler_check_result, context
-                )
+                try:
+                    new_state: object = await handler.handle_update(
+                        update, application, handler_check_result, context
+                    )
+                except Exception as exc:
+                    print(exc)
             else:
                 new_state = application.create_task(
                     coroutine=handler.handle_update(
