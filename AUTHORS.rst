@@ -99,6 +99,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `Simon Schürrle <https://github.com/SitiSchu>`_
+- `SReza SMohseni <https://github.com/srezasm>`_
 - `sooyhwang <https://github.com/sooyhwang>`_
 - `syntx <https://github.com/syntx>`_
 - `thodnev <https://github.com/thodnev>`_

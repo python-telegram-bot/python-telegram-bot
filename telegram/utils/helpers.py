@@ -167,11 +167,11 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
         elif entity_type == 'text_link':
             escape_chars = r'\)'
         else:
-            escape_chars = r'_*[]()~`>#+-=|{}.!'
+            escape_chars = r'_*[]()~`>+-=|{}.!'
     else:
         raise ValueError('Markdown version must be either 1 or 2!')
 
-    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text.replace('#', r'\\%23\\'))
 
 
 # -------- date/time related helpers --------
