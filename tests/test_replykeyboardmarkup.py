@@ -39,6 +39,12 @@ class TestReplyKeyboardMarkup:
     one_time_keyboard = True
     selective = True
 
+    def test_slot_behaviour(self, reply_keyboard_markup, mro_slots):
+        inst = reply_keyboard_markup
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
     @flaky(3, 1)
     @pytest.mark.asyncio
     async def test_send_message_with_reply_keyboard_markup(

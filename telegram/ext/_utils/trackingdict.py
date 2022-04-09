@@ -57,7 +57,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
     DELETED: ClassVar = object()
     """Special marker indicating that an entry was deleted."""
 
-    __slots__ = ('_data', '_write_access_keys')
+    __slots__ = ('_write_access_keys',)
 
     def __init__(self) -> None:
         super().__init__()

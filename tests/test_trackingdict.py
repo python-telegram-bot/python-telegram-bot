@@ -35,6 +35,11 @@ def data() -> dict:
 
 
 class TestTrackingDict:
+    def test_slot_behaviour(self, td, mro_slots):
+        for attr in td.__slots__:
+            assert getattr(td, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(td)) == len(set(mro_slots(td))), "duplicate slot"
+
     def test_representations(self, td, data):
         assert repr(td) == repr(data)
         assert str(td) == str(data)

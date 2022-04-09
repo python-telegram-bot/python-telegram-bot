@@ -142,12 +142,12 @@ class TestErrors:
             (InvalidCallbackData('test data')),
         ],
     )
-    def test_slots_behavior(self, inst, mro_slots):
+    def test_slot_behaviour(self, inst, mro_slots):
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_test_coverage(self):
+    def test_coverage(self):
         """
         This test is only here to make sure that new errors will override __reduce__ and set
         __slots__ properly.

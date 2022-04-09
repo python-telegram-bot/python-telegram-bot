@@ -133,6 +133,11 @@ def mixed_rqs(mixed_params) -> RequestData:
 
 
 class TestRequestData:
+    def test_slot_behaviour(self, simple_rqs, mro_slots):
+        for attr in simple_rqs.__slots__:
+            assert getattr(simple_rqs, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(simple_rqs)) == len(set(mro_slots(simple_rqs))), "duplicate slot"
+
     def test_contains_files(self, simple_rqs, file_rqs, mixed_rqs):
         assert not simple_rqs.contains_files
         assert file_rqs.contains_files

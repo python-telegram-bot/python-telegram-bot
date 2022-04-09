@@ -142,16 +142,6 @@ xfail = pytest.mark.xfail(
 )
 
 
-@pytest.fixture(scope='function')
-@pytest.mark.asyncio
-async def inst(request, bot_info, default_bot):
-    if request.param == 'bot':
-        async with Bot(bot_info['token']) as _bot:
-            yield _bot
-    else:
-        yield default_bot
-
-
 class TestBot:
     """
     Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot

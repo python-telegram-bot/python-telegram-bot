@@ -46,6 +46,12 @@ class TestPreCheckoutQuery:
     from_user = User(0, '', False)
     order_info = OrderInfo()
 
+    def test_slot_behaviour(self, pre_checkout_query, mro_slots):
+        inst = pre_checkout_query
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
     def test_de_json(self, bot):
         json_dict = {
             'id': self.id_,

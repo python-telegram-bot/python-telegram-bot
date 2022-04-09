@@ -348,7 +348,6 @@ class TestBasePersistence:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         # We're interested in BasePersistence, not in the implementation
         slots = mro_slots(inst, only_parents=True)
-        print(slots)
         assert len(slots) == len(set(slots)), "duplicate slot"
 
     @pytest.mark.parametrize('bot_data', (True, False))

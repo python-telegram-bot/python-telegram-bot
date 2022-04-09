@@ -325,6 +325,11 @@ class TestMessage:
 
         assert new.to_dict() == message_params.to_dict()
 
+    def test_slot_behaviour(self, message, mro_slots):
+        for attr in message.__slots__:
+            assert getattr(message, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
+
     @pytest.mark.asyncio
     async def test_parse_entity(self):
         text = (

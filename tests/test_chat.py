@@ -65,6 +65,11 @@ class TestChat:
     has_protected_content = True
     has_private_forwards = True
 
+    def test_slot_behaviour(self, chat, mro_slots):
+        for attr in chat.__slots__:
+            assert getattr(chat, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(chat)) == len(set(mro_slots(chat))), "duplicate slot"
+
     def test_de_json(self, bot):
         json_dict = {
             'id': self.id_,

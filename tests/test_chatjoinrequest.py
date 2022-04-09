@@ -56,7 +56,7 @@ class TestChatJoinRequest:
         is_primary=False,
     )
 
-    def test_slot_behaviour(self, chat_join_request, recwarn, mro_slots):
+    def test_slot_behaviour(self, chat_join_request, mro_slots):
         inst = chat_join_request
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
