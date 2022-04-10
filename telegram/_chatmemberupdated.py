@@ -163,7 +163,7 @@ class ChatMemberUpdated(TelegramObject):
         attributes = (entry[0] for entry in set(old_dict.items()) ^ set(new_dict.items()))
 
         result = {
-            attribute: (self.old_chat_member[attribute], self.new_chat_member[attribute])
+            attribute: (old_dict.get(attribute), new_dict.get(attribute))
             for attribute in attributes
         }
         if old_user_dict != new_user_dict:
