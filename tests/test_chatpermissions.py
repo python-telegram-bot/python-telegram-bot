@@ -130,7 +130,9 @@ class TestChatPermissions:
         t = ChatPermissions.all_true()
         # if the dirs are the same, the attributes will all be there
         assert dir(f) == dir(t)
-        # now we just need to check that all attributes are True. to_dict gives them to us
-        # as a dict, mapping the attribute name to the value.
-        for key in t.to_dict().keys():
-            assert t[key] is True
+        # now we just need to check that all attributes are True. _id_attrs returns all values,
+        # if a new one is added without defaulting to True, this will fail
+        for key in t._id_attrs:
+            assert key is True
+        # and as a finisher, make sure the default is different.
+        assert f != t
