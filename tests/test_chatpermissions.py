@@ -125,14 +125,26 @@ class TestChatPermissions:
         assert a != d
         assert hash(a) != hash(d)
 
-    def test_all_true(self):
+    def test_all_permissions(self):
         f = ChatPermissions()
-        t = ChatPermissions.all_true()
+        t = ChatPermissions.all_permissions()
         # if the dirs are the same, the attributes will all be there
         assert dir(f) == dir(t)
         # now we just need to check that all attributes are True. _id_attrs returns all values,
         # if a new one is added without defaulting to True, this will fail
         for key in t._id_attrs:
             assert key is True
+        # and as a finisher, make sure the default is different.
+        assert f != t
+
+    def test_no_permissions(self):
+        f = ChatPermissions()
+        t = ChatPermissions.no_permissions()
+        # if the dirs are the same, the attributes will all be there
+        assert dir(f) == dir(t)
+        # now we just need to check that all attributes are True. _id_attrs returns all values,
+        # if a new one is added without defaulting to True, this will fail
+        for key in t._id_attrs:
+            assert key is False
         # and as a finisher, make sure the default is different.
         assert f != t
