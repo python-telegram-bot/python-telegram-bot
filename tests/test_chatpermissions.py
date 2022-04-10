@@ -124,3 +124,13 @@ class TestChatPermissions:
 
         assert a != d
         assert hash(a) != hash(d)
+
+    def test_all_true(self):
+        f = ChatPermissions()
+        t = ChatPermissions.all_true()
+        # if the dirs are the same, the attributes will all be there
+        assert dir(f) == dir(t)
+        # now we just need to check that all attributes are True. to_dict gives them to us
+        # as a dict, mapping the attribute name to the value.
+        for key in t.to_dict().keys():
+            assert t[key] is True

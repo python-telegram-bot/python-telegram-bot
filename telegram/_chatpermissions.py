@@ -121,3 +121,19 @@ class ChatPermissions(TelegramObject):
             self.can_invite_users,
             self.can_pin_messages,
         )
+
+    @staticmethod
+    def all_true() -> 'ChatPermissions':
+        """
+        This method returns the ChatPermissions object with all attributes set to :obj:`bool`.
+        This is e.g. useful when unrestricting a ChatMember with
+        :meth:`telegram.Bot.restrict_chat_member`.
+        """
+        # we generate the object so we can set the attributes to True dynamically in case
+        # there are more added later.
+        object_to_return = ChatPermissions()
+        # slots return us all attributes as a set of strings,
+        # which is exactly what we need to set them
+        for attribute in object_to_return.__slots__:
+            setattr(object_to_return, attribute, True)
+        return object_to_return
