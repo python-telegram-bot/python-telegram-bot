@@ -123,7 +123,7 @@ async def done(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
         del context.user_data['choice']
 
     await update.message.reply_text(
-        f"I learned these facts about you: {facts_to_str(context.user_data)} Until next time!",
+        f"I learned these facts about you: {facts_to_str(context.user_data)}Until next time!",
         reply_markup=ReplyKeyboardRemove(),
     )
     return ConversationHandler.END
@@ -134,9 +134,6 @@ def main() -> None:
     # Create the Application and pass it your bot's token.
     persistence = PicklePersistence(filepath='conversationbot')
     application = Application.builder().token("TOKEN").persistence(persistence).build()
-
-    # Get the application to register handlers
-    application = application.application
 
     # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
     conv_handler = ConversationHandler(

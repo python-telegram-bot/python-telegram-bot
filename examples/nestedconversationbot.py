@@ -120,27 +120,29 @@ async def adding_self(update: Update, context: CallbackContext.DEFAULT_TYPE) -> 
 async def show_data(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Pretty print gathered data."""
 
-    def prettyprint(user_data: Dict[str, Any], level: str) -> str:
-        people = user_data.get(level)
+    def pretty_print(data: Dict[str, Any], level: str) -> str:
+        people = data.get(level)
         if not people:
             return '\nNo information yet.'
 
-        text = ''
+        return_str = ''
         if level == SELF:
-            for person in user_data[level]:
-                text += f"\nName: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
+            for person in data[level]:
+                return_str += f"\nName: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
         else:
             male, female = _name_switcher(level)
 
-            for person in user_data[level]:
+            for person in data[level]:
                 gender = female if person[GENDER] == FEMALE else male
-                text += f"\n{gender}: Name: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
-        return text
+                return_str += (
+                    f"\n{gender}: Name: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
+                )
+        return return_str
 
     user_data = context.user_data
-    text = f"Yourself:{prettyprint(user_data, SELF)}"
-    text += f"\n\nParents:{prettyprint(user_data, PARENTS)}"
-    text += f"\n\nChildren:{prettyprint(user_data, CHILDREN)}"
+    text = f"Yourself:{pretty_print(user_data, SELF)}"
+    text += f"\n\nParents:{pretty_print(user_data, PARENTS)}"
+    text += f"\n\nChildren:{pretty_print(user_data, CHILDREN)}"
 
     buttons = [[InlineKeyboardButton(text='Back', callback_data=str(END))]]
     keyboard = InlineKeyboardMarkup(buttons)

@@ -69,7 +69,7 @@ async def photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Stores the photo and asks for a location."""
     user = update.message.from_user
     photo_file = await update.message.photo[-1].get_file()
-    photo_file.download('user_photo.jpg')
+    await photo_file.download('user_photo.jpg')
     logger.info("Photo of %s: %s", user.first_name, 'user_photo.jpg')
     await update.message.reply_text(
         'Gorgeous! Now, send me your location please, or send /skip if you don\'t want to.'

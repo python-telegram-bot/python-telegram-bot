@@ -9,6 +9,8 @@ repos:
         args:
         - --diff
         - --check
+        additional_dependencies:
+          - click==8.0.2
 -   repo: https://gitlab.com/pycqa/flake8
     rev: 4.0.1
     hooks:
@@ -44,6 +46,18 @@ repos:
           - APScheduler==3.6.3
           - cachetools==4.2.2
           - . # this basically does `pip install -e .`n
+    - id: mypy
+      name: mypy-examples
+      files: ^examples/.*\.py$
+      args:
+        - --no-strict-optional
+        - --follow-imports=silent
+      additional_dependencies:
+        - certifi
+        - tornado>=6.1
+        - APScheduler==3.6.3
+        - cachetools==4.2.2
+        - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.29.0
     hooks:

@@ -14,10 +14,10 @@ bot.
 """
 import logging
 from uuid import uuid4
+from html import escape
 
 from telegram import InlineQueryResultArticle, InputTextMessageContent, Update
 from telegram.constants import ParseMode
-from telegram.helpers import escape_markdown
 from telegram.ext import Application, InlineQueryHandler, CommandHandler, CallbackContext
 
 # Enable logging
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
+# context.
 async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     await update.message.reply_text('Hi!')
@@ -39,8 +39,8 @@ async def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) ->
     await update.message.reply_text('Help!')
 
 
-async def inlinequery(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
-    """Handle the inline query."""
+async def inline_query(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+    """Handle the inline query. This is run when you type: @botusername <query>"""
     query = update.inline_query.query
 
     if query == "":
@@ -56,14 +56,14 @@ async def inlinequery(update: Update, context: CallbackContext.DEFAULT_TYPE) -> 
             id=str(uuid4()),
             title="Bold",
             input_message_content=InputTextMessageContent(
-                f"*{escape_markdown(query)}*", parse_mode=ParseMode.MARKDOWN
+                f"<b>{escape(query)}</b>", parse_mode=ParseMode.HTML
             ),
         ),
         InlineQueryResultArticle(
             id=str(uuid4()),
             title="Italic",
             input_message_content=InputTextMessageContent(
-                f"_{escape_markdown(query)}_", parse_mode=ParseMode.MARKDOWN
+                f"<i>{escape(query)}</i>", parse_mode=ParseMode.HTML
             ),
         ),
     ]
@@ -81,7 +81,7 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
 
     # on non command i.e message - echo the message on Telegram
-    application.add_handler(InlineQueryHandler(inlinequery))
+    application.add_handler(InlineQueryHandler(inline_query))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()

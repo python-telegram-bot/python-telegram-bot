@@ -127,12 +127,12 @@ async def greet_chat_members(update: Update, context: CallbackContext.DEFAULT_TY
     member_name = update.chat_member.new_chat_member.user.mention_html()
 
     if not was_member and is_member:
-        update.effective_chat.send_message(
+        await update.effective_chat.send_message(
             f"{member_name} was added by {cause_name}. Welcome!",
             parse_mode=ParseMode.HTML,
         )
     elif was_member and not is_member:
-        update.effective_chat.send_message(
+        await update.effective_chat.send_message(
             f"{member_name} is no longer with us. Thanks a lot, {cause_name} ...",
             parse_mode=ParseMode.HTML,
         )
@@ -153,7 +153,7 @@ def main() -> None:
     # Run the bot until the user presses Ctrl-C
     # We pass 'allowed_updates' handle *all* updates including `chat_member` updates
     # To reset this, simply pass `allowed_updates=[]`
-    application.run_polling()(allowed_updates=Update.ALL_TYPES)
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":

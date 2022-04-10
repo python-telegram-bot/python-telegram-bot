@@ -97,13 +97,13 @@ def main() -> None:
         .build()
     )
 
-    application.application.add_handler(CommandHandler('start', start))
-    application.application.add_handler(CommandHandler('help', help_command))
-    application.application.add_handler(CommandHandler('clear', clear))
-    application.application.add_handler(
+    application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('help', help_command))
+    application.add_handler(CommandHandler('clear', clear))
+    application.add_handler(
         CallbackQueryHandler(handle_invalid_button, pattern=InvalidCallbackData)
     )
-    application.application.add_handler(CallbackQueryHandler(list_button))
+    application.add_handler(CallbackQueryHandler(list_button))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()

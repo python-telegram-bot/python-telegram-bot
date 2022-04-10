@@ -10,6 +10,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
+import logging
 from collections import defaultdict
 from typing import DefaultDict, Optional, Set
 
@@ -24,6 +25,12 @@ from telegram.ext import (
     ExtBot,
     Application,
 )
+
+# Enable logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 
 class ChatData:
@@ -88,7 +95,7 @@ async def count_click(update: Update, context: CustomContext) -> None:
     """Update the click count for the message."""
     context.message_clicks += 1
     await update.callback_query.answer()
-    update.effective_message.edit_text(
+    await update.effective_message.edit_text(
         f'This button was clicked <i>{context.message_clicks}</i> times.',
         reply_markup=InlineKeyboardMarkup.from_button(
             InlineKeyboardButton(text='Click me!', callback_data='button')
@@ -116,7 +123,6 @@ def main() -> None:
     context_types = ContextTypes(context=CustomContext, chat_data=ChatData)
     application = Application.builder().token("TOKEN").context_types(context_types).build()
 
-    application = application.application
     # run track_users in its own group to not interfere with the user handlers
     application.add_handler(TypeHandler(Update, track_users), group=-1)
     application.add_handler(CommandHandler("start", start))
