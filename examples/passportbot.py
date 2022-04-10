@@ -20,7 +20,7 @@ from telegram.ext import MessageHandler, filters, Application, CallbackContext
 # Enable logging
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ async def msg(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
             selfie_file = await data.selfie.get_file()
             print(data.type, selfie_file)
             await selfie_file.download()
-        if data.type in (
+        if data.translation and data.type in (
             'passport',
             'driver_license',
             'identity_card',
