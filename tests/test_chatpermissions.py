@@ -132,8 +132,8 @@ class TestChatPermissions:
         assert dir(f) == dir(t)
         # now we just need to check that all attributes are True. _id_attrs returns all values,
         # if a new one is added without defaulting to True, this will fail
-        for key in t._id_attrs:
-            assert key is True
+        for key in t.__slots__:
+            assert t[key] is True
         # and as a finisher, make sure the default is different.
         assert f != t
 
@@ -144,7 +144,7 @@ class TestChatPermissions:
         assert dir(f) == dir(t)
         # now we just need to check that all attributes are True. _id_attrs returns all values,
         # if a new one is added without defaulting to True, this will fail
-        for key in t._id_attrs:
-            assert key is False
+        for key in t.__slots__:
+            assert t[key] is False
         # and as a finisher, make sure the default is different.
         assert f != t
