@@ -80,16 +80,6 @@ def to_camel_case(snake_str):
     return components[0] + ''.join(x.title() for x in components[1:])
 
 
-class ExtBotSubClass(ExtBot):
-    # used for test_defaults_warning below
-    pass
-
-
-class BotSubClass(Bot):
-    # used for test_defaults_warning below
-    pass
-
-
 @pytest.fixture(scope='class')
 @pytest.mark.asyncio
 async def message(bot, chat_id):
@@ -3049,7 +3039,7 @@ class TestBot:
             if (
                 function_name.startswith("_")
                 or not callable(function)
-                or function_name in ["to_dict", "do_init", "do_teardown"]
+                or function_name in ["to_dict"]
             ):
                 continue
             camel_case_function = getattr(Bot, to_camel_case(function_name), False)
