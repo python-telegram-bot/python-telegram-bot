@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
+# context.
 # Best practice would be to replace context with an underscore,
 # since context is an unused local variable.
 # This being an example and not having context present confusing beginners,
@@ -59,7 +59,7 @@ def remove_job_if_exists(name: str, context: CallbackContext.DEFAULT_TYPE) -> bo
 
 async def set_timer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Add a job to the queue."""
-    chat_id = update.message.chat_id
+    chat_id = update.effective_message.chat_id
     try:
         # args[0] should contain the time for the timer in seconds
         due = int(context.args[0])
@@ -76,7 +76,7 @@ async def set_timer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> No
         await update.message.reply_text(text)
 
     except (IndexError, ValueError):
-        await update.message.reply_text('Usage: /set <seconds>')
+        await update.effective_message.reply_text('Usage: /set <seconds>')
 
 
 async def unset(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
@@ -93,8 +93,7 @@ def main() -> None:
     application = Application.builder().token("TOKEN").build()
 
     # on different commands - answer in Telegram
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", start))
+    application.add_handler(CommandHandler(["start", "help"], start))
     application.add_handler(CommandHandler("set", set_timer))
     application.add_handler(CommandHandler("unset", unset))
 

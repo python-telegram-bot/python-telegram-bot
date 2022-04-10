@@ -32,7 +32,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Stages
-FIRST, SECOND = range(2)
+START_ROUTES, END_ROUTES = range(2)
 # Callback data
 ONE, TWO, THREE, FOUR = range(4)
 
@@ -56,7 +56,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     # Send message with text and appended InlineKeyboard
     await update.message.reply_text("Start handler, Choose a route", reply_markup=reply_markup)
     # Tell ConversationHandler that we're in state `FIRST` now
-    return FIRST
+    return START_ROUTES
 
 
 async def start_over(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
@@ -77,7 +77,7 @@ async def start_over(update: Update, context: CallbackContext.DEFAULT_TYPE) -> i
     # originated the CallbackQuery. This gives the feeling of an
     # interactive menu.
     await query.edit_message_text(text="Start handler, Choose a route", reply_markup=reply_markup)
-    return FIRST
+    return START_ROUTES
 
 
 async def one(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
@@ -94,7 +94,7 @@ async def one(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     await query.edit_message_text(
         text="First CallbackQueryHandler, Choose a route", reply_markup=reply_markup
     )
-    return FIRST
+    return START_ROUTES
 
 
 async def two(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
@@ -111,11 +111,11 @@ async def two(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     await query.edit_message_text(
         text="Second CallbackQueryHandler, Choose a route", reply_markup=reply_markup
     )
-    return FIRST
+    return START_ROUTES
 
 
 async def three(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
-    """Show new choice of buttons"""
+    """Show new choice of buttons. This is the end point of the conversation."""
     query = update.callback_query
     await query.answer()
     keyboard = [
@@ -129,7 +129,7 @@ async def three(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
         text="Third CallbackQueryHandler. Do want to start over?", reply_markup=reply_markup
     )
     # Transfer to conversation state `SECOND`
-    return SECOND
+    return END_ROUTES
 
 
 async def four(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
@@ -146,7 +146,7 @@ async def four(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     await query.edit_message_text(
         text="Fourth CallbackQueryHandler, Choose a route", reply_markup=reply_markup
     )
-    return FIRST
+    return START_ROUTES
 
 
 async def end(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
@@ -173,13 +173,13 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            FIRST: [
+            START_ROUTES: [
                 CallbackQueryHandler(one, pattern='^' + str(ONE) + '$'),
                 CallbackQueryHandler(two, pattern='^' + str(TWO) + '$'),
                 CallbackQueryHandler(three, pattern='^' + str(THREE) + '$'),
                 CallbackQueryHandler(four, pattern='^' + str(FOUR) + '$'),
             ],
-            SECOND: [
+            END_ROUTES: [
                 CallbackQueryHandler(start_over, pattern='^' + str(ONE) + '$'),
                 CallbackQueryHandler(end, pattern='^' + str(TWO) + '$'),
             ],
