@@ -128,6 +128,8 @@ class ChatPermissions(TelegramObject):
         This method returns the ChatPermissions object with all attributes set to :obj:`bool`.
         This is e.g. useful when unrestricting a ChatMember with
         :meth:`telegram.Bot.restrict_chat_member`.
+
+        .. versionadded:: 14.0
         """
         # we generate the object so we can set the attributes to True dynamically in case
         # there are more added later.
