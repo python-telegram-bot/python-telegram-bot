@@ -22,6 +22,7 @@ import logging
 from warnings import filterwarnings
 
 import pytest
+from flaky import flaky
 
 from telegram import (
     Chat,
@@ -67,10 +68,10 @@ def user2():
     return User(first_name='Mister Test', id=124, is_bot=False)
 
 
-def raise_dphs(func):
+def raise_ahs(func):
     async def decorator(self, *args, **kwargs):
         result = await func(self, *args, **kwargs)
-        if self.raise_dp_handler_stop:
+        if self.raise_app_handler_stop:
             raise ApplicationHandlerStop(result)
         return result
 
@@ -79,6 +80,9 @@ def raise_dphs(func):
 
 class TestConversationHandler:
     """Persistence of conversations is tested in test_basepersistence.py"""
+
+    # TODO
+    #  * Test that we have a warning when conversation timeout is scheduled with non-running JQ
 
     # State definitions
     # At first we're thirsty.  Then we brew coffee, we drink it
@@ -93,13 +97,13 @@ class TestConversationHandler:
     group = Chat(0, Chat.GROUP)
     second_group = Chat(1, Chat.GROUP)
 
-    raise_dp_handler_stop = False
+    raise_app_handler_stop = False
     test_flag = False
 
     # Test related
     @pytest.fixture(autouse=True)
     def reset(self):
-        self.raise_dp_handler_stop = False
+        self.raise_app_handler_stop = False
         self.test_flag = False
         self.current_state = {}
         self.entry_points = [CommandHandler('start', self.start)]
@@ -165,79 +169,79 @@ class TestConversationHandler:
         return state
 
     # Actions
-    @raise_dphs
+    @raise_ahs
     async def start(self, update, context):
         if isinstance(update, Update):
             return self._set_state(update, self.THIRSTY)
         return self._set_state(context.bot, self.THIRSTY)
 
-    @raise_dphs
+    @raise_ahs
     async def end(self, update, context):
         return self._set_state(update, self.END)
 
-    @raise_dphs
+    @raise_ahs
     async def start_end(self, update, context):
         return self._set_state(update, self.END)
 
-    @raise_dphs
+    @raise_ahs
     async def start_none(self, update, context):
         return self._set_state(update, None)
 
-    @raise_dphs
+    @raise_ahs
     async def brew(self, update, context):
         if isinstance(update, Update):
             return self._set_state(update, self.BREWING)
         return self._set_state(context.bot, self.BREWING)
 
-    @raise_dphs
+    @raise_ahs
     async def drink(self, update, context):
         return self._set_state(update, self.DRINKING)
 
-    @raise_dphs
+    @raise_ahs
     async def code(self, update, context):
         return self._set_state(update, self.CODING)
 
-    @raise_dphs
+    @raise_ahs
     async def passout(self, update, context):
         assert update.message.text == '/brew'
         assert isinstance(update, Update)
         self.is_timeout = True
 
-    @raise_dphs
+    @raise_ahs
     async def passout2(self, update, context):
         assert isinstance(update, Update)
         self.is_timeout = True
 
-    @raise_dphs
+    @raise_ahs
     async def passout_context(self, update, context):
         assert update.message.text == '/brew'
         assert isinstance(context, CallbackContext)
         self.is_timeout = True
 
-    @raise_dphs
+    @raise_ahs
     async def passout2_context(self, update, context):
         assert isinstance(context, CallbackContext)
         self.is_timeout = True
 
     # Drinking actions (nested)
 
-    @raise_dphs
+    @raise_ahs
     async def hold(self, update, context):
         return self._set_state(update, self.HOLDING)
 
-    @raise_dphs
+    @raise_ahs
     async def sip(self, update, context):
         return self._set_state(update, self.SIPPING)
 
-    @raise_dphs
+    @raise_ahs
     async def swallow(self, update, context):
         return self._set_state(update, self.SWALLOWING)
 
-    @raise_dphs
+    @raise_ahs
     async def replenish(self, update, context):
         return self._set_state(update, self.REPLENISHING)
 
-    @raise_dphs
+    @raise_ahs
     async def stop(self, update, context):
         return self._set_state(update, self.STOPPING)
 
@@ -1123,219 +1127,270 @@ class TestConversationHandler:
 
             await app.stop()
 
+    @pytest.mark.asyncio
+    async def test_timeout_not_triggered_on_conv_end_non_blocking(self, bot, app, user1):
+        def timeout(*a, **kw):
+            self.test_flag = True
+
+        self.states.update({ConversationHandler.TIMEOUT: [TypeHandler(Update, timeout)]})
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=0.5,
+            block=False,
+        )
+        app.add_handler(handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        async with app:
+            # start the conversation
+            await app.process_update(Update(update_id=0, message=message))
+            await asyncio.sleep(0.1)
+            message.text = '/brew'
+            message.entities[0].length = len('/brew')
+            await app.process_update(Update(update_id=1, message=message))
+            await asyncio.sleep(0.1)
+            message.text = '/pourCoffee'
+            message.entities[0].length = len('/pourCoffee')
+            await app.process_update(Update(update_id=2, message=message))
+            await asyncio.sleep(0.1)
+            message.text = '/end'
+            message.entities[0].length = len('/end')
+            await app.process_update(Update(update_id=3, message=message))
+            await asyncio.sleep(1)
+            # assert timeout handler didn't get called
+            assert self.test_flag is False
+
+    @pytest.mark.asyncio
+    async def test_conversation_timeout_application_handler_stop(self, app, bot, user1, recwarn):
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=0.5,
+        )
+
+        def timeout(*args, **kwargs):
+            raise ApplicationHandlerStop()
+
+        self.states.update({ConversationHandler.TIMEOUT: [TypeHandler(Update, timeout)]})
+        app.add_handler(handler)
+
+        # Start state machine, then reach timeout
+        message = Message(
+            0,
+            None,
+            self.group,
+            text='/start',
+            from_user=user1,
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        brew_message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/brew',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/brew'))
+            ],
+            bot=bot,
+        )
+
+        async with app:
+            await app.start()
+
+            await app.process_update(Update(update_id=0, message=message))
+            # Make sure that we're in the next state
+            assert handler.check_update(Update(0, message=brew_message))
+            await app.process_update(Update(0, message=brew_message))
+            await asyncio.sleep(0.9)
+            # Check that conversation has ended by checking that the start messages is accepted
+            # again
+            assert handler.check_update(Update(0, message=message))
+            assert len(recwarn) == 1
+            assert str(recwarn[0].message).startswith('ApplicationHandlerStop in TIMEOUT')
+
+            await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_conversation_handler_timeout_update_and_context(self, app, bot, user1):
+        context = None
+
+        async def start_callback(u, c):
+            nonlocal context, self
+            context = c
+            return await self.start(u, c)
+
+        # Start state machine, then reach timeout
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        update = Update(update_id=0, message=message)
+
+        async def timeout_callback(u, c):
+            nonlocal update, context
+            assert u is update
+            assert c is context
+
+            self.is_timeout = (u is update) and (c is context)
+
+        states = self.states
+        timeout_handler = CommandHandler('start', timeout_callback)
+        states.update({ConversationHandler.TIMEOUT: [timeout_handler]})
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', start_callback)],
+            states=states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=0.5,
+        )
+        app.add_handler(handler)
+
+        async with app:
+            await app.start()
+
+            await app.process_update(update)
+            await asyncio.sleep(0.9)
+            # check that the conversation has ended by checking that the start message is accepted
+            assert handler.check_update(Update(0, message=message))
+            assert self.is_timeout
+
+            await app.stop()
+
+    @flaky(3, 1)
+    @pytest.mark.asyncio
+    async def test_conversation_timeout_keeps_extending(self, app, bot, user1):
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=0.5,
+        )
+        app.add_handler(handler)
+
+        # Start state machine, wait, do something, verify the timeout is extended.
+        # t=0 /start (timeout=.5)
+        # t=.35 /brew (timeout=.85)
+        # t=.5 original timeout
+        # t=.6 /pourCoffee (timeout=1.1)
+        # t=.85 second timeout
+        # t=1.1 actual timeout
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+
+        async with app:
+            await app.start()
+
+            await app.process_update(Update(update_id=0, message=message))
+            message.text = '/brew'
+            message.entities[0].length = len('/brew')
+            assert handler.check_update(Update(0, message=message))
+            await asyncio.sleep(0.35)  # t=.35
+            assert handler.check_update(Update(0, message=message))
+            await app.process_update(Update(update_id=0, message=message))
+            message.text = '/pourCoffee'
+            message.entities[0].length = len('/pourCoffee')
+            assert handler.check_update(Update(0, message=message))
+            await asyncio.sleep(0.25)  # t=.6
+            assert handler.check_update(Update(0, message=message))
+            await app.process_update(Update(update_id=0, message=message))
+            message.text = '/startCoding'
+            message.entities[0].length = len('/startCoding')
+            assert handler.check_update(Update(0, message=message))
+            await asyncio.sleep(0.4)  # t=1.0
+            assert handler.check_update(Update(0, message=message))
+            await asyncio.sleep(0.3)  # t=1.3
+            assert not handler.check_update(Update(0, message=message))
+            message.text = '/start'
+            message.entities[0].length = len('/start')
+            assert handler.check_update(Update(0, message=message))
+
+            await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_conversation_timeout_two_users(self, app, bot, user1, user2):
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=0.5,
+        )
+        app.add_handler(handler)
+
+        # Start state machine, do something as second user, then reach timeout
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+
+        async with app:
+            await app.start()
+
+            await app.process_update(Update(update_id=0, message=message))
+            message.text = '/brew'
+            message.entities[0].length = len('/brew')
+            assert handler.check_update(Update(0, message=message))
+            message.from_user = user2
+            await app.process_update(Update(update_id=0, message=message))
+            message.text = '/start'
+            message.entities[0].length = len('/start')
+            # Make sure that user2s conversation has not yet started
+            assert handler.check_update(Update(0, message=message))
+            await app.process_update(Update(update_id=0, message=message))
+            message.text = '/brew'
+            message.entities[0].length = len('/brew')
+            assert handler.check_update(Update(0, message=message))
+            await asyncio.sleep(0.7)
+            # check that both conversations have ended by checking that the start message is
+            # accepted again
+            message.text = '/start'
+            message.entities[0].length = len('/start')
+            message.from_user = user1
+            assert handler.check_update(Update(0, message=message))
+            message.from_user = user2
+            assert handler.check_update(Update(0, message=message))
+
+            await app.stop()
+
     # TODO
-    # @pytest.mark.asyncio
-    # async def test_timeout_not_triggered_on_conv_end_async(self, bot, app, user1):
-    #     def timeout(*a, **kw):
-    #         self.test_flag = True
-    #
-    #     self.states.update({ConversationHandler.TIMEOUT: [TypeHandler(Update, timeout)]})
-    #     handler = ConversationHandler(
-    #         entry_points=self.entry_points,
-    #         states=self.states,
-    #         fallbacks=self.fallbacks,
-    #         conversation_timeout=0.5,
-    #         block=False,
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         from_user=user1,
-    #         text='/start',
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     # start the conversation
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     message.text = '/brew'
-    #     message.entities[0].length = len('/brew')
-    #     await app.process_update(Update(update_id=1, message=message))
-    #     await asyncio.sleep(0.1)
-    #     message.text = '/pourCoffee'
-    #     message.entities[0].length = len('/pourCoffee')
-    #     await app.process_update(Update(update_id=2, message=message))
-    #     await asyncio.sleep(0.1)
-    #     message.text = '/end'
-    #     message.entities[0].length = len('/end')
-    #     await app.process_update(Update(update_id=3, message=message))
-    #     await asyncio.sleep(1)
-    #     # assert timeout handler didn't got called
-    #     assert self.test_flag is False
-    #
-    # @pytest.mark.asyncio
-    # async def test_conversation_timeout_dispatcher_handler_stop(self, app, bot, user1, recwarn):
-    #     handler = ConversationHandler(
-    #         entry_points=self.entry_points,
-    #         states=self.states,
-    #         fallbacks=self.fallbacks,
-    #         conversation_timeout=0.5,
-    #     )
-    #
-    #     def timeout(*args, **kwargs):
-    #         raise DispatcherHandlerStop()
-    #
-    #     self.states.update({ConversationHandler.TIMEOUT: [TypeHandler(Update, timeout)]})
-    #     app.add_handler(handler)
-    #
-    #     # Start state machine, then reach timeout
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         text='/start',
-    #         from_user=user1,
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-    #     await asyncio.sleep(0.9)
-    #     assert handler.conversations.get((self.group.id, user1.id)) is None
-    #     assert len(recwarn) == 1
-    #     assert str(recwarn[0].message).startswith('DispatcherHandlerStop in TIMEOUT')
-    #
-    # @pytest.mark.asyncio
-    # async def test_conversation_handler_timeout_update_and_context(self, app, bot, user1):
-    #     context = None
-    #
-    #     def start_callback(u, c):
-    #         nonlocal context, self
-    #         context = c
-    #         return self.start(u, c)
-    #
-    #     states = self.states
-    #     timeout_handler = CommandHandler('start', None)
-    #     states.update({ConversationHandler.TIMEOUT: [timeout_handler]})
-    #     handler = ConversationHandler(
-    #         entry_points=[CommandHandler('start', start_callback)],
-    #         states=states,
-    #         fallbacks=self.fallbacks,
-    #         conversation_timeout=0.5,
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # Start state machine, then reach timeout
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         from_user=user1,
-    #         text='/start',
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     update = Update(update_id=0, message=message)
-    #
-    #     def timeout_callback(u, c):
-    #         nonlocal update, context, self
-    #         self.is_timeout = True
-    #         assert u is update
-    #         assert c is context
-    #
-    #     timeout_handler.callback = timeout_callback
-    #
-    #     await app.process_update(update)
-    #     await asyncio.sleep(0.7)
-    #     assert handler.conversations.get((self.group.id, user1.id)) is None
-    #     assert self.is_timeout
-    #
-    # @flaky(3, 1)
-    # @pytest.mark.asyncio
-    # async def test_conversation_timeout_keeps_extending(self, app, bot, user1):
-    #     handler = ConversationHandler(
-    #         entry_points=self.entry_points,
-    #         states=self.states,
-    #         fallbacks=self.fallbacks,
-    #         conversation_timeout=0.5,
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # Start state machine, wait, do something, verify the timeout is extended.
-    #     # t=0 /start (timeout=.5)
-    #     # t=.35 /brew (timeout=.85)
-    #     # t=.5 original timeout
-    #     # t=.6 /pourCoffee (timeout=1.1)
-    #     # t=.85 second timeout
-    #     # t=1.1 actual timeout
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         from_user=user1,
-    #         text='/start',
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-    #     await asyncio.sleep(0.35)  # t=.35
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-    #     message.text = '/brew'
-    #     message.entities[0].length = len('/brew')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
-    #     await asyncio.sleep(0.25)  # t=.6
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
-    #     message.text = '/pourCoffee'
-    #     message.entities[0].length = len('/pourCoffee')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
-    #     await asyncio.sleep(0.4)  # t=1.0
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.DRINKING
-    #     await asyncio.sleep(0.3)  # t=1.3
-    #     assert handler.conversations.get((self.group.id, user1.id)) is None
-    #
-    # @pytest.mark.asyncio
-    # async def test_conversation_timeout_two_users(self, app, bot, user1, user2):
-    #     handler = ConversationHandler(
-    #         entry_points=self.entry_points,
-    #         states=self.states,
-    #         fallbacks=self.fallbacks,
-    #         conversation_timeout=0.5,
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # Start state machine, do something as second user, then reach timeout
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         from_user=user1,
-    #         text='/start',
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-    #     message.text = '/brew'
-    #     message.entities[0].length = len('/brew')
-    #     message.entities[0].length = len('/brew')
-    #     message.from_user = user2
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert handler.conversations.get((self.group.id, user2.id)) is None
-    #     message.text = '/start'
-    #     message.entities[0].length = len('/start')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert handler.conversations.get((self.group.id, user2.id)) == self.THIRSTY
-    #     await asyncio.sleep(0.7)
-    #     assert handler.conversations.get((self.group.id, user1.id)) is None
-    #     assert handler.conversations.get((self.group.id, user2.id)) is None
-    #
     # @pytest.mark.asyncio
     # async def test_conversation_handler_timeout_state(self, app, bot, user1):
     #     states = self.states
@@ -1647,7 +1702,7 @@ class TestConversationHandler:
     #
     #     app.add_handler(handler)
     #     app.add_handler(TypeHandler(Update, test_callback), group=1)
-    #     self.raise_dp_handler_stop = True
+    #     self.raise_app_handler_stop = True
     #
     #     # User one, starts the state machine.
     #     message = Message(
