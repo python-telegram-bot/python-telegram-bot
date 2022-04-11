@@ -858,77 +858,37 @@ class TestConversationHandler:
             # ended
             assert handler.check_update(Update(0, message=message))
 
-    # TODO
-    # @pytest.mark.asyncio
-    # async def test_none_on_first_message_async(self, app, bot, user1):
-    #     handler = ConversationHandler(
-    #         entry_points=[
-    #             CommandHandler(
-    #                 'start', lambda update, context: app.run_async(self.start_none, update,
-    #                 context)
-    #             )
-    #         ],
-    #         states={},
-    #         fallbacks=[],
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # User starts the state machine with an async function that returns None
-    #     # Async results are resolved when the users state is queried next time.
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         from_user=user1,
-    #         text='/start',
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     app.update_queue.put(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     # Assert that the Promise has been accepted as the new state
-    #     assert len(handler.conversations) == 1
-    #
-    #     message.text = 'resolve promise pls'
-    #     app.update_queue.put(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     # Assert that the Promise has been resolved and the conversation ended.
-    #     assert len(handler.conversations) == 0
-    #
-    # @pytest.mark.asyncio
-    # async def test_none_on_first_message_async_handler(self, app, bot, user1):
-    #     handler = ConversationHandler(
-    #         entry_points=[CommandHandler('start', self.start_none, run_async=True)],
-    #         states={},
-    #         fallbacks=[],
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # User starts the state machine with an async function that returns None
-    #     # Async results are resolved when the users state is queried next time.
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         text='/start',
-    #         from_user=user1,
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     app.update_queue.put(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     # Assert that the Promise has been accepted as the new state
-    #     assert len(handler.conversations) == 1
-    #
-    #     message.text = 'resolve promise pls'
-    #     app.update_queue.put(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     # Assert that the Promise has been resolved and the conversation ended.
-    #     assert len(handler.conversations) == 0
+    @pytest.mark.asyncio
+    async def test_none_on_first_message_non_blocking_handler(self, app, bot, user1):
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_none, block=False)],
+            states={},
+            fallbacks=[],
+        )
+        app.add_handler(handler)
+
+        # User starts the state machine with a non-blocking handler that returns None
+        # non-blocking results are resolved when the users state is queried next time.
+        message = Message(
+            0,
+            None,
+            self.group,
+            text='/start',
+            from_user=user1,
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        async with app:
+            await app.process_update(Update(update_id=0, message=message))
+            # Give the task a chance to finish
+            await asyncio.sleep(0.1)
+
+            # Let's check that processing the same update again is accepted. this confirms that
+            # a) the pending state is correctly resolved
+            # b) the conversation has ended
+            assert handler.check_update(Update(0, message=message))
 
     @pytest.mark.asyncio
     async def test_per_chat_message_without_chat(self, bot, user1):
@@ -1046,92 +1006,124 @@ class TestConversationHandler:
             assert caplog.records[0].message == "Failed to schedule timeout."
             assert str(caplog.records[0].exc_info[1]) == "job error"
 
-    # @pytest.mark.asyncio
-    # async def test_promise_exception(self, app, bot, user1, caplog):
-    #     """
-    #     Here we make sure that when a run_async handle raises an
-    #     exception, the state isn't changed.
-    #     """
-    #
-    #     def conv_entry(*a, **kw):
-    #         return 1
-    #
-    #     def raise_error(*a, **kw):
-    #         raise Exception("promise exception")
-    #
-    #     handler = ConversationHandler(
-    #         entry_points=[CommandHandler("start", conv_entry)],
-    #         states={1: [MessageHandler(filters.ALL, raise_error)]},
-    #         fallbacks=self.fallbacks,
-    #         run_async=True,
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         from_user=user1,
-    #         text='/start',
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     # start the conversation
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     message.text = "error"
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     message.text = "resolve promise pls"
-    #     caplog.clear()
-    #     with caplog.at_level(logging.ERROR):
-    #         await app.process_update(Update(update_id=0, message=message))
-    #         await asyncio.sleep(0.5)
-    #     assert len(caplog.records) == 3
-    #     assert caplog.records[0].message == "Promise function raised exception"
-    #     assert caplog.records[1].message == "promise exception"
-    #     # assert res is old state
-    #     assert handler.conversations.get((self.group.id, user1.id))[0] == 1
-    #
-    # @pytest.mark.asyncio
-    # async def test_conversation_timeout(self, app, bot, user1):
-    #     handler = ConversationHandler(
-    #         entry_points=self.entry_points,
-    #         states=self.states,
-    #         fallbacks=self.fallbacks,
-    #         conversation_timeout=0.5,
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # Start state machine, then reach timeout
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         from_user=user1,
-    #         text='/start',
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-    #     await asyncio.sleep(0.75)
-    #     assert handler.conversations.get((self.group.id, user1.id)) is None
-    #
-    #     # Start state machine, do something, then reach timeout
-    #     await app.process_update(Update(update_id=1, message=message))
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
-    #     message.text = '/brew'
-    #     message.entities[0].length = len('/brew')
-    #     await app.process_update(Update(update_id=2, message=message))
-    #     assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
-    #     await asyncio.sleep(0.7)
-    #     assert handler.conversations.get((self.group.id, user1.id)) is None
-    #
+    @pytest.mark.asyncio
+    async def test_non_blocking_exception(self, app, bot, user1, caplog):
+        """Here we make sure that when a non-blocking handler raises an
+        exception, the state isn't changed.
+        """
+        error = Exception('task exception')
+
+        async def conv_entry(*a, **kw):
+            return 1
+
+        async def raise_error(*a, **kw):
+            raise error
+
+        handler = ConversationHandler(
+            entry_points=[CommandHandler("start", conv_entry)],
+            states={1: [MessageHandler(filters.Text(['error']), raise_error)]},
+            fallbacks=self.fallbacks,
+            block=False,
+        )
+        app.add_handler(handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        # start the conversation
+        async with app:
+            await app.process_update(Update(update_id=0, message=message))
+            await asyncio.sleep(0.1)
+            message.text = "error"
+            await app.process_update(Update(update_id=0, message=message))
+            await asyncio.sleep(0.1)
+            caplog.clear()
+            with caplog.at_level(logging.ERROR):
+                # This also makes sure that we're still in the same state
+                assert handler.check_update(Update(0, message=message))
+            assert len(caplog.records) == 1
+            assert (
+                caplog.records[0].message
+                == "Task function raised exception. Falling back to old state 1"
+            )
+            assert caplog.records[0].exc_info[1] is error
+
+    @pytest.mark.asyncio
+    async def test_conversation_timeout(self, app, bot, user1):
+        handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            conversation_timeout=0.5,
+        )
+        app.add_handler(handler)
+
+        # Start state machine, then reach timeout
+        start_message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        brew_message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/brew',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/brew'))
+            ],
+            bot=bot,
+        )
+        pour_coffee_message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/pourCoffee',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/pourCoffee'))
+            ],
+            bot=bot,
+        )
+        async with app:
+            await app.start()
+
+            await app.process_update(Update(update_id=0, message=start_message))
+            assert handler.check_update(Update(0, message=brew_message))
+            await asyncio.sleep(0.75)
+            assert handler.check_update(Update(0, message=start_message))
+
+            # Start state machine, do something, then reach timeout
+            await app.process_update(Update(update_id=1, message=start_message))
+            assert handler.check_update(Update(0, message=brew_message))
+            # assert handler.conversations.get((self.group.id, user1.id)) == self.THIRSTY
+            # start_message.text = '/brew'
+            # start_message.entities[0].length = len('/brew')
+            await app.process_update(Update(update_id=2, message=brew_message))
+            assert handler.check_update(Update(0, message=pour_coffee_message))
+            # assert handler.conversations.get((self.group.id, user1.id)) == self.BREWING
+            await asyncio.sleep(0.7)
+            assert handler.check_update(Update(0, message=start_message))
+            # assert handler.conversations.get((self.group.id, user1.id)) is None
+
+            await app.stop()
+
+    # TODO
     # @pytest.mark.asyncio
     # async def test_timeout_not_triggered_on_conv_end_async(self, bot, app, user1):
     #     def timeout(*a, **kw):
@@ -1143,7 +1135,7 @@ class TestConversationHandler:
     #         states=self.states,
     #         fallbacks=self.fallbacks,
     #         conversation_timeout=0.5,
-    #         run_async=True,
+    #         block=False,
     #     )
     #     app.add_handler(handler)
     #
@@ -1780,7 +1772,7 @@ class TestConversationHandler:
     #         entry_points=self.entry_points,
     #         states=self.states,
     #         fallbacks=self.fallbacks,
-    #         run_async=True,
+    #         block=False,
     #     )
     #
     #     all_handlers = conv_handler.entry_points + conv_handler.fallbacks
@@ -1793,7 +1785,7 @@ class TestConversationHandler:
     # @pytest.mark.asyncio
     # async def test_conversation_handler_run_async_false(self, app):
     #     conv_handler = ConversationHandler(
-    #         entry_points=[CommandHandler('start', self.start_end, run_async=True)],
+    #         entry_points=[CommandHandler('start', self.start_end, block=False)],
     #         states=self.states,
     #         fallbacks=self.fallbacks,
     #         run_async=False,
