@@ -736,47 +736,56 @@ class TestConversationHandler:
             message.chat = self.second_group
             assert handler.check_update(Update(update_id=0, message=message))
 
-    # TODO
-    # @pytest.mark.asyncio
-    # async def test_conversation_handler_per_message(self, app, bot, user1, user2):
-    #     def entry(update, context):
-    #         return 1
-    #
-    #     def one(update, context):
-    #         return 2
-    #
-    #     def two(update, context):
-    #         return ConversationHandler.END
-    #
-    #     handler = ConversationHandler(
-    #         entry_points=[CallbackQueryHandler(entry)],
-    #         states={1: [CallbackQueryHandler(one)], 2: [CallbackQueryHandler(two)]},
-    #         fallbacks=[],
-    #         per_message=True,
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # User one, starts the state machine.
-    #     message = Message(
-    #         0, None, self.group, from_user=user1, text='msg w/ inlinekeyboard', bot=bot
-    #     )
-    #
-    #     async with app:
-    #         cbq = CallbackQuery(0, user1, None, message=message, data='data', bot=bot)
-    #         await app.process_update(Update(update_id=0, callback_query=cbq))
-    #
-    #         assert handler.conversations[(self.group.id, user1.id, message.message_id)] == 1
-    #
-    #         await app.process_update(Update(update_id=0, callback_query=cbq))
-    #
-    #         assert handler.conversations[(self.group.id, user1.id, message.message_id)] == 2
-    #
-    #         # Let's now verify that for a different user in the same group, the state will not be
-    #         # updated
-    #         cbq.from_user = user2
-    #         await app.process_update(Update(update_id=0, callback_query=cbq))
-    #
-    #         assert handler.conversations[(self.group.id, user1.id, message.message_id)] == 2
+    @pytest.mark.asyncio
+    async def test_conversation_handler_per_message(self, app, bot, user1, user2):
+        async def entry(update, context):
+            return 1
+
+        async def one(update, context):
+            return 2
+
+        async def two(update, context):
+            return ConversationHandler.END
+
+        handler = ConversationHandler(
+            entry_points=[CallbackQueryHandler(entry)],
+            states={
+                1: [CallbackQueryHandler(one, pattern='^1$')],
+                2: [CallbackQueryHandler(two, pattern='^2$')],
+            },
+            fallbacks=[],
+            per_message=True,
+        )
+        app.add_handler(handler)
+
+        # User one, starts the state machine.
+        message = Message(
+            0, None, self.group, from_user=user1, text='msg w/ inlinekeyboard', bot=bot
+        )
+
+        async with app:
+            cbq_1 = CallbackQuery(0, user1, None, message=message, data='1', bot=bot)
+            cbq_2 = CallbackQuery(0, user1, None, message=message, data='2', bot=bot)
+            await app.process_update(Update(update_id=0, callback_query=cbq_1))
+
+            # Make sure that we're in the correct state
+            assert handler.check_update(Update(0, callback_query=cbq_1))
+            assert not handler.check_update(Update(0, callback_query=cbq_2))
+
+            await app.process_update(Update(update_id=0, callback_query=cbq_1))
+
+            # Make sure that we're in the correct state
+            assert not handler.check_update(Update(0, callback_query=cbq_1))
+            assert handler.check_update(Update(0, callback_query=cbq_2))
+
+            # Let's now verify that for a different user in the same group, the state will not be
+            # updated
+            cbq_2.from_user = user2
+            await app.process_update(Update(update_id=0, callback_query=cbq_2))
+
+            cbq_2.from_user = user1
+            assert not handler.check_update(Update(0, callback_query=cbq_1))
+            assert handler.check_update(Update(0, callback_query=cbq_2))
 
     @pytest.mark.asyncio
     async def test_end_on_first_message(self, app, bot, user1):
@@ -801,92 +810,55 @@ class TestConversationHandler:
             await app.process_update(Update(update_id=0, message=message))
             assert handler.check_update(Update(update_id=0, message=message))
 
-    # TODO
-    # @pytest.mark.asyncio
-    # async def test_end_on_first_message_async(self, app, bot, user1):
-    #     handler = ConversationHandler(
-    #         entry_points=[
-    #             CommandHandler(
-    #                 'start', lambda update, context: app.run_async(self.start_end, update,
-    #                 context)
-    #             )
-    #         ],
-    #         states={},
-    #         fallbacks=[],
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # User starts the state machine with an async function that immediately ends the
-    #     # conversation. Async results are resolved when the users state is queried next time.
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         from_user=user1,
-    #         text='/start',
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     app.update_queue.put(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     # Assert that the Promise has been accepted as the new state
-    #     assert len(handler.conversations) == 1
-    #
-    #     message.text = 'resolve promise pls'
-    #     message.entities[0].length = len('resolve promise pls')
-    #     app.update_queue.put(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     # Assert that the Promise has been resolved and the conversation ended.
-    #     assert len(handler.conversations) == 0
+    @pytest.mark.asyncio
+    async def test_end_on_first_message_non_blocking_handler(self, app, bot, user1):
+        handler = ConversationHandler(
+            entry_points=[CommandHandler('start', callback=self.start_end, block=False)],
+            states={},
+            fallbacks=[],
+        )
+        app.add_handler(handler)
 
-    # @pytest.mark.asyncio
-    # async def test_end_on_first_message_async_handler(self, app, bot, user1):
-    #     handler = ConversationHandler(
-    #         entry_points=[CommandHandler('start', self.start_end, run_async=True)],
-    #         states={},
-    #         fallbacks=[],
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # User starts the state machine with an async function that immediately ends the
-    #     # conversation. Async results are resolved when the users state is queried next time.
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         text='/start',
-    #         from_user=user1,
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #         bot=bot,
-    #     )
-    #     app.update_queue.put(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     # Assert that the Promise has been accepted as the new state
-    #     assert len(handler.conversations) == 1
-    #
-    #     message.text = 'resolve promise pls'
-    #     message.entities[0].length = len('resolve promise pls')
-    #     app.update_queue.put(Update(update_id=0, message=message))
-    #     await asyncio.sleep(0.1)
-    #     # Assert that the Promise has been resolved and the conversation ended.
-    #     assert len(handler.conversations) == 0
-    #
-    # @pytest.mark.asyncio
-    # async def test_none_on_first_message(self, app, bot, user1):
-    #     handler = ConversationHandler(
-    #         entry_points=[CommandHandler('start', self.start_none)], states={}, fallbacks=[]
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # User starts the state machine and a callback function returns None
-    #     message = Message(0, None, self.group, from_user=user1, text='/start', bot=bot)
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert len(handler.conversations) == 0
-    #
+        # User starts the state machine with a non-blocking function that immediately ends the
+        # conversation. non-blocking results are resolved when the users state is queried next
+        # time.
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+            bot=bot,
+        )
+        async with app:
+            await app.process_update(Update(update_id=0, message=message))
+            # give the task a chance to finish
+            await asyncio.sleep(0.1)
+
+            # Let's check that processing the same update again is accepted. this confirms that
+            # a) the pending state is correctly resolved
+            # b) the conversation has ended
+            assert handler.check_update(Update(0, message=message))
+
+    @pytest.mark.asyncio
+    async def test_none_on_first_message(self, app, bot, user1):
+        handler = ConversationHandler(
+            entry_points=[MessageHandler(filters.ALL, self.start_none)], states={}, fallbacks=[]
+        )
+        app.add_handler(handler)
+
+        # User starts the state machine and a callback function returns None
+        message = Message(0, None, self.group, from_user=user1, text='/start', bot=bot)
+        async with app:
+            await app.process_update(Update(update_id=0, message=message))
+            # Check that the same message is accepted again, i.e. the conversation immediately
+            # ended
+            assert handler.check_update(Update(0, message=message))
+
+    # TODO
     # @pytest.mark.asyncio
     # async def test_none_on_first_message_async(self, app, bot, user1):
     #     handler = ConversationHandler(
