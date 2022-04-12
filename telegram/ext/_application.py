@@ -570,20 +570,28 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         # running event loop or we are in the main thread, which are the intended use cases.
         # See the docs of get_event_loop() and get_running_loop() for more info
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.initialize())
-        loop.run_until_complete(updater_coroutine)
-        loop.run_until_complete(self.start())
         try:
+            loop.run_until_complete(self.initialize())
+            loop.run_until_complete(updater_coroutine)
+            loop.run_until_complete(self.start())
+
             loop.run_forever()
         except (KeyboardInterrupt, SystemExit):
             pass
+        except Exception as exc:
+            # In case the coroutine wasn't awaited, we don't need to bother the user with a warning
+            updater_coroutine.close()
+            raise exc
         finally:
             # We arrive here either by catching the exceptions above or if the loop gets stopped
             try:
                 # Mypy doesn't know that we already check if updater is None
-                loop.run_until_complete(self.updater.stop())  # type: ignore[union-attr]
-                loop.run_until_complete(self.stop())
+                if self.updater.running:  # type: ignore[union-attr]
+                    loop.run_until_complete(self.updater.stop())  # type: ignore[union-attr]
+                if self.running:
+                    loop.run_until_complete(self.stop())
                 loop.run_until_complete(self.shutdown())
+                loop.run_until_complete(self.updater.shutdown())  # type: ignore[union-attr]
             finally:
                 if close_loop:
                     loop.close()
