@@ -84,6 +84,7 @@ class TestConversationHandler:
     # TODO
     #  * Test that we have a warning when conversation timeout is scheduled with non-running JQ
     #  * Test the blocking/non-blocking behavior including the different resolution orders
+    #  * test AppHandlerStop with non-nested conversations
 
     # State definitions
     # At first we're thirsty.  Then we brew coffee, we drink it
@@ -1602,262 +1603,276 @@ class TestConversationHandler:
 
             await app.stop()
 
+    @pytest.mark.asyncio
+    async def test_nested_conversation_handler(self, app, bot, user1, user2):
+        self.nested_states[self.DRINKING] = [
+            ConversationHandler(
+                entry_points=self.drinking_entry_points,
+                states=self.drinking_states,
+                fallbacks=self.drinking_fallbacks,
+                map_to_parent=self.drinking_map_to_parent,
+            )
+        ]
+        handler = ConversationHandler(
+            entry_points=self.entry_points, states=self.nested_states, fallbacks=self.fallbacks
+        )
+        app.add_handler(handler)
+
+        # User one, starts the state machine.
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text='/start',
+            bot=bot,
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+        )
+        async with app:
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.THIRSTY
+
+            # The user is thirsty and wants to brew coffee.
+            message.text = '/brew'
+            message.entities[0].length = len('/brew')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.BREWING
+
+            # Lets pour some coffee.
+            message.text = '/pourCoffee'
+            message.entities[0].length = len('/pourCoffee')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.DRINKING
+
+            # The user is holding the cup
+            message.text = '/hold'
+            message.entities[0].length = len('/hold')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.HOLDING
+
+            # The user is sipping coffee
+            message.text = '/sip'
+            message.entities[0].length = len('/sip')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.SIPPING
+
+            # The user is swallowing
+            message.text = '/swallow'
+            message.entities[0].length = len('/swallow')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.SWALLOWING
+
+            # The user is holding the cup again
+            message.text = '/hold'
+            message.entities[0].length = len('/hold')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.HOLDING
+
+            # The user wants to replenish the coffee supply
+            message.text = '/replenish'
+            message.entities[0].length = len('/replenish')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.REPLENISHING
+            # check that we're in the right state now by checking that the update is accepted
+            message.text = '/pourCoffee'
+            message.entities[0].length = len('/pourCoffee')
+            assert handler.check_update(Update(0, message=message))
+
+            # The user wants to drink their coffee again)
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.DRINKING
+
+            # The user is now ready to start coding
+            message.text = '/startCoding'
+            message.entities[0].length = len('/startCoding')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.CODING
+
+            # The user decides it's time to drink again
+            message.text = '/drinkMore'
+            message.entities[0].length = len('/drinkMore')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.DRINKING
+
+            # The user is holding their cup
+            message.text = '/hold'
+            message.entities[0].length = len('/hold')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.HOLDING
+
+            # The user wants to end with the drinking and go back to coding
+            message.text = '/end'
+            message.entities[0].length = len('/end')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.END
+            # check that we're in the right state now by checking that the update is accepted
+            message.text = '/drinkMore'
+            message.entities[0].length = len('/drinkMore')
+            assert handler.check_update(Update(0, message=message))
+
+            # The user wants to drink once more
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.DRINKING
+
+            # The user wants to stop altogether
+            message.text = '/stop'
+            message.entities[0].length = len('/stop')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.STOPPING
+            # check that the conversation has ended by checking that the start cmd is accepted
+            message.text = '/start'
+            message.entities[0].length = len('/start')
+            assert handler.check_update(Update(0, message=message))
+
+    @pytest.mark.asyncio
+    async def test_nested_conversation_application_handler_stop(self, app, bot, user1, user2):
+        self.nested_states[self.DRINKING] = [
+            ConversationHandler(
+                entry_points=self.drinking_entry_points,
+                states=self.drinking_states,
+                fallbacks=self.drinking_fallbacks,
+                map_to_parent=self.drinking_map_to_parent,
+            )
+        ]
+        handler = ConversationHandler(
+            entry_points=self.entry_points, states=self.nested_states, fallbacks=self.fallbacks
+        )
+
+        def test_callback(u, c):
+            self.test_flag = True
+
+        app.add_handler(handler)
+        app.add_handler(TypeHandler(Update, test_callback), group=1)
+        self.raise_app_handler_stop = True
+
+        # User one, starts the state machine.
+        message = Message(
+            0,
+            None,
+            self.group,
+            text='/start',
+            bot=bot,
+            from_user=user1,
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
+            ],
+        )
+        async with app:
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.THIRSTY
+            assert not self.test_flag
+
+            # The user is thirsty and wants to brew coffee.
+            message.text = '/brew'
+            message.entities[0].length = len('/brew')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.BREWING
+            assert not self.test_flag
+
+            # Lets pour some coffee.
+            message.text = '/pourCoffee'
+            message.entities[0].length = len('/pourCoffee')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.DRINKING
+            assert not self.test_flag
+
+            # The user is holding the cup
+            message.text = '/hold'
+            message.entities[0].length = len('/hold')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.HOLDING
+            assert not self.test_flag
+
+            # The user is sipping coffee
+            message.text = '/sip'
+            message.entities[0].length = len('/sip')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.SIPPING
+            assert not self.test_flag
+
+            # The user is swallowing
+            message.text = '/swallow'
+            message.entities[0].length = len('/swallow')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.SWALLOWING
+            assert not self.test_flag
+
+            # The user is holding the cup again
+            message.text = '/hold'
+            message.entities[0].length = len('/hold')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.HOLDING
+            assert not self.test_flag
+
+            # The user wants to replenish the coffee supply
+            message.text = '/replenish'
+            message.entities[0].length = len('/replenish')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.REPLENISHING
+            # check that we're in the right state now by checking that the update is accepted
+            message.text = '/pourCoffee'
+            message.entities[0].length = len('/pourCoffee')
+            assert handler.check_update(Update(0, message=message))
+            assert not self.test_flag
+
+            # The user wants to drink their coffee again
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.DRINKING
+            assert not self.test_flag
+
+            # The user is now ready to start coding
+            message.text = '/startCoding'
+            message.entities[0].length = len('/startCoding')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.CODING
+            assert not self.test_flag
+
+            # The user decides it's time to drink again
+            message.text = '/drinkMore'
+            message.entities[0].length = len('/drinkMore')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.DRINKING
+            assert not self.test_flag
+
+            # The user is holding their cup
+            message.text = '/hold'
+            message.entities[0].length = len('/hold')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.HOLDING
+            assert not self.test_flag
+
+            # The user wants to end with the drinking and go back to coding
+            message.text = '/end'
+            message.entities[0].length = len('/end')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.END
+            # check that we're in the right state now by checking that the update is accepted
+            message.text = '/drinkMore'
+            message.entities[0].length = len('/drinkMore')
+            assert handler.check_update(Update(0, message=message))
+            assert not self.test_flag
+
+            # The user wants to drink once more
+            message.text = '/drinkMore'
+            message.entities[0].length = len('/drinkMore')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.DRINKING
+            assert not self.test_flag
+
+            # The user wants to stop altogether
+            message.text = '/stop'
+            message.entities[0].length = len('/stop')
+            await app.process_update(Update(update_id=0, message=message))
+            assert self.current_state[user1.id] == self.STOPPING
+            # check that the conv has ended by checking that the start cmd is accepted
+            message.text = '/start'
+            message.entities[0].length = len('/start')
+            assert handler.check_update(Update(0, message=message))
+            assert not self.test_flag
+
     # TODO
-    # @pytest.mark.asyncio
-    # async def test_nested_conversation_handler(self, app, bot, user1, user2):
-    #     self.nested_states[self.DRINKING] = [
-    #         ConversationHandler(
-    #             entry_points=self.drinking_entry_points,
-    #             states=self.drinking_states,
-    #             fallbacks=self.drinking_fallbacks,
-    #             map_to_parent=self.drinking_map_to_parent,
-    #         )
-    #     ]
-    #     handler = ConversationHandler(
-    #         entry_points=self.entry_points, states=self.nested_states, fallbacks=self.fallbacks
-    #     )
-    #     app.add_handler(handler)
-    #
-    #     # User one, starts the state machine.
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         from_user=user1,
-    #         text='/start',
-    #         bot=bot,
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #     )
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.THIRSTY
-    #
-    #     # The user is thirsty and wants to brew coffee.
-    #     message.text = '/brew'
-    #     message.entities[0].length = len('/brew')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.BREWING
-    #
-    #     # Lets pour some coffee.
-    #     message.text = '/pourCoffee'
-    #     message.entities[0].length = len('/pourCoffee')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.DRINKING
-    #
-    #     # The user is holding the cup
-    #     message.text = '/hold'
-    #     message.entities[0].length = len('/hold')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.HOLDING
-    #
-    #     # The user is sipping coffee
-    #     message.text = '/sip'
-    #     message.entities[0].length = len('/sip')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.SIPPING
-    #
-    #     # The user is swallowing
-    #     message.text = '/swallow'
-    #     message.entities[0].length = len('/swallow')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.SWALLOWING
-    #
-    #     # The user is holding the cup again
-    #     message.text = '/hold'
-    #     message.entities[0].length = len('/hold')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.HOLDING
-    #
-    #     # The user wants to replenish the coffee supply
-    #     message.text = '/replenish'
-    #     message.entities[0].length = len('/replenish')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.REPLENISHING
-    #     assert handler.conversations[(0, user1.id)] == self.BREWING
-    #
-    #     # The user wants to drink their coffee again
-    #     message.text = '/pourCoffee'
-    #     message.entities[0].length = len('/pourCoffee')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.DRINKING
-    #
-    #     # The user is now ready to start coding
-    #     message.text = '/startCoding'
-    #     message.entities[0].length = len('/startCoding')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.CODING
-    #
-    #     # The user decides it's time to drink again
-    #     message.text = '/drinkMore'
-    #     message.entities[0].length = len('/drinkMore')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.DRINKING
-    #
-    #     # The user is holding their cup
-    #     message.text = '/hold'
-    #     message.entities[0].length = len('/hold')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.HOLDING
-    #
-    #     # The user wants to end with the drinking and go back to coding
-    #     message.text = '/end'
-    #     message.entities[0].length = len('/end')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.END
-    #     assert handler.conversations[(0, user1.id)] == self.CODING
-    #
-    #     # The user wants to drink once more
-    #     message.text = '/drinkMore'
-    #     message.entities[0].length = len('/drinkMore')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.DRINKING
-    #
-    #     # The user wants to stop altogether
-    #     message.text = '/stop'
-    #     message.entities[0].length = len('/stop')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.STOPPING
-    #     assert handler.conversations.get((0, user1.id)) is None
-    #
-    # @pytest.mark.asyncio
-    # async def test_conversation_dispatcher_handler_stop(self, app, bot, user1, user2):
-    #     self.nested_states[self.DRINKING] = [
-    #         ConversationHandler(
-    #             entry_points=self.drinking_entry_points,
-    #             states=self.drinking_states,
-    #             fallbacks=self.drinking_fallbacks,
-    #             map_to_parent=self.drinking_map_to_parent,
-    #         )
-    #     ]
-    #     handler = ConversationHandler(
-    #         entry_points=self.entry_points, states=self.nested_states, fallbacks=self.fallbacks
-    #     )
-    #
-    #     def test_callback(u, c):
-    #         self.test_flag = True
-    #
-    #     app.add_handler(handler)
-    #     app.add_handler(TypeHandler(Update, test_callback), group=1)
-    #     self.raise_app_handler_stop = True
-    #
-    #     # User one, starts the state machine.
-    #     message = Message(
-    #         0,
-    #         None,
-    #         self.group,
-    #         text='/start',
-    #         bot=bot,
-    #         from_user=user1,
-    #         entities=[
-    #             MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len('/start'))
-    #         ],
-    #     )
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.THIRSTY
-    #     assert not self.test_flag
-    #
-    #     # The user is thirsty and wants to brew coffee.
-    #     message.text = '/brew'
-    #     message.entities[0].length = len('/brew')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.BREWING
-    #     assert not self.test_flag
-    #
-    #     # Lets pour some coffee.
-    #     message.text = '/pourCoffee'
-    #     message.entities[0].length = len('/pourCoffee')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.DRINKING
-    #     assert not self.test_flag
-    #
-    #     # The user is holding the cup
-    #     message.text = '/hold'
-    #     message.entities[0].length = len('/hold')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.HOLDING
-    #     assert not self.test_flag
-    #
-    #     # The user is sipping coffee
-    #     message.text = '/sip'
-    #     message.entities[0].length = len('/sip')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.SIPPING
-    #     assert not self.test_flag
-    #
-    #     # The user is swallowing
-    #     message.text = '/swallow'
-    #     message.entities[0].length = len('/swallow')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.SWALLOWING
-    #     assert not self.test_flag
-    #
-    #     # The user is holding the cup again
-    #     message.text = '/hold'
-    #     message.entities[0].length = len('/hold')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.HOLDING
-    #     assert not self.test_flag
-    #
-    #     # The user wants to replenish the coffee supply
-    #     message.text = '/replenish'
-    #     message.entities[0].length = len('/replenish')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.REPLENISHING
-    #     assert handler.conversations[(0, user1.id)] == self.BREWING
-    #     assert not self.test_flag
-    #
-    #     # The user wants to drink their coffee again
-    #     message.text = '/pourCoffee'
-    #     message.entities[0].length = len('/pourCoffee')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.DRINKING
-    #     assert not self.test_flag
-    #
-    #     # The user is now ready to start coding
-    #     message.text = '/startCoding'
-    #     message.entities[0].length = len('/startCoding')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.CODING
-    #     assert not self.test_flag
-    #
-    #     # The user decides it's time to drink again
-    #     message.text = '/drinkMore'
-    #     message.entities[0].length = len('/drinkMore')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.DRINKING
-    #     assert not self.test_flag
-    #
-    #     # The user is holding their cup
-    #     message.text = '/hold'
-    #     message.entities[0].length = len('/hold')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.HOLDING
-    #     assert not self.test_flag
-    #
-    #     # The user wants to end with the drinking and go back to coding
-    #     message.text = '/end'
-    #     message.entities[0].length = len('/end')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.END
-    #     assert handler.conversations[(0, user1.id)] == self.CODING
-    #     assert not self.test_flag
-    #
-    #     # The user wants to drink once more
-    #     message.text = '/drinkMore'
-    #     message.entities[0].length = len('/drinkMore')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.DRINKING
-    #     assert not self.test_flag
-    #
-    #     # The user wants to stop altogether
-    #     message.text = '/stop'
-    #     message.entities[0].length = len('/stop')
-    #     await app.process_update(Update(update_id=0, message=message))
-    #     assert self.current_state[user1.id] == self.STOPPING
-    #     assert handler.conversations.get((0, user1.id)) is None
-    #     assert not self.test_flag
-    #
     # @pytest.mark.asyncio
     # async def test_conversation_handler_run_async_true(self, app):
     #     conv_handler = ConversationHandler(
