@@ -799,7 +799,16 @@ class ConversationHandler(Handler[Update, CCT]):
             raise_dp_handler_stop = True
         async with self._timeout_jobs_lock:
             if self.conversation_timeout:
-                if application.job_queue is not None:
+                if application.job_queue is None:
+                    warn(
+                        "Ignoring `conversation_timeout` because the Application has no JobQueue.",
+                    )
+                elif not application.job_queue.scheduler.running:
+                    warn(
+                        "Ignoring `conversation_timeout` because the Applications JobQueue is "
+                        "not running.",
+                    )
+                else:
                     # Add the new timeout job
                     # checking if the new state is self.END is done in _schedule_job
                     if isinstance(new_state, asyncio.Task):
@@ -813,10 +822,6 @@ class ConversationHandler(Handler[Update, CCT]):
                         self._schedule_job(
                             new_state, application, update, context, conversation_key
                         )
-                else:
-                    warn(
-                        "Ignoring `conversation_timeout` because the Application has no JobQueue.",
-                    )
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self._update_state(self.END, conversation_key)
