@@ -24,6 +24,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+PAYMENT_PROVIDER_TOKEN = 'TOKEN'
+
 
 async def start_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Displays info on how to use the bot."""
@@ -45,7 +47,6 @@ async def start_with_shipping_callback(
     # select a payload just for you to recognize its the donation from your bot
     payload = "Custom-Payload"
     # In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
-    provider_token = "PROVIDER_TOKEN"
     currency = "USD"
     # price in dollars
     price = 1
@@ -60,7 +61,7 @@ async def start_with_shipping_callback(
         title,
         description,
         payload,
-        provider_token,
+        PAYMENT_PROVIDER_TOKEN,
         currency,
         prices,
         need_name=True,
@@ -81,7 +82,6 @@ async def start_without_shipping_callback(
     # select a payload just for you to recognize its the donation from your bot
     payload = "Custom-Payload"
     # In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
-    provider_token = "PROVIDER_TOKEN"
     currency = "USD"
     # price in dollars
     price = 1
@@ -91,7 +91,7 @@ async def start_without_shipping_callback(
     # optionally pass need_name=True, need_phone_number=True,
     # need_email=True, need_shipping_address=True, is_flexible=True
     await context.bot.send_invoice(
-        chat_id, title, description, payload, provider_token, currency, prices
+        chat_id, title, description, payload, PAYMENT_PROVIDER_TOKEN, currency, prices
     )
 
 

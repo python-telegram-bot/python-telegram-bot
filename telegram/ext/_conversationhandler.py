@@ -784,12 +784,9 @@ class ConversationHandler(Handler[Update, CCT]):
 
         try:
             if block:
-                try:
-                    new_state: object = await handler.handle_update(
-                        update, application, handler_check_result, context
-                    )
-                except Exception as exc:
-                    print(exc)
+                new_state: object = await handler.handle_update(
+                    update, application, handler_check_result, context
+                )
             else:
                 new_state = application.create_task(
                     coroutine=handler.handle_update(

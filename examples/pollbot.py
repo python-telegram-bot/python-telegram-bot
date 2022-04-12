@@ -69,9 +69,9 @@ async def poll(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
 async def receive_poll_answer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Summarize a users poll vote"""
     answer = update.poll_answer
-    poll_id = answer.poll_id
+    answered_poll = context.bot_data[answer.poll_id]
     try:
-        questions = context.bot_data[poll_id]["questions"]
+        questions = answered_poll["questions"]
     # this means this poll answer update is from an old poll, we can't do our answering then
     except KeyError:
         return
@@ -83,16 +83,14 @@ async def receive_poll_answer(update: Update, context: CallbackContext.DEFAULT_T
         else:
             answer_string += questions[question_id]
     await context.bot.send_message(
-        context.bot_data[poll_id]["chat_id"],
+        answered_poll["chat_id"],
         f"{update.effective_user.mention_html()} feels {answer_string}!",
         parse_mode=ParseMode.HTML,
     )
-    context.bot_data[poll_id]["answers"] += 1
+    answered_poll["answers"] += 1
     # Close poll after three participants voted
-    if context.bot_data[poll_id]["answers"] == 3:
-        await context.bot.stop_poll(
-            context.bot_data[poll_id]["chat_id"], context.bot_data[poll_id]["message_id"]
-        )
+    if answered_poll["answers"] == 3:
+        await context.bot.stop_poll(answered_poll["chat_id"], answered_poll["message_id"])
 
 
 async def quiz(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
@@ -158,12 +156,12 @@ def main() -> None:
     application = Application.builder().token("TOKEN").build()
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('poll', poll))
-    application.add_handler(PollAnswerHandler(receive_poll_answer))
     application.add_handler(CommandHandler('quiz', quiz))
-    application.add_handler(PollHandler(receive_quiz_answer))
     application.add_handler(CommandHandler('preview', preview))
-    application.add_handler(MessageHandler(filters.POLL, receive_poll))
     application.add_handler(CommandHandler('help', help_handler))
+    application.add_handler(MessageHandler(filters.POLL, receive_poll))
+    application.add_handler(PollAnswerHandler(receive_poll_answer))
+    application.add_handler(PollHandler(receive_quiz_answer))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()

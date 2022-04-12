@@ -483,6 +483,53 @@ class TestUpdater:
             assert updater.running is False
 
     @pytest.mark.asyncio
+    async def test_polling_update_de_json_fails(self, monkeypatch, updater, caplog):
+        updates = asyncio.Queue()
+        raise_exception = True
+        await updates.put(Update(update_id=1))
+
+        async def get_updates(*args, **kwargs):
+            if raise_exception:
+                await asyncio.sleep(0.01)
+                raise TypeError('Invalid Data')
+
+            next_update = await updates.get()
+            updates.task_done()
+            return [next_update]
+
+        orig_del_webhook = updater.bot.delete_webhook
+
+        async def delete_webhook(*args, **kwargs):
+            # Dropping pending updates is done by passing the parameter to delete_webhook
+            if kwargs.get('drop_pending_updates'):
+                self.message_count += 1
+            return await orig_del_webhook(*args, **kwargs)
+
+        monkeypatch.setattr(updater.bot, 'get_updates', get_updates)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', delete_webhook)
+
+        async with updater:
+            with caplog.at_level(logging.CRITICAL):
+                await updater.start_polling()
+                assert updater.running
+                await asyncio.sleep(1)
+
+            assert len(caplog.records) > 0
+            for record in caplog.records:
+                assert record.getMessage().startswith('Something went wrong processing')
+
+            # Make sure that everything works fine again when receiving proper updates
+            raise_exception = False
+            await asyncio.sleep(0.5)
+            caplog.clear()
+            with caplog.at_level(logging.CRITICAL):
+                await updates.join()
+            assert len(caplog.records) == 0
+
+            await updater.stop()
+            assert not updater.running
+
+    @pytest.mark.asyncio
     @pytest.mark.parametrize('ext_bot', [True, False])
     @pytest.mark.parametrize('drop_pending_updates', (True, False))
     async def test_webhook_basic(self, monkeypatch, updater, drop_pending_updates, ext_bot):
@@ -832,3 +879,50 @@ class TestUpdater:
             # assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
             await updater.stop()
+
+    @pytest.mark.asyncio
+    async def test_webhook_update_de_json_fails(self, monkeypatch, updater, caplog):
+        async def delete_webhook(*args, **kwargs):
+            return True
+
+        async def set_webhook(*args, **kwargs):
+            return True
+
+        def de_json_fails(*args, **kwargs):
+            raise TypeError('Invalid input')
+
+        monkeypatch.setattr(updater.bot, 'set_webhook', set_webhook)
+        monkeypatch.setattr(updater.bot, 'delete_webhook', delete_webhook)
+        orig_de_json = Update.de_json
+        monkeypatch.setattr(Update, 'de_json', de_json_fails)
+
+        ip = '127.0.0.1'
+        port = randrange(1024, 49152)  # Select random port
+
+        async with updater:
+            return_value = await updater.start_webhook(
+                ip_address=ip,
+                port=port,
+                url_path='TOKEN',
+            )
+            assert return_value is updater.update_queue
+            assert updater.running
+
+            # Now, we send an update to the server
+            update = make_message_update('Webhook')
+            with caplog.at_level(logging.CRITICAL):
+                await send_webhook_message(ip, port, update.to_json(), 'TOKEN')
+
+            assert len(caplog.records) == 1
+            assert caplog.records[-1].getMessage().startswith('Something went wrong processing')
+
+            # Make sure that everything works fine again when receiving proper updates
+            caplog.clear()
+            with caplog.at_level(logging.CRITICAL):
+                monkeypatch.setattr(Update, 'de_json', orig_de_json)
+                await send_webhook_message(ip, port, update.to_json(), 'TOKEN')
+                assert (await updater.update_queue.get()).to_dict() == update.to_dict()
+            assert len(caplog.records) == 0
+
+            await updater.stop()
+            assert not updater.running

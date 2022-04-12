@@ -89,7 +89,7 @@ async def received_information(update: Update, context: CallbackContext.DEFAULT_
 
     await update.message.reply_text(
         "Neat! Just so you know, this is what you already told me:"
-        f"{facts_to_str(user_data)} You can tell me more, or change your opinion"
+        f"{facts_to_str(user_data)}You can tell me more, or change your opinion"
         " on something.",
         reply_markup=markup,
     )
