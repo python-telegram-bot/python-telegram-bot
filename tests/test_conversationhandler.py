@@ -937,7 +937,8 @@ class TestConversationHandler:
         assert not handler.check_update(Update(0, shipping_query=shipping_query))
 
     @pytest.mark.asyncio
-    async def test_no_job_queue_warning(self, app, bot, user1, recwarn):
+    @pytest.mark.parametrize('jq', [True, False])
+    async def test_no_running_job_queue_warning(self, app, bot, user1, recwarn, jq):
         handler = ConversationHandler(
             entry_points=self.entry_points,
             states=self.states,
@@ -947,7 +948,8 @@ class TestConversationHandler:
         # save app.job_queue in temp variable jqueue
         # and then set app.job_queue to None.
         jqueue = app.job_queue
-        app.job_queue = None
+        if not jq:
+            app.job_queue = None
         app.add_handler(handler)
 
         message = Message(
@@ -966,10 +968,8 @@ class TestConversationHandler:
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.5)
             assert len(recwarn) == 1
-            assert (
-                str(recwarn[0].message)
-                == "Ignoring `conversation_timeout` because the Application has no JobQueue."
-            )
+            assert str(recwarn[0].message).startswith("Ignoring `conversation_timeout`")
+            assert ("is not running" if jq else "has no JobQueue.") in str(recwarn[0].message)
             # now set app.job_queue back to it's original value
             app.job_queue = jqueue
 
