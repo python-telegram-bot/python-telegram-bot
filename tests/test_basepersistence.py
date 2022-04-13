@@ -1259,7 +1259,7 @@ class TestBasePersistence:
         stop_task = asyncio.create_task(papp.stop())
         assert not stop_task.done()
         event.set()
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.5)
         assert stop_task.done()
         assert papp.persistence.updated_conversations == {}
 
