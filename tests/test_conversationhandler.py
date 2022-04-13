@@ -1004,6 +1004,8 @@ class TestConversationHandler:
         )
 
         async with app:
+            await app.start()
+
             with caplog.at_level(logging.ERROR):
                 await app.process_update(Update(update_id=0, message=message))
                 await asyncio.sleep(0.5)
@@ -1011,6 +1013,8 @@ class TestConversationHandler:
             assert len(caplog.records) == 1
             assert caplog.records[0].message == "Failed to schedule timeout."
             assert str(caplog.records[0].exc_info[1]) == "job error"
+
+            await app.stop()
 
     @pytest.mark.asyncio
     async def test_non_blocking_exception(self, app, bot, user1, caplog):
