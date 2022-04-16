@@ -288,15 +288,27 @@ class Updater:
         self._logger.debug('Bootstrap done')
 
         async def polling_action_cb() -> bool:
-            updates = await self.bot.get_updates(
-                offset=self._last_update_id,
-                timeout=timeout,
-                read_timeout=read_timeout,
-                connect_timeout=connect_timeout,
-                write_timeout=write_timeout,
-                pool_timeout=pool_timeout,
-                allowed_updates=allowed_updates,
-            )
+            try:
+                updates = await self.bot.get_updates(
+                    offset=self._last_update_id,
+                    timeout=timeout,
+                    read_timeout=read_timeout,
+                    connect_timeout=connect_timeout,
+                    write_timeout=write_timeout,
+                    pool_timeout=pool_timeout,
+                    allowed_updates=allowed_updates,
+                )
+            except TelegramError as exc:
+                # TelegramErrors should be processed by the network retry loop
+                raise exc
+            except Exception as exc:
+                # Other exceptions should not. Let's log them for now.
+                self._logger.critical(
+                    'Something went wrong processing the data received from Telegram. '
+                    'Received data was *not* processed!',
+                    exc_info=exc,
+                )
+                return True
 
             if updates:
                 if not self.running:

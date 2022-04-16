@@ -232,13 +232,17 @@ class ConversationHandler(Handler[Update, CCT]):
         map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
             used to instruct a child conversation handler to transition into a mapped state on
             its parent conversation handler in place of a specified nested state.
-        block (:obj:`bool`, optional): Pass :obj:`False` or :obj:`True` to *overrule* the
-            :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
-            :attr:`states` and :attr:`fallbacks`).
-            By default the handlers setting and :attr:`telegram.ext.Defaults.block` will be
-            respected (in that order).
+        block (:obj:`bool`, optional): Pass :obj:`False` or :obj:`True` to set a default value for
+            the :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
+            :attr:`states` and :attr:`fallbacks`). The resolution order for checking if a handler
+            should be run non-blocking is:
 
-            .. versionadded:: 13.2
+            1. :attr:`telegram.ext.Handler.block` (if set)
+            2. the value passed to this parameter (if any)
+            3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
+
+            .. versionchanged:: 14.0
+                No longer overrides the handlers settings. Resolution order was changed.
 
     Raises:
         :exc:`ValueError`: If :paramref:`persistent` is used but :paramref:`name` was not set, or
@@ -247,8 +251,6 @@ class ConversationHandler(Handler[Update, CCT]):
     Attributes:
         block (:obj:`bool`): Determines whether the callback will run asynchronously. Always
             :obj:`True` since conversation handlers handle any non-blocking callbacks internally.
-
-            .. versionadded:: 13.2
 
     """
 
@@ -364,9 +366,6 @@ class ConversationHandler(Handler[Update, CCT]):
         # this loop is going to warn the user about handlers which can work unexpectedly
         # in conversations
         for handler in all_handlers:
-            if self.block:
-                handler.block = True
-
             if isinstance(handler, (StringCommandHandler, StringRegexHandler)):
                 warn(
                     "The `ConversationHandler` only handles updates of type `telegram.Update`. "
@@ -531,7 +530,7 @@ class ConversationHandler(Handler[Update, CCT]):
     @property
     def persistent(self) -> bool:
         """:obj:`bool`: Optional. If the conversations dict for this handler should be
-        saved. :attr:`name` is required and persistence has to be set in 
+        saved. :attr:`name` is required and persistence has to be set in
         :attr:`Application <.Application.persistence>`.
         """
         return self._persistent
@@ -621,7 +620,8 @@ class ConversationHandler(Handler[Update, CCT]):
                 raise RuntimeError("Can't build key for update without CallbackQuery!")
             if update.callback_query.inline_message_id:
                 key.append(update.callback_query.inline_message_id)
-            key.append(update.callback_query.message.message_id)  # type: ignore[union-attr]
+            else:
+                key.append(update.callback_query.message.message_id)  # type: ignore[union-attr]
 
         return tuple(key)
 
@@ -790,15 +790,14 @@ class ConversationHandler(Handler[Update, CCT]):
                 timeout_job.schedule_removal()
 
         # Resolution order of "block":
-        # 1. Setting of the ConversationHandler
-        # 2. Setting of the selected handler
+        # 1. Setting of the selected handler
+        # 2. Setting of the ConversationHandler
         # 3. Default values of the bot
-        if self._block is not DEFAULT_TRUE:
-            # CHs block-setting has the highest priority
-            block = self._block
+        if handler.block is not DEFAULT_TRUE:
+            block = handler.block
         else:
-            if handler.block is not DEFAULT_TRUE:
-                block = handler.block
+            if self._block is not DEFAULT_TRUE:
+                block = self._block
             elif isinstance(application.bot, ExtBot) and application.bot.defaults is not None:
                 block = application.bot.defaults.block
             else:
@@ -821,7 +820,16 @@ class ConversationHandler(Handler[Update, CCT]):
             raise_dp_handler_stop = True
         async with self._timeout_jobs_lock:
             if self.conversation_timeout:
-                if application.job_queue is not None:
+                if application.job_queue is None:
+                    warn(
+                        "Ignoring `conversation_timeout` because the Application has no JobQueue.",
+                    )
+                elif not application.job_queue.scheduler.running:
+                    warn(
+                        "Ignoring `conversation_timeout` because the Applications JobQueue is "
+                        "not running.",
+                    )
+                else:
                     # Add the new timeout job
                     # checking if the new state is self.END is done in _schedule_job
                     if isinstance(new_state, asyncio.Task):
@@ -835,10 +843,6 @@ class ConversationHandler(Handler[Update, CCT]):
                         self._schedule_job(
                             new_state, application, update, context, conversation_key
                         )
-                else:
-                    warn(
-                        "Ignoring `conversation_timeout` because the Application has no JobQueue.",
-                    )
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
             self._update_state(self.END, conversation_key)

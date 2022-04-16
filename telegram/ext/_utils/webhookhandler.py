@@ -125,7 +125,15 @@ class TelegramHandler(tornado.web.RequestHandler):
         self.set_status(HTTPStatus.OK)
         self._logger.debug('Webhook received data: %s', json_string)
 
-        update = Update.de_json(data, self.bot)
+        try:
+            update = Update.de_json(data, self.bot)
+        except Exception as exc:
+            self._logger.critical(
+                'Something went wrong processing the data received from Telegram. '
+                'Received data was *not* processed!',
+                exc_info=exc,
+            )
+
         if update:
             self._logger.debug('Received Update with ID %d on Webhook', update.update_id)
 
