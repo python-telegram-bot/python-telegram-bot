@@ -597,7 +597,8 @@ class ConversationHandler(Handler[Update, CCT]):
                 raise RuntimeError("Can't build key for update without CallbackQuery!")
             if update.callback_query.inline_message_id:
                 key.append(update.callback_query.inline_message_id)
-            key.append(update.callback_query.message.message_id)  # type: ignore[union-attr]
+            else:
+                key.append(update.callback_query.message.message_id)  # type: ignore[union-attr]
 
         return tuple(key)
 
