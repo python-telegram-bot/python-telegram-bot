@@ -86,9 +86,6 @@ def raise_ahs(func):
 class TestConversationHandler:
     """Persistence of conversations is tested in test_basepersistence.py"""
 
-    # TODO
-    #  * Test the blocking/non-blocking behavior including the different resolution orders
-
     # State definitions
     # At first we're thirsty.  Then we brew coffee, we drink it
     # and then we can start coding!
@@ -290,6 +287,16 @@ class TestConversationHandler:
             ConversationHandler(
                 self.entry_points, states=self.states, fallbacks=[], persistent=True
             )
+
+    @pytest.mark.asyncio
+    async def test_check_update_returns_non(self, app, user1):
+        """checks some cases where updates should not be handled"""
+        conv_handler = ConversationHandler([], {}, [], per_message=True, per_chat=True)
+        assert not conv_handler.check_update('not an Update')
+        assert not conv_handler.check_update(Update(0))
+        assert not conv_handler.check_update(
+            Update(0, callback_query=CallbackQuery('1', from_user=user1, chat_instance='1'))
+        )
 
     @pytest.mark.asyncio
     async def test_handlers_generate_warning(self, recwarn):
@@ -766,7 +773,9 @@ class TestConversationHandler:
             assert handler.check_update(Update(update_id=0, message=message))
 
     @pytest.mark.asyncio
-    async def test_conversation_handler_per_message(self, app, bot, user1, user2):
+    @pytest.mark.parametrize('inline', [True, False])
+    @pytest.mark.filterwarnings("ignore: If 'per_message=True' is used, 'per_chat=True'")
+    async def test_conversation_handler_per_message(self, app, bot, user1, user2, inline):
         async def entry(update, context):
             return 1
 
@@ -784,17 +793,37 @@ class TestConversationHandler:
             },
             fallbacks=[],
             per_message=True,
+            per_chat=not inline,
         )
         app.add_handler(handler)
 
         # User one, starts the state machine.
-        message = Message(
-            0, None, self.group, from_user=user1, text='msg w/ inlinekeyboard', bot=bot
+        message = (
+            Message(0, None, self.group, from_user=user1, text='msg w/ inlinekeyboard', bot=bot)
+            if not inline
+            else None
         )
+        inline_message_id = '42' if inline else None
 
         async with app:
-            cbq_1 = CallbackQuery(0, user1, None, message=message, data='1', bot=bot)
-            cbq_2 = CallbackQuery(0, user1, None, message=message, data='2', bot=bot)
+            cbq_1 = CallbackQuery(
+                0,
+                user1,
+                None,
+                message=message,
+                data='1',
+                bot=bot,
+                inline_message_id=inline_message_id,
+            )
+            cbq_2 = CallbackQuery(
+                0,
+                user1,
+                None,
+                message=message,
+                data='2',
+                bot=bot,
+                inline_message_id=inline_message_id,
+            )
             await app.process_update(Update(update_id=0, callback_query=cbq_1))
 
             # Make sure that we're in the correct state
@@ -1900,6 +1929,73 @@ class TestConversationHandler:
             assert not self.test_flag
 
     @pytest.mark.asyncio
+    @pytest.mark.parametrize('callback_raises', [True, False])
+    async def test_timeout_non_block(self, app, user1, callback_raises):
+        event = asyncio.Event()
+
+        async def callback(_, __):
+            await event.wait()
+            if callback_raises:
+                raise RuntimeError
+            return 1
+
+        conv_handler = ConversationHandler(
+            entry_points=[MessageHandler(filters.ALL, callback=callback, block=False)],
+            states={ConversationHandler.TIMEOUT: [TypeHandler(Update, self.passout2)]},
+            fallbacks=[],
+            conversation_timeout=0.5,
+        )
+        app.add_handler(conv_handler)
+
+        async with app:
+            await app.start()
+
+            message = Message(
+                0,
+                None,
+                self.group,
+                text='/start',
+                from_user=user1,
+            )
+            assert conv_handler.check_update(Update(0, message=message))
+            await app.process_update(Update(0, message=message))
+            await asyncio.sleep(0.7)
+            assert not self.is_timeout
+            event.set()
+            await asyncio.sleep(0.7)
+            assert self.is_timeout == (not callback_raises)
+
+            await app.stop()
+
+    @pytest.mark.asyncio
+    async def test_no_timeout_on_end(self, app, user1):
+
+        conv_handler = ConversationHandler(
+            entry_points=[MessageHandler(filters.ALL, callback=self.start_end)],
+            states={ConversationHandler.TIMEOUT: [TypeHandler(Update, self.passout2)]},
+            fallbacks=[],
+            conversation_timeout=0.5,
+        )
+        app.add_handler(conv_handler)
+
+        async with app:
+            await app.start()
+
+            message = Message(
+                0,
+                None,
+                self.group,
+                text='/start',
+                from_user=user1,
+            )
+            assert conv_handler.check_update(Update(0, message=message))
+            await app.process_update(Update(0, message=message))
+            await asyncio.sleep(0.7)
+            assert not self.is_timeout
+
+            await app.stop()
+
+    @pytest.mark.asyncio
     async def test_conversation_handler_block_dont_override(self, app):
         """This just makes sure that we don't change any attributes of the handlers of the conv"""
         conv_handler = ConversationHandler(
@@ -2017,3 +2113,56 @@ class TestConversationHandler:
                 assert process_update_task.done()
                 assert self.test_flag
                 self.test_flag = False
+
+    @pytest.mark.asyncio
+    async def test_waiting_state(self, app, user1):
+        event = asyncio.Event()
+
+        async def callback_1(_, __):
+            self.test_flag = 1
+
+        async def callback_2(_, __):
+            self.test_flag = 2
+
+        async def callback_3(_, __):
+            self.test_flag = 3
+
+        async def blocking(_, __):
+            await event.wait()
+            return 1
+
+        conv_handler = ConversationHandler(
+            entry_points=[MessageHandler(filters.ALL, callback=blocking, block=False)],
+            states={
+                ConversationHandler.WAITING: [
+                    MessageHandler(filters.Regex('1'), callback_1),
+                    MessageHandler(filters.Regex('2'), callback_2),
+                ],
+                1: [MessageHandler(filters.Regex('2'), callback_3)],
+            },
+            fallbacks=[],
+        )
+        app.add_handler(conv_handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            text='/start',
+            from_user=user1,
+        )
+
+        async with app:
+            await app.process_update(Update(0, message=message))
+            assert not self.test_flag
+            message.text = '1'
+            await app.process_update(Update(0, message=message))
+            assert self.test_flag == 1
+            message.text = '2'
+            await app.process_update(Update(0, message=message))
+            assert self.test_flag == 2
+            event.set()
+            await asyncio.sleep(0.05)
+            self.test_flag = None
+            await app.process_update(Update(0, message=message))
+            assert self.test_flag == 3
