@@ -35,6 +35,7 @@ from telegram import (
     ChosenInlineResult,
     ShippingQuery,
     PreCheckoutQuery,
+    Bot,
 )
 from telegram.ext import (
     ConversationHandler,
@@ -54,8 +55,12 @@ from telegram.ext import (
     InlineQueryHandler,
     PollAnswerHandler,
     ChosenInlineResultHandler,
+    Defaults,
+    ApplicationBuilder,
+    ExtBot,
 )
 from telegram.warnings import PTBUserWarning
+from tests.conftest import make_command_message
 
 
 @pytest.fixture(scope='class')
@@ -82,9 +87,7 @@ class TestConversationHandler:
     """Persistence of conversations is tested in test_basepersistence.py"""
 
     # TODO
-    #  * Test that we have a warning when conversation timeout is scheduled with non-running JQ
     #  * Test the blocking/non-blocking behavior including the different resolution orders
-    #  * test AppHandlerStop with non-nested conversations
 
     # State definitions
     # At first we're thirsty.  Then we brew coffee, we drink it
@@ -282,6 +285,12 @@ class TestConversationHandler:
         assert ch.name == 'name'
         assert ch.allow_reentry == 'allow_reentry'
 
+    def test_init_persistent_no_name(self):
+        with pytest.raises(ValueError, match="can't be persistent when handler is unnamed"):
+            ConversationHandler(
+                self.entry_points, states=self.states, fallbacks=[], persistent=True
+            )
+
     @pytest.mark.asyncio
     async def test_handlers_generate_warning(self, recwarn):
         """this function tests all handler + per_* setting combinations."""
@@ -293,6 +302,8 @@ class TestConversationHandler:
         # this class doesn't do anything, its just not the Update class
         class NotUpdate:
             pass
+
+        recwarn.clear()
 
         # this conversation handler has the string, string_regex, Pollhandler and TypeHandler
         # which should all generate a warning no matter the per_* setting. TypeHandler should
@@ -479,11 +490,18 @@ class TestConversationHandler:
             )
 
     @pytest.mark.asyncio
-    async def test_conversation_handler(self, app, bot, user1, user2):
+    @pytest.mark.parametrize('raise_ahs', [True, False])
+    async def test_basic_and_app_handler_stop(self, app, bot, user1, user2, raise_ahs):
         handler = ConversationHandler(
             entry_points=self.entry_points, states=self.states, fallbacks=self.fallbacks
         )
         app.add_handler(handler)
+
+        async def callback(_, __):
+            self.test_flag = True
+
+        app.add_handler(TypeHandler(object, callback), group=100)
+        self.raise_app_handler_stop = raise_ahs
 
         # User one, starts the state machine.
         message = Message(
@@ -500,24 +518,29 @@ class TestConversationHandler:
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
+            assert self.test_flag == (not raise_ahs)
 
             # The user is thirsty and wants to brew coffee.
             message.text = '/brew'
             message.entities[0].length = len('/brew')
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.BREWING
+            assert self.test_flag == (not raise_ahs)
 
             # Lets see if an invalid command makes sure, no state is changed.
             message.text = '/nothing'
             message.entities[0].length = len('/nothing')
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.BREWING
+            assert self.test_flag is True
+            self.test_flag = False
 
             # Lets see if the state machine still works by pouring coffee.
             message.text = '/pourCoffee'
             message.entities[0].length = len('/pourCoffee')
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.DRINKING
+            assert self.test_flag == (not raise_ahs)
 
             # Let's now verify that for another user, who did not start yet,
             # the state has not been changed.
@@ -1876,38 +1899,121 @@ class TestConversationHandler:
             assert handler.check_update(Update(0, message=message))
             assert not self.test_flag
 
-    # TODO
-    # @pytest.mark.asyncio
-    # async def test_conversation_handler_run_async_true(self, app):
-    #     conv_handler = ConversationHandler(
-    #         entry_points=self.entry_points,
-    #         states=self.states,
-    #         fallbacks=self.fallbacks,
-    #         block=False,
-    #     )
-    #
-    #     all_handlers = conv_handler.entry_points + conv_handler.fallbacks
-    #     for state_handlers in conv_handler.states.values():
-    #         all_handlers += state_handlers
-    #
-    #     for handler in all_handlers:
-    #         assert handler.run_async
-    #
-    # @pytest.mark.asyncio
-    # async def test_conversation_handler_run_async_false(self, app):
-    #     conv_handler = ConversationHandler(
-    #         entry_points=[CommandHandler('start', self.start_end, block=False)],
-    #         states=self.states,
-    #         fallbacks=self.fallbacks,
-    #         run_async=False,
-    #     )
-    #
-    #     for handler in conv_handler.entry_points:
-    #         assert handler.run_async
-    #
-    #     all_handlers = conv_handler.fallbacks
-    #     for state_handlers in conv_handler.states.values():
-    #         all_handlers += state_handlers
-    #
-    #     for handler in all_handlers:
-    #         assert not handler.run_async.value
+    @pytest.mark.asyncio
+    async def test_conversation_handler_block_dont_override(self, app):
+        """This just makes sure that we don't change any attributes of the handlers of the conv"""
+        conv_handler = ConversationHandler(
+            entry_points=self.entry_points,
+            states=self.states,
+            fallbacks=self.fallbacks,
+            block=False,
+        )
+
+        all_handlers = conv_handler.entry_points + conv_handler.fallbacks
+        for state_handlers in conv_handler.states.values():
+            all_handlers += state_handlers
+
+        for handler in all_handlers:
+            assert handler.block
+
+        conv_handler = ConversationHandler(
+            entry_points=[CommandHandler('start', self.start_end, block=False)],
+            states={1: [CommandHandler('start', self.start_end, block=False)]},
+            fallbacks=[CommandHandler('start', self.start_end, block=False)],
+            block=True,
+        )
+
+        all_handlers = conv_handler.entry_points + conv_handler.fallbacks
+        for state_handlers in conv_handler.states.values():
+            all_handlers += state_handlers
+
+        for handler in all_handlers:
+            assert handler.block is False
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('default_block', [True, False, None])
+    @pytest.mark.parametrize('ch_block', [True, False, None])
+    @pytest.mark.parametrize('handler_block', [True, False, None])
+    @pytest.mark.parametrize('ext_bot', [True, False], ids=['ExtBot', 'Bot'])
+    async def test_blocking_resolution_order(
+        self, bot, default_block, ch_block, handler_block, ext_bot
+    ):
+
+        event = asyncio.Event()
+
+        async def callback(_, __):
+            await event.wait()
+            event.clear()
+            self.test_flag = True
+            return 1
+
+        if handler_block is not None:
+            handler = CommandHandler('start', callback=callback, block=handler_block)
+            fallback = MessageHandler(filters.ALL, callback, block=handler_block)
+        else:
+            handler = CommandHandler('start', callback=callback)
+            fallback = MessageHandler(filters.ALL, callback, block=handler_block)
+
+        if default_block is not None:
+            defaults = Defaults(block=default_block)
+        else:
+            defaults = None
+
+        if ch_block is not None:
+            conv_handler = ConversationHandler(
+                entry_points=[handler],
+                states={1: [handler]},
+                fallbacks=[fallback],
+                block=ch_block,
+            )
+        else:
+            conv_handler = ConversationHandler(
+                entry_points=[handler],
+                states={1: [handler]},
+                fallbacks=[fallback],
+            )
+
+        bot = ExtBot(bot.token, defaults=defaults) if ext_bot else Bot(bot.token)
+        app = ApplicationBuilder().bot(bot).build()
+        app.add_handler(conv_handler)
+
+        async with app:
+            start_message = make_command_message('/start', bot=bot)
+            fallback_message = make_command_message('/fallback', bot=bot)
+
+            # This loop makes sure that we test all of entry points, states handler & fallbacks
+            for message in [start_message, start_message, fallback_message]:
+                process_update_task = asyncio.create_task(
+                    app.process_update(Update(0, message=message))
+                )
+                if (
+                    # resolution order is handler_block -> ch_block -> default_block
+                    # setting block=True/False on a lower priority setting may only have an effect
+                    # if it wasn't set for the higher priority settings
+                    (handler_block is False)
+                    or ((handler_block is None) and (ch_block is False))
+                    or (
+                        (handler_block is None)
+                        and (ch_block is None)
+                        and ext_bot
+                        and (default_block is False)
+                    )
+                ):
+                    # check that the handler was called non-blocking by checking that
+                    # `process_update` has finished
+                    await asyncio.sleep(0.01)
+                    assert process_update_task.done()
+                else:
+                    # the opposite
+                    assert not process_update_task.done()
+
+                # In any case, the callback must not have finished
+                assert not self.test_flag
+
+                # After setting the event, the callback must have finished and in the blocking
+                # case this leads to `process_update` finishing.
+                event.set()
+                await asyncio.sleep(0.01)
+                assert process_update_task.done()
+                assert self.test_flag
+                self.test_flag = False
