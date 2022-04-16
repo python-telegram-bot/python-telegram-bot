@@ -216,15 +216,17 @@ class ConversationHandler(Handler[Update, CCT]):
         map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
             used to instruct a nested conversation handler to transition into a mapped state on
             its parent conversation handler in place of a specified nested state.
-        block (:obj:`bool`, optional): Pass :obj:`False` to *overrule* the
+        block (:obj:`bool`, optional): Pass :obj:`False` to set a default value for the
             :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
-            :attr:`states` and :attr:`fallbacks`).
-            By default the handlers setting and :attr:`telegram.ext.Defaults.block` will be
-            respected (in that order).
+            :attr:`states` and :attr:`fallbacks`). The resolution order for checking if a handler
+            should be run non-blocking is:
 
-            .. versionadded:: 13.2
+                1. :attr:`telegram.ext.Handler.block` (if set)
+                2. the value passed to this parameter (if any)
+                3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
+
             .. versionchanged:: 14.0
-                No longer *overrides* the handlers settings.
+                No longer overrides the handlers settings. Resolution order was changed.
 
     Raises:
         ValueError
@@ -232,8 +234,6 @@ class ConversationHandler(Handler[Update, CCT]):
     Attributes:
         block (:obj:`bool`): Determines whether the callback will run asynchronously. Always
             :obj:`True` since conversation handlers handle any non-blocking callbacks internally.
-
-            .. versionadded:: 13.2
 
     """
 
@@ -346,9 +346,6 @@ class ConversationHandler(Handler[Update, CCT]):
         )
 
         for handler in all_handlers:
-            if self.block:
-                handler.block = True
-
             if isinstance(handler, (StringCommandHandler, StringRegexHandler)):
                 warn(
                     "The `ConversationHandler` only handles updates of type `telegram.Update`. "
@@ -768,15 +765,14 @@ class ConversationHandler(Handler[Update, CCT]):
                 timeout_job.schedule_removal()
 
         # Resolution order of "block":
-        # 1. Setting of the ConversationHandler
-        # 2. Setting of the selected handler
+        # 1. Setting of the selected handler
+        # 2. Setting of the ConversationHandler
         # 3. Default values of the bot
-        if self._block is not DEFAULT_TRUE:
-            # CHs block-setting has highest priority
-            block = self._block
+        if handler.block is not DEFAULT_TRUE:
+            block = handler.block
         else:
-            if handler.block is not DEFAULT_TRUE:
-                block = handler.block
+            if self._block is not DEFAULT_TRUE:
+                block = self._block
             elif isinstance(application.bot, ExtBot) and application.bot.defaults is not None:
                 block = application.bot.defaults.block
             else:
