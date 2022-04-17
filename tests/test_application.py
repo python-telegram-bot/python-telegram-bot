@@ -1662,13 +1662,9 @@ class TestApplication:
         reason="Only really relevant on windows",
     )
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
+    @pytest.mark.filterwarnings("ignore:was never awaited")
     @pytest.mark.asyncio
-    async def test_run_stop_signal_warning_windows(self, bot, method, monkeypatch):
-        async def raise_method(*args, **kwargs):
-            raise RuntimeError('Test Exception')
-
-        # monkeypatch.setattr(Updater, method, raise_method)
-        app = ApplicationBuilder().token(bot.token).build()
+    async def test_run_stop_signal_warning_windows(self, app, method):
         with pytest.raises(
             PTBUserWarning, match='Could not add signal handlers for the stop signals'
         ) as exc_info:
