@@ -4,7 +4,6 @@ on:
     branches:
       - master
       - v14
-      - asyncio
   push:
     branches: 
       - master

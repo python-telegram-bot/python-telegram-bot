@@ -310,7 +310,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.leave_chat(update.effective_chat.id, *args, **kwargs)
+             await bot.leave_chat(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.leave_chat`.
 
@@ -337,7 +337,7 @@ class Chat(TelegramObject):
     ) -> List['ChatMember']:
         """Shortcut for::
 
-            bot.get_chat_administrators(update.effective_chat.id, *args, **kwargs)
+             await bot.get_chat_administrators(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_chat_administrators`.
@@ -368,7 +368,7 @@ class Chat(TelegramObject):
     ) -> int:
         """Shortcut for::
 
-            bot.get_chat_member_count(update.effective_chat.id, *args, **kwargs)
+             await bot.get_chat_member_count(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_chat_member_count`.
@@ -396,7 +396,7 @@ class Chat(TelegramObject):
     ) -> 'ChatMember':
         """Shortcut for::
 
-            bot.get_chat_member(update.effective_chat.id, *args, **kwargs)
+             await bot.get_chat_member(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.get_chat_member`.
 
@@ -427,7 +427,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.ban_chat_member(update.effective_chat.id, *args, **kwargs)
+             await bot.ban_chat_member(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.ban_chat_member`.
@@ -458,7 +458,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.ban_chat_sender_chat(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.ban_chat_sender_chat(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.ban_chat_sender_chat`.
@@ -490,7 +490,11 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.ban_chat_sender_chat(sender_chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.ban_chat_sender_chat(
+                 sender_chat_id=update.effective_chat.id,
+                 *args,
+                 **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.ban_chat_sender_chat`.
@@ -522,7 +526,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.unban_chat_sender_chat(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.unban_chat_sender_chat(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.unban_chat_sender_chat`.
@@ -554,7 +558,11 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.unban_chat_sender_chat(sender_chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.unban_chat_sender_chat(
+                 sender_chat_id=update.effective_chat.id,
+                 *args,
+                 **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.unban_chat_sender_chat`.
@@ -587,7 +595,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.unban_chat_member(update.effective_chat.id, *args, **kwargs)
+             await bot.unban_chat_member(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unban_chat_member`.
 
@@ -628,7 +636,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.promote_chat_member(update.effective_chat.id, *args, **kwargs)
+             await bot.promote_chat_member(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.promote_chat_member`.
@@ -673,7 +681,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.restrict_chat_member(update.effective_chat.id, *args, **kwargs)
+             await bot.restrict_chat_member(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.restrict_chat_member`.
@@ -707,7 +715,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.set_chat_permissions(update.effective_chat.id, *args, **kwargs)
+             await bot.set_chat_permissions(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_permissions`.
@@ -738,7 +746,11 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.set_chat_administrator_custom_title(update.effective_chat.id, *args, **kwargs)
+             await bot.set_chat_administrator_custom_title(
+                 update.effective_chat.id,
+                 *args,
+                 **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_administrator_custom_title`.
@@ -770,7 +782,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             bot.pin_chat_message(chat_id=update.effective_chat.id,
+              await bot.pin_chat_message(chat_id=update.effective_chat.id,
                                   *args,
                                   **kwargs)
 
@@ -803,7 +815,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             bot.unpin_chat_message(chat_id=update.effective_chat.id,
+              await bot.unpin_chat_message(chat_id=update.effective_chat.id,
                                     *args,
                                     **kwargs)
 
@@ -834,7 +846,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             bot.unpin_all_chat_messages(chat_id=update.effective_chat.id,
+              await bot.unpin_all_chat_messages(chat_id=update.effective_chat.id,
                                          *args,
                                          **kwargs)
 
@@ -873,7 +885,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_chat.id, *args, **kwargs)
+             await bot.send_message(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
@@ -916,7 +928,7 @@ class Chat(TelegramObject):
     ) -> List['Message']:
         """Shortcut for::
 
-            bot.send_media_group(update.effective_chat.id, *args, **kwargs)
+             await bot.send_media_group(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
@@ -949,7 +961,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.send_chat_action(update.effective_chat.id, *args, **kwargs)
+             await bot.send_chat_action(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
@@ -990,7 +1002,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_photo(update.effective_chat.id, *args, **kwargs)
+             await bot.send_photo(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
@@ -1037,7 +1049,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_contact(update.effective_chat.id, *args, **kwargs)
+             await bot.send_contact(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
@@ -1088,7 +1100,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_audio(update.effective_chat.id, *args, **kwargs)
+             await bot.send_audio(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
@@ -1141,7 +1153,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_document(update.effective_chat.id, *args, **kwargs)
+             await bot.send_document(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
@@ -1186,7 +1198,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_dice(update.effective_chat.id, *args, **kwargs)
+             await bot.send_dice(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
@@ -1225,7 +1237,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_game(update.effective_chat.id, *args, **kwargs)
+             await bot.send_game(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
@@ -1284,7 +1296,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_invoice(update.effective_chat.id, *args, **kwargs)
+             await bot.send_invoice(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
@@ -1357,7 +1369,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_location(update.effective_chat.id, *args, **kwargs)
+             await bot.send_location(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
@@ -1410,7 +1422,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_animation(update.effective_chat.id, *args, **kwargs)
+             await bot.send_animation(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
@@ -1457,7 +1469,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_sticker(update.effective_chat.id, *args, **kwargs)
+             await bot.send_sticker(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
@@ -1504,7 +1516,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_venue(update.effective_chat.id, *args, **kwargs)
+             await bot.send_venue(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
@@ -1560,7 +1572,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_video(update.effective_chat.id, *args, **kwargs)
+             await bot.send_video(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
@@ -1612,7 +1624,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_video_note(update.effective_chat.id, *args, **kwargs)
+             await bot.send_video_note(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
@@ -1660,7 +1672,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_voice(update.effective_chat.id, *args, **kwargs)
+             await bot.send_voice(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
@@ -1716,7 +1728,7 @@ class Chat(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_poll(update.effective_chat.id, *args, **kwargs)
+             await bot.send_poll(update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
@@ -1770,7 +1782,7 @@ class Chat(TelegramObject):
     ) -> 'MessageId':
         """Shortcut for::
 
-            bot.copy_message(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.copy_message(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
@@ -1817,7 +1829,7 @@ class Chat(TelegramObject):
     ) -> 'MessageId':
         """Shortcut for::
 
-            bot.copy_message(from_chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.copy_message(from_chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
@@ -1854,7 +1866,7 @@ class Chat(TelegramObject):
     ) -> str:
         """Shortcut for::
 
-            bot.export_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.export_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.export_chat_invite_link`.
@@ -1888,7 +1900,7 @@ class Chat(TelegramObject):
     ) -> 'ChatInviteLink':
         """Shortcut for::
 
-            bot.create_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.create_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.create_chat_invite_link`.
@@ -1931,7 +1943,7 @@ class Chat(TelegramObject):
     ) -> 'ChatInviteLink':
         """Shortcut for::
 
-            bot.edit_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.edit_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_chat_invite_link`.
@@ -1970,7 +1982,7 @@ class Chat(TelegramObject):
     ) -> 'ChatInviteLink':
         """Shortcut for::
 
-            bot.revoke_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.revoke_chat_invite_link(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.revoke_chat_invite_link`.
@@ -2002,7 +2014,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.approve_chat_join_request(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.approve_chat_join_request(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.approve_chat_join_request`.
@@ -2034,7 +2046,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.decline_chat_join_request(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.decline_chat_join_request(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.decline_chat_join_request`.

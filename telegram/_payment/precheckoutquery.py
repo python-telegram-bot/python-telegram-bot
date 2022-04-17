@@ -126,7 +126,7 @@ class PreCheckoutQuery(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
+             await bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.answer_pre_checkout_query`.

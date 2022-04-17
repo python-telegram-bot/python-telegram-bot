@@ -156,7 +156,7 @@ class CallbackQuery(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.answer_callback_query(update.callback_query.id, *args, **kwargs)
+             await bot.answer_callback_query(update.callback_query.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.answer_callback_query`.

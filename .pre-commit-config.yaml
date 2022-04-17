@@ -45,7 +45,7 @@ repos:
           - tornado>=6.1
           - APScheduler==3.6.3
           - cachetools==4.2.2
-          - . # this basically does `pip install -e .`n
+          - . # this basically does `pip install -e .`
     - id: mypy
       name: mypy-examples
       files: ^examples/.*\.py$

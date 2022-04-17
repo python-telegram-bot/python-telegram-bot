@@ -176,7 +176,7 @@ class User(TelegramObject):
         """
         Shortcut for::
 
-            bot.get_user_profile_photos(update.effective_user.id, *args, **kwargs)
+             await bot.get_user_profile_photos(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_user_profile_photos`.
@@ -265,7 +265,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             bot.pin_chat_message(chat_id=update.effective_user.id,
+              await bot.pin_chat_message(chat_id=update.effective_user.id,
                                   *args,
                                   **kwargs)
 
@@ -297,7 +297,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             bot.unpin_chat_message(chat_id=update.effective_user.id,
+              await bot.unpin_chat_message(chat_id=update.effective_user.id,
                                     *args,
                                     **kwargs)
 
@@ -327,7 +327,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             bot.unpin_all_chat_messages(chat_id=update.effective_user.id,
+              await bot.unpin_all_chat_messages(chat_id=update.effective_user.id,
                                          *args,
                                          **kwargs)
 
@@ -366,7 +366,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_user.id, *args, **kwargs)
+             await bot.send_message(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
@@ -412,7 +412,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_photo(update.effective_user.id, *args, **kwargs)
+             await bot.send_photo(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
@@ -456,7 +456,7 @@ class User(TelegramObject):
     ) -> List['Message']:
         """Shortcut for::
 
-            bot.send_media_group(update.effective_user.id, *args, **kwargs)
+             await bot.send_media_group(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
@@ -502,7 +502,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_audio(update.effective_user.id, *args, **kwargs)
+             await bot.send_audio(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
@@ -544,7 +544,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.send_chat_action(update.effective_user.id, *args, **kwargs)
+             await bot.send_chat_action(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
@@ -585,7 +585,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_contact(update.effective_user.id, *args, **kwargs)
+             await bot.send_contact(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
@@ -628,7 +628,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_dice(update.effective_user.id, *args, **kwargs)
+             await bot.send_dice(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
@@ -673,7 +673,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_document(update.effective_user.id, *args, **kwargs)
+             await bot.send_document(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
@@ -718,7 +718,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_game(update.effective_user.id, *args, **kwargs)
+             await bot.send_game(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
@@ -777,7 +777,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_invoice(update.effective_user.id, *args, **kwargs)
+             await bot.send_invoice(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
@@ -850,7 +850,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_location(update.effective_user.id, *args, **kwargs)
+             await bot.send_location(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
@@ -903,7 +903,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_animation(update.effective_user.id, *args, **kwargs)
+             await bot.send_animation(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
@@ -950,7 +950,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_sticker(update.effective_user.id, *args, **kwargs)
+             await bot.send_sticker(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
@@ -998,7 +998,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_video(update.effective_user.id, *args, **kwargs)
+             await bot.send_video(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
@@ -1054,7 +1054,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_venue(update.effective_user.id, *args, **kwargs)
+             await bot.send_venue(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
@@ -1105,7 +1105,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_video_note(update.effective_user.id, *args, **kwargs)
+             await bot.send_video_note(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
@@ -1153,7 +1153,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_voice(update.effective_user.id, *args, **kwargs)
+             await bot.send_voice(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
@@ -1209,7 +1209,7 @@ class User(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_poll(update.effective_user.id, *args, **kwargs)
+             await bot.send_poll(update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
@@ -1263,7 +1263,7 @@ class User(TelegramObject):
     ) -> 'MessageId':
         """Shortcut for::
 
-            bot.copy_message(chat_id=update.effective_user.id, *args, **kwargs)
+             await bot.copy_message(chat_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
@@ -1310,7 +1310,7 @@ class User(TelegramObject):
     ) -> 'MessageId':
         """Shortcut for::
 
-            bot.copy_message(from_chat_id=update.effective_user.id, *args, **kwargs)
+             await bot.copy_message(from_chat_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
@@ -1348,7 +1348,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.approve_chat_join_request(user_id=update.effective_user.id, *args, **kwargs)
+             await bot.approve_chat_join_request(user_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.approve_chat_join_request`.
@@ -1380,7 +1380,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.decline_chat_join_request(user_id=update.effective_user.id, *args, **kwargs)
+             await bot.decline_chat_join_request(user_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.decline_chat_join_request`.

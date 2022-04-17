@@ -35,13 +35,19 @@ logger = logging.getLogger(__name__)
 class InputFile:
     """This object represents a Telegram InputFile.
 
+    .. versionchanged:: 14.0
+        The former attribute ``attach`` was renamed to :attr:`attach_name`.
+
     Args:
-        obj (:term:`file object` | :obj:`bytes`): An open file descriptor or the files content as
-            bytes.
+        obj (:term:`file object` | :obj:`bytes` | :obj:`str`): An open file descriptor or the files
+            content as bytes or string.
 
             Note:
                 If :paramref:`obj` is a string, it will be encoded as bytes via
                 :external:obj:`obj.encode('utf-8') <str.encode>`.
+
+            .. versionchanged:: 14.0
+                Accept string input.
         filename (:obj:`str`, optional): Filename for this InputFile.
 
     Attributes:

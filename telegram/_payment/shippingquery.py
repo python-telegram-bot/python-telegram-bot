@@ -100,7 +100,7 @@ class ShippingQuery(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.answer_shipping_query(update.shipping_query.id, *args, **kwargs)
+             await bot.answer_shipping_query(update.shipping_query.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.answer_shipping_query`.

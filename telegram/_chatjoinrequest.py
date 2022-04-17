@@ -119,7 +119,7 @@ class ChatJoinRequest(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.approve_chat_join_request(chat_id=update.effective_chat.id,
+             await bot.approve_chat_join_request(chat_id=update.effective_chat.id,
             user_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
@@ -149,7 +149,7 @@ class ChatJoinRequest(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            bot.decline_chat_join_request(chat_id=update.effective_chat.id,
+             await bot.decline_chat_join_request(chat_id=update.effective_chat.id,
             user_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see

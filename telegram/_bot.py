@@ -364,7 +364,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def initialize(self) -> None:
         """Initialize resources used by this class. Currently calls :meth:`get_me` to
         cache :attr:`bot` and calls :meth:`telegram.request.BaseRequest.initialize` for
-        :attr:`request`.
+        the request objects used by this bot.
+
+        .. versionadded:: 14.0
         """
         if self._initialized:
             self._logger.debug('This Bot is already initialized.')
@@ -377,6 +379,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def shutdown(self) -> None:
         """Stop & clear resources used by this class. Currently just calls
         :meth:`telegram.request.BaseRequest.shutdown` for the request objects used by this bot.
+
+        .. versionadded:: 14.0
         """
         if not self._initialized:
             self._logger.debug('This Bot is already shut down. Returning.')
