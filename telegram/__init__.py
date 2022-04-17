@@ -141,6 +141,7 @@ __all__ = (  # Keep this alphabetically ordered
     'ResidentialAddress',
     'SecureData',
     'SecureValue',
+    'SentWebAppMessage',
     'ShippingAddress',
     'ShippingOption',
     'ShippingQuery',
@@ -160,12 +161,19 @@ __all__ = (  # Keep this alphabetically ordered
     'VoiceChatScheduled',
     'VoiceChatParticipantsInvited',
     'warnings',
+    'WebAppData',
+    'WebAppInfo',
     'WebhookInfo',
 )
 
 
 from ._telegramobject import TelegramObject
 from ._botcommand import BotCommand
+from ._webappdata import WebAppData
+from ._webappinfo import WebAppInfo
+from ._sentwebappmessage import SentWebAppMessage
+from ._loginurl import LoginUrl
+from ._games.callbackgame import CallbackGame
 from ._user import User
 from ._files.chatphoto import ChatPhoto
 from ._chat import Chat
@@ -213,9 +221,7 @@ from ._voicechat import (
     VoiceChatParticipantsInvited,
     VoiceChatScheduled,
 )
-from ._loginurl import LoginUrl
 from ._proximityalerttriggered import ProximityAlertTriggered
-from ._games.callbackgame import CallbackGame
 from ._payment.shippingaddress import ShippingAddress
 from ._payment.orderinfo import OrderInfo
 from ._payment.successfulpayment import SuccessfulPayment

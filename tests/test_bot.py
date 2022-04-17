@@ -54,6 +54,7 @@ from telegram import (
     BotCommandScopeChat,
     File,
     InputMedia,
+    SentWebAppMessage,
 )
 from telegram.constants import ChatAction, ParseMode, InlineQueryLimit
 from telegram.ext import ExtBot, InvalidCallbackData
@@ -999,6 +1000,28 @@ class TestBot:
         assert await bot.send_chat_action(chat_id, chat_action)
         with pytest.raises(BadRequest, match='Wrong parameter action'):
             await bot.send_chat_action(chat_id, 'unknown action')
+
+    @pytest.mark.asyncio
+    async def test_answer_web_app_query(self, bot, monkeypatch):
+        params = False
+        # For now just test that our internals pass the correct data
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            nonlocal params
+            params = request_data.parameters == {
+                'web_app_query_id': '12345',
+                'result': result.to_dict(),
+            }
+            print(type(request_data.parameters['result']['type']))  # TODO: this is an enum!
+            web_app_msg = SentWebAppMessage('321').to_dict()
+            return web_app_msg
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        result = InlineQueryResultArticle('1', 'title', InputTextMessageContent('text'))
+        web_app_msg = await bot.answer_web_app_query('12345', result)
+        assert params, "something went wrong with passing arguments to the request"
+        assert isinstance(web_app_msg, SentWebAppMessage)
+        assert web_app_msg.inline_message_id == '321'
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     @pytest.mark.asyncio

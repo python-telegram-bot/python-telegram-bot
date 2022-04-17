@@ -51,6 +51,7 @@ from telegram import (
     VoiceChatParticipantsInvited,
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
+    WebAppData,
 )
 from telegram.constants import ParseMode, ChatAction
 from telegram.ext import Defaults
@@ -188,6 +189,7 @@ def message(bot):
                 MessageEntity(MessageEntity.TEXT_LINK, 2, 3, url='https://ptb.org'),
             ]
         },
+        {'web_app_data': WebAppData('some_data', 'some_button_text')},
     ],
     ids=[
         'forwarded_user',
@@ -241,6 +243,7 @@ def message(bot):
         'is_automatic_forward',
         'has_protected_content',
         'entities',
+        'web_app_data',
     ],
 )
 def message_params(bot, request):

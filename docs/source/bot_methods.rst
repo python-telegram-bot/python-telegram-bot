@@ -74,6 +74,8 @@
       - Used for answering a pre checkout query
     * - :meth:`~telegram.Bot.answer_shipping_query`
       - Used for answering a shipping query
+    * - :meth:`~telegram.Bot.answer_web_app_query`
+      - Used for answering a web app query
     * - :meth:`~telegram.Bot.edit_message_caption`
       - Used for editing captions
     * - :meth:`~telegram.Bot.edit_message_media`

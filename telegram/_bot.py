@@ -94,6 +94,8 @@ from telegram import (
     WebhookInfo,
     InlineKeyboardMarkup,
     ChatInviteLink,
+    SentWebAppMessage,
+    InlineQueryResult,
 )
 from telegram.error import InvalidToken, TelegramError
 from telegram.constants import InlineQueryLimit
@@ -110,7 +112,6 @@ if TYPE_CHECKING:
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        InlineQueryResult,
         LabeledPrice,
         MessageEntity,
     )
@@ -4786,6 +4787,63 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return result  # type: ignore[return-value]
 
     @_log
+    async def answer_web_app_query(
+        self,
+        web_app_query_id: str,
+        result: InlineQueryResult,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> SentWebAppMessage:
+        """Use this method to set the result of an interaction with a Web App and send a
+        corresponding message on behalf of the user to the chat from which the query originated.
+
+        .. versionadded:: 14.0
+
+        Args:
+            web_app_query_id (:obj:`str`): Unique identifier for the query to be answered.
+            result (:class:`telegram.InlineQueryResult`): An object describing the message to be
+                sent.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.SentWebAppMessage`: On success, a sent
+            :class:`telegram.SentWebAppMessage` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {'web_app_query_id': web_app_query_id, 'result': result}
+
+        api_result = await self._post(
+            'answerWebAppQuery',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return SentWebAppMessage.de_json(api_result, self)  # type: ignore[return-value, arg-type]
+
+    @_log
     async def restrict_chat_member(
         self,
         chat_id: Union[str, int],
@@ -7293,6 +7351,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     """Alias for :meth:`answer_shipping_query`"""
     answerPreCheckoutQuery = answer_pre_checkout_query
     """Alias for :meth:`answer_pre_checkout_query`"""
+    answerWebAppQuery = answer_web_app_query
+    """Alias for :meth:`answer_web_app_query`"""
     restrictChatMember = restrict_chat_member
     """Alias for :meth:`restrict_chat_member`"""
     promoteChatMember = promote_chat_member

@@ -52,6 +52,7 @@ from telegram import (
     ProximityAlertTriggered,
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
+    WebAppData,
 )
 from telegram.constants import ParseMode, MessageAttachmentType
 from telegram.helpers import escape_markdown
@@ -226,6 +227,10 @@ class Message(TelegramObject):
             Service message: new participants invited to a voice chat.
 
             .. versionadded:: 13.4
+        web_app_data (:class:`telegram.WebAppData`, optional): Service message: data sent by a Web
+            App.
+
+            .. versionadded:: 14.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -341,6 +346,10 @@ class Message(TelegramObject):
             Service message: new participants invited to a voice chat.
 
             .. versionadded:: 13.4
+        web_app_data (:class:`telegram.WebAppData`): Optional. Service message: data sent by a Web
+            App.
+
+            .. versionadded:: 14.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -408,6 +417,7 @@ class Message(TelegramObject):
         'voice_chat_scheduled',
         'is_automatic_forward',
         'has_protected_content',
+        'web_app_data',
     )
 
     def __init__(
@@ -471,6 +481,7 @@ class Message(TelegramObject):
         voice_chat_scheduled: VoiceChatScheduled = None,
         is_automatic_forward: bool = None,
         has_protected_content: bool = None,
+        web_app_data: WebAppData = None,
         **_kwargs: Any,
     ):
         # Required
@@ -533,6 +544,7 @@ class Message(TelegramObject):
         self.voice_chat_ended = voice_chat_ended
         self.voice_chat_participants_invited = voice_chat_participants_invited
         self.reply_markup = reply_markup
+        self.web_app_data = web_app_data
         self.set_bot(bot)
 
         self._effective_attachment = DEFAULT_NONE
@@ -614,6 +626,8 @@ class Message(TelegramObject):
         data['voice_chat_participants_invited'] = VoiceChatParticipantsInvited.de_json(
             data.get('voice_chat_participants_invited'), bot
         )
+        data['web_app_data'] = WebAppData.de_json(data.get('web_app_data'), bot)
+
         return cls(bot=bot, **data)
 
     @property

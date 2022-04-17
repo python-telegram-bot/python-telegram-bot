@@ -59,6 +59,7 @@ telegram package
     telegram.proximityalerttriggered
     telegram.replykeyboardremove
     telegram.replykeyboardmarkup
+    telegram.sentwebappmessage
     telegram.telegramobject
     telegram.update
     telegram.user
@@ -71,6 +72,8 @@ telegram package
     telegram.voicechatended
     telegram.voicechatscheduled
     telegram.voicechatparticipantsinvited
+    telegram.webappdata
+    telegram.webappinfo
     telegram.webhookinfo
 
 Stickers
