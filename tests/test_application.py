@@ -1018,7 +1018,7 @@ class TestApplication:
         assert recwarn[0].category is PTBUserWarning
         assert (
             str(recwarn[0].message)
-            == 'ApplicationHandlerStop is not supported with asynchronously running handlers.'
+            == 'ApplicationHandlerStop is not supported with handlers running non-blocking.'
         )
         assert (
             Path(recwarn[0].filename) == PROJECT_ROOT_PATH / 'telegram' / 'ext' / '_application.py'
