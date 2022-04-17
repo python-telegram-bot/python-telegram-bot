@@ -422,6 +422,14 @@ class TestJobQueue:
         assert job_queue.get_jobs_by_name('name2') == (job3,)
 
     @pytest.mark.asyncio
+    async def test_job_run(self, app):
+        job = app.job_queue.run_repeating(self.job_run_once, 0.02)
+        await asyncio.sleep(0.05)
+        assert self.result == 0
+        await job.run(app)
+        assert self.result == 1
+
+    @pytest.mark.asyncio
     async def test_enable_disable_job(self, job_queue):
         job = job_queue.run_repeating(self.job_run_once, 0.2)
         await asyncio.sleep(0.5)

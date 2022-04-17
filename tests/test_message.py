@@ -639,26 +639,26 @@ class TestMessage:
     def test_chat_id(self, message):
         assert message.chat_id == message.chat.id
 
-    @pytest.mark.parametrize('type', argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
-    def test_link_with_username(self, message, type):
+    @pytest.mark.parametrize('type_', argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
+    def test_link_with_username(self, message, type_):
         message.chat.username = 'username'
-        message.chat.type = type
+        message.chat.type = type_
         assert message.link == f'https://t.me/{message.chat.username}/{message.message_id}'
 
     @pytest.mark.parametrize(
-        'type, id', argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
+        'type_, id_', argvalues=[(Chat.CHANNEL, -1003), (Chat.SUPERGROUP, -1003)]
     )
-    def test_link_with_id(self, message, type, id):
+    def test_link_with_id(self, message, type_, id_):
         message.chat.username = None
-        message.chat.id = id
-        message.chat.type = type
+        message.chat.id = id_
+        message.chat.type = type_
         # The leading - for group ids/ -100 for supergroup ids isn't supposed to be in the link
         assert message.link == f'https://t.me/c/{3}/{message.message_id}'
 
-    @pytest.mark.parametrize('id, username', argvalues=[(None, 'username'), (-3, None)])
-    def test_link_private_chats(self, message, id, username):
+    @pytest.mark.parametrize('id_, username', argvalues=[(None, 'username'), (-3, None)])
+    def test_link_private_chats(self, message, id_, username):
         message.chat.type = Chat.PRIVATE
-        message.chat.id = id
+        message.chat.id = id_
         message.chat.username = username
         assert message.link is None
         message.chat.type = Chat.GROUP
