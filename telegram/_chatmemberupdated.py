@@ -125,6 +125,19 @@ class ChatMemberUpdated(TelegramObject):
 
         return data
 
+    def _get_attribute_difference(self, attribute: str) -> Tuple[object, object]:
+        try:
+            old = self.old_chat_member[attribute]
+        except KeyError:
+            old = None
+
+        try:
+            new = self.new_chat_member[attribute]
+        except KeyError:
+            new = None
+
+        return old, new
+
     def difference(
         self,
     ) -> Dict[
@@ -136,7 +149,7 @@ class ChatMemberUpdated(TelegramObject):
         """Computes the difference between :attr:`old_chat_member` and :attr:`new_chat_member`.
 
         Example:
-            .. code:: python
+            .. code:: pycon
 
                 >>> chat_member_updated.difference()
                 {'custom_title': ('old title', 'new title')}
@@ -162,10 +175,7 @@ class ChatMemberUpdated(TelegramObject):
         # we can't directly use the values from old_dict ^ new_dict b/c that set is unordered
         attributes = (entry[0] for entry in set(old_dict.items()) ^ set(new_dict.items()))
 
-        result = {
-            attribute: (old_dict.get(attribute), new_dict.get(attribute))
-            for attribute in attributes
-        }
+        result = {attribute: self._get_attribute_difference(attribute) for attribute in attributes}
         if old_user_dict != new_user_dict:
             result['user'] = (self.old_chat_member.user, self.new_chat_member.user)
 
