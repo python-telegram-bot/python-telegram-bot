@@ -30,7 +30,7 @@ class ChatJoinRequestHandler(Handler[Update, CCT]):
     :attr:`telegram.Update.chat_join_request`.
 
     Warning:
-        When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     .. versionadded:: 13.8

@@ -48,7 +48,7 @@ class CommandHandler(Handler[Update, CCT]):
         * :class:`CommandHandler` does *not* handle (edited) channel posts.
 
     Warning:
-        When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
@@ -202,7 +202,7 @@ class PrefixHandler(CommandHandler):
         * :class:`PrefixHandler` does *not* handle (edited) channel posts.
 
     Warning:
-        When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:

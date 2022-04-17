@@ -47,7 +47,7 @@ class InlineQueryHandler(Handler[Update, CCT]):
     documentation of the :mod:`re` module for more information.
 
     Warning:
-        * When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
+        * When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
           attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
         * :attr:`telegram.InlineQuery.chat_type` will not be set for inline queries from secret
           chats and may not be set for inline queries coming from third-party clients. These

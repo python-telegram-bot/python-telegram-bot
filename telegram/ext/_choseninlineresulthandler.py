@@ -37,7 +37,7 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
     :attr:`telegram.Update.chosen_inline_result`.
 
     Warning:
-        When setting :paramref:`block` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
