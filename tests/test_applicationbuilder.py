@@ -44,6 +44,11 @@ def builder():
 
 
 class TestApplicationBuilder:
+    def test_slot_behaviour(self, builder, mro_slots):
+        for attr in builder.__slots__:
+            assert getattr(builder, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(builder)) == len(set(mro_slots(builder))), "duplicate slot"
+
     def test_build_without_token(self, builder):
         with pytest.raises(RuntimeError, match='No bot token was set.'):
             builder.build()

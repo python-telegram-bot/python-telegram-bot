@@ -65,6 +65,11 @@ class TestUser:
     can_read_all_group_messages = True
     supports_inline_queries = False
 
+    def test_slot_behaviour(self, user, mro_slots):
+        for attr in user.__slots__:
+            assert getattr(user, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(user)) == len(set(mro_slots(user))), "duplicate slot"
+
     def test_de_json(self, json_dict, bot):
         user = User.de_json(json_dict, bot)
 

@@ -67,6 +67,11 @@ class TestVideo:
     video_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     video_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
+    def test_slot_behaviour(self, video, mro_slots):
+        for attr in video.__slots__:
+            assert getattr(video, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(video)) == len(set(mro_slots(video))), "duplicate slot"
+
     def test_creation(self, video):
         # Make sure file has been uploaded.
         assert isinstance(video, Video)

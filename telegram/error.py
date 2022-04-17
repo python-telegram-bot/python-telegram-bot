@@ -74,9 +74,8 @@ class TelegramError(Exception):
     def __str__(self) -> str:
         return self.message
 
-    # TODO: test this
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.message})'
+        return f"{self.__class__.__name__}('{self.message}')"
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
         return self.__class__, (self.message,)

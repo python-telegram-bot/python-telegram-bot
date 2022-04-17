@@ -182,6 +182,12 @@ def message(bot):
         {'sender_chat': Chat(-123, 'discussion_channel')},
         {'is_automatic_forward': True},
         {'has_protected_content': True},
+        {
+            'entities': [
+                MessageEntity(MessageEntity.BOLD, 0, 1),
+                MessageEntity(MessageEntity.TEXT_LINK, 2, 3, url='https://ptb.org'),
+            ]
+        },
     ],
     ids=[
         'forwarded_user',
@@ -234,6 +240,7 @@ def message(bot):
         'sender_chat',
         'is_automatic_forward',
         'has_protected_content',
+        'entities',
     ],
 )
 def message_params(bot, request):
@@ -318,6 +325,11 @@ class TestMessage:
 
         assert new.to_dict() == message_params.to_dict()
 
+    def test_slot_behaviour(self, message, mro_slots):
+        for attr in message.__slots__:
+            assert getattr(message, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
+
     @pytest.mark.asyncio
     async def test_parse_entity(self):
         text = (
@@ -327,6 +339,9 @@ class TestMessage:
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         message = Message(1, self.from_user, self.date, self.chat, text=text, entities=[entity])
         assert message.parse_entity(entity) == 'http://google.com'
+
+        with pytest.raises(RuntimeError, match='Message has no'):
+            Message(message_id=1, date=self.date, chat=self.chat).parse_entity(entity)
 
     @pytest.mark.asyncio
     async def test_parse_caption_entity(self):
@@ -339,6 +354,9 @@ class TestMessage:
             1, self.from_user, self.date, self.chat, caption=caption, caption_entities=[entity]
         )
         assert message.parse_caption_entity(entity) == 'http://google.com'
+
+        with pytest.raises(RuntimeError, match='Message has no'):
+            Message(message_id=1, date=self.date, chat=self.chat).parse_entity(entity)
 
     @pytest.mark.asyncio
     async def test_parse_entities(self):
@@ -669,18 +687,21 @@ class TestMessage:
             'venue',
         ]
 
-        attachment = message_params.effective_attachment
-        if attachment:
-            condition = any(
-                message_params[message_type] is attachment
-                for message_type in expected_attachment_types
-            )
-            assert condition, 'Got effective_attachment for unexpected type'
-        else:
-            condition = any(
-                message_params[message_type] for message_type in expected_attachment_types
-            )
-            assert not condition, 'effective_attachment was None even though it should not be'
+        for _ in range(3):
+            # We run the same test multiple times to make sure that the caching is tested
+
+            attachment = message_params.effective_attachment
+            if attachment:
+                condition = any(
+                    message_params[message_type] is attachment
+                    for message_type in expected_attachment_types
+                )
+                assert condition, 'Got effective_attachment for unexpected type'
+            else:
+                condition = any(
+                    message_params[message_type] for message_type in expected_attachment_types
+                )
+                assert not condition, 'effective_attachment was None even though it should not be'
 
     @pytest.mark.asyncio
     async def test_reply_text(self, monkeypatch, message):

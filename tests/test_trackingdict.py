@@ -35,6 +35,11 @@ def data() -> dict:
 
 
 class TestTrackingDict:
+    def test_slot_behaviour(self, td, mro_slots):
+        for attr in td.__slots__:
+            assert getattr(td, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(td)) == len(set(mro_slots(td))), "duplicate slot"
+
     def test_representations(self, td, data):
         assert repr(td) == repr(data)
         assert str(td) == str(data)
@@ -159,3 +164,10 @@ class TestTrackingDict:
         td.update_no_track({2: 2, 3: 3, 4: 4})
         assert not td.pop_accessed_keys()
         assert list(iter(td)) == list(iter(data))
+
+    def test_mark_as_accessed(self, td):
+        td[1] = 2
+        assert td.pop_accessed_keys() == {1}
+        assert td.pop_accessed_keys() == set()
+        td.mark_as_accessed(1)
+        assert td.pop_accessed_keys() == {1}

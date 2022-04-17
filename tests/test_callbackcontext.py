@@ -44,8 +44,6 @@ class TestCallbackContext:
             assert getattr(c, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert not c.__dict__, f"got missing slot(s): {c.__dict__}"
         assert len(mro_slots(c)) == len(set(mro_slots(c))), "duplicate slot"
-        c.args = c.args
-        assert len(recwarn) == 0, recwarn.list
 
     def test_from_job(self, app):
         job = app.job_queue.run_once(lambda x: x, 10)

@@ -58,6 +58,11 @@ class TestVoice:
     voice_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     voice_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
+    def test_slot_behaviour(self, voice, mro_slots):
+        for attr in voice.__slots__:
+            assert getattr(voice, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(voice)) == len(set(mro_slots(voice))), "duplicate slot"
+
     @pytest.mark.asyncio
     async def test_creation(self, voice):
         # Make sure file has been uploaded.

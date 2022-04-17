@@ -1609,3 +1609,48 @@ class TestApplication:
 
         with pytest.raises(RuntimeError, match='only available if the application has an Updater'):
             app.run_polling()
+
+    @pytest.mark.parametrize('method', ['start', 'initialize'])
+    def test_run_error_in_application(self, bot, monkeypatch, method):
+        shutdowns = []
+
+        async def raise_method(*args, **kwargs):
+            raise RuntimeError('Test Exception')
+
+        async def shutdown(*args, **kwargs):
+            shutdowns.append(True)
+
+        monkeypatch.setattr(Application, method, raise_method)
+        monkeypatch.setattr(Application, 'shutdown', shutdown)
+        monkeypatch.setattr(Updater, 'shutdown', shutdown)
+        app = ApplicationBuilder().token(bot.token).build()
+        with pytest.raises(RuntimeError, match='Test Exception'):
+            app.run_polling(close_loop=False)
+
+        assert not app.running
+        assert not app.updater.running
+        assert shutdowns == [True, True]
+
+    @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
+    def test_run_error_in_updater(self, bot, monkeypatch, method):
+        shutdowns = []
+
+        async def raise_method(*args, **kwargs):
+            raise RuntimeError('Test Exception')
+
+        async def shutdown(*args, **kwargs):
+            shutdowns.append(True)
+
+        monkeypatch.setattr(Updater, method, raise_method)
+        monkeypatch.setattr(Application, 'shutdown', shutdown)
+        monkeypatch.setattr(Updater, 'shutdown', shutdown)
+        app = ApplicationBuilder().token(bot.token).build()
+        with pytest.raises(RuntimeError, match='Test Exception'):
+            if 'polling' in method:
+                app.run_polling(close_loop=False)
+            else:
+                app.run_webhook(close_loop=False)
+
+        assert not app.running
+        assert not app.updater.running
+        assert shutdowns == [True, True]

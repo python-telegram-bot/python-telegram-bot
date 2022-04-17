@@ -60,6 +60,11 @@ class TestDocument:
     document_file_id = '5a3128a4d2a04750b5b58397f3b5e812'
     document_file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
 
+    def test_slot_behaviour(self, document, mro_slots):
+        for attr in document.__slots__:
+            assert getattr(document, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(document)) == len(set(mro_slots(document))), "duplicate slot"
+
     def test_creation(self, document):
         assert isinstance(document, Document)
         assert isinstance(document.file_id, str)

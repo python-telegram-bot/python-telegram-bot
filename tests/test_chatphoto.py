@@ -60,6 +60,11 @@ class TestChatPhoto:
     chatphoto_big_file_unique_id = 'bigadc3145fd2e84d95b64d68eaa22aa33e'
     chatphoto_file_url = 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
 
+    def test_slot_behaviour(self, chat_photo, mro_slots):
+        for attr in chat_photo.__slots__:
+            assert getattr(chat_photo, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"
+
     @flaky(3, 1)
     @pytest.mark.asyncio
     async def test_send_all_args(

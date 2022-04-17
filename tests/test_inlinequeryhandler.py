@@ -142,6 +142,13 @@ class TestInlineQueryHandler:
             await app.process_update(inline_query)
             assert self.test_flag
 
+            update = Update(
+                update_id=0, inline_query=InlineQuery(id='id', from_user=None, query='', offset='')
+            )
+            assert not handler.check_update(update)
+            update.inline_query.query = 'not_a_match'
+            assert not handler.check_update(update)
+
     @pytest.mark.parametrize('chat_types', [[Chat.SENDER], [Chat.SENDER, Chat.SUPERGROUP], []])
     @pytest.mark.parametrize(
         'chat_type,result', [(Chat.SENDER, True), (Chat.CHANNEL, False), (None, False)]

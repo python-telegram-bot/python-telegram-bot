@@ -102,7 +102,7 @@ def chat_join_request_update(bot, chat_join_request):
 class TestChatJoinRequestHandler:
     test_flag = False
 
-    def test_slot_behaviour(self, recwarn, mro_slots):
+    def test_slot_behaviour(self, mro_slots):
         action = ChatJoinRequestHandler(self.callback)
         for attr in action.__slots__:
             assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"

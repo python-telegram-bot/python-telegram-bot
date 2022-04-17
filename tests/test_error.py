@@ -142,12 +142,12 @@ class TestErrors:
             (InvalidCallbackData('test data')),
         ],
     )
-    def test_slots_behavior(self, inst, mro_slots):
+    def test_slot_behaviour(self, inst, mro_slots):
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_test_coverage(self):
+    def test_coverage(self):
         """
         This test is only here to make sure that new errors will override __reduce__ and set
         __slots__ properly.
@@ -178,3 +178,17 @@ class TestErrors:
         )
 
         make_assertion(TelegramError)
+
+    def test_string_representations(self):
+        """We just randomly test a few of the subclasses - should suffice"""
+        e = TelegramError('This is a message')
+        assert repr(e) == "TelegramError('This is a message')"
+        assert str(e) == "This is a message"
+
+        e = RetryAfter(42)
+        assert repr(e) == "RetryAfter('Flood control exceeded. Retry in 42.0 seconds')"
+        assert str(e) == 'Flood control exceeded. Retry in 42.0 seconds'
+
+        e = BadRequest('This is a message')
+        assert repr(e) == "BadRequest('This is a message')"
+        assert str(e) == "This is a message"

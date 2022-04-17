@@ -161,6 +161,7 @@ class TestMessageHandler:
     def test_other_update_types(self, false_update):
         handler = MessageHandler(None, self.callback)
         assert not handler.check_update(false_update)
+        assert not handler.check_update('string')
 
     def test_filters_returns_empty_dict(self):
         class DataFilter(MessageFilter):

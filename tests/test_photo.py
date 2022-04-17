@@ -74,6 +74,11 @@ class TestPhoto:
     # so we accept three different sizes here. Shouldn't be too much
     file_size = [29176, 27662]
 
+    def test_slot_behaviour(self, photo, mro_slots):
+        for attr in photo.__slots__:
+            assert getattr(photo, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(photo)) == len(set(mro_slots(photo))), "duplicate slot"
+
     def test_creation(self, thumb, photo):
         # Make sure file has been uploaded.
         assert isinstance(photo, PhotoSize)
