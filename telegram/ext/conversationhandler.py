@@ -50,11 +50,11 @@ class _ConversationTimeoutContext:
     __slots__ = ('conversation_key', 'update', 'dispatcher', 'callback_context')
 
     def __init__(
-        self,
-        conversation_key: Tuple[int, ...],
-        update: Update,
-        dispatcher: 'Dispatcher',
-        callback_context: Optional[CallbackContext],
+            self,
+            conversation_key: Tuple[int, ...],
+            update: Update,
+            dispatcher: 'Dispatcher',
+            callback_context: Optional[CallbackContext],
     ):
         self.conversation_key = conversation_key
         self.update = update
@@ -126,6 +126,13 @@ class ConversationHandler(Handler[Update, CCT]):
             trigger the start of the conversation. The first handler which :attr:`check_update`
             method returns :obj:`True` will be used. If all return :obj:`False`, the update is not
             handled.
+        prefallbacks (List[:class:`telegram.ext.Handler`]): A list of handlers that will be trigger
+            before all the other "states" and "fallbacks" handlers. Useful for such commands as
+            "cancel", "back", "repeat". Intended to place part of "fallbacks" handlers inside and
+            avoid using many "& ~" conditions in "Filters".
+            :obj:`False` on :attr:`check_update`. The first handler which :attr:`check_update`
+            method returns :obj:`True` will be used. If all return :obj:`False`, the update will be
+            forwarded to "states" handlers.
         states (Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]): A :obj:`dict` that
             defines the different states of conversation a user can be in and one or more
             associated ``Handler`` objects that should be used in that state. The first handler
@@ -213,25 +220,28 @@ class ConversationHandler(Handler[Update, CCT]):
     WAITING: ClassVar[int] = -3
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
     previous ``@run_sync`` decorated running handler to finish."""
+
     # pylint: disable=W0231
     def __init__(
-        self,
-        entry_points: List[Handler[Update, CCT]],
-        states: Dict[object, List[Handler[Update, CCT]]],
-        fallbacks: List[Handler[Update, CCT]],
-        allow_reentry: bool = False,
-        per_chat: bool = True,
-        per_user: bool = True,
-        per_message: bool = False,
-        conversation_timeout: Union[float, datetime.timedelta] = None,
-        name: str = None,
-        persistent: bool = False,
-        map_to_parent: Dict[object, object] = None,
-        run_async: bool = False,
+            self,
+            entry_points: List[Handler[Update, CCT]],
+            states: Dict[object, List[Handler[Update, CCT]]],
+            fallbacks: List[Handler[Update, CCT]],
+            prefallbacks: List[Handler[Update, CCT]] = None,
+            allow_reentry: bool = False,
+            per_chat: bool = True,
+            per_user: bool = True,
+            per_message: bool = False,
+            conversation_timeout: Union[float, datetime.timedelta] = None,
+            name: str = None,
+            persistent: bool = False,
+            map_to_parent: Dict[object, object] = None,
+            run_async: bool = False,
     ):
         self.run_async = run_async
 
         self._entry_points = entry_points
+        self._prefallbacks = prefallbacks or []
         self._states = states
         self._fallbacks = fallbacks
 
@@ -266,6 +276,7 @@ class ConversationHandler(Handler[Update, CCT]):
             )
 
         all_handlers: List[Handler] = []
+        all_handlers.extend(prefallbacks)  # type: ignore[arg-type]
         all_handlers.extend(entry_points)
         all_handlers.extend(fallbacks)
 
@@ -323,6 +334,18 @@ class ConversationHandler(Handler[Update, CCT]):
     @entry_points.setter
     def entry_points(self, value: object) -> NoReturn:
         raise ValueError('You can not assign a new value to entry_points after initialization.')
+
+    @property
+    def prefallbacks(self) -> List[Handler]:
+        """List[:class:`telegram.ext.Handler`]: A list of handlers that will be
+        checked for handling before all the other handlers
+        :obj:`False` on :attr:`check_update`.
+        """
+        return self._prefallbacks  # pylint: disable=maybe-no-member
+
+    @prefallbacks.setter
+    def prefallbacks(self, value: object) -> NoReturn:
+        raise ValueError('You can not assign a new value to prefallbacks after initialization.')
 
     @property
     def states(self) -> Dict[object, List[Handler]]:
@@ -386,7 +409,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @property
     def conversation_timeout(
-        self,
+            self,
     ) -> Optional[Union[float, datetime.timedelta]]:
         """:obj:`float` | :obj:`datetime.timedelta`: Optional. When this
         handler is inactive more than this timeout (in seconds), it will be automatically
@@ -483,12 +506,12 @@ class ConversationHandler(Handler[Update, CCT]):
         return res
 
     def _schedule_job(
-        self,
-        new_state: object,
-        dispatcher: 'Dispatcher',
-        update: Update,
-        context: Optional[CallbackContext],
-        conversation_key: Tuple[int, ...],
+            self,
+            new_state: object,
+            dispatcher: 'Dispatcher',
+            update: Update,
+            context: Optional[CallbackContext],
+            conversation_key: Tuple[int, ...],
     ) -> None:
         if new_state != self.END:
             try:
@@ -565,41 +588,36 @@ class ConversationHandler(Handler[Update, CCT]):
                 check = entry_point.check_update(update)
                 if check is not None and check is not False:
                     handler = entry_point
-                    break
-
-            else:
-                if state is None:
-                    return None
+                    return key, handler, check
+        # Find a prefallback handler before all others handlers
+        for prefallback in self.prefallbacks:
+            check = prefallback.check_update(update)
+            if check is not None and check is not False:
+                handler = prefallback
+                return key, handler, check
 
         # Get the handler list for current state, if we didn't find one yet and we're still here
-        if state is not None and not handler:
-            handlers = self.states.get(state)
+        handlers = self.states.get(state)
+        for candidate in handlers or []:
+            check = candidate.check_update(update)
+            if check is not None and check is not False:
+                handler = candidate
+                return key, handler, check
 
-            for candidate in handlers or []:
-                check = candidate.check_update(update)
-                if check is not None and check is not False:
-                    handler = candidate
-                    break
-
-            # Find a fallback handler if all other handlers fail
-            else:
-                for fallback in self.fallbacks:
-                    check = fallback.check_update(update)
-                    if check is not None and check is not False:
-                        handler = fallback
-                        break
-
-                else:
-                    return None
-
-        return key, handler, check  # type: ignore[return-value]
+        # Find a fallback handler if all other handlers fail
+        for fallback in self.fallbacks:
+            check = fallback.check_update(update)
+            if check is not None and check is not False:
+                handler = fallback
+                return key, handler, check
+        return None
 
     def handle_update(  # type: ignore[override]
-        self,
-        update: Update,
-        dispatcher: 'Dispatcher',
-        check_result: CheckUpdateType,
-        context: CallbackContext = None,
+            self,
+            update: Update,
+            dispatcher: 'Dispatcher',
+            check_result: CheckUpdateType,
+            context: CallbackContext = None,
     ) -> Optional[object]:
         """Send the update to the callback for the current state and Handler
 
