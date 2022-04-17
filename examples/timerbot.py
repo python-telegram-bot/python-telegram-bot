@@ -27,7 +27,6 @@ from telegram.ext import CommandHandler, Application, CallbackContext
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
@@ -44,7 +43,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
 async def alarm(context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
     job = context.job
-    await context.bot.send_message(job.context, text='Beep!')
+    await context.bot.send_message(job.chat_id, text=f'Beep! {job.context} seconds are over!')
 
 
 def remove_job_if_exists(name: str, context: CallbackContext.DEFAULT_TYPE) -> bool:
@@ -68,7 +67,7 @@ async def set_timer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> No
             return
 
         job_removed = remove_job_if_exists(str(chat_id), context)
-        context.job_queue.run_once(alarm, due, context=chat_id, name=str(chat_id))
+        context.job_queue.run_once(alarm, due, chat_id=chat_id, name=str(chat_id), context=due)
 
         text = 'Timer successfully set!'
         if job_removed:
