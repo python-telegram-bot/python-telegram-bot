@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an classes that represent Telegram errors.
+"""This module contains classes that represent Telegram errors.
 
 .. versionchanged:: 14.0
     Replaced ``Unauthorized`` by :class:`Forbidden`.

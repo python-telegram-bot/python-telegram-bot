@@ -1,20 +1,21 @@
+#!/usr/bin/env python
 #
-#  A library that provides a Python interface to the Telegram Bot API
-#  Copyright (C) 2015-2022
-#  Leandro Toledo de Souza <devs@python-telegram-bot.org>
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2022
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
 #
-#  This program is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU Lesser Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU Lesser Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser Public License
-#  along with this program.  If not, see [http://www.gnu.org/licenses/].
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
 import logging
 from typing import Tuple, Optional
@@ -51,25 +52,26 @@ class HTTPXRequest(BaseRequest):
 
             Note:
                 * The proxy URL can also be set via the environment variables ``HTTPS_PROXY`` or
-                  ``ALL_PROXY``. See `the docs`_ of ``httpx`` for more info.
+                  ``ALL_PROXY``. See `the docs of httpx`_ for more info.
                 * For Socks5 support, additional dependencies are required. Make sure to install
-                  PTB via ``pip install python-telegram-bot[socks]`` in this case.
+                  PTB via :command:`pip install python-telegram-bot[socks]` in this case.
                 * Socks5 proxies can not be set via environment variables.
 
-            .. _the docs: https://www.python-httpx.org/environment_variables/#proxies
-        connect_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait
-            for a connection attempt to a server to succeed. :obj:`None` will set an infinite
-            timeout for connection attempts. Defaults to ``5.0``.
-        read_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait for
-            a response from Telegram's server. :obj:`None` will set an infinite timeout. This value
-            is usually overridden by the various methods of :class:`telegram.Bot`. Defaults to
-            ``5.0``.
-        write_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait for
-            a write operation to complete (in terms of a network socket; i.e. POSTing a request or
-            uploading a file).:obj:`None` will set an infinite timeout. Defaults to ``5.0``.
-        pool_timeout (:obj:`float`, optional): The maximum amount of time (in seconds) to wait for
-            a connection from the connection pool becoming available. :obj:`None` will set an
-            infinite timeout. Defaults to :obj:`None`.
+            .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
+        read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
+            amount of time (in seconds) to wait for a response from Telegram's server instead
+            of the time specified during creating of this object. Defaults to ``5``.
+        write_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
+            amount of time (in seconds) to wait for a write operation to complete (in terms of
+            a network socket; i.e. POSTing a request or uploading a file) instead of the time
+            specified during creating of this object. Defaults to ``5``.
+        connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
+            maximum amount of time (in seconds) to wait for a connection attempt to a server
+            to succeed instead of the time specified during creating of this object. Defaults
+            to ``5``.
+        pool_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
+            amount of time (in seconds) to wait for a connection to become available instead
+            of the time specified during creating of this object. Defaults to ``1``.
 
             Warning:
                 With a finite pool timeout, you must expect :exc:`telegram.error.TimedOut`
@@ -136,6 +138,8 @@ class HTTPXRequest(BaseRequest):
         if self._client.is_closed:
             raise RuntimeError('This HTTPXRequest is not initialized!')
 
+        # If user did not specify timeouts (for e.g. in a bot method), use the default ones when we
+        # created this instance.
         if isinstance(read_timeout, DefaultValue):
             read_timeout = self._client.timeout.read
         if isinstance(write_timeout, DefaultValue):

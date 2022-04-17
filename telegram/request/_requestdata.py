@@ -16,7 +16,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an class that holds a parameters of a request to the Bot API."""
+"""This module contains a class that holds the parameters of a request to the Bot API."""
 from typing import List, Dict, Any, Union
 from urllib.parse import urlencode
 
@@ -47,10 +47,7 @@ class RequestData:
 
     __slots__ = ('_parameters', 'contains_files')
 
-    def __init__(
-        self,
-        parameters: List[RequestParameter] = None,
-    ):
+    def __init__(self, parameters: List[RequestParameter] = None):
         self._parameters = parameters or []
         self.contains_files = any(param.input_files for param in self._parameters)
 

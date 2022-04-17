@@ -43,7 +43,8 @@ RT = TypeVar('RT')
 
 
 class CallbackQueryHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram callback queries. Optionally based on a regex.
+    """Handler class to handle Telegram :attr:`callback queries <telegram.Update.callback_query>`.
+    Optionally based on a regex.
 
     Read the documentation of the :mod:`re` module for more information.
 
@@ -64,18 +65,21 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pattern (:obj:`str` | `Pattern` | :obj:`callable` | :obj:`type`, optional):
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`, \
+            optional):
             Pattern to test :attr:`telegram.CallbackQuery.data` against. If a string or a regex
             pattern is passed, :func:`re.match` is used on :attr:`telegram.CallbackQuery.data` to
             determine if an update should be handled by this handler. If your bot allows arbitrary
-            objects as ``callback_data``, non-strings will be accepted. To filter arbitrary
-            objects you may pass
+            objects as :paramref:`~telegram.InlineKeyboardButton.callback_data`, non-strings will
+            be accepted. To filter arbitrary objects you may pass:
 
                 * a callable, accepting exactly one argument, namely the
                   :attr:`telegram.CallbackQuery.data`. It must return :obj:`True` or
@@ -93,9 +97,9 @@ class CallbackQueryHandler(Handler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
-        pattern (`Pattern` | :obj:`callable` | :obj:`type`): Optional. Regex pattern, callback or
-            type to test :attr:`telegram.CallbackQuery.data` against.
+        callback (:term:`coroutine function`): The callback function for this handler.
+        pattern (:func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`): Optional.
+            Regex pattern, callback or type to test :attr:`telegram.CallbackQuery.data` against.
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
@@ -126,7 +130,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         self.pattern = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.

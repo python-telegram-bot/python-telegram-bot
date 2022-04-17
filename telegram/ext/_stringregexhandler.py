@@ -39,7 +39,7 @@ class StringRegexHandler(Handler[str, CCT]):
     function is used to determine if an update should be handled by this handler.
 
     Note:
-        This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
+        This handler is not used to handle Telegram :class:`telegram.Update`, but strings manually
         put in the queue. For example to send messages with the bot using command line or API.
 
     Warning:
@@ -48,9 +48,11 @@ class StringRegexHandler(Handler[str, CCT]):
 
     Args:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -60,7 +62,7 @@ class StringRegexHandler(Handler[str, CCT]):
 
     Attributes:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
-        callback (:obj:`callable`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
@@ -83,13 +85,13 @@ class StringRegexHandler(Handler[str, CCT]):
         self.pattern = pattern
 
     def check_update(self, update: object) -> Optional[Match]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:obj:`object`): The incoming update.
 
         Returns:
-            :obj:`bool`
+            :obj:`None` | :obj:`re.match`
 
         """
         if isinstance(update, str):

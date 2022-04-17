@@ -145,7 +145,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
     @property
     def update_interval(self) -> float:
-        """:obj:`int`, optional): Time (in seconds) that the :class:`~telegram.ext.Application`
+        """:obj:`float`: Time (in seconds) that the :class:`~telegram.ext.Application`
         will wait between two consecutive runs of updating the persistence.
 
         .. versionadded:: 14.0
@@ -163,6 +163,10 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Args:
             bot (:class:`telegram.Bot`): The bot.
+
+        Raises:
+            :exc:`TypeError`: If :attr:`PersistenceInput.callback_data` is :obj:`True` and the
+                :paramref:`bot` is not an instance of :class:`telegram.ext.ExtBot`.
         """
         if self.store_data.callback_data and not isinstance(bot, ExtBot):
             raise TypeError('callback_data can only be stored when using telegram.ext.ExtBot.')
@@ -231,12 +235,12 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Returns:
             Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
                 Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]]:
-                The restored meta data or :obj:`None`, if no data was stored.
+                The restored metadata or :obj:`None`, if no data was stored.
         """
 
     @abstractmethod
@@ -244,7 +248,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """Will be called by :class:`telegram.ext.Application` when a
         :class:`telegram.ext.ConversationHandler` is added if
         :attr:`telegram.ext.ConversationHandler.persistent` is :obj:`True`.
-        It should return the conversations for the handler with `name` or an empty :obj:`dict`
+        It should return the conversations for the handler with :paramref:`name` or an empty
+        :obj:`dict`.
 
         Args:
             name (:obj:`str`): The handlers name.
@@ -263,7 +268,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         Args:
             name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
-            new_state (:obj:`tuple` | :class:`object`): The new state for the given key.
+            new_state (:class:`object`): The new state for the given key.
         """
 
     @abstractmethod
@@ -306,7 +311,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Args:
             data (Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
@@ -345,7 +350,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Args:
             user_id (:obj:`int`): The user ID this :attr:`~telegram.ext.Application.user_data` is
@@ -363,7 +368,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Args:
             chat_id (:obj:`int`): The chat ID this :attr:`~telegram.ext.Application.chat_data` is
@@ -381,7 +386,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         .. versionadded:: 13.6
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Args:
             bot_data (:obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`):
@@ -394,5 +399,5 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         persistence a chance to finish up saving or close a database connection gracefully.
 
         .. versionchanged:: 14.0
-           Changed this method into an ``@abstractmethod``.
+           Changed this method into an :external:func:`~abc.abstractmethod`.
         """

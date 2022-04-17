@@ -16,7 +16,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an class that describes a single parameter of a request to the Bot API."""
+"""This module contains a class that describes a single parameter of a request to the Bot API."""
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -47,7 +47,7 @@ class RequestParameter:
     Args:
         name (:obj:`str`): The name of the parameter.
         value (:obj:`object`): The value of the parameter. Must be JSON-dumpable.
-        input_files (List[:class:`telegram.InputFile`, optional): A list of files that should be
+        input_files (List[:class:`telegram.InputFile`], optional): A list of files that should be
             uploaded along with this parameter.
 
     Attributes:

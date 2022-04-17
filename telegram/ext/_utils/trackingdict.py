@@ -49,7 +49,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
     Read-access is not tracked.
 
     Note:
-        * ``setdefault()`` and ``pop`` are considered writing only depending on whether or not the
+        * ``setdefault()`` and ``pop`` are considered writing only depending on whether the
             key is present
         * deleting values is considered writing
     """
@@ -86,7 +86,8 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
 
     def mark_as_accessed(self, key: _KT) -> None:
         """Use this method have the key returned again in the next call to
-        :meth:`pop_accessed_write_items` or :meth:`pop_accessed_keys"""
+        :meth:`pop_accessed_write_items` or :meth:`pop_accessed_keys`
+        """
         self._write_access_keys.add(key)
 
     # Override methods to track access

@@ -76,11 +76,11 @@ class ApplicationHandlerStop(Exception):
     different group).
 
     In order to use this exception in a :class:`telegram.ext.ConversationHandler`, pass the
-    optional ``state`` parameter instead of returning the next state:
+    optional :paramref:`state` parameter instead of returning the next state:
 
     .. code-block:: python
 
-        def callback(update, context):
+        async def conversation_callback(update, context):
             ...
             raise ApplicationHandlerStop(next_state)
 
@@ -102,9 +102,10 @@ class ApplicationHandlerStop(Exception):
 
 
 class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
-    """This class dispatches all kinds of updates to its registered handlers.
+    """This class dispatches all kinds of updates to its registered handlers, and is the entry
+    point to a PTB application.
 
-    Note:
+    Tip:
          This class may not be initialized directly. Use :class:`telegram.ext.ApplicationBuilder`
          or :meth:`builder` (for convenience).
 
@@ -117,7 +118,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
         update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
             updates.
-        updater (:class:`telegram.ext.Updater`, optional): The updater used by this application.
+        updater (:class:`telegram.ext.Updater`): Optional. The updater used by this application.
         job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
             instance to pass onto handler callbacks.
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
@@ -139,15 +140,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                Manually modifying :attr:`user_data` is almost never needed and unadvisable.
 
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
-        persistence (:class:`telegram.ext.BasePersistence`): Optional. The persistence class to
+        persistence (:class:`telegram.ext.BasePersistence`): The persistence class to
             store data that should be persistent over restarts.
         handlers (Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]): A dictionary mapping each
             handler group to the list of handlers registered to that group.
 
             .. seealso::
                 :meth:`add_handler`, :meth:`add_handlers`.
-        error_handlers (Dict[:obj:`callable`, :obj:`bool`]): A dict, where the keys are error
-            handlers and the values indicate whether they are to be run blocking.
+        error_handlers (Dict[:term:`coroutine function`, :obj:`bool`]): A dict, where the keys are
+            error handlers and the values indicate whether they are to be run blocking.
 
             .. seealso::
                 :meth:`add_error_handler`
@@ -234,7 +235,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             raise TypeError("persistence must be based on telegram.ext.BasePersistence")
         self.persistence = persistence
 
-        # Some book keeping for persistence logic
+        # Some bookkeeping for persistence logic
         self._chat_ids_to_be_updated_in_persistence: Set[int] = set()
         self._user_ids_to_be_updated_in_persistence: Set[int] = set()
         self._chat_ids_to_be_deleted_in_persistence: Set[int] = set()
@@ -253,7 +254,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self.__update_persistence_task: Optional[asyncio.Task] = None
         self.__update_persistence_event = asyncio.Event()
         self.__update_persistence_lock = asyncio.Lock()
-        self.__create_task_tasks: Set[asyncio.Task] = set()
+        self.__create_task_tasks: Set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
 
     def _check_initialized(self) -> None:
         if not self._initialized:
@@ -272,10 +273,21 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     @property
     def concurrent_updates(self) -> int:
-        """0 == not concurrent"""
+        """:obj:`int`: Indicates the number of concurrent updates set. A value of ``0`` indicates
+        updates are *not* being processed concurrently.
+        """
         return self._concurrent_updates
 
     async def initialize(self) -> None:
+        """Initializes the Application by initializing:
+
+        * The :attr:`bot`, by calling :meth:`telegram.Bot.initialize`.
+        * The :attr:`updater`, by calling :meth:`telegram.ext.Updater.initialize`.
+        * The :attr:`persistence`, by loading persistent conversations and data.
+
+        .. seealso::
+            :meth:`shutdown`
+        """
         if self._initialized:
             _logger.debug('This Application is already initialized.')
             return
@@ -307,9 +319,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         )
 
     async def shutdown(self) -> None:
-        """
+        """Shuts down the Application by shutting down:
 
-        Returns:
+        * :attr:`bot` by calling :meth:`telegram.Bot.shutdown`
+        * :attr:`updater` by calling :meth:`telegram.ext.Updater.shutdown`
+        * :attr:`persistence` by calling :meth:`update_persistence` and :meth`persistence.flush`
+
+        .. seealso::
+            :meth:`initialize`
 
         Raises:
             :exc:`RuntimeError`: If the application is still :attr:`running`.
@@ -334,6 +351,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._initialized = False
 
     async def __aenter__(self: _AppType) -> _AppType:
+        """Simple context manager which initializes the App."""
         try:
             await self.initialize()
             return self
@@ -347,11 +365,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
+        """Shutdown the App from the context manager."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
 
     async def _initialize_persistence(self) -> None:
+        """This method basically just loads all the data by awaiting the BP methods"""
         if not self.persistence:
             return
 
@@ -392,15 +412,17 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
     async def start(self) -> None:
         """Starts
 
-        * a background task that fetches updates from :attr:`update_queue` and
-          processes them.
-        * :attr:`job_queue`, if set
-        * a background tasks that calls :meth:`update_persistence` in regular intervals, if
+        * a background task that fetches updates from :attr:`update_queue` and processes them.
+        * :attr:`job_queue`, if set.
+        * a background task that calls :meth:`update_persistence` in regular intervals, if
           :attr:`persistence` is set.
 
         Note:
             This does *not* start fetching updates from Telegram. You need to either start
             :attr:`updater` manually or use one of :meth:`run_polling` or :meth:`run_webhook`.
+
+        .. seealso::
+            :meth:`stop`
 
         Raises:
             :exc:`RuntimeError`: If the application is already running or was not initialized.
@@ -445,6 +467,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Warning:
             Once this method is called, no more updates will be fetched from :attr:`update_queue`,
             even if it's not empty.
+
+        .. seealso::
+            :meth:`start`
 
         Note:
             This does *not* stop :attr:`updater`. You need to either manually call
@@ -498,8 +523,46 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         drop_pending_updates: bool = None,
         close_loop: bool = True,
     ) -> None:
-        """Temp docstring to make this referencable
-        #TODO: Adda meaningful description
+        """Starts polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling`.
+
+        .. seealso::
+            :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`
+
+        Args:
+            poll_interval (:obj:`float`, optional): Time to wait between polling updates from
+                Telegram in seconds. Default is ``0.0``.
+            timeout (:obj:`float`, optional): Passed to
+                :paramref:`telegram.Bot.get_updates.timeout`. Default is ``10`` seconds.
+            bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
+                :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
+
+                * < 0 - retry indefinitely (default)
+                *   0 - no retries
+                * > 0 - retry up to X times
+
+            read_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to ``2``.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
+                Telegram servers before actually starting to poll. Default is :obj:`False`.
+            allowed_updates (List[:obj:`str`], optional): Passed to
+                :meth:`telegram.Bot.get_updates`.
+            close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
+                closed upon shutdown.
+
+                .. seealso::
+                    :meth:`asyncio.loop.close`
+
+        Raises:
+            :exc:`RuntimeError`: If the Application does not have an :class:`telegram.ext.Updater`.
         """
         if not self.updater:
             raise RuntimeError(
@@ -520,7 +583,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 pool_timeout=pool_timeout,
                 allowed_updates=allowed_updates,
                 drop_pending_updates=drop_pending_updates,
-                error_callback=error_callback,
+                error_callback=error_callback,  # if there is an error in fetching updates
             ),
             close_loop=close_loop,
         )
@@ -540,8 +603,46 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         max_connections: int = 40,
         close_loop: bool = True,
     ) -> None:
-        """Temp docstring to make this referencable
-        #TODO: Adda meaningful description
+        """
+        Starts a small http server to listen for updates via webhook using
+        :meth:`telegram.ext.Updater.start_webhook`. If :paramref:`cert`
+        and :paramref:`key` are not provided, the webhook will be started directly on
+        ``http://listen:port/url_path``, so SSL can be handled by another
+        application. Else, the webhook will be started on
+        ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as required.
+
+        .. seealso::
+            :meth:`telegram.ext.Updater.start_webhook`, :meth:`run_polling`
+
+        Args:
+            listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
+                `127.0.0.1 <https://en.wikipedia.org/wiki/Localhost>`_.
+            port (:obj:`int`, optional): Port the bot should be listening on. Must be one of
+                :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`. Defaults to ``80``.
+            url_path (:obj:`str`, optional): Path inside url. Defaults to `` '' ``
+            cert (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL certificate file.
+            key (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL key file.
+            bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
+                :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
+
+                * < 0 - retry indefinitely
+                *   0 - no retries (default)
+                * > 0 - retry up to X times
+            webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
+                NAT, reverse proxy, etc. Default is derived from :paramref:`listen`,
+                :paramref:`port`, :paramref:`url_path`, :paramref:`cert`, and :paramref:`key`.
+            allowed_updates (List[:obj:`str`], optional): Passed to
+                :meth:`telegram.Bot.set_webhook`.
+            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
+                Telegram servers before actually starting to poll. Default is :obj:`False`.
+            ip_address (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
+            max_connections (:obj:`int`, optional): Passed to
+                :meth:`telegram.Bot.set_webhook`. Defaults to ``40``.
+            close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
+                closed upon shutdown. Defaults to :obj:`True`.
+
+                .. seealso::
+                    :meth:`asyncio.loop.close`
         """
         if not self.updater:
             raise RuntimeError(
@@ -572,9 +673,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         loop = asyncio.get_event_loop()
         try:
             loop.run_until_complete(self.initialize())
-            loop.run_until_complete(updater_coroutine)
+            loop.run_until_complete(updater_coroutine)  # one of updater.start_webhook/polling
             loop.run_until_complete(self.start())
-
             loop.run_forever()
         except (KeyboardInterrupt, SystemExit):
             pass
@@ -603,14 +703,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Note:
             * If :paramref:`coroutine` raises an exception, it will be set on the task created by
               this method even though it's handled by :meth:`process_error`.
-            * If the application is currently running, tasks created by this methods will be
+            * If the application is currently running, tasks created by this method will be
               awaited by :meth:`stop`.
 
         Args:
-            coroutine: The coroutine to run as task.
-            update: Optional. If passed, will be passed to :meth:`process_error` as additional
-                information for the error handlers. Moreover, the corresponding :attr:`chat_data`
-                and :attr:`user_data` entries will be updated in the next run of
+            coroutine (:term:`coroutine function`): The coroutine to run as task.
+            update (:obj:`object`, optional): If passed, will be passed to :meth:`process_error`
+                as additional information for the error handlers. Moreover, the corresponding
+                :attr:`chat_data` and :attr:`user_data` entries will be updated in the next run of
                 :meth:`update_persistence` after the :paramref:`coroutine` is finished.
 
         Returns:
@@ -643,7 +743,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         return task
 
     def __create_task_done_callback(self, task: asyncio.Task) -> None:
-        self.__create_task_tasks.discard(task)
+        self.__create_task_tasks.discard(task)  # Discard from our set since we are done with it
         # We just retrieve the eventual exception so that asyncio doesn't complain in case
         # it's not retrieved somewhere else
         try:
@@ -661,7 +761,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             return await coroutine
         except asyncio.CancelledError as cancel:
             # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
-            #   close when we drop py3.7
+            #  clause when we drop py3.7
             raise cancel
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
@@ -685,7 +785,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                 # So we can and must handle it
                 await self.process_error(update=update, error=exception, coroutine=coroutine)
 
-            # Raise exception so that it can be set on the task
+            # Raise exception so that it can be set on the task and retrieved by task.exception()
             raise exception
         finally:
             self._mark_for_persistence_update(update=update)
@@ -707,6 +807,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             _logger.debug('Processing update %s', update)
 
             if self._concurrent_updates:
+                # We don't await the below because it has to be run concurrently
                 self.create_task(self.__process_update_wrapper(update), update=update)
             else:
                 await self.__process_update_wrapper(update)
@@ -717,18 +818,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             self.update_queue.task_done()
 
     async def process_update(self, update: object) -> None:
-        """Processes a single update and updates the persistence.
+        """Processes a single update and marks the update to be updated by the persistence later.
         Exceptions raised by handler callbacks will be processed by :meth:`process_update`.
 
         .. versionchanged:: 14.0
-            This calls :meth:`update_persistence` exactly once after handling of the update was
-            finished by *all* handlers that handled the update, including asynchronously running
-            handlers.
+            Persistence is now updated in an interval set by
+            :attr:`telegram.ext.BasePersistence.update_interval`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object` | \
-                :class:`telegram.error.TelegramError`):
-                The update to process.
+                :class:`telegram.error.TelegramError`): The update to process.
 
         Raises:
             :exc:`RuntimeError`: If the application was not initialized.
@@ -737,19 +836,19 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._check_initialized()
 
         context = None
-        any_blocking = False
+        any_blocking = False  # Flag which is set to True if any handler specifies block=True
 
         for handlers in self.handlers.values():
             try:
                 for handler in handlers:
-                    check = handler.check_update(update)
-                    if not (check is None or check is False):
-                        if not context:
+                    check = handler.check_update(update)  # Should the handler handle this update?
+                    if not (check is None or check is False):  # if yes,
+                        if not context:  # build a context if not already built
                             context = self.context_types.context.from_update(update, self)
                             await context.refresh_data()
                         coroutine: Coroutine = handler.handle_update(update, self, check, context)
 
-                        if not handler.block or (
+                        if not handler.block or (  # if handler is running with block=False,
                             handler.block is DEFAULT_TRUE
                             and isinstance(self.bot, ExtBot)
                             and self.bot.defaults
@@ -759,7 +858,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                         else:
                             any_blocking = True
                             await coroutine
-                        break
+                        break  # Only a max of 1 handler per group is handled
 
             # Stop processing with any other handler.
             except ApplicationHandlerStop:
@@ -775,6 +874,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         if any_blocking:
             # Only need to mark the update for persistence if there was at least one
             # blocking handler - the non-blocking handlers mark the update again when finished
+            # (in __create_task_callback)
             self._mark_for_persistence_update(update=update)
 
     def add_handler(self, handler: Handler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
@@ -806,7 +906,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Args:
             handler (:class:`telegram.ext.Handler`): A Handler instance.
-            group (:obj:`int`, optional): The group identifier. Default is 0.
+            group (:obj:`int`, optional): The group identifier. Default is ``0``.
 
         """
         # Unfortunately due to circular imports this has to be here
@@ -852,12 +952,19 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. seealso:: :meth:`add_handler`
 
         Args:
-            handlers (List[:obj:`telegram.ext.Handler`] | \
-                Dict[int, List[:obj:`telegram.ext.Handler`]]): \
+            handlers (List[:class:`telegram.ext.Handler`] | \
+                Dict[int, List[:class:`telegram.ext.Handler`]]): \
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
-            group (:obj:`int`, optional): Specify which group the sequence of ``handlers``
+            group (:obj:`int`, optional): Specify which group the sequence of :paramref:`handlers`
                 should be added to. Defaults to ``0``.
+
+        Example::
+
+            app.add_handlers(handlers={
+                -1: [MessageHandler(...)],
+                1: [CallbackQueryHandler(...), CommandHandler(...)]
+            }
 
         """
         if isinstance(handlers, dict) and not isinstance(group, DefaultValue):
@@ -885,8 +992,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Remove a handler from the specified group.
 
         Args:
-            handler (:class:`telegram.ext.Handler`): A Handler instance.
-            group (:obj:`object`, optional): The group identifier. Default is 0.
+            handler (:class:`telegram.ext.Handler`): A :class:`telegram.ext.Handler` instance.
+            group (:obj:`object`, optional): The group identifier. Default is ``0``.
 
         """
         if handler in self.handlers[group]:
@@ -946,7 +1053,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
               :class:`telegram.ext.Job`.
 
         Warning:
-            When using :paramref:`concurrent_updates` or the :attr:`job_queue`,
+            When using :attr:`concurrent_updates` or the :attr:`job_queue`,
             :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create the old entry due
             to the asynchronous nature of these features. Please make sure that your program can
             avoid or handle such situations.
@@ -955,9 +1062,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             message (:class:`telegram.Message`, optional): A message with either
                 :attr:`~telegram.Message.migrate_from_chat_id` or
                 :attr:`~telegram.Message.migrate_to_chat_id`.
-                Mutually exclusive with passing :paramref:`old_chat_id`` and
-                :paramref:`new_chat_id`
-                .. seealso: `telegram.ext.filters.StatusUpdate.MIGRATE`
+                Mutually exclusive with passing :paramref:`old_chat_id` and
+                :paramref:`new_chat_id`.
+
+                .. seealso::
+                    :attr:`telegram.ext.filters.StatusUpdate.MIGRATE`
+
             old_chat_id (:obj:`int`, optional): The old chat ID.
                 Mutually exclusive with passing :paramref:`message`
             new_chat_id (:obj:`int`, optional): The new chat ID.
@@ -1006,6 +1116,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             if not self.persistence:
                 return
 
+            # asyncio synchronization primitives don't accept a timeout argument, it is recommended
+            # to use wait_for instead
             try:
                 await asyncio.wait_for(
                     self.__update_persistence_event.wait(),
@@ -1030,6 +1142,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         Tip:
             This method will be called in regular intervals by the application. There is usually
             no need to call it manually.
+
+        Note:
+            Any data is deep copied with :func:`copy.deepcopy` before handing it over to the
+            persistence in order to avoid race conditions, so all persisted data must be copyable.
 
         .. seealso:: :attr:`telegram.ext.BasePersistence.update_interval`.
         """
@@ -1156,10 +1272,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             Attempts to add the same callback multiple times will be ignored.
 
         Args:
-            callback (:obj:`callable`): The callback function for this error handler. Will be
-                called when an error is raised. Callback signature:
-                ``def callback(update: Optional[object], context: CallbackContext)``.
-                The error that happened will be present in ``context.error``.
+            callback (:term:`coroutine function`): The callback function for this error handler.
+                Will be called when an error is raised. Callback signature::
+
+                    async def callback(update: Optional[object], context: CallbackContext)
+
+                The error that happened will be present in
+                :attr:`telegram.ext.CallbackContext.error`.
             block (:obj:`bool`, optional): Determines whether the return value of the callback
                 should be awaited before processing the next error handler in
                 :meth:`process_error`. Defaults to :obj:`True`.
@@ -1174,7 +1293,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Removes an error handler.
 
         Args:
-            callback (:obj:`callable`): The error handler to remove.
+            callback (:term:`coroutine function`): The error handler to remove.
 
         """
         self.error_handlers.pop(callback, None)
@@ -1196,6 +1315,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. versionchanged:: 14.0
 
+            * ``dispatch_error`` was renamed to :meth:`process_error`.
             * Exceptions raised by error handlers are now properly logged.
             * :class:`telegram.ext.ApplicationHandlerStop` is no longer reraised but converted into
               the return value.
@@ -1206,10 +1326,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
             job (:class:`telegram.ext.Job`, optional): The job that caused the error.
 
                 .. versionadded:: 14.0
+            coroutine (:term:`coroutine function`, optional): The coroutine that caused the error.
 
         Returns:
-            :obj:`bool`: :obj:`True` if one of the error handlers raised
-                :class:`telegram.ext.ApplicationHandlerStop`. :obj:`False`, otherwise.
+            :obj:`bool`: :obj:`True`, if one of the error handlers raised
+            :class:`telegram.ext.ApplicationHandlerStop`. :obj:`False`, otherwise.
         """
         if self.error_handlers:
             for (
@@ -1223,7 +1344,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
                     job=job,
                     coroutine=coroutine,
                 )
-                if not block or (
+                if not block or (  # If error handler has `block=False`, create a Task to run cb
                     block is DEFAULT_TRUE
                     and isinstance(self.bot, ExtBot)
                     and self.bot.defaults

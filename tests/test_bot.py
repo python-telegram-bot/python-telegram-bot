@@ -2438,7 +2438,7 @@ class TestBot:
             pass
 
         async def do_request(*args, **kwargs):
-            obj = kwargs.get('read_timeout')
+            obj = kwargs.get('write_timeout')
             if obj == 20:
                 raise OkException
 

@@ -66,6 +66,10 @@ _logger = logging.getLogger(__name__)
 
 @dataclass
 class _ConversationTimeoutContext(Generic[CCT]):
+    """Used as a datastore for conversation timeouts. Passed in the
+    :paramref:`JobQueue.run_once.context` parameter. See :meth:`_trigger_timeout`.
+    """
+
     __slots__ = ('conversation_key', 'update', 'application', 'callback_context')
 
     conversation_key: ConversationKey
@@ -76,8 +80,8 @@ class _ConversationTimeoutContext(Generic[CCT]):
 
 @dataclass
 class PendingState:
-    """Thin wrapper around asyncio.Task to handle block=False handlers. Note that this is a
-    public class of this module, since `Application.update_persistence` needs to access it.
+    """Thin wrapper around :class:`asyncio.Task` to handle block=False handlers. Note that this is
+    a public class of this module, since :meth:`Application.update_persistence` needs to access it.
     It's still hidden from users, since this module itself is private.
     """
 
@@ -90,6 +94,13 @@ class PendingState:
         return self.task.done()
 
     def resolve(self) -> object:
+        """Returns the new state of the :class:`ConversationHandler` if available. If there was an
+        exception during the task execution, then return the old state. If the returned state was
+        :obj:`None`, then end the conversation.
+
+        Raises:
+            :exc:`RuntimeError`: If the current task has not yet finished.
+        """
         if not self.task.done():
             raise RuntimeError('New state is not yet available')
 
@@ -112,7 +123,7 @@ class PendingState:
 class ConversationHandler(Handler[Update, CCT]):
     """
     A handler to hold a conversation with a single or multiple users through Telegram updates by
-    managing four collections of other handlers.
+    managing three collections of other handlers.
 
     Warning:
         :class:`ConversationHandler` heavily relies on incoming updates being processed one by one.
@@ -120,36 +131,38 @@ class ConversationHandler(Handler[Update, CCT]):
         :obj:`False`.
 
     Note:
-        ``ConversationHandler`` will only accept updates that are (subclass-)instances of
+        :class:`ConversationHandler` will only accept updates that are (subclass-)instances of
         :class:`telegram.Update`. This is, because depending on the :attr:`per_user` and
-        :attr:`per_chat` ``ConversationHandler`` relies on
+        :attr:`per_chat`, :class:`ConversationHandler` relies on
         :attr:`telegram.Update.effective_user` and/or :attr:`telegram.Update.effective_chat` in
-        order to determine which conversation an update should belong to. For ``per_message=True``,
-        ``ConversationHandler`` uses ``update.callback_query.message.message_id`` when
-        ``per_chat=True`` and ``update.callback_query.inline_message_id`` when ``per_chat=False``.
-        For a more detailed explanation, please see our `FAQ`_.
+        order to determine which conversation an update should belong to. For
+        :attr:`per_message=True <per_message>`, :class:`ConversationHandler` uses
+        :attr:`update.callback_query.message.message_id <telegram.Message.message_id>` when
+        :attr:`per_chat=True <per_chat>` and
+        :attr:`update.callback_query.inline_message_id <.CallbackQuery.inline_message_id>` when
+        :attr:`per_chat=False <per_chat>`. For a more detailed explanation, please see our `FAQ`_.
 
-        Finally, ``ConversationHandler``, does *not* handle (edited) channel posts.
+        Finally, :class:`ConversationHandler`, does *not* handle (edited) channel posts.
 
     .. _`FAQ`: https://github.com/python-telegram-bot/python-telegram-bot/wiki\
         /Frequently-Asked-Questions#what-do-the-per_-settings-in-conversation handler-do
 
-    The first collection, a ``list`` named :attr:`entry_points`, is used to initiate the
+    The first collection, a :obj:`list` named :attr:`entry_points`, is used to initiate the
     conversation, for example with a :class:`telegram.ext.CommandHandler` or
     :class:`telegram.ext.MessageHandler`.
 
-    The second collection, a ``dict`` named :attr:`states`, contains the different conversation
+    The second collection, a :obj:`dict` named :attr:`states`, contains the different conversation
     steps and one or more associated handlers that should be used if the user sends a message when
     the conversation with them is currently in that state. Here you can also define a state for
     :attr:`TIMEOUT` to define the behavior when :attr:`conversation_timeout` is exceeded, and a
     state for :attr:`WAITING` to define behavior when a new update is received while the previous
-    ``@run_async`` decorated handler is not finished.
+    :attr:`block=False <block>` handler is not finished.
 
-    The third collection, a ``list`` named :attr:`fallbacks`, is used if the user is currently in a
-    conversation but the state has either no associated handler or the handler that is associated
-    to the state is inappropriate for the update, for example if the update contains a command, but
-    a regular text message is expected. You could use this for a ``/cancel`` command or to let the
-    user know their message was not recognized.
+    The third collection, a :obj:`list` named :attr:`fallbacks`, is used if the user is currently
+    in a conversation but the state has either no associated handler or the handler that is
+    associated to the state is inappropriate for the update, for example if the update contains a
+    command, but a regular text message is expected. You could use this for a ``/cancel`` command
+    or to let the user know their message was not recognized.
 
     To change the state of conversation, the callback function of a handler must return the new
     state after responding to the user. If it does not return anything (returning :obj:`None` by
@@ -158,78 +171,82 @@ class ConversationHandler(Handler[Update, CCT]):
     To end the conversation, the callback function must return :attr:`END` or ``-1``. To
     handle the conversation timeout, use handler :attr:`TIMEOUT` or ``-2``.
     Finally, :class:`telegram.ext.ApplicationHandlerStop` can be used in conversations as described
-    in the corresponding documentation.
+    in its documentation.
 
     Note:
         In each of the described collections of handlers, a handler may in turn be a
-        :class:`ConversationHandler`. In that case, the nested :class:`ConversationHandler` should
-        have the attribute :attr:`map_to_parent` which allows to return to the parent conversation
-        at specified states within the nested conversation.
+        :class:`ConversationHandler`. In that case, the child :class:`ConversationHandler` should
+        have the attribute :attr:`map_to_parent` which allows returning to the parent conversation
+        at specified states within the child conversation.
 
         Note that the keys in :attr:`map_to_parent` must not appear as keys in :attr:`states`
         attribute or else the latter will be ignored. You may map :attr:`END` to one of the parents
-        states to continue the parent conversation after this has ended or even map a state to
-        :attr:`END` to end the *parent* conversation from within the nested one. For an example on
-        nested :class:`ConversationHandler` s, see our `examples`_.
+        states to continue the parent conversation after the child conversation has ended or even
+        map a state to :attr:`END` to end the *parent* conversation from within the child
+        conversation. For an example on nested :class:`ConversationHandler` s, see our `examples`_.
 
     .. _`examples`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples
 
     Args:
-        entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
-            trigger the start of the conversation. The first handler which :attr:`check_update`
+        entry_points (List[:class:`telegram.ext.Handler`]): A list of :obj:`Handler` objects that
+            can trigger the start of the conversation. The first handler whose :meth:`check_update`
             method returns :obj:`True` will be used. If all return :obj:`False`, the update is not
             handled.
         states (Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]): A :obj:`dict` that
             defines the different states of conversation a user can be in and one or more
-            associated ``Handler`` objects that should be used in that state. The first handler
-            which :attr:`check_update` method returns :obj:`True` will be used.
+            associated :obj:`Handler` objects that should be used in that state. The first handler
+            whose :meth:`check_update` method returns :obj:`True` will be used.
         fallbacks (List[:class:`telegram.ext.Handler`]): A list of handlers that might be used if
             the user is in a conversation, but every handler for their current state returned
-            :obj:`False` on :attr:`check_update`. The first handler which :attr:`check_update`
+            :obj:`False` on :meth:`check_update`. The first handler which :meth:`check_update`
             method returns :obj:`True` will be used. If all return :obj:`False`, the update is not
             handled.
         allow_reentry (:obj:`bool`, optional): If set to :obj:`True`, a user that is currently in a
             conversation can restart the conversation by triggering one of the entry points.
-        per_chat (:obj:`bool`, optional): If the conversationkey should contain the Chat's ID.
+        per_chat (:obj:`bool`, optional): If the conversation key should contain the Chat's ID.
             Default is :obj:`True`.
-        per_user (:obj:`bool`, optional): If the conversationkey should contain the User's ID.
+        per_user (:obj:`bool`, optional): If the conversation key should contain the User's ID.
             Default is :obj:`True`.
-        per_message (:obj:`bool`, optional): If the conversationkey should contain the Message's
+        per_message (:obj:`bool`, optional): If the conversation key should contain the Message's
             ID. Default is :obj:`False`.
         conversation_timeout (:obj:`float` | :obj:`datetime.timedelta`, optional): When this
             handler is inactive more than this timeout (in seconds), it will be automatically
-            ended. If this value is 0 or :obj:`None` (default), there will be no timeout. The last
-            received update and the corresponding ``context`` will be handled by ALL the handler's
-            who's :attr:`check_update` method returns :obj:`True` that are in the state
-            :attr:`ConversationHandler.TIMEOUT`.
+            ended. If this value is ``0`` or :obj:`None` (default), there will be no timeout. The
+            last received update and the corresponding :class:`context <.CallbackContext>` will be
+            handled by *ALL* the handler's whose :meth:`check_update` method returns :obj:`True`
+            that are in the state :attr:`ConversationHandler.TIMEOUT`.
 
             Note:
-                 Using `conversation_timeout` with nested conversations is currently not
+                 Using :paramref:`conversation_timeout` with nested conversations is currently not
                  supported. You can still try to use it, but it will likely behave differently
                  from what you expect.
 
-
         name (:obj:`str`, optional): The name for this conversation handler. Required for
             persistence.
-        persistent (:obj:`bool`, optional): If the conversations dict for this handler should be
-            saved. Name is required and persistence has to be set in :class:`telegram.ext.Updater`
+        persistent (:obj:`bool`, optional): If the conversation's dict for this handler should be
+            saved. :paramref:`name` is required and persistence has to be set in
+            :attr:`Application <.Application.persistence>`.
+
+            .. versionchanged:: 14.0
+                Was previously named as ``persistence``.
         map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
-            used to instruct a nested conversation handler to transition into a mapped state on
+            used to instruct a child conversation handler to transition into a mapped state on
             its parent conversation handler in place of a specified nested state.
-        block (:obj:`bool`, optional): Pass :obj:`False` to set a default value for the
-            :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
+        block (:obj:`bool`, optional): Pass :obj:`False` or :obj:`True` to set a default value for
+            the :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
             :attr:`states` and :attr:`fallbacks`). The resolution order for checking if a handler
             should be run non-blocking is:
 
-                1. :attr:`telegram.ext.Handler.block` (if set)
-                2. the value passed to this parameter (if any)
-                3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
+            1. :attr:`telegram.ext.Handler.block` (if set)
+            2. the value passed to this parameter (if any)
+            3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
 
             .. versionchanged:: 14.0
                 No longer overrides the handlers settings. Resolution order was changed.
 
     Raises:
-        ValueError
+        :exc:`ValueError`: If :paramref:`persistent` is used but :paramref:`name` was not set, or
+            when :attr:`per_message`, :attr:`per_chat`, :attr:`per_user` are all :obj:`False`.
 
     Attributes:
         block (:obj:`bool`): Determines whether the callback will run asynchronously. Always
@@ -259,10 +276,12 @@ class ConversationHandler(Handler[Update, CCT]):
     END: ClassVar[int] = -1
     """:obj:`int`: Used as a constant to return when a conversation is ended."""
     TIMEOUT: ClassVar[int] = -2
-    """:obj:`int`: Used as a constant to handle state when a conversation is timed out."""
+    """:obj:`int`: Used as a constant to handle state when a conversation is timed out
+    (exceeded :attr:`conversation_timeout`).
+    """
     WAITING: ClassVar[int] = -3
     """:obj:`int`: Used as a constant to handle state when a conversation is still waiting on the
-    previous ``@run_sync`` decorated running handler to finish."""
+    previous :attr:`block=False <block>` handler to finish."""
     # pylint: disable=super-init-not-called
     def __init__(
         self,
@@ -305,6 +324,8 @@ class ConversationHandler(Handler[Update, CCT]):
         self._name = name
         self._map_to_parent = map_to_parent
 
+        # if conversation_timeout is used, this dict is used to schedule a job which runs when the
+        # conv has timed out.
         self.timeout_jobs: Dict[ConversationKey, 'Job'] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
@@ -335,9 +356,6 @@ class ConversationHandler(Handler[Update, CCT]):
             handler for handler in all_handlers if isinstance(handler, ConversationHandler)
         )
 
-        # this loop is going to warn the user about handlers which can work unexpected
-        # in conversations
-
         # this link will be added to all warnings tied to per_* setting
         per_faq_link = (
             " Read this FAQ entry to learn more about the per_* settings: "
@@ -345,6 +363,8 @@ class ConversationHandler(Handler[Update, CCT]):
             "/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do."
         )
 
+        # this loop is going to warn the user about handlers which can work unexpectedly
+        # in conversations
         for handler in all_handlers:
             if isinstance(handler, (StringCommandHandler, StringRegexHandler)):
                 warn(
@@ -409,8 +429,8 @@ class ConversationHandler(Handler[Update, CCT]):
 
     @property
     def entry_points(self) -> List[Handler]:
-        """List[:class:`telegram.ext.Handler`]: A list of ``Handler`` objects that can trigger the
-        start of the conversation.
+        """List[:class:`telegram.ext.Handler`]: A list of :obj:`Handler` objects that can trigger
+        the start of the conversation.
         """
         return self._entry_points
 
@@ -424,7 +444,7 @@ class ConversationHandler(Handler[Update, CCT]):
     def states(self) -> Dict[object, List[Handler]]:
         """Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]: A :obj:`dict` that
         defines the different states of conversation a user can be in and one or more
-        associated ``Handler`` objects that should be used in that state.
+        associated :obj:`Handler` objects that should be used in that state.
         """
         return self._states
 
@@ -436,7 +456,7 @@ class ConversationHandler(Handler[Update, CCT]):
     def fallbacks(self) -> List[Handler]:
         """List[:class:`telegram.ext.Handler`]: A list of handlers that might be used if
         the user is in a conversation, but every handler for their current state returned
-        :obj:`False` on :attr:`check_update`.
+        :obj:`False` on :meth:`check_update`.
         """
         return self._fallbacks
 
@@ -510,7 +530,9 @@ class ConversationHandler(Handler[Update, CCT]):
     @property
     def persistent(self) -> bool:
         """:obj:`bool`: Optional. If the conversations dict for this handler should be
-        saved."""
+        saved. :attr:`name` is required and persistence has to be set in
+        :attr:`Application <.Application.persistence>`.
+        """
         return self._persistent
 
     @persistent.setter
@@ -534,9 +556,9 @@ class ConversationHandler(Handler[Update, CCT]):
     async def _initialize_persistence(
         self, application: 'Application'
     ) -> Dict[str, TrackingDict[ConversationKey, object]]:
-        """Initializes the persistence for this handler. While this method is marked as protected,
-        we expect it to be called by the Application/parent conversations. It's just protected to
-        hide it from users.
+        """Initializes the persistence for this handler and its child conversations.
+        While this method is marked as protected, we expect it to be called by the
+        Application/parent conversations. It's just protected to hide it from users.
 
         Args:
             application (:class:`telegram.ext.Application`): The application.
@@ -577,6 +599,7 @@ class ConversationHandler(Handler[Update, CCT]):
         return out
 
     def _get_key(self, update: Update) -> ConversationKey:
+        """Builds the conversation key associated with the update."""
         chat = update.effective_chat
         user = update.effective_user
 
@@ -635,6 +658,7 @@ class ConversationHandler(Handler[Update, CCT]):
         context: CallbackContext,
         conversation_key: ConversationKey,
     ) -> None:
+        """Schedules a job which executes :meth:`_trigger_timeout` upon conversation timeout."""
         if new_state == self.END:
             return
 
@@ -680,11 +704,11 @@ class ConversationHandler(Handler[Update, CCT]):
         state = self._conversations.get(key)
         check: Optional[object] = None
 
-        # Resolve promises
+        # Resolve futures
         if isinstance(state, PendingState):
             _logger.debug('Waiting for asyncio Task to finish ...')
 
-            # check if promise is finished or not
+            # check if future is finished or not
             if state.done():
                 res = state.resolve()
                 self._update_state(res, key)
@@ -746,8 +770,8 @@ class ConversationHandler(Handler[Update, CCT]):
         """Send the update to the callback for the current state and Handler
 
         Args:
-            check_result: The result from check_update. For this handler it's a tuple of the
-                conversation state, key, handler, and the handler's check result.
+            check_result: The result from :meth:`check_update`. For this handler it's a tuple of
+                the conversation state, key, handler, and the handler's check result.
             update (:class:`telegram.Update`): Incoming telegram update.
             application (:class:`telegram.ext.Application`): Application that originated the
                 update.
@@ -779,7 +803,7 @@ class ConversationHandler(Handler[Update, CCT]):
             else:
                 block = DefaultValue.get_value(handler.block)
 
-        try:
+        try:  # Now create task or await the callback
             if block:
                 new_state: object = await handler.handle_update(
                     update, application, handler_check_result, context
@@ -857,6 +881,10 @@ class ConversationHandler(Handler[Update, CCT]):
             self._conversations[key] = new_state
 
     async def _trigger_timeout(self, context: CallbackContext) -> None:
+        """This is run whenever a conversation has timed out. Also makes sure that all handlers
+        which are in the :attr:`TIMEOUT` state and whose :meth:`Handler.check_update` returns
+        :obj:`True` is handled.
+        """
         job = cast('Job', context.job)
         ctxt = cast(_ConversationTimeoutContext, job.context)
 
@@ -873,6 +901,7 @@ class ConversationHandler(Handler[Update, CCT]):
                 return
             del self.timeout_jobs[ctxt.conversation_key]
 
+        # Now run all handlers which are in TIMEOUT state
         handlers = self.states.get(self.TIMEOUT, [])
         for handler in handlers:
             check = handler.check_update(ctxt.update)

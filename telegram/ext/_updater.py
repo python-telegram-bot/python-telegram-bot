@@ -57,11 +57,11 @@ class Updater:
           the sole purpose of this class is to fetch updates. The entry point to a PTB application
           is now :class:`telegram.ext.Application`.
 
-    Attributes:
+    Args:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
         update_queue (:class:`asyncio.Queue`): Queue for the updates.
 
-    Args:
+    Attributes:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
         update_queue (:class:`asyncio.Queue`): Queue for the updates.
 
@@ -100,6 +100,12 @@ class Updater:
         return self._running
 
     async def initialize(self) -> None:
+        """Initialize the Updater & the associated :attr:`bot` by calling
+        :meth:`telegram.Bot.initialize`.
+
+        .. seealso::
+            :meth:`shutdown`
+        """
         if self._initialized:
             self._logger.debug('This Updater is already initialized.')
             return
@@ -109,8 +115,10 @@ class Updater:
 
     async def shutdown(self) -> None:
         """
+        Shutdown the Updater & the associated :attr:`bot` by calling :meth:`telegram.Bot.shutdown`.
 
-        Returns:
+        .. seealso::
+            :meth:`initialize`
 
         Raises:
             :exc:`RuntimeError`: If the updater is still running.
@@ -127,6 +135,7 @@ class Updater:
         self._logger.debug('Shut down of Updater complete')
 
     async def __aenter__(self: _UpdaterType) -> _UpdaterType:
+        """Simple context manager which initializes the Updater."""
         try:
             await self.initialize()
             return self
@@ -140,6 +149,7 @@ class Updater:
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
+        """Shutdown the Updater from the context manager."""
         # Make sure not to return `True` so that exceptions are not suppressed
         # https://docs.python.org/3/reference/datamodel.html?#object.__aexit__
         await self.shutdown()
@@ -165,38 +175,46 @@ class Updater:
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
                 Telegram in seconds. Default is ``0.0``.
-            timeout (:obj:`float`, optional): Passed to :meth:`telegram.Bot.get_updates`.
-            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
-                Telegram servers before actually starting to poll. Default is :obj:`False`.
-
-                .. versionadded :: 13.4
+            timeout (:obj:`float`, optional): Passed to
+                :paramref:`telegram.Bot.get_updates.timeout`. Defaults to ``10`` seconds.
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
                 * < 0 - retry indefinitely (default)
                 *   0 - no retries
                 * > 0 - retry up to X times
-
+            read_timeout (:obj:`float`, optional): Value to pass to
+                :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to ``2``.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
-            read_timeout (:obj:`float` | :obj:`int`, optional): Grace time in seconds for receiving
-                the reply from server. Will be added to the ``timeout`` value and used as the read
-                timeout from server (Default: ``2``).
+            drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
+                Telegram servers before actually starting to poll. Default is :obj:`False`.
+
+                .. versionadded :: 13.4
             error_callback (Callable[[:exc:`telegram.error.TelegramError`], :obj:`None`], \
                 optional): Callback to handle :exc:`telegram.error.TelegramError` s that occur
                 while calling :meth:`telegram.Bot.get_updates` during polling. Defaults to
                 :obj:`None`, in which case errors will be logged.
 
                 Note:
-                    The :paramref:`error_callback` must *not* be a coroutine function! If
-                    asynchorous behavior of the callback is wanted, please schedule a task from
+                    The :paramref:`error_callback` must *not* be a :term:`coroutine function`! If
+                    asynchronous behavior of the callback is wanted, please schedule a task from
                     within the callback.
 
         Returns:
             :class:`asyncio.Queue`: The update queue that can be filled from the main thread.
 
         Raises:
-            :exc:`RuntimeError`: If the updater is already running.
+            :exc:`RuntimeError`: If the updater is already running or was not initialized.
 
         """
         if error_callback and asyncio.iscoroutinefunction(error_callback):
@@ -244,7 +262,7 @@ class Updater:
         self,
         poll_interval: float,
         timeout: int,
-        read_timeout: Optional[float],
+        read_timeout: float,
         write_timeout: ODVInput[float],
         connect_timeout: ODVInput[float],
         pool_timeout: ODVInput[float],
@@ -257,6 +275,9 @@ class Updater:
 
         self._logger.debug('Updater started (polling)')
 
+        # the bootstrapping phase does two things:
+        # 1) make sure there is no webhook set
+        # 2) apply drop_pending_updates
         await self._bootstrap(
             bootstrap_retries,
             drop_pending_updates=drop_pending_updates,
@@ -298,9 +319,9 @@ class Updater:
                 else:
                     for update in updates:
                         await self.update_queue.put(update)
-                    self._last_update_id = updates[-1].update_id + 1
+                    self._last_update_id = updates[-1].update_id + 1  # Add one to 'confirm' it
 
-            return True
+            return True  # Keep fetching updates & don't quit. Polls with poll_interval.
 
         def default_error_callback(exc: TelegramError) -> None:
             self._logger.exception('Exception happened while polling for updates.', exc_info=exc)
@@ -349,10 +370,12 @@ class Updater:
             the deprecated argument ``force_event_loop``.
 
         Args:
-            listen (:obj:`str`, optional): IP-Address to listen on. Default ``127.0.0.1``.
+            listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
+                `127.0.0.1 <https://en.wikipedia.org/wiki/Localhost>`_.
             port (:obj:`int`, optional): Port the bot should be listening on. Must be one of
                 :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`. Defaults to ``80``.
-            url_path (:obj:`str`, optional): Path inside url.
+            url_path (:obj:`str`, optional): Path inside url (http(s)://listen:port/<url_path>).
+                Defaults to ``''``.
             cert (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL certificate file.
             key (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL key file.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
@@ -361,24 +384,25 @@ class Updater:
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
 
-                * < 0 - retry indefinitely (default)
-                *   0 - no retries
+                * < 0 - retry indefinitely
+                *   0 - no retries (default)
                 * > 0 - retry up to X times
             webhook_url (:obj:`str`, optional): Explicitly specify the webhook url. Useful behind
-                NAT, reverse proxy, etc. Default is derived from ``listen``, ``port`` &
-                ``url_path``.
+                NAT, reverse proxy, etc. Default is derived from :paramref:`listen`,
+                :paramref:`port`, :paramref:`url_path`, :paramref:`cert`, and :paramref:`key`.
             ip_address (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
+                Defaults to :obj:`None`.
                 .. versionadded :: 13.4
             allowed_updates (List[:obj:`str`], optional): Passed to
-                :meth:`telegram.Bot.set_webhook`.
+                :meth:`telegram.Bot.set_webhook`. Defaults to :obj:`None`.
             max_connections (:obj:`int`, optional): Passed to
-                :meth:`telegram.Bot.set_webhook`.
+                :meth:`telegram.Bot.set_webhook`. Defaults to ``40``.
                 .. versionadded:: 13.6
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.
 
         Raises:
-            :exc:`RuntimeError`: If the updater is already running.
+            :exc:`RuntimeError`: If the updater is already running or was not initialized.
         """
         async with self.__lock:
             if self.running:
@@ -499,7 +523,7 @@ class Updater:
         `action_cb` evaluates :obj:`False`.
 
         Args:
-            action_cb (:obj:`callable`): Network oriented callback function to call.
+            action_cb (:term:`coroutine function`): Network oriented callback function to call.
             on_err_cb (:obj:`callable`): Callback to call when TelegramError is caught. Receives
                 the exception object as a parameter.
             description (:obj:`str`): Description text to use for logs and exception raised.
@@ -551,6 +575,10 @@ class Updater:
         ip_address: str = None,
         max_connections: int = 40,
     ) -> None:
+        """Prepares the setup for fetching updates: delete or set the webhook and drop pending
+        updates if appropriate. If there are unsuccessful attempts, this will retry as specified by
+        :paramref:`max_retries`.
+        """
         retries = 0
 
         async def bootstrap_del_webhook() -> bool:
@@ -589,7 +617,7 @@ class Updater:
                 raise exc
 
         # Dropping pending updates from TG can be efficiently done with the drop_pending_updates
-        # parameter of delete/start_webhook, even in the case of polling. Also we want to make
+        # parameter of delete/start_webhook, even in the case of polling. Also, we want to make
         # sure that no webhook is configured in case of polling, so we just always call
         # delete_webhook for polling
         if drop_pending_updates or not webhook_url:
@@ -616,6 +644,9 @@ class Updater:
     async def stop(self) -> None:
         """Stops the polling/webhook.
 
+        .. seealso::
+            :meth:`start_polling`, :meth:`start_webhook`
+
         Raises:
             :exc:`RuntimeError`: If the updater is not running.
         """
@@ -633,12 +664,14 @@ class Updater:
             self._logger.debug('Updater.stop() is complete')
 
     async def _stop_httpd(self) -> None:
+        """Stops the Webhook server by calling ``WebhookServer.shutdown()``"""
         if self._httpd:
             self._logger.debug('Waiting for current webhook connection to be closed.')
             await self._httpd.shutdown()
             self._httpd = None
 
     async def _stop_polling(self) -> None:
+        """Stops the polling task by awaiting it."""
         if self.__polling_task:
             self._logger.debug('Waiting background polling task to finish up.')
             self.__polling_task.cancel()
@@ -647,7 +680,7 @@ class Updater:
                 await self.__polling_task
             except asyncio.CancelledError:
                 # This only happens in rare edge-cases, e.g. when `stop()` is called directly
-                # after start_polling(), but let's better be safe than sorry ...
+                # after start_polling(), but lets better be safe than sorry ...
                 pass
 
             self.__polling_task = None

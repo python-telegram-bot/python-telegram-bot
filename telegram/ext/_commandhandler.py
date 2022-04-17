@@ -36,12 +36,13 @@ class CommandHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram commands.
 
     Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
-    bot's name and/or some additional text. The handler will add a ``list`` to the
+    bot's name and/or some additional text. The handler will add a :obj:`list` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
     which is the text following the command split on single or consecutive whitespace characters.
 
-    By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~filters.UpdateType.EDITED_MESSAGE`` in the filter argument.
+    By default, the handler listens to messages as well as edited messages. To change this behavior
+    use :attr:`~filters.UpdateType.EDITED_MESSAGE <telegram.ext.filters.UpdateType.EDITED_MESSAGE>`
+    in the filter argument.
 
     Note:
         * :class:`CommandHandler` does *not* handle (edited) channel posts.
@@ -53,29 +54,31 @@ class CommandHandler(Handler[Update, CCT]):
     Args:
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-            Limitations are the same as described here https://core.telegram.org/bots#commands
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+            Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         filters (:class:`telegram.ext.filters.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :mod:`telegram.ext.filters`. Filters can be combined using bitwise
-            operators (& for and, | for or, ~ for not).
+            operators (``&`` for :keyword:`and`, ``|`` for :keyword:`or`, ``~`` for :keyword:`not`)
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Raises:
-        ValueError: when command is too long or has illegal chars.
+        :exc:`ValueError`: When the command is too long or has illegal chars.
 
     Attributes:
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-            Limitations are the same as described here https://core.telegram.org/bots#commands
-        callback (:obj:`callable`): The callback function for this handler.
+            Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
+        callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
         block (:obj:`bool`): Determines whether the return value of the callback should be
@@ -107,7 +110,7 @@ class CommandHandler(Handler[Update, CCT]):
     def check_update(
         self, update: object
     ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.
@@ -162,11 +165,12 @@ class CommandHandler(Handler[Update, CCT]):
 class PrefixHandler(CommandHandler):
     """Handler class to handle custom prefix commands.
 
-    This is a intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
-    It supports configurable commands with the same options as CommandHandler. It will respond to
-    every combination of :attr:`prefix` and :attr:`command`. It will add a :obj:`list` to the
-    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
-    which is the text following the command split on single or consecutive whitespace characters.
+    This is an intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
+    It supports configurable commands with the same options as :class:`CommandHandler`. It will
+    respond to every combination of :attr:`prefix` and :attr:`command`. It will add a :obj:`list`
+    to the :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of
+    strings, which is the text following the command split on single or consecutive whitespace
+    characters.
 
     Examples:
 
@@ -190,8 +194,8 @@ class PrefixHandler(CommandHandler):
             '#test', '!help' and '#help'.
 
 
-    By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~filters.UpdateType.EDITED_MESSAGE``.
+    By default, the handler listens to messages as well as edited messages. To change this behavior
+    use :attr:`~filters.UpdateType.EDITED_MESSAGE <telegram.ext.filters.UpdateType.EDITED_MESSAGE>`
 
     Note:
         * :class:`PrefixHandler` does *not* handle (edited) channel posts.
@@ -205,22 +209,24 @@ class PrefixHandler(CommandHandler):
             The prefix(es) that will precede :attr:`command`.
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         filters (:class:`telegram.ext.filters.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :mod:`telegram.ext.filters`. Filters can be combined using bitwise
-            operators (& for and, | for or, ~ for not).
+            operators (``&`` for :keyword:`and`, ``|`` for :keyword:`or`, ``~`` for :keyword:`not`)
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
         block (:obj:`bool`): Determines whether the return value of the callback should be
@@ -298,7 +304,7 @@ class PrefixHandler(CommandHandler):
     def check_update(
         self, update: object
     ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.

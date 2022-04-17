@@ -128,7 +128,7 @@ class _BotUnpickler(pickle.Unpickler):
 
 
 class PicklePersistence(BasePersistence[UD, CD, BD]):
-    """Using python's builtin pickle for making your bot persistent.
+    """Using python's builtin :mod:`pickle` for making your bot persistent.
 
     Attention:
         The interface provided by this class is intended to be accessed exclusively by
@@ -153,12 +153,6 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         store_data (:class:`PersistenceInput`, optional): Specifies which kinds of data will be
             saved by this persistence instance. By default, all available kinds of data will be
             saved.
-        update_interval (:obj:`int` | :obj:`float`, optional): The
-            :class:`~telegram.ext.Application` will update
-            the persistence in regular intervals. This parameter specifies the time (in seconds) to
-            wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
-
-            .. versionadded:: 14.0
         single_file (:obj:`bool`, optional): When :obj:`False` will store 5 separate files of
             `filename_user_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
@@ -172,6 +166,12 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             :class:`telegram.ext.ContextTypes` will be used.
 
             .. versionadded:: 13.6
+        update_interval (:obj:`int` | :obj:`float`, optional): The
+            :class:`~telegram.ext.Application` will update
+            the persistence in regular intervals. This parameter specifies the time (in seconds) to
+            wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
+
+            .. versionadded:: 14.0
 
     Attributes:
         filepath (:obj:`str` | :obj:`pathlib.Path`): The filepath for storing the pickle files.
@@ -400,7 +400,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         Args:
             name (:obj:`str`): The handler's name.
             key (:obj:`tuple`): The key the state is changed for.
-            new_state (:obj:`tuple` | :class:`object`): The new state for the given key.
+            new_state (:class:`object`): The new state for the given key.
         """
         if not self.conversations:
             self.conversations = {}

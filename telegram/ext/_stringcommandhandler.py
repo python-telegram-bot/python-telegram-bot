@@ -31,12 +31,12 @@ if TYPE_CHECKING:
 
 class StringCommandHandler(Handler[str, CCT]):
     """Handler class to handle string commands. Commands are string updates that start with ``/``.
-    The handler will add a ``list`` to the
+    The handler will add a :obj:`list` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
     which is the text following the command split on single whitespace characters.
 
     Note:
-        This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
+        This handler is not used to handle Telegram :class:`telegram.Update`, but strings manually
         put in the queue. For example to send messages with the bot using command line or API.
 
     Warning:
@@ -45,9 +45,11 @@ class StringCommandHandler(Handler[str, CCT]):
 
     Args:
         command (:obj:`str`): The command this handler should listen for.
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -57,7 +59,7 @@ class StringCommandHandler(Handler[str, CCT]):
 
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
-        callback (:obj:`callable`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
@@ -76,13 +78,13 @@ class StringCommandHandler(Handler[str, CCT]):
         self.command = command
 
     def check_update(self, update: object) -> Optional[List[str]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:obj:`object`): The incoming update.
 
         Returns:
-            :obj:`bool`
+            List[:obj:`str`]: List containing the text command split on whitespace.
 
         """
         if isinstance(update, str) and update.startswith('/'):

@@ -46,7 +46,7 @@ class File(TelegramObject):
         * Maximum file size to download is
             :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD`.
         * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
-          then it will automatically be decrypted as it downloads when you call :attr:`download()`.
+          then it will automatically be decrypted as it downloads when you call :meth:`download()`.
 
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -65,7 +65,7 @@ class File(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`str`): Optional. File size in bytes.
-        file_path (:obj:`str`): Optional. File path. Use :attr:`download` to get the file.
+        file_path (:obj:`str`): Optional. File path. Use :meth:`download` to get the file.
 
     """
 
@@ -102,8 +102,8 @@ class File(TelegramObject):
         custom_path: FilePathInput = None,
         out: IO = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[Path, IO]:
         """
@@ -129,9 +129,18 @@ class File(TelegramObject):
             custom_path (:class:`pathlib.Path` | :obj:`str`, optional): Custom path.
             out (:obj:`io.BufferedWriter`, optional): A file-like object. Must be opened for
                 writing in binary mode, if applicable.
-            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
-                the read timeout from the server (instead of the one specified during creation of
-                the connection pool).
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
         Returns:
             :class:`pathlib.Path` | :obj:`io.BufferedWriter`: The same object as :paramref:`out` if

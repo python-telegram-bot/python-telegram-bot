@@ -91,7 +91,6 @@ class JobQueue:
             if shift_day and date_time <= datetime.datetime.now(pytz.utc):
                 date_time += datetime.timedelta(days=1)
             return date_time
-        # isinstance(time, datetime.datetime):
         return time
 
     def set_application(self, application: 'Application') -> None:
@@ -131,8 +130,11 @@ class JobQueue:
         """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
         Args:
-            callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature: ``def callback(context: CallbackContext)``
+            callback (:term:`coroutine function`): The callback function that should be executed by
+                the new job. Callback signature::
+
+                    async def callback(context: CallbackContext)
+
             when (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                         \
                   :obj:`datetime.datetime` | :obj:`datetime.time`):
                 Time in or at which the job should run. This parameter will be interpreted
@@ -165,7 +167,7 @@ class JobQueue:
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
@@ -216,8 +218,11 @@ class JobQueue:
                            #daylight-saving-time-behavior
 
         Args:
-            callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature: ``def callback(context: CallbackContext)``
+            callback (:term:`coroutine function`): The callback function that should be executed by
+                the new job. Callback signature::
+
+                    async def callback(context: CallbackContext)
+
             interval (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta`): The interval in which
                 the job will run. If it is an :obj:`int` or a :obj:`float`, it will be interpreted
                 as seconds.
@@ -253,7 +258,7 @@ class JobQueue:
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
@@ -320,8 +325,11 @@ class JobQueue:
             parameter to have the job run on the last day of the month.
 
         Args:
-            callback (:obj:`callable`):  The callback function that should be executed by the new
-                job. Callback signature: ``def callback(context: CallbackContext)``
+            callback (:term:`coroutine function`): The callback function that should be executed by
+                the new job. Callback signature::
+
+                    async def callback(context: CallbackContext)
+
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
@@ -332,7 +340,7 @@ class JobQueue:
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
@@ -393,8 +401,11 @@ class JobQueue:
                            #daylight-saving-time-behavior
 
         Args:
-            callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature: ``def callback(context: CallbackContext)``
+            callback (:term:`coroutine function`): The callback function that should be executed by
+                the new job. Callback signature::
+
+                    async def callback(context: CallbackContext)
+
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (:obj:`datetime.time.tzinfo`) is :obj:`None`, the default timezone of the bot will
                 be used.
@@ -404,7 +415,7 @@ class JobQueue:
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
@@ -458,15 +469,18 @@ class JobQueue:
         """Creates a new custom defined :class:`Job`.
 
         Args:
-            callback (:obj:`callable`): The callback function that should be executed by the new
-                job. Callback signature: ``def callback(context: CallbackContext)``
+            callback (:term:`coroutine function`): The callback function that should be executed by
+                the new job. Callback signature::
+
+                    async def callback(context: CallbackContext)
+
             job_kwargs (:obj:`dict`): Arbitrary keyword arguments. Used as arguments for
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job`.
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
-                ``callback.__name__``.
+                :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
@@ -502,7 +516,7 @@ class JobQueue:
         """Shuts down the :class:`~telegram.ext.JobQueue`.
 
         Args:
-            wait (:obj:`bool`, optional): Whether or not to wait until all currently running jobs
+            wait (:obj:`bool`, optional): Whether to wait until all currently running jobs
                 have finished. Defaults to :obj:`True`.
 
         """
@@ -546,8 +560,6 @@ class Job:
     Note:
         * All attributes and instance methods of :attr:`job` are also directly available as
           attributes/methods of the corresponding :class:`telegram.ext.Job` object.
-        * Two instances of :class:`telegram.ext.Job` are considered equal, if their corresponding
-          :attr:`job` attributes have the same ``id``.
         * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
           this :class:`telegram.ext.Job` to be useful.
 
@@ -555,11 +567,15 @@ class Job:
         Removed argument and attribute ``job_queue``.
 
     Args:
-        callback (:obj:`callable`): The callback function that should be executed by the new job.
-            Callback signature: ``def callback(context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function that should be executed by the
+            new job. Callback signature::
+
+                async def callback(context: CallbackContext)
+
         context (:obj:`object`, optional): Additional data needed for the callback function. Can be
             accessed through :attr:`Job.context` in the callback. Defaults to :obj:`None`.
-        name (:obj:`str`, optional): The name of the new job. Defaults to ``callback.__name__``.
+        name (:obj:`str`, optional): The name of the new job. Defaults to
+            :external:obj:`callback.__name__ <definition.__name__>`.
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
         chat_id (:obj:`int`, optional): Chat id of the chat that this job is associated with.
 
@@ -569,7 +585,8 @@ class Job:
             ..versionadded:: 14.0
 
     Attributes:
-        callback (:obj:`callable`): The callback function that should be executed by the new job.
+        callback (:term:`coroutine function`): The callback function that should be executed by the
+            new job.
         context (:obj:`object`): Optional. Additional data needed for the callback function.
         name (:obj:`str`): Optional. The name of the new job.
         job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.

@@ -119,36 +119,35 @@ class BaseFilter:
 
     Filters subclassing from this class can combined using bitwise operators:
 
-    And:
+    And::
 
-        >>> (filters.TEXT & filters.Entity(MENTION))
+        filters.TEXT & filters.Entity(MENTION)
 
-    Or:
+    Or::
 
-        >>> (filters.AUDIO | filters.VIDEO)
+        filters.AUDIO | filters.VIDEO
 
-    Exclusive Or:
+    Exclusive Or::
 
-        >>> (filters.Regex('To Be') ^ filters.Regex('Not 2B'))
+        filters.Regex('To Be') ^ filters.Regex('Not 2B')
 
-    Not:
+    Not::
 
-        >>> ~ filters.COMMAND
+        ~ filters.COMMAND
 
-    Also works with more than two filters:
+    Also works with more than two filters::
 
-        >>> (filters.TEXT & (filters.Entity(URL) | filters.Entity(TEXT_LINK)))
-        >>> filters.TEXT & (~ filters.FORWARDED)
+        filters.TEXT & (filters.Entity(URL) | filters.Entity(TEXT_LINK))
+        filters.TEXT & (~ filters.FORWARDED)
 
     Note:
-        Filters use the same short circuiting logic as python's `and`, `or` and `not`.
-        This means that for example:
+        Filters use the same short circuiting logic as python's :keyword:`and`, :keyword:`or` and
+        :keyword:`not`. This means that for example::
 
-            >>> filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
+            filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
 
         With ``message.text == 'x'``, will only ever return the matches for the first filter,
         since the second one is never evaluated.
-
 
     If you want to create your own filters create a class inheriting from either
     :class:`MessageFilter` or :class:`UpdateFilter` and implement a ``filter()``
@@ -157,7 +156,7 @@ class BaseFilter:
     Note that the filters work only as class instances, not actual class objects (so remember to
     initialize your filter classes).
 
-    By default the filters name (what will get printed when converted to a string for display)
+    By default, the filters name (what will get printed when converted to a string for display)
     will be the class name. If you want to overwrite this assign a better name to the :attr:`name`
     class variable.
 
@@ -547,7 +546,7 @@ class CaptionEntity(MessageFilter):
 
 class CaptionRegex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of ``pattern`` in the message caption.
+    Filters updates by searching for an occurrence of :paramref:`pattern` in the message caption.
 
     This filter works similarly to :class:`Regex`, with the only exception being that
     it applies to the message caption instead of the text.
@@ -874,7 +873,7 @@ class ChatType:  # A convenience namespace for Chat types.
 
 class Command(MessageFilter):
     """
-    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
+    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default, only allows
     messages `starting` with a bot command. Pass :obj:`False` to also allow messages that contain a
     bot command `anywhere` in the text.
 
@@ -1497,7 +1496,7 @@ POLL = _Poll(name="filters.POLL")
 
 class Regex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of ``pattern`` in the message text.
+    Filters updates by searching for an occurrence of :paramref:`pattern` in the message text.
     The :func:`re.search` function is used to determine whether an update should be filtered.
 
     Refer to the documentation of the :obj:`re` module for more information.
@@ -1512,7 +1511,8 @@ class Regex(MessageFilter):
         if you need to specify flags on your pattern.
 
     Note:
-        Filters use the same short circuiting logic as python's `and`, `or` and `not`.
+        Filters use the same short circuiting logic as python's :keyword:`and`, :keyword:`or` and
+        :keyword:`not`.
         This means that for example:
 
             >>> filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
@@ -1973,7 +1973,10 @@ class UpdateType:
 
     EDITED = _Edited(name="filters.UpdateType.EDITED")
     """Updates with either :attr:`telegram.Update.edited_message` or
-    :attr:`telegram.Update.edited_channel_post`."""
+    :attr:`telegram.Update.edited_channel_post`.
+
+    .. versionadded:: 14.0
+    """
 
     class _EditedChannelPost(UpdateFilter):
         __slots__ = ()

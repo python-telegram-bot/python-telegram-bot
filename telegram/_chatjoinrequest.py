@@ -62,13 +62,7 @@ class ChatJoinRequest(TelegramObject):
 
     """
 
-    __slots__ = (
-        'chat',
-        'from_user',
-        'date',
-        'bio',
-        'invite_link',
-    )
+    __slots__ = ('chat', 'from_user', 'date', 'bio', 'invite_link')
 
     def __init__(
         self,
