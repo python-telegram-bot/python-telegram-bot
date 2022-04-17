@@ -273,8 +273,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     @property
     def concurrent_updates(self) -> int:
-        """:obj:`int`: Indicates the number of concurrent updates set. A value of ``0`` indicates
-        updates are *not* being processed concurrently.
+        """:obj:`int`: The number of concurrent updates that will be processed in parallel. A
+        value of ``0`` indicates updates are *not* being processed concurrently.
         """
         return self._concurrent_updates
 
@@ -418,8 +418,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
           :attr:`persistence` is set.
 
         Note:
-            This does *not* start fetching updates from Telegram. You need to either start
-            :attr:`updater` manually or use one of :meth:`run_polling` or :meth:`run_webhook`.
+            This does *not* start fetching updates from Telegram. To fetch updates, you need to
+            either start :attr:`updater` manually or use one of :meth:`run_polling` or
+            :meth:`run_webhook`.
 
         .. seealso::
             :meth:`stop`
@@ -523,9 +524,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         drop_pending_updates: bool = None,
         close_loop: bool = True,
     ) -> None:
-        """Starts polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling`.
+        """Convenience method that takes care of initializing and starting the app,
+        polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling` and
+        a graceful shutdown of the app on exit.
 
         .. seealso::
+            :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
             :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`
 
         Args:
@@ -603,15 +607,18 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         max_connections: int = 40,
         close_loop: bool = True,
     ) -> None:
-        """
-        Starts a small http server to listen for updates via webhook using
-        :meth:`telegram.ext.Updater.start_webhook`. If :paramref:`cert`
+        """Convenience method that takes care of initializing and starting the app,
+        polling updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
+        a graceful shutdown of the app on exit.
+
+        If :paramref:`cert`
         and :paramref:`key` are not provided, the webhook will be started directly on
         ``http://listen:port/url_path``, so SSL can be handled by another
         application. Else, the webhook will be started on
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as required.
 
         .. seealso::
+            :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
             :meth:`telegram.ext.Updater.start_webhook`, :meth:`run_polling`
 
         Args:
