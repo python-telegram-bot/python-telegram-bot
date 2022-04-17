@@ -1662,23 +1662,28 @@ class TestApplication:
         reason="Only really relevant on windows",
     )
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
-    @pytest.mark.filterwarnings(r"ignore:coroutine '[\w\.\_]+' was never awaited")
-    @pytest.mark.asyncio
-    async def test_run_stop_signal_warning_windows(self, app, method):
-        with pytest.raises(
-            PTBUserWarning, match='Could not add signal handlers for the stop signals'
-        ) as exc_info:
+    def test_run_stop_signal_warning_windows(self, bot, method, recwarn, monkeypatch):
+        async def raise_method(*args, **kwargs):
+            raise RuntimeError('Prevent Actually Running')
+
+        monkeypatch.setattr(Application, 'initialize', raise_method)
+        app = ApplicationBuilder().token(bot.token).build()
+
+        with pytest.raises(RuntimeError, match='Prevent Actually Running'):
             if 'polling' in method:
                 app.run_polling(close_loop=False)
             else:
                 app.run_webhook(close_loop=False)
 
-        assert exc_info.traceback[0].path == Path(__file__), "stacklevel is incorrect!"
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message).startswith('Could not add signal handlers for the stop')
+        assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
-        with pytest.raises(RuntimeError, match="This event loop is already running"):
-            # this is somewhat silly: app.run_*() won't work as the pytest asyncio loop is already
-            # running, but we only care about checking that no warning is issued ...
+        recwarn.clear()
+        with pytest.raises(RuntimeError, match='Prevent Actually Running'):
             if 'polling' in method:
                 app.run_polling(close_loop=False, stop_signals=None)
             else:
                 app.run_webhook(close_loop=False, stop_signals=None)
+
+        assert len(recwarn) == 0
