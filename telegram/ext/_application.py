@@ -22,6 +22,7 @@ import inspect
 import itertools
 import logging
 from collections import defaultdict
+from contextlib import AbstractAsyncContextManager
 from copy import deepcopy
 from pathlib import Path
 from types import TracebackType, MappingProxyType
@@ -101,13 +102,30 @@ class ApplicationHandlerStop(Exception):
         self.state = state
 
 
-class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
+class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager):
     """This class dispatches all kinds of updates to its registered handlers, and is the entry
     point to a PTB application.
 
     Tip:
          This class may not be initialized directly. Use :class:`telegram.ext.ApplicationBuilder`
          or :meth:`builder` (for convenience).
+
+    Instances of this class can be used as asyncio context managers, where
+
+    .. code:: python
+
+        async with application:
+            # code
+
+    is roughly equivalent to
+
+    .. code:: python
+
+        try:
+            await application.initialize()
+            # code
+        finally:
+            await application.shutdown()
 
     .. versionchanged:: 14.0
 

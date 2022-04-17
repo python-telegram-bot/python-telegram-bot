@@ -20,6 +20,7 @@
 import asyncio
 import logging
 import ssl
+from contextlib import AbstractAsyncContextManager
 from pathlib import Path
 from types import TracebackType
 from typing import (
@@ -45,10 +46,27 @@ if TYPE_CHECKING:
 _UpdaterType = TypeVar('_UpdaterType', bound="Updater")
 
 
-class Updater:
+class Updater(AbstractAsyncContextManager):
     """This class fetches updates for the bot either via long polling or by starting a webhook
     server. Received updates are enqueued into the :attr:`update_queue` and may be fetched from
     there to handle them appropriately.
+
+    Instances of this class can be used as asyncio context managers, where
+
+    .. code:: python
+
+        async with updater:
+            # code
+
+    is roughly equivalent to
+
+    .. code:: python
+
+        try:
+            await updater.initialize()
+            # code
+        finally:
+            await updater.shutdown()
 
     .. versionchanged:: 14.0
 

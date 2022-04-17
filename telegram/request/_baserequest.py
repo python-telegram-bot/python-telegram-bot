@@ -71,7 +71,7 @@ class BaseRequest(
             await request_object.initialize()
             # code
         finally:
-            await request_object.stop()
+            await request_object.shutdown()
     """
 
     __slots__ = ()
