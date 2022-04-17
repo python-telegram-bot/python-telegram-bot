@@ -50,7 +50,7 @@ class ChatJoinRequestHandler(Handler[Update, CCT]):
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
-        block (:obj:`bool`): Determines whether the callback will run asynchronously.
+        block (:obj:`bool`): Determines whether the callback will run in a blocking way..
 
     """
 

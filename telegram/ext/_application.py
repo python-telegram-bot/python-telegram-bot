@@ -85,7 +85,7 @@ class ApplicationHandlerStop(Exception):
             raise ApplicationHandlerStop(next_state)
 
     Note:
-        Has no effect, if the handler or error handler is run asynchronously.
+        Has no effect, if the handler or error handler is run in a non-blocking way.
 
     Args:
         state (:obj:`object`, optional): The next state of the conversation.
@@ -766,8 +766,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ]):
         except Exception as exception:
             if isinstance(exception, ApplicationHandlerStop):
                 warn(
-                    'ApplicationHandlerStop is not supported with asynchronously '
-                    'running handlers.',
+                    'ApplicationHandlerStop is not supported with handlers '
+                    'running non-blocking.',
                     stacklevel=1,
                 )
 
