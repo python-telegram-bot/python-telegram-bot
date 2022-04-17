@@ -1611,6 +1611,7 @@ class TestApplication:
             app.run_polling()
 
     @pytest.mark.parametrize('method', ['start', 'initialize'])
+    @pytest.mark.filterwarnings('ignore::telegram.warnings.PTBUserWarning')
     def test_run_error_in_application(self, bot, monkeypatch, method):
         shutdowns = []
 
@@ -1632,6 +1633,7 @@ class TestApplication:
         assert shutdowns == [True, True]
 
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
+    @pytest.mark.filterwarnings('ignore::telegram.warnings.PTBUserWarning')
     def test_run_error_in_updater(self, bot, monkeypatch, method):
         shutdowns = []
 
@@ -1654,3 +1656,33 @@ class TestApplication:
         assert not app.running
         assert not app.updater.running
         assert shutdowns == [True, True]
+
+    @pytest.mark.skipif(
+        platform.system() != 'Windows',
+        reason="Only really relevant on windows",
+    )
+    @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
+    @pytest.mark.asyncio
+    async def test_run_stop_signal_warning_windows(self, bot, method, monkeypatch):
+        async def raise_method(*args, **kwargs):
+            raise RuntimeError('Test Exception')
+
+        # monkeypatch.setattr(Updater, method, raise_method)
+        app = ApplicationBuilder().token(bot.token).build()
+        with pytest.raises(
+            PTBUserWarning, match='Could not add signal handlers for the stop signals'
+        ) as exc_info:
+            if 'polling' in method:
+                app.run_polling(close_loop=False)
+            else:
+                app.run_webhook(close_loop=False)
+
+        assert exc_info.traceback[0].path == Path(__file__), "stacklevel is incorrect!"
+
+        with pytest.raises(RuntimeError, match="This event loop is already running"):
+            # this is somewhat silly: app.run_*() won't work as the pytest asyncio loop is already
+            # running, but we only care about checking that no warning is issued ...
+            if 'polling' in method:
+                app.run_polling(close_loop=False, stop_signals=None)
+            else:
+                app.run_webhook(close_loop=False, stop_signals=None)

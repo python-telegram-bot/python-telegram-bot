@@ -21,6 +21,7 @@ import asyncio
 import inspect
 import itertools
 import logging
+import signal
 from collections import defaultdict
 from contextlib import AbstractAsyncContextManager
 from copy import deepcopy
@@ -42,6 +43,8 @@ from typing import (
     Set,
     Mapping,
     DefaultDict,
+    Sequence,
+    NoReturn,
 )
 
 from telegram import Update
@@ -541,10 +544,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
         close_loop: bool = True,
+        stop_signals: Optional[Sequence[int]] = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT),
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling` and
         a graceful shutdown of the app on exit.
+
+        The app will shut down when :exc:`KeyboardInterrupt` or :exc:`SystemExit` is raised.
+        On unix, the app will also shut down on receiving the signals specified by
+        :paramref:`stop_signals`.
 
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
@@ -582,6 +590,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
                 .. seealso::
                     :meth:`asyncio.loop.close`
+            stop_signals (Sequence[:obj:`int`] | :obj:`None`, optional): Signals that will shut
+                down the app. Pass :obj:`None` to not use stop signals.
+                Defaults to :data:`signal.SIGINT`, :data:`signal.SIGTERM` and
+                :data:`signal.SIGABRT`.
+
+                Caution:
+                    Not every :class:`asyncio.AbstractEventLoop` implements
+                    :meth:`asyncio.loop.add_signal_handler`. Most notably, the standard event loop
+                    on Windows, :class:`asyncio.ProactorEventLoop`, does not implement this method.
+                    If this method is not available, stop signals can not be set.
 
         Raises:
             :exc:`RuntimeError`: If the Application does not have an :class:`telegram.ext.Updater`.
@@ -608,6 +626,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 error_callback=error_callback,  # if there is an error in fetching updates
             ),
             close_loop=close_loop,
+            stop_signals=stop_signals,
         )
 
     def run_webhook(
@@ -624,10 +643,15 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         ip_address: str = None,
         max_connections: int = 40,
         close_loop: bool = True,
+        stop_signals: Optional[Sequence[int]] = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT),
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
         a graceful shutdown of the app on exit.
+
+        The app will shut down when :exc:`KeyboardInterrupt` or :exc:`SystemExit` is raised.
+        On unix, the app will also shut down on receiving the signals specified by
+        :paramref:`stop_signals`.
 
         If :paramref:`cert`
         and :paramref:`key` are not provided, the webhook will be started directly on
@@ -668,6 +692,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
                 .. seealso::
                     :meth:`asyncio.loop.close`
+            stop_signals (Sequence[:obj:`int`] | :obj:`None`, optional): Signals that will shut
+                down the app. Pass :obj:`None` to not use stop signals.
+                Defaults to :data:`signal.SIGINT`, :data:`signal.SIGTERM` and
+                :data:`signal.SIGABRT`.
+
+                Caution:
+                    Not every :class:`asyncio.AbstractEventLoop` implements
+                    :meth:`asyncio.loop.add_signal_handler`. Most notably, the standard event loop
+                    on Windows, :class:`asyncio.ProactorEventLoop`, does not implement this method.
+                    If this method is not available, stop signals can not be set.
         """
         if not self.updater:
             raise RuntimeError(
@@ -689,13 +723,35 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 max_connections=max_connections,
             ),
             close_loop=close_loop,
+            stop_signals=stop_signals,
         )
 
-    def __run(self, updater_coroutine: Coroutine, close_loop: bool = True) -> None:
+    @staticmethod
+    def _raise_system_exit() -> NoReturn:
+        raise SystemExit
+
+    def __run(
+        self,
+        updater_coroutine: Coroutine,
+        stop_signals: Optional[Sequence[int]],
+        close_loop: bool = True,
+    ) -> None:
         # Calling get_event_loop() should still be okay even in py3.10+ as long as there is a
         # running event loop or we are in the main thread, which are the intended use cases.
         # See the docs of get_event_loop() and get_running_loop() for more info
         loop = asyncio.get_event_loop()
+
+        try:
+            for sig in stop_signals or []:
+                loop.add_signal_handler(sig, self._raise_system_exit)
+        except NotImplementedError as exc:
+            warn(
+                f'Could not add signal handlers for the stop signals {stop_signals} due to '
+                f'exception `{exc!r}`. If your event loop does not implement `add_signal_handler`,'
+                f' please pass `stop_signals=None`.',
+                stacklevel=3,
+            )
+
         try:
             loop.run_until_complete(self.initialize())
             loop.run_until_complete(updater_coroutine)  # one of updater.start_webhook/polling
