@@ -34,7 +34,7 @@ def was_called_by(frame: Optional[FrameType], caller: Path) -> bool:
     """Checks if the passed frame was called by the specified file.
 
     Example:
-        .. code:: python
+        .. code:: pycon
 
             >>> was_called_by(inspect.currentframe(), Path(__file__))
             True

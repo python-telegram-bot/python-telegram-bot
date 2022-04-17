@@ -254,11 +254,12 @@ break the API classes. For example:
 
     # GOOD
     def __init__(self, id, name, last_name=None, **kwargs):
-       self.last_name = last_name
+        self.last_name = last_name
+
 
     # BAD
     def __init__(self, id, name, last_name=None):
-       self.last_name = last_name
+        self.last_name = last_name
 
 
 .. _`Code of Conduct`: https://www.python.org/psf/codeofconduct/

@@ -797,7 +797,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-             await bot.send_message(
+            await bot.send_message(
                 update.effective_message.chat_id,
                 parse_mode=ParseMode.MARKDOWN,
                 *args,
@@ -859,7 +859,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-             await bot.send_message(
+            await bot.send_message(
                 update.effective_message.chat_id,
                 parse_mode=ParseMode.MARKDOWN_V2,
                 *args,
@@ -917,7 +917,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-             await bot.send_message(
+            await bot.send_message(
                 update.effective_message.chat_id,
                 parse_mode=ParseMode.HTML,
                 *args,
@@ -1952,11 +1952,13 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-             await bot.forward_message(chat_id=chat_id,
-                                from_chat_id=update.effective_message.chat_id,
-                                message_id=update.effective_message.message_id,
-                                *args,
-                                **kwargs)
+             await bot.forward_message(
+                 chat_id=chat_id,
+                 from_chat_id=update.effective_message.chat_id,
+                 message_id=update.effective_message.message_id,
+                 *args,
+                 **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
@@ -2004,11 +2006,13 @@ class Message(TelegramObject):
     ) -> 'MessageId':
         """Shortcut for::
 
-             await bot.copy_message(chat_id=chat_id,
-                             from_chat_id=update.effective_message.chat_id,
-                             message_id=update.effective_message.message_id,
-                             *args,
-                             **kwargs)
+             await bot.copy_message(
+                 chat_id=chat_id,
+                 from_chat_id=update.effective_message.chat_id,
+                 message_id=update.effective_message.message_id,
+                 *args,
+                 **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
@@ -2056,11 +2060,13 @@ class Message(TelegramObject):
     ) -> 'MessageId':
         """Shortcut for::
 
-             await bot.copy_message(chat_id=message.chat.id,
-                             from_chat_id=from_chat_id,
-                             message_id=message_id,
-                             *args,
-                             **kwargs)
+             await bot.copy_message(
+                 chat_id=message.chat.id,
+                 from_chat_id=from_chat_id,
+                 message_id=message_id,
+                 *args,
+                 **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
@@ -2111,10 +2117,9 @@ class Message(TelegramObject):
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-             await bot.edit_message_text(chat_id=message.chat_id,
-                                  message_id=message.message_id,
-                                  *args,
-                                  **kwargs)
+             await bot.edit_message_text(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.edit_message_text`.
 
@@ -2158,10 +2163,9 @@ class Message(TelegramObject):
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-             await bot.edit_message_caption(chat_id=message.chat_id,
-                                     message_id=message.message_id,
-                                     *args,
-                                     **kwargs)
+             await bot.edit_message_caption(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_caption`.
@@ -2203,10 +2207,9 @@ class Message(TelegramObject):
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-             await bot.edit_message_media(chat_id=message.chat_id,
-                                   message_id=message.message_id,
-                                   *args,
-                                   **kwargs)
+             await bot.edit_message_media(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_media`.
@@ -2245,10 +2248,9 @@ class Message(TelegramObject):
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-             await bot.edit_message_reply_markup(chat_id=message.chat_id,
-                                          message_id=message.message_id,
-                                          *args,
-                                          **kwargs)
+             await bot.edit_message_reply_markup(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_reply_markup`.
@@ -2291,10 +2293,9 @@ class Message(TelegramObject):
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-             await bot.edit_message_live_location(chat_id=message.chat_id,
-                                           message_id=message.message_id,
-                                           *args,
-                                           **kwargs)
+             await bot.edit_message_live_location(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_live_location`.
@@ -2337,10 +2338,9 @@ class Message(TelegramObject):
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-             await bot.stop_message_live_location(chat_id=message.chat_id,
-                                           message_id=message.message_id,
-                                           *args,
-                                           **kwargs)
+             await bot.stop_message_live_location(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.stop_message_live_location`.
@@ -2380,10 +2380,9 @@ class Message(TelegramObject):
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-             await bot.set_game_score(chat_id=message.chat_id,
-                               message_id=message.message_id,
-                               *args,
-                               **kwargs)
+             await bot.set_game_score(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.set_game_score`.
 
@@ -2422,10 +2421,9 @@ class Message(TelegramObject):
     ) -> List['GameHighScore']:
         """Shortcut for::
 
-             await bot.get_game_high_scores(chat_id=message.chat_id,
-                                     message_id=message.message_id,
-                                     *args,
-                                     **kwargs)
+             await bot.get_game_high_scores(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_game_high_scores`.
@@ -2460,10 +2458,9 @@ class Message(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-              await bot.delete_message(chat_id=message.chat_id,
-                                message_id=message.message_id,
-                                *args,
-                                **kwargs)
+              await bot.delete_message(
+                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.delete_message`.
 
@@ -2492,10 +2489,9 @@ class Message(TelegramObject):
     ) -> Poll:
         """Shortcut for::
 
-              await bot.stop_poll(chat_id=message.chat_id,
-                           message_id=message.message_id,
-                           *args,
-                           **kwargs)
+              await bot.stop_poll(
+                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.stop_poll`.
 
@@ -2526,10 +2522,9 @@ class Message(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-              await bot.pin_chat_message(chat_id=message.chat_id,
-                                  message_id=message.message_id,
-                                  *args,
-                                  **kwargs)
+              await bot.pin_chat_message(
+                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
 
@@ -2558,10 +2553,9 @@ class Message(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-              await bot.unpin_chat_message(chat_id=message.chat_id,
-                                    message_id=message.message_id,
-                                    *args,
-                                    **kwargs)
+              await bot.unpin_chat_message(
+                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
 

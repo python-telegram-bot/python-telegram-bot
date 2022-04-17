@@ -190,8 +190,10 @@ This library uses the ``logging`` module. To set up logging to standard output, 
 .. code:: python
 
     import logging
-    logging.basicConfig(level=logging.DEBUG,
-                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    logging.basicConfig(
+        level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
 at the beginning of your script.
 

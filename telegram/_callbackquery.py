@@ -728,7 +728,8 @@ class CallbackQuery(TelegramObject):
                 from_chat_id=update.message.chat_id,
                 message_id=update.message.message_id,
                 *args,
-                **kwargs)
+                **kwargs
+            )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Message.copy`.

@@ -101,8 +101,7 @@ class DefaultValue(Generic[DVType]):
 
     @staticmethod
     def get_value(obj: Union[OT, 'DefaultValue[OT]']) -> OT:
-        """
-        Shortcut for::
+        """Shortcut for::
 
             return obj.value if isinstance(obj, DefaultValue) else obj
 

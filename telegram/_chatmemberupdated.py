@@ -136,7 +136,7 @@ class ChatMemberUpdated(TelegramObject):
         """Computes the difference between :attr:`old_chat_member` and :attr:`new_chat_member`.
 
         Example:
-            .. code:: python
+            .. code:: pycon
 
                 >>> chat_member_updated.difference()
                 {'custom_title': ('old title', 'new title')}

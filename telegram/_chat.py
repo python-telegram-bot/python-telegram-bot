@@ -491,9 +491,7 @@ class Chat(TelegramObject):
         """Shortcut for::
 
              await bot.ban_chat_sender_chat(
-                 sender_chat_id=update.effective_chat.id,
-                 *args,
-                 **kwargs
+                 sender_chat_id=update.effective_chat.id, *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -559,9 +557,7 @@ class Chat(TelegramObject):
         """Shortcut for::
 
              await bot.unban_chat_sender_chat(
-                 sender_chat_id=update.effective_chat.id,
-                 *args,
-                 **kwargs
+                 sender_chat_id=update.effective_chat.id, *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -747,9 +743,7 @@ class Chat(TelegramObject):
         """Shortcut for::
 
              await bot.set_chat_administrator_custom_title(
-                 update.effective_chat.id,
-                 *args,
-                 **kwargs
+                 update.effective_chat.id, *args, **kwargs
              )
 
         For the documentation of the arguments, please see
@@ -782,9 +776,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-              await bot.pin_chat_message(chat_id=update.effective_chat.id,
-                                  *args,
-                                  **kwargs)
+              await bot.pin_chat_message(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.pin_chat_message`.
@@ -815,9 +807,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-              await bot.unpin_chat_message(chat_id=update.effective_chat.id,
-                                    *args,
-                                    **kwargs)
+              await bot.unpin_chat_message(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.unpin_chat_message`.
@@ -846,9 +836,7 @@ class Chat(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-              await bot.unpin_all_chat_messages(chat_id=update.effective_chat.id,
-                                         *args,
-                                         **kwargs)
+              await bot.unpin_all_chat_messages(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.unpin_all_chat_messages`.

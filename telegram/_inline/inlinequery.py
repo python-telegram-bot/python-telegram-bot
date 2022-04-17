@@ -131,10 +131,10 @@ class InlineQuery(TelegramObject):
         """Shortcut for::
 
             await bot.answer_inline_query(
-                      update.inline_query.id,
-                      *args,
-                      current_offset=self.offset if auto_pagination else None,
-                      **kwargs
+                update.inline_query.id,
+                *args,
+                current_offset=self.offset if auto_pagination else None,
+                **kwargs
             )
 
         For the documentation of the arguments, please see

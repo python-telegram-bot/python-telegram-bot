@@ -104,7 +104,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     Example:
         .. code:: python
 
-            application = ApplicationBuilder().token('TOKEN').build()
+            application = ApplicationBuilder().token("TOKEN").build()
 
     Please see the description of the individual methods for information on which arguments can be
     set and what the defaults are when not called. When no default is mentioned, the argument will

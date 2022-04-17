@@ -173,8 +173,7 @@ class User(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Optional['UserProfilePhotos']:
-        """
-        Shortcut for::
+        """Shortcut for::
 
              await bot.get_user_profile_photos(update.effective_user.id, *args, **kwargs)
 
@@ -238,8 +237,7 @@ class User(TelegramObject):
         return helpers_mention_html(self.id, self.full_name)
 
     def mention_button(self, name: str = None) -> InlineKeyboardButton:
-        """
-        Shortcut for::
+        """Shortcut for::
 
             InlineKeyboardButton(text=name, url=f"tg://user?id={update.effective_user.id}")
 
@@ -265,9 +263,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-              await bot.pin_chat_message(chat_id=update.effective_user.id,
-                                  *args,
-                                  **kwargs)
+              await bot.pin_chat_message(chat_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
 
@@ -297,9 +293,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-              await bot.unpin_chat_message(chat_id=update.effective_user.id,
-                                    *args,
-                                    **kwargs)
+              await bot.unpin_chat_message(chat_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
 
@@ -327,9 +321,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-              await bot.unpin_all_chat_messages(chat_id=update.effective_user.id,
-                                         *args,
-                                         **kwargs)
+              await bot.unpin_all_chat_messages(chat_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.unpin_all_chat_messages`.
