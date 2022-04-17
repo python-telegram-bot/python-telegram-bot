@@ -87,6 +87,11 @@ class RequestParameter:
         Note that we use this for *all* files to be uploaded. This is not documented in the
         official API, but has been confirmed to be supported in the official Bot API repository.
         See https://github.com/tdlib/telegram-bot-api/issues/167
+
+        This method does no special casing for enums because
+        * all enums in tg.constants are subclasses of int/str, so they are already json-dumpable
+        * if a user passes a custom enum, it's unlikely that we can actually properly handle it
+          even with some special casing.
         """
         if isinstance(value, datetime):
             return to_timestamp(value), []
