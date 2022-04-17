@@ -1662,7 +1662,7 @@ class TestApplication:
         reason="Only really relevant on windows",
     )
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
-    @pytest.mark.filterwarnings("ignore:was never awaited")
+    @pytest.mark.filterwarnings(r"ignore:coroutine '[\w\.\_]+' was never awaited")
     @pytest.mark.asyncio
     async def test_run_stop_signal_warning_windows(self, app, method):
         with pytest.raises(
