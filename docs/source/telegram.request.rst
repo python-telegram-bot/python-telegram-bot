@@ -3,6 +3,8 @@
 telegram.request Module
 =======================
 
+.. versionadded:: 14.0
+
 .. toctree::
     telegram.request.baserequest
     telegram.request.requestdata

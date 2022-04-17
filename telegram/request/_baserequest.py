@@ -72,6 +72,8 @@ class BaseRequest(
             # code
         finally:
             await request_object.shutdown()
+
+    .. versionadded:: 14.0
     """
 
     __slots__ = ()
