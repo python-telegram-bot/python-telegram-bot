@@ -255,11 +255,6 @@ def class_thumb_file():
     f.close()
 
 
-def pytest_configure(config):
-    config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
-    # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
-
-
 def make_bot(bot_info, **kwargs):
     """
     Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
