@@ -816,9 +816,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             self.__create_task_tasks.add(task)
             task.add_done_callback(self.__create_task_done_callback)
         else:
-            _logger.warning(
+            warn(
                 "Tasks created via `Application.create_task` while the application is not "
-                "running won't be automatically awaited!"
+                "running won't be automatically awaited!",
+                stacklevel=3,
             )
 
         return task

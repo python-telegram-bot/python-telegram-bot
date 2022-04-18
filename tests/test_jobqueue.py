@@ -490,7 +490,7 @@ class TestJobQueue:
         with caplog.at_level(logging.ERROR):
             job = job_queue.run_once(self.job_with_exception, 0.1)
         await asyncio.sleep(0.15)
-        assert len(caplog.records) == 2
+        assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert 'An error was raised and an uncaught' in rec.getMessage()
         caplog.clear()
@@ -509,7 +509,7 @@ class TestJobQueue:
         with caplog.at_level(logging.ERROR):
             job = job_queue.run_once(self.job_with_exception, 0.1)
         await asyncio.sleep(0.15)
-        assert len(caplog.records) == 2
+        assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert 'No error handlers are registered' in rec.getMessage()
         caplog.clear()

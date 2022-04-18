@@ -1166,7 +1166,7 @@ class TestApplication:
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize('running', (True, False))
-    async def test_create_task_awaiting_warning(self, app, running, caplog):
+    async def test_create_task_awaiting_warning(self, app, running, recwarn):
         async def callback():
             await asyncio.sleep(0.1)
             return 43
@@ -1175,18 +1175,18 @@ class TestApplication:
             if running:
                 await app.start()
 
-            with caplog.at_level(logging.WARNING):
-                task = app.create_task(callback())
+            task = app.create_task(callback())
 
             if running:
-                assert len(caplog.records) == 0
+                assert len(recwarn) == 0
                 assert not task.done()
                 await app.stop()
                 assert task.done()
                 assert task.result() == 43
             else:
-                assert len(caplog.records) == 1
-                assert "won't be automatically awaited" in caplog.records[-1].getMessage()
+                assert len(recwarn) == 1
+                assert "won't be automatically awaited" in str(recwarn[0].message)
+                assert recwarn[0].filename == __file__, "wrong stacklevel!"
                 assert not task.done()
                 await task
 
