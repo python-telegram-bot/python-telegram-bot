@@ -61,19 +61,22 @@ class HTTPXRequest(BaseRequest):
 
             .. _the docs of httpx: https://www.python-httpx.org/environment_variables/#proxies
         read_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
-            amount of time (in seconds) to wait for a response from Telegram's server instead
-            of the time specified during creating of this object. Defaults to ``5``.
+            amount of time (in seconds) to wait for a response from Telegram's server.
+            This value is used unless a different value is passed to :meth:`do_request`.
+            Defaults to ``5``.
         write_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
             amount of time (in seconds) to wait for a write operation to complete (in terms of
-            a network socket; i.e. POSTing a request or uploading a file) instead of the time
-            specified during creating of this object. Defaults to ``5``.
+            a network socket; i.e. POSTing a request or uploading a file).
+            This value is used unless a different value is passed to :meth:`do_request`.
+            Defaults to ``5``.
         connect_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the
             maximum amount of time (in seconds) to wait for a connection attempt to a server
-            to succeed instead of the time specified during creating of this object. Defaults
-            to ``5``.
+            to succeed. This value is used unless a different value is passed to
+            :meth:`do_request`. Defaults to ``5``.
         pool_timeout (:obj:`float` | :obj:`None`, optional): If passed, specifies the maximum
-            amount of time (in seconds) to wait for a connection to become available instead
-            of the time specified during creating of this object. Defaults to ``1``.
+            amount of time (in seconds) to wait for a connection to become available.
+            This value is used unless a different value is passed to :meth:`do_request`.
+            Defaults to ``1``.
 
             Warning:
                 With a finite pool timeout, you must expect :exc:`telegram.error.TimedOut`
