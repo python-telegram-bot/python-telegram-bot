@@ -1906,6 +1906,8 @@ class Sticker:
     ANIMATED = _Animated(name="filters.Sticker.ANIMATED")
     """Messages that contain :attr:`telegram.Message.sticker` and
     :attr:`is animated <telegram.Sticker.is_animated>`.
+
+    .. versionadded:: 14.0
     """
 
     class _Static(MessageFilter):
@@ -1920,6 +1922,8 @@ class Sticker:
     STATIC = _Static(name="filters.Sticker.STATIC")
     """Messages that contain :attr:`telegram.Message.sticker` and is a static sticker, i.e. does
     not contain :attr:`telegram.Sticker.is_animated` or :attr:`telegram.Sticker.is_video`.
+
+    .. versionadded:: 14.0
     """
 
     class _Video(MessageFilter):
@@ -1931,6 +1935,8 @@ class Sticker:
     VIDEO = _Video(name="filters.Sticker.VIDEO")
     """Messages that contain :attr:`telegram.Message.sticker` and is a
     :attr:`video sticker <telegram.Sticker.is_video>`.
+
+    .. versionadded:: 14.0
     """
 
 
