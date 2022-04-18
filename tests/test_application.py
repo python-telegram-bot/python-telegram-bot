@@ -1675,6 +1675,10 @@ class TestApplication:
             else:
                 app.run_webhook(close_loop=False)
 
+        for record in recwarn:
+            print(record)
+            print(record.message)
+            print(str(record.message))
         assert len(recwarn) == 1
         assert str(recwarn[0].message).startswith('Could not add signal handlers for the stop')
         assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
