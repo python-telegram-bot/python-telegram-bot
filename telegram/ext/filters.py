@@ -1105,7 +1105,7 @@ class Document:
         all document messages.
 
     Caution:
-        ``filters.DOCUMENT`` itself is *not* a filter.
+        ``filters.Document`` itself is *not* a filter, but just a convenience namespace.
     """
 
     __slots__ = ()
@@ -1883,7 +1883,7 @@ class Sticker:
         any type of sticker.
 
     Caution:
-        ``filters.STICKER`` itself is *not* a filter.
+        ``filters.Sticker`` itself is *not* a filter, but just a convenience namespace.
     """
 
     __slots__ = ()
@@ -1904,7 +1904,9 @@ class Sticker:
             return bool(message.sticker) and bool(message.sticker.is_animated)  # type: ignore
 
     ANIMATED = _Animated(name="filters.Sticker.ANIMATED")
-    """Messages that contain :attr:`telegram.Message.sticker` and is an animated sticker."""
+    """Messages that contain :attr:`telegram.Message.sticker` and
+    :attr:`is animated <telegram.Sticker.is_animated>`.
+    """
 
     class _Static(MessageFilter):
         __slots__ = ()
@@ -1916,7 +1918,9 @@ class Sticker:
             )
 
     STATIC = _Static(name="filters.Sticker.STATIC")
-    """Messages that contain :attr:`telegram.Message.sticker` and is a static sticker."""
+    """Messages that contain :attr:`telegram.Message.sticker` and is a static sticker, i.e. does
+    not contain :attr:`telegram.Sticker.is_animated` or :attr:`telegram.Sticker.is_video`.
+    """
 
     class _Video(MessageFilter):
         __slots__ = ()
@@ -1925,7 +1929,9 @@ class Sticker:
             return bool(message.sticker) and bool(message.sticker.is_video)  # type: ignore
 
     VIDEO = _Video(name="filters.Sticker.VIDEO")
-    """Messages that contain :attr:`telegram.Message.sticker` and is a video sticker."""
+    """Messages that contain :attr:`telegram.Message.sticker` and is a
+    :attr:`video sticker <telegram.Sticker.is_video>`.
+    """
 
 
 class _SuccessfulPayment(MessageFilter):
