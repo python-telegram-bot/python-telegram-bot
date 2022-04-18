@@ -53,19 +53,6 @@ InCD = TypeVar('InCD')
 InBD = TypeVar('InBD')
 BuilderType = TypeVar('BuilderType', bound='ApplicationBuilder')
 
-if TYPE_CHECKING:
-    DEF_CCT = CallbackContext.DEFAULT_TYPE  # type: ignore[misc]
-    InitApplicationBuilder = (
-        ApplicationBuilder[  # noqa: F821  # pylint: disable=used-before-assignment
-            ExtBot,
-            DEF_CCT,
-            Dict,
-            Dict,
-            Dict,
-            JobQueue,
-        ]
-    )
-
 
 _BOT_CHECKS = [
     ('request', 'request instance'),
@@ -902,3 +889,15 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         self._updater = updater
         return self
+
+
+InitApplicationBuilder = (  # This is defined all the way down here so that its type is inferred
+    ApplicationBuilder[  # by Pylance correctly.
+        ExtBot,
+        CallbackContext.DEFAULT_TYPE,
+        Dict,
+        Dict,
+        Dict,
+        JobQueue,
+    ]
+)
