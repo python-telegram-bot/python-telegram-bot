@@ -1154,6 +1154,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 Mutually exclusive with passing :paramref:`message`
             new_chat_id (:obj:`int`, optional): The new chat ID.
                 Mutually exclusive with passing :paramref:`message`
+
+        Raises:
+            ValueError: Raised if the input is invalid.
         """
         if message and (old_chat_id or new_chat_id):
             raise ValueError("Message and chat_id pair are mutually exclusive")
