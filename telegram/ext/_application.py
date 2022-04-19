@@ -1129,7 +1129,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         :meth:`update_persistence`.
 
         Warning:
-            * Any data stored in :attr:`chat_data` at key `new_chat_id` will be overridden
+            * Any data stored in :attr:`chat_data` at key ``new_chat_id`` will be overridden
             * The key `old_chat_id` of :attr:`chat_data` will be deleted
             * This does not update the :attr:`~telegram.ext.Job.chat_id` attribute of any scheduled
               :class:`telegram.ext.Job`.
