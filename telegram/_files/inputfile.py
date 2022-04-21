@@ -49,10 +49,15 @@ class InputFile:
             .. versionchanged:: 14.0
                 Accept string input.
         filename (:obj:`str`, optional): Filename for this InputFile.
+        attach (:obj:`bool`, optional): Pass :obj:`True` if the parameter this file belongs to in
+            the request to Telegram should point to the multipart data via an ``attach://`` URI.
+            Defaults to `False`.
 
     Attributes:
         input_file_content (:obj:`bytes`): The binary content of the file to send.
-        attach_name (:obj:`str`): Attach name.
+        attach_name (:obj:`str`, Optional ): If present, the parameter this file belongs to in
+            the request to Telegram should point to the multipart data via a an URI of the form
+            ``attach://<attach_name>`` URI.
         filename (:obj:`str`): Filename for the file to be sent.
         mimetype (:obj:`str`): The mimetype inferred from the file to be sent.
 
@@ -60,14 +65,16 @@ class InputFile:
 
     __slots__ = ('filename', 'attach_name', 'input_file_content', 'mimetype')
 
-    def __init__(self, obj: Union[IO[bytes], bytes, str], filename: str = None):
+    def __init__(
+        self, obj: Union[IO[bytes], bytes, str], filename: str = None, attach: bool = False
+    ):
         if isinstance(obj, bytes):
             self.input_file_content = obj
         elif isinstance(obj, str):
             self.input_file_content = obj.encode('utf-8')
         else:
             self.input_file_content = obj.read()
-        self.attach_name = 'attached' + uuid4().hex
+        self.attach_name: Optional[str] = 'attached' + uuid4().hex if attach else None
 
         if (
             not filename
@@ -119,6 +126,7 @@ class InputFile:
         return self.filename, self.input_file_content, self.mimetype
 
     @property
-    def attach_uri(self) -> str:
-        """URI to insert into the JSON data for uploading the file."""
-        return f'attach://{self.attach_name}'
+    def attach_uri(self) -> Optional[str]:
+        """URI to insert into the JSON data for uploading the file. Returns :obj:`None`, if
+        :attr:`attach_name` is :obj:`None`."""
+        return f'attach://{self.attach_name}' if self.attach_name else None

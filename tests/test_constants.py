@@ -23,12 +23,12 @@ import pytest
 from flaky import flaky
 
 from telegram import constants
-from telegram.constants import _StringEnum
+from telegram._utils.enum import StringEnum
 from telegram.error import BadRequest
 from tests.conftest import data_file
 
 
-class StrEnumTest(_StringEnum):
+class StrEnumTest(StringEnum):
     FOO = 'foo'
     BAR = 'bar'
 
@@ -39,6 +39,9 @@ class IntEnumTest(IntEnum):
 
 
 class TestConstants:
+    """Also test _utils.enum.StringEnum on the fly because tg.constants is currently the only
+    place where that class is used."""
+
     def test__all__(self):
         expected = {
             key

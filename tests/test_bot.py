@@ -1646,6 +1646,7 @@ class TestBot:
             max_connections=max_connections,
             allowed_updates=allowed_updates,
             ip_address=ip if use_ip else None,
+            certificate=data_file('sslcert.pem').read_bytes() if use_ip else None,
         )
 
         await asyncio.sleep(1)
@@ -1654,12 +1655,14 @@ class TestBot:
         assert live_info.max_connections == max_connections
         assert live_info.allowed_updates == allowed_updates
         assert live_info.ip_address == ip
+        assert live_info.has_custom_certificate == use_ip
 
         await bot.delete_webhook()
         await asyncio.sleep(1)
         info = await bot.get_webhook_info()
         assert info.url == ''
         assert info.ip_address is None
+        assert info.has_custom_certificate is False
 
     @pytest.mark.parametrize('drop_pending_updates', [True, False])
     @pytest.mark.asyncio

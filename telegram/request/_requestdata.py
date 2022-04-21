@@ -58,14 +58,22 @@ class RequestData:
         (possibly nested) composition of lists, tuples and dictionaries, where each entry, key
         and value is of one of the mentioned types.
         """
-        return {param.name: param.value for param in self._parameters}  # type: ignore[misc]
+        return {
+            param.name: param.value  # type: ignore[misc]
+            for param in self._parameters
+            if param.value is not None
+        }
 
     @property
     def json_parameters(self) -> Dict[str, str]:
         """Gives the parameters as mapping of parameter name to the respective JSON encoded
         value.
         """
-        return {param.name: param.json_value for param in self._parameters}
+        return {
+            param.name: param.json_value
+            for param in self._parameters
+            if param.json_value is not None
+        }
 
     def url_encoded_parameters(self, encode_kwargs: Dict[str, Any] = None) -> str:
         """Encodes the parameters with :func:`urllib.parse.urlencode`.

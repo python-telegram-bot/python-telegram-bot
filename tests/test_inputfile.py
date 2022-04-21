@@ -56,6 +56,16 @@ class TestInputFile:
             # to kill it.
             pass
 
+    @pytest.mark.parametrize('attach', [True, False])
+    def test_attach(self, attach):
+        input_file = InputFile('contents', attach=attach)
+        if attach:
+            assert isinstance(input_file.attach_name, str)
+            assert input_file.attach_uri == f'attach://{input_file.attach_name}'
+        else:
+            assert input_file.attach_name is None
+            assert input_file.attach_uri is None
+
     def test_mimetypes(self, caplog):
         # Only test a few to make sure logic works okay
         assert InputFile(data_file('telegram.jpg').open('rb')).mimetype == 'image/jpeg'

@@ -1036,7 +1036,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if caption_entities:
             data['caption_entities'] = caption_entities
         if thumb:
-            data['thumb'] = parse_file_input(thumb)
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             'sendAudio',
@@ -1171,7 +1171,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if disable_content_type_detection is not None:
             data['disable_content_type_detection'] = disable_content_type_detection
         if thumb:
-            data['thumb'] = parse_file_input(thumb)
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             'sendDocument',
@@ -1410,7 +1410,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if height:
             data['height'] = height
         if thumb:
-            data['thumb'] = parse_file_input(thumb)
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             'sendVideo',
@@ -1533,7 +1533,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if length is not None:
             data['length'] = length
         if thumb:
-            data['thumb'] = parse_file_input(thumb)
+            data['thumb'] = parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             'sendVideoNote',
@@ -1673,7 +1673,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if height:
             data['height'] = height
         if thumb:
-            data['thumb'] = parse_file_input(thumb)
+            data['thumb'] = parse_file_input(thumb, attach=True)
         if caption:
             data['caption'] = caption
         if caption_entities:

@@ -50,7 +50,7 @@ class TestRequestParameter:
             (1, '1'),
             ('one', 'one'),
             (True, 'true'),
-            (None, 'null'),
+            (None, None),
             ([1, '1'], '[1, "1"]'),
             ({True: None}, '{"true": null}'),
             ((1,), '[1]'),
@@ -60,15 +60,17 @@ class TestRequestParameter:
         request_parameter = RequestParameter('name', value, None)
         assert request_parameter.json_value == expected
 
-    def test_multipart_data(self):
+    def test_multiple_multipart_data(self):
         assert RequestParameter('name', 'value', []).multipart_data is None
 
-        input_file_1 = InputFile(data_file('telegram.jpg').read_bytes())
-        input_file_2 = InputFile(data_file('telegram.jpg').read_bytes(), filename='custom')
-        request_parameter = RequestParameter('value', 'name', [input_file_1, input_file_2])
+        input_file_1 = InputFile('data1', attach=True)
+        input_file_2 = InputFile('data2', filename='custom')
+        request_parameter = RequestParameter(
+            value='value', name='name', input_files=[input_file_1, input_file_2]
+        )
         files = request_parameter.multipart_data
         assert files[input_file_1.attach_name] == input_file_1.field_tuple
-        assert files[input_file_2.attach_name] == input_file_2.field_tuple
+        assert files['name'] == input_file_2.field_tuple
 
     @pytest.mark.parametrize(
         ('value', 'expected_value'),
@@ -97,15 +99,19 @@ class TestRequestParameter:
         assert request_parameter.input_files is None
 
     def test_from_input_inputfile(self):
-        inputfile_1 = InputFile(data_file('telegram.jpg').read_bytes(), 'inputfile_1')
-        inputfile_2 = InputFile(data_file('telegram.mp4').read_bytes(), 'inputfile_2')
+        inputfile_1 = InputFile('data1', filename='inputfile_1', attach=True)
+        inputfile_2 = InputFile('data2', filename='inputfile_2')
 
         request_parameter = RequestParameter.from_input('key', inputfile_1)
         assert request_parameter.value == inputfile_1.attach_uri
         assert request_parameter.input_files == [inputfile_1]
 
+        request_parameter = RequestParameter.from_input('key', inputfile_2)
+        assert request_parameter.value is None
+        assert request_parameter.input_files == [inputfile_2]
+
         request_parameter = RequestParameter.from_input('key', [inputfile_1, inputfile_2])
-        assert request_parameter.value == [inputfile_1.attach_uri, inputfile_2.attach_uri]
+        assert request_parameter.value == [inputfile_1.attach_uri]
         assert request_parameter.input_files == [inputfile_1, inputfile_2]
 
     def test_from_input_input_media(self):
@@ -137,3 +143,16 @@ class TestRequestParameter:
             input_media_thumb.thumb,
             input_media_no_thumb.media,
         ]
+
+    def test_from_input_inputmedia_without_attach(self):
+        """This case will never happen, but we test it for completeness"""
+        input_media = InputMediaVideo(
+            data_file('telegram.png').read_bytes(),
+            thumb=data_file('telegram.png').read_bytes(),
+            parse_mode=None,
+        )
+        input_media.media.attach_name = None
+        input_media.thumb.attach_name = None
+        request_parameter = RequestParameter.from_input('key', input_media)
+        assert request_parameter.value == {"type": "video"}
+        assert request_parameter.input_files == [input_media.media, input_media.thumb]

@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an abstract class to make POST and GET requests."""
 import abc
-import traceback
 from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from types import TracebackType
@@ -280,7 +279,6 @@ class BaseRequest(
         except TelegramError as exc:
             raise exc
         except Exception as exc:
-            traceback.print_tb(exc.__traceback__)
             raise NetworkError(f"Unknown error in HTTP implementation: {repr(exc)}") from exc
 
         if HTTPStatus.OK <= code <= 299:

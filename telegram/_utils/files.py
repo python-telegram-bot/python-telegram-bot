@@ -58,6 +58,7 @@ def parse_file_input(
     file_input: Union[FileInput, 'TelegramObject'],
     tg_type: Type['TelegramObject'] = None,
     filename: str = None,
+    attach: bool = False,
 ) -> Union[str, 'InputFile', Any]:
     """
     Parses input for sending files:
@@ -77,6 +78,9 @@ def parse_file_input(
             :class:`telegram.Animation`.
         filename (:obj:`str`, optional): The filename. Only relevant in case an
             :class:`telegram.InputFile` is returned.
+        attach (:obj:`bool`, optional): Pass :obj:`True` if the parameter this file belongs to in
+            the request to Telegram should point to the multipart data via an ``attach://`` URI.
+            Defaults to `False`. Only relevant if an :class:`telegram.InputFile` is returned.
 
     Returns:
         :obj:`str` | :class:`telegram.InputFile` | :obj:`object`: The parsed input or the untouched
@@ -94,9 +98,9 @@ def parse_file_input(
             out = file_input  # type: ignore[assignment]
         return out
     if isinstance(file_input, bytes):
-        return InputFile(file_input, filename=filename)
+        return InputFile(file_input, filename=filename, attach=attach)
     if hasattr(file_input, 'read'):
-        return InputFile(cast(IO, file_input), filename=filename)
+        return InputFile(cast(IO, file_input), filename=filename, attach=attach)
     if tg_type and isinstance(file_input, tg_type):
         return file_input.file_id  # type: ignore[attr-defined]
     return file_input
