@@ -508,7 +508,7 @@ class JobQueue:
 
     async def start(self) -> None:
         # this method async just in case future versions need that
-        """Starts the job_queue thread."""
+        """Starts the job_queue."""
         if not self.scheduler.running:
             self.scheduler.start()
 
@@ -579,10 +579,10 @@ class Job:
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
         chat_id (:obj:`int`, optional): Chat id of the chat that this job is associated with.
 
-            ..versionadded:: 14.0
+            .. versionadded:: 14.0
         user_id (:obj:`int`, optional): User id of the user that this job is associated with.
 
-            ..versionadded:: 14.0
+            .. versionadded:: 14.0
 
     Attributes:
         callback (:term:`coroutine function`): The callback function that should be executed by the
@@ -592,10 +592,10 @@ class Job:
         job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
         chat_id (:obj:`int`): Optional. Chat id of the chat that this job is associated with.
 
-            ..versionadded:: 14.0
+            .. versionadded:: 14.0
         user_id (:obj:`int`): Optional. User id of the user that this job is associated with.
 
-            ..versionadded:: 14.0
+            .. versionadded:: 14.0
     """
 
     __slots__ = (
