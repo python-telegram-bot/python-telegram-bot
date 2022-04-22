@@ -48,8 +48,8 @@ from .test_requestdata import (  # noqa: F401
     mixed_rqs,
     mixed_params,
     file_params,
+    inputfiles,
     simple_params,
-    inputfile,
     input_media_video,
     input_media_photo,
 )

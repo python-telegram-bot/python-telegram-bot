@@ -33,8 +33,8 @@ from tests.conftest import data_file
 
 
 @pytest.fixture(scope='module')
-def inputfile() -> InputFile:
-    return InputFile(data_file('telegram.jpg').read_bytes())
+def inputfiles() -> Dict[bool, InputFile]:
+    return {True: InputFile(obj='data', attach=True), False: InputFile(obj='data', attach=False)}
 
 
 @pytest.fixture(scope='module')
@@ -59,8 +59,8 @@ def simple_params() -> Dict[str, Any]:
     return {
         'string': 'string',
         'integer': 1,
-        'tg_object': MessageEntity('type', 1, 1).to_dict(),
-        'list': [1, 'string', MessageEntity('type', 1, 1).to_dict()],
+        'tg_object': MessageEntity('type', 1, 1),
+        'list': [1, 'string', MessageEntity('type', 1, 1)],
     }
 
 
@@ -82,23 +82,24 @@ def simple_rqs(simple_params) -> RequestData:
 
 
 @pytest.fixture(scope='module')
-def file_params(inputfile, input_media_video, input_media_photo) -> Dict[str, Any]:
+def file_params(inputfiles, input_media_video, input_media_photo) -> Dict[str, Any]:
     return {
-        'inputfile': inputfile,
+        'inputfile_attach': inputfiles[True],
+        'inputfile_no_attach': inputfiles[False],
         'inputmedia': input_media_video,
         'inputmedia_list': [input_media_video, input_media_photo],
     }
 
 
 @pytest.fixture(scope='module')
-def file_jsons(inputfile, input_media_video, input_media_photo) -> Dict[str, Any]:
+def file_jsons(inputfiles, input_media_video, input_media_photo) -> Dict[str, Any]:
     input_media_video_dict = input_media_video.to_dict()
     input_media_video_dict['media'] = input_media_video.media.attach_uri
     input_media_video_dict['thumb'] = input_media_video.thumb.attach_uri
     input_media_photo_dict = input_media_photo.to_dict()
     input_media_photo_dict['media'] = input_media_photo.media.attach_uri
     return {
-        'inputfile': inputfile.attach_uri,
+        'inputfile_attach': inputfiles[True].attach_uri,
         'inputmedia': json.dumps(input_media_video_dict),
         'inputmedia_list': json.dumps([input_media_video_dict, input_media_photo_dict]),
     }
@@ -133,7 +134,6 @@ def mixed_rqs(mixed_params) -> RequestData:
 
 
 class TestRequestData:
-    # TODO: Adjust tests!
     def test_slot_behaviour(self, simple_rqs, mro_slots):
         for attr in simple_rqs.__slots__:
             assert getattr(simple_rqs, attr, 'err') != 'err', f"got extra slot '{attr}'"
@@ -145,17 +145,32 @@ class TestRequestData:
         assert mixed_rqs.contains_files
 
     def test_parameters(
-        self,
-        simple_rqs,
-        simple_params,  # file_rqs, mixed_rqs, file_params, mixed_params
+        self, simple_rqs, file_rqs, mixed_rqs, inputfiles, input_media_video, input_media_photo
     ):
-        assert simple_rqs.parameters == simple_params
-        # We don't test these for now since that's a struggle
-        # And the conversion part is already being tested in test_requestparameter.py
-        # assert file_rqs.parameters == file_params
-        # assert mixed_rqs.parameters == mixed_params
+        simple_params_expected = {
+            'string': 'string',
+            'integer': 1,
+            'tg_object': MessageEntity('type', 1, 1).to_dict(),
+            'list': [1, 'string', MessageEntity('type', 1, 1).to_dict()],
+        }
+        video_value = {
+            'media': input_media_video.media.attach_uri,
+            'thumb': input_media_video.thumb.attach_uri,
+            'type': input_media_video.type,
+        }
+        photo_value = {'media': input_media_photo.media.attach_uri, 'type': input_media_photo.type}
+        file_params_expected = {
+            'inputfile_attach': inputfiles[True].attach_uri,
+            'inputmedia': video_value,
+            'inputmedia_list': [video_value, photo_value],
+        }
+        mixed_params_expected = simple_params_expected.copy()
+        mixed_params_expected.update(file_params_expected)
 
-    @pytest.mark.xfail(True, reason='Not adjusted yet')
+        assert simple_rqs.parameters == simple_params_expected
+        assert file_rqs.parameters == file_params_expected
+        assert mixed_rqs.parameters == mixed_params_expected
+
     def test_json_parameters(
         self, simple_rqs, file_rqs, mixed_rqs, simple_jsons, file_jsons, mixed_jsons
     ):
@@ -163,7 +178,6 @@ class TestRequestData:
         assert file_rqs.json_parameters == file_jsons
         assert mixed_rqs.json_parameters == mixed_jsons
 
-    @pytest.mark.xfail(True, reason='Not adjusted yet')
     def test_json_payload(
         self, simple_rqs, file_rqs, mixed_rqs, simple_jsons, file_jsons, mixed_jsons
     ):
@@ -171,18 +185,18 @@ class TestRequestData:
         assert file_rqs.json_payload == json.dumps(file_jsons).encode()
         assert mixed_rqs.json_payload == json.dumps(mixed_jsons).encode()
 
-    @pytest.mark.xfail(True, reason='Not adjusted yet')
     def test_multipart_data(
         self,
         simple_rqs,
         file_rqs,
         mixed_rqs,
-        inputfile,
+        inputfiles,
         input_media_video,
         input_media_photo,
     ):
         expected = {
-            inputfile.attach_name: inputfile.field_tuple,
+            inputfiles[True].attach_name: inputfiles[True].field_tuple,
+            'inputfile_no_attach': inputfiles[False].field_tuple,
             input_media_photo.media.attach_name: input_media_photo.media.field_tuple,
             input_media_video.media.attach_name: input_media_video.media.field_tuple,
             input_media_video.thumb.attach_name: input_media_video.thumb.field_tuple,
