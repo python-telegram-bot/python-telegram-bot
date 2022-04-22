@@ -1083,8 +1083,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         changed in the future.
 
         Note:
-            The document argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
+            * The document argument can be either a file_id, an URL or a file from disk
+              ``open(filename, 'rb')``.
+
+            * Sending by URL will currently only work ``GIF``, ``PDF`` & ``ZIP`` files.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1717,14 +1719,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """
         Use this method to send audio files, if you want Telegram clients to display the file
-        as a playable voice message. For this to work, your audio must be in an .ogg file
+        as a playable voice message. For this to work, your audio must be in an ``.ogg`` file
         encoded with OPUS (other formats may be sent as Audio or Document). Bots can currently
         send voice messages of up to :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD`
         in size, this limit may be changed in the future.
 
         Note:
-            The voice argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
+            * The voice argument can be either a file_id, an URL or a file from disk
+              ``open(filename, 'rb')``.
+
+            * To use this method, the file must have the type ``audio/ogg`` and be no more than 1MB
+              in size. 1-20MB voice notes will be sent as files.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
