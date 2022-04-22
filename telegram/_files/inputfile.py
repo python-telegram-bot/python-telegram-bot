@@ -128,5 +128,6 @@ class InputFile:
     @property
     def attach_uri(self) -> Optional[str]:
         """URI to insert into the JSON data for uploading the file. Returns :obj:`None`, if
-        :attr:`attach_name` is :obj:`None`."""
+        :attr:`attach_name` is :obj:`None`.
+        """
         return f'attach://{self.attach_name}' if self.attach_name else None

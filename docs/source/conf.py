@@ -517,7 +517,7 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
         base = str(base)
 
         # Special case because base classes are in std lib:
-        if "_StringEnum" in base:
+        if "StringEnum" in base == "<enum 'StringEnum'>":
             bases[idx] = ":class:`enum.Enum`"
             bases.insert(0, ':class:`str`')
             continue
