@@ -77,7 +77,7 @@ _logger = logging.getLogger(__name__)
 class ApplicationHandlerStop(Exception):
     """
     Raise this in a handler or an error handler to prevent execution of any other handler (even in
-    different group).
+    different groups).
 
     In order to use this exception in a :class:`telegram.ext.ConversationHandler`, pass the
     optional :paramref:`state` parameter instead of returning the next state:
@@ -168,7 +168,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
             .. seealso::
                 :meth:`add_handler`, :meth:`add_handlers`.
-        error_handlers (Dict[:term:`coroutine function`, :obj:`bool`]): A dict, where the keys are
+        error_handlers (Dict[:term:`coroutine function`, :obj:`bool`]): A dictionary where the keys are
             error handlers and the values indicate whether they are to be run blocking.
 
             .. seealso::
@@ -785,11 +785,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             * If :paramref:`coroutine` raises an exception, it will be set on the task created by
               this method even though it's handled by :meth:`process_error`.
             * If the application is currently running, tasks created by this method will be
-              awaited by :meth:`stop`.
+              awaited with :meth:`stop`.
 
         Args:
             coroutine (:term:`coroutine function`): The coroutine to run as task.
-            update (:obj:`object`, optional): If passed, will be passed to :meth:`process_error`
+            update (:obj:`object`, optional): If set, will be passed to :meth:`process_error`
                 as additional information for the error handlers. Moreover, the corresponding
                 :attr:`chat_data` and :attr:`user_data` entries will be updated in the next run of
                 :meth:`update_persistence` after the :paramref:`coroutine` is finished.
@@ -974,7 +974,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         The priority/order of handlers is determined as follows:
 
           * Priority of the group (lower group number == higher priority)
-          * The first handler in a group which should handle an update (see
+          * The first handler in a group which can handle an update (see
             :attr:`telegram.ext.Handler.check_update`) will be used. Other handlers from the
             group will not be used. The order in which handlers were added to the group defines the
             priority.
@@ -1031,7 +1031,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         sequence(s) matters. See :meth:`add_handler` for details.
 
         .. versionadded:: 14.0
-        .. seealso:: :meth:`add_handler`
 
         Args:
             handlers (List[:class:`telegram.ext.Handler`] | \

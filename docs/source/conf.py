@@ -158,7 +158,7 @@ html_theme_options = {
     "announcement": 'PTB has undergone significant changes in v14. Please read the documentation '
                     'carefully and also check out the transition guide in the '
                     '<a href="https://github.com/python-telegram-bot/python-telegram-bot/wiki">'
-                    'wiki</a>',
+                    'wiki</a>.',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.

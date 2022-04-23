@@ -103,7 +103,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
           use :class:`telegram.ext.ExtBot` for the bot.
 
-    .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern.
+    .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
     """
 
     __slots__ = (
@@ -278,7 +278,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def application_class(
         self: BuilderType, application_class: Type[Application], kwargs: Dict[str, object] = None
     ) -> BuilderType:
-        """Sets a custom subclass to be used instead of :class:`telegram.ext.Application`. The
+        """Sets a custom subclass instead of :class:`telegram.ext.Application`. The
         subclass's ``__init__`` should look like this
 
         .. code:: python
@@ -301,7 +301,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def token(self: BuilderType, token: str) -> BuilderType:
-        """Sets the token to be used for :attr:`telegram.ext.Application.bot`.
+        """Sets the token for :attr:`telegram.ext.Application.bot`.
 
         Args:
             token (:obj:`str`): The token.
@@ -317,7 +317,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def base_url(self: BuilderType, base_url: str) -> BuilderType:
-        """Sets the base URL to be used for :attr:`telegram.ext.Application.bot`. If not called,
+        """Sets the base URL for :attr:`telegram.ext.Application.bot`. If not called,
         will default to ``'https://api.telegram.org/bot'``.
 
         .. seealso:: :paramref:`telegram.Bot.base_url`, `Local Bot API Server <https://github.com/\
@@ -338,7 +338,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def base_file_url(self: BuilderType, base_file_url: str) -> BuilderType:
-        """Sets the base file URL to be used for :attr:`telegram.ext.Application.bot`. If not
+        """Sets the base file URL for :attr:`telegram.ext.Application.bot`. If not
         called, will default to ``'https://api.telegram.org/file/bot'``.
 
         .. seealso:: :paramref:`telegram.Bot.base_file_url`, `Local Bot API Server <https://\
@@ -397,13 +397,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             )
 
     def request(self: BuilderType, request: BaseRequest) -> BuilderType:
-        """Sets a :class:`telegram.request.BaseRequest` object to be used for the
+        """Sets a :class:`telegram.request.BaseRequest` instance for the
         :paramref:`telegram.Bot.request` parameter of :attr:`telegram.ext.Application.bot`.
 
         .. seealso:: :meth:`get_updates_request`
 
         Args:
-            request (:class:`telegram.request.BaseRequest`): The request object.
+            request (:class:`telegram.request.BaseRequest`): The request instance.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -413,7 +413,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def connection_pool_size(self: BuilderType, connection_pool_size: int) -> BuilderType:
-        """Sets the size of the connection pool to be used for the
+        """Sets the size of the connection pool for the
         :paramref:`~telegram.request.HTTPXRequest.connection_pool_size` parameter of
         :attr:`telegram.Bot.request`. Defaults to ``128``.
 
@@ -428,7 +428,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def proxy_url(self: BuilderType, proxy_url: str) -> BuilderType:
-        """Sets the proxy to be used for the :paramref:`~telegram.request.HTTPXRequest.proxy_url`
+        """Sets the proxy for the :paramref:`~telegram.request.HTTPXRequest.proxy_url`
         parameter of :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
 
         Args:
@@ -443,7 +443,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def connect_timeout(self: BuilderType, connect_timeout: Optional[float]) -> BuilderType:
-        """Sets the connection attempt timeout to be used for the
+        """Sets the connection attempt timeout for the
         :paramref:`~telegram.request.HTTPXRequest.connect_timeout` parameter of
         :attr:`telegram.Bot.request`. Defaults to ``5.0``.
 
@@ -459,7 +459,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def read_timeout(self: BuilderType, read_timeout: Optional[float]) -> BuilderType:
-        """Sets the waiting timeout to be used for the
+        """Sets the waiting timeout for the
         :paramref:`~telegram.request.HTTPXRequest.read_timeout` parameter of
         :attr:`telegram.Bot.request`. Defaults to ``5.0``.
 
@@ -475,7 +475,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def write_timeout(self: BuilderType, write_timeout: Optional[float]) -> BuilderType:
-        """Sets the write operation timeout to be used for the
+        """Sets the write operation timeout for the
         :paramref:`~telegram.request.HTTPXRequest.write_timeout` parameter of
         :attr:`telegram.Bot.request`. Defaults to ``5.0``.
 
@@ -491,7 +491,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def pool_timeout(self: BuilderType, pool_timeout: Optional[float]) -> BuilderType:
-        """Sets the connection pool's connection freeing timeout to be used for the
+        """Sets the connection pool's connection freeing timeout for the
         :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter of
         :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
 
@@ -507,14 +507,14 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def get_updates_request(self: BuilderType, get_updates_request: BaseRequest) -> BuilderType:
-        """Sets a :class:`telegram.request.BaseRequest` object to be used for the
+        """Sets a :class:`telegram.request.BaseRequest` instance for the
         :paramref:`~telegram.Bot.get_updates_request` parameter of
         :attr:`telegram.ext.Application.bot`.
 
         .. seealso:: :meth:`request`
 
         Args:
-            get_updates_request (:class:`telegram.request.BaseRequest`): The request object.
+            get_updates_request (:class:`telegram.request.BaseRequest`): The request instance.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -526,9 +526,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_connection_pool_size(
         self: BuilderType, get_updates_connection_pool_size: int
     ) -> BuilderType:
-        """Sets the size of the connection pool to be used for the
+        """Sets the size of the connection pool for the
         :paramref:`telegram.request.HTTPXRequest.connection_pool_size` parameter which is used
-        for :meth:`telegram.Bot.get_updates`. Defaults to ``1``.
+        for the :meth:`telegram.Bot.get_updates` request. Defaults to ``1``.
 
         Args:
             get_updates_connection_pool_size (:obj:`int`): The size of the connection pool.
@@ -541,7 +541,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def get_updates_proxy_url(self: BuilderType, get_updates_proxy_url: str) -> BuilderType:
-        """Sets the proxy to be used for the :paramref:`telegram.request.HTTPXRequest.proxy_url`
+        """Sets the proxy for the :paramref:`telegram.request.HTTPXRequest.proxy_url`
         parameter which is used for :meth:`telegram.Bot.get_updates`. Defaults to :obj:`None`.
 
         Args:
@@ -558,9 +558,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_connect_timeout(
         self: BuilderType, get_updates_connect_timeout: Optional[float]
     ) -> BuilderType:
-        """Sets the connection attempt timeout to be used for the
+        """Sets the connection attempt timeout for the
         :paramref:`telegram.request.HTTPXRequest.connect_timeout` parameter which is used for
-        :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
+        the :meth:`telegram.Bot.get_updates` request. Defaults to ``5.0``.
 
         Args:
             get_updates_connect_timeout (:obj:`float`): See
@@ -576,9 +576,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_read_timeout(
         self: BuilderType, get_updates_read_timeout: Optional[float]
     ) -> BuilderType:
-        """Sets the waiting timeout to be used for the
-        :paramref:`telegram.request.HTTPXRequest.read_timeout` parameter which is used for
-        :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
+        """Sets the waiting timeout for the
+        :paramref:`telegram.request.HTTPXRequest.read_timeout` parameter which is used for the
+        :meth:`telegram.Bot.get_updates` request. Defaults to ``5.0``.
 
         Args:
             get_updates_read_timeout (:obj:`float`): See
@@ -594,9 +594,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_write_timeout(
         self: BuilderType, get_updates_write_timeout: Optional[float]
     ) -> BuilderType:
-        """Sets the write operation timeout to be used for the
+        """Sets the write operation timeout for the
         :paramref:`telegram.request.HTTPXRequest.write_timeout` parameter which is used for
-        :meth:`telegram.Bot.get_updates`. Defaults to ``5.0``.
+        the :meth:`telegram.Bot.get_updates` request. Defaults to ``5.0``.
 
         Args:
             get_updates_write_timeout (:obj:`float`): See
@@ -612,9 +612,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def get_updates_pool_timeout(
         self: BuilderType, get_updates_pool_timeout: Optional[float]
     ) -> BuilderType:
-        """Sets the connection pool's connection freeing timeout to be used for the
-        :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter which is used for
-        :meth:`telegram.Bot.get_updates`. Defaults to :obj:`None`.
+        """Sets the connection pool's connection freeing timeout for the
+        :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter which is used for the
+        :meth:`telegram.Bot.get_updates` request. Defaults to :obj:`None`.
 
         Args:
             get_updates_pool_timeout (:obj:`float`): See
@@ -633,7 +633,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         password: Union[bytes, FilePathInput] = None,
     ) -> BuilderType:
         """Sets the private key and corresponding password for decryption of telegram passport data
-        to be used for :attr:`telegram.ext.Application.bot`.
+        for :attr:`telegram.ext.Application.bot`.
 
         .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
             /tree/master/examples#passportbotpy>`_, `Telegram Passports
@@ -666,14 +666,14 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self
 
     def defaults(self: BuilderType, defaults: 'Defaults') -> BuilderType:
-        """Sets the :class:`telegram.ext.Defaults` object to be used for
+        """Sets the :class:`telegram.ext.Defaults` instance for
         :attr:`telegram.ext.Application.bot`.
 
         .. seealso:: `Adding Defaults <https://github.com/python-telegram-bot/python-telegram-bot\
             /wiki/Adding-defaults-to-your-bot>`_
 
         Args:
-            defaults (:class:`telegram.ext.Defaults`): The defaults.
+            defaults (:class:`telegram.ext.Defaults`): The defaults instance.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
@@ -717,7 +717,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: 'ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]',
         bot: InBT,
     ) -> 'ApplicationBuilder[InBT, CCT, UD, CD, BD, JQ]':
-        """Sets a :class:`telegram.Bot` instance to be used for
+        """Sets a :class:`telegram.Bot` instance for
         :attr:`telegram.ext.Application.bot`. Instances of subclasses like
         :class:`telegram.ext.ExtBot` are also valid.
 
@@ -736,7 +736,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self  # type: ignore[return-value]
 
     def update_queue(self: BuilderType, update_queue: Queue) -> BuilderType:
-        """Sets a :class:`asyncio.Queue` instance to be used for
+        """Sets a :class:`asyncio.Queue` instance for
         :attr:`telegram.ext.Application.update_queue`, i.e. the queue that the application will
         fetch updates from. Will also be used for the :attr:`telegram.ext.Application.updater`.
         If not called, a queue will be instantiated.
@@ -759,7 +759,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         Warning:
             Processing updates concurrently is not recommended when stateful handlers like
-            :class:`telegram.ext.ConversationHandler` are used. Only use this, when you are sure
+            :class:`telegram.ext.ConversationHandler` are used. Only use this if you are sure
             that your bot does not (explicitly or implicitly) rely on updates being processed
             sequentially.
 
@@ -780,7 +780,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: 'ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]',
         job_queue: InJQ,
     ) -> 'ApplicationBuilder[BT, CCT, UD, CD, BD, InJQ]':
-        """Sets a :class:`telegram.ext.JobQueue` instance to be used for
+        """Sets a :class:`telegram.ext.JobQueue` instance for
         :attr:`telegram.ext.Application.job_queue`. If not called, a job queue will be
         instantiated.
 
@@ -809,7 +809,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self  # type: ignore[return-value]
 
     def persistence(self: BuilderType, persistence: 'BasePersistence') -> BuilderType:
-        """Sets a :class:`telegram.ext.BasePersistence` instance to be used for
+        """Sets a :class:`telegram.ext.BasePersistence` instance for
         :attr:`telegram.ext.Application.persistence`.
 
         Note:
@@ -843,7 +843,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: 'ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]',
         context_types: 'ContextTypes[InCCT, InUD, InCD, InBD]',
     ) -> 'ApplicationBuilder[BT, InCCT, InUD, InCD, InBD, JQ]':
-        """Sets a :class:`telegram.ext.ContextTypes` instance to be used for
+        """Sets a :class:`telegram.ext.ContextTypes` instance for
         :attr:`telegram.ext.Application.context_types`.
 
         .. seealso:: `contexttypesbot.py <https://github.com/python-telegram-bot\
@@ -859,7 +859,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return self  # type: ignore[return-value]
 
     def updater(self: BuilderType, updater: Optional[Updater]) -> BuilderType:
-        """Sets a :class:`telegram.ext.Updater` instance to be used for
+        """Sets a :class:`telegram.ext.Updater` instance for
         :attr:`telegram.ext.Application.updater`. The :attr:`telegram.ext.Updater.bot` and
         :attr:`telegram.ext.Updater.update_queue` will be used for
         :attr:`telegram.ext.Application.bot` and :attr:`telegram.ext.Application.update_queue`,

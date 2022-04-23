@@ -118,7 +118,7 @@ class Updater(AbstractAsyncContextManager):
         return self._running
 
     async def initialize(self) -> None:
-        """Initialize the Updater & the associated :attr:`bot` by calling
+        """Initializes the Updater & the associated :attr:`bot` by calling
         :meth:`telegram.Bot.initialize`.
 
         .. seealso::
@@ -221,7 +221,9 @@ class Updater(AbstractAsyncContextManager):
             error_callback (Callable[[:exc:`telegram.error.TelegramError`], :obj:`None`], \
                 optional): Callback to handle :exc:`telegram.error.TelegramError` s that occur
                 while calling :meth:`telegram.Bot.get_updates` during polling. Defaults to
-                :obj:`None`, in which case errors will be logged.
+                :obj:`None`, in which case errors will be logged. Callback signature::
+
+                    def callback(error: telegram.error.TelegramError)
 
                 Note:
                     The :paramref:`error_callback` must *not* be a :term:`coroutine function`! If
