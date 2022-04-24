@@ -38,7 +38,7 @@ class InlineQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        In Python :keyword:`from` is a reserved word, :paramref:`from_user`
+        In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -110,7 +110,7 @@ class InlineQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(
+    async def answer(
         self,
         results: Union[
             Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
@@ -120,14 +120,17 @@ class InlineQuery(TelegramObject):
         next_offset: str = None,
         switch_pm_text: str = None,
         switch_pm_parameter: str = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         current_offset: str = None,
         api_kwargs: JSONDict = None,
         auto_pagination: bool = False,
     ) -> bool:
         """Shortcut for::
 
-            bot.answer_inline_query(
+            await bot.answer_inline_query(
                 update.inline_query.id,
                 *args,
                 current_offset=self.offset if auto_pagination else None,
@@ -146,13 +149,12 @@ class InlineQuery(TelegramObject):
                 Defaults to :obj:`False`.
 
         Raises:
-            ValueError: If both
-                :paramref:`~telegram.Bot.answer_inline_query.current_offset` and
+            ValueError: If both :paramref:`~telegram.Bot.answer_inline_query.current_offset` and
                 :paramref:`auto_pagination` are supplied.
         """
         if current_offset and auto_pagination:
             raise ValueError('current_offset and auto_pagination are mutually exclusive!')
-        return self.get_bot().answer_inline_query(
+        return await self.get_bot().answer_inline_query(
             inline_query_id=self.id,
             current_offset=self.offset if auto_pagination else current_offset,
             results=results,
@@ -161,7 +163,10 @@ class InlineQuery(TelegramObject):
             next_offset=next_offset,
             switch_pm_text=switch_pm_text,
             switch_pm_parameter=switch_pm_parameter,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 

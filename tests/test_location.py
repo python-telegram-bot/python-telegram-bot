@@ -21,6 +21,7 @@ from flaky import flaky
 
 from telegram import Location
 from telegram.error import BadRequest
+from telegram.request import RequestData
 
 
 @pytest.fixture(scope='class')
@@ -68,8 +69,9 @@ class TestLocation:
 
     @flaky(3, 1)
     @pytest.mark.xfail
-    def test_send_live_location(self, bot, chat_id):
-        message = bot.send_location(
+    @pytest.mark.asyncio
+    async def test_send_live_location(self, bot, chat_id):
+        message = await bot.send_location(
             chat_id=chat_id,
             latitude=52.223880,
             longitude=5.166146,
@@ -88,7 +90,7 @@ class TestLocation:
         assert message.location.proximity_alert_radius == 1000
         assert message.has_protected_content
 
-        message2 = bot.edit_message_live_location(
+        message2 = await bot.edit_message_live_location(
             message.chat_id,
             message.message_id,
             latitude=52.223098,
@@ -104,25 +106,27 @@ class TestLocation:
         assert message2.location.heading == 10
         assert message2.location.proximity_alert_radius == 500
 
-        bot.stop_message_live_location(message.chat_id, message.message_id)
+        await bot.stop_message_live_location(message.chat_id, message.message_id)
         with pytest.raises(BadRequest, match="Message can't be edited"):
-            bot.edit_message_live_location(
+            await bot.edit_message_live_location(
                 message.chat_id, message.message_id, latitude=52.223880, longitude=5.164306
             )
 
     # TODO: Needs improvement with in inline sent live location.
-    def test_edit_live_inline_message(self, monkeypatch, bot, location):
-        def make_assertion(url, data, **kwargs):
-            lat = data['latitude'] == location.latitude
-            lon = data['longitude'] == location.longitude
-            id_ = data['inline_message_id'] == 1234
-            ha = data['horizontal_accuracy'] == 50
-            heading = data['heading'] == 90
-            prox_alert = data['proximity_alert_radius'] == 1000
+    @pytest.mark.asyncio
+    async def test_edit_live_inline_message(self, monkeypatch, bot, location):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.json_parameters
+            lat = data['latitude'] == str(location.latitude)
+            lon = data['longitude'] == str(location.longitude)
+            id_ = data['inline_message_id'] == '1234'
+            ha = data['horizontal_accuracy'] == '50'
+            heading = data['heading'] == '90'
+            prox_alert = data['proximity_alert_radius'] == '1000'
             return lat and lon and id_ and ha and heading and prox_alert
 
         monkeypatch.setattr(bot.request, 'post', make_assertion)
-        assert bot.edit_message_live_location(
+        assert await bot.edit_message_live_location(
             inline_message_id=1234,
             location=location,
             horizontal_accuracy=50,
@@ -131,22 +135,24 @@ class TestLocation:
         )
 
     # TODO: Needs improvement with in inline sent live location.
-    def test_stop_live_inline_message(self, monkeypatch, bot):
-        def test(url, data, **kwargs):
-            id_ = data['inline_message_id'] == 1234
+    @pytest.mark.asyncio
+    async def test_stop_live_inline_message(self, monkeypatch, bot):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            id_ = request_data.json_parameters['inline_message_id'] == '1234'
             return id_
 
-        monkeypatch.setattr(bot.request, 'post', test)
-        assert bot.stop_message_live_location(inline_message_id=1234)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        assert await bot.stop_message_live_location(inline_message_id=1234)
 
-    def test_send_with_location(self, monkeypatch, bot, chat_id, location):
-        def test(url, data, **kwargs):
-            lat = data['latitude'] == location.latitude
-            lon = data['longitude'] == location.longitude
+    @pytest.mark.asyncio
+    async def test_send_with_location(self, monkeypatch, bot, chat_id, location):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            lat = request_data.json_parameters['latitude'] == str(location.latitude)
+            lon = request_data.json_parameters['longitude'] == str(location.longitude)
             return lat and lon
 
-        monkeypatch.setattr(bot.request, 'post', test)
-        assert bot.send_location(location=location, chat_id=chat_id)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        assert await bot.send_location(location=location, chat_id=chat_id)
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
@@ -158,13 +164,14 @@ class TestLocation:
         ],
         indirect=['default_bot'],
     )
-    def test_send_location_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_location_default_allow_sending_without_reply(
         self, default_bot, chat_id, location, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_location(
+            message = await default_bot.send_location(
                 chat_id,
                 location=location,
                 allow_sending_without_reply=custom,
@@ -172,48 +179,56 @@ class TestLocation:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_location(
+            message = await default_bot.send_location(
                 chat_id, location=location, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_location(
+                await default_bot.send_location(
                     chat_id, location=location, reply_to_message_id=reply_to_message.message_id
                 )
 
     @flaky(3, 1)
+    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
-    def test_send_location_default_protect_content(self, chat_id, default_bot, location):
-        protected = default_bot.send_location(chat_id, location=location)
+    async def test_send_location_default_protect_content(self, chat_id, default_bot, location):
+        protected = await default_bot.send_location(chat_id, location=location)
         assert protected.has_protected_content
-        unprotected = default_bot.send_location(chat_id, location=location, protect_content=False)
+        unprotected = await default_bot.send_location(
+            chat_id, location=location, protect_content=False
+        )
         assert not unprotected.has_protected_content
 
-    def test_edit_live_location_with_location(self, monkeypatch, bot, location):
-        def test(url, data, **kwargs):
-            lat = data['latitude'] == location.latitude
-            lon = data['longitude'] == location.longitude
+    @pytest.mark.asyncio
+    async def test_edit_live_location_with_location(self, monkeypatch, bot, location):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            lat = request_data.json_parameters['latitude'] == str(location.latitude)
+            lon = request_data.json_parameters['longitude'] == str(location.longitude)
             return lat and lon
 
-        monkeypatch.setattr(bot.request, 'post', test)
-        assert bot.edit_message_live_location(None, None, location=location)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        assert await bot.edit_message_live_location(None, None, location=location)
 
-    def test_send_location_without_required(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_location_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either location or latitude and longitude'):
-            bot.send_location(chat_id=chat_id)
+            await bot.send_location(chat_id=chat_id)
 
-    def test_edit_location_without_required(self, bot):
+    @pytest.mark.asyncio
+    async def test_edit_location_without_required(self, bot):
         with pytest.raises(ValueError, match='Either location or latitude and longitude'):
-            bot.edit_message_live_location(chat_id=2, message_id=3)
+            await bot.edit_message_live_location(chat_id=2, message_id=3)
 
-    def test_send_location_with_all_args(self, bot, location):
+    @pytest.mark.asyncio
+    async def test_send_location_with_all_args(self, bot, location):
         with pytest.raises(ValueError, match='Not both'):
-            bot.send_location(chat_id=1, latitude=2.5, longitude=4.6, location=location)
+            await bot.send_location(chat_id=1, latitude=2.5, longitude=4.6, location=location)
 
-    def test_edit_location_with_all_args(self, bot, location):
+    @pytest.mark.asyncio
+    async def test_edit_location_with_all_args(self, bot, location):
         with pytest.raises(ValueError, match='Not both'):
-            bot.edit_message_live_location(
+            await bot.edit_message_live_location(
                 chat_id=1, message_id=7, latitude=2.5, longitude=4.6, location=location
             )
 

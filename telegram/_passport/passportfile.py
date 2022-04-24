@@ -136,8 +136,13 @@ class PassportFile(TelegramObject):
             for i, passport_file in enumerate(data)
         ]
 
-    def get_file(
-        self, timeout: ODVInput[float] = DEFAULT_NONE, api_kwargs: JSONDict = None
+    async def get_file(
+        self,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> 'File':
         """
         Wrapper over :attr:`telegram.Bot.get_file`. Will automatically assign the correct
@@ -153,8 +158,13 @@ class PassportFile(TelegramObject):
             :class:`telegram.error.TelegramError`
 
         """
-        file = self.get_bot().get_file(
-            file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs
+        file = await self.get_bot().get_file(
+            file_id=self.file_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
         file.set_credentials(self._credentials)
         return file

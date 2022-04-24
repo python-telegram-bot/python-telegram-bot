@@ -23,12 +23,12 @@ import pytest
 from flaky import flaky
 
 from telegram import constants
-from telegram.constants import _StringEnum
+from telegram._utils.enum import StringEnum
 from telegram.error import BadRequest
 from tests.conftest import data_file
 
 
-class StrEnumTest(_StringEnum):
+class StrEnumTest(StringEnum):
     FOO = 'foo'
     BAR = 'bar'
 
@@ -39,6 +39,9 @@ class IntEnumTest(IntEnum):
 
 
 class TestConstants:
+    """Also test _utils.enum.StringEnum on the fly because tg.constants is currently the only
+    place where that class is used."""
+
     def test__all__(self):
         expected = {
             key
@@ -88,23 +91,27 @@ class TestConstants:
         assert hash(IntEnumTest.FOO) == hash(1)
 
     @flaky(3, 1)
-    def test_max_message_length(self, bot, chat_id):
-        bot.send_message(chat_id=chat_id, text='a' * constants.MessageLimit.TEXT_LENGTH)
+    @pytest.mark.asyncio
+    async def test_max_message_length(self, bot, chat_id):
+        await bot.send_message(chat_id=chat_id, text='a' * constants.MessageLimit.TEXT_LENGTH)
 
         with pytest.raises(
             BadRequest,
             match='Message is too long',
         ):
-            bot.send_message(chat_id=chat_id, text='a' * (constants.MessageLimit.TEXT_LENGTH + 1))
+            await bot.send_message(
+                chat_id=chat_id, text='a' * (constants.MessageLimit.TEXT_LENGTH + 1)
+            )
 
     @flaky(3, 1)
-    def test_max_caption_length(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_max_caption_length(self, bot, chat_id):
         good_caption = 'a' * constants.MessageLimit.CAPTION_LENGTH
         with data_file('telegram.png').open('rb') as f:
-            good_msg = bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
+            good_msg = await bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
         assert good_msg.caption == good_caption
 
         bad_caption = good_caption + 'Z'
         match = "Media_caption_too_long"
         with pytest.raises(BadRequest, match=match), data_file('telegram.png').open('rb') as f:
-            bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
+            await bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)

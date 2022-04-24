@@ -38,8 +38,11 @@ class TestReplyKeyboardRemove:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     @flaky(3, 1)
-    def test_send_message_with_reply_keyboard_remove(self, bot, chat_id, reply_keyboard_remove):
-        message = bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_remove)
+    @pytest.mark.asyncio
+    async def test_send_message_with_reply_keyboard_remove(
+        self, bot, chat_id, reply_keyboard_remove
+    ):
+        message = await bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_remove)
 
         assert message.text == 'Text'
 

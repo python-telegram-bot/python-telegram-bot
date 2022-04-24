@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -88,7 +88,7 @@ class TestPollHandler:
     test_flag = False
 
     def test_slot_behaviour(self, mro_slots):
-        inst = PollHandler(self.callback_context)
+        inst = PollHandler(self.callback)
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -97,12 +97,12 @@ class TestPollHandler:
     def reset(self):
         self.test_flag = False
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, Update)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and context.user_data is None
             and context.chat_data is None
@@ -111,12 +111,14 @@ class TestPollHandler:
         )
 
     def test_other_update_types(self, false_update):
-        handler = PollHandler(self.callback_context)
+        handler = PollHandler(self.callback)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp, poll):
-        handler = PollHandler(self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context(self, app, poll):
+        handler = PollHandler(self.callback)
+        app.add_handler(handler)
 
-        dp.process_update(poll)
+        async with app:
+            await app.process_update(poll)
         assert self.test_flag

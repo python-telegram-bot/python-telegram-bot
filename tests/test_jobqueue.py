@@ -16,25 +16,23 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import calendar
 import datetime as dtm
 import logging
 import os
 import platform
 import time
-from queue import Queue
-from time import sleep
 
 import pytest
 import pytz
-from apscheduler.schedulers import SchedulerNotRunningError
 from flaky import flaky
 from telegram.ext import (
     JobQueue,
     Job,
     CallbackContext,
     ContextTypes,
-    DispatcherBuilder,
+    ApplicationBuilder,
 )
 
 
@@ -43,12 +41,13 @@ class CustomContext(CallbackContext):
 
 
 @pytest.fixture(scope='function')
-def job_queue(bot, _dp):
+@pytest.mark.asyncio
+async def job_queue(bot, app):
     jq = JobQueue()
-    jq.set_dispatcher(_dp)
-    jq.start()
+    jq.set_application(app)
+    await jq.start()
     yield jq
-    jq.stop()
+    await jq.stop()
 
 
 @pytest.mark.skipif(
@@ -67,241 +66,262 @@ class TestJobQueue:
         self.job_time = 0
         self.received_error = None
 
-    def job_run_once(self, context):
-        self.result += 1
-
-    def job_with_exception(self, context):
-        raise Exception('Test Error')
-
-    def job_remove_self(self, context):
-        self.result += 1
-        context.job.schedule_removal()
-
-    def job_run_once_with_context(self, context):
-        self.result += context.job.context
-
-    def job_datetime_tests(self, context):
-        self.job_time = time.time()
-
-    def job_context_based_callback(self, context):
+    async def job_run_once(self, context):
         if (
             isinstance(context, CallbackContext)
             and isinstance(context.job, Job)
-            and isinstance(context.update_queue, Queue)
-            and context.job.context == 2
+            and isinstance(context.update_queue, asyncio.Queue)
+            and context.job.context is None
             and context.chat_data is None
             and context.user_data is None
             and isinstance(context.bot_data, dict)
         ):
             self.result += 1
 
-    def error_handler_context(self, update, context):
+    async def job_with_exception(self, context):
+        raise Exception('Test Error')
+
+    async def job_remove_self(self, context):
+        self.result += 1
+        context.job.schedule_removal()
+
+    async def job_run_once_with_context(self, context):
+        self.result += context.job.context
+
+    async def job_datetime_tests(self, context):
+        self.job_time = time.time()
+
+    async def error_handler_context(self, update, context):
         self.received_error = (str(context.error), context.job)
 
-    def error_handler_raise_error(self, *args):
+    async def error_handler_raise_error(self, *args):
         raise Exception('Failing bigly')
 
-    def test_slot_behaviour(self, job_queue, mro_slots, _dp):
+    def test_slot_behaviour(self, job_queue, mro_slots):
         for attr in job_queue.__slots__:
             assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
 
-    def test_dispatcher_weakref(self, bot):
+    def test_application_weakref(self, bot):
         jq = JobQueue()
-        dispatcher = DispatcherBuilder().bot(bot).job_queue(None).build()
-        with pytest.raises(RuntimeError, match='No dispatcher was set'):
-            jq.dispatcher
-        jq.set_dispatcher(dispatcher)
-        assert jq.dispatcher is dispatcher
-        del dispatcher
+        application = ApplicationBuilder().token(bot.token).job_queue(None).build()
+        with pytest.raises(RuntimeError, match='No application was set'):
+            jq.application
+        jq.set_application(application)
+        assert jq.application is application
+        del application
         with pytest.raises(RuntimeError, match='no longer alive'):
-            jq.dispatcher
+            jq.application
 
-    def test_run_once(self, job_queue):
-        job_queue.run_once(self.job_run_once, 0.01)
-        sleep(0.02)
+    @pytest.mark.asyncio
+    async def test_run_once(self, job_queue):
+        job_queue.run_once(self.job_run_once, 0.1)
+        await asyncio.sleep(0.2)
         assert self.result == 1
 
-    def test_run_once_timezone(self, job_queue, timezone):
+    @pytest.mark.asyncio
+    async def test_run_once_timezone(self, job_queue, timezone):
         """Test the correct handling of aware datetimes"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         when = dtm.datetime.now(timezone)
         job_queue.run_once(self.job_run_once, when)
-        sleep(0.001)
+        await asyncio.sleep(0.1)
         assert self.result == 1
 
-    def test_job_with_context(self, job_queue):
-        job_queue.run_once(self.job_run_once_with_context, 0.01, context=5)
-        sleep(0.02)
+    @pytest.mark.asyncio
+    async def test_job_with_context(self, job_queue):
+        job_queue.run_once(self.job_run_once_with_context, 0.1, context=5)
+        await asyncio.sleep(0.2)
         assert self.result == 5
 
-    def test_run_repeating(self, job_queue):
-        job_queue.run_repeating(self.job_run_once, 0.02)
-        sleep(0.05)
+    @pytest.mark.asyncio
+    async def test_run_repeating(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, 0.1)
+        await asyncio.sleep(0.25)
         assert self.result == 2
 
-    def test_run_repeating_first(self, job_queue):
-        job_queue.run_repeating(self.job_run_once, 0.05, first=0.2)
-        sleep(0.15)
+    @pytest.mark.asyncio
+    async def test_run_repeating_first(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, 0.5, first=0.2)
+        await asyncio.sleep(0.15)
         assert self.result == 0
-        sleep(0.07)
+        await asyncio.sleep(0.1)
         assert self.result == 1
 
-    def test_run_repeating_first_timezone(self, job_queue, timezone):
+    @pytest.mark.asyncio
+    async def test_run_repeating_first_timezone(self, job_queue, timezone):
         """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
         job_queue.run_repeating(
-            self.job_run_once, 0.1, first=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.05)
+            self.job_run_once, 0.5, first=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.2)
         )
-        sleep(0.1)
+        await asyncio.sleep(0.15)
+        assert self.result == 0
+        await asyncio.sleep(0.2)
         assert self.result == 1
 
-    def test_run_repeating_last(self, job_queue):
-        job_queue.run_repeating(self.job_run_once, 0.05, last=0.06)
-        sleep(0.1)
+    @pytest.mark.asyncio
+    async def test_run_repeating_last(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, 0.25, last=0.4)
+        await asyncio.sleep(0.3)
         assert self.result == 1
-        sleep(0.1)
+        await asyncio.sleep(0.4)
         assert self.result == 1
 
-    def test_run_repeating_last_timezone(self, job_queue, timezone):
+    @pytest.mark.asyncio
+    async def test_run_repeating_last_timezone(self, job_queue, timezone):
         """Test correct scheduling of job when passing a timezone-aware datetime as ``first``"""
         job_queue.run_repeating(
-            self.job_run_once, 0.05, last=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.06)
+            self.job_run_once, 0.25, last=dtm.datetime.now(timezone) + dtm.timedelta(seconds=0.4)
         )
-        sleep(0.1)
+        await asyncio.sleep(0.3)
         assert self.result == 1
-        sleep(0.1)
+        await asyncio.sleep(0.4)
         assert self.result == 1
 
-    def test_run_repeating_last_before_first(self, job_queue):
+    @pytest.mark.asyncio
+    async def test_run_repeating_last_before_first(self, job_queue):
         with pytest.raises(ValueError, match="'last' must not be before 'first'!"):
-            job_queue.run_repeating(self.job_run_once, 0.05, first=1, last=0.5)
+            job_queue.run_repeating(self.job_run_once, 0.5, first=1, last=0.5)
 
-    def test_run_repeating_timedelta(self, job_queue):
-        job_queue.run_repeating(self.job_run_once, dtm.timedelta(minutes=3.3333e-4))
-        sleep(0.05)
+    @pytest.mark.asyncio
+    async def test_run_repeating_timedelta(self, job_queue):
+        job_queue.run_repeating(self.job_run_once, dtm.timedelta(seconds=0.1))
+        await asyncio.sleep(0.25)
         assert self.result == 2
 
-    def test_run_custom(self, job_queue):
-        job_queue.run_custom(self.job_run_once, {'trigger': 'interval', 'seconds': 0.02})
-        sleep(0.05)
+    @pytest.mark.asyncio
+    async def test_run_custom(self, job_queue):
+        job_queue.run_custom(self.job_run_once, {'trigger': 'interval', 'seconds': 0.2})
+        await asyncio.sleep(0.5)
         assert self.result == 2
 
-    def test_multiple(self, job_queue):
-        job_queue.run_once(self.job_run_once, 0.01)
-        job_queue.run_once(self.job_run_once, 0.02)
-        job_queue.run_repeating(self.job_run_once, 0.02)
-        sleep(0.055)
+    @pytest.mark.asyncio
+    async def test_multiple(self, job_queue):
+        job_queue.run_once(self.job_run_once, 0.1)
+        job_queue.run_once(self.job_run_once, 0.2)
+        job_queue.run_repeating(self.job_run_once, 0.2)
+        await asyncio.sleep(0.55)
         assert self.result == 4
 
-    def test_disabled(self, job_queue):
+    @pytest.mark.asyncio
+    async def test_disabled(self, job_queue):
         j1 = job_queue.run_once(self.job_run_once, 0.1)
-        j2 = job_queue.run_repeating(self.job_run_once, 0.05)
+        j2 = job_queue.run_repeating(self.job_run_once, 0.5)
 
         j1.enabled = False
         j2.enabled = False
 
-        sleep(0.06)
+        await asyncio.sleep(0.6)
 
         assert self.result == 0
 
         j1.enabled = True
 
-        sleep(0.2)
+        await asyncio.sleep(0.6)
 
         assert self.result == 1
 
-    def test_schedule_removal(self, job_queue):
-        j1 = job_queue.run_once(self.job_run_once, 0.03)
-        j2 = job_queue.run_repeating(self.job_run_once, 0.02)
+    @pytest.mark.asyncio
+    async def test_schedule_removal(self, job_queue):
+        j1 = job_queue.run_once(self.job_run_once, 0.3)
+        j2 = job_queue.run_repeating(self.job_run_once, 0.2)
 
-        sleep(0.025)
+        await asyncio.sleep(0.25)
 
         j1.schedule_removal()
         j2.schedule_removal()
 
-        sleep(0.04)
+        await asyncio.sleep(0.4)
 
         assert self.result == 1
 
-    def test_schedule_removal_from_within(self, job_queue):
-        job_queue.run_repeating(self.job_remove_self, 0.01)
+    @pytest.mark.asyncio
+    async def test_schedule_removal_from_within(self, job_queue):
+        job_queue.run_repeating(self.job_remove_self, 0.1)
 
-        sleep(0.05)
-
-        assert self.result == 1
-
-    def test_longer_first(self, job_queue):
-        job_queue.run_once(self.job_run_once, 0.02)
-        job_queue.run_once(self.job_run_once, 0.01)
-
-        sleep(0.015)
+        await asyncio.sleep(0.5)
 
         assert self.result == 1
 
-    def test_error(self, job_queue):
-        job_queue.run_repeating(self.job_with_exception, 0.01)
-        job_queue.run_repeating(self.job_run_once, 0.02)
-        sleep(0.03)
+    @pytest.mark.asyncio
+    async def test_longer_first(self, job_queue):
+        job_queue.run_once(self.job_run_once, 0.2)
+        job_queue.run_once(self.job_run_once, 0.1)
+
+        await asyncio.sleep(0.15)
+
         assert self.result == 1
 
-    def test_in_dispatcher(self, bot):
-        dispatcher = DispatcherBuilder().bot(bot).build()
-        dispatcher.job_queue.start()
-        try:
-            dispatcher.job_queue.run_repeating(self.job_run_once, 0.02)
-            sleep(0.03)
+    @pytest.mark.asyncio
+    async def test_error(self, job_queue):
+        job_queue.run_repeating(self.job_with_exception, 0.1)
+        job_queue.run_repeating(self.job_run_once, 0.2)
+        await asyncio.sleep(0.3)
+        assert self.result == 1
+
+    @pytest.mark.asyncio
+    async def test_in_application(self, bot):
+        app = ApplicationBuilder().token(bot.token).build()
+        async with app:
+            assert not app.job_queue.scheduler.running
+            await app.start()
+            assert app.job_queue.scheduler.running
+
+            app.job_queue.run_repeating(self.job_run_once, 0.2)
+            await asyncio.sleep(0.3)
             assert self.result == 1
-            dispatcher.stop()
-            sleep(1)
+            await app.stop()
+            assert not app.job_queue.scheduler.running
+            await asyncio.sleep(1)
             assert self.result == 1
-        finally:
-            try:
-                dispatcher.stop()
-            except SchedulerNotRunningError:
-                pass
 
-    def test_time_unit_int(self, job_queue):
+    @pytest.mark.asyncio
+    async def test_time_unit_int(self, job_queue):
         # Testing seconds in int
-        delta = 0.05
+        delta = 0.5
         expected_time = time.time() + delta
 
         job_queue.run_once(self.job_datetime_tests, delta)
-        sleep(0.06)
+        await asyncio.sleep(0.6)
         assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_timedelta(self, job_queue):
+    @pytest.mark.asyncio
+    async def test_time_unit_dt_timedelta(self, job_queue):
         # Testing seconds, minutes and hours as datetime.timedelta object
         # This is sufficient to test that it actually works.
-        interval = dtm.timedelta(seconds=0.05)
+        interval = dtm.timedelta(seconds=0.5)
         expected_time = time.time() + interval.total_seconds()
 
         job_queue.run_once(self.job_datetime_tests, interval)
-        sleep(0.06)
+        await asyncio.sleep(0.6)
         assert pytest.approx(self.job_time) == expected_time
 
-    def test_time_unit_dt_datetime(self, job_queue):
+    @pytest.mark.asyncio
+    async def test_time_unit_dt_datetime(self, job_queue):
         # Testing running at a specific datetime
-        delta, now = dtm.timedelta(seconds=0.05), dtm.datetime.now(pytz.utc)
+        delta, now = dtm.timedelta(seconds=0.5), dtm.datetime.now(pytz.utc)
         when = now + delta
         expected_time = (now + delta).timestamp()
 
         job_queue.run_once(self.job_datetime_tests, when)
-        sleep(0.06)
+        await asyncio.sleep(0.6)
         assert self.job_time == pytest.approx(expected_time)
 
-    def test_time_unit_dt_time_today(self, job_queue):
+    @pytest.mark.asyncio
+    async def test_time_unit_dt_time_today(self, job_queue):
         # Testing running at a specific time today
-        delta, now = 0.05, dtm.datetime.now(pytz.utc)
+        delta, now = 0.5, dtm.datetime.now(pytz.utc)
         expected_time = now + dtm.timedelta(seconds=delta)
         when = expected_time.time()
         expected_time = expected_time.timestamp()
 
         job_queue.run_once(self.job_datetime_tests, when)
-        sleep(0.06)
+        await asyncio.sleep(0.6)
         assert self.job_time == pytest.approx(expected_time)
 
-    def test_time_unit_dt_time_tomorrow(self, job_queue):
+    @pytest.mark.asyncio
+    async def test_time_unit_dt_time_tomorrow(self, job_queue):
         # Testing running at a specific time that has passed today. Since we can't wait a day, we
         # test if the job's next scheduled execution time has been calculated correctly
         delta, now = -2, dtm.datetime.now(pytz.utc)
@@ -312,18 +332,20 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_time)
 
-    def test_run_daily(self, job_queue):
+    @pytest.mark.asyncio
+    async def test_run_daily(self, job_queue):
         delta, now = 1, dtm.datetime.now(pytz.utc)
         time_of_day = (now + dtm.timedelta(seconds=delta)).time()
         expected_reschedule_time = (now + dtm.timedelta(seconds=delta, days=1)).timestamp()
 
         job_queue.run_daily(self.job_run_once, time_of_day)
-        sleep(delta + 0.1)
+        await asyncio.sleep(delta + 0.1)
         assert self.result == 1
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
 
-    def test_run_monthly(self, job_queue, timezone):
+    @pytest.mark.asyncio
+    async def test_run_monthly(self, job_queue, timezone):
         delta, now = 1, dtm.datetime.now(timezone)
         expected_reschedule_time = now + dtm.timedelta(seconds=delta)
         time_of_day = expected_reschedule_time.time().replace(tzinfo=timezone)
@@ -347,12 +369,13 @@ class TestJobQueue:
         expected_reschedule_time = expected_reschedule_time.timestamp()
 
         job_queue.run_monthly(self.job_run_once, time_of_day, day)
-        sleep(delta + 0.1)
+        await asyncio.sleep(delta + 0.1)
         assert self.result == 1
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time, rel=1e-3)
 
-    def test_run_monthly_non_strict_day(self, job_queue, timezone):
+    @pytest.mark.asyncio
+    async def test_run_monthly_non_strict_day(self, job_queue, timezone):
         delta, now = 1, dtm.datetime.now(timezone)
         expected_reschedule_time = now + dtm.timedelta(seconds=delta)
         time_of_day = expected_reschedule_time.time().replace(tzinfo=timezone)
@@ -371,27 +394,24 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
 
-    def test_default_tzinfo(self, _dp, tz_bot):
+    @pytest.mark.asyncio
+    async def test_default_tzinfo(self, tz_bot):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
-        jq = JobQueue()
-        original_bot = _dp.bot
-        _dp.bot = tz_bot
-        jq.set_dispatcher(_dp)
-        try:
-            jq.start()
+        app = ApplicationBuilder().bot(tz_bot).build()
+        jq = app.job_queue
+        await jq.start()
 
-            when = dtm.datetime.now(tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=0.0005)
-            jq.run_once(self.job_run_once, when.time())
-            sleep(0.001)
-            assert self.result == 1
+        when = dtm.datetime.now(tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=0.1)
+        jq.run_once(self.job_run_once, when.time())
+        await asyncio.sleep(0.15)
+        assert self.result == 1
 
-            jq.stop()
-        finally:
-            _dp.bot = original_bot
+        await jq.stop()
 
-    def test_get_jobs(self, job_queue):
-        callback = self.job_context_based_callback
+    @pytest.mark.asyncio
+    async def test_get_jobs(self, job_queue):
+        callback = self.job_run_once
 
         job1 = job_queue.run_once(callback, 10, name='name1')
         job2 = job_queue.run_once(callback, 10, name='name1')
@@ -401,104 +421,110 @@ class TestJobQueue:
         assert job_queue.get_jobs_by_name('name1') == (job1, job2)
         assert job_queue.get_jobs_by_name('name2') == (job3,)
 
-    def test_job_run(self, _dp):
-        job_queue = JobQueue()
-        job_queue.set_dispatcher(_dp)
-        job = job_queue.run_repeating(self.job_context_based_callback, 0.02, context=2)
+    @pytest.mark.asyncio
+    async def test_job_run(self, app):
+        job = app.job_queue.run_repeating(self.job_run_once, 0.02)
+        await asyncio.sleep(0.05)
         assert self.result == 0
-        job.run(_dp)
+        await job.run(app)
         assert self.result == 1
 
-    def test_enable_disable_job(self, job_queue):
-        job = job_queue.run_repeating(self.job_run_once, 0.02)
-        sleep(0.05)
+    @pytest.mark.asyncio
+    async def test_enable_disable_job(self, job_queue):
+        job = job_queue.run_repeating(self.job_run_once, 0.2)
+        await asyncio.sleep(0.5)
         assert self.result == 2
         job.enabled = False
         assert not job.enabled
-        sleep(0.05)
+        await asyncio.sleep(0.5)
         assert self.result == 2
         job.enabled = True
         assert job.enabled
-        sleep(0.05)
+        await asyncio.sleep(0.5)
         assert self.result == 4
 
-    def test_remove_job(self, job_queue):
-        job = job_queue.run_repeating(self.job_run_once, 0.02)
-        sleep(0.05)
+    @pytest.mark.asyncio
+    async def test_remove_job(self, job_queue):
+        job = job_queue.run_repeating(self.job_run_once, 0.2)
+        await asyncio.sleep(0.5)
         assert self.result == 2
         assert not job.removed
         job.schedule_removal()
         assert job.removed
-        sleep(0.05)
+        await asyncio.sleep(0.5)
         assert self.result == 2
 
-    def test_job_lt_eq(self, job_queue):
-        job = job_queue.run_repeating(self.job_run_once, 0.02)
+    @pytest.mark.asyncio
+    async def test_job_lt_eq(self, job_queue):
+        job = job_queue.run_repeating(self.job_run_once, 0.2)
         assert not job == job_queue
         assert not job < job
 
-    def test_dispatch_error_context(self, job_queue, dp):
-        dp.add_error_handler(self.error_handler_context)
+    @pytest.mark.asyncio
+    async def test_process_error_context(self, job_queue, app):
+        app.add_error_handler(self.error_handler_context)
 
-        job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(0.1)
+        job = job_queue.run_once(self.job_with_exception, 0.1)
+        await asyncio.sleep(0.15)
         assert self.received_error[0] == 'Test Error'
         assert self.received_error[1] is job
         self.received_error = None
-        job.run(dp)
+        await job.run(app)
         assert self.received_error[0] == 'Test Error'
         assert self.received_error[1] is job
 
         # Remove handler
-        dp.remove_error_handler(self.error_handler_context)
+        app.remove_error_handler(self.error_handler_context)
         self.received_error = None
 
-        job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(0.1)
+        job = job_queue.run_once(self.job_with_exception, 0.1)
+        await asyncio.sleep(0.15)
         assert self.received_error is None
-        job.run(dp)
+        await job.run(app)
         assert self.received_error is None
 
-    def test_dispatch_error_that_raises_errors(self, job_queue, dp, caplog):
-        dp.add_error_handler(self.error_handler_raise_error)
+    @pytest.mark.asyncio
+    async def test_process_error_that_raises_errors(self, job_queue, app, caplog):
+        app.add_error_handler(self.error_handler_raise_error)
 
         with caplog.at_level(logging.ERROR):
-            job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(0.1)
+            job = job_queue.run_once(self.job_with_exception, 0.1)
+        await asyncio.sleep(0.15)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert 'An error was raised and an uncaught' in rec.getMessage()
         caplog.clear()
 
         with caplog.at_level(logging.ERROR):
-            job.run(dp)
+            await job.run(app)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert 'uncaught error was raised while handling' in rec.getMessage()
         caplog.clear()
 
         # Remove handler
-        dp.remove_error_handler(self.error_handler_raise_error)
+        app.remove_error_handler(self.error_handler_raise_error)
         self.received_error = None
 
         with caplog.at_level(logging.ERROR):
-            job = job_queue.run_once(self.job_with_exception, 0.05)
-        sleep(0.1)
+            job = job_queue.run_once(self.job_with_exception, 0.1)
+        await asyncio.sleep(0.15)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert 'No error handlers are registered' in rec.getMessage()
         caplog.clear()
 
         with caplog.at_level(logging.ERROR):
-            job.run(dp)
+            await job.run(app)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
         assert 'No error handlers are registered' in rec.getMessage()
 
-    def test_custom_context(self, bot, job_queue):
-        dispatcher = (
-            DispatcherBuilder()
-            .bot(bot)
+    @pytest.mark.asyncio
+    async def test_custom_context(self, bot, job_queue):
+        application = (
+            ApplicationBuilder()
+            .token(bot.token)
             .context_types(
                 ContextTypes(
                     context=CustomContext, bot_data=int, user_data=float, chat_data=complex
@@ -506,7 +532,7 @@ class TestJobQueue:
             )
             .build()
         )
-        job_queue.set_dispatcher(dispatcher)
+        job_queue.set_application(application)
 
         def callback(context):
             self.result = (
@@ -517,12 +543,35 @@ class TestJobQueue:
             )
 
         job_queue.run_once(callback, 0.1)
-        sleep(0.15)
+        await asyncio.sleep(0.15)
         assert self.result == (CustomContext, None, None, int)
 
-    def test_attribute_error(self):
+    @pytest.mark.asyncio
+    async def test_attribute_error(self):
         job = Job(self.job_run_once)
         with pytest.raises(
             AttributeError, match="nor 'apscheduler.job.Job' has attribute 'error'"
         ):
             job.error
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('wait', (True, False))
+    async def test_wait_on_shut_down(self, job_queue, wait):
+        ready_event = asyncio.Event()
+
+        async def callback(_):
+            await ready_event.wait()
+
+        await job_queue.start()
+        job_queue.run_once(callback, when=0.1)
+        await asyncio.sleep(0.15)
+
+        task = asyncio.create_task(job_queue.stop(wait=wait))
+        if wait:
+            assert not task.done()
+            ready_event.set()
+            await asyncio.sleep(0.1)
+            assert task.done()
+        else:
+            await asyncio.sleep(0.1)
+            assert task.done()

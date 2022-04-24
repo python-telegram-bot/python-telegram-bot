@@ -17,20 +17,23 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=no-self-use
-"""This module contains the class Defaults, which allows to pass default values to Updater."""
+"""This module contains the class Defaults, which allows passing default values to Application."""
 from typing import NoReturn, Optional, Dict, Any
 
 import pytz
-
-from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import ODVInput
 
 
 class Defaults:
     """Convenience Class to gather all parameters with a (user defined) default value
 
+    .. versionchanged:: 14.0
+        Removed the argument and attribute ``timeout``. Specify default timeout behavior for the
+        networking backend directly via :class:`telegram.ext.ApplicationBuilder` instead.
+
+
     Parameters:
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
+        parse_mode (:obj:`str`, optional): Send :attr:`~telegram.constants.ParseMode.MARKDOWN` or
+            :attr:`~telegram.constants.ParseMode.HTML`, if you want Telegram apps to show
             bold, italic, fixed-width text or URLs in your bot's message.
         disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
             receive a notification with no sound.
@@ -38,22 +41,16 @@ class Defaults:
             message.
         allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
             should be sent even if the specified replied-to message is not found.
-        timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as the
-            read timeout from the server (instead of the one specified during creation of the
-            connection pool).
-
-            Note:
-                Will *not* be used for :meth:`telegram.Bot.get_updates`!
         quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
             to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
         tzinfo (:obj:`tzinfo`, optional): A timezone to be used for all date(time) inputs
             appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
-            somewhere, it will be assumed to be in ``tzinfo``. Must be a timezone provided by the
-            ``pytz`` module. Defaults to UTC.
-        run_async (:obj:`bool`, optional): Default setting for the ``run_async`` parameter of
-            handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
-            :meth:`Dispatcher.add_error_handler`. Defaults to :obj:`False`.
+            somewhere, it will be assumed to be in :paramref:`tzinfo`. Must be a timezone provided
+            by the ``pytz`` module. Defaults to UTC.
+        block (:obj:`bool`, optional): Default setting for the :paramref:`Handler.block` parameter
+            of handlers and error handlers registered through :meth:`Application.add_handler` and
+            :meth:`Application.add_error_handler`. Defaults to :obj:`True`.
         protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
             forwarding and saving.
 
@@ -61,10 +58,9 @@ class Defaults:
     """
 
     __slots__ = (
-        '_timeout',
         '_tzinfo',
         '_disable_web_page_preview',
-        '_run_async',
+        '_block',
         '_quote',
         '_disable_notification',
         '_allow_sending_without_reply',
@@ -78,12 +74,9 @@ class Defaults:
         parse_mode: str = None,
         disable_notification: bool = None,
         disable_web_page_preview: bool = None,
-        # Timeout needs special treatment, since the bot methods have two different
-        # default values for timeout (None and 20s)
-        timeout: ODVInput[float] = DEFAULT_NONE,
         quote: bool = None,
         tzinfo: pytz.BaseTzInfo = pytz.utc,
-        run_async: bool = False,
+        block: bool = True,
         allow_sending_without_reply: bool = None,
         protect_content: bool = None,
     ):
@@ -91,10 +84,9 @@ class Defaults:
         self._disable_notification = disable_notification
         self._disable_web_page_preview = disable_web_page_preview
         self._allow_sending_without_reply = allow_sending_without_reply
-        self._timeout = timeout
         self._quote = quote
         self._tzinfo = tzinfo
-        self._run_async = run_async
+        self._block = block
         self._protect_content = protect_content
 
         # Gather all defaults that actually have a default value
@@ -108,11 +100,8 @@ class Defaults:
             'protect_content',
         ):
             value = getattr(self, kwarg)
-            if value not in [None, DEFAULT_NONE]:
+            if value is not None:
                 self._api_defaults[kwarg] = value
-        # Special casing, as None is a valid default value
-        if self._timeout != DEFAULT_NONE:
-            self._api_defaults['timeout'] = self._timeout
 
     @property
     def api_defaults(self) -> Dict[str, Any]:  # skip-cq: PY-D0003
@@ -182,18 +171,6 @@ class Defaults:
         )
 
     @property
-    def timeout(self) -> ODVInput[float]:
-        """:obj:`int` | :obj:`float`: Optional. If this value is specified, use it as the
-        read timeout from the server (instead of the one specified during creation of the
-        connection pool).
-        """
-        return self._timeout
-
-    @timeout.setter
-    def timeout(self, value: object) -> NoReturn:
-        raise AttributeError("You can not assign a new value to timeout after initialization.")
-
-    @property
     def quote(self) -> Optional[bool]:
         """:obj:`bool`: Optional. If set to :obj:`True`, the reply is sent as an actual reply
         to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
@@ -217,16 +194,16 @@ class Defaults:
         raise AttributeError("You can not assign a new value to tzinfo after initialization.")
 
     @property
-    def run_async(self) -> bool:
-        """:obj:`bool`: Optional. Default setting for the ``run_async`` parameter of
-        handlers and error handlers registered through :meth:`Dispatcher.add_handler` and
-        :meth:`Dispatcher.add_error_handler`.
+    def block(self) -> bool:
+        """:obj:`bool`: Optional. Default setting for the :paramref:`Handler.block` parameter of
+        handlers and error handlers registered through :meth:`Application.add_handler` and
+        :meth:`Application.add_error_handler`.
         """
-        return self._run_async
+        return self._block
 
-    @run_async.setter
-    def run_async(self, value: object) -> NoReturn:
-        raise AttributeError("You can not assign a new value to run_async after initialization.")
+    @block.setter
+    def block(self, value: object) -> NoReturn:
+        raise AttributeError("You can not assign a new value to block after initialization.")
 
     @property
     def protect_content(self) -> Optional[bool]:
@@ -250,10 +227,9 @@ class Defaults:
                 self._disable_notification,
                 self._disable_web_page_preview,
                 self._allow_sending_without_reply,
-                self._timeout,
                 self._quote,
                 self._tzinfo,
-                self._run_async,
+                self._block,
                 self._protect_content,
             )
         )

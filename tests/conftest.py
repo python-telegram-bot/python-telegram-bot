@@ -16,22 +16,19 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import asyncio
 import datetime
 import functools
 import inspect
 
 import os
 import re
-from collections import defaultdict
 from pathlib import Path
-from queue import Queue
-from threading import Thread, Event
-from time import sleep
-from typing import Callable, List, Iterable, Any
-from types import MappingProxyType
+from typing import Callable, List, Iterable, Any, Dict, Optional
 
 import pytest
 import pytz
+from httpx import AsyncClient, Response
 
 from telegram import (
     Message,
@@ -51,19 +48,21 @@ from telegram import (
     InputTextMessageContent,
     InlineQueryResultCachedPhoto,
     InputMediaPhoto,
-    InputMedia,
 )
+from telegram._utils.types import ODVInput
+from telegram.constants import InputMediaType
 from telegram.ext import (
-    Dispatcher,
+    Application,
     Defaults,
     ExtBot,
-    DispatcherBuilder,
-    UpdaterBuilder,
+    ApplicationBuilder,
+    Updater,
 )
 from telegram.ext.filters import UpdateFilter, MessageFilter
-from telegram.error import BadRequest
+from telegram.error import BadRequest, TimedOut, RetryAfter
 from telegram._utils.defaultvalue import DefaultValue, DEFAULT_NONE
-from telegram.request import Request
+from telegram.request import RequestData
+from telegram.request._httpxrequest import HTTPXRequest
 from tests.bots import get_bot
 
 
@@ -92,14 +91,53 @@ def env_var_2_bool(env_var: object) -> bool:
     return env_var.lower().strip() == 'true'
 
 
+# Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be
+# session. See https://github.com/pytest-dev/pytest-asyncio/issues/68 for more details.
+@pytest.fixture(scope='session')
+def event_loop(request):
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    # loop.close() # instead of closing here, do that at the every end of the test session
+
+
+# Related to the above, see https://stackoverflow.com/a/67307042/10606962
+def pytest_sessionfinish(session, exitstatus):
+    asyncio.get_event_loop().close()
+
+
 @pytest.fixture(scope='session')
 def bot_info():
     return get_bot()
 
 
-# Below Dict* classes are used to monkeypatch attributes since parent classes don't have __dict__
-class DictRequest(Request):
-    pass
+# Below classes are used to monkeypatch attributes since parent classes don't have __dict__
+
+
+class TestHttpxRequest(HTTPXRequest):
+    async def _request_wrapper(
+        self,
+        method: str,
+        url: str,
+        request_data: RequestData = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+    ) -> bytes:
+        try:
+            return await super()._request_wrapper(
+                method=method,
+                url=url,
+                request_data=request_data,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+            )
+        except RetryAfter as e:
+            pytest.xfail(f'Not waiting for flood control: {e}')
+        except TimedOut as e:
+            pytest.xfail(f'Ignoring TimedOut error: {e}')
 
 
 class DictExtBot(ExtBot):
@@ -110,45 +148,45 @@ class DictBot(Bot):
     pass
 
 
-class DictDispatcher(Dispatcher):
+class DictApplication(Application):
     pass
 
 
 @pytest.fixture(scope='session')
-def bot(bot_info):
-    return DictExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest(8))
+@pytest.mark.asyncio
+async def bot(bot_info):
+    """Makes an ExtBot instance with the given bot_info"""
+    async with make_bot(bot_info) as _bot:
+        yield _bot
 
 
 @pytest.fixture(scope='session')
-def raw_bot(bot_info):
-    return DictBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest(8))
-
-
-DEFAULT_BOTS = {}
+@pytest.mark.asyncio
+async def raw_bot(bot_info):
+    """Makes an regular Bot instance with the given bot_info"""
+    async with DictBot(
+        bot_info['token'],
+        private_key=PRIVATE_KEY,
+        request=TestHttpxRequest(8),
+        get_updates_request=TestHttpxRequest(1),
+    ) as _bot:
+        yield _bot
 
 
 @pytest.fixture(scope='function')
-def default_bot(request, bot_info):
+async def default_bot(request, bot_info):
     param = request.param if hasattr(request, 'param') else {}
 
-    defaults = Defaults(**param)
-    default_bot = DEFAULT_BOTS.get(defaults)
-    if default_bot:
-        return default_bot
-    default_bot = make_bot(bot_info, **{'defaults': defaults})
-    DEFAULT_BOTS[defaults] = default_bot
-    return default_bot
+    default_bot = make_bot(bot_info, defaults=Defaults(**param))
+    async with default_bot:
+        yield default_bot
 
 
 @pytest.fixture(scope='function')
-def tz_bot(timezone, bot_info):
-    defaults = Defaults(tzinfo=timezone)
-    default_bot = DEFAULT_BOTS.get(defaults)
-    if default_bot:
-        return default_bot
-    default_bot = make_bot(bot_info, **{'defaults': defaults})
-    DEFAULT_BOTS[defaults] = default_bot
-    return default_bot
+async def tz_bot(timezone, bot_info):
+    default_bot = make_bot(bot_info, defaults=Defaults(tzinfo=timezone))
+    async with default_bot:
+        yield default_bot
 
 
 @pytest.fixture(scope='session')
@@ -171,51 +209,28 @@ def provider_token(bot_info):
     return bot_info['payment_provider_token']
 
 
-def create_dp(bot):
-    # Dispatcher is heavy to init (due to many threads and such) so we have a single session
-    # scoped one here, but before each test, reset it (dp fixture below)
-    dispatcher = DispatcherBuilder().bot(bot).workers(2).dispatcher_class(DictDispatcher).build()
-    thr = Thread(target=dispatcher.start)
-    thr.start()
-    sleep(2)
-    yield dispatcher
-    sleep(1)
-    if dispatcher.running:
-        dispatcher.stop()
-    thr.join()
-
-
-@pytest.fixture(scope='session')
-def _dp(bot):
-    yield from create_dp(bot)
+@pytest.fixture(scope='function')
+@pytest.mark.asyncio
+async def app(bot_info):
+    # We build a new bot each time so that we use `app` in a context manager without problems
+    application = (
+        ApplicationBuilder().bot(make_bot(bot_info)).application_class(DictApplication).build()
+    )
+    yield application
+    if application.running:
+        await application.stop()
+        await application.shutdown()
 
 
 @pytest.fixture(scope='function')
-def dp(_dp):
-    # Reset the dispatcher first
-    while not _dp.update_queue.empty():
-        _dp.update_queue.get(False)
-    _dp._chat_data = defaultdict(dict)
-    _dp._user_data = defaultdict(dict)
-    _dp.chat_data = MappingProxyType(_dp._chat_data)  # Rebuild the mapping so it updates
-    _dp.user_data = MappingProxyType(_dp._user_data)
-    _dp.bot_data = {}
-    _dp.handlers = {}
-    _dp.error_handlers = {}
-    _dp.exception_event = Event()
-    _dp.__stop_event = Event()
-    _dp.__async_queue = Queue()
-    _dp.__async_threads = set()
-    _dp.persistence = None
-    yield _dp
-
-
-@pytest.fixture(scope='function')
-def updater(bot):
-    up = UpdaterBuilder().bot(bot).workers(2).build()
+@pytest.mark.asyncio
+async def updater(bot_info):
+    # We build a new bot each time so that we use `updater` in a context manager without problems
+    up = Updater(bot=make_bot(bot_info), update_queue=asyncio.Queue())
     yield up
     if up.running:
-        up.stop()
+        await up.stop()
+        await up.shutdown()
 
 
 PROJECT_ROOT_PATH = Path(__file__).parent.parent.resolve()
@@ -240,16 +255,18 @@ def class_thumb_file():
     f.close()
 
 
-def pytest_configure(config):
-    config.addinivalue_line('filterwarnings', 'ignore::ResourceWarning')
-    # TODO: Write so good code that we don't need to ignore ResourceWarnings anymore
-
-
 def make_bot(bot_info, **kwargs):
     """
     Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
     """
-    return ExtBot(bot_info['token'], private_key=PRIVATE_KEY, request=DictRequest(), **kwargs)
+    _bot = DictExtBot(
+        bot_info['token'],
+        private_key=PRIVATE_KEY,
+        request=TestHttpxRequest(8),
+        get_updates_request=TestHttpxRequest(1),
+        **kwargs,
+    )
+    return _bot
 
 
 CMD_PATTERN = re.compile(r'/[\da-z_]{1,32}(?:@\w{1,32})?')
@@ -263,13 +280,16 @@ def make_message(text, **kwargs):
     :param text: (str) message text
     :return: a (fake) ``telegram.Message``
     """
+    bot = kwargs.pop('bot', None)
+    if bot is None:
+        bot = make_bot(get_bot())
     return Message(
         message_id=1,
         from_user=kwargs.pop('user', User(id=1, first_name='', is_bot=False)),
         date=kwargs.pop('date', DATE),
         chat=kwargs.pop('chat', Chat(id=1, type='')),
         text=text,
-        bot=kwargs.pop('bot', make_bot(get_bot())),
+        bot=bot,
         **kwargs,
     )
 
@@ -377,10 +397,15 @@ def timezone(tzinfo):
 
 @pytest.fixture()
 def mro_slots():
-    def _mro_slots(_class):
+    def _mro_slots(_class, only_parents: bool = False):
+        if only_parents:
+            classes = _class.__class__.__mro__[1:-1]
+        else:
+            classes = _class.__class__.__mro__[:-1]
+
         return [
             attr
-            for cls in _class.__class__.__mro__[:-1]
+            for cls in classes
             if hasattr(cls, '__slots__')  # The Exception class doesn't have slots
             for attr in cls.__slots__
             if attr != '__dict__'  # left here for classes which still has __dict__
@@ -389,13 +414,46 @@ def mro_slots():
     return _mro_slots
 
 
-def expect_bad_request(func, message, reason):
+def call_after(function: Callable, after: Callable):
+    """Run a callable after another has executed. Useful when trying to make sure that a function
+    did actually run, but just monkeypatching it doesn't work because this would break some other
+    functionality.
+
+    Example usage:
+
+    def test_stuff(self, bot, monkeypatch):
+
+        def after(arg):
+            # arg is the return value of `send_message`
+            self.received = arg
+
+        monkeypatch.setattr(bot, 'send_message', call_after(bot.send_message, after)
+
+    """
+    if asyncio.iscoroutinefunction(function):
+
+        async def wrapped(*args, **kwargs):
+            out = await function(*args, **kwargs)
+            after(out)
+            return out
+
+    else:
+
+        def wrapped(*args, **kwargs):
+            out = function(*args, **kwargs)
+            after(out)
+            return out
+
+    return wrapped
+
+
+async def expect_bad_request(func, message, reason):
     """
     Wrapper for testing bot functions expected to result in an :class:`telegram.error.BadRequest`.
     Makes it XFAIL, if the specified error message is present.
 
     Args:
-        func: The callable to be executed.
+        func: The awaitable to be executed.
         message: The expected message of the bad request error. If another message is present,
             the error will be reraised.
         reason: Explanation for the XFAIL.
@@ -404,7 +462,7 @@ def expect_bad_request(func, message, reason):
         On success, returns the return value of :attr:`func`
     """
     try:
-        return func()
+        return await func()
     except BadRequest as e:
         if message in str(e):
             pytest.xfail(f'{reason}. {e}')
@@ -474,7 +532,7 @@ def check_shortcut_signature(
     return True
 
 
-def check_shortcut_call(
+async def check_shortcut_call(
     shortcut_method: Callable,
     bot: ExtBot,
     bot_method_name: str,
@@ -484,7 +542,7 @@ def check_shortcut_call(
     """
     Checks that a shortcut passes all the existing arguments to the underlying bot method. Use as::
 
-        assert check_shortcut_call(message.reply_text, message.bot, 'send_message')
+        assert await check_shortcut_call(message.reply_text, message.bot, 'send_message')
 
     Args:
         shortcut_method: The shortcut method, e.g. `message.reply_text`
@@ -513,7 +571,7 @@ def check_shortcut_call(
     # auto_pagination: Special casing for InlineQuery.answer
     kwargs = {name: name for name in shortcut_signature.parameters if name != 'auto_pagination'}
 
-    def make_assertion(**kw):
+    async def make_assertion(**kw):
         # name == value makes sure that
         # a) we receive non-None input for all parameters
         # b) we receive the correct input for each kwarg
@@ -534,7 +592,7 @@ def check_shortcut_call(
 
     setattr(bot, bot_method_name, make_assertion)
     try:
-        shortcut_method(**kwargs)
+        await shortcut_method(**kwargs)
     except Exception as exc:
         raise exc
     finally:
@@ -595,7 +653,7 @@ def build_kwargs(signature: inspect.Signature, default_kwargs, dfv: Any = DEFAUL
     return kws
 
 
-def check_defaults_handling(
+async def check_defaults_handling(
     method: Callable,
     bot: ExtBot,
     return_value=None,
@@ -615,10 +673,8 @@ def check_defaults_handling(
     kwargs_need_default = [
         kwarg
         for kwarg, value in shortcut_signature.parameters.items()
-        if isinstance(value.default, DefaultValue)
+        if isinstance(value.default, DefaultValue) and not kwarg.endswith('_timeout')
     ]
-    # shortcut_signature.parameters['timeout'] is of type DefaultValue
-    method_timeout = shortcut_signature.parameters['timeout'].default.value
 
     defaults_no_custom_defaults = Defaults()
     kwargs = {kwarg: 'custom_default' for kwarg in inspect.signature(Defaults).parameters.keys()}
@@ -627,11 +683,10 @@ def check_defaults_handling(
 
     expected_return_values = [None, []] if return_value is None else [return_value]
 
-    def make_assertion(_, data, timeout=DEFAULT_NONE, df_value=DEFAULT_NONE):
-        # Check timeout first
-        expected_timeout = method_timeout if df_value is DEFAULT_NONE else df_value
-        if timeout != expected_timeout:
-            pytest.fail(f'Got value {timeout} for "timeout", expected {expected_timeout}')
+    async def make_assertion(
+        url, request_data: RequestData, df_value=DEFAULT_NONE, *args, **kwargs
+    ):
+        data = request_data.parameters
 
         # Check regular arguments that need defaults
         for arg in (dkw for dkw in kwargs_need_default if dkw != 'timeout'):
@@ -647,8 +702,8 @@ def check_defaults_handling(
                     pytest.fail(f'Got value {value} for argument {arg} instead of {df_value}')
 
         # Check InputMedia (parse_mode can have a default)
-        def check_input_media(m: InputMedia):
-            parse_mode = m.parse_mode
+        def check_input_media(m: Dict):
+            parse_mode = m.get('parse_mode', None)
             if df_value is DEFAULT_NONE:
                 if parse_mode is not None:
                     pytest.fail('InputMedia has non-None parse_mode')
@@ -659,7 +714,7 @@ def check_defaults_handling(
 
         media = data.pop('media', None)
         if media:
-            if isinstance(media, InputMedia):
+            if isinstance(media, dict) and isinstance(media.get('type', None), InputMediaType):
                 check_input_media(media)
             else:
                 for m in media:
@@ -732,13 +787,13 @@ def check_defaults_handling(
             )
             assertion_callback = functools.partial(make_assertion, df_value=default_value)
             setattr(bot.request, 'post', assertion_callback)
-            assert method(**kwargs) in expected_return_values
+            assert await method(**kwargs) in expected_return_values
 
             # 2: test that we get the manually passed non-None value
             kwargs = build_kwargs(shortcut_signature, kwargs_need_default, dfv='non-None-value')
             assertion_callback = functools.partial(make_assertion, df_value='non-None-value')
             setattr(bot.request, 'post', assertion_callback)
-            assert method(**kwargs) in expected_return_values
+            assert await method(**kwargs) in expected_return_values
 
             # 3: test that we get the manually passed None value
             kwargs = build_kwargs(
@@ -748,7 +803,7 @@ def check_defaults_handling(
             )
             assertion_callback = functools.partial(make_assertion, df_value=None)
             setattr(bot.request, 'post', assertion_callback)
-            assert method(**kwargs) in expected_return_values
+            assert await method(**kwargs) in expected_return_values
     except Exception as exc:
         raise exc
     finally:
@@ -756,3 +811,36 @@ def check_defaults_handling(
         bot._defaults = None
 
     return True
+
+
+async def send_webhook_message(
+    ip: str,
+    port: int,
+    payload_str: Optional[str],
+    url_path: str = '',
+    content_len: int = -1,
+    content_type: str = 'application/json',
+    get_method: str = None,
+) -> Response:
+    headers = {
+        'content-type': content_type,
+    }
+
+    if not payload_str:
+        content_len = None
+        payload = None
+    else:
+        payload = bytes(payload_str, encoding='utf-8')
+
+    if content_len == -1:
+        content_len = len(payload)
+
+    if content_len is not None:
+        headers['content-length'] = str(content_len)
+
+    url = f'http://{ip}:{port}/{url_path}'
+
+    async with AsyncClient() as client:
+        return await client.request(
+            url=url, method=get_method or 'POST', data=payload, headers=headers
+        )

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -104,12 +104,12 @@ class TestChosenInlineResultHandler:
     def callback_queue_2(self, bot, update, job_queue=None, update_queue=None):
         self.test_flag = (job_queue is not None) and (update_queue is not None)
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, Update)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and isinstance(context.user_data, dict)
             and context.chat_data is None
@@ -117,7 +117,7 @@ class TestChosenInlineResultHandler:
             and isinstance(update.chosen_inline_result, ChosenInlineResult)
         )
 
-    def callback_context_pattern(self, update, context):
+    def callback_pattern(self, update, context):
         if context.matches[0].groups():
             self.test_flag = context.matches[0].groups() == ('res', '_id')
         if context.matches[0].groupdict():
@@ -127,11 +127,13 @@ class TestChosenInlineResultHandler:
         handler = ChosenInlineResultHandler(self.callback_basic)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp, chosen_inline_result):
-        handler = ChosenInlineResultHandler(self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context(self, app, chosen_inline_result):
+        handler = ChosenInlineResultHandler(self.callback)
+        app.add_handler(handler)
 
-        dp.process_update(chosen_inline_result)
+        async with app:
+            await app.process_update(chosen_inline_result)
         assert self.test_flag
 
     def test_with_pattern(self, chosen_inline_result):
@@ -143,17 +145,19 @@ class TestChosenInlineResultHandler:
         assert not handler.check_update(chosen_inline_result)
         chosen_inline_result.chosen_inline_result.result_id = 'result_id'
 
-    def test_context_pattern(self, dp, chosen_inline_result):
+    @pytest.mark.asyncio
+    async def test_context_pattern(self, app, chosen_inline_result):
         handler = ChosenInlineResultHandler(
-            self.callback_context_pattern, pattern=r'(?P<begin>.*)ult(?P<end>.*)'
+            self.callback_pattern, pattern=r'(?P<begin>.*)ult(?P<end>.*)'
         )
-        dp.add_handler(handler)
-        dp.process_update(chosen_inline_result)
-        assert self.test_flag
+        app.add_handler(handler)
+        async with app:
+            await app.process_update(chosen_inline_result)
+            assert self.test_flag
 
-        dp.remove_handler(handler)
-        handler = ChosenInlineResultHandler(self.callback_context_pattern, pattern=r'(res)ult(.*)')
-        dp.add_handler(handler)
+            app.remove_handler(handler)
+            handler = ChosenInlineResultHandler(self.callback_pattern, pattern=r'(res)ult(.*)')
+            app.add_handler(handler)
 
-        dp.process_update(chosen_inline_result)
-        assert self.test_flag
+            await app.process_update(chosen_inline_result)
+            assert self.test_flag

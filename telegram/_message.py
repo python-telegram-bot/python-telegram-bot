@@ -56,7 +56,7 @@ from telegram import (
 from telegram.constants import ParseMode, MessageAttachmentType
 from telegram.helpers import escape_markdown
 from telegram._utils.datetime import from_timestamp, to_timestamp
-from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_20, DefaultValue
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput, ReplyMarkup
 
 if TYPE_CHECKING:
@@ -81,7 +81,7 @@ class Message(TelegramObject):
     considered equal, if their :attr:`message_id` and :attr:`chat` are equal.
 
     Note:
-        In Python :keyword:`from` is a reserved word, :paramref:`from_user`
+        In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -725,7 +725,7 @@ class Message(TelegramObject):
 
         return None
 
-    def reply_text(
+    async def reply_text(
         self,
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -733,7 +733,10 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
@@ -742,7 +745,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_message(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
@@ -757,7 +760,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_message(
+        return await self.get_bot().send_message(
             chat_id=self.chat_id,
             text=text,
             parse_mode=parse_mode,
@@ -765,21 +768,27 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
         )
 
-    def reply_markdown(
+    async def reply_markdown(
         self,
         text: str,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
@@ -788,7 +797,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(
+            await bot.send_message(
                 update.effective_message.chat_id,
                 parse_mode=ParseMode.MARKDOWN,
                 *args,
@@ -813,7 +822,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_message(
+        return await self.get_bot().send_message(
             chat_id=self.chat_id,
             text=text,
             parse_mode=ParseMode.MARKDOWN,
@@ -821,21 +830,27 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
         )
 
-    def reply_markdown_v2(
+    async def reply_markdown_v2(
         self,
         text: str,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
@@ -844,7 +859,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(
+            await bot.send_message(
                 update.effective_message.chat_id,
                 parse_mode=ParseMode.MARKDOWN_V2,
                 *args,
@@ -865,7 +880,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_message(
+        return await self.get_bot().send_message(
             chat_id=self.chat_id,
             text=text,
             parse_mode=ParseMode.MARKDOWN_V2,
@@ -873,21 +888,27 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
         )
 
-    def reply_html(
+    async def reply_html(
         self,
         text: str,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
@@ -896,7 +917,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_message(
+            await bot.send_message(
                 update.effective_message.chat_id,
                 parse_mode=ParseMode.HTML,
                 *args,
@@ -917,7 +938,7 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_message(
+        return await self.get_bot().send_message(
             chat_id=self.chat_id,
             text=text,
             parse_mode=ParseMode.HTML,
@@ -925,21 +946,27 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
         )
 
-    def reply_media_group(
+    async def reply_media_group(
         self,
         media: List[
             Union['InputMediaAudio', 'InputMediaDocument', 'InputMediaPhoto', 'InputMediaVideo']
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
@@ -947,7 +974,7 @@ class Message(TelegramObject):
     ) -> List['Message']:
         """Shortcut for::
 
-            bot.send_media_group(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_media_group(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
@@ -964,25 +991,31 @@ class Message(TelegramObject):
             :class:`telegram.error.TelegramError`
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_media_group(
+        return await self.get_bot().send_media_group(
             chat_id=self.chat_id,
             media=media,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
         )
 
-    def reply_photo(
+    async def reply_photo(
         self,
         photo: Union[FileInput, 'PhotoSize'],
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -993,7 +1026,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_photo(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_photo(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
@@ -1008,14 +1041,17 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_photo(
+        return await self.get_bot().send_photo(
             chat_id=self.chat_id,
             photo=photo,
             caption=caption,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1024,7 +1060,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_audio(
+    async def reply_audio(
         self,
         audio: Union[FileInput, 'Audio'],
         duration: int = None,
@@ -1034,7 +1070,10 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
@@ -1046,7 +1085,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_audio(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_audio(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
@@ -1061,7 +1100,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_audio(
+        return await self.get_bot().send_audio(
             chat_id=self.chat_id,
             audio=audio,
             duration=duration,
@@ -1071,7 +1110,10 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             thumb=thumb,
             api_kwargs=api_kwargs,
@@ -1081,7 +1123,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_document(
+    async def reply_document(
         self,
         document: Union[FileInput, 'Document'],
         filename: str = None,
@@ -1089,7 +1131,10 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
@@ -1101,7 +1146,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_document(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_document(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
@@ -1116,7 +1161,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_document(
+        return await self.get_bot().send_document(
             chat_id=self.chat_id,
             document=document,
             filename=filename,
@@ -1124,7 +1169,10 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             thumb=thumb,
             api_kwargs=api_kwargs,
@@ -1134,7 +1182,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_animation(
+    async def reply_animation(
         self,
         animation: Union[FileInput, 'Animation'],
         duration: int = None,
@@ -1146,7 +1194,10 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
@@ -1156,7 +1207,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_animation(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_animation(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
@@ -1171,7 +1222,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_animation(
+        return await self.get_bot().send_animation(
             chat_id=self.chat_id,
             animation=animation,
             duration=duration,
@@ -1183,7 +1234,10 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
@@ -1191,13 +1245,16 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_sticker(
+    async def reply_sticker(
         self,
         sticker: Union[FileInput, 'Sticker'],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
@@ -1205,7 +1262,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_sticker(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_sticker(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
@@ -1220,19 +1277,22 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_sticker(
+        return await self.get_bot().send_sticker(
             chat_id=self.chat_id,
             sticker=sticker,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
         )
 
-    def reply_video(
+    async def reply_video(
         self,
         video: Union[FileInput, 'Video'],
         duration: int = None,
@@ -1240,7 +1300,10 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         width: int = None,
         height: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
@@ -1255,7 +1318,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_video(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_video(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
@@ -1270,7 +1333,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_video(
+        return await self.get_bot().send_video(
             chat_id=self.chat_id,
             video=video,
             duration=duration,
@@ -1278,7 +1341,10 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             width=width,
             height=height,
             parse_mode=parse_mode,
@@ -1291,7 +1357,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_video_note(
+    async def reply_video_note(
         self,
         video_note: Union[FileInput, 'VideoNote'],
         duration: int = None,
@@ -1299,7 +1365,10 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1309,7 +1378,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_video_note(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_video_note(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
@@ -1324,7 +1393,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_video_note(
+        return await self.get_bot().send_video_note(
             chat_id=self.chat_id,
             video_note=video_note,
             duration=duration,
@@ -1332,7 +1401,10 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             thumb=thumb,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1340,7 +1412,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_voice(
+    async def reply_voice(
         self,
         voice: Union[FileInput, 'Voice'],
         duration: int = None,
@@ -1348,7 +1420,10 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: DVInput[float] = DEFAULT_20,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1359,7 +1434,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_voice(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_voice(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
@@ -1374,7 +1449,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_voice(
+        return await self.get_bot().send_voice(
             chat_id=self.chat_id,
             voice=voice,
             duration=duration,
@@ -1382,7 +1457,10 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
@@ -1391,14 +1469,17 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_location(
+    async def reply_location(
         self,
         latitude: float = None,
         longitude: float = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         location: Location = None,
         live_period: int = None,
         api_kwargs: JSONDict = None,
@@ -1411,7 +1492,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_location(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_location(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
@@ -1426,14 +1507,17 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_location(
+        return await self.get_bot().send_location(
             chat_id=self.chat_id,
             latitude=latitude,
             longitude=longitude,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             location=location,
             live_period=live_period,
             api_kwargs=api_kwargs,
@@ -1444,7 +1528,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_venue(
+    async def reply_venue(
         self,
         latitude: float = None,
         longitude: float = None,
@@ -1454,7 +1538,10 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         venue: Venue = None,
         foursquare_type: str = None,
         api_kwargs: JSONDict = None,
@@ -1466,7 +1553,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_venue(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_venue(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
@@ -1481,7 +1568,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_venue(
+        return await self.get_bot().send_venue(
             chat_id=self.chat_id,
             latitude=latitude,
             longitude=longitude,
@@ -1491,7 +1578,10 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             venue=venue,
             foursquare_type=foursquare_type,
             api_kwargs=api_kwargs,
@@ -1501,7 +1591,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_contact(
+    async def reply_contact(
         self,
         phone_number: str = None,
         first_name: str = None,
@@ -1509,7 +1599,10 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         contact: Contact = None,
         vcard: str = None,
         api_kwargs: JSONDict = None,
@@ -1519,7 +1612,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_contact(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_contact(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
@@ -1534,7 +1627,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_contact(
+        return await self.get_bot().send_contact(
             chat_id=self.chat_id,
             phone_number=phone_number,
             first_name=first_name,
@@ -1542,7 +1635,10 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             contact=contact,
             vcard=vcard,
             api_kwargs=api_kwargs,
@@ -1550,7 +1646,7 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_poll(
+    async def reply_poll(
         self,
         question: str,
         options: List[str],
@@ -1562,7 +1658,10 @@ class Message(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         explanation: str = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: int = None,
@@ -1575,7 +1674,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_poll(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_poll(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
@@ -1590,7 +1689,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_poll(
+        return await self.get_bot().send_poll(
             chat_id=self.chat_id,
             question=question,
             options=options,
@@ -1602,7 +1701,10 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             explanation=explanation,
             explanation_parse_mode=explanation_parse_mode,
             open_period=open_period,
@@ -1613,12 +1715,15 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def reply_dice(
+    async def reply_dice(
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         emoji: str = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
@@ -1627,7 +1732,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_dice(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_dice(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
@@ -1642,27 +1747,33 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_dice(
+        return await self.get_bot().send_dice(
             chat_id=self.chat_id,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             emoji=emoji,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
         )
 
-    def reply_chat_action(
+    async def reply_chat_action(
         self,
         action: str,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
 
-            bot.send_chat_action(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_chat_action(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_chat_action`.
 
@@ -1672,20 +1783,26 @@ class Message(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().send_chat_action(
+        return await self.get_bot().send_chat_action(
             chat_id=self.chat_id,
             action=action,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def reply_game(
+    async def reply_game(
         self,
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: 'InlineKeyboardMarkup' = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
@@ -1693,7 +1810,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_game(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_game(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
@@ -1710,19 +1827,22 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_game(
+        return await self.get_bot().send_game(
             chat_id=self.chat_id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
         )
 
-    def reply_invoice(
+    async def reply_invoice(
         self,
         title: str,
         description: str,
@@ -1746,7 +1866,10 @@ class Message(TelegramObject):
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
@@ -1756,7 +1879,7 @@ class Message(TelegramObject):
     ) -> 'Message':
         """Shortcut for::
 
-            bot.send_invoice(update.effective_message.chat_id, *args, **kwargs)
+             await bot.send_invoice(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
@@ -1781,7 +1904,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().send_invoice(
+        return await self.get_bot().send_invoice(
             chat_id=self.chat_id,
             title=title,
             description=description,
@@ -1805,7 +1928,10 @@ class Message(TelegramObject):
             provider_data=provider_data,
             send_phone_number_to_provider=send_phone_number_to_provider,
             send_email_to_provider=send_email_to_provider,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             max_tip_amount=max_tip_amount,
@@ -1813,21 +1939,26 @@ class Message(TelegramObject):
             protect_content=protect_content,
         )
 
-    def forward(
+    async def forward(
         self,
         chat_id: Union[int, str],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'Message':
         """Shortcut for::
 
-            bot.forward_message(chat_id=chat_id,
-                                from_chat_id=update.effective_message.chat_id,
-                                message_id=update.effective_message.message_id,
-                                *args,
-                                **kwargs)
+             await bot.forward_message(
+                 chat_id=chat_id,
+                 from_chat_id=update.effective_message.chat_id,
+                 message_id=update.effective_message.message_id,
+                 *args,
+                 **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
@@ -1843,17 +1974,20 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message forwarded.
 
         """
-        return self.get_bot().forward_message(
+        return await self.get_bot().forward_message(
             chat_id=chat_id,
             from_chat_id=self.chat_id,
             message_id=self.message_id,
             disable_notification=disable_notification,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
         )
 
-    def copy(
+    async def copy(
         self,
         chat_id: Union[int, str],
         caption: str = None,
@@ -1863,17 +1997,22 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'MessageId':
         """Shortcut for::
 
-            bot.copy_message(chat_id=chat_id,
-                             from_chat_id=update.effective_message.chat_id,
-                             message_id=update.effective_message.message_id,
-                             *args,
-                             **kwargs)
+             await bot.copy_message(
+                 chat_id=chat_id,
+                 from_chat_id=update.effective_message.chat_id,
+                 message_id=update.effective_message.message_id,
+                 *args,
+                 **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
@@ -1881,7 +2020,7 @@ class Message(TelegramObject):
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.
 
         """
-        return self.get_bot().copy_message(
+        return await self.get_bot().copy_message(
             chat_id=chat_id,
             from_chat_id=self.chat_id,
             message_id=self.message_id,
@@ -1892,12 +2031,15 @@ class Message(TelegramObject):
             reply_to_message_id=reply_to_message_id,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
         )
 
-    def reply_copy(
+    async def reply_copy(
         self,
         from_chat_id: Union[str, int],
         message_id: int,
@@ -1908,18 +2050,23 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> 'MessageId':
         """Shortcut for::
 
-            bot.copy_message(chat_id=message.chat.id,
-                             from_chat_id=from_chat_id,
-                             message_id=message_id,
-                             *args,
-                             **kwargs)
+             await bot.copy_message(
+                 chat_id=message.chat.id,
+                 from_chat_id=from_chat_id,
+                 message_id=message_id,
+                 *args,
+                 **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
@@ -1936,7 +2083,7 @@ class Message(TelegramObject):
 
         """
         reply_to_message_id = self._quote(quote, reply_to_message_id)
-        return self.get_bot().copy_message(
+        return await self.get_bot().copy_message(
             chat_id=self.chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
@@ -1947,27 +2094,32 @@ class Message(TelegramObject):
             reply_to_message_id=reply_to_message_id,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
         )
 
-    def edit_text(
+    async def edit_text(
         self,
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: InlineKeyboardMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-            bot.edit_message_text(chat_id=message.chat_id,
-                                  message_id=message.message_id,
-                                  *args,
-                                  **kwargs)
+             await bot.edit_message_text(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.edit_message_text`.
 
@@ -1981,34 +2133,39 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
 
         """
-        return self.get_bot().edit_message_text(
+        return await self.get_bot().edit_message_text(
             chat_id=self.chat_id,
             message_id=self.message_id,
             text=text,
             parse_mode=parse_mode,
             disable_web_page_preview=disable_web_page_preview,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             entities=entities,
             inline_message_id=None,
         )
 
-    def edit_caption(
+    async def edit_caption(
         self,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-            bot.edit_message_caption(chat_id=message.chat_id,
-                                     message_id=message.message_id,
-                                     *args,
-                                     **kwargs)
+             await bot.edit_message_caption(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_caption`.
@@ -2023,31 +2180,36 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
 
         """
-        return self.get_bot().edit_message_caption(
+        return await self.get_bot().edit_message_caption(
             chat_id=self.chat_id,
             message_id=self.message_id,
             caption=caption,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             api_kwargs=api_kwargs,
             caption_entities=caption_entities,
             inline_message_id=None,
         )
 
-    def edit_media(
+    async def edit_media(
         self,
         media: 'InputMedia',
         reply_markup: InlineKeyboardMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-            bot.edit_message_media(chat_id=message.chat_id,
-                                   message_id=message.message_id,
-                                   *args,
-                                   **kwargs)
+             await bot.edit_message_media(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_media`.
@@ -2062,28 +2224,33 @@ class Message(TelegramObject):
             edited Message is returned, otherwise ``True`` is returned.
 
         """
-        return self.get_bot().edit_message_media(
+        return await self.get_bot().edit_message_media(
             media=media,
             chat_id=self.chat_id,
             message_id=self.message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
         )
 
-    def edit_reply_markup(
+    async def edit_reply_markup(
         self,
         reply_markup: Optional['InlineKeyboardMarkup'] = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-            bot.edit_message_reply_markup(chat_id=message.chat_id,
-                                          message_id=message.message_id,
-                                          *args,
-                                          **kwargs)
+             await bot.edit_message_reply_markup(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_reply_markup`.
@@ -2097,22 +2264,28 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise ``True`` is returned.
         """
-        return self.get_bot().edit_message_reply_markup(
+        return await self.get_bot().edit_message_reply_markup(
             chat_id=self.chat_id,
             message_id=self.message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
         )
 
-    def edit_live_location(
+    async def edit_live_location(
         self,
         latitude: float = None,
         longitude: float = None,
         location: Location = None,
         reply_markup: InlineKeyboardMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         horizontal_accuracy: float = None,
         heading: int = None,
@@ -2120,10 +2293,9 @@ class Message(TelegramObject):
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-            bot.edit_message_live_location(chat_id=message.chat_id,
-                                           message_id=message.message_id,
-                                           *args,
-                                           **kwargs)
+             await bot.edit_message_live_location(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_live_location`.
@@ -2137,14 +2309,17 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
         """
-        return self.get_bot().edit_message_live_location(
+        return await self.get_bot().edit_message_live_location(
             chat_id=self.chat_id,
             message_id=self.message_id,
             latitude=latitude,
             longitude=longitude,
             location=location,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             horizontal_accuracy=horizontal_accuracy,
             heading=heading,
@@ -2152,18 +2327,20 @@ class Message(TelegramObject):
             inline_message_id=None,
         )
 
-    def stop_live_location(
+    async def stop_live_location(
         self,
         reply_markup: InlineKeyboardMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-            bot.stop_message_live_location(chat_id=message.chat_id,
-                                           message_id=message.message_id,
-                                           *args,
-                                           **kwargs)
+             await bot.stop_message_live_location(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.stop_message_live_location`.
@@ -2177,30 +2354,35 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
         """
-        return self.get_bot().stop_message_live_location(
+        return await self.get_bot().stop_message_live_location(
             chat_id=self.chat_id,
             message_id=self.message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
         )
 
-    def set_game_score(
+    async def set_game_score(
         self,
         user_id: Union[int, str],
         score: int,
         force: bool = None,
         disable_edit_message: bool = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union['Message', bool]:
         """Shortcut for::
 
-            bot.set_game_score(chat_id=message.chat_id,
-                               message_id=message.message_id,
-                               *args,
-                               **kwargs)
+             await bot.set_game_score(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.set_game_score`.
 
@@ -2213,30 +2395,35 @@ class Message(TelegramObject):
             :class:`telegram.Message`: On success, if edited message is sent by the bot, the
             edited Message is returned, otherwise :obj:`True` is returned.
         """
-        return self.get_bot().set_game_score(
+        return await self.get_bot().set_game_score(
             chat_id=self.chat_id,
             message_id=self.message_id,
             user_id=user_id,
             score=score,
             force=force,
             disable_edit_message=disable_edit_message,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
         )
 
-    def get_game_high_scores(
+    async def get_game_high_scores(
         self,
         user_id: Union[int, str],
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> List['GameHighScore']:
         """Shortcut for::
 
-            bot.get_game_high_scores(chat_id=message.chat_id,
-                                     message_id=message.message_id,
-                                     *args,
-                                     **kwargs)
+             await bot.get_game_high_scores(
+                 chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+             )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_game_high_scores`.
@@ -2249,26 +2436,31 @@ class Message(TelegramObject):
         Returns:
             List[:class:`telegram.GameHighScore`]
         """
-        return self.get_bot().get_game_high_scores(
+        return await self.get_bot().get_game_high_scores(
             chat_id=self.chat_id,
             message_id=self.message_id,
             user_id=user_id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             inline_message_id=None,
         )
 
-    def delete(
+    async def delete(
         self,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
 
-             bot.delete_message(chat_id=message.chat_id,
-                                message_id=message.message_id,
-                                *args,
-                                **kwargs)
+              await bot.delete_message(
+                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.delete_message`.
 
@@ -2276,25 +2468,30 @@ class Message(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().delete_message(
+        return await self.get_bot().delete_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def stop_poll(
+    async def stop_poll(
         self,
         reply_markup: InlineKeyboardMarkup = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Poll:
         """Shortcut for::
 
-             bot.stop_poll(chat_id=message.chat_id,
-                           message_id=message.message_id,
-                           *args,
-                           **kwargs)
+              await bot.stop_poll(
+                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.stop_poll`.
 
@@ -2303,26 +2500,31 @@ class Message(TelegramObject):
             returned.
 
         """
-        return self.get_bot().stop_poll(
+        return await self.get_bot().stop_poll(
             chat_id=self.chat_id,
             message_id=self.message_id,
             reply_markup=reply_markup,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def pin(
+    async def pin(
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
 
-             bot.pin_chat_message(chat_id=message.chat_id,
-                                  message_id=message.message_id,
-                                  *args,
-                                  **kwargs)
+              await bot.pin_chat_message(
+                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.pin_chat_message`.
 
@@ -2330,25 +2532,30 @@ class Message(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().pin_chat_message(
+        return await self.get_bot().pin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
             disable_notification=disable_notification,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 
-    def unpin(
+    async def unpin(
         self,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
 
-             bot.unpin_chat_message(chat_id=message.chat_id,
-                                    message_id=message.message_id,
-                                    *args,
-                                    **kwargs)
+              await bot.unpin_chat_message(
+                  chat_id=message.chat_id, message_id=message.message_id, *args, **kwargs
+              )
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.unpin_chat_message`.
 
@@ -2356,10 +2563,13 @@ class Message(TelegramObject):
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        return self.get_bot().unpin_chat_message(
+        return await self.get_bot().unpin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
 

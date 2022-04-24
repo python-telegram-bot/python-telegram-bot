@@ -107,6 +107,13 @@ Telegram API support
 
 All types and methods of the Telegram Bot API **5.7** are supported.
 
+===========
+Concurrency
+===========
+
+Since v14.0, ``python-telegram-bot`` is built on top of Pythons ``asyncio`` module.
+Because ``asyncio`` is in general single-threaded, ``python-telegram-bot`` does currently not aim to be thread-safe.
+
 ==========
 Installing
 ==========
@@ -124,12 +131,6 @@ Or you can install from source with:
     $ git clone https://github.com/python-telegram-bot/python-telegram-bot --recursive
     $ cd python-telegram-bot
     $ python setup-raw.py install
-
-In case you have a previously cloned local repository already, you should initialize the added urllib3 submodule before installing with:
-
-.. code:: shell
-
-    $ git submodule update --init --recursive
 
 ----
 Note
@@ -164,8 +165,10 @@ This library uses the ``logging`` module. To set up logging to standard output, 
 .. code:: python
 
     import logging
-    logging.basicConfig(level=logging.DEBUG,
-                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    logging.basicConfig(
+        level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
 at the beginning of your script.
 

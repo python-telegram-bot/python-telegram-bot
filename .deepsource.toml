@@ -5,7 +5,6 @@ test_patterns = ["tests/**"]
 exclude_patterns = [
     "tests/**",
     "docs/**",
-    "telegram/vendor/**",
     "setup.py",
     "setup-raw.py"
 ]

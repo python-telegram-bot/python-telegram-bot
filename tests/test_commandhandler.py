@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import re
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -54,14 +54,15 @@ class BaseTest:
     def reset(self):
         self.test_flag = False
 
-    def response(self, dispatcher, update):
+    async def response(self, application, update):
         """
         Utility to send an update to a dispatcher and assert
         whether the callback was called appropriately. Its purpose is
         for repeated usage in the same test function.
         """
         self.test_flag = False
-        dispatcher.process_update(update)
+        async with application:
+            await application.process_update(update)
         return self.test_flag
 
     def callback_basic(self, update, context):
@@ -76,12 +77,12 @@ class BaseTest:
         keyword = pass_keyword[5:]
         return callback
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, Update)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and isinstance(context.user_data, dict)
             and isinstance(context.chat_data, dict)
@@ -89,27 +90,27 @@ class BaseTest:
             and isinstance(update.message, Message)
         )
 
-    def callback_context_args(self, update, context):
+    def callback_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']
 
-    def callback_context_regex1(self, update, context):
+    def callback_regex1(self, update, context):
         if context.matches:
             types = all(type(res) is self.SRE_TYPE for res in context.matches)
             num = len(context.matches) == 1
             self.test_flag = types and num
 
-    def callback_context_regex2(self, update, context):
+    def callback_regex2(self, update, context):
         if context.matches:
             types = all(type(res) is self.SRE_TYPE for res in context.matches)
             num = len(context.matches) == 2
             self.test_flag = types and num
 
-    def _test_context_args_or_regex(self, dp, handler, text):
-        dp.add_handler(handler)
-        update = make_command_update(text)
-        assert not self.response(dp, update)
+    async def _test_context_args_or_regex(self, app, handler, text):
+        app.add_handler(handler)
+        update = make_command_update(text, bot=app.bot)
+        assert not await self.response(app, update)
         update.message.text += ' one two'
-        assert self.response(dp, update)
+        assert await self.response(app, update)
 
     def _test_edited(self, message, handler_edited, handler_not_edited):
         """
@@ -145,8 +146,8 @@ class TestCommandHandler(BaseTest):
         return self.CMD
 
     @pytest.fixture(scope='class')
-    def command_message(self, command):
-        return make_command_message(command)
+    def command_message(self, command, bot):
+        return make_command_message(command, bot=bot)
 
     @pytest.fixture(scope='class')
     def command_update(self, command_message):
@@ -156,16 +157,17 @@ class TestCommandHandler(BaseTest):
         callback = callback or self.callback_basic
         return CommandHandler(self.CMD[1:], callback, **kwargs)
 
-    def test_basic(self, dp, command):
+    @pytest.mark.asyncio
+    async def test_basic(self, app, command):
         """Test whether a command handler responds to its command
         and not to others, or badly formatted commands"""
         handler = self.make_default_handler()
-        dp.add_handler(handler)
+        app.add_handler(handler)
 
-        assert self.response(dp, make_command_update(command))
-        assert not is_match(handler, make_command_update(command[1:]))
-        assert not is_match(handler, make_command_update(f'/not{command[1:]}'))
-        assert not is_match(handler, make_command_update(f'not {command} at start'))
+        assert await self.response(app, make_command_update(command, bot=app.bot))
+        assert not is_match(handler, make_command_update(command[1:], bot=app.bot))
+        assert not is_match(handler, make_command_update(f'/not{command[1:]}', bot=app.bot))
+        assert not is_match(handler, make_command_update(f'not {command} at start', bot=app.bot))
 
     @pytest.mark.parametrize(
         'cmd',
@@ -178,12 +180,12 @@ class TestCommandHandler(BaseTest):
         ):
             CommandHandler(cmd, self.callback_basic)
 
-    def test_command_list(self):
+    def test_command_list(self, bot):
         """A command handler with multiple commands registered should respond to all of them."""
         handler = CommandHandler(['test', 'star'], self.callback_basic)
-        assert is_match(handler, make_command_update('/test'))
-        assert is_match(handler, make_command_update('/star'))
-        assert not is_match(handler, make_command_update('/stop'))
+        assert is_match(handler, make_command_update('/test', bot=bot))
+        assert is_match(handler, make_command_update('/star', bot=bot))
+        assert not is_match(handler, make_command_update('/stop', bot=bot))
 
     def test_edited(self, command_message):
         """Test that a CH responds to an edited message if its filters allow it"""
@@ -197,55 +199,61 @@ class TestCommandHandler(BaseTest):
         assert is_match(handler, make_command_update(command + '@' + bot.username, bot=bot))
         assert not is_match(handler, make_command_update(command + '@otherbot', bot=bot))
 
-    def test_with_filter(self, command):
+    def test_with_filter(self, command, bot):
         """Test that a CH with a (generic) filter responds if its filters match"""
         handler = self.make_default_handler(filters=filters.ChatType.GROUP)
-        assert is_match(handler, make_command_update(command, chat=Chat(-23, Chat.GROUP)))
-        assert not is_match(handler, make_command_update(command, chat=Chat(23, Chat.PRIVATE)))
+        assert is_match(handler, make_command_update(command, chat=Chat(-23, Chat.GROUP), bot=bot))
+        assert not is_match(
+            handler, make_command_update(command, chat=Chat(23, Chat.PRIVATE), bot=bot)
+        )
 
-    def test_newline(self, dp, command):
+    @pytest.mark.asyncio
+    async def test_newline(self, app, command):
         """Assert that newlines don't interfere with a command handler matching a message"""
         handler = self.make_default_handler()
-        dp.add_handler(handler)
-        update = make_command_update(command + '\nfoobar')
-        assert is_match(handler, update)
-        assert self.response(dp, update)
+        app.add_handler(handler)
+        update = make_command_update(command + '\nfoobar', bot=app.bot)
+        async with app:
+            assert is_match(handler, update)
+        assert await self.response(app, update)
 
     def test_other_update_types(self, false_update):
         """Test that a command handler doesn't respond to unrelated updates"""
         handler = self.make_default_handler()
         assert not is_match(handler, false_update)
 
-    def test_filters_for_wrong_command(self, mock_filter):
+    def test_filters_for_wrong_command(self, mock_filter, bot):
         """Filters should not be executed if the command does not match the handler"""
         handler = self.make_default_handler(filters=mock_filter)
-        assert not is_match(handler, make_command_update('/star'))
+        assert not is_match(handler, make_command_update('/star', bot=bot))
         assert not mock_filter.tested
 
-    def test_context(self, dp, command_update):
+    @pytest.mark.asyncio
+    async def test_context(self, app, command_update):
         """Test correct behaviour of CHs with context-based callbacks"""
-        handler = self.make_default_handler(self.callback_context)
-        dp.add_handler(handler)
-        assert self.response(dp, command_update)
+        handler = self.make_default_handler(self.callback)
+        app.add_handler(handler)
+        assert await self.response(app, command_update)
 
-    def test_context_args(self, dp, command):
+    @pytest.mark.asyncio
+    async def test_context_args(self, app, command):
         """Test CHs that pass arguments through ``context``"""
-        handler = self.make_default_handler(self.callback_context_args)
-        self._test_context_args_or_regex(dp, handler, command)
+        handler = self.make_default_handler(self.callback_args)
+        await self._test_context_args_or_regex(app, handler, command)
 
-    def test_context_regex(self, dp, command):
+    @pytest.mark.asyncio
+    async def test_context_regex(self, app, command):
         """Test CHs with context-based callbacks and a single filter"""
-        handler = self.make_default_handler(
-            self.callback_context_regex1, filters=filters.Regex('one two')
-        )
-        self._test_context_args_or_regex(dp, handler, command)
+        handler = self.make_default_handler(self.callback_regex1, filters=filters.Regex('one two'))
+        await self._test_context_args_or_regex(app, handler, command)
 
-    def test_context_multiple_regex(self, dp, command):
+    @pytest.mark.asyncio
+    async def test_context_multiple_regex(self, app, command):
         """Test CHs with context-based callbacks and filters combined"""
         handler = self.make_default_handler(
-            self.callback_context_regex2, filters=filters.Regex('one') & filters.Regex('two')
+            self.callback_regex2, filters=filters.Regex('one') & filters.Regex('two')
         )
-        self._test_context_args_or_regex(dp, handler, command)
+        await self._test_context_args_or_regex(app, handler, command)
 
 
 # ----------------------------- PrefixHandler -----------------------------
@@ -299,13 +307,14 @@ class TestPrefixHandler(BaseTest):
         callback = callback or self.callback_basic
         return PrefixHandler(self.PREFIXES, self.COMMANDS, callback, **kwargs)
 
-    def test_basic(self, dp, prefix, command):
+    @pytest.mark.asyncio
+    async def test_basic(self, app, prefix, command):
         """Test the basic expected response from a prefix handler"""
         handler = self.make_default_handler()
-        dp.add_handler(handler)
+        app.add_handler(handler)
         text = prefix + command
 
-        assert self.response(dp, make_message_update(text))
+        assert await self.response(app, make_message_update(text))
         assert not is_match(handler, make_message_update(command))
         assert not is_match(handler, make_message_update(prefix + 'notacommand'))
         assert not is_match(handler, make_command_update(f'not {text} at start'))
@@ -350,34 +359,37 @@ class TestPrefixHandler(BaseTest):
         handler.command = 'foo'
         assert handler._commands == list(combinations(self.PREFIXES, ['foo']))
 
-    def test_basic_after_editing(self, dp, prefix, command):
+    @pytest.mark.asyncio
+    async def test_basic_after_editing(self, app, prefix, command):
         """Test the basic expected response from a prefix handler"""
         handler = self.make_default_handler()
-        dp.add_handler(handler)
+        app.add_handler(handler)
         text = prefix + command
 
-        assert self.response(dp, make_message_update(text))
+        assert await self.response(app, make_message_update(text))
         handler.command = 'foo'
         text = prefix + 'foo'
-        assert self.response(dp, make_message_update(text))
+        assert await self.response(app, make_message_update(text))
 
-    def test_context(self, dp, prefix_message_update):
-        handler = self.make_default_handler(self.callback_context)
-        dp.add_handler(handler)
-        assert self.response(dp, prefix_message_update)
+    @pytest.mark.asyncio
+    async def test_context(self, app, prefix_message_update):
+        handler = self.make_default_handler(self.callback)
+        app.add_handler(handler)
+        assert await self.response(app, prefix_message_update)
 
-    def test_context_args(self, dp, prefix_message_text):
-        handler = self.make_default_handler(self.callback_context_args)
-        self._test_context_args_or_regex(dp, handler, prefix_message_text)
+    @pytest.mark.asyncio
+    async def test_context_args(self, app, prefix_message_text):
+        handler = self.make_default_handler(self.callback_args)
+        await self._test_context_args_or_regex(app, handler, prefix_message_text)
 
-    def test_context_regex(self, dp, prefix_message_text):
+    @pytest.mark.asyncio
+    async def test_context_regex(self, app, prefix_message_text):
+        handler = self.make_default_handler(self.callback_regex1, filters=filters.Regex('one two'))
+        await self._test_context_args_or_regex(app, handler, prefix_message_text)
+
+    @pytest.mark.asyncio
+    async def test_context_multiple_regex(self, app, prefix_message_text):
         handler = self.make_default_handler(
-            self.callback_context_regex1, filters=filters.Regex('one two')
+            self.callback_regex2, filters=filters.Regex('one') & filters.Regex('two')
         )
-        self._test_context_args_or_regex(dp, handler, prefix_message_text)
-
-    def test_context_multiple_regex(self, dp, prefix_message_text):
-        handler = self.make_default_handler(
-            self.callback_context_regex2, filters=filters.Regex('one') & filters.Regex('two')
-        )
-        self._test_context_args_or_regex(dp, handler, prefix_message_text)
+        await self._test_context_args_or_regex(app, handler, prefix_message_text)

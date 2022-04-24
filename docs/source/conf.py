@@ -127,6 +127,9 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+# Decides the language used for syntax highlighting of code blocks.
+highlight_language = 'python3'
+
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
@@ -155,7 +158,7 @@ html_theme_options = {
     "announcement": 'PTB has undergone significant changes in v14. Please read the documentation '
                     'carefully and also check out the transition guide in the '
                     '<a href="https://github.com/python-telegram-bot/python-telegram-bot/wiki">'
-                    'wiki</a>',
+                    'wiki</a>.',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -453,10 +456,14 @@ def _git_branch() -> str:
     """Get's the current git sha if available or fall back to `master`"""
     try:
         output = subprocess.check_output(  # skipcq: BAN-B607
-            ["git", "describe", "--tags"], stderr=subprocess.STDOUT
+            ["git", "describe", "--tags", "--always"], stderr=subprocess.STDOUT
         )
         return output.decode().strip()
-    except Exception:
+    except Exception as exc:
+        sphinx_logger.exception(
+            f'Failed to get a description of the current commit. Falling back to `master`.',
+            exc_info=exc
+        )
         return 'master'
 
 
@@ -510,7 +517,7 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
         base = str(base)
 
         # Special case because base classes are in std lib:
-        if "_StringEnum" in base:
+        if "StringEnum" in base == "<enum 'StringEnum'>":
             bases[idx] = ":class:`enum.Enum`"
             bases.insert(0, ':class:`str`')
             continue
@@ -521,24 +528,24 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
             bases[idx] = f':class:`{base}`'
 
         # Now convert `telegram._message.Message` to `telegram.Message` etc
-        match = re.search(pattern=r"(telegram(\.ext|))\.", string=base)
-        if match and '_utils' not in base:
-            base = base.rstrip("'>")
-            parts = base.rsplit(".", maxsplit=2)
+        match = re.search(pattern=r"(telegram(\.ext|))\.[_\w\.]+", string=base)
+        if not match or '_utils' in base:
+            return
 
-            # Replace private base classes with their respective parent
-            parts[-1] = PRIVATE_BASE_CLASSES.get(parts[-1], parts[-1])
+        parts = match.group(0).split(".")
 
-            # To make sure that e.g. `telegram.ext.filters.BaseFilter` keeps the `filters` part
-            if not parts[-2].startswith('_') and '_' not in parts[0]:
-                base = '.'.join(parts[-2:])
-            else:
-                base = parts[-1]
+        # Remove private paths
+        for index, part in enumerate(parts):
+            if part.startswith("_"):
+                parts = parts[:index] + parts[-1:]
+                break
 
-            # add `telegram(.ext).` back in front
-            base = f'{match.group(0)}{base}'
+        # Replace private base classes with their respective parent
+        parts = [PRIVATE_BASE_CLASSES.get(part, part) for part in parts]
 
-            bases[idx] = f':class:`{base}`'
+        base = ".".join(parts)
+
+        bases[idx] = f':class:`{base}`'
 
 
 def setup(app: Sphinx):

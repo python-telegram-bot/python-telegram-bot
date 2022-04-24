@@ -18,9 +18,6 @@ jobs:
       fail-fast: False
     steps:
       - uses: actions/checkout@v2
-      - name: Initialize vendored libs
-        run:
-          git submodule update --init --recursive
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -75,9 +72,6 @@ jobs:
       fail-fast: False
     steps:
       - uses: actions/checkout@v2
-      - name: Initialize vendored libs
-        run:
-          git submodule update --init --recursive
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -104,9 +98,6 @@ jobs:
       fail-fast: False
     steps:
       - uses: actions/checkout@v2
-      - name: Initialize vendored libs
-        run:
-          git submodule update --init --recursive
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:

@@ -10,7 +10,7 @@ import traceback
 
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import CommandHandler, Updater, CallbackContext
+from telegram.ext import CommandHandler, Application, CallbackContext
 
 # Enable logging
 logging.basicConfig(
@@ -18,15 +18,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# The token you got from @botfather when you created the bot
-BOT_TOKEN = "TOKEN"
-
 # This can be your own ID, or one for a developer group/channel.
 # You can use the /start command of this bot to see your chat id.
 DEVELOPER_CHAT_ID = 123456789
 
 
-def error_handler(update: object, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def error_handler(update: object, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Log the error and send a telegram message to notify the developer."""
     # Log the error before we do anything else, so we can see it even if something breaks.
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
@@ -49,17 +46,19 @@ def error_handler(update: object, context: CallbackContext.DEFAULT_TYPE) -> None
     )
 
     # Finally, send the message
-    context.bot.send_message(chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML)
+    await context.bot.send_message(
+        chat_id=DEVELOPER_CHAT_ID, text=message, parse_mode=ParseMode.HTML
+    )
 
 
-def bad_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def bad_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Raise an error to trigger the error handler."""
-    context.bot.wrong_method_name()  # type: ignore[attr-defined]
+    await context.bot.wrong_method_name()  # type: ignore[attr-defined]
 
 
-def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Displays info on how to trigger an error."""
-    update.effective_message.reply_html(
+    await update.effective_message.reply_html(
         'Use /bad_command to cause an error.\n'
         f'Your chat id is <code>{update.effective_chat.id}</code>.'
     )
@@ -67,26 +66,18 @@ def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
 
 def main() -> None:
     """Run the bot."""
-    # Create the Updater and pass it your bot's token.
-    updater = Updater.builder().token(BOT_TOKEN).build()
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("TOKEN").build()
 
     # Register the commands...
-    dispatcher.add_handler(CommandHandler('start', start))
-    dispatcher.add_handler(CommandHandler('bad_command', bad_command))
+    application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('bad_command', bad_command))
 
     # ...and the error handler
-    dispatcher.add_error_handler(error_handler)
+    application.add_error_handler(error_handler)
 
-    # Start the Bot
-    updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 
 if __name__ == '__main__':

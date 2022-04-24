@@ -217,6 +217,18 @@ class TestPoll:
 
         assert poll.parse_explanation_entity(entity) == 'http://google.com'
 
+        with pytest.raises(RuntimeError, match='Poll has no'):
+            Poll(
+                'id',
+                'question',
+                [PollOption('text', voter_count=0)],
+                total_voter_count=0,
+                is_closed=False,
+                is_anonymous=False,
+                type=Poll.QUIZ,
+                allows_multiple_answers=False,
+            ).parse_explanation_entity(entity)
+
     def test_parse_entities(self, poll):
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)

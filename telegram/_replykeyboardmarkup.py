@@ -29,7 +29,7 @@ class ReplyKeyboardMarkup(TelegramObject):
     """This object represents a custom keyboard with reply options.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their the size of :attr:`keyboard` and all the buttons are equal.
+    considered equal, if their size of :attr:`keyboard` and all the buttons are equal.
 
     Example:
         A user requests to change the bot's language, bot replies to the request with a keyboard
@@ -37,7 +37,7 @@ class ReplyKeyboardMarkup(TelegramObject):
 
     Args:
         keyboard (List[List[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of button rows,
-                each represented by an Array of :class:`telegram.KeyboardButton` objects.
+            each represented by an Array of :class:`telegram.KeyboardButton` objects.
         resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard vertically
             for optimal fit (e.g., make the keyboard smaller if there are just two rows of
             buttons). Defaults to :obj:`False`, in which case the custom keyboard is always of the

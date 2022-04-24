@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 
 class UserProfilePhotos(TelegramObject):
-    """This object represent a user's profile pictures.
+    """This object represents a user's profile pictures.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`total_count` and :attr:`photos` are equal.

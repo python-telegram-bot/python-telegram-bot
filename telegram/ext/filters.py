@@ -92,7 +92,6 @@ import mimetypes
 import re
 
 from abc import ABC, abstractmethod
-from threading import Lock
 from typing import (
     Dict,
     FrozenSet,
@@ -120,36 +119,35 @@ class BaseFilter:
 
     Filters subclassing from this class can combined using bitwise operators:
 
-    And:
+    And::
 
-        >>> (filters.TEXT & filters.Entity(MENTION))
+        filters.TEXT & filters.Entity(MENTION)
 
-    Or:
+    Or::
 
-        >>> (filters.AUDIO | filters.VIDEO)
+        filters.AUDIO | filters.VIDEO
 
-    Exclusive Or:
+    Exclusive Or::
 
-        >>> (filters.Regex('To Be') ^ filters.Regex('Not 2B'))
+        filters.Regex('To Be') ^ filters.Regex('Not 2B')
 
-    Not:
+    Not::
 
-        >>> ~ filters.COMMAND
+        ~ filters.COMMAND
 
-    Also works with more than two filters:
+    Also works with more than two filters::
 
-        >>> (filters.TEXT & (filters.Entity(URL) | filters.Entity(TEXT_LINK)))
-        >>> filters.TEXT & (~ filters.FORWARDED)
+        filters.TEXT & (filters.Entity(URL) | filters.Entity(TEXT_LINK))
+        filters.TEXT & (~ filters.FORWARDED)
 
     Note:
-        Filters use the same short circuiting logic as python's `and`, `or` and `not`.
-        This means that for example:
+        Filters use the same short circuiting logic as python's :keyword:`and`, :keyword:`or` and
+        :keyword:`not`. This means that for example::
 
-            >>> filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
+            filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
 
         With ``message.text == 'x'``, will only ever return the matches for the first filter,
         since the second one is never evaluated.
-
 
     If you want to create your own filters create a class inheriting from either
     :class:`MessageFilter` or :class:`UpdateFilter` and implement a ``filter()``
@@ -158,7 +156,7 @@ class BaseFilter:
     Note that the filters work only as class instances, not actual class objects (so remember to
     initialize your filter classes).
 
-    By default the filters name (what will get printed when converted to a string for display)
+    By default, the filters name (what will get printed when converted to a string for display)
     will be the class name. If you want to overwrite this assign a better name to the :attr:`name`
     class variable.
 
@@ -548,7 +546,7 @@ class CaptionEntity(MessageFilter):
 
 class CaptionRegex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of ``pattern`` in the message caption.
+    Filters updates by searching for an occurrence of :paramref:`pattern` in the message caption.
 
     This filter works similarly to :class:`Regex`, with the only exception being that
     it applies to the message caption instead of the text.
@@ -585,7 +583,6 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         '_chat_id_name',
         '_username_name',
         'allow_empty',
-        '__lock',
         '_chat_ids',
         '_usernames',
     )
@@ -600,7 +597,6 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         self._chat_id_name = 'chat_id'
         self._username_name = 'username'
         self.allow_empty = allow_empty
-        self.__lock = Lock()
 
         self._chat_ids: Set[int] = set()
         self._usernames: Set[str] = set()
@@ -629,27 +625,24 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         return {chat[1:] if chat.startswith('@') else chat for chat in username}
 
     def _set_chat_ids(self, chat_id: Optional[SLT[int]]) -> None:
-        with self.__lock:
-            if chat_id and self._usernames:
-                raise RuntimeError(
-                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
-                    f"{self._username_name}s."
-                )
-            self._chat_ids = self._parse_chat_id(chat_id)
+        if chat_id and self._usernames:
+            raise RuntimeError(
+                f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                f"{self._username_name}s."
+            )
+        self._chat_ids = self._parse_chat_id(chat_id)
 
     def _set_usernames(self, username: Optional[SLT[str]]) -> None:
-        with self.__lock:
-            if username and self._chat_ids:
-                raise RuntimeError(
-                    f"Can't set {self._username_name} in conjunction with (already set) "
-                    f"{self._chat_id_name}s."
-                )
-            self._usernames = self._parse_username(username)
+        if username and self._chat_ids:
+            raise RuntimeError(
+                f"Can't set {self._username_name} in conjunction with (already set) "
+                f"{self._chat_id_name}s."
+            )
+        self._usernames = self._parse_username(username)
 
     @property
     def chat_ids(self) -> FrozenSet[int]:
-        with self.__lock:
-            return frozenset(self._chat_ids)
+        return frozenset(self._chat_ids)
 
     @chat_ids.setter
     def chat_ids(self, chat_id: SLT[int]) -> None:
@@ -669,8 +662,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         Returns:
             frozenset(:obj:`str`)
         """
-        with self.__lock:
-            return frozenset(self._usernames)
+        return frozenset(self._usernames)
 
     @usernames.setter
     def usernames(self, username: SLT[str]) -> None:
@@ -684,27 +676,25 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
             username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
                 allow through. Leading ``'@'`` s in usernames will be discarded.
         """
-        with self.__lock:
-            if self._chat_ids:
-                raise RuntimeError(
-                    f"Can't set {self._username_name} in conjunction with (already set) "
-                    f"{self._chat_id_name}s."
-                )
+        if self._chat_ids:
+            raise RuntimeError(
+                f"Can't set {self._username_name} in conjunction with (already set) "
+                f"{self._chat_id_name}s."
+            )
 
-            parsed_username = self._parse_username(username)
-            self._usernames |= parsed_username
+        parsed_username = self._parse_username(username)
+        self._usernames |= parsed_username
 
     def _add_chat_ids(self, chat_id: SLT[int]) -> None:
-        with self.__lock:
-            if self._usernames:
-                raise RuntimeError(
-                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
-                    f"{self._username_name}s."
-                )
+        if self._usernames:
+            raise RuntimeError(
+                f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                f"{self._username_name}s."
+            )
 
-            parsed_chat_id = self._parse_chat_id(chat_id)
+        parsed_chat_id = self._parse_chat_id(chat_id)
 
-            self._chat_ids |= parsed_chat_id
+        self._chat_ids |= parsed_chat_id
 
     def remove_usernames(self, username: SLT[str]) -> None:
         """
@@ -714,25 +704,23 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
             username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
                 disallow through. Leading ``'@'`` s in usernames will be discarded.
         """
-        with self.__lock:
-            if self._chat_ids:
-                raise RuntimeError(
-                    f"Can't set {self._username_name} in conjunction with (already set) "
-                    f"{self._chat_id_name}s."
-                )
+        if self._chat_ids:
+            raise RuntimeError(
+                f"Can't set {self._username_name} in conjunction with (already set) "
+                f"{self._chat_id_name}s."
+            )
 
-            parsed_username = self._parse_username(username)
-            self._usernames -= parsed_username
+        parsed_username = self._parse_username(username)
+        self._usernames -= parsed_username
 
     def _remove_chat_ids(self, chat_id: SLT[int]) -> None:
-        with self.__lock:
-            if self._usernames:
-                raise RuntimeError(
-                    f"Can't set {self._chat_id_name} in conjunction with (already set) "
-                    f"{self._username_name}s."
-                )
-            parsed_chat_id = self._parse_chat_id(chat_id)
-            self._chat_ids -= parsed_chat_id
+        if self._usernames:
+            raise RuntimeError(
+                f"Can't set {self._chat_id_name} in conjunction with (already set) "
+                f"{self._username_name}s."
+            )
+        parsed_chat_id = self._parse_chat_id(chat_id)
+        self._chat_ids -= parsed_chat_id
 
     def filter(self, message: Message) -> bool:
         chat_or_user = self.get_chat_or_user(message)
@@ -885,7 +873,7 @@ class ChatType:  # A convenience namespace for Chat types.
 
 class Command(MessageFilter):
     """
-    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default only allows
+    Messages with a :attr:`telegram.MessageEntity.BOT_COMMAND`. By default, only allows
     messages `starting` with a bot command. Pass :obj:`False` to also allow messages that contain a
     bot command `anywhere` in the text.
 
@@ -1508,7 +1496,7 @@ POLL = _Poll(name="filters.POLL")
 
 class Regex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of ``pattern`` in the message text.
+    Filters updates by searching for an occurrence of :paramref:`pattern` in the message text.
     The :func:`re.search` function is used to determine whether an update should be filtered.
 
     Refer to the documentation of the :obj:`re` module for more information.
@@ -1523,7 +1511,8 @@ class Regex(MessageFilter):
         if you need to specify flags on your pattern.
 
     Note:
-        Filters use the same short circuiting logic as python's `and`, `or` and `not`.
+        Filters use the same short circuiting logic as python's :keyword:`and`, :keyword:`or` and
+        :keyword:`not`.
         This means that for example:
 
             >>> filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
@@ -1984,7 +1973,10 @@ class UpdateType:
 
     EDITED = _Edited(name="filters.UpdateType.EDITED")
     """Updates with either :attr:`telegram.Update.edited_message` or
-    :attr:`telegram.Update.edited_channel_post`."""
+    :attr:`telegram.Update.edited_channel_post`.
+
+    .. versionadded:: 14.0
+    """
 
     class _EditedChannelPost(UpdateFilter):
         __slots__ = ()

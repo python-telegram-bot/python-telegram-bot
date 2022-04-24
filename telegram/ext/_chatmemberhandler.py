@@ -16,13 +16,14 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the ChatMemberHandler classes."""
-from typing import ClassVar, TypeVar, Union, Callable
+"""This module contains the ChatMemberHandler class."""
+from typing import ClassVar, TypeVar
 
 from telegram import Update
+from telegram._utils.types import DVInput
 from telegram.ext import Handler
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-from telegram.ext._utils.types import CCT
+from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar('RT')
 
@@ -33,13 +34,15 @@ class ChatMemberHandler(Handler[Update, CCT]):
     .. versionadded:: 13.4
 
     Warning:
-        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
@@ -47,15 +50,18 @@ class ChatMemberHandler(Handler[Update, CCT]):
             :attr:`CHAT_MEMBER` or :attr:`ANY_CHAT_MEMBER` to specify if this handler should handle
             only updates with :attr:`telegram.Update.my_chat_member`,
             :attr:`telegram.Update.chat_member` or both. Defaults to :attr:`MY_CHAT_MEMBER`.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         chat_member_types (:obj:`int`, optional): Specifies if this handler should handle
             only updates with :attr:`telegram.Update.my_chat_member`,
             :attr:`telegram.Update.chat_member` or both.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
 
     """
 
@@ -65,24 +71,21 @@ class ChatMemberHandler(Handler[Update, CCT]):
     CHAT_MEMBER: ClassVar[int] = 0
     """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.chat_member`."""
     ANY_CHAT_MEMBER: ClassVar[int] = 1
-    """:obj:`int`: Used as a constant to handle bot :attr:`telegram.Update.my_chat_member`
+    """:obj:`int`: Used as a constant to handle both :attr:`telegram.Update.my_chat_member`
     and :attr:`telegram.Update.chat_member`."""
 
     def __init__(
         self,
-        callback: Callable[[Update, CCT], RT],
+        callback: HandlerCallback[Update, CCT, RT],
         chat_member_types: int = MY_CHAT_MEMBER,
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
-        super().__init__(
-            callback,
-            run_async=run_async,
-        )
+        super().__init__(callback, block=block)
 
         self.chat_member_types = chat_member_types
 
     def check_update(self, update: object) -> bool:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.
