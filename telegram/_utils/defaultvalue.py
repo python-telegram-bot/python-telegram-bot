@@ -101,8 +101,7 @@ class DefaultValue(Generic[DVType]):
 
     @staticmethod
     def get_value(obj: Union[OT, 'DefaultValue[OT]']) -> OT:
-        """
-        Shortcut for::
+        """Shortcut for::
 
             return obj.value if isinstance(obj, DefaultValue) else obj
 
@@ -128,6 +127,12 @@ DEFAULT_NONE: DefaultValue = DefaultValue(None)
 
 DEFAULT_FALSE: DefaultValue = DefaultValue(False)
 """:class:`DefaultValue`: Default :obj:`False`"""
+
+DEFAULT_TRUE: DefaultValue = DefaultValue(True)
+""":class:`DefaultValue`: Default :obj:`True`
+
+.. versionadded:: 14.0
+"""
 
 DEFAULT_20: DefaultValue = DefaultValue(20)
 """:class:`DefaultValue`: Default :obj:`20`"""

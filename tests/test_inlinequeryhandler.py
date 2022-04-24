@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -85,7 +85,7 @@ class TestInlineQueryHandler:
     test_flag = False
 
     def test_slot_behaviour(self, mro_slots):
-        handler = InlineQueryHandler(self.callback_context)
+        handler = InlineQueryHandler(self.callback)
         for attr in handler.__slots__:
             assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
@@ -94,12 +94,12 @@ class TestInlineQueryHandler:
     def reset(self):
         self.test_flag = False
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, Update)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and isinstance(context.user_data, dict)
             and context.chat_data is None
@@ -107,50 +107,61 @@ class TestInlineQueryHandler:
             and isinstance(update.inline_query, InlineQuery)
         )
 
-    def callback_context_pattern(self, update, context):
+    def callback_pattern(self, update, context):
         if context.matches[0].groups():
             self.test_flag = context.matches[0].groups() == ('t', ' query')
         if context.matches[0].groupdict():
             self.test_flag = context.matches[0].groupdict() == {'begin': 't', 'end': ' query'}
 
     def test_other_update_types(self, false_update):
-        handler = InlineQueryHandler(self.callback_context)
+        handler = InlineQueryHandler(self.callback)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp, inline_query):
-        handler = InlineQueryHandler(self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context(self, app, inline_query):
+        handler = InlineQueryHandler(self.callback)
+        app.add_handler(handler)
 
-        dp.process_update(inline_query)
+        async with app:
+            await app.process_update(inline_query)
         assert self.test_flag
 
-    def test_context_pattern(self, dp, inline_query):
-        handler = InlineQueryHandler(
-            self.callback_context_pattern, pattern=r'(?P<begin>.*)est(?P<end>.*)'
-        )
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context_pattern(self, app, inline_query):
+        handler = InlineQueryHandler(self.callback_pattern, pattern=r'(?P<begin>.*)est(?P<end>.*)')
+        app.add_handler(handler)
 
-        dp.process_update(inline_query)
-        assert self.test_flag
+        async with app:
+            await app.process_update(inline_query)
+            assert self.test_flag
 
-        dp.remove_handler(handler)
-        handler = InlineQueryHandler(self.callback_context_pattern, pattern=r'(t)est(.*)')
-        dp.add_handler(handler)
+            app.remove_handler(handler)
+            handler = InlineQueryHandler(self.callback_pattern, pattern=r'(t)est(.*)')
+            app.add_handler(handler)
 
-        dp.process_update(inline_query)
-        assert self.test_flag
+            await app.process_update(inline_query)
+            assert self.test_flag
+
+            update = Update(
+                update_id=0, inline_query=InlineQuery(id='id', from_user=None, query='', offset='')
+            )
+            assert not handler.check_update(update)
+            update.inline_query.query = 'not_a_match'
+            assert not handler.check_update(update)
 
     @pytest.mark.parametrize('chat_types', [[Chat.SENDER], [Chat.SENDER, Chat.SUPERGROUP], []])
     @pytest.mark.parametrize(
         'chat_type,result', [(Chat.SENDER, True), (Chat.CHANNEL, False), (None, False)]
     )
-    def test_chat_types(self, dp, inline_query, chat_types, chat_type, result):
+    @pytest.mark.asyncio
+    async def test_chat_types(self, app, inline_query, chat_types, chat_type, result):
         try:
             inline_query.inline_query.chat_type = chat_type
 
-            handler = InlineQueryHandler(self.callback_context, chat_types=chat_types)
-            dp.add_handler(handler)
-            dp.process_update(inline_query)
+            handler = InlineQueryHandler(self.callback, chat_types=chat_types)
+            app.add_handler(handler)
+            async with app:
+                await app.process_update(inline_query)
 
             if not chat_types:
                 assert self.test_flag is False

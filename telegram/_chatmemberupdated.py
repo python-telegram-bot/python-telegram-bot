@@ -38,7 +38,7 @@ class ChatMemberUpdated(TelegramObject):
     .. versionadded:: 13.4
 
     Note:
-        In Python :keyword:`from` is a reserved word, :paramref:`from_user`
+        In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
     Args:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
@@ -136,7 +136,7 @@ class ChatMemberUpdated(TelegramObject):
         """Computes the difference between :attr:`old_chat_member` and :attr:`new_chat_member`.
 
         Example:
-            .. code:: python
+            .. code:: pycon
 
                 >>> chat_member_updated.difference()
                 {'custom_title': ('old title', 'new title')}

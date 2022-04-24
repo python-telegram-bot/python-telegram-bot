@@ -31,7 +31,7 @@ class TestDefault:
             assert getattr(a, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(a)) == len(set(mro_slots(a))), "duplicate slot"
 
-    def test_data_assignment(self, dp):
+    def test_data_assignment(self):
         defaults = Defaults()
 
         for name, val in inspect.getmembers(Defaults, lambda x: isinstance(x, property)):
@@ -42,7 +42,7 @@ class TestDefault:
         a = Defaults(parse_mode='HTML', quote=True)
         b = Defaults(parse_mode='HTML', quote=True)
         c = Defaults(parse_mode='HTML', quote=True, protect_content=True)
-        d = Defaults(parse_mode='HTML', timeout=50)
+        d = Defaults(parse_mode='HTML', protect_content=True)
         e = User(123, 'test_user', False)
 
         assert a == b

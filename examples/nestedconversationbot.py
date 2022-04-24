@@ -4,7 +4,7 @@
 
 """
 First, a few callback functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
+the Application and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 
 Usage:
@@ -24,7 +24,7 @@ from telegram.ext import (
     filters,
     ConversationHandler,
     CallbackQueryHandler,
-    Updater,
+    Application,
     CallbackContext,
 )
 
@@ -71,7 +71,7 @@ def _name_switcher(level: str) -> Tuple[str, str]:
 
 
 # Top level conversation callbacks
-def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
+async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Select an action: Adding parent/child or show data."""
     text = (
         "You may choose to add a family member, yourself, show the gathered data, or end the "
@@ -92,85 +92,87 @@ def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
 
     # If we're starting over we don't need to send a new message
     if context.user_data.get(START_OVER):
-        update.callback_query.answer()
-        update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     else:
-        update.message.reply_text(
+        await update.message.reply_text(
             "Hi, I'm Family Bot and I'm here to help you gather information about your family."
         )
-        update.message.reply_text(text=text, reply_markup=keyboard)
+        await update.message.reply_text(text=text, reply_markup=keyboard)
 
     context.user_data[START_OVER] = False
     return SELECTING_ACTION
 
 
-def adding_self(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
+async def adding_self(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Add information about yourself."""
     context.user_data[CURRENT_LEVEL] = SELF
     text = 'Okay, please tell me about yourself.'
     button = InlineKeyboardButton(text='Add info', callback_data=str(MALE))
     keyboard = InlineKeyboardMarkup.from_button(button)
 
-    update.callback_query.answer()
-    update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+    await update.callback_query.answer()
+    await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
     return DESCRIBING_SELF
 
 
-def show_data(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
+async def show_data(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Pretty print gathered data."""
 
-    def prettyprint(user_data: Dict[str, Any], level: str) -> str:
-        people = user_data.get(level)
+    def pretty_print(data: Dict[str, Any], level: str) -> str:
+        people = data.get(level)
         if not people:
             return '\nNo information yet.'
 
-        text = ''
+        return_str = ''
         if level == SELF:
-            for person in user_data[level]:
-                text += f"\nName: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
+            for person in data[level]:
+                return_str += f"\nName: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
         else:
             male, female = _name_switcher(level)
 
-            for person in user_data[level]:
+            for person in data[level]:
                 gender = female if person[GENDER] == FEMALE else male
-                text += f"\n{gender}: Name: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
-        return text
+                return_str += (
+                    f"\n{gender}: Name: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
+                )
+        return return_str
 
     user_data = context.user_data
-    text = f"Yourself:{prettyprint(user_data, SELF)}"
-    text += f"\n\nParents:{prettyprint(user_data, PARENTS)}"
-    text += f"\n\nChildren:{prettyprint(user_data, CHILDREN)}"
+    text = f"Yourself:{pretty_print(user_data, SELF)}"
+    text += f"\n\nParents:{pretty_print(user_data, PARENTS)}"
+    text += f"\n\nChildren:{pretty_print(user_data, CHILDREN)}"
 
     buttons = [[InlineKeyboardButton(text='Back', callback_data=str(END))]]
     keyboard = InlineKeyboardMarkup(buttons)
 
-    update.callback_query.answer()
-    update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+    await update.callback_query.answer()
+    await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     user_data[START_OVER] = True
 
     return SHOWING
 
 
-def stop(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def stop(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """End Conversation by command."""
-    update.message.reply_text('Okay, bye.')
+    await update.message.reply_text('Okay, bye.')
 
     return END
 
 
-def end(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def end(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """End conversation from InlineKeyboardButton."""
-    update.callback_query.answer()
+    await update.callback_query.answer()
 
     text = 'See you around!'
-    update.callback_query.edit_message_text(text=text)
+    await update.callback_query.edit_message_text(text=text)
 
     return END
 
 
 # Second level conversation callbacks
-def select_level(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
+async def select_level(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Choose to add a parent or a child."""
     text = 'You may add a parent or a child. Also you can show the gathered data or go back.'
     buttons = [
@@ -185,13 +187,13 @@ def select_level(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     ]
     keyboard = InlineKeyboardMarkup(buttons)
 
-    update.callback_query.answer()
-    update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+    await update.callback_query.answer()
+    await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
     return SELECTING_LEVEL
 
 
-def select_gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
+async def select_gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Choose to add mother or father."""
     level = update.callback_query.data
     context.user_data[CURRENT_LEVEL] = level
@@ -212,22 +214,22 @@ def select_gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     ]
     keyboard = InlineKeyboardMarkup(buttons)
 
-    update.callback_query.answer()
-    update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+    await update.callback_query.answer()
+    await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
     return SELECTING_GENDER
 
 
-def end_second_level(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def end_second_level(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Return to top level conversation."""
     context.user_data[START_OVER] = True
-    start(update, context)
+    await start(update, context)
 
     return END
 
 
 # Third level callbacks
-def select_feature(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
+async def select_feature(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Select a feature to update for the person."""
     buttons = [
         [
@@ -243,39 +245,39 @@ def select_feature(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str
         context.user_data[FEATURES] = {GENDER: update.callback_query.data}
         text = 'Please select a feature to update.'
 
-        update.callback_query.answer()
-        update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     # But after we do that, we need to send a new message
     else:
         text = 'Got it! Please select a feature to update.'
-        update.message.reply_text(text=text, reply_markup=keyboard)
+        await update.message.reply_text(text=text, reply_markup=keyboard)
 
     context.user_data[START_OVER] = False
     return SELECTING_FEATURE
 
 
-def ask_for_input(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
+async def ask_for_input(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Prompt user to input data for selected feature."""
     context.user_data[CURRENT_FEATURE] = update.callback_query.data
     text = 'Okay, tell me.'
 
-    update.callback_query.answer()
-    update.callback_query.edit_message_text(text=text)
+    await update.callback_query.answer()
+    await update.callback_query.edit_message_text(text=text)
 
     return TYPING
 
 
-def save_input(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
+async def save_input(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Save input for feature and return to feature selection."""
     user_data = context.user_data
     user_data[FEATURES][user_data[CURRENT_FEATURE]] = update.message.text
 
     user_data[START_OVER] = True
 
-    return select_feature(update, context)
+    return await select_feature(update, context)
 
 
-def end_describing(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def end_describing(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """End gathering of features and return to parent conversation."""
     user_data = context.user_data
     level = user_data[CURRENT_LEVEL]
@@ -286,27 +288,24 @@ def end_describing(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int
     # Print upper level menu
     if level == SELF:
         user_data[START_OVER] = True
-        start(update, context)
+        await start(update, context)
     else:
-        select_level(update, context)
+        await select_level(update, context)
 
     return END
 
 
-def stop_nested(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
+async def stop_nested(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Completely end conversation from within nested conversation."""
-    update.message.reply_text('Okay, bye.')
+    await update.message.reply_text('Okay, bye.')
 
     return STOPPING
 
 
 def main() -> None:
     """Run the bot."""
-    # Create the Updater and pass it your bot's token.
-    updater = Updater.builder().token("TOKEN").build()
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("TOKEN").build()
 
     # Set up third level ConversationHandler (collecting features)
     description_conv = ConversationHandler(
@@ -378,15 +377,10 @@ def main() -> None:
         fallbacks=[CommandHandler('stop', stop)],
     )
 
-    dispatcher.add_handler(conv_handler)
+    application.add_handler(conv_handler)
 
-    # Start the Bot
-    updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 
 if __name__ == '__main__':

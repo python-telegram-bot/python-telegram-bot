@@ -10,6 +10,7 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
+import logging
 from collections import defaultdict
 from typing import DefaultDict, Optional, Set
 
@@ -21,10 +22,15 @@ from telegram.ext import (
     ContextTypes,
     CallbackQueryHandler,
     TypeHandler,
-    Dispatcher,
     ExtBot,
-    Updater,
+    Application,
 )
+
+# Enable logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 
 class ChatData:
@@ -38,8 +44,8 @@ class ChatData:
 class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
     """Custom class for context."""
 
-    def __init__(self, dispatcher: Dispatcher):
-        super().__init__(dispatcher=dispatcher)
+    def __init__(self, application: Application):
+        super().__init__(application=application)
         self._message_id: Optional[int] = None
 
     @property
@@ -62,10 +68,10 @@ class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
         self.chat_data.clicks_per_message[self._message_id] = value
 
     @classmethod
-    def from_update(cls, update: object, dispatcher: 'Dispatcher') -> 'CustomContext':
+    def from_update(cls, update: object, application: 'Application') -> 'CustomContext':
         """Override from_update to set _message_id."""
         # Make sure to call super()
-        context = super().from_update(update, dispatcher)
+        context = super().from_update(update, application)
 
         if context.chat_data and isinstance(update, Update) and update.effective_message:
             # pylint: disable=protected-access
@@ -75,9 +81,9 @@ class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
         return context
 
 
-def start(update: Update, context: CustomContext) -> None:
+async def start(update: Update, context: CustomContext) -> None:
     """Display a message with a button."""
-    update.message.reply_html(
+    await update.message.reply_html(
         'This button was clicked <i>0</i> times.',
         reply_markup=InlineKeyboardMarkup.from_button(
             InlineKeyboardButton(text='Click me!', callback_data='button')
@@ -85,11 +91,11 @@ def start(update: Update, context: CustomContext) -> None:
     )
 
 
-def count_click(update: Update, context: CustomContext) -> None:
+async def count_click(update: Update, context: CustomContext) -> None:
     """Update the click count for the message."""
     context.message_clicks += 1
-    update.callback_query.answer()
-    update.effective_message.edit_text(
+    await update.callback_query.answer()
+    await update.effective_message.edit_text(
         f'This button was clicked <i>{context.message_clicks}</i> times.',
         reply_markup=InlineKeyboardMarkup.from_button(
             InlineKeyboardButton(text='Click me!', callback_data='button')
@@ -98,15 +104,15 @@ def count_click(update: Update, context: CustomContext) -> None:
     )
 
 
-def print_users(update: Update, context: CustomContext) -> None:
+async def print_users(update: Update, context: CustomContext) -> None:
     """Show which users have been using this bot."""
-    update.message.reply_text(
+    await update.message.reply_text(
         'The following user IDs have used this bot: '
         f'{", ".join(map(str, context.bot_user_ids))}'
     )
 
 
-def track_users(update: Update, context: CustomContext) -> None:
+async def track_users(update: Update, context: CustomContext) -> None:
     """Store the user id of the incoming update, if any."""
     if update.effective_user:
         context.bot_user_ids.add(update.effective_user.id)
@@ -115,17 +121,15 @@ def track_users(update: Update, context: CustomContext) -> None:
 def main() -> None:
     """Run the bot."""
     context_types = ContextTypes(context=CustomContext, chat_data=ChatData)
-    updater = Updater.builder().token("TOKEN").context_types(context_types).build()
+    application = Application.builder().token("TOKEN").context_types(context_types).build()
 
-    dispatcher = updater.dispatcher
     # run track_users in its own group to not interfere with the user handlers
-    dispatcher.add_handler(TypeHandler(Update, track_users), group=-1)
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CallbackQueryHandler(count_click))
-    dispatcher.add_handler(CommandHandler("print_users", print_users))
+    application.add_handler(TypeHandler(Update, track_users), group=-1)
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(count_click))
+    application.add_handler(CommandHandler("print_users", print_users))
 
-    updater.start_polling()
-    updater.idle()
+    application.run_polling()
 
 
 if __name__ == '__main__':

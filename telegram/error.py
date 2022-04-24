@@ -16,12 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an classes that represent Telegram errors."""
+"""This module contains classes that represent Telegram errors.
+
+.. versionchanged:: 14.0
+    Replaced ``Unauthorized`` by :class:`Forbidden`.
+"""
 
 __all__ = (
     'BadRequest',
     'ChatMigrated',
     'Conflict',
+    'Forbidden',
     'InvalidToken',
     'NetworkError',
     'PassportDecryptionError',
@@ -30,7 +35,7 @@ __all__ = (
     'TimedOut',
 )
 
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 
 
 def _lstrip_str(in_s: str, lstr: str) -> str:
@@ -69,26 +74,40 @@ class TelegramError(Exception):
     def __str__(self) -> str:
         return self.message
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}('{self.message}')"
+
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
         return self.__class__, (self.message,)
 
 
-class Unauthorized(TelegramError):
-    """Raised when the bot has not enough rights to perform the requested action."""
+class Forbidden(TelegramError):
+    """Raised when the bot has not enough rights to perform the requested action.
+
+    .. versionchanged:: 14.0
+        This class was previously named ``Unauthorized``.
+    """
 
     __slots__ = ()
 
 
 class InvalidToken(TelegramError):
-    """Raised when the token is invalid."""
+    """Raised when the token is invalid.
 
-    __slots__ = ()
+    Args:
+        message (:obj:`str`, optional): Any additional information about the exception.
 
-    def __init__(self) -> None:
-        super().__init__('Invalid token')
+            .. versionadded:: 14.0
+    """
 
-    def __reduce__(self) -> Tuple[type, Tuple]:  # type: ignore[override]
-        return self.__class__, ()
+    __slots__ = ('_message',)
+
+    def __init__(self, message: str = None) -> None:
+        self._message = message
+        super().__init__('Invalid token' if self._message is None else self._message)
+
+    def __reduce__(self) -> Tuple[type, Tuple[Optional[str]]]:  # type: ignore[override]
+        return self.__class__, (self._message,)
 
 
 class NetworkError(TelegramError):
@@ -104,15 +123,18 @@ class BadRequest(NetworkError):
 
 
 class TimedOut(NetworkError):
-    """Raised when a request took too long to finish."""
+    """Raised when a request took too long to finish.
+
+    Args:
+        message (:obj:`str`, optional): Any additional information about the exception.
+
+            .. versionadded:: 14.0
+    """
 
     __slots__ = ()
 
-    def __init__(self) -> None:
-        super().__init__('Timed out')
-
-    def __reduce__(self) -> Tuple[type, Tuple]:  # type: ignore[override]
-        return self.__class__, ()
+    def __init__(self, message: str = None) -> None:
+        super().__init__(message or 'Timed out')
 
 
 class ChatMigrated(TelegramError):
@@ -128,7 +150,7 @@ class ChatMigrated(TelegramError):
 
     def __init__(self, new_chat_id: int):
         super().__init__(f'Group migrated to supergroup. New chat id: {new_chat_id}')
-        self.new_chat_id = new_chat_id
+        self.new_chat_id = int(new_chat_id)
 
     def __reduce__(self) -> Tuple[type, Tuple[int]]:  # type: ignore[override]
         return self.__class__, (self.new_chat_id,)

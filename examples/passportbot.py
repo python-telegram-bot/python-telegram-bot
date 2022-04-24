@@ -15,18 +15,18 @@ import logging
 from pathlib import Path
 
 from telegram import Update
-from telegram.ext import MessageHandler, filters, Updater, CallbackContext
+from telegram.ext import MessageHandler, filters, Application, CallbackContext
 
 # Enable logging
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
 logger = logging.getLogger(__name__)
 
 
-def msg(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def msg(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Downloads and prints the received passport data."""
     # Retrieve passport data
     passport_data = update.message.passport_data
@@ -62,28 +62,28 @@ def msg(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
         ):
             print(data.type, len(data.files), 'files')
             for file in data.files:
-                actual_file = file.get_file()
+                actual_file = await file.get_file()
                 print(actual_file)
-                actual_file.download()
+                await actual_file.download()
         if (
             data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport')
             and data.front_side
         ):
-            front_file = data.front_side.get_file()
+            front_file = await data.front_side.get_file()
             print(data.type, front_file)
-            front_file.download()
+            await front_file.download()
         if data.type in ('driver_license' and 'identity_card') and data.reverse_side:
-            reverse_file = data.reverse_side.get_file()
+            reverse_file = await data.reverse_side.get_file()
             print(data.type, reverse_file)
-            reverse_file.download()
+            await reverse_file.download()
         if (
             data.type in ('passport', 'driver_license', 'identity_card', 'internal_passport')
             and data.selfie
         ):
-            selfie_file = data.selfie.get_file()
+            selfie_file = await data.selfie.get_file()
             print(data.type, selfie_file)
-            selfie_file.download()
-        if data.type in (
+            await selfie_file.download()
+        if data.translation and data.type in (
             'passport',
             'driver_license',
             'identity_card',
@@ -96,30 +96,24 @@ def msg(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
         ):
             print(data.type, len(data.translation), 'translation')
             for file in data.translation:
-                actual_file = file.get_file()
+                actual_file = await file.get_file()
                 print(actual_file)
-                actual_file.download()
+                await actual_file.download()
 
 
 def main() -> None:
     """Start the bot."""
-    # Create the Updater and pass it your token and private key
+    # Create the Application and pass it your token and private key
     private_key = Path('private.key')
-    updater = Updater.builder().token("TOKEN").private_key(private_key.read_bytes()).build()
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    application = (
+        Application.builder().token("TOKEN").private_key(private_key.read_bytes()).build()
+    )
 
     # On messages that include passport data call msg
-    dispatcher.add_handler(MessageHandler(filters.PASSPORT_DATA, msg))
+    application.add_handler(MessageHandler(filters.PASSPORT_DATA, msg))
 
-    # Start the Bot
-    updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 
 if __name__ == '__main__':

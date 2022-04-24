@@ -18,13 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
 
-from typing import Dict, Optional, Tuple, cast
+from typing import Dict, Optional, cast
 
 from copy import deepcopy
 
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram._utils.types import JSONDict
-from telegram.ext._utils.types import ConversationDict, CDCData
+from telegram.ext._utils.types import ConversationDict, CDCData, ConversationKey
 
 try:
     import ujson as json
@@ -37,8 +37,8 @@ class DictPersistence(BasePersistence):
 
     Attention:
         The interface provided by this class is intended to be accessed exclusively by
-        :class:`~telegram.ext.Dispatcher`. Calling any of the methods below manually might
-        interfere with the integration of persistence into :class:`~telegram.ext.Dispatcher`.
+        :class:`~telegram.ext.Application`. Calling any of the methods below manually might
+        interfere with the integration of persistence into :class:`~telegram.ext.Application`.
 
     Note:
         * Data managed by :class:`DictPersistence` is in-memory only and will be lost when the bot
@@ -62,12 +62,18 @@ class DictPersistence(BasePersistence):
             chat_data on creating this persistence. Default is ``""``.
         bot_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             bot_data on creating this persistence. Default is ``""``.
+        conversations_json (:obj:`str`, optional): JSON string that will be used to reconstruct
+            conversation on creating this persistence. Default is ``""``.
         callback_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
             callback_data on creating this persistence. Default is ``""``.
 
             .. versionadded:: 13.6
-        conversations_json (:obj:`str`, optional): JSON string that will be used to reconstruct
-            conversation on creating this persistence. Default is ``""``.
+        update_interval (:obj:`int` | :obj:`float`, optional): The
+            :class:`~telegram.ext.Application` will update
+            the persistence in regular intervals. This parameter specifies the time (in seconds) to
+            wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
+
+            .. versionadded:: 14.0
 
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
@@ -95,8 +101,9 @@ class DictPersistence(BasePersistence):
         bot_data_json: str = '',
         conversations_json: str = '',
         callback_data_json: str = '',
+        update_interval: float = 60,
     ):
-        super().__init__(store_data=store_data)
+        super().__init__(store_data=store_data, update_interval=update_interval)
         self._user_data = None
         self._chat_data = None
         self._bot_data = None
@@ -230,9 +237,11 @@ class DictPersistence(BasePersistence):
         """:obj:`str`: The conversations serialized as a JSON-string."""
         if self._conversations_json:
             return self._conversations_json
-        return self._encode_conversations_to_json(self.conversations)  # type: ignore[arg-type]
+        if self.conversations:
+            return self._encode_conversations_to_json(self.conversations)
+        return json.dumps(self.conversations)
 
-    def get_user_data(self) -> Dict[int, Dict[object, object]]:
+    async def get_user_data(self) -> Dict[int, Dict[object, object]]:
         """Returns the user_data created from the ``user_data_json`` or an empty :obj:`dict`.
 
         Returns:
@@ -242,7 +251,7 @@ class DictPersistence(BasePersistence):
             self._user_data = {}
         return deepcopy(self.user_data)  # type: ignore[arg-type]
 
-    def get_chat_data(self) -> Dict[int, Dict[object, object]]:
+    async def get_chat_data(self) -> Dict[int, Dict[object, object]]:
         """Returns the chat_data created from the ``chat_data_json`` or an empty :obj:`dict`.
 
         Returns:
@@ -252,7 +261,7 @@ class DictPersistence(BasePersistence):
             self._chat_data = {}
         return deepcopy(self.chat_data)  # type: ignore[arg-type]
 
-    def get_bot_data(self) -> Dict[object, object]:
+    async def get_bot_data(self) -> Dict[object, object]:
         """Returns the bot_data created from the ``bot_data_json`` or an empty :obj:`dict`.
 
         Returns:
@@ -262,7 +271,7 @@ class DictPersistence(BasePersistence):
             self._bot_data = {}
         return deepcopy(self.bot_data)  # type: ignore[arg-type]
 
-    def get_callback_data(self) -> Optional[CDCData]:
+    async def get_callback_data(self) -> Optional[CDCData]:
         """Returns the callback_data created from the ``callback_data_json`` or :obj:`None`.
 
         .. versionadded:: 13.6
@@ -275,9 +284,9 @@ class DictPersistence(BasePersistence):
         if self.callback_data is None:
             self._callback_data = None
             return None
-        return deepcopy((self.callback_data[0], self.callback_data[1].copy()))
+        return deepcopy(self.callback_data)
 
-    def get_conversations(self, name: str) -> ConversationDict:
+    async def get_conversations(self, name: str) -> ConversationDict:
         """Returns the conversations created from the ``conversations_json`` or an empty
         :obj:`dict`.
 
@@ -288,8 +297,8 @@ class DictPersistence(BasePersistence):
             self._conversations = {}
         return self.conversations.get(name, {}).copy()  # type: ignore[union-attr]
 
-    def update_conversation(
-        self, name: str, key: Tuple[int, ...], new_state: Optional[object]
+    async def update_conversation(
+        self, name: str, key: ConversationKey, new_state: Optional[object]
     ) -> None:
         """Will update the conversations for the given handler.
 
@@ -305,46 +314,46 @@ class DictPersistence(BasePersistence):
         self._conversations[name][key] = new_state
         self._conversations_json = None
 
-    def update_user_data(self, user_id: int, data: Dict) -> None:
+    async def update_user_data(self, user_id: int, data: Dict) -> None:
         """Will update the user_data (if changed).
 
         Args:
             user_id (:obj:`int`): The user the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.user_data` ``[user_id]``.
+            data (:obj:`dict`): The :attr:`telegram.ext.Application.user_data` ``[user_id]``.
         """
         if self._user_data is None:
             self._user_data = {}
         if self._user_data.get(user_id) == data:
             return
-        self._user_data[user_id] = deepcopy(data)
+        self._user_data[user_id] = data
         self._user_data_json = None
 
-    def update_chat_data(self, chat_id: int, data: Dict) -> None:
+    async def update_chat_data(self, chat_id: int, data: Dict) -> None:
         """Will update the chat_data (if changed).
 
         Args:
             chat_id (:obj:`int`): The chat the data might have been changed for.
-            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.chat_data` ``[chat_id]``.
+            data (:obj:`dict`): The :attr:`telegram.ext.Application.chat_data` ``[chat_id]``.
         """
         if self._chat_data is None:
             self._chat_data = {}
         if self._chat_data.get(chat_id) == data:
             return
-        self._chat_data[chat_id] = deepcopy(data)
+        self._chat_data[chat_id] = data
         self._chat_data_json = None
 
-    def update_bot_data(self, data: Dict) -> None:
+    async def update_bot_data(self, data: Dict) -> None:
         """Will update the bot_data (if changed).
 
         Args:
-            data (:obj:`dict`): The :attr:`telegram.ext.Dispatcher.bot_data`.
+            data (:obj:`dict`): The :attr:`telegram.ext.Application.bot_data`.
         """
         if self._bot_data == data:
             return
-        self._bot_data = deepcopy(data)
+        self._bot_data = data
         self._bot_data_json = None
 
-    def update_callback_data(self, data: CDCData) -> None:
+    async def update_callback_data(self, data: CDCData) -> None:
         """Will update the callback_data (if changed).
 
         .. versionadded:: 13.6
@@ -356,10 +365,10 @@ class DictPersistence(BasePersistence):
         """
         if self._callback_data == data:
             return
-        self._callback_data = deepcopy((data[0], data[1].copy()))
+        self._callback_data = data
         self._callback_data_json = None
 
-    def drop_chat_data(self, chat_id: int) -> None:
+    async def drop_chat_data(self, chat_id: int) -> None:
         """Will delete the specified key from the :attr:`chat_data`.
 
         .. versionadded:: 14.0
@@ -372,7 +381,7 @@ class DictPersistence(BasePersistence):
         self._chat_data.pop(chat_id, None)
         self._chat_data_json = None
 
-    def drop_user_data(self, user_id: int) -> None:
+    async def drop_user_data(self, user_id: int) -> None:
         """Will delete the specified key from the :attr:`user_data`.
 
         .. versionadded:: 14.0
@@ -385,28 +394,28 @@ class DictPersistence(BasePersistence):
         self._user_data.pop(user_id, None)
         self._user_data_json = None
 
-    def refresh_user_data(self, user_id: int, user_data: Dict) -> None:
+    async def refresh_user_data(self, user_id: int, user_data: Dict) -> None:
         """Does nothing.
 
         .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_user_data`
         """
 
-    def refresh_chat_data(self, chat_id: int, chat_data: Dict) -> None:
+    async def refresh_chat_data(self, chat_id: int, chat_data: Dict) -> None:
         """Does nothing.
 
         .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_chat_data`
         """
 
-    def refresh_bot_data(self, bot_data: Dict) -> None:
+    async def refresh_bot_data(self, bot_data: Dict) -> None:
         """Does nothing.
 
         .. versionadded:: 13.6
         .. seealso:: :meth:`telegram.ext.BasePersistence.refresh_bot_data`
         """
 
-    def flush(self) -> None:
+    async def flush(self) -> None:
         """Does nothing.
 
         .. versionadded:: 14.0
@@ -414,7 +423,7 @@ class DictPersistence(BasePersistence):
         """
 
     @staticmethod
-    def _encode_conversations_to_json(conversations: Dict[str, Dict[Tuple, object]]) -> str:
+    def _encode_conversations_to_json(conversations: Dict[str, ConversationDict]) -> str:
         """Helper method to encode a conversations dict (that uses tuples as keys) to a
         JSON-serializable way. Use :meth:`self._decode_conversations_from_json` to decode.
 
@@ -432,7 +441,7 @@ class DictPersistence(BasePersistence):
         return json.dumps(tmp)
 
     @staticmethod
-    def _decode_conversations_from_json(json_string: str) -> Dict[str, Dict[Tuple, object]]:
+    def _decode_conversations_from_json(json_string: str) -> Dict[str, ConversationDict]:
         """Helper method to decode a conversations dict (that uses tuples as keys) from a
         JSON-string created with :meth:`self._encode_conversations_to_json`.
 
@@ -443,7 +452,7 @@ class DictPersistence(BasePersistence):
             :obj:`dict`: The conversations dict after decoding
         """
         tmp = json.loads(json_string)
-        conversations: Dict[str, Dict[Tuple, object]] = {}
+        conversations: Dict[str, ConversationDict] = {}
         for handler, states in tmp.items():
             conversations[handler] = {}
             for key, state in states.items():

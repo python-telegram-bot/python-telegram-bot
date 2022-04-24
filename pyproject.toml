@@ -8,4 +8,3 @@ skip-string-normalization = true
 # see https://github.com/psf/black/issues/1778
 force-exclude = '^(?!/(telegram|examples|tests)/).*\.py$'
 include = '(telegram|examples|tests)/.*\.py$'
-exclude = 'telegram/vendor'

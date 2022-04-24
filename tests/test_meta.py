@@ -22,16 +22,22 @@ import pytest
 
 from tests.conftest import env_var_2_bool
 
-
-@pytest.mark.skipif(
+skip_disabled = pytest.mark.skipif(
     not env_var_2_bool(os.getenv('TEST_BUILD', False)), reason='TEST_BUILD not enabled'
 )
+
+
+# To make the tests agnostic of the cwd
+@pytest.fixture(autouse=True)
+def change_test_dir(request, monkeypatch):
+    monkeypatch.chdir(request.config.rootdir)
+
+
+@skip_disabled
 def test_build():
     assert os.system('python setup.py bdist_dumb') == 0  # pragma: no cover
 
 
-@pytest.mark.skipif(
-    not env_var_2_bool(os.getenv('TEST_BUILD', False)), reason='TEST_BUILD not enabled'
-)
+@skip_disabled
 def test_build_raw():
     assert os.system('python setup-raw.py bdist_dumb') == 0  # pragma: no cover

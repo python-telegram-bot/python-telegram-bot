@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -105,12 +105,12 @@ class TestCallbackQueryHandler:
         if groupdict is not None:
             self.test_flag = groupdict == {'begin': 't', 'end': ' data'}
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, Update)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and isinstance(context.user_data, dict)
             and context.chat_data is None
@@ -118,7 +118,7 @@ class TestCallbackQueryHandler:
             and isinstance(update.callback_query, CallbackQuery)
         )
 
-    def callback_context_pattern(self, update, context):
+    def callback_pattern(self, update, context):
         if context.matches[0].groups():
             self.test_flag = context.matches[0].groups() == ('t', ' data')
         if context.matches[0].groupdict():
@@ -172,30 +172,35 @@ class TestCallbackQueryHandler:
         handler = CallbackQueryHandler(self.callback_basic)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp, callback_query):
-        handler = CallbackQueryHandler(self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context(self, app, callback_query):
+        handler = CallbackQueryHandler(self.callback)
+        app.add_handler(handler)
 
-        dp.process_update(callback_query)
-        assert self.test_flag
+        async with app:
+            await app.process_update(callback_query)
+            assert self.test_flag
 
-    def test_context_pattern(self, dp, callback_query):
+    @pytest.mark.asyncio
+    async def test_context_pattern(self, app, callback_query):
         handler = CallbackQueryHandler(
-            self.callback_context_pattern, pattern=r'(?P<begin>.*)est(?P<end>.*)'
+            self.callback_pattern, pattern=r'(?P<begin>.*)est(?P<end>.*)'
         )
-        dp.add_handler(handler)
+        app.add_handler(handler)
 
-        dp.process_update(callback_query)
-        assert self.test_flag
+        async with app:
+            await app.process_update(callback_query)
+            assert self.test_flag
 
-        dp.remove_handler(handler)
-        handler = CallbackQueryHandler(self.callback_context_pattern, pattern=r'(t)est(.*)')
-        dp.add_handler(handler)
+            app.remove_handler(handler)
+            handler = CallbackQueryHandler(self.callback_pattern, pattern=r'(t)est(.*)')
+            app.add_handler(handler)
 
-        dp.process_update(callback_query)
-        assert self.test_flag
+            await app.process_update(callback_query)
+            assert self.test_flag
 
-    def test_context_callable_pattern(self, dp, callback_query):
+    @pytest.mark.asyncio
+    async def test_context_callable_pattern(self, app, callback_query):
         class CallbackData:
             pass
 
@@ -206,6 +211,14 @@ class TestCallbackQueryHandler:
             assert context.matches is None
 
         handler = CallbackQueryHandler(callback, pattern=pattern)
-        dp.add_handler(handler)
+        app.add_handler(handler)
 
-        dp.process_update(callback_query)
+        async with app:
+            await app.process_update(callback_query)
+
+    def test_async_pattern(self):
+        async def pattern():
+            pass
+
+        with pytest.raises(TypeError, match='must not be a coroutine function'):
+            CallbackQueryHandler(self.callback, pattern=pattern)
