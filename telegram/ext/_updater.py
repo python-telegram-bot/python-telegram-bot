@@ -513,7 +513,9 @@ class Updater(AbstractAsyncContextManager):
 
         # We pass along the cert to the webhook if present.
         await self._bootstrap(
-            cert=cert,
+            # Passing a Path or string only works if the bot is running against a local bot API
+            # server, so let's read the contents
+            cert=Path(cert).read_bytes() if cert else None,
             max_retries=bootstrap_retries,
             drop_pending_updates=drop_pending_updates,
             webhook_url=webhook_url,
@@ -590,7 +592,7 @@ class Updater(AbstractAsyncContextManager):
         webhook_url: Optional[str],
         allowed_updates: Optional[List[str]],
         drop_pending_updates: bool = None,
-        cert: Union[str, Path] = None,
+        cert: Optional[bytes] = None,
         bootstrap_interval: float = 1,
         ip_address: str = None,
         max_connections: int = 40,

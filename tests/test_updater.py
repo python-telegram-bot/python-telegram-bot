@@ -667,7 +667,7 @@ class TestUpdater:
             )
 
             expected_set_webhook = dict(
-                certificate='certificate',
+                certificate=data_file('sslcert.pem').read_bytes(),
                 max_connections=47,
                 allowed_updates=['message'],
                 ip_address='123.456.789',
@@ -680,11 +680,10 @@ class TestUpdater:
                 drop_pending_updates=True,
                 ip_address='123.456.789',
                 max_connections=47,
-                cert='certificate',
+                cert=str(data_file('sslcert.pem').resolve()),
             )
             await updater.stop()
 
-            expected_set_webhook['certificate'] = data_file('sslcert.pem')
             await updater.start_webhook(
                 listen='listen-ssl',
                 port=42,
