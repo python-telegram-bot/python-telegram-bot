@@ -181,7 +181,7 @@ class ExtBot(Bot):
         Note:
             Checks :attr:`telegram.Message.via_bot` and :attr:`telegram.Message.from_user`
             to figure out if a) a reply markup exists and b) it was actually sent by this
-            cached bot. If not, the message will be returned unchanged.
+            bot. If not, the message will be returned unchanged.
 
             Note that this will fail for channel posts, as :attr:`telegram.Message.from_user` is
             :obj:`None` for those! In the corresponding reply markups, the callback data will be

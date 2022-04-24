@@ -168,8 +168,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
             .. seealso::
                 :meth:`add_handler`, :meth:`add_handlers`.
-        error_handlers (Dict[:term:`coroutine function`, :obj:`bool`]): A dictionary where the keys are
-            error handlers and the values indicate whether they are to be run blocking.
+        error_handlers (Dict[:term:`coroutine function`, :obj:`bool`]): A dictionary where the keys
+            are error handlers and the values indicate whether they are to be run blocking.
 
             .. seealso::
                 :meth:`add_error_handler`
