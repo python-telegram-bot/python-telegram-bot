@@ -90,7 +90,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             Only present when passed to the callback of :class:`telegram.ext.Job` or in error
             handlers if the error is caused by a job.
 
-            .. versionchanged:: 14.0
+            .. versionchanged:: 20.0
                 :attr:`job` is now also present in error handlers if the error is caused by a job.
 
     """
@@ -112,7 +112,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 async def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
                     ...
 
-        .. versionadded: 14.0
+        .. versionadded: 20.0
         """
 
     __slots__ = (
@@ -261,7 +261,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
         .. seealso:: :meth:`telegram.ext.Application.add_error_handler`
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             Removed arguments ``async_args`` and ``async_kwargs``.
 
         Args:
@@ -272,7 +272,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 context.
             job (:class:`telegram.ext.Job`, optional): The job associated with the error.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
 
         Returns:
             :class:`telegram.ext.CallbackContext`

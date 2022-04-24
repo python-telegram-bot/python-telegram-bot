@@ -40,7 +40,7 @@ class HTTPXRequest(BaseRequest):
     """Implementation of :class:`~telegram.request.BaseRequest` using the library
     `httpx <https://www.python-httpx.org>`_.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
 
     Args:
         connection_pool_size (:obj:`int`, optional): Number of connections to keep in the

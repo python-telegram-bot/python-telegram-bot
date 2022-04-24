@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions related to inspecting the program stack.
 
-.. versionadded:: 14.0
+.. versionadded:: 20.0
 
 Warning:
     Contents of this module are intended to be used internally by the library and *not* by the

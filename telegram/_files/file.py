@@ -119,7 +119,7 @@ class File(TelegramObject):
               :attr:`file_path` is the path of a local file (which is the case when a Bot API
               Server is running in local mode), this method will just return the path.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
 
             * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
             * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was

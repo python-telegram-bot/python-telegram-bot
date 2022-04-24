@@ -140,7 +140,7 @@ class InlineQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.answer_inline_query`.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             Raises :class:`ValueError` instead of :class:`TypeError`.
 
         Args:
@@ -178,5 +178,5 @@ class InlineQuery(TelegramObject):
     MAX_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH
     """:const:`telegram.constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH`
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """

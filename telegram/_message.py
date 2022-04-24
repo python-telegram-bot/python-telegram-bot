@@ -661,7 +661,7 @@ class Message(TelegramObject):
 
          Otherwise :obj:`None` is returned.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             :attr:`dice`, :attr:`passport_data` and :attr:`poll` are now also considered to be an
             attachment.
 

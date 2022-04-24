@@ -152,7 +152,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Objects of this class are comparable in terms of equality. Two objects of this class are
         considered equal, if their :attr:`bot` is equal.
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
 
         * Removed the deprecated methods ``kick_chat_member``, ``kickChatMember``,
           ``get_chat_members_count`` and ``getChatMembersCount``.
@@ -366,7 +366,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         cache :attr:`bot` and calls :meth:`telegram.request.BaseRequest.initialize` for
         the request objects used by this bot.
 
-        .. versionadded:: 14.0
+        .. versionadded:: 20.0
         """
         if self._initialized:
             self._logger.debug('This Bot is already initialized.')
@@ -380,7 +380,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """Stop & clear resources used by this class. Currently just calls
         :meth:`telegram.request.BaseRequest.shutdown` for the request objects used by this bot.
 
-        .. versionadded:: 14.0
+        .. versionadded:: 20.0
         """
         if not self._initialized:
             self._logger.debug('This Bot is already shut down. Returning.')
@@ -5278,7 +5278,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to edit.
 
-                .. versionchanged:: 14.0
+                .. versionchanged:: 20.0
                     Now also accepts :obj:`telegram.ChatInviteLink` instances.
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire.
@@ -5373,7 +5373,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to revoke.
 
-                .. versionchanged:: 14.0
+                .. versionchanged:: 20.0
                     Now also accepts :obj:`telegram.ChatInviteLink` instances.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to

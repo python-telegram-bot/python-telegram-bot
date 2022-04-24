@@ -20,8 +20,8 @@ Unless noted otherwise, all constants in this module were extracted from the
 `Telegram Bots FAQ <https://core.telegram.org/bots/faq>`_ and
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
-.. versionchanged:: 14.0
-    Since v14.0, most of the constants in this module are grouped into enums.
+.. versionchanged:: 20.0
+    Since v20.0, most of the constants in this module are grouped into enums.
 
 Attributes:
     BOT_API_VERSION (:obj:`str`): `5.7`. Telegram Bot API version supported by this
@@ -79,7 +79,7 @@ class BotCommandScopeType(StringEnum):
     """This enum contains the available types of :class:`telegram.BotCommandScope`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -105,7 +105,7 @@ class CallbackQueryLimit(IntEnum):
     :meth:`telegram.Bot.answer_callback_query`. The enum members of this enumeration are instances
     of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -119,7 +119,7 @@ class ChatAction(StringEnum):
     """This enum contains the available chat actions for :meth:`telegram.Bot.send_chat_action`.
     The enum members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -152,7 +152,7 @@ class ChatID(IntEnum):
     """This enum contains some special chat IDs. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -187,7 +187,7 @@ class ChatInviteLinkLimit(IntEnum):
     :meth:`telegram.Bot.create_chat_invite_link`/:meth:`telegram.Bot.edit_chat_invite_link`. The
     enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -204,7 +204,7 @@ class ChatMemberStatus(StringEnum):
     """This enum contains the available states for :class:`telegram.ChatMember`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -227,7 +227,7 @@ class ChatType(StringEnum):
     """This enum contains the available types of :class:`telegram.Chat`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -250,7 +250,7 @@ class DiceEmoji(StringEnum):
     :meth:`telegram.Bot.send_dice`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -273,7 +273,7 @@ class FileSizeLimit(IntEnum):
     """This enum contains limitations regarding the upload and download of files. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -290,7 +290,7 @@ class FloodLimit(IntEnum):
     """This enum contains limitations regarding flood limits. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -315,7 +315,7 @@ class InlineKeyboardMarkupLimit(IntEnum):
     :meth:`telegram.Bot.send_message` & friends. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -338,7 +338,7 @@ class InputMediaType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -360,7 +360,7 @@ class InlineQueryLimit(IntEnum):
     :meth:`telegram.Bot.answer_inline_query`. The enum members of this enumeration are instances
     of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -377,7 +377,7 @@ class InlineQueryResultType(StringEnum):
     """This enum contains the available types of :class:`telegram.InlineQueryResult`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -429,7 +429,7 @@ class LocationLimit(IntEnum):
     :meth:`telegram.Bot.send_location`. The enum members of this enumeration are instances
     of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -451,7 +451,7 @@ class MaskPosition(StringEnum):
     """This enum contains the available positions for :class:`telegram.MaskPosition`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -471,7 +471,7 @@ class MessageAttachmentType(StringEnum):
     as attachment. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -519,7 +519,7 @@ class MessageEntityType(StringEnum):
     """This enum contains the available types of :class:`telegram.MessageEntity`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -563,7 +563,7 @@ class MessageLimit(IntEnum):
     :meth:`telegram.Bot.send_message` & friends. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -587,7 +587,7 @@ class MessageType(StringEnum):
     as attachment. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -673,7 +673,7 @@ class ParseMode(StringEnum):
     """This enum contains the available parse modes. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -696,7 +696,7 @@ class PollLimit(IntEnum):
     :meth:`telegram.Bot.send_poll`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -714,7 +714,7 @@ class PollType(StringEnum):
     :meth:`telegram.Bot.send_poll`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -729,7 +729,7 @@ class UpdateType(StringEnum):
     """This enum contains the available types of :class:`telegram.Update`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()

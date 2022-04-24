@@ -68,7 +68,7 @@ class Updater(AbstractAsyncContextManager):
         finally:
             await updater.shutdown()
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
 
         * Removed argument and attribute ``user_sig_handler``
         * The only arguments and attributes are now :attr:`bot` and :attr:`update_queue` as now
@@ -187,7 +187,7 @@ class Updater(AbstractAsyncContextManager):
     ) -> asyncio.Queue:
         """Starts polling updates from Telegram.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates`.
 
         Args:
@@ -385,7 +385,7 @@ class Updater(AbstractAsyncContextManager):
         .. versionchanged:: 13.4
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
             ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates` and removed
             the deprecated argument ``force_event_loop``.
 

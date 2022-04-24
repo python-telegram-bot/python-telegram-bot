@@ -38,7 +38,7 @@ class Handler(Generic[UT, CCT], ABC):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
         The attribute ``run_async`` is now :paramref:`block`.
 
     Args:
