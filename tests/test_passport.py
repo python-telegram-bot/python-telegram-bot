@@ -35,7 +35,7 @@ from telegram.error import PassportDecryptionError
 # Note: All classes in telegram.credentials (except EncryptedCredentials) aren't directly tested
 # here, although they are implicitly tested. Testing for those classes was too much work and not
 # worth it.
-
+from telegram.request import RequestData
 
 RAW_PASSPORT_DATA = {
     'credentials': {
@@ -427,9 +427,10 @@ class TestPassport:
         with pytest.raises(ValueError):
             Bot(bot.token, private_key=b'Invalid key!')
 
-    def test_passport_data_okay_with_non_crypto_bot(self, bot):
-        b = Bot(bot.token)
-        assert PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
+    @pytest.mark.asyncio
+    async def test_passport_data_okay_with_non_crypto_bot(self, bot):
+        async with Bot(bot.token) as b:
+            assert PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
 
     def test_wrong_hash(self, bot):
         data = deepcopy(RAW_PASSPORT_DATA)
@@ -438,20 +439,22 @@ class TestPassport:
         with pytest.raises(PassportDecryptionError):
             assert passport_data.decrypted_data
 
-    def test_wrong_key(self, bot):
+    @pytest.mark.asyncio
+    async def test_wrong_key(self, bot):
         short_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIBOQIBAAJBAKU+OZ2jJm7sCA/ec4gngNZhXYPu+DZ/TAwSMl0W7vAPXAsLplBk\r\nO8l6IBHx8N0ZC4Bc65mO3b2G8YAzqndyqH8CAwEAAQJAWOx3jQFzeVXDsOaBPdAk\r\nYTncXVeIc6tlfUl9mOLyinSbRNCy1XicOiOZFgH1rRKOGIC1235QmqxFvdecySoY\r\nwQIhAOFeGgeX9CrEPuSsd9+kqUcA2avCwqdQgSdy2qggRFyJAiEAu7QHT8JQSkHU\r\nDELfzrzc24AhjyG0z1DpGZArM8COascCIDK42SboXj3Z2UXiQ0CEcMzYNiVgOisq\r\nBUd5pBi+2mPxAiAM5Z7G/Sv1HjbKrOGh29o0/sXPhtpckEuj5QMC6E0gywIgFY6S\r\nNjwrAA+cMmsgY0O2fAzEKkDc5YiFsiXaGaSS4eA=\r\n-----END RSA PRIVATE KEY-----"
-        b = Bot(bot.token, private_key=short_key)
-        passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
-        with pytest.raises(PassportDecryptionError):
-            assert passport_data.decrypted_data
+        async with Bot(bot.token, private_key=short_key) as b:
+            passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
+            with pytest.raises(PassportDecryptionError):
+                assert passport_data.decrypted_data
 
         wrong_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIEogIBAAKCAQB4qCFltuvHakZze86TUweU7E/SB3VLGEHAe7GJlBmrou9SSWsL\r\nH7E++157X6UqWFl54LOE9MeHZnoW7rZ+DxLKhk6NwAHTxXPnvw4CZlvUPC3OFxg3\r\nhEmNen6ojSM4sl4kYUIa7F+Q5uMEYaboxoBen9mbj4zzMGsG4aY/xBOb2ewrXQyL\r\nRh//tk1Px4ago+lUPisAvQVecz7/6KU4Xj4Lpv2z20f3cHlZX6bb7HlE1vixCMOf\r\nxvfC5SkWEGZMR/ZoWQUsoDkrDSITF/S3GtLfg083TgtCKaOF3mCT27sJ1og77npP\r\n0cH/qdlbdoFtdrRj3PvBpaj/TtXRhmdGcJBxAgMBAAECggEAYSq1Sp6XHo8dkV8B\r\nK2/QSURNu8y5zvIH8aUrgqo8Shb7OH9bryekrB3vJtgNwR5JYHdu2wHttcL3S4SO\r\nftJQxbyHgmxAjHUVNGqOM6yPA0o7cR70J7FnMoKVgdO3q68pVY7ll50IET9/T0X9\r\nDrTdKFb+/eILFsXFS1NpeSzExdsKq3zM0sP/vlJHHYVTmZDGaGEvny/eLAS+KAfG\r\nrKP96DeO4C/peXEJzALZ/mG1ReBB05Qp9Dx1xEC20yreRk5MnnBA5oiHVG5ZLOl9\r\nEEHINidqN+TMNSkxv67xMfQ6utNu5IpbklKv/4wqQOJOO50HZ+qBtSurTN573dky\r\nzslbCQKBgQDHDUBYyKN/v69VLmvNVcxTgrOcrdbqAfefJXb9C3dVXhS8/oRkCRU/\r\ndzxYWNT7hmQyWUKor/izh68rZ/M+bsTnlaa7IdAgyChzTfcZL/2pxG9pq05GF1Q4\r\nBSJ896ZEe3jEhbpJXRlWYvz7455svlxR0H8FooCTddTmkU3nsQSx0wKBgQCbLSa4\r\nyZs2QVstQQerNjxAtLi0IvV8cJkuvFoNC2Q21oqQc7BYU7NJL7uwriprZr5nwkCQ\r\nOFQXi4N3uqimNxuSng31ETfjFZPp+pjb8jf7Sce7cqU66xxR+anUzVZqBG1CJShx\r\nVxN7cWN33UZvIH34gA2Ax6AXNnJG42B5Gn1GKwKBgQCZ/oh/p4nGNXfiAK3qB6yy\r\nFvX6CwuvsqHt/8AUeKBz7PtCU+38roI/vXF0MBVmGky+HwxREQLpcdl1TVCERpIT\r\nUFXThI9OLUwOGI1IcTZf9tby+1LtKvM++8n4wGdjp9qAv6ylQV9u09pAzZItMwCd\r\nUx5SL6wlaQ2y60tIKk0lfQKBgBJS+56YmA6JGzY11qz+I5FUhfcnpauDNGOTdGLT\r\n9IqRPR2fu7RCdgpva4+KkZHLOTLReoRNUojRPb4WubGfEk93AJju5pWXR7c6k3Bt\r\novS2mrJk8GQLvXVksQxjDxBH44sLDkKMEM3j7uYJqDaZNKbyoCWT7TCwikAau5qx\r\naRevAoGAAKZV705dvrpJuyoHFZ66luANlrAwG/vNf6Q4mBEXB7guqMkokCsSkjqR\r\nhsD79E6q06zA0QzkLCavbCn5kMmDS/AbA80+B7El92iIN6d3jRdiNZiewkhlWhEG\r\nm4N0gQRfIu+rUjsS/4xk8UuQUT/Ossjn/hExi7ejpKdCc7N++bc=\r\n-----END RSA PRIVATE KEY-----"
-        b = Bot(bot.token, private_key=wrong_key)
-        passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
-        with pytest.raises(PassportDecryptionError):
-            assert passport_data.decrypted_data
+        async with Bot(bot.token, private_key=wrong_key) as b:
+            passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
+            with pytest.raises(PassportDecryptionError):
+                assert passport_data.decrypted_data
 
-    def test_mocked_download_passport_file(self, passport_data, monkeypatch):
+    @pytest.mark.asyncio
+    async def test_mocked_download_passport_file(self, passport_data, monkeypatch):
         # The files are not coming from our test bot, therefore the file id is invalid/wrong
         # when coming from this bot, so we monkeypatch the call, to make sure that Bot.get_file
         # at least gets called
@@ -459,30 +462,32 @@ class TestPassport:
         selfie = passport_data.decrypted_data[1].selfie
 
         # NOTE: file_unique_id is not used in the get_file method, so it is passed directly
-        def get_file(*_, **kwargs):
+        async def get_file(*_, **kwargs):
             return File(kwargs['file_id'], selfie.file_unique_id)
 
         monkeypatch.setattr(passport_data.get_bot(), 'get_file', get_file)
-        file = selfie.get_file()
+        file = await selfie.get_file()
         assert file.file_id == selfie.file_id
         assert file.file_unique_id == selfie.file_unique_id
         assert file._credentials.file_hash == self.driver_license_selfie_credentials_file_hash
         assert file._credentials.secret == self.driver_license_selfie_credentials_secret
 
-    def test_mocked_set_passport_data_errors(self, monkeypatch, bot, chat_id, passport_data):
-        def test(url, data, **kwargs):
+    @pytest.mark.asyncio
+    async def test_mocked_set_passport_data_errors(self, monkeypatch, bot, chat_id, passport_data):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.parameters
             return (
-                data['user_id'] == chat_id
+                data['user_id'] == str(chat_id)
                 and data['errors'][0]['file_hash']
                 == (
                     passport_data.decrypted_credentials.secure_data.driver_license.selfie.file_hash
                 )
                 and data['errors'][1]['data_hash']
-                == (passport_data.decrypted_credentials.secure_data.driver_license.data.data_hash)
+                == passport_data.decrypted_credentials.secure_data.driver_license.data.data_hash
             )
 
-        monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.set_passport_data_errors(
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        message = await bot.set_passport_data_errors(
             chat_id,
             [
                 PassportElementErrorSelfie(

@@ -20,7 +20,6 @@
 import logging
 import time
 from datetime import datetime
-from threading import Lock
 from typing import Dict, Tuple, Union, Optional, MutableMapping, TYPE_CHECKING, cast
 from uuid import uuid4
 
@@ -106,7 +105,7 @@ class CallbackDataCache:
     Args:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
         maxsize (:obj:`int`, optional): Maximum number of items in each of the internal mappings.
-            Defaults to 1024.
+            Defaults to ``1024``.
 
         persistent_data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
         Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
@@ -119,7 +118,7 @@ class CallbackDataCache:
 
     """
 
-    __slots__ = ('bot', 'maxsize', '_keyboard_data', '_callback_queries', '__lock', 'logger')
+    __slots__ = ('bot', 'maxsize', '_keyboard_data', '_callback_queries', 'logger')
 
     def __init__(
         self,
@@ -133,7 +132,6 @@ class CallbackDataCache:
         self.maxsize = maxsize
         self._keyboard_data: MutableMapping[str, _KeyboardData] = LRUCache(maxsize=maxsize)
         self._callback_queries: MutableMapping[str, str] = LRUCache(maxsize=maxsize)
-        self.__lock = Lock()
 
         if persistent_data:
             keyboard_data, callback_queries = persistent_data
@@ -153,16 +151,15 @@ class CallbackDataCache:
         # While building a list/dict from the LRUCaches has linear runtime (in the number of
         # entries), the runtime is bounded by maxsize and it has the big upside of not throwing a
         # highly customized data structure at users trying to implement a custom persistence class
-        with self.__lock:
-            return [data.to_tuple() for data in self._keyboard_data.values()], dict(
-                self._callback_queries.items()
-            )
+        return [data.to_tuple() for data in self._keyboard_data.values()], dict(
+            self._callback_queries.items()
+        )
 
     def process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
         """Registers the reply markup to the cache. If any of the buttons have
         :attr:`~telegram.InlineKeyboardButton.callback_data`, stores that data and builds a new
-        keyboard with the correspondingly
-        replaced buttons. Otherwise does nothing and returns the original reply markup.
+        keyboard with the correspondingly replaced buttons. Otherwise, does nothing and returns
+        the original reply markup.
 
         Args:
             reply_markup (:class:`telegram.InlineKeyboardMarkup`): The keyboard.
@@ -171,10 +168,6 @@ class CallbackDataCache:
             :class:`telegram.InlineKeyboardMarkup`: The keyboard to be passed to Telegram.
 
         """
-        with self.__lock:
-            return self.__process_keyboard(reply_markup)
-
-    def __process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
         keyboard_uuid = uuid4().hex
         keyboard_data = _KeyboardData(keyboard_uuid)
 
@@ -228,10 +221,11 @@ class CallbackDataCache:
 
     @staticmethod
     def extract_uuids(callback_data: str) -> Tuple[str, str]:
-        """Extracts the keyboard uuid and the button uuid from the given ``callback_data``.
+        """Extracts the keyboard uuid and the button uuid from the given :paramref:`callback_data`.
 
         Args:
-            callback_data (:obj:`str`): The ``callback_data`` as present in the button.
+            callback_data (:obj:`str`): The
+                :paramref:`~telegram.InlineKeyboardButton.callback_data` as present in the button.
 
         Returns:
             (:obj:`str`, :obj:`str`): Tuple of keyboard and button uuid
@@ -247,7 +241,7 @@ class CallbackDataCache:
 
         Note:
             Checks :attr:`telegram.Message.via_bot` and :attr:`telegram.Message.from_user` to check
-            if the reply markup (if any) was actually sent by this caches bot. If it was not, the
+            if the reply markup (if any) was actually sent by this cache's bot. If it was not, the
             message will be returned unchanged.
 
             Note that this will fail for channel posts, as :attr:`telegram.Message.from_user` is
@@ -256,15 +250,14 @@ class CallbackDataCache:
 
         Warning:
             * Does *not* consider :attr:`telegram.Message.reply_to_message` and
-              :attr:`telegram.Message.pinned_message`. Pass them to these method separately.
+              :attr:`telegram.Message.pinned_message`. Pass them to this method separately.
             * *In place*, i.e. the passed :class:`telegram.Message` will be changed!
 
         Args:
             message (:class:`telegram.Message`): The message.
 
         """
-        with self.__lock:
-            self.__process_message(message)
+        self.__process_message(message)
 
     def __process_message(self, message: Message) -> Optional[str]:
         """As documented in process_message, but returns the uuid of the attached keyboard, if any,
@@ -324,38 +317,37 @@ class CallbackDataCache:
             callback_query (:class:`telegram.CallbackQuery`): The callback query.
 
         """
-        with self.__lock:
-            mapped = False
+        mapped = False
 
-            if callback_query.data:
-                data = callback_query.data
+        if callback_query.data:
+            data = callback_query.data
 
-                # Get the cached callback data for the CallbackQuery
-                keyboard_uuid, button_data = self.__get_keyboard_uuid_and_button_data(data)
-                callback_query.data = button_data  # type: ignore[assignment]
+            # Get the cached callback data for the CallbackQuery
+            keyboard_uuid, button_data = self.__get_keyboard_uuid_and_button_data(data)
+            callback_query.data = button_data  # type: ignore[assignment]
 
-                # Map the callback queries ID to the keyboards UUID for later use
-                if not mapped and not isinstance(button_data, InvalidCallbackData):
-                    self._callback_queries[callback_query.id] = keyboard_uuid  # type: ignore
-                    mapped = True
+            # Map the callback queries ID to the keyboards UUID for later use
+            if not mapped and not isinstance(button_data, InvalidCallbackData):
+                self._callback_queries[callback_query.id] = keyboard_uuid  # type: ignore
+                mapped = True
 
-            # Get the cached callback data for the inline keyboard attached to the
-            # CallbackQuery.
-            if callback_query.message:
-                self.__process_message(callback_query.message)
-                for message in (
-                    callback_query.message.pinned_message,
-                    callback_query.message.reply_to_message,
-                ):
-                    if message:
-                        self.__process_message(message)
+        # Get the cached callback data for the inline keyboard attached to the
+        # CallbackQuery.
+        if callback_query.message:
+            self.__process_message(callback_query.message)
+            for message in (
+                callback_query.message.pinned_message,
+                callback_query.message.reply_to_message,
+            ):
+                if message:
+                    self.__process_message(message)
 
     def drop_data(self, callback_query: CallbackQuery) -> None:
         """Deletes the data for the specified callback query.
 
         Note:
             Will *not* raise exceptions in case the callback data is not found in the cache.
-            *Will* raise :class:`KeyError` in case the callback query can not be found in the
+            *Will* raise :exc:`KeyError` in case the callback query can not be found in the
             cache.
 
         Args:
@@ -364,12 +356,11 @@ class CallbackDataCache:
         Raises:
             KeyError: If the callback query can not be found in the cache
         """
-        with self.__lock:
-            try:
-                keyboard_uuid = self._callback_queries.pop(callback_query.id)
-                self.__drop_keyboard(keyboard_uuid)
-            except KeyError as exc:
-                raise KeyError('CallbackQuery was not found in cache.') from exc
+        try:
+            keyboard_uuid = self._callback_queries.pop(callback_query.id)
+            self.__drop_keyboard(keyboard_uuid)
+        except KeyError as exc:
+            raise KeyError('CallbackQuery was not found in cache.') from exc
 
     def __drop_keyboard(self, keyboard_uuid: str) -> None:
         try:
@@ -387,13 +378,11 @@ class CallbackDataCache:
                 bot will be used.
 
         """
-        with self.__lock:
-            self.__clear(self._keyboard_data, time_cutoff=time_cutoff)
+        self.__clear(self._keyboard_data, time_cutoff=time_cutoff)
 
     def clear_callback_queries(self) -> None:
         """Clears the stored callback query IDs."""
-        with self.__lock:
-            self.__clear(self._callback_queries)
+        self.__clear(self._callback_queries)
 
     def __clear(self, mapping: MutableMapping, time_cutoff: Union[float, datetime] = None) -> None:
         if not time_cutoff:

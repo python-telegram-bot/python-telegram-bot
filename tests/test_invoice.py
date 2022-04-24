@@ -21,6 +21,7 @@ from flaky import flaky
 
 from telegram import LabeledPrice, Invoice
 from telegram.error import BadRequest
+from telegram.request import RequestData
 
 
 @pytest.fixture(scope='class')
@@ -80,8 +81,9 @@ class TestInvoice:
         assert invoice_dict['total_amount'] == invoice.total_amount
 
     @flaky(3, 1)
-    def test_send_required_args_only(self, bot, chat_id, provider_token):
-        message = bot.send_invoice(
+    @pytest.mark.asyncio
+    async def test_send_required_args_only(self, bot, chat_id, provider_token):
+        message = await bot.send_invoice(
             chat_id=chat_id,
             title=self.title,
             description=self.description,
@@ -98,8 +100,9 @@ class TestInvoice:
         assert message.invoice.total_amount == self.total_amount
 
     @flaky(3, 1)
-    def test_send_all_args(self, bot, chat_id, provider_token, monkeypatch):
-        message = bot.send_invoice(
+    @pytest.mark.asyncio
+    async def test_send_all_args(self, bot, chat_id, provider_token, monkeypatch):
+        message = await bot.send_invoice(
             chat_id,
             self.title,
             self.description,
@@ -137,7 +140,7 @@ class TestInvoice:
 
         # We do this next one as safety guard to make sure that we pass all of the optional
         # parameters correctly because #2526 went unnoticed for 3 years …
-        def make_assertion(*args, **_):
+        async def make_assertion(*args, **_):
             kwargs = args[1]
             return (
                 kwargs['chat_id'] == 'chat_id'
@@ -146,7 +149,7 @@ class TestInvoice:
                 and kwargs['payload'] == 'payload'
                 and kwargs['provider_token'] == 'provider_token'
                 and kwargs['currency'] == 'currency'
-                and kwargs['prices'] == [p.to_dict() for p in self.prices]
+                and kwargs['prices'] == self.prices
                 and kwargs['max_tip_amount'] == 'max_tip_amount'
                 and kwargs['suggested_tip_amounts'] == 'suggested_tip_amounts'
                 and kwargs['start_parameter'] == 'start_parameter'
@@ -164,8 +167,8 @@ class TestInvoice:
                 and kwargs['is_flexible'] == 'is_flexible'
             )
 
-        monkeypatch.setattr(bot, '_message', make_assertion)
-        assert bot.send_invoice(
+        monkeypatch.setattr(bot, '_send_message', make_assertion)
+        assert await bot.send_invoice(
             chat_id='chat_id',
             title='title',
             description='description',
@@ -192,14 +195,18 @@ class TestInvoice:
             protect_content=True,
         )
 
-    def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
-        def test(url, data, **kwargs):
+    @pytest.mark.asyncio
+    async def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             # depends on whether we're using ujson
-            return data['provider_data'] in ['{"test_data": 123456789}', '{"test_data":123456789}']
+            return request_data.json_parameters['provider_data'] in [
+                '{"test_data": 123456789}',
+                '{"test_data":123456789}',
+            ]
 
-        monkeypatch.setattr(bot.request, 'post', test)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
 
-        assert bot.send_invoice(
+        assert await bot.send_invoice(
             chat_id,
             self.title,
             self.description,
@@ -221,13 +228,14 @@ class TestInvoice:
         ],
         indirect=['default_bot'],
     )
-    def test_send_invoice_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_invoice_default_allow_sending_without_reply(
         self, default_bot, chat_id, custom, provider_token
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_invoice(
+            message = await default_bot.send_invoice(
                 chat_id,
                 self.title,
                 self.description,
@@ -240,7 +248,7 @@ class TestInvoice:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_invoice(
+            message = await default_bot.send_invoice(
                 chat_id,
                 self.title,
                 self.description,
@@ -253,7 +261,7 @@ class TestInvoice:
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_invoice(
+                await default_bot.send_invoice(
                     chat_id,
                     self.title,
                     self.description,
@@ -265,9 +273,12 @@ class TestInvoice:
                 )
 
     @flaky(3, 1)
+    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
-    def test_send_invoice_default_protect_content(self, chat_id, default_bot, provider_token):
-        protected = default_bot.send_invoice(
+    async def test_send_invoice_default_protect_content(
+        self, chat_id, default_bot, provider_token
+    ):
+        protected = await default_bot.send_invoice(
             chat_id,
             self.title,
             self.description,
@@ -277,7 +288,7 @@ class TestInvoice:
             self.prices,
         )
         assert protected.has_protected_content
-        unprotected = default_bot.send_invoice(
+        unprotected = await default_bot.send_invoice(
             chat_id,
             self.title,
             self.description,

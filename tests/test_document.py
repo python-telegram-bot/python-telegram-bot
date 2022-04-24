@@ -25,6 +25,7 @@ from flaky import flaky
 from telegram import Document, PhotoSize, Voice, MessageEntity, Bot
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
+from telegram.request import RequestData
 from tests.conftest import (
     check_shortcut_signature,
     check_shortcut_call,
@@ -41,9 +42,10 @@ def document_file():
 
 
 @pytest.fixture(scope='class')
-def document(bot, chat_id):
+@pytest.mark.asyncio
+async def document(bot, chat_id):
     with data_file('telegram.png').open('rb') as f:
-        return bot.send_document(chat_id, document=f, timeout=50).document
+        return (await bot.send_document(chat_id, document=f, read_timeout=50)).document
 
 
 class TestDocument:
@@ -79,8 +81,9 @@ class TestDocument:
         assert document.thumb.height == self.thumb_height
 
     @flaky(3, 1)
-    def test_send_all_args(self, bot, chat_id, document_file, document, thumb_file):
-        message = bot.send_document(
+    @pytest.mark.asyncio
+    async def test_send_all_args(self, bot, chat_id, document_file, document, thumb_file):
+        message = await bot.send_document(
             chat_id,
             document=document_file,
             caption=self.caption,
@@ -106,21 +109,27 @@ class TestDocument:
         assert message.has_protected_content
 
     @flaky(3, 1)
-    def test_get_and_download(self, bot, document):
-        new_file = bot.get_file(document.file_id)
+    @pytest.mark.asyncio
+    async def test_get_and_download(self, bot, document):
+        path = Path('telegram.png')
+        if path.is_file():
+            path.unlink()
+
+        new_file = await bot.get_file(document.file_id)
 
         assert new_file.file_size == document.file_size
         assert new_file.file_id == document.file_id
         assert new_file.file_unique_id == document.file_unique_id
         assert new_file.file_path.startswith('https://')
 
-        new_file.download('telegram.png')
+        await new_file.download('telegram.png')
 
-        assert Path('telegram.png').is_file()
+        assert path.is_file()
 
     @flaky(3, 1)
-    def test_send_url_gif_file(self, bot, chat_id):
-        message = bot.send_document(chat_id, self.document_file_url)
+    @pytest.mark.asyncio
+    async def test_send_url_gif_file(self, bot, chat_id):
+        message = await bot.send_document(chat_id, self.document_file_url)
 
         document = message.document
 
@@ -135,16 +144,19 @@ class TestDocument:
         assert document.file_size == 3878
 
     @flaky(3, 1)
-    def test_send_resend(self, bot, chat_id, document):
-        message = bot.send_document(chat_id=chat_id, document=document.file_id)
+    @pytest.mark.asyncio
+    async def test_send_resend(self, bot, chat_id, document):
+        message = await bot.send_document(chat_id=chat_id, document=document.file_id)
 
         assert message.document == document
 
     @pytest.mark.parametrize('disable_content_type_detection', [True, False, None])
-    def test_send_with_document(
+    @pytest.mark.asyncio
+    async def test_send_with_document(
         self, monkeypatch, bot, chat_id, document, disable_content_type_detection
     ):
-        def make_assertion(url, data, **kwargs):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            data = request_data.parameters
             type_detection = (
                 data.get('disable_content_type_detection') == disable_content_type_detection
             )
@@ -152,7 +164,7 @@ class TestDocument:
 
         monkeypatch.setattr(bot.request, 'post', make_assertion)
 
-        message = bot.send_document(
+        message = await bot.send_document(
             document=document,
             chat_id=chat_id,
             disable_content_type_detection=disable_content_type_detection,
@@ -161,14 +173,15 @@ class TestDocument:
         assert message
 
     @flaky(3, 1)
-    def test_send_document_caption_entities(self, bot, chat_id, document):
+    @pytest.mark.asyncio
+    async def test_send_document_caption_entities(self, bot, chat_id, document):
         test_string = 'Italic Bold Code'
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.ITALIC, 7, 4),
             MessageEntity(MessageEntity.ITALIC, 12, 4),
         ]
-        message = bot.send_document(
+        message = await bot.send_document(
             chat_id, document, caption=test_string, caption_entities=entities
         )
 
@@ -177,20 +190,22 @@ class TestDocument:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_document_default_parse_mode_1(self, default_bot, chat_id, document):
+    @pytest.mark.asyncio
+    async def test_send_document_default_parse_mode_1(self, default_bot, chat_id, document):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_document(chat_id, document, caption=test_markdown_string)
+        message = await default_bot.send_document(chat_id, document, caption=test_markdown_string)
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_document_default_parse_mode_2(self, default_bot, chat_id, document):
+    @pytest.mark.asyncio
+    async def test_send_document_default_parse_mode_2(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_document(
+        message = await default_bot.send_document(
             chat_id, document, caption=test_markdown_string, parse_mode=None
         )
         assert message.caption == test_markdown_string
@@ -198,10 +213,11 @@ class TestDocument:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_document_default_parse_mode_3(self, default_bot, chat_id, document):
+    @pytest.mark.asyncio
+    async def test_send_document_default_parse_mode_3(self, default_bot, chat_id, document):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_document(
+        message = await default_bot.send_document(
             chat_id, document, caption=test_markdown_string, parse_mode='HTML'
         )
         assert message.caption == test_markdown_string
@@ -217,13 +233,14 @@ class TestDocument:
         ],
         indirect=['default_bot'],
     )
-    def test_send_document_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_document_default_allow_sending_without_reply(
         self, default_bot, chat_id, document, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_document(
+            message = await default_bot.send_document(
                 chat_id,
                 document,
                 allow_sending_without_reply=custom,
@@ -231,38 +248,39 @@ class TestDocument:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_document(
+            message = await default_bot.send_document(
                 chat_id, document, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_document(
+                await default_bot.send_document(
                     chat_id, document, reply_to_message_id=reply_to_message.message_id
                 )
 
     @flaky(3, 1)
+    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
-    def test_send_document_default_protect_content(self, chat_id, default_bot, document):
-        protected = default_bot.send_document(chat_id, document)
+    async def test_send_document_default_protect_content(self, chat_id, default_bot, document):
+        protected = await default_bot.send_document(chat_id, document)
         assert protected.has_protected_content
-        unprotected = default_bot.send_document(chat_id, document, protect_content=False)
+        unprotected = await default_bot.send_document(chat_id, document, protect_content=False)
         assert not unprotected.has_protected_content
 
-    def test_send_document_local_files(self, monkeypatch, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_document_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file('telegram.jpg')
         expected = file.as_uri()
 
-        def make_assertion(_, data, *args, **kwargs):
+        async def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
             test_flag = data.get('document') == expected and data.get('thumb') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)
-        bot.send_document(chat_id, file, thumb=file)
+        await bot.send_document(chat_id, file, thumb=file)
         assert test_flag
-        monkeypatch.delattr(bot, '_post')
 
     def test_de_json(self, bot, document):
         json_dict = {
@@ -293,29 +311,34 @@ class TestDocument:
         assert document_dict['file_size'] == document.file_size
 
     @flaky(3, 1)
-    def test_error_send_empty_file(self, bot, chat_id):
-        with Path(os.devnull).open('rb') as f, pytest.raises(TelegramError):
-            bot.send_document(chat_id=chat_id, document=f)
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file(self, bot, chat_id):
+        with open(os.devnull, 'rb') as f:
+            with pytest.raises(TelegramError):
+                await bot.send_document(chat_id=chat_id, document=f)
 
     @flaky(3, 1)
-    def test_error_send_empty_file_id(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_document(chat_id=chat_id, document='')
+            await bot.send_document(chat_id=chat_id, document='')
 
-    def test_error_send_without_required_args(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
-            bot.send_document(chat_id=chat_id)
+            await bot.send_document(chat_id=chat_id)
 
-    def test_get_file_instance_method(self, monkeypatch, document):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, document):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == document.file_id
 
         assert check_shortcut_signature(Document.get_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(document.get_file, document.get_bot(), 'get_file')
-        assert check_defaults_handling(document.get_file, document.get_bot())
+        assert await check_shortcut_call(document.get_file, document.get_bot(), 'get_file')
+        assert await check_defaults_handling(document.get_file, document.get_bot())
 
         monkeypatch.setattr(document.get_bot(), 'get_file', make_assertion)
-        assert document.get_file()
+        assert await document.get_file()
 
     def test_equality(self, document):
         a = Document(document.file_id, document.file_unique_id)

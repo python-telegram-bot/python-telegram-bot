@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import time
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -89,7 +89,7 @@ class TestChatMemberHandler:
     test_flag = False
 
     def test_slot_behaviour(self, mro_slots):
-        action = ChatMemberHandler(self.callback_context)
+        action = ChatMemberHandler(self.callback)
         for attr in action.__slots__:
             assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
@@ -98,12 +98,12 @@ class TestChatMemberHandler:
     def reset(self):
         self.test_flag = False
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, Update)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and isinstance(context.user_data, dict)
             and isinstance(context.chat_data, dict)
@@ -120,34 +120,38 @@ class TestChatMemberHandler:
         ],
         ids=['MY_CHAT_MEMBER', 'CHAT_MEMBER', 'ANY_CHAT_MEMBER'],
     )
-    def test_chat_member_types(
-        self, dp, chat_member_updated, chat_member, expected, allowed_types
+    @pytest.mark.asyncio
+    async def test_chat_member_types(
+        self, app, chat_member_updated, chat_member, expected, allowed_types
     ):
         result_1, result_2 = expected
 
-        handler = ChatMemberHandler(self.callback_context, chat_member_types=allowed_types)
-        dp.add_handler(handler)
+        handler = ChatMemberHandler(self.callback, chat_member_types=allowed_types)
+        app.add_handler(handler)
 
-        assert handler.check_update(chat_member) == result_1
-        dp.process_update(chat_member)
-        assert self.test_flag == result_1
+        async with app:
+            assert handler.check_update(chat_member) == result_1
+            await app.process_update(chat_member)
+            assert self.test_flag == result_1
 
-        self.test_flag = False
-        chat_member.my_chat_member = None
-        chat_member.chat_member = chat_member_updated
+            self.test_flag = False
+            chat_member.my_chat_member = None
+            chat_member.chat_member = chat_member_updated
 
-        assert handler.check_update(chat_member) == result_2
-        dp.process_update(chat_member)
-        assert self.test_flag == result_2
+            assert handler.check_update(chat_member) == result_2
+            await app.process_update(chat_member)
+            assert self.test_flag == result_2
 
     def test_other_update_types(self, false_update):
-        handler = ChatMemberHandler(self.callback_context)
+        handler = ChatMemberHandler(self.callback)
         assert not handler.check_update(false_update)
         assert not handler.check_update(True)
 
-    def test_context(self, dp, chat_member):
-        handler = ChatMemberHandler(self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context(self, app, chat_member):
+        handler = ChatMemberHandler(self.callback)
+        app.add_handler(handler)
 
-        dp.process_update(chat_member)
-        assert self.test_flag
+        async with app:
+            await app.process_update(chat_member)
+            assert self.test_flag

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=no-self-use
 """This module contains the CallbackContext class."""
-from queue import Queue
+from asyncio import Queue
 from typing import (
     TYPE_CHECKING,
     Dict,
@@ -27,17 +27,17 @@ from typing import (
     NoReturn,
     Optional,
     Tuple,
-    Union,
     Generic,
     Type,
+    Coroutine,
 )
 
 from telegram import Update, CallbackQuery
 from telegram.ext import ExtBot
-from telegram.ext._utils.types import UD, CD, BD, BT, JQ, PT  # pylint: disable=unused-import
+from telegram.ext._utils.types import UD, CD, BD, BT, JQ  # pylint: disable=unused-import
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher, Job, JobQueue
+    from telegram.ext import Application, Job, JobQueue
     from telegram.ext._utils.types import CCT
 
 _STORING_DATA_WIKI = (
@@ -49,46 +49,43 @@ _STORING_DATA_WIKI = (
 class CallbackContext(Generic[BT, UD, CD, BD]):
     """
     This is a context object passed to the callback called by :class:`telegram.ext.Handler`
-    or by the :class:`telegram.ext.Dispatcher` in an error handler added by
-    :attr:`telegram.ext.Dispatcher.add_error_handler` or to the callback of a
+    or by the :class:`telegram.ext.Application` in an error handler added by
+    :attr:`telegram.ext.Application.add_error_handler` or to the callback of a
     :class:`telegram.ext.Job`.
 
     Note:
-        :class:`telegram.ext.Dispatcher` will create a single context for an entire update. This
+        :class:`telegram.ext.Application` will create a single context for an entire update. This
         means that if you got 2 handlers in different groups and they both get called, they will
-        get passed the same `CallbackContext` object (of course with proper attributes like
-        `.matches` differing). This allows you to add custom attributes in a lower handler group
-        callback, and then subsequently access those attributes in a higher handler group callback.
-        Note that the attributes on `CallbackContext` might change in the future, so make sure to
-        use a fairly unique name for the attributes.
+        receive the same :class:`CallbackContext` object (of course with proper attributes like
+        :attr:`matches` differing). This allows you to add custom attributes in a lower handler
+        group callback, and then subsequently access those attributes in a higher handler group
+        callback. Note that the attributes on :class:`CallbackContext` might change in the future,
+        so make sure to use a fairly unique name for the attributes.
 
     Warning:
-         Do not combine custom attributes and ``@run_async``/
-         :func:`telegram.ext.Dispatcher.run_async`. Due to how ``run_async`` works, it will
-         almost certainly execute the callbacks for an update out of order, and the attributes
-         that you think you added will not be present.
+         Do not combine custom attributes with :paramref:`telegram.ext.Handler.block` set to
+         :obj:`False` or :paramref:`telegram.ext.Application.concurrent_updates` set to
+         :obj:`True`. Due to how those work, it will almost certainly execute the callbacks for an
+         update out of order, and the attributes that you think you added will not be present.
 
     Args:
-        dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this context.
+        application (:class:`telegram.ext.Application`): The application associated with this
+            context.
 
     Attributes:
+        coroutine (:term:`coroutine function`): Optional. Only present in error handlers if the
+            error was caused by a coroutine run with :meth:`Application.create_task` or a handler
+            callback with :attr:`block=False <Handler.block>`.
         matches (List[:meth:`re.Match <re.Match.expand>`]): Optional. If the associated update
-            originated from
-            a :class:`filters.Regex`, this will contain a list of match objects for every pattern
-            where ``re.search(pattern, string)`` returned a match. Note that filters short circuit,
-            so combined regex filters will not always be evaluated.
+            originated from a :class:`filters.Regex`, this will contain a list of match objects for
+            every pattern where ``re.search(pattern, string)`` returned a match. Note that filters
+            short circuit, so combined regex filters will not always be evaluated.
         args (List[:obj:`str`]): Optional. Arguments passed to a command if the associated update
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
             text after the command, using any whitespace string as a delimiter.
-        error (:obj:`Exception`): Optional. The error that was raised. Only present when passed
-            to a error handler registered with :attr:`telegram.ext.Dispatcher.add_error_handler`.
-        async_args (List[:obj:`object`]): Optional. Positional arguments of the function that
-            raised the error. Only present when the raising function was run asynchronously using
-            :meth:`telegram.ext.Dispatcher.run_async`.
-        async_kwargs (Dict[:obj:`str`, :obj:`object`]): Optional. Keyword arguments of the function
-            that raised the error. Only present when the raising function was run asynchronously
-            using :meth:`telegram.ext.Dispatcher.run_async`.
+        error (:exc:`Exception`): Optional. The error that was raised. Only present when passed
+            to an error handler registered with :attr:`telegram.ext.Application.add_error_handler`.
         job (:class:`telegram.ext.Job`): Optional. The job which originated this callback.
             Only present when passed to the callback of :class:`telegram.ext.Job` or in error
             handlers if the error is caused by a job.
@@ -112,51 +109,45 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Example:
             .. code:: python
 
-                def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
+                async def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
                     ...
 
         .. versionadded: 14.0
         """
 
     __slots__ = (
-        '_dispatcher',
+        '_application',
         '_chat_id_and_data',
         '_user_id_and_data',
         'args',
         'matches',
         'error',
         'job',
-        'async_args',
-        'async_kwargs',
+        'coroutine',
         '__dict__',
     )
 
-    def __init__(self: 'CCT', dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]'):
-        """
-        Args:
-            dispatcher (:class:`telegram.ext.Dispatcher`):
-        """
-        self._dispatcher = dispatcher
+    def __init__(self: 'CCT', application: 'Application[BT, CCT, UD, CD, BD, JQ]'):
+        self._application = application
         self._chat_id_and_data: Optional[Tuple[int, CD]] = None
         self._user_id_and_data: Optional[Tuple[int, UD]] = None
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match]] = None
         self.error: Optional[Exception] = None
         self.job: Optional['Job'] = None
-        self.async_args: Optional[Union[List, Tuple]] = None
-        self.async_kwargs: Optional[Dict[str, object]] = None
+        self.coroutine: Optional[Coroutine] = None
 
     @property
-    def dispatcher(self) -> 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]':
-        """:class:`telegram.ext.Dispatcher`: The dispatcher associated with this context."""
-        return self._dispatcher
+    def application(self) -> 'Application[BT, CCT, UD, CD, BD, JQ]':
+        """:class:`telegram.ext.Application`: The application associated with this context."""
+        return self._application
 
     @property
     def bot_data(self) -> BD:
-        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
-        update it will be the same ``dict``.
+        """:obj:`ContextTypes.bot_data`: Optional. An object that can be used to keep any data in.
+        For each update it will be the same :attr:`ContextTypes.bot_data`. Defaults to :obj:`dict`.
         """
-        return self.dispatcher.bot_data
+        return self.application.bot_data
 
     @bot_data.setter
     def bot_data(self, value: object) -> NoReturn:
@@ -166,8 +157,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @property
     def chat_data(self) -> Optional[CD]:
-        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
-        update from the same chat id it will be the same ``dict``.
+        """:obj:`ContextTypes.chat_data`: Optional. An object that can be used to keep any data in.
+        For each update from the same chat id it will be the same :obj:`ContextTypes.chat_data`.
+        Defaults to :obj:`dict`.
 
         Warning:
             When a group chat migrates to a supergroup, its chat id will change and the
@@ -187,8 +179,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @property
     def user_data(self) -> Optional[UD]:
-        """:obj:`dict`: Optional. A dict that can be used to keep any data in. For each
-        update from the same user it will be the same ``dict``.
+        """:obj:`ContextTypes.user_data`: Optional. An object that can be used to keep any data in.
+        For each update from the same user it will be the same :obj:`ContextTypes.user_data`.
+        Defaults to :obj:`dict`.
         """
         if self._user_id_and_data:
             return self._user_id_and_data[1]
@@ -200,28 +193,31 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             f"You can not assign a new value to user_data, see {_STORING_DATA_WIKI}"
         )
 
-    def refresh_data(self) -> None:
-        """If :attr:`dispatcher` uses persistence, calls
+    async def refresh_data(self) -> None:
+        """If :attr:`application` uses persistence, calls
         :meth:`telegram.ext.BasePersistence.refresh_bot_data` on :attr:`bot_data`,
         :meth:`telegram.ext.BasePersistence.refresh_chat_data` on :attr:`chat_data` and
         :meth:`telegram.ext.BasePersistence.refresh_user_data` on :attr:`user_data`, if
         appropriate.
 
+        Will be called by :meth:`telegram.ext.Application.process_update` and
+        :meth:`telegram.ext.Job.run`.
+
         .. versionadded:: 13.6
         """
-        if self.dispatcher.persistence:
-            if self.dispatcher.persistence.store_data.bot_data:
-                self.dispatcher.persistence.refresh_bot_data(self.bot_data)
+        if self.application.persistence:
+            if self.application.persistence.store_data.bot_data:
+                await self.application.persistence.refresh_bot_data(self.bot_data)
             if (
-                self.dispatcher.persistence.store_data.chat_data
+                self.application.persistence.store_data.chat_data
                 and self._chat_id_and_data is not None
             ):
-                self.dispatcher.persistence.refresh_chat_data(*self._chat_id_and_data)
+                await self.application.persistence.refresh_chat_data(*self._chat_id_and_data)
             if (
-                self.dispatcher.persistence.store_data.user_data
+                self.application.persistence.store_data.user_data
                 and self._user_id_and_data is not None
             ):
-                self.dispatcher.persistence.refresh_user_data(*self._user_id_and_data)
+                await self.application.persistence.refresh_user_data(*self._user_id_and_data)
 
     def drop_callback_data(self, callback_query: CallbackQuery) -> None:
         """
@@ -231,15 +227,14 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
         Note:
             Will *not* raise exceptions in case the data is not found in the cache.
-            *Will* raise :class:`KeyError` in case the callback query can not be found in the
-            cache.
+            *Will* raise :exc:`KeyError` in case the callback query can not be found in the cache.
 
         Args:
             callback_query (:class:`telegram.CallbackQuery`): The callback query.
 
         Raises:
-            KeyError | RuntimeError: :class:`KeyError`, if the callback query can not be found in
-                the cache and :class:`RuntimeError`, if the bot doesn't allow for arbitrary
+            KeyError | RuntimeError: :exc:`KeyError`, if the callback query can not be found in
+                the cache and :exc:`RuntimeError`, if the bot doesn't allow for arbitrary
                 callback data.
         """
         if isinstance(self.bot, ExtBot):
@@ -256,29 +251,25 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         cls: Type['CCT'],
         update: object,
         error: Exception,
-        dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]',
-        async_args: Union[List, Tuple] = None,
-        async_kwargs: Dict[str, object] = None,
+        application: 'Application[BT, CCT, UD, CD, BD, JQ]',
         job: 'Job' = None,
+        coroutine: Coroutine = None,
     ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
         handlers.
 
-        .. seealso:: :meth:`telegram.ext.Dispatcher.add_error_handler`
+        .. seealso:: :meth:`telegram.ext.Application.add_error_handler`
+
+        .. versionchanged:: 14.0
+            Removed arguments ``async_args`` and ``async_kwargs``.
 
         Args:
             update (:obj:`object` | :class:`telegram.Update`): The update associated with the
                 error. May be :obj:`None`, e.g. for errors in job callbacks.
             error (:obj:`Exception`): The error.
-            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
+            application (:class:`telegram.ext.Application`): The application associated with this
                 context.
-            async_args (List[:obj:`object`], optional): Positional arguments of the function that
-                raised the error. Pass only when the raising function was run asynchronously using
-                :meth:`telegram.ext.Dispatcher.run_async`.
-            async_kwargs (Dict[:obj:`str`, :obj:`object`], optional): Keyword arguments of the
-                function that raised the error. Pass only when the raising function was run
-                asynchronously using :meth:`telegram.ext.Dispatcher.run_async`.
             job (:class:`telegram.ext.Job`, optional): The job associated with the error.
 
                 .. versionadded:: 14.0
@@ -286,32 +277,33 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls.from_update(update, dispatcher)
+        self = cls.from_update(update, application)
         self.error = error
-        self.async_args = async_args
-        self.async_kwargs = async_kwargs
+        self.coroutine = coroutine
         self.job = job
         return self
 
     @classmethod
     def from_update(
-        cls: Type['CCT'], update: object, dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]'
+        cls: Type['CCT'],
+        update: object,
+        application: 'Application[BT, CCT, UD, CD, BD, JQ]',
     ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
         handlers.
 
-        .. seealso:: :meth:`telegram.ext.Dispatcher.add_handler`
+        .. seealso:: :meth:`telegram.ext.Application.add_handler`
 
         Args:
             update (:obj:`object` | :class:`telegram.Update`): The update.
-            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
+            application (:class:`telegram.ext.Application`): The application associated with this
                 context.
 
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(dispatcher)  # type: ignore[arg-type]
+        self = cls(application)  # type: ignore[arg-type]
 
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
@@ -320,18 +312,20 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             if chat:
                 self._chat_id_and_data = (
                     chat.id,
-                    dispatcher.chat_data[chat.id],  # pylint: disable=protected-access
+                    application.chat_data[chat.id],  # pylint: disable=protected-access
                 )
             if user:
                 self._user_id_and_data = (
                     user.id,
-                    dispatcher.user_data[user.id],  # pylint: disable=protected-access
+                    application.user_data[user.id],  # pylint: disable=protected-access
                 )
         return self
 
     @classmethod
     def from_job(
-        cls: Type['CCT'], job: 'Job', dispatcher: 'Dispatcher[BT, CCT, UD, CD, BD, JQ, PT]'
+        cls: Type['CCT'],
+        job: 'Job',
+        application: 'Application[BT, CCT, UD, CD, BD, JQ]',
     ) -> 'CCT':
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
@@ -341,14 +335,25 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
         Args:
             job (:class:`telegram.ext.Job`): The job.
-            dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher associated with this
+            application (:class:`telegram.ext.Application`): The application associated with this
                 context.
 
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(dispatcher)  # type: ignore[arg-type]
+        self = cls(application)  # type: ignore[arg-type]
         self.job = job
+
+        if job.chat_id:
+            self._chat_id_and_data = (
+                job.chat_id,
+                application.chat_data[job.chat_id],  # pylint: disable=protected-access
+            )
+        if job.user_id:
+            self._user_id_and_data = (
+                job.user_id,
+                application.user_data[job.user_id],  # pylint: disable=protected-access
+            )
         return self
 
     def update(self, data: Dict[str, object]) -> None:
@@ -363,34 +368,33 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     @property
     def bot(self) -> BT:
         """:class:`telegram.Bot`: The bot associated with this context."""
-        return self._dispatcher.bot
+        return self._application.bot
 
     @property
     def job_queue(self) -> Optional['JobQueue']:
         """
-        :class:`telegram.ext.JobQueue`: The ``JobQueue`` used by the
-            :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegram.ext.Updater`
-            associated with this context.
+        :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
+            :class:`telegram.ext.Application`.
 
         """
-        return self._dispatcher.job_queue
+        return self._application.job_queue
 
     @property
-    def update_queue(self) -> Queue:
+    def update_queue(self) -> 'Queue[object]':
         """
-        :class:`queue.Queue`: The ``Queue`` instance used by the
-            :class:`telegram.ext.Dispatcher` and (usually) the :class:`telegram.ext.Updater`
+        :class:`asyncio.Queue`: The :class:`asyncio.Queue` instance used by the
+            :class:`telegram.ext.Application` and (usually) the :class:`telegram.ext.Updater`
             associated with this context.
 
         """
-        return self._dispatcher.update_queue
+        return self._application.update_queue
 
     @property
     def match(self) -> Optional[Match[str]]:
         """
-        `Regex match type`: The first match from :attr:`matches`.
+        :meth:`re.Match <re.Match.expand>`: The first match from :attr:`matches`.
             Useful if you are only filtering using a single regex filter.
-            Returns `None` if :attr:`matches` is empty.
+            Returns :obj:`None` if :attr:`matches` is empty.
         """
         try:
             return self.matches[0]  # type: ignore[index] # pylint: disable=unsubscriptable-object

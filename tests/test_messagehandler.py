@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import re
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -34,6 +34,7 @@ from telegram import (
     PreCheckoutQuery,
 )
 from telegram.ext import filters, MessageHandler, CallbackContext, JobQueue
+from telegram.ext.filters import MessageFilter
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
@@ -71,7 +72,7 @@ class TestMessageHandler:
     SRE_TYPE = type(re.match("", ""))
 
     def test_slot_behaviour(self, mro_slots):
-        handler = MessageHandler(filters.ALL, self.callback_context)
+        handler = MessageHandler(filters.ALL, self.callback)
         for attr in handler.__slots__:
             assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
@@ -80,12 +81,12 @@ class TestMessageHandler:
     def reset(self):
         self.test_flag = False
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, Update)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and isinstance(context.chat_data, dict)
             and isinstance(context.bot_data, dict)
@@ -107,20 +108,20 @@ class TestMessageHandler:
             )
         )
 
-    def callback_context_regex1(self, update, context):
+    def callback_regex1(self, update, context):
         if context.matches:
             types = all(type(res) is self.SRE_TYPE for res in context.matches)
             num = len(context.matches) == 1
             self.test_flag = types and num
 
-    def callback_context_regex2(self, update, context):
+    def callback_regex2(self, update, context):
         if context.matches:
             types = all(type(res) is self.SRE_TYPE for res in context.matches)
             num = len(context.matches) == 2
             self.test_flag = types and num
 
     def test_with_filter(self, message):
-        handler = MessageHandler(filters.ChatType.GROUP, self.callback_context)
+        handler = MessageHandler(filters.ChatType.GROUP, self.callback)
 
         message.chat.type = 'group'
         assert handler.check_update(Update(0, message))
@@ -136,7 +137,7 @@ class TestMessageHandler:
                 self.flag = True
 
         test_filter = TestFilter()
-        handler = MessageHandler(test_filter, self.callback_context)
+        handler = MessageHandler(test_filter, self.callback)
 
         update = Update(1, callback_query=CallbackQuery(1, None, None, message=message))
 
@@ -150,7 +151,7 @@ class TestMessageHandler:
             & ~filters.UpdateType.CHANNEL_POST
             & filters.UpdateType.EDITED_CHANNEL_POST
         )
-        handler = MessageHandler(f, self.callback_context)
+        handler = MessageHandler(f, self.callback)
 
         assert not handler.check_update(Update(0, edited_message=message))
         assert not handler.check_update(Update(0, message=message))
@@ -158,53 +159,68 @@ class TestMessageHandler:
         assert handler.check_update(Update(0, edited_channel_post=message))
 
     def test_other_update_types(self, false_update):
-        handler = MessageHandler(None, self.callback_context)
+        handler = MessageHandler(None, self.callback)
         assert not handler.check_update(false_update)
+        assert not handler.check_update('string')
 
-    def test_context(self, dp, message):
+    def test_filters_returns_empty_dict(self):
+        class DataFilter(MessageFilter):
+            data_filter = True
+
+            def filter(self, msg: Message):
+                return {}
+
+        handler = MessageHandler(DataFilter(), self.callback)
+        assert handler.check_update(Update(0, message)) is False
+
+    @pytest.mark.asyncio
+    async def test_context(self, app, message):
         handler = MessageHandler(
             None,
-            self.callback_context,
+            self.callback,
         )
-        dp.add_handler(handler)
+        app.add_handler(handler)
 
-        dp.process_update(Update(0, message=message))
-        assert self.test_flag
+        async with app:
+            await app.process_update(Update(0, message=message))
+            assert self.test_flag
 
-        self.test_flag = False
-        dp.process_update(Update(0, edited_message=message))
-        assert self.test_flag
+            self.test_flag = False
+            await app.process_update(Update(0, edited_message=message))
+            assert self.test_flag
 
-        self.test_flag = False
-        dp.process_update(Update(0, channel_post=message))
-        assert self.test_flag
+            self.test_flag = False
+            await app.process_update(Update(0, channel_post=message))
+            assert self.test_flag
 
-        self.test_flag = False
-        dp.process_update(Update(0, edited_channel_post=message))
-        assert self.test_flag
+            self.test_flag = False
+            await app.process_update(Update(0, edited_channel_post=message))
+            assert self.test_flag
 
-    def test_context_regex(self, dp, message):
-        handler = MessageHandler(filters.Regex('one two'), self.callback_context_regex1)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context_regex(self, app, message):
+        handler = MessageHandler(filters.Regex('one two'), self.callback_regex1)
+        app.add_handler(handler)
 
-        message.text = 'not it'
-        dp.process_update(Update(0, message))
-        assert not self.test_flag
+        async with app:
+            message.text = 'not it'
+            await app.process_update(Update(0, message))
+            assert not self.test_flag
 
-        message.text += ' one two now it is'
-        dp.process_update(Update(0, message))
-        assert self.test_flag
+            message.text += ' one two now it is'
+            await app.process_update(Update(0, message))
+            assert self.test_flag
 
-    def test_context_multiple_regex(self, dp, message):
-        handler = MessageHandler(
-            filters.Regex('one') & filters.Regex('two'), self.callback_context_regex2
-        )
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context_multiple_regex(self, app, message):
+        handler = MessageHandler(filters.Regex('one') & filters.Regex('two'), self.callback_regex2)
+        app.add_handler(handler)
 
-        message.text = 'not it'
-        dp.process_update(Update(0, message))
-        assert not self.test_flag
+        async with app:
+            message.text = 'not it'
+            await app.process_update(Update(0, message))
+            assert not self.test_flag
 
-        message.text += ' one two now it is'
-        dp.process_update(Update(0, message))
-        assert self.test_flag
+            message.text += ' one two now it is'
+            await app.process_update(Update(0, message))
+            assert self.test_flag

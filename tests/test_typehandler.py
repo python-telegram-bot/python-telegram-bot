@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from collections import OrderedDict
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -29,7 +29,7 @@ class TestTypeHandler:
     test_flag = False
 
     def test_slot_behaviour(self, mro_slots):
-        inst = TypeHandler(dict, self.callback_context)
+        inst = TypeHandler(dict, self.callback)
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -38,36 +38,31 @@ class TestTypeHandler:
     def reset(self):
         self.test_flag = False
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, dict)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and context.user_data is None
             and context.chat_data is None
             and isinstance(context.bot_data, dict)
         )
 
-    def test_basic(self, dp):
-        handler = TypeHandler(dict, self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_basic(self, app):
+        handler = TypeHandler(dict, self.callback)
+        app.add_handler(handler)
 
         assert handler.check_update({'a': 1, 'b': 2})
         assert not handler.check_update('not a dict')
-        dp.process_update({'a': 1, 'b': 2})
+        async with app:
+            await app.process_update({'a': 1, 'b': 2})
         assert self.test_flag
 
     def test_strict(self):
-        handler = TypeHandler(dict, self.callback_context, strict=True)
+        handler = TypeHandler(dict, self.callback, strict=True)
         o = OrderedDict({'a': 1, 'b': 2})
         assert handler.check_update({'a': 1, 'b': 2})
         assert not handler.check_update(o)
-
-    def test_context(self, dp):
-        handler = TypeHandler(dict, self.callback_context)
-        dp.add_handler(handler)
-
-        dp.process_update({'a': 1, 'b': 2})
-        assert self.test_flag

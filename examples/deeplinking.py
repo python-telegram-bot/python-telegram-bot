@@ -6,10 +6,10 @@
 
 This program is dedicated to the public domain under the CC0 license.
 
-This Bot uses the Updater class to handle the bot.
+This Bot uses the Application class to handle the bot.
 
 First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
+the Application and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 
 Usage:
@@ -26,7 +26,7 @@ from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
     filters,
-    Updater,
+    Application,
     CallbackContext,
 )
 
@@ -47,15 +47,15 @@ SO_COOL = "so-cool"
 KEYBOARD_CALLBACKDATA = "keyboard-callback-data"
 
 
-def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a deep-linked URL when the command /start is issued."""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, CHECK_THIS_OUT, group=True)
     text = "Feel free to tell your friends about it:\n\n" + url
-    update.message.reply_text(text)
+    await update.message.reply_text(text)
 
 
-def deep_linked_level_1(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def deep_linked_level_1(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Reached through the CHECK_THIS_OUT payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, SO_COOL)
@@ -66,20 +66,20 @@ def deep_linked_level_1(update: Update, context: CallbackContext.DEFAULT_TYPE) -
     keyboard = InlineKeyboardMarkup.from_button(
         InlineKeyboardButton(text="Continue here!", url=url)
     )
-    update.message.reply_text(text, reply_markup=keyboard)
+    await update.message.reply_text(text, reply_markup=keyboard)
 
 
-def deep_linked_level_2(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def deep_linked_level_2(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Reached through the SO_COOL payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_ENTITIES)
-    text = f"You can also mask the deep-linked URLs as links: [▶️ CLICK HERE]({url})."
-    update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+    text = f"You can also mask the deep-linked URLs as links: <a href=\"{url}\">▶️ CLICK HERE</a>."
+    await update.message.reply_text(text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
 
 
-def deep_linked_level_3(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def deep_linked_level_3(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Reached through the USING_ENTITIES payload"""
-    update.message.reply_text(
+    await update.message.reply_text(
         "It is also possible to make deep-linking using InlineKeyboardButtons.",
         reply_markup=InlineKeyboardMarkup(
             [[InlineKeyboardButton(text="Like this!", callback_data=KEYBOARD_CALLBACKDATA)]]
@@ -87,65 +87,59 @@ def deep_linked_level_3(update: Update, context: CallbackContext.DEFAULT_TYPE) -
     )
 
 
-def deep_link_level_3_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def deep_link_level_3_callback(
+    update: Update, context: CallbackContext.DEFAULT_TYPE
+) -> None:
     """Answers CallbackQuery with deeplinking url."""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_KEYBOARD)
-    update.callback_query.answer(url=url)
+    await update.callback_query.answer(url=url)
 
 
-def deep_linked_level_4(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def deep_linked_level_4(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Reached through the USING_KEYBOARD payload"""
     payload = context.args
-    update.message.reply_text(
+    await update.message.reply_text(
         f"Congratulations! This is as deep as it gets 👏🏻\n\nThe payload was: {payload}"
     )
 
 
 def main() -> None:
     """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    updater = Updater.builder().token("TOKEN").build()
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("TOKEN").build()
 
     # More info on what deep linking actually is (read this first if it's unclear to you):
     # https://core.telegram.org/bots#deep-linking
 
     # Register a deep-linking handler
-    dispatcher.add_handler(
+    application.add_handler(
         CommandHandler("start", deep_linked_level_1, filters.Regex(CHECK_THIS_OUT))
     )
 
     # This one works with a textual link instead of an URL
-    dispatcher.add_handler(CommandHandler("start", deep_linked_level_2, filters.Regex(SO_COOL)))
+    application.add_handler(CommandHandler("start", deep_linked_level_2, filters.Regex(SO_COOL)))
 
     # We can also pass on the deep-linking payload
-    dispatcher.add_handler(
+    application.add_handler(
         CommandHandler("start", deep_linked_level_3, filters.Regex(USING_ENTITIES))
     )
 
     # Possible with inline keyboard buttons as well
-    dispatcher.add_handler(
+    application.add_handler(
         CommandHandler("start", deep_linked_level_4, filters.Regex(USING_KEYBOARD))
     )
 
     # register callback handler for inline keyboard button
-    dispatcher.add_handler(
+    application.add_handler(
         CallbackQueryHandler(deep_link_level_3_callback, pattern=KEYBOARD_CALLBACKDATA)
     )
 
     # Make sure the deep-linking handlers occur *before* the normal /start handler.
-    dispatcher.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("start", start))
 
-    # Start the Bot
-    updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 
 if __name__ == "__main__":

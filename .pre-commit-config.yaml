@@ -9,6 +9,8 @@ repos:
         args:
         - --diff
         - --check
+        additional_dependencies:
+          - click==8.0.2
 -   repo: https://gitlab.com/pycqa/flake8
     rev: 4.0.1
     hooks:
@@ -23,7 +25,7 @@ repos:
           #  run pylint across multiple cpu cores to speed it up-
           - --jobs=0  # See https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
         additional_dependencies:
-          - certifi
+          - httpx >= 0.20.0,<1.0
           - tornado>=6.1
           - APScheduler==3.6.3
           - cachetools==4.2.2
@@ -38,25 +40,24 @@ repos:
           - types-ujson
           - types-pytz
           - types-cryptography
-          - types-certifi
           - types-cachetools
-          - certifi
+          - httpx >= 0.20.0,<1.0
           - tornado>=6.1
           - APScheduler==3.6.3
           - cachetools==4.2.2
           - . # this basically does `pip install -e .`
-    -   id: mypy
-        name: mypy-examples
-        files: ^examples/.*\.py$
-        args:
-          - --no-strict-optional
-          - --follow-imports=silent
-        additional_dependencies:
-          - certifi
-          - tornado>=6.1
-          - APScheduler==3.6.3
-          - cachetools==4.2.2
-          - . # this basically does `pip install -e .`
+    - id: mypy
+      name: mypy-examples
+      files: ^examples/.*\.py$
+      args:
+        - --no-strict-optional
+        - --follow-imports=silent
+      additional_dependencies:
+        - certifi
+        - tornado>=6.1
+        - APScheduler==3.6.3
+        - cachetools==4.2.2
+        - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.29.0
     hooks:

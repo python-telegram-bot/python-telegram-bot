@@ -4,7 +4,7 @@
 
 """
 First, a few callback functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
+the Application and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 
 Usage:
@@ -23,7 +23,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
     ConversationHandler,
-    Updater,
+    Application,
     CallbackContext,
 )
 
@@ -50,9 +50,9 @@ def facts_to_str(user_data: Dict[str, str]) -> str:
     return "\n".join(facts).join(['\n', '\n'])
 
 
-def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Start the conversation and ask user for input."""
-    update.message.reply_text(
+    await update.message.reply_text(
         "Hi! My name is Doctor Botter. I will hold a more complex conversation with you. "
         "Why don't you tell me something about yourself?",
         reply_markup=markup,
@@ -61,25 +61,25 @@ def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return CHOOSING
 
 
-def regular_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def regular_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Ask the user for info about the selected predefined choice."""
     text = update.message.text
     context.user_data['choice'] = text
-    update.message.reply_text(f'Your {text.lower()}? Yes, I would love to hear about that!')
+    await update.message.reply_text(f'Your {text.lower()}? Yes, I would love to hear about that!')
 
     return TYPING_REPLY
 
 
-def custom_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def custom_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Ask the user for a description of a custom category."""
-    update.message.reply_text(
+    await update.message.reply_text(
         'Alright, please send me the category first, for example "Most impressive skill"'
     )
 
     return TYPING_CHOICE
 
 
-def received_information(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def received_information(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Store info provided by user and ask for the next category."""
     user_data = context.user_data
     text = update.message.text
@@ -87,9 +87,9 @@ def received_information(update: Update, context: CallbackContext.DEFAULT_TYPE) 
     user_data[category] = text
     del user_data['choice']
 
-    update.message.reply_text(
+    await update.message.reply_text(
         "Neat! Just so you know, this is what you already told me:"
-        f"{facts_to_str(user_data)} You can tell me more, or change your opinion"
+        f"{facts_to_str(user_data)}You can tell me more, or change your opinion"
         " on something.",
         reply_markup=markup,
     )
@@ -97,13 +97,13 @@ def received_information(update: Update, context: CallbackContext.DEFAULT_TYPE) 
     return CHOOSING
 
 
-def done(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def done(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Display the gathered info and end the conversation."""
     user_data = context.user_data
     if 'choice' in user_data:
         del user_data['choice']
 
-    update.message.reply_text(
+    await update.message.reply_text(
         f"I learned these facts about you: {facts_to_str(user_data)}Until next time!",
         reply_markup=ReplyKeyboardRemove(),
     )
@@ -114,11 +114,8 @@ def done(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
 
 def main() -> None:
     """Run the bot."""
-    # Create the Updater and pass it your bot's token.
-    updater = Updater.builder().token("TOKEN").build()
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("TOKEN").build()
 
     # Add conversation handler with the states CHOOSING, TYPING_CHOICE and TYPING_REPLY
     conv_handler = ConversationHandler(
@@ -145,15 +142,10 @@ def main() -> None:
         fallbacks=[MessageHandler(filters.Regex('^Done$'), done)],
     )
 
-    dispatcher.add_handler(conv_handler)
+    application.add_handler(conv_handler)
 
-    # Start the Bot
-    updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 
 if __name__ == '__main__':

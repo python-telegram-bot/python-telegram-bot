@@ -56,7 +56,7 @@ class TestChatJoinRequest:
         is_primary=False,
     )
 
-    def test_slot_behaviour(self, chat_join_request, recwarn, mro_slots):
+    def test_slot_behaviour(self, chat_join_request, mro_slots):
         inst = chat_join_request
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
@@ -119,8 +119,9 @@ class TestChatJoinRequest:
         assert a != f
         assert hash(a) != hash(f)
 
-    def test_approve(self, monkeypatch, chat_join_request):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_approve(self, monkeypatch, chat_join_request):
+        async def make_assertion(*_, **kwargs):
             chat_id_test = kwargs['chat_id'] == chat_join_request.chat.id
             user_id_test = kwargs['user_id'] == chat_join_request.from_user.id
 
@@ -129,18 +130,21 @@ class TestChatJoinRequest:
         assert check_shortcut_signature(
             ChatJoinRequest.approve, Bot.approve_chat_join_request, ['chat_id', 'user_id'], []
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             chat_join_request.approve, chat_join_request.get_bot(), 'approve_chat_join_request'
         )
-        assert check_defaults_handling(chat_join_request.approve, chat_join_request.get_bot())
+        assert await check_defaults_handling(
+            chat_join_request.approve, chat_join_request.get_bot()
+        )
 
         monkeypatch.setattr(
             chat_join_request.get_bot(), 'approve_chat_join_request', make_assertion
         )
-        assert chat_join_request.approve()
+        assert await chat_join_request.approve()
 
-    def test_decline(self, monkeypatch, chat_join_request):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_decline(self, monkeypatch, chat_join_request):
+        async def make_assertion(*_, **kwargs):
             chat_id_test = kwargs['chat_id'] == chat_join_request.chat.id
             user_id_test = kwargs['user_id'] == chat_join_request.from_user.id
 
@@ -149,12 +153,14 @@ class TestChatJoinRequest:
         assert check_shortcut_signature(
             ChatJoinRequest.decline, Bot.decline_chat_join_request, ['chat_id', 'user_id'], []
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             chat_join_request.decline, chat_join_request.get_bot(), 'decline_chat_join_request'
         )
-        assert check_defaults_handling(chat_join_request.decline, chat_join_request.get_bot())
+        assert await check_defaults_handling(
+            chat_join_request.decline, chat_join_request.get_bot()
+        )
 
         monkeypatch.setattr(
             chat_join_request.get_bot(), 'decline_chat_join_request', make_assertion
         )
-        assert chat_join_request.decline()
+        assert await chat_join_request.decline()

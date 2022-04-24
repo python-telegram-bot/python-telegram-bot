@@ -54,8 +54,10 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
         text (:obj:`str`): The text.
         version (:obj:`int` | :obj:`str`): Use to specify the version of telegrams Markdown.
             Either ``1`` or ``2``. Defaults to ``1``.
-        entity_type (:obj:`str`, optional): For the entity types ``PRE``, ``CODE`` and the link
-            part of ``TEXT_LINKS``, only certain characters need to be escaped in ``MarkdownV2``.
+        entity_type (:obj:`str`, optional): For the entity types
+            :tg-const:`telegram.MessageEntity.PRE`, :tg-const:`telegram.MessageEntity.CODE` and
+            the link part of :tg-const:`telegram.MessageEntity.TEXT_LINK`, only certain characters
+            need to be escaped in :tg-const:`telegram.constants.ParseMode.MARKDOWN_V2`.
             See the official API documentation for details. Only valid in combination with
             ``version=2``, will be ignored else.
     """
@@ -135,14 +137,14 @@ def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
 
 def create_deep_linked_url(bot_username: str, payload: str = None, group: bool = False) -> str:
     """
-    Creates a deep-linked URL for this ``bot_username`` with the specified ``payload``.
-    See  https://core.telegram.org/bots#deep-linking to learn more.
+    Creates a deep-linked URL for this :paramref:`bot_username` with the specified
+    :paramref:`payload`. See  https://core.telegram.org/bots#deep-linking to learn more.
 
-    The ``payload`` may consist of the following characters: ``A-Z, a-z, 0-9, _, -``
+    The :paramref:`payload` may consist of the following characters: ``A-Z, a-z, 0-9, _, -``
 
     Note:
         Works well in conjunction with
-        ``CommandHandler("start", callback, filters = filters.Regex('payload'))``
+        ``CommandHandler("start", callback, filters=filters.Regex('payload'))``
 
     Examples:
         ``create_deep_linked_url(bot.get_me().username, "some-params")``

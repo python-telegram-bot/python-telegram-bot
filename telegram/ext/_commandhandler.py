@@ -18,16 +18,16 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CommandHandler and PrefixHandler classes."""
 import re
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
 from telegram.ext import filters as filters_module, Handler
-from telegram._utils.types import SLT
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-from telegram.ext._utils.types import CCT
+from telegram._utils.types import SLT, DVInput
+from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher
+    from telegram.ext import Application
 
 RT = TypeVar('RT')
 
@@ -36,48 +36,54 @@ class CommandHandler(Handler[Update, CCT]):
     """Handler class to handle Telegram commands.
 
     Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
-    bot's name and/or some additional text. The handler will add a ``list`` to the
+    bot's name and/or some additional text. The handler will add a :obj:`list` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
     which is the text following the command split on single or consecutive whitespace characters.
 
-    By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~filters.UpdateType.EDITED_MESSAGE`` in the filter argument.
+    By default, the handler listens to messages as well as edited messages. To change this behavior
+    use :attr:`~filters.UpdateType.EDITED_MESSAGE <telegram.ext.filters.UpdateType.EDITED_MESSAGE>`
+    in the filter argument.
 
     Note:
         * :class:`CommandHandler` does *not* handle (edited) channel posts.
 
     Warning:
-        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-            Limitations are the same as described here https://core.telegram.org/bots#commands
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+            Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         filters (:class:`telegram.ext.filters.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :mod:`telegram.ext.filters`. Filters can be combined using bitwise
-            operators (& for and, | for or, ~ for not).
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+            operators (``&`` for :keyword:`and`, ``|`` for :keyword:`or`, ``~`` for :keyword:`not`)
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Raises:
-        ValueError: when command is too long or has illegal chars.
+        :exc:`ValueError`: When the command is too long or has illegal chars.
 
     Attributes:
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-            Limitations are the same as described here https://core.telegram.org/bots#commands
-        callback (:obj:`callable`): The callback function for this handler.
+            Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
+        callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
     """
 
     __slots__ = ('command', 'filters')
@@ -85,11 +91,11 @@ class CommandHandler(Handler[Update, CCT]):
     def __init__(
         self,
         command: SLT[str],
-        callback: Callable[[Update, CCT], RT],
+        callback: HandlerCallback[Update, CCT, RT],
         filters: filters_module.BaseFilter = None,
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
-        super().__init__(callback, run_async=run_async)
+        super().__init__(callback, block=block)
 
         if isinstance(command, str):
             self.command = [command.lower()]
@@ -104,7 +110,7 @@ class CommandHandler(Handler[Update, CCT]):
     def check_update(
         self, update: object
     ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.
@@ -144,7 +150,7 @@ class CommandHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        dispatcher: 'Dispatcher',
+        application: 'Application',
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single
@@ -159,11 +165,12 @@ class CommandHandler(Handler[Update, CCT]):
 class PrefixHandler(CommandHandler):
     """Handler class to handle custom prefix commands.
 
-    This is a intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
-    It supports configurable commands with the same options as CommandHandler. It will respond to
-    every combination of :attr:`prefix` and :attr:`command`. It will add a :obj:`list` to the
-    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
-    which is the text following the command split on single or consecutive whitespace characters.
+    This is an intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
+    It supports configurable commands with the same options as :class:`CommandHandler`. It will
+    respond to every combination of :attr:`prefix` and :attr:`command`. It will add a :obj:`list`
+    to the :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of
+    strings, which is the text following the command split on single or consecutive whitespace
+    characters.
 
     Examples:
 
@@ -171,30 +178,31 @@ class PrefixHandler(CommandHandler):
 
         .. code:: python
 
-            PrefixHandler('!', 'test', callback)  # will respond to '!test'.
+            PrefixHandler("!", "test", callback)  # will respond to '!test'.
 
         Multiple prefixes, single command:
 
         .. code:: python
 
-            PrefixHandler(['!', '#'], 'test', callback)  # will respond to '!test' and '#test'.
+            PrefixHandler(["!", "#"], "test", callback)  # will respond to '!test' and '#test'.
 
         Multiple prefixes and commands:
 
         .. code:: python
 
-            PrefixHandler(['!', '#'], ['test', 'help'], callback)  # will respond to '!test', \
-            '#test', '!help' and '#help'.
+            PrefixHandler(
+                ["!", "#"], ["test", "help"], callback
+            )  # will respond to '!test', '#test', '!help' and '#help'.
 
 
-    By default the handler listens to messages as well as edited messages. To change this behavior
-    use ``~filters.UpdateType.EDITED_MESSAGE``.
+    By default, the handler listens to messages as well as edited messages. To change this behavior
+    use :attr:`~filters.UpdateType.EDITED_MESSAGE <telegram.ext.filters.UpdateType.EDITED_MESSAGE>`
 
     Note:
         * :class:`PrefixHandler` does *not* handle (edited) channel posts.
 
     Warning:
-        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
@@ -202,24 +210,29 @@ class PrefixHandler(CommandHandler):
             The prefix(es) that will precede :attr:`command`.
         command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
             The command or list of commands this handler should listen for.
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         filters (:class:`telegram.ext.filters.BaseFilter`, optional): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :mod:`telegram.ext.filters`. Filters can be combined using bitwise
-            operators (& for and, | for or, ~ for not).
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+            operators (``&`` for :keyword:`and`, ``|`` for :keyword:`or`, ``~`` for :keyword:`not`)
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
+        callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
 
     """
 
@@ -230,9 +243,9 @@ class PrefixHandler(CommandHandler):
         self,
         prefix: SLT[str],
         command: SLT[str],
-        callback: Callable[[Update, CCT], RT],
+        callback: HandlerCallback[Update, CCT, RT],
         filters: filters_module.BaseFilter = None,
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
 
         self._prefix: List[str] = []
@@ -243,7 +256,7 @@ class PrefixHandler(CommandHandler):
             'nocommand',
             callback,
             filters=filters,
-            run_async=run_async,
+            block=block,
         )
 
         self.prefix = prefix  # type: ignore[assignment]
@@ -292,7 +305,7 @@ class PrefixHandler(CommandHandler):
     def check_update(
         self, update: object
     ) -> Optional[Union[bool, Tuple[List[str], Optional[Union[bool, Dict]]]]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.

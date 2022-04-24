@@ -154,8 +154,9 @@ class Game(TelegramObject):
     def parse_text_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
         """
         Returns a :obj:`dict` that maps :class:`telegram.MessageEntity` to :obj:`str`.
-        It contains entities from this message filtered by their ``type`` attribute as the key, and
-        the text that each entity belongs to as the value of the :obj:`dict`.
+        It contains entities from this message filtered by their
+        :attr:`~telegram.MessageEntity.type` attribute as the key, and the text that each entity
+        belongs to as the value of the :obj:`dict`.
 
         Note:
             This method should always be used instead of the :attr:`text_entities` attribute, since
@@ -163,9 +164,10 @@ class Game(TelegramObject):
             See :attr:`parse_text_entity` for more info.
 
         Args:
-            types (List[:obj:`str`], optional): List of ``MessageEntity`` types as strings. If the
-                    ``type`` attribute of an entity is contained in this list, it will be returned.
-                    Defaults to :attr:`telegram.MessageEntity.ALL_TYPES`.
+            types (List[:obj:`str`], optional): List of :class:`telegram.MessageEntity` types as
+                strings. If the :attr:`~telegram.MessageEntity.type` attribute of an entity is
+                contained in this list, it will be returned. Defaults to
+                :attr:`telegram.MessageEntity.ALL_TYPES`.
 
         Returns:
             Dict[:class:`telegram.MessageEntity`, :obj:`str`]: A dictionary of entities mapped to

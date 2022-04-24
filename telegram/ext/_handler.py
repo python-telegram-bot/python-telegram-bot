@@ -16,17 +16,16 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the base class for handlers as used by the Dispatcher."""
+"""This module contains the base class for handlers as used by the Application."""
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Callable, Optional, TypeVar, Union, Generic
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, Generic
 
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-from telegram.ext._utils.promise import Promise
-from telegram.ext._utils.types import CCT
-from telegram.ext._extbot import ExtBot
+from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.types import DVInput
+from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher
+    from telegram.ext import Application
 
 RT = TypeVar('RT')
 UT = TypeVar('UT')
@@ -36,37 +35,43 @@ class Handler(Generic[UT, CCT], ABC):
     """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Warning:
-        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    .. versionchanged:: 14.0
+        The attribute ``run_async`` is now :paramref:`block`.
+
     Args:
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        callback (:term:`coroutine function`): The callback function for this handler.
+        block (:obj:`bool`): Determines whether the callback will run in a blocking way..
 
     """
 
     __slots__ = (
         'callback',
-        'run_async',
+        'block',
     )
 
     def __init__(
         self,
-        callback: Callable[[UT, CCT], RT],
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        callback: HandlerCallback[UT, CCT, RT],
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
         self.callback = callback
-        self.run_async = run_async
+        self.block = block
 
     @abstractmethod
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
@@ -75,7 +80,7 @@ class Handler(Generic[UT, CCT], ABC):
         this handler instance. It should always be overridden.
 
         Note:
-            Custom updates types can be handled by the dispatcher. Therefore, an implementation of
+            Custom updates types can be handled by the application. Therefore, an implementation of
             this method should always check the type of :paramref:`update`.
 
         Args:
@@ -88,13 +93,13 @@ class Handler(Generic[UT, CCT], ABC):
 
         """
 
-    def handle_update(
+    async def handle_update(
         self,
         update: UT,
-        dispatcher: 'Dispatcher',
+        application: 'Application',
         check_result: object,
         context: CCT,
-    ) -> Union[RT, Promise]:
+    ) -> RT:
         """
         This method is called if it was determined that an update should indeed
         be handled by this instance. Calls :attr:`callback` along with its respectful
@@ -104,31 +109,20 @@ class Handler(Generic[UT, CCT], ABC):
 
         Args:
             update (:obj:`str` | :class:`telegram.Update`): The update to be handled.
-            dispatcher (:class:`telegram.ext.Dispatcher`): The calling dispatcher.
-            check_result (:class:`object`): The result from :attr:`check_update`.
+            application (:class:`telegram.ext.Application`): The calling application.
+            check_result (:class:`object`): The result from :meth:`check_update`.
             context (:class:`telegram.ext.CallbackContext`): The context as provided by
-                the dispatcher.
+                the application.
 
         """
-        run_async = self.run_async
-        if (
-            self.run_async is DEFAULT_FALSE
-            and isinstance(dispatcher.bot, ExtBot)
-            and dispatcher.bot.defaults
-            and dispatcher.bot.defaults.run_async
-        ):
-            run_async = True
-
-        self.collect_additional_context(context, update, dispatcher, check_result)
-        if run_async:
-            return dispatcher.run_async(self.callback, update, context, update=update)
-        return self.callback(update, context)
+        self.collect_additional_context(context, update, application, check_result)
+        return await self.callback(update, context)
 
     def collect_additional_context(
         self,
         context: CCT,
         update: UT,
-        dispatcher: 'Dispatcher',
+        application: 'Application',
         check_result: Any,
     ) -> None:
         """Prepares additional arguments for the context. Override if needed.
@@ -136,7 +130,7 @@ class Handler(Generic[UT, CCT], ABC):
         Args:
             context (:class:`telegram.ext.CallbackContext`): The context object.
             update (:class:`telegram.Update`): The update to gather chat/user id from.
-            dispatcher (:class:`telegram.ext.Dispatcher`): The calling dispatcher.
-            check_result: The result (return value) from :attr:`check_update`.
+            application (:class:`telegram.ext.Application`): The calling application.
+            check_result: The result (return value) from :meth:`check_update`.
 
         """

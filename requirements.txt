@@ -1,8 +1,8 @@
 # Make sure to install those as additional_dependencies in the
 # pre-commit hooks for pylint & mypy
-certifi
+httpx ~= 0.22.0
 # only telegram.ext: # Keep this line here; used in setup(-raw).py
 tornado>=6.1
-APScheduler==3.6.3
+APScheduler==3.8.1
 pytz>=2018.6
 cachetools==4.2.2

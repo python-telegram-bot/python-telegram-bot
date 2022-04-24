@@ -111,14 +111,20 @@ class TestVoiceChatParticipantsInvited:
         assert voice_chat_participants.users[0].id == user1.id
         assert voice_chat_participants.users[1].id == user2.id
 
-    def test_to_dict(self, user1, user2):
-        voice_chat_participants = VoiceChatParticipantsInvited([user1, user2])
+    @pytest.mark.parametrize('use_users', (True, False))
+    def test_to_dict(self, user1, user2, use_users):
+        voice_chat_participants = VoiceChatParticipantsInvited(
+            [user1, user2] if use_users else None
+        )
         voice_chat_dict = voice_chat_participants.to_dict()
 
         assert isinstance(voice_chat_dict, dict)
-        assert voice_chat_dict["users"] == [user1.to_dict(), user2.to_dict()]
-        assert voice_chat_dict["users"][0]["id"] == user1.id
-        assert voice_chat_dict["users"][1]["id"] == user2.id
+        if use_users:
+            assert voice_chat_dict["users"] == [user1.to_dict(), user2.to_dict()]
+            assert voice_chat_dict["users"][0]["id"] == user1.id
+            assert voice_chat_dict["users"][1]["id"] == user2.id
+        else:
+            assert voice_chat_dict == {}
 
     def test_equality(self, user1, user2):
         a = VoiceChatParticipantsInvited([user1])

@@ -19,9 +19,7 @@
 import importlib
 import os
 from pathlib import Path
-
 import inspect
-
 
 included = {  # These modules/classes intentionally have __dict__.
     'CallbackContext',
@@ -29,7 +27,7 @@ included = {  # These modules/classes intentionally have __dict__.
 
 
 def test_class_has_slots_and_no_dict():
-    tg_paths = [p for p in Path('telegram').rglob("*.py") if 'vendor' not in str(p)]
+    tg_paths = Path('telegram').rglob("*.py")
 
     for path in tg_paths:
         if '__' in str(path):  # Exclude __init__, __main__, etc

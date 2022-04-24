@@ -26,36 +26,38 @@ from telegram.ext._utils.types import CCT
 
 
 class ChatJoinRequestHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain a chat join request.
+    """Handler class to handle Telegram updates that contain
+    :attr:`telegram.Update.chat_join_request`.
 
     Warning:
-        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     .. versionadded:: 13.8
 
     Args:
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature for context based API:
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
 
-            ``def callback(update: Update, context: CallbackContext)``
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        callback (:term:`coroutine function`): The callback function for this handler.
+        block (:obj:`bool`): Determines whether the callback will run in a blocking way..
 
     """
 
     __slots__ = ()
 
     def check_update(self, update: object) -> bool:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.

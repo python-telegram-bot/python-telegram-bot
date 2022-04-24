@@ -50,11 +50,6 @@ class TestCallbackQuery:
     inline_message_id = 'inline_message_id'
     game_short_name = 'the_game'
 
-    def test_slot_behaviour(self, callback_query, mro_slots):
-        for attr in callback_query.__slots__:
-            assert getattr(callback_query, attr, 'err') != 'err', f"got extra slot '{attr}'"
-        assert len(mro_slots(callback_query)) == len(set(mro_slots(callback_query))), "same slot"
-
     @staticmethod
     def skip_params(callback_query: CallbackQuery):
         if callback_query.inline_message_id:
@@ -78,6 +73,11 @@ class TestCallbackQuery:
             chat_id = kwargs['chat_id'] == callback_query.message.chat_id
             message_id = kwargs['message_id'] == callback_query.message.message_id
         return id_ and chat_id and message_id
+
+    def test_slot_behaviour(self, callback_query, mro_slots):
+        for attr in callback_query.__slots__:
+            assert getattr(callback_query, attr, 'err') != 'err', f"got extra slot '{attr}'"
+        assert len(mro_slots(callback_query)) == len(set(mro_slots(callback_query))), "same slot"
 
     def test_de_json(self, bot):
         json_dict = {
@@ -113,24 +113,25 @@ class TestCallbackQuery:
         assert callback_query_dict['data'] == callback_query.data
         assert callback_query_dict['game_short_name'] == callback_query.game_short_name
 
-    def test_answer(self, monkeypatch, callback_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_answer(self, monkeypatch, callback_query):
+        async def make_assertion(*_, **kwargs):
             return kwargs['callback_query_id'] == callback_query.id
 
         assert check_shortcut_signature(
             CallbackQuery.answer, Bot.answer_callback_query, ['callback_query_id'], []
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.answer, callback_query.get_bot(), 'answer_callback_query'
         )
-        assert check_defaults_handling(callback_query.answer, callback_query.get_bot())
+        assert await check_defaults_handling(callback_query.answer, callback_query.get_bot())
 
         monkeypatch.setattr(callback_query.get_bot(), 'answer_callback_query', make_assertion)
-        # TODO: PEP8
-        assert callback_query.answer()
+        assert await callback_query.answer()
 
-    def test_edit_message_text(self, monkeypatch, callback_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_edit_message_text(self, monkeypatch, callback_query):
+        async def make_assertion(*_, **kwargs):
             text = kwargs['text'] == 'test'
             ids = self.check_passed_ids(callback_query, kwargs)
             return ids and text
@@ -141,21 +142,24 @@ class TestCallbackQuery:
             ['inline_message_id', 'message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.edit_message_text,
             callback_query.get_bot(),
             'edit_message_text',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
-        assert check_defaults_handling(callback_query.edit_message_text, callback_query.get_bot())
+        assert await check_defaults_handling(
+            callback_query.edit_message_text, callback_query.get_bot()
+        )
 
         monkeypatch.setattr(callback_query.get_bot(), 'edit_message_text', make_assertion)
-        assert callback_query.edit_message_text(text='test')
-        assert callback_query.edit_message_text('test')
+        assert await callback_query.edit_message_text(text='test')
+        assert await callback_query.edit_message_text('test')
 
-    def test_edit_message_caption(self, monkeypatch, callback_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_edit_message_caption(self, monkeypatch, callback_query):
+        async def make_assertion(*_, **kwargs):
             caption = kwargs['caption'] == 'new caption'
             ids = self.check_passed_ids(callback_query, kwargs)
             return ids and caption
@@ -166,23 +170,24 @@ class TestCallbackQuery:
             ['inline_message_id', 'message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.edit_message_caption,
             callback_query.get_bot(),
             'edit_message_caption',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
-        assert check_defaults_handling(
+        assert await check_defaults_handling(
             callback_query.edit_message_caption, callback_query.get_bot()
         )
 
         monkeypatch.setattr(callback_query.get_bot(), 'edit_message_caption', make_assertion)
-        assert callback_query.edit_message_caption(caption='new caption')
-        assert callback_query.edit_message_caption('new caption')
+        assert await callback_query.edit_message_caption(caption='new caption')
+        assert await callback_query.edit_message_caption('new caption')
 
-    def test_edit_message_reply_markup(self, monkeypatch, callback_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_edit_message_reply_markup(self, monkeypatch, callback_query):
+        async def make_assertion(*_, **kwargs):
             reply_markup = kwargs['reply_markup'] == [['1', '2']]
             ids = self.check_passed_ids(callback_query, kwargs)
             return ids and reply_markup
@@ -193,23 +198,24 @@ class TestCallbackQuery:
             ['inline_message_id', 'message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.edit_message_reply_markup,
             callback_query.get_bot(),
             'edit_message_reply_markup',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
-        assert check_defaults_handling(
+        assert await check_defaults_handling(
             callback_query.edit_message_reply_markup, callback_query.get_bot()
         )
 
         monkeypatch.setattr(callback_query.get_bot(), 'edit_message_reply_markup', make_assertion)
-        assert callback_query.edit_message_reply_markup(reply_markup=[['1', '2']])
-        assert callback_query.edit_message_reply_markup([['1', '2']])
+        assert await callback_query.edit_message_reply_markup(reply_markup=[['1', '2']])
+        assert await callback_query.edit_message_reply_markup([['1', '2']])
 
-    def test_edit_message_media(self, monkeypatch, callback_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_edit_message_media(self, monkeypatch, callback_query):
+        async def make_assertion(*_, **kwargs):
             message_media = kwargs.get('media') == [['1', '2']]
             ids = self.check_passed_ids(callback_query, kwargs)
             return ids and message_media
@@ -220,21 +226,24 @@ class TestCallbackQuery:
             ['inline_message_id', 'message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.edit_message_media,
             callback_query.get_bot(),
             'edit_message_media',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
-        assert check_defaults_handling(callback_query.edit_message_media, callback_query.get_bot())
+        assert await check_defaults_handling(
+            callback_query.edit_message_media, callback_query.get_bot()
+        )
 
         monkeypatch.setattr(callback_query.get_bot(), 'edit_message_media', make_assertion)
-        assert callback_query.edit_message_media(media=[['1', '2']])
-        assert callback_query.edit_message_media([['1', '2']])
+        assert await callback_query.edit_message_media(media=[['1', '2']])
+        assert await callback_query.edit_message_media([['1', '2']])
 
-    def test_edit_message_live_location(self, monkeypatch, callback_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_edit_message_live_location(self, monkeypatch, callback_query):
+        async def make_assertion(*_, **kwargs):
             latitude = kwargs.get('latitude') == 1
             longitude = kwargs.get('longitude') == 2
             ids = self.check_passed_ids(callback_query, kwargs)
@@ -246,23 +255,24 @@ class TestCallbackQuery:
             ['inline_message_id', 'message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.edit_message_live_location,
             callback_query.get_bot(),
             'edit_message_live_location',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
-        assert check_defaults_handling(
+        assert await check_defaults_handling(
             callback_query.edit_message_live_location, callback_query.get_bot()
         )
 
         monkeypatch.setattr(callback_query.get_bot(), 'edit_message_live_location', make_assertion)
-        assert callback_query.edit_message_live_location(latitude=1, longitude=2)
-        assert callback_query.edit_message_live_location(1, 2)
+        assert await callback_query.edit_message_live_location(latitude=1, longitude=2)
+        assert await callback_query.edit_message_live_location(1, 2)
 
-    def test_stop_message_live_location(self, monkeypatch, callback_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_stop_message_live_location(self, monkeypatch, callback_query):
+        async def make_assertion(*_, **kwargs):
             ids = self.check_passed_ids(callback_query, kwargs)
             return ids
 
@@ -272,22 +282,23 @@ class TestCallbackQuery:
             ['inline_message_id', 'message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.stop_message_live_location,
             callback_query.get_bot(),
             'stop_message_live_location',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
-        assert check_defaults_handling(
+        assert await check_defaults_handling(
             callback_query.stop_message_live_location, callback_query.get_bot()
         )
 
         monkeypatch.setattr(callback_query.get_bot(), 'stop_message_live_location', make_assertion)
-        assert callback_query.stop_message_live_location()
+        assert await callback_query.stop_message_live_location()
 
-    def test_set_game_score(self, monkeypatch, callback_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_set_game_score(self, monkeypatch, callback_query):
+        async def make_assertion(*_, **kwargs):
             user_id = kwargs.get('user_id') == 1
             score = kwargs.get('score') == 2
             ids = self.check_passed_ids(callback_query, kwargs)
@@ -299,21 +310,24 @@ class TestCallbackQuery:
             ['inline_message_id', 'message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.set_game_score,
             callback_query.get_bot(),
             'set_game_score',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
-        assert check_defaults_handling(callback_query.set_game_score, callback_query.get_bot())
+        assert await check_defaults_handling(
+            callback_query.set_game_score, callback_query.get_bot()
+        )
 
         monkeypatch.setattr(callback_query.get_bot(), 'set_game_score', make_assertion)
-        assert callback_query.set_game_score(user_id=1, score=2)
-        assert callback_query.set_game_score(1, 2)
+        assert await callback_query.set_game_score(user_id=1, score=2)
+        assert await callback_query.set_game_score(1, 2)
 
-    def test_get_game_high_scores(self, monkeypatch, callback_query):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_game_high_scores(self, monkeypatch, callback_query):
+        async def make_assertion(*_, **kwargs):
             user_id = kwargs.get('user_id') == 1
             ids = self.check_passed_ids(callback_query, kwargs)
             return ids and user_id
@@ -324,26 +338,27 @@ class TestCallbackQuery:
             ['inline_message_id', 'message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.get_game_high_scores,
             callback_query.get_bot(),
             'get_game_high_scores',
             skip_params=self.skip_params(callback_query),
             shortcut_kwargs=self.shortcut_kwargs(callback_query),
         )
-        assert check_defaults_handling(
+        assert await check_defaults_handling(
             callback_query.get_game_high_scores, callback_query.get_bot()
         )
 
         monkeypatch.setattr(callback_query.get_bot(), 'get_game_high_scores', make_assertion)
-        assert callback_query.get_game_high_scores(user_id=1)
-        assert callback_query.get_game_high_scores(1)
+        assert await callback_query.get_game_high_scores(user_id=1)
+        assert await callback_query.get_game_high_scores(1)
 
-    def test_delete_message(self, monkeypatch, callback_query):
+    @pytest.mark.asyncio
+    async def test_delete_message(self, monkeypatch, callback_query):
         if callback_query.inline_message_id:
             pytest.skip("Can't delete inline messages")
 
-        def make_assertion(*args, **kwargs):
+        async def make_assertion(*args, **kwargs):
             id_ = kwargs['chat_id'] == callback_query.message.chat_id
             message = kwargs['message_id'] == callback_query.message.message_id
             return id_ and message
@@ -354,19 +369,22 @@ class TestCallbackQuery:
             ['message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.delete_message, callback_query.get_bot(), 'delete_message'
         )
-        assert check_defaults_handling(callback_query.delete_message, callback_query.get_bot())
+        assert await check_defaults_handling(
+            callback_query.delete_message, callback_query.get_bot()
+        )
 
         monkeypatch.setattr(callback_query.get_bot(), 'delete_message', make_assertion)
-        assert callback_query.delete_message()
+        assert await callback_query.delete_message()
 
-    def test_pin_message(self, monkeypatch, callback_query):
+    @pytest.mark.asyncio
+    async def test_pin_message(self, monkeypatch, callback_query):
         if callback_query.inline_message_id:
             pytest.skip("Can't pin inline messages")
 
-        def make_assertion(*args, **kwargs):
+        async def make_assertion(*args, **kwargs):
             return kwargs['chat_id'] == callback_query.message.chat_id
 
         assert check_shortcut_signature(
@@ -375,19 +393,20 @@ class TestCallbackQuery:
             ['message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.pin_message, callback_query.get_bot(), 'pin_chat_message'
         )
-        assert check_defaults_handling(callback_query.pin_message, callback_query.get_bot())
+        assert await check_defaults_handling(callback_query.pin_message, callback_query.get_bot())
 
         monkeypatch.setattr(callback_query.get_bot(), 'pin_chat_message', make_assertion)
-        assert callback_query.pin_message()
+        assert await callback_query.pin_message()
 
-    def test_unpin_message(self, monkeypatch, callback_query):
+    @pytest.mark.asyncio
+    async def test_unpin_message(self, monkeypatch, callback_query):
         if callback_query.inline_message_id:
             pytest.skip("Can't unpin inline messages")
 
-        def make_assertion(*args, **kwargs):
+        async def make_assertion(*args, **kwargs):
             return kwargs['chat_id'] == callback_query.message.chat_id
 
         assert check_shortcut_signature(
@@ -396,22 +415,25 @@ class TestCallbackQuery:
             ['message_id', 'chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.unpin_message,
             callback_query.get_bot(),
             'unpin_chat_message',
             shortcut_kwargs=['message_id', 'chat_id'],
         )
-        assert check_defaults_handling(callback_query.unpin_message, callback_query.get_bot())
+        assert await check_defaults_handling(
+            callback_query.unpin_message, callback_query.get_bot()
+        )
 
         monkeypatch.setattr(callback_query.get_bot(), 'unpin_chat_message', make_assertion)
-        assert callback_query.unpin_message()
+        assert await callback_query.unpin_message()
 
-    def test_copy_message(self, monkeypatch, callback_query):
+    @pytest.mark.asyncio
+    async def test_copy_message(self, monkeypatch, callback_query):
         if callback_query.inline_message_id:
             pytest.skip("Can't copy inline messages")
 
-        def make_assertion(*args, **kwargs):
+        async def make_assertion(*args, **kwargs):
             id_ = kwargs['from_chat_id'] == callback_query.message.chat_id
             chat_id = kwargs['chat_id'] == 1
             message = kwargs['message_id'] == callback_query.message.message_id
@@ -423,13 +445,13 @@ class TestCallbackQuery:
             ['message_id', 'from_chat_id'],
             [],
         )
-        assert check_shortcut_call(
+        assert await check_shortcut_call(
             callback_query.copy_message, callback_query.get_bot(), 'copy_message'
         )
-        assert check_defaults_handling(callback_query.copy_message, callback_query.get_bot())
+        assert await check_defaults_handling(callback_query.copy_message, callback_query.get_bot())
 
         monkeypatch.setattr(callback_query.get_bot(), 'copy_message', make_assertion)
-        assert callback_query.copy_message(1)
+        assert await callback_query.copy_message(1)
 
     def test_equality(self):
         a = CallbackQuery(self.id_, self.from_user, 'chat')

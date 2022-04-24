@@ -4,7 +4,7 @@
 
 """
 First, a few callback functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
+the Application and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 
 Usage:
@@ -22,7 +22,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
     ConversationHandler,
-    Updater,
+    Application,
     CallbackContext,
 )
 
@@ -36,11 +36,11 @@ logger = logging.getLogger(__name__)
 GENDER, PHOTO, LOCATION, BIO = range(4)
 
 
-def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Starts the conversation and asks the user about their gender."""
     reply_keyboard = [['Boy', 'Girl', 'Other']]
 
-    update.message.reply_text(
+    await update.message.reply_text(
         'Hi! My name is Professor Bot. I will hold a conversation with you. '
         'Send /cancel to stop talking to me.\n\n'
         'Are you a boy or a girl?',
@@ -52,11 +52,11 @@ def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return GENDER
 
 
-def gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Stores the selected gender and asks for a photo."""
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
-    update.message.reply_text(
+    await update.message.reply_text(
         'I see! Please send me a photo of yourself, '
         'so I know what you look like, or send /skip if you don\'t want to.',
         reply_markup=ReplyKeyboardRemove(),
@@ -65,69 +65,69 @@ def gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return PHOTO
 
 
-def photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Stores the photo and asks for a location."""
     user = update.message.from_user
-    photo_file = update.message.photo[-1].get_file()
-    photo_file.download('user_photo.jpg')
+    photo_file = await update.message.photo[-1].get_file()
+    await photo_file.download('user_photo.jpg')
     logger.info("Photo of %s: %s", user.first_name, 'user_photo.jpg')
-    update.message.reply_text(
+    await update.message.reply_text(
         'Gorgeous! Now, send me your location please, or send /skip if you don\'t want to.'
     )
 
     return LOCATION
 
 
-def skip_photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def skip_photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Skips the photo and asks for a location."""
     user = update.message.from_user
     logger.info("User %s did not send a photo.", user.first_name)
-    update.message.reply_text(
+    await update.message.reply_text(
         'I bet you look great! Now, send me your location please, or send /skip.'
     )
 
     return LOCATION
 
 
-def location(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def location(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Stores the location and asks for some info about the user."""
     user = update.message.from_user
     user_location = update.message.location
     logger.info(
         "Location of %s: %f / %f", user.first_name, user_location.latitude, user_location.longitude
     )
-    update.message.reply_text(
+    await update.message.reply_text(
         'Maybe I can visit you sometime! At last, tell me something about yourself.'
     )
 
     return BIO
 
 
-def skip_location(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def skip_location(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Skips the location and asks for info about the user."""
     user = update.message.from_user
     logger.info("User %s did not send a location.", user.first_name)
-    update.message.reply_text(
+    await update.message.reply_text(
         'You seem a bit paranoid! At last, tell me something about yourself.'
     )
 
     return BIO
 
 
-def bio(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def bio(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Stores the info about the user and ends the conversation."""
     user = update.message.from_user
     logger.info("Bio of %s: %s", user.first_name, update.message.text)
-    update.message.reply_text('Thank you! I hope we can talk again some day.')
+    await update.message.reply_text('Thank you! I hope we can talk again some day.')
 
     return ConversationHandler.END
 
 
-def cancel(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def cancel(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """Cancels and ends the conversation."""
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
-    update.message.reply_text(
+    await update.message.reply_text(
         'Bye! I hope we can talk again some day.', reply_markup=ReplyKeyboardRemove()
     )
 
@@ -136,11 +136,8 @@ def cancel(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
 
 def main() -> None:
     """Run the bot."""
-    # Create the Updater and pass it your bot's token.
-    updater = Updater.builder().token("TOKEN").build()
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("TOKEN").build()
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
@@ -157,15 +154,10 @@ def main() -> None:
         fallbacks=[CommandHandler('cancel', cancel)],
     )
 
-    dispatcher.add_handler(conv_handler)
+    application.add_handler(conv_handler)
 
-    # Start the Bot
-    updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 
 if __name__ == '__main__':

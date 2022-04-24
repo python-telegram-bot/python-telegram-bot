@@ -57,7 +57,7 @@ def to_float_timestamp(
     Converts a given time object to a float POSIX timestamp.
     Used to convert different time specifications to a common format. The time object
     can be relative (i.e. indicate a time increment, or a time of day) or absolute.
-    object objects from the :class:`datetime` module that are timezone-naive will be assumed
+    Objects from the :class:`datetime` module that are timezone-naive will be assumed
     to be in UTC, if ``bot`` is not passed or ``bot.defaults`` is :obj:`None`.
 
     Args:
@@ -65,33 +65,36 @@ def to_float_timestamp(
             :obj:`datetime.datetime` | :obj:`datetime.time`):
             Time value to convert. The semantics of this parameter will depend on its type:
 
-            * :obj:`int` or :obj:`float` will be interpreted as "seconds from ``reference_t``"
+            * :obj:`int` or :obj:`float` will be interpreted as "seconds from
+              :paramref:`reference_t`"
             * :obj:`datetime.timedelta` will be interpreted as
-              "time increment from ``reference_t``"
+              "time increment from :paramref:`reference_timestamp`"
             * :obj:`datetime.datetime` will be interpreted as an absolute date/time value
             * :obj:`datetime.time` will be interpreted as a specific time of day
 
         reference_timestamp (:obj:`float`, optional): POSIX timestamp that indicates the absolute
-            time from which relative calculations are to be performed (e.g. when ``t`` is given as
-            an :obj:`int`, indicating "seconds from ``reference_t``"). Defaults to now (the time at
-            which this function is called).
+            time from which relative calculations are to be performed (e.g. when
+            :paramref:`time_object` is given as an :obj:`int`, indicating "seconds from
+            :paramref:`reference_time`"). Defaults to now (the time at which this function is
+            called).
 
-            If ``t`` is given as an absolute representation of date & time (i.e. a
-            :obj:`datetime.datetime` object), ``reference_timestamp`` is not relevant and so its
-            value should be :obj:`None`. If this is not the case, a ``ValueError`` will be raised.
-        tzinfo (:obj:`pytz.BaseTzInfo`, optional): If ``t`` is a naive object from the
-            :class:`datetime` module, it will be interpreted as this timezone. Defaults to
+            If :paramref:`time_object` is given as an absolute representation of date & time (i.e.
+            a :obj:`datetime.datetime` object), :paramref:`reference_timestamp` is not relevant
+            and so its value should be :obj:`None`. If this is not the case, a :exc:`ValueError`
+            will be raised.
+        tzinfo (:obj:`pytz.BaseTzInfo`, optional): If :paramref:`time_object` is a naive object
+            from the :mod:`datetime` module, it will be interpreted as this timezone. Defaults to
             ``pytz.utc``.
 
             Note:
                 Only to be used by ``telegram.ext``.
 
-
     Returns:
         :obj:`float` | :obj:`None`:
-            The return value depends on the type of argument ``t``.
-            If ``t`` is given as a time increment (i.e. as a :obj:`int`, :obj:`float` or
-            :obj:`datetime.timedelta`), then the return value will be ``reference_t`` + ``t``.
+            The return value depends on the type of argument :paramref:`time_object`.
+            If :paramref:`time_object` is given as a time increment (i.e. as a :obj:`int`,
+            :obj:`float` or :obj:`datetime.timedelta`), then the return value will be
+            :paramref:`reference_timestamp` + :paramref:`time_object`.
 
             Else if it is given as an absolute date/time value (i.e. a :obj:`datetime.datetime`
             object), the equivalent value as a POSIX timestamp will be returned.
@@ -100,9 +103,9 @@ def to_float_timestamp(
             object), the return value is the nearest future occurrence of that time of day.
 
     Raises:
-        TypeError: If ``t``'s type is not one of those described above.
-        ValueError: If ``t`` is a :obj:`datetime.datetime` and :obj:`reference_timestamp` is not
-            :obj:`None`.
+        TypeError: If :paramref:`time_object` s type is not one of those described above.
+        ValueError: If :paramref:`time_object` is a :obj:`datetime.datetime` and
+            :paramref:`reference_timestamp` is not :obj:`None`.
     """
     if reference_timestamp is None:
         reference_timestamp = time.time()
@@ -169,7 +172,7 @@ def from_timestamp(unixtime: Optional[int], tzinfo: dtm.tzinfo = UTC) -> Optiona
             converted to. Defaults to UTC.
 
     Returns:
-        Timezone aware equivalent :obj:`datetime.datetime` value if ``unixtime`` is not
+        Timezone aware equivalent :obj:`datetime.datetime` value if :paramref:`unixtime` is not
         :obj:`None`; else :obj:`None`.
     """
     if unixtime is None:

@@ -30,8 +30,8 @@ ThumbedMT = TypeVar('ThumbedMT', bound='_BaseThumbedMedium', covariant=True)
 
 
 class _BaseThumbedMedium(_BaseMedium):
-    """Base class for objects representing the various media file types that may include a
-        thumbnail.
+    """
+    Base class for objects representing the various media file types that may include a thumbnail.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
