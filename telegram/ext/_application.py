@@ -1087,7 +1087,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         the persistence on the next run of :meth:`update_persistence`, if applicable.
 
         Warning:
-            When using :paramref:`concurrent_updates` or the :attr:`job_queue`,
+            When using :attr:`concurrent_updates` or the :attr:`job_queue`,
             :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create this entry due to
             the asynchronous nature of these features. Please make sure that your program can
             avoid or handle such situations.
@@ -1106,7 +1106,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         the persistence on the next run of :meth:`update_persistence`, if applicable.
 
         Warning:
-            When using :paramref:`concurrent_updates` or the :attr:`job_queue`,
+            When using :attr:`concurrent_updates` or the :attr:`job_queue`,
             :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create this entry due to
             the asynchronous nature of these features. Please make sure that your program can
             avoid or handle such situations.

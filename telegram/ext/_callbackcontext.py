@@ -64,7 +64,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     Warning:
          Do not combine custom attributes with :paramref:`telegram.ext.Handler.block` set to
-         :obj:`False` or :paramref:`telegram.ext.Application.concurrent_updates` set to
+         :obj:`False` or :attr:`telegram.ext.Application.concurrent_updates` set to
          :obj:`True`. Due to how those work, it will almost certainly execute the callbacks for an
          update out of order, and the attributes that you think you added will not be present.
 

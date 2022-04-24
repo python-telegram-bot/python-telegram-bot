@@ -30,7 +30,6 @@ class Defaults:
         Removed the argument and attribute ``timeout``. Specify default timeout behavior for the
         networking backend directly via :class:`telegram.ext.ApplicationBuilder` instead.
 
-
     Parameters:
         parse_mode (:obj:`str`, optional): Send :attr:`~telegram.constants.ParseMode.MARKDOWN` or
             :attr:`~telegram.constants.ParseMode.HTML`, if you want Telegram apps to show
@@ -120,7 +119,7 @@ class Defaults:
 
     @property
     def explanation_parse_mode(self) -> Optional[str]:
-        """:obj:`str`: Optional. Alias for :paramref:`parse_mode`, used for
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
         the corresponding parameter of :meth:`telegram.Bot.send_poll`.
         """
         return self._parse_mode

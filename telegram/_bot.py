@@ -6542,7 +6542,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 available modes.
             explanation_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :paramref:`parse_mode`.
+                :paramref:`explanation_parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
                 after creation, 5-600. Can't be used together with :paramref:`close_date`.
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix

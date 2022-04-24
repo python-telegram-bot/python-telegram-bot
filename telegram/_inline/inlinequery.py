@@ -145,7 +145,9 @@ class InlineQuery(TelegramObject):
 
         Args:
             auto_pagination (:obj:`bool`, optional): If set to :obj:`True`, :attr:`offset` will be
-                passed as :paramref:`current_offset` to :meth:`telegram.Bot.answer_inline_query`.
+                passed as
+                :paramref:`current_offset <telegram.Bot.answer_inline_query.current_offset>` to
+                :meth:`telegram.Bot.answer_inline_query`.
                 Defaults to :obj:`False`.
 
         Raises:
