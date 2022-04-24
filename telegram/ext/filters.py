@@ -52,7 +52,6 @@ __all__ = (
     'Chat',
     'ChatType',
     'Command',
-    'DOCUMENT',
     'Dice',
     'Document',
     'Entity',
@@ -70,7 +69,7 @@ __all__ = (
     'POLL',
     'REPLY',
     'Regex',
-    'STICKER',
+    'Sticker',
     'SUCCESSFUL_PAYMENT',
     'SenderChat',
     'StatusUpdate',
@@ -819,7 +818,7 @@ class ChatType:  # A convenience namespace for Chat types.
         Use these filters like: ``filters.ChatType.CHANNEL`` or
         ``filters.ChatType.SUPERGROUP`` etc.
 
-    Note:
+    Caution:
         ``filters.ChatType`` itself is *not* a filter, but just a convenience namespace.
     """
 
@@ -1084,17 +1083,29 @@ class Dice(_Dice):
     """Dice messages with the emoji 🎰. Matches any dice value."""
 
 
-class Document(MessageFilter):
+class Document:
     """
     Subset for messages containing a document/file.
 
     Examples:
         Use these filters like: ``filters.Document.MP3``,
-        ``filters.Document.MimeType("text/plain")`` etc. Or use just ``filters.DOCUMENT`` for all
-        document messages.
+        ``filters.Document.MimeType("text/plain")`` etc. Or just use ``filters.Document.ALL`` for
+        all document messages.
+
+    Caution:
+        ``filters.Document`` itself is *not* a filter, but just a convenience namespace.
     """
 
     __slots__ = ()
+
+    class _All(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.document)
+
+    ALL = _All(name="filters.Document.ALL")
+    """Messages that contain a :attr:`telegram.Message.document`."""
 
     class Category(MessageFilter):
         """Filters documents by their category in the mime-type attribute.
@@ -1251,13 +1262,6 @@ class Document(MessageFilter):
     """Use as ``filters.Document.XML``."""
     ZIP = MimeType(mimetypes.types_map['.zip'])
     """Use as ``filters.Document.ZIP``."""
-
-    def filter(self, message: Message) -> bool:
-        return bool(message.document)
-
-
-DOCUMENT = Document(name="filters.DOCUMENT")
-"""Shortcut for :class:`telegram.ext.filters.Document()`."""
 
 
 class Entity(MessageFilter):
@@ -1665,7 +1669,7 @@ class StatusUpdate:
         Use these filters like: ``filters.StatusUpdate.NEW_CHAT_MEMBERS`` etc. Or use just
         ``filters.StatusUpdate.ALL`` for all status update messages.
 
-    Note:
+    Caution:
         ``filters.StatusUpdate`` itself is *not* a filter, but just a convenience namespace.
     """
 
@@ -1860,15 +1864,69 @@ class StatusUpdate:
     """
 
 
-class _Sticker(MessageFilter):
+class Sticker:
+    """Filters messages which contain a sticker.
+
+    Examples:
+        Use this filter like: ``filters.Sticker.VIDEO``. Or, just use ``filters.Sticker.ALL`` for
+        any type of sticker.
+
+    Caution:
+        ``filters.Sticker`` itself is *not* a filter, but just a convenience namespace.
+    """
+
     __slots__ = ()
 
-    def filter(self, message: Message) -> bool:
-        return bool(message.sticker)
+    class _All(MessageFilter):
+        __slots__ = ()
 
+        def filter(self, message: Message) -> bool:
+            return bool(message.sticker)
 
-STICKER = _Sticker(name="filters.STICKER")
-"""Messages that contain :attr:`telegram.Message.sticker`."""
+    ALL = _All(name="filters.Sticker.ALL")
+    """Messages that contain :attr:`telegram.Message.sticker`."""
+
+    class _Animated(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.sticker) and bool(message.sticker.is_animated)  # type: ignore
+
+    ANIMATED = _Animated(name="filters.Sticker.ANIMATED")
+    """Messages that contain :attr:`telegram.Message.sticker` and
+    :attr:`is animated <telegram.Sticker.is_animated>`.
+
+    .. versionadded:: 14.0
+    """
+
+    class _Static(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.sticker) and (
+                not bool(message.sticker.is_animated)  # type: ignore[union-attr]
+                and not bool(message.sticker.is_video)  # type: ignore[union-attr]
+            )
+
+    STATIC = _Static(name="filters.Sticker.STATIC")
+    """Messages that contain :attr:`telegram.Message.sticker` and is a static sticker, i.e. does
+    not contain :attr:`telegram.Sticker.is_animated` or :attr:`telegram.Sticker.is_video`.
+
+    .. versionadded:: 14.0
+    """
+
+    class _Video(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.sticker) and bool(message.sticker.is_video)  # type: ignore
+
+    VIDEO = _Video(name="filters.Sticker.VIDEO")
+    """Messages that contain :attr:`telegram.Message.sticker` and is a
+    :attr:`video sticker <telegram.Sticker.is_video>`.
+
+    .. versionadded:: 14.0
+    """
 
 
 class _SuccessfulPayment(MessageFilter):
@@ -1940,7 +1998,7 @@ class UpdateType:
         Use these filters like: ``filters.UpdateType.MESSAGE`` or
         ``filters.UpdateType.CHANNEL_POSTS`` etc.
 
-    Note:
+    Caution:
         ``filters.UpdateType`` itself is *not* a filter, but just a convenience namespace.
     """
 

@@ -20,7 +20,17 @@ import datetime
 
 import pytest
 
-from telegram import Message, User, Chat, MessageEntity, Document, Update, Dice, CallbackQuery
+from telegram import (
+    Message,
+    User,
+    Chat,
+    MessageEntity,
+    Document,
+    Update,
+    Dice,
+    CallbackQuery,
+    Sticker,
+)
 from telegram.ext import filters
 import inspect
 import re
@@ -583,9 +593,9 @@ class TestFilters:
         assert filters.AUDIO.check_update(update)
 
     def test_filters_document(self, update):
-        assert not filters.DOCUMENT.check_update(update)
+        assert not filters.Document.ALL.check_update(update)
         update.message.document = 'test'
-        assert filters.DOCUMENT.check_update(update)
+        assert filters.Document.ALL.check_update(update)
 
     def test_filters_document_type(self, update):
         update.message.document = Document(
@@ -816,9 +826,19 @@ class TestFilters:
         assert filters.PHOTO.check_update(update)
 
     def test_filters_sticker(self, update):
-        assert not filters.STICKER.check_update(update)
-        update.message.sticker = 'test'
-        assert filters.STICKER.check_update(update)
+        assert not filters.Sticker.ALL.check_update(update)
+        update.message.sticker = Sticker('1', 'uniq', 1, 2, False, False)
+        assert filters.Sticker.ALL.check_update(update)
+        assert filters.Sticker.STATIC.check_update(update)
+        update.message.sticker.is_animated = True
+        assert filters.Sticker.ANIMATED.check_update(update)
+        assert not filters.Sticker.VIDEO.check_update(update)
+        assert not filters.Sticker.STATIC.check_update(update)
+        update.message.sticker.is_animated = False
+        update.message.sticker.is_video = True
+        assert not filters.Sticker.ANIMATED.check_update(update)
+        assert not filters.Sticker.STATIC.check_update(update)
+        assert filters.Sticker.VIDEO.check_update(update)
 
     def test_filters_video(self, update):
         assert not filters.VIDEO.check_update(update)
