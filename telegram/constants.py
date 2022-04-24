@@ -659,14 +659,14 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.pinned_message`."""
     PROXIMITY_ALERT_TRIGGERED = 'proximity_alert_triggered'
     """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
-    VOICE_CHAT_SCHEDULED = 'voice_chat_scheduled'
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_scheduled`."""
-    VOICE_CHAT_STARTED = 'voice_chat_started'
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_started`."""
-    VOICE_CHAT_ENDED = 'voice_chat_ended'
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_ended`."""
-    VOICE_CHAT_PARTICIPANTS_INVITED = 'voice_chat_participants_invited'
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_participants_invited`."""
+    VIDEO_CHAT_SCHEDULED = 'video_chat_scheduled'
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_scheduled`."""
+    VIDEO_CHAT_STARTED = 'video_chat_started'
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_started`."""
+    VIDEO_CHAT_ENDED = 'video_chat_ended'
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_ended`."""
+    VIDEO_CHAT_PARTICIPANTS_INVITED = 'video_chat_participants_invited'
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_participants_invited`."""
 
 
 class ParseMode(StringEnum):

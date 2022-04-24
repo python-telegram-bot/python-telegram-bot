@@ -1,9 +1,9 @@
 :github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/voicechat.py
 
-telegram.VoiceChatStarted
+telegram.VideoChatStarted
 =========================
 
-.. autoclass:: telegram.VoiceChatStarted
+.. autoclass:: telegram.VideoChatStarted
     :members:
     :show-inheritance:
 

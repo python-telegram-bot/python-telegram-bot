@@ -2044,7 +2044,7 @@ class TestBot:
                 can_pin_messages=True,
                 can_promote_members=True,
                 can_manage_chat=True,
-                can_manage_voice_chats=True,
+                can_manage_video_chats=True,
             )
 
         # Test that we pass the correct params to TG
@@ -2063,7 +2063,7 @@ class TestBot:
                 and data.get('can_pin_messages') == 8
                 and data.get('can_promote_members') == 9
                 and data.get('can_manage_chat') == 10
-                and data.get('can_manage_voice_chats') == 11
+                and data.get('can_manage_video_chats') == 11
             )
 
         monkeypatch.setattr(bot, '_post', make_assertion)
@@ -2080,7 +2080,7 @@ class TestBot:
             can_pin_messages=8,
             can_promote_members=9,
             can_manage_chat=10,
-            can_manage_voice_chats=11,
+            can_manage_video_chats=11,
         )
 
     @flaky(3, 1)

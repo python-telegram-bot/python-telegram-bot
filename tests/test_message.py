@@ -46,11 +46,11 @@ from telegram import (
     ProximityAlertTriggered,
     Dice,
     Bot,
-    VoiceChatStarted,
-    VoiceChatEnded,
-    VoiceChatParticipantsInvited,
+    VideoChatStarted,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
     MessageAutoDeleteTimerChanged,
-    VoiceChatScheduled,
+    VideoChatScheduled,
     WebAppData,
 )
 from telegram.constants import ParseMode, ChatAction
@@ -172,11 +172,11 @@ def message(bot):
                 User(1, 'John', False), User(2, 'Doe', False), 42
             )
         },
-        {'voice_chat_scheduled': VoiceChatScheduled(datetime.utcnow())},
-        {'voice_chat_started': VoiceChatStarted()},
-        {'voice_chat_ended': VoiceChatEnded(100)},
+        {'video_chat_scheduled': VideoChatScheduled(datetime.utcnow())},
+        {'video_chat_started': VideoChatStarted()},
+        {'video_chat_ended': VideoChatEnded(100)},
         {
-            'voice_chat_participants_invited': VoiceChatParticipantsInvited(
+            'video_chat_participants_invited': VideoChatParticipantsInvited(
                 [User(1, 'Rem', False), User(2, 'Emilia', False)]
             )
         },
@@ -235,10 +235,10 @@ def message(bot):
         'dice',
         'via_bot',
         'proximity_alert_triggered',
-        'voice_chat_scheduled',
-        'voice_chat_started',
-        'voice_chat_ended',
-        'voice_chat_participants_invited',
+        'video_chat_scheduled',
+        'video_chat_started',
+        'video_chat_ended',
+        'video_chat_participants_invited',
         'sender_chat',
         'is_automatic_forward',
         'has_protected_content',

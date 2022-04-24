@@ -628,7 +628,7 @@ class Chat(TelegramObject):
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
-        can_manage_voice_chats: bool = None,
+        can_manage_video_chats: bool = None,
     ) -> bool:
         """Shortcut for::
 
@@ -638,6 +638,10 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.promote_chat_member`.
 
         .. versionadded:: 13.2
+        .. versionchanged:: 20.0
+           The argument ``can_manage_voice_chats`` was renamed to
+           :paramref:`~telegram.Bot.promote_chat_member.can_manage_video_chats` in accordance to
+           Bot API 6.0.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -661,7 +665,7 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
             is_anonymous=is_anonymous,
             can_manage_chat=can_manage_chat,
-            can_manage_voice_chats=can_manage_voice_chats,
+            can_manage_video_chats=can_manage_video_chats,
         )
 
     async def restrict_member(

@@ -68,10 +68,10 @@ telegram package
     telegram.video
     telegram.videonote
     telegram.voice
-    telegram.voicechatstarted
-    telegram.voicechatended
-    telegram.voicechatscheduled
-    telegram.voicechatparticipantsinvited
+    telegram.videochatstarted
+    telegram.videochatended
+    telegram.videochatscheduled
+    telegram.videochatparticipantsinvited
     telegram.webappdata
     telegram.webappinfo
     telegram.webhookinfo

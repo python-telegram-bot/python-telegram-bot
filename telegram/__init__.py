@@ -156,10 +156,10 @@ __all__ = (  # Keep this alphabetically ordered
     'Video',
     'VideoNote',
     'Voice',
-    'VoiceChatStarted',
-    'VoiceChatEnded',
-    'VoiceChatScheduled',
-    'VoiceChatParticipantsInvited',
+    'VideoChatStarted',
+    'VideoChatEnded',
+    'VideoChatScheduled',
+    'VideoChatParticipantsInvited',
     'warnings',
     'WebAppData',
     'WebAppInfo',
@@ -215,11 +215,11 @@ from ._messageentity import MessageEntity
 from ._messageid import MessageId
 from ._games.game import Game
 from ._poll import Poll, PollOption, PollAnswer
-from ._voicechat import (
-    VoiceChatStarted,
-    VoiceChatEnded,
-    VoiceChatParticipantsInvited,
-    VoiceChatScheduled,
+from ._videochat import (
+    VideoChatStarted,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
 )
 from ._proximityalerttriggered import ProximityAlertTriggered
 from ._payment.shippingaddress import ShippingAddress

@@ -46,12 +46,12 @@ from telegram import (
     Video,
     VideoNote,
     Voice,
-    VoiceChatStarted,
-    VoiceChatEnded,
-    VoiceChatParticipantsInvited,
+    VideoChatStarted,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
     ProximityAlertTriggered,
     MessageAutoDeleteTimerChanged,
-    VoiceChatScheduled,
+    VideoChatScheduled,
     WebAppData,
 )
 from telegram.constants import ParseMode, MessageAttachmentType
@@ -83,6 +83,15 @@ class Message(TelegramObject):
 
     Note:
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
+
+    .. versionchanged:: 20.0
+        The arguments and attributes ``voice_chat_scheduled``, ``voice_chat_started`` and
+        ``voice_chat_ended``, ``voice_chat_participants_invited`` where renamed to
+        :paramref:`video_chat_scheduled`/:attr:`video_chat_scheduled`,
+        :paramref:`video_chat_started`/:attr:`video_chat_started`,
+        :paramref:`video_chat_ended`/:attr:`video_chat_ended` and
+        :paramref:`video_chat_participants_invited`/:attr:`video_chat_participants_invited`,
+        respectively, in accordance to Bot API 6.0.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -211,22 +220,22 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
-        voice_chat_scheduled (:class:`telegram.VoiceChatScheduled`, optional): Service message:
-            voice chat scheduled.
+        video_chat_scheduled (:class:`telegram.VideoChatScheduled`, optional): Service message:
+            video chat scheduled.
 
-            .. versionadded:: 13.5
-        voice_chat_started (:class:`telegram.VoiceChatStarted`, optional): Service message: voice
+            .. versionadded:: 20.0
+        video_chat_started (:class:`telegram.VideoChatStarted`, optional): Service message: video
             chat started.
 
-            .. versionadded:: 13.4
-        voice_chat_ended (:class:`telegram.VoiceChatEnded`, optional): Service message: voice chat
+            .. versionadded:: 20.0
+        video_chat_ended (:class:`telegram.VideoChatEnded`, optional): Service message: video chat
             ended.
 
-            .. versionadded:: 13.4
-        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` optional):
-            Service message: new participants invited to a voice chat.
+            .. versionadded:: 20.0
+        video_chat_participants_invited (:class:`telegram.VideoChatParticipantsInvited` optional):
+            Service message: new participants invited to a video chat.
 
-            .. versionadded:: 13.4
+            .. versionadded:: 20.0
         web_app_data (:class:`telegram.WebAppData`, optional): Service message: data sent by a Web
             App.
 
@@ -330,22 +339,22 @@ class Message(TelegramObject):
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
-        voice_chat_scheduled (:class:`telegram.VoiceChatScheduled`): Optional. Service message:
-            voice chat scheduled.
+        video_chat_scheduled (:class:`telegram.VideoChatScheduled`): Optional. Service message:
+            video chat scheduled.
 
-            .. versionadded:: 13.5
-        voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Service message: voice
+            .. versionadded:: 20.0
+        video_chat_started (:class:`telegram.VideoChatStarted`): Optional. Service message: video
             chat started.
 
-            .. versionadded:: 13.4
-        voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Service message: voice chat
+            .. versionadded:: 20.0
+        video_chat_ended (:class:`telegram.VideoChatEnded`): Optional. Service message: video chat
             ended.
 
-            .. versionadded:: 13.4
-        voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited`): Optional.
-            Service message: new participants invited to a voice chat.
+            .. versionadded:: 20.0
+        video_chat_participants_invited (:class:`telegram.VideoChatParticipantsInvited`): Optional.
+            Service message: new participants invited to a video chat.
 
-            .. versionadded:: 13.4
+            .. versionadded:: 20.0
         web_app_data (:class:`telegram.WebAppData`): Optional. Service message: data sent by a Web
             App.
 
@@ -411,10 +420,10 @@ class Message(TelegramObject):
         'video_note',
         '_effective_attachment',
         'message_auto_delete_timer_changed',
-        'voice_chat_ended',
-        'voice_chat_participants_invited',
-        'voice_chat_started',
-        'voice_chat_scheduled',
+        'video_chat_ended',
+        'video_chat_participants_invited',
+        'video_chat_started',
+        'video_chat_scheduled',
         'is_automatic_forward',
         'has_protected_content',
         'web_app_data',
@@ -474,11 +483,11 @@ class Message(TelegramObject):
         via_bot: User = None,
         proximity_alert_triggered: ProximityAlertTriggered = None,
         sender_chat: Chat = None,
-        voice_chat_started: VoiceChatStarted = None,
-        voice_chat_ended: VoiceChatEnded = None,
-        voice_chat_participants_invited: VoiceChatParticipantsInvited = None,
+        video_chat_started: VideoChatStarted = None,
+        video_chat_ended: VideoChatEnded = None,
+        video_chat_participants_invited: VideoChatParticipantsInvited = None,
         message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged = None,
-        voice_chat_scheduled: VoiceChatScheduled = None,
+        video_chat_scheduled: VideoChatScheduled = None,
         is_automatic_forward: bool = None,
         has_protected_content: bool = None,
         web_app_data: WebAppData = None,
@@ -539,10 +548,10 @@ class Message(TelegramObject):
         self.dice = dice
         self.via_bot = via_bot
         self.proximity_alert_triggered = proximity_alert_triggered
-        self.voice_chat_scheduled = voice_chat_scheduled
-        self.voice_chat_started = voice_chat_started
-        self.voice_chat_ended = voice_chat_ended
-        self.voice_chat_participants_invited = voice_chat_participants_invited
+        self.video_chat_scheduled = video_chat_scheduled
+        self.video_chat_started = video_chat_started
+        self.video_chat_ended = video_chat_ended
+        self.video_chat_participants_invited = video_chat_participants_invited
         self.reply_markup = reply_markup
         self.web_app_data = web_app_data
         self.set_bot(bot)
@@ -618,13 +627,13 @@ class Message(TelegramObject):
             data.get('proximity_alert_triggered'), bot
         )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-        data['voice_chat_scheduled'] = VoiceChatScheduled.de_json(
-            data.get('voice_chat_scheduled'), bot
+        data['video_chat_scheduled'] = VideoChatScheduled.de_json(
+            data.get('video_chat_scheduled'), bot
         )
-        data['voice_chat_started'] = VoiceChatStarted.de_json(data.get('voice_chat_started'), bot)
-        data['voice_chat_ended'] = VoiceChatEnded.de_json(data.get('voice_chat_ended'), bot)
-        data['voice_chat_participants_invited'] = VoiceChatParticipantsInvited.de_json(
-            data.get('voice_chat_participants_invited'), bot
+        data['video_chat_started'] = VideoChatStarted.de_json(data.get('video_chat_started'), bot)
+        data['video_chat_ended'] = VideoChatEnded.de_json(data.get('video_chat_ended'), bot)
+        data['video_chat_participants_invited'] = VideoChatParticipantsInvited.de_json(
+            data.get('video_chat_participants_invited'), bot
         )
         data['web_app_data'] = WebAppData.de_json(data.get('web_app_data'), bot)
 

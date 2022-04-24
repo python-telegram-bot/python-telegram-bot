@@ -4936,12 +4936,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
-        can_manage_voice_chats: bool = None,
+        can_manage_video_chats: bool = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
         an administrator in the chat for this to work and must have the appropriate admin rights.
         Pass :obj:`False` for all boolean parameters to demote a user.
+
+        .. versionchanged:: 20.0
+           The argument ``can_manage_voice_chats`` was renamed to
+           :paramref:`can_manage_video_chats` in accordance to Bot API 6.0.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4956,10 +4960,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionadded:: 13.4
 
-            can_manage_voice_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
-                can manage voice chats.
+            can_manage_video_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
+                can manage video chats.
 
-                .. versionadded:: 13.4
+                .. versionadded:: 20.0
 
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
@@ -5023,8 +5027,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data['can_promote_members'] = can_promote_members
         if can_manage_chat is not None:
             data['can_manage_chat'] = can_manage_chat
-        if can_manage_voice_chats is not None:
-            data['can_manage_voice_chats'] = can_manage_voice_chats
+        if can_manage_video_chats is not None:
+            data['can_manage_video_chats'] = can_manage_video_chats
 
         result = await self._post(
             'promoteChatMember',
