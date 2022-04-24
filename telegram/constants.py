@@ -63,20 +63,10 @@ __all__ = [
     'UpdateType',
 ]
 
-from enum import Enum, IntEnum
+from enum import IntEnum
 from typing import List
 
-
-class _StringEnum(str, Enum):
-    """Helper class for string enums where the value is not important to be displayed on
-    stringification.
-    """
-
-    __slots__ = ()
-
-    def __repr__(self) -> str:
-        return f'<{self.__class__.__name__}.{self.name}>'
-
+from telegram._utils.enum import StringEnum
 
 BOT_API_VERSION = '5.7'
 
@@ -85,7 +75,7 @@ BOT_API_VERSION = '5.7'
 SUPPORTED_WEBHOOK_PORTS: List[int] = [443, 80, 88, 8443]
 
 
-class BotCommandScopeType(_StringEnum):
+class BotCommandScopeType(StringEnum):
     """This enum contains the available types of :class:`telegram.BotCommandScope`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -125,7 +115,7 @@ class CallbackQueryLimit(IntEnum):
     :meth:`telegram.Bot.answer_callback_query`."""
 
 
-class ChatAction(_StringEnum):
+class ChatAction(StringEnum):
     """This enum contains the available chat actions for :meth:`telegram.Bot.send_chat_action`.
     The enum members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -210,7 +200,7 @@ class ChatInviteLinkLimit(IntEnum):
     :meth:`telegram.Bot.create_chat_invite_link` and :meth:`telegram.Bot.edit_chat_invite_link`."""
 
 
-class ChatMemberStatus(_StringEnum):
+class ChatMemberStatus(StringEnum):
     """This enum contains the available states for :class:`telegram.ChatMember`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -233,7 +223,7 @@ class ChatMemberStatus(_StringEnum):
     """:obj:`str`: A :class:`telegram.ChatMember` who was restricted in this chat."""
 
 
-class ChatType(_StringEnum):
+class ChatType(StringEnum):
     """This enum contains the available types of :class:`telegram.Chat`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -255,7 +245,7 @@ class ChatType(_StringEnum):
     """:obj:`str`: A :class:`telegram.Chat` that is a channel."""
 
 
-class DiceEmoji(_StringEnum):
+class DiceEmoji(StringEnum):
     """This enum contains the available emoji for :class:`telegram.Dice`/
     :meth:`telegram.Bot.send_dice`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -344,7 +334,7 @@ class InlineKeyboardMarkupLimit(IntEnum):
     """
 
 
-class InputMediaType(_StringEnum):
+class InputMediaType(StringEnum):
     """This enum contains the available types of :class:`telegram.InputMedia`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -383,7 +373,7 @@ class InlineQueryLimit(IntEnum):
     :meth:`telegram.Bot.answer_inline_query`."""
 
 
-class InlineQueryResultType(_StringEnum):
+class InlineQueryResultType(StringEnum):
     """This enum contains the available types of :class:`telegram.InlineQueryResult`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -457,7 +447,7 @@ class LocationLimit(IntEnum):
     """
 
 
-class MaskPosition(_StringEnum):
+class MaskPosition(StringEnum):
     """This enum contains the available positions for :class:`telegram.MaskPosition`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -476,7 +466,7 @@ class MaskPosition(_StringEnum):
     """:obj:`str`: Mask position for a sticker on the chin."""
 
 
-class MessageAttachmentType(_StringEnum):
+class MessageAttachmentType(StringEnum):
     """This enum contains the available types of :class:`telegram.Message` that can bee seens
     as attachment. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -525,7 +515,7 @@ class MessageAttachmentType(_StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
 
 
-class MessageEntityType(_StringEnum):
+class MessageEntityType(StringEnum):
     """This enum contains the available types of :class:`telegram.MessageEntity`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -592,7 +582,7 @@ class MessageLimit(IntEnum):
     """
 
 
-class MessageType(_StringEnum):
+class MessageType(StringEnum):
     """This enum contains the available types of :class:`telegram.Message` that can be seen
     as attachment. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -679,7 +669,7 @@ class MessageType(_StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_participants_invited`."""
 
 
-class ParseMode(_StringEnum):
+class ParseMode(StringEnum):
     """This enum contains the available parse modes. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -719,7 +709,7 @@ class PollLimit(IntEnum):
     """:obj:`str`: Maximum number of available options for the poll."""
 
 
-class PollType(_StringEnum):
+class PollType(StringEnum):
     """This enum contains the available types for :class:`telegram.Poll`/
     :meth:`telegram.Bot.send_poll`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -735,7 +725,7 @@ class PollType(_StringEnum):
     """:obj:`str`: quiz polls."""
 
 
-class UpdateType(_StringEnum):
+class UpdateType(StringEnum):
     """This enum contains the available types of :class:`telegram.Update`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 

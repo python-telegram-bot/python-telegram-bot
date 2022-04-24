@@ -39,15 +39,18 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
             (error-)handler callbacks and job callbacks. Must be a subclass of
             :class:`telegram.ext.CallbackContext`. Defaults to
             :class:`telegram.ext.CallbackContext`.
-        bot_data (:obj:`type`, optional): Determines the type of ``context.bot_data`` of all
-            (error-)handler callbacks and job callbacks. Defaults to :obj:`dict`. Must support
-            instantiating without arguments.
-        chat_data (:obj:`type`, optional): Determines the type of ``context.chat_data`` of all
-            (error-)handler callbacks and job callbacks. Defaults to :obj:`dict`. Must support
-            instantiating without arguments.
-        user_data (:obj:`type`, optional): Determines the type of ``context.user_data`` of all
-            (error-)handler callbacks and job callbacks. Defaults to :obj:`dict`. Must support
-            instantiating without arguments.
+        bot_data (:obj:`type`, optional): Determines the type of
+            :attr:`context.bot_data <CallbackContext.bot_data>` of all (error-)handler callbacks
+            and job callbacks. Defaults to :obj:`dict`. Must support instantiating without
+            arguments.
+        chat_data (:obj:`type`, optional): Determines the type of
+            :attr:`context.chat_data <CallbackContext.chat_data>` of all (error-)handler callbacks
+            and job callbacks. Defaults to :obj:`dict`. Must support instantiating without
+            arguments.
+        user_data (:obj:`type`, optional): Determines the type of
+            :attr:`context.user_data <CallbackContext.user_data>` of all (error-)handler callbacks
+            and job callbacks. Defaults to :obj:`dict`. Must support instantiating without
+            arguments.
 
     """
 
@@ -201,15 +204,21 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @property
     def bot_data(self) -> Type[BD]:
-        """The type of ``context.bot_data`` of all (error-)handler callbacks and job callbacks."""
+        """The type of :attr:`context.bot_data <CallbackContext.bot_data>` of all (error-)handler
+        callbacks and job callbacks.
+        """
         return self._bot_data
 
     @property
     def chat_data(self) -> Type[CD]:
-        """The type of ``context.chat_data`` of all (error-)handler callbacks and job callbacks."""
+        """The type of :attr:`context.chat_data <CallbackContext.chat_data>` of all (error-)handler
+        callbacks and job callbacks.
+        """
         return self._chat_data
 
     @property
     def user_data(self) -> Type[UD]:
-        """The type of ``context.user_data`` of all (error-)handler callbacks and job callbacks."""
+        """The type of :attr:`context.user_data <CallbackContext.user_data>` of all (error-)handler
+        callbacks and job callbacks.
+        """
         return self._user_data

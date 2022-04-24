@@ -25,6 +25,7 @@ from flaky import flaky
 from telegram import PhotoSize, Animation, Voice, MessageEntity, Bot
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
+from telegram.request import RequestData
 from tests.conftest import (
     check_shortcut_call,
     check_shortcut_signature,
@@ -41,11 +42,12 @@ def animation_file():
 
 
 @pytest.fixture(scope='class')
-def animation(bot, chat_id):
+@pytest.mark.asyncio
+async def animation(bot, chat_id):
     with data_file('game.gif').open('rb') as f:
         thumb = data_file('thumb.jpg')
-        return bot.send_animation(
-            chat_id, animation=f, timeout=50, thumb=thumb.open('rb')
+        return (
+            await bot.send_animation(chat_id, animation=f, read_timeout=50, thumb=thumb.open('rb'))
         ).animation
 
 
@@ -81,8 +83,9 @@ class TestAnimation:
         assert isinstance(animation.thumb, PhotoSize)
 
     @flaky(3, 1)
-    def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
-        message = bot.send_animation(
+    @pytest.mark.asyncio
+    async def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
+        message = await bot.send_animation(
             chat_id,
             animation_file,
             duration=self.duration,
@@ -108,29 +111,36 @@ class TestAnimation:
         assert message.has_protected_content
 
     @flaky(3, 1)
-    def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):
-        def make_assertion(url, data, **kwargs):
-            return data['animation'].filename == 'custom_filename'
+    @pytest.mark.asyncio
+    async def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return list(request_data.multipart_data.values())[0][0] == 'custom_filename'
 
         monkeypatch.setattr(bot.request, 'post', make_assertion)
 
-        assert bot.send_animation(chat_id, animation_file, filename='custom_filename')
+        assert await bot.send_animation(chat_id, animation_file, filename='custom_filename')
         monkeypatch.delattr(bot.request, 'post')
 
     @flaky(3, 1)
-    def test_get_and_download(self, bot, animation):
-        new_file = bot.get_file(animation.file_id)
+    @pytest.mark.asyncio
+    async def test_get_and_download(self, bot, animation):
+        path = Path('game.gif')
+        if path.is_file():
+            path.unlink()
+
+        new_file = await bot.get_file(animation.file_id)
 
         assert new_file.file_id == animation.file_id
         assert new_file.file_path.startswith('https://')
 
-        new_filepath: Path = new_file.download('game.gif')
+        new_filepath = await new_file.download('game.gif')
 
         assert new_filepath.is_file()
 
     @flaky(3, 1)
-    def test_send_animation_url_file(self, bot, chat_id, animation):
-        message = bot.send_animation(
+    @pytest.mark.asyncio
+    async def test_send_animation_url_file(self, bot, chat_id, animation):
+        message = await bot.send_animation(
             chat_id=chat_id, animation=self.animation_file_url, caption=self.caption
         )
 
@@ -149,14 +159,15 @@ class TestAnimation:
         assert message.animation.mime_type == animation.mime_type
 
     @flaky(3, 1)
-    def test_send_animation_caption_entities(self, bot, chat_id, animation):
+    @pytest.mark.asyncio
+    async def test_send_animation_caption_entities(self, bot, chat_id, animation):
         test_string = 'Italic Bold Code'
         entities = [
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.ITALIC, 7, 4),
             MessageEntity(MessageEntity.ITALIC, 12, 4),
         ]
-        message = bot.send_animation(
+        message = await bot.send_animation(
             chat_id, animation, caption=test_string, caption_entities=entities
         )
 
@@ -165,20 +176,24 @@ class TestAnimation:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_animation_default_parse_mode_1(self, default_bot, chat_id, animation_file):
+    @pytest.mark.asyncio
+    async def test_send_animation_default_parse_mode_1(self, default_bot, chat_id, animation_file):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_animation(chat_id, animation_file, caption=test_markdown_string)
+        message = await default_bot.send_animation(
+            chat_id, animation_file, caption=test_markdown_string
+        )
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_animation_default_parse_mode_2(self, default_bot, chat_id, animation_file):
+    @pytest.mark.asyncio
+    async def test_send_animation_default_parse_mode_2(self, default_bot, chat_id, animation_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_animation(
+        message = await default_bot.send_animation(
             chat_id, animation_file, caption=test_markdown_string, parse_mode=None
         )
         assert message.caption == test_markdown_string
@@ -186,27 +201,29 @@ class TestAnimation:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    def test_send_animation_default_parse_mode_3(self, default_bot, chat_id, animation_file):
+    @pytest.mark.asyncio
+    async def test_send_animation_default_parse_mode_3(self, default_bot, chat_id, animation_file):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
-        message = default_bot.send_animation(
+        message = await default_bot.send_animation(
             chat_id, animation_file, caption=test_markdown_string, parse_mode='HTML'
         )
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    def test_send_animation_local_files(self, monkeypatch, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_send_animation_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
         file = data_file('telegram.jpg')
         expected = file.as_uri()
 
-        def make_assertion(_, data, *args, **kwargs):
+        async def make_assertion(_, data, *args, **kwargs):
             nonlocal test_flag
             test_flag = data.get('animation') == expected and data.get('thumb') == expected
 
         monkeypatch.setattr(bot, '_post', make_assertion)
-        bot.send_animation(chat_id, file, thumb=file)
+        await bot.send_animation(chat_id, file, thumb=file)
         assert test_flag
         monkeypatch.delattr(bot, '_post')
 
@@ -220,13 +237,14 @@ class TestAnimation:
         ],
         indirect=['default_bot'],
     )
-    def test_send_animation_default_allow_sending_without_reply(
+    @pytest.mark.asyncio
+    async def test_send_animation_default_allow_sending_without_reply(
         self, default_bot, chat_id, animation, custom
     ):
-        reply_to_message = default_bot.send_message(chat_id, 'test')
-        reply_to_message.delete()
+        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        await reply_to_message.delete()
         if custom is not None:
-            message = default_bot.send_animation(
+            message = await default_bot.send_animation(
                 chat_id,
                 animation,
                 allow_sending_without_reply=custom,
@@ -234,36 +252,41 @@ class TestAnimation:
             )
             assert message.reply_to_message is None
         elif default_bot.defaults.allow_sending_without_reply:
-            message = default_bot.send_animation(
+            message = await default_bot.send_animation(
                 chat_id, animation, reply_to_message_id=reply_to_message.message_id
             )
             assert message.reply_to_message is None
         else:
             with pytest.raises(BadRequest, match='message not found'):
-                default_bot.send_animation(
+                await default_bot.send_animation(
                     chat_id, animation, reply_to_message_id=reply_to_message.message_id
                 )
 
     @flaky(3, 1)
+    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
-    def test_send_animation_default_protect_content(self, default_bot, chat_id, animation):
-        animation_protected = default_bot.send_animation(chat_id, animation)
+    async def test_send_animation_default_protect_content(self, default_bot, chat_id, animation):
+        animation_protected = await default_bot.send_animation(chat_id, animation)
         assert animation_protected.has_protected_content
-        ani_unprotected = default_bot.send_animation(chat_id, animation, protect_content=False)
+        ani_unprotected = await default_bot.send_animation(
+            chat_id, animation, protect_content=False
+        )
         assert not ani_unprotected.has_protected_content
 
     @flaky(3, 1)
-    def test_resend(self, bot, chat_id, animation):
-        message = bot.send_animation(chat_id, animation.file_id)
+    @pytest.mark.asyncio
+    async def test_resend(self, bot, chat_id, animation):
+        message = await bot.send_animation(chat_id, animation.file_id)
 
         assert message.animation == animation
 
-    def test_send_with_animation(self, monkeypatch, bot, chat_id, animation):
-        def test(url, data, **kwargs):
-            return data['animation'] == animation.file_id
+    @pytest.mark.asyncio
+    async def test_send_with_animation(self, monkeypatch, bot, chat_id, animation):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.json_parameters['animation'] == animation.file_id
 
-        monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.send_animation(animation=animation, chat_id=chat_id)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        message = await bot.send_animation(animation=animation, chat_id=chat_id)
         assert message
 
     def test_de_json(self, bot, animation):
@@ -300,31 +323,35 @@ class TestAnimation:
         assert animation_dict['file_size'] == animation.file_size
 
     @flaky(3, 1)
-    def test_error_send_empty_file(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file(self, bot, chat_id):
         animation_file = open(os.devnull, 'rb')
 
         with pytest.raises(TelegramError):
-            bot.send_animation(chat_id=chat_id, animation=animation_file)
+            await bot.send_animation(chat_id=chat_id, animation=animation_file)
 
     @flaky(3, 1)
-    def test_error_send_empty_file_id(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
-            bot.send_animation(chat_id=chat_id, animation='')
+            await bot.send_animation(chat_id=chat_id, animation='')
 
-    def test_error_send_without_required_args(self, bot, chat_id):
+    @pytest.mark.asyncio
+    async def test_error_send_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
-            bot.send_animation(chat_id=chat_id)
+            await bot.send_animation(chat_id=chat_id)
 
-    def test_get_file_instance_method(self, monkeypatch, animation):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_file_instance_method(self, monkeypatch, animation):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == animation.file_id
 
         assert check_shortcut_signature(Animation.get_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(animation.get_file, animation.get_bot(), 'get_file')
-        assert check_defaults_handling(animation.get_file, animation.get_bot())
+        assert await check_shortcut_call(animation.get_file, animation.get_bot(), 'get_file')
+        assert await check_defaults_handling(animation.get_file, animation.get_bot())
 
         monkeypatch.setattr(animation.get_bot(), 'get_file', make_assertion)
-        assert animation.get_file()
+        assert await animation.get_file()
 
     def test_equality(self):
         a = Animation(

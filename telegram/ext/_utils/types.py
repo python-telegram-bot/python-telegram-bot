@@ -25,15 +25,45 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from typing import TypeVar, TYPE_CHECKING, Tuple, List, Dict, Any, Optional, Union
+from typing import (
+    TypeVar,
+    TYPE_CHECKING,
+    Tuple,
+    List,
+    Dict,
+    Any,
+    Union,
+    Callable,
+    Coroutine,
+    MutableMapping,
+)
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, JobQueue, BasePersistence  # noqa: F401
+    from telegram.ext import CallbackContext, JobQueue, BasePersistence, Updater  # noqa: F401
     from telegram import Bot
 
+CCT = TypeVar('CCT', bound='CallbackContext')
+"""An instance of :class:`telegram.ext.CallbackContext` or a custom subclass.
 
-ConversationDict = Dict[Tuple[int, ...], Optional[object]]
-"""Dict[Tuple[:obj:`int`, ...], Optional[:obj:`object`]]:
+.. versionadded:: 13.6
+"""
+
+RT = TypeVar('RT')
+UT = TypeVar('UT')
+HandlerCallback = Callable[[UT, CCT], Coroutine[Any, Any, RT]]
+"""Type of a handler callback
+
+    .. versionadded:: 14.0
+"""
+JobCallback = Callable[[CCT], Coroutine[Any, Any, Any]]
+"""Type of a job callback
+
+    .. versionadded:: 14.0
+"""
+
+ConversationKey = Tuple[Union[int, str], ...]
+ConversationDict = MutableMapping[ConversationKey, object]
+"""Dict[Tuple[:obj:`int` | :obj:`str`, ...], Optional[:obj:`object`]]:
     Dicts as maintained by the :class:`telegram.ext.ConversationHandler`.
 
     .. versionadded:: 13.6
@@ -47,11 +77,6 @@ CDCData = Tuple[List[Tuple[str, float, Dict[str, Any]]], Dict[str, str]]
     .. versionadded:: 13.6
 """
 
-CCT = TypeVar('CCT', bound='CallbackContext')
-"""An instance of :class:`telegram.ext.CallbackContext` or a custom subclass.
-
-.. versionadded:: 13.6
-"""
 BT = TypeVar('BT', bound='Bot')
 """Type of the bot.
 
@@ -74,9 +99,5 @@ BD = TypeVar('BD')
 """
 JQ = TypeVar('JQ', bound=Union[None, 'JobQueue'])
 """Type of the job queue.
-
-.. versionadded:: 14.0"""
-PT = TypeVar('PT', bound=Union[None, 'BasePersistence'])
-"""Type of the persistence.
 
 .. versionadded:: 14.0"""

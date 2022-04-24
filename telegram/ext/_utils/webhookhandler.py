@@ -17,21 +17,18 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
-
+import asyncio
 import logging
-from queue import Queue
+from http import HTTPStatus
 from ssl import SSLContext
-from threading import Event, Lock
-from typing import TYPE_CHECKING, Any, Optional
+from types import TracebackType
+from typing import TYPE_CHECKING, Optional, Type
 
 import tornado.web
-from tornado import httputil
 from tornado.httpserver import HTTPServer
-from tornado.ioloop import IOLoop
 
 from telegram import Update
 from telegram.ext import ExtBot
-from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -43,131 +40,125 @@ except ImportError:
 
 
 class WebhookServer:
+    """Thin wrapper around ``tornado.httpserver.HTTPServer``."""
+
     __slots__ = (
-        'http_server',
+        '_http_server',
         'listen',
         'port',
-        'loop',
-        'logger',
+        '_logger',
         'is_running',
-        'server_lock',
-        'shutdown_lock',
+        '_server_lock',
+        '_shutdown_lock',
     )
 
     def __init__(
-        self, listen: str, port: int, webhook_app: 'WebhookAppClass', ssl_ctx: SSLContext
+        self, listen: str, port: int, webhook_app: 'WebhookAppClass', ssl_ctx: Optional[SSLContext]
     ):
-        self.http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
+        self._http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
         self.port = port
-        self.loop: Optional[IOLoop] = None
-        self.logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger(__name__)
         self.is_running = False
-        self.server_lock = Lock()
-        self.shutdown_lock = Lock()
+        self._server_lock = asyncio.Lock()
+        self._shutdown_lock = asyncio.Lock()
 
-    def serve_forever(self, ready: Event = None) -> None:
-        with self.server_lock:
-            IOLoop().make_current()
+    async def serve_forever(self, ready: asyncio.Event = None) -> None:
+        async with self._server_lock:
+            self._http_server.listen(self.port, address=self.listen)
+
             self.is_running = True
-            self.logger.debug('Webhook Server started.')
-            self.loop = IOLoop.current()
-            self.http_server.listen(self.port, address=self.listen)
-
             if ready is not None:
                 ready.set()
 
-            self.loop.start()
-            self.logger.debug('Webhook Server stopped.')
-            self.is_running = False
+            self._logger.debug('Webhook Server started.')
 
-    def shutdown(self) -> None:
-        with self.shutdown_lock:
+    async def shutdown(self) -> None:
+        async with self._shutdown_lock:
             if not self.is_running:
-                self.logger.warning('Webhook Server already stopped.')
+                self._logger.debug('Webhook Server is already shut down. Returning')
                 return
-            self.loop.add_callback(self.loop.stop)  # type: ignore
-
-    # pylint: disable=unused-argument
-    def handle_error(self, request: object, client_address: str) -> None:
-        """Handle an error gracefully."""
-        self.logger.debug(
-            'Exception happened during processing of request from %s',
-            client_address,
-            exc_info=True,
-        )
+            self.is_running = False
+            self._http_server.stop()
+            await self._http_server.close_all_connections()
+            self._logger.debug('Webhook Server stopped')
 
 
 class WebhookAppClass(tornado.web.Application):
-    def __init__(self, webhook_path: str, bot: 'Bot', update_queue: Queue):
+    """Application used in the Webserver"""
+
+    def __init__(self, webhook_path: str, bot: 'Bot', update_queue: asyncio.Queue):
         self.shared_objects = {"bot": bot, "update_queue": update_queue}
-        handlers = [(rf"{webhook_path}/?", WebhookHandler, self.shared_objects)]  # noqa
+        handlers = [(rf"{webhook_path}/?", TelegramHandler, self.shared_objects)]  # noqa
         tornado.web.Application.__init__(self, handlers)  # type: ignore
 
-    def log_request(self, handler: tornado.web.RequestHandler) -> None:  # skipcq: PTC-W0049
-        pass
+    def log_request(self, handler: tornado.web.RequestHandler) -> None:
+        """Overrides the default implementation since we have our own logging setup."""
 
 
-# WebhookHandler, process webhook calls
 # pylint: disable=abstract-method
-class WebhookHandler(tornado.web.RequestHandler):
-    SUPPORTED_METHODS = ["POST"]  # type: ignore
+class TelegramHandler(tornado.web.RequestHandler):
+    """Handler that processes incoming requests from Telegram"""
 
-    def __init__(
-        self,
-        application: tornado.web.Application,
-        request: httputil.HTTPServerRequest,
-        **kwargs: JSONDict,
-    ):
-        super().__init__(application, request, **kwargs)
-        self.logger = logging.getLogger(__name__)
+    __slots__ = ('bot', 'update_queue', '_logger')
 
-    def initialize(self, bot: 'Bot', update_queue: Queue) -> None:
+    SUPPORTED_METHODS = ("POST",)  # type: ignore[assignment]
+
+    def initialize(self, bot: 'Bot', update_queue: asyncio.Queue) -> None:
+        """Initialize for each request - that's the interface provided by tornado"""
         # pylint: disable=attribute-defined-outside-init
         self.bot = bot
         self.update_queue = update_queue
+        self._logger = logging.getLogger(__name__)
 
     def set_default_headers(self) -> None:
+        """Sets default headers"""
         self.set_header("Content-Type", 'application/json; charset="utf-8"')
 
-    def post(self) -> None:
-        self.logger.debug('Webhook triggered')
+    async def post(self) -> None:
+        """Handle incoming POST request"""
+        self._logger.debug('Webhook triggered')
         self._validate_post()
+
         json_string = self.request.body.decode()
         data = json.loads(json_string)
-        self.set_status(200)
-        self.logger.debug('Webhook received data: %s', json_string)
-        update = Update.de_json(data, self.bot)
+        self.set_status(HTTPStatus.OK)
+        self._logger.debug('Webhook received data: %s', json_string)
+
+        try:
+            update = Update.de_json(data, self.bot)
+        except Exception as exc:
+            self._logger.critical(
+                'Something went wrong processing the data received from Telegram. '
+                'Received data was *not* processed!',
+                exc_info=exc,
+            )
+
         if update:
-            self.logger.debug('Received Update with ID %d on Webhook', update.update_id)
+            self._logger.debug('Received Update with ID %d on Webhook', update.update_id)
+
             # handle arbitrary callback data, if necessary
             if isinstance(self.bot, ExtBot):
                 self.bot.insert_callback_data(update)
-            self.update_queue.put(update)
+
+            await self.update_queue.put(update)
 
     def _validate_post(self) -> None:
+        """Only accept requests with content type JSON"""
         ct_header = self.request.headers.get("Content-Type", None)
         if ct_header != 'application/json':
-            raise tornado.web.HTTPError(403)
+            raise tornado.web.HTTPError(HTTPStatus.FORBIDDEN)
 
-    def write_error(self, status_code: int, **kwargs: Any) -> None:
-        """Log an arbitrary message.
-
-        This is used by all other logging functions.
-
-        It overrides ``BaseHTTPRequestHandler.log_message``, which logs to ``sys.stderr``.
-
-        The first argument, FORMAT, is a format string for the message to be logged.  If the format
-        string contains any % escapes requiring parameters, they should be specified as subsequent
-        arguments (it's just like printf!).
-
-        The client ip is prefixed to every message.
-
-        """
-        super().write_error(status_code, **kwargs)
-        self.logger.debug(
-            "%s - - %s",
+    def log_exception(
+        self,
+        typ: Optional[Type[BaseException]],
+        value: Optional[BaseException],
+        tb: Optional[TracebackType],
+    ) -> None:
+        """Override the default logging and instead use our custom logging."""
+        self._logger.debug(
+            "%s - %s",
             self.request.remote_ip,
-            "Exception in WebhookHandler",
-            exc_info=kwargs['exc_info'],
+            "Exception in TelegramHandler",
+            exc_info=(typ, value, tb) if typ and value and tb else value,
         )

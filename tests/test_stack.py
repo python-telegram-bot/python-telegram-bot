@@ -32,4 +32,4 @@ class TestStack:
         assert was_called_by(frame, file)
 
     # Testing a call by a different file is somewhat hard but it's covered in
-    # TestUpdater/Dispatcher.test_manual_init_warning
+    # TestUpdater/Application.test_manual_init_warning

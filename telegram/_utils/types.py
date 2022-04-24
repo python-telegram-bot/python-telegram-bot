@@ -41,15 +41,16 @@ if TYPE_CHECKING:
     from telegram._utils.defaultvalue import DefaultValue  # noqa: F401
     from telegram import InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply
 
-FileLike = Union[IO, 'InputFile']
-"""Either an open file handler or a :class:`telegram.InputFile`."""
+FileLike = Union[IO[bytes], 'InputFile']
+"""Either a bytes-stream (e.g. open file handler) or a :class:`telegram.InputFile`."""
 
 FilePathInput = Union[str, Path]
 """A filepath either as string or as :obj:`pathlib.Path` object."""
 
-FileInput = Union[FilePathInput, bytes, FileLike]
+FileInput = Union[FilePathInput, FileLike, bytes, str]
 """Valid input for passing files to Telegram. Either a file id as string, a file like object,
-a local file path as string, :class:`pathlib.Path` or the file contents as :obj:`bytes`."""
+a local file path as string, :class:`pathlib.Path` or the file contents as :obj:`bytes` or
+:obj:`str`."""
 
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
@@ -73,3 +74,8 @@ ReplyMarkup = Union[
 
 .. versionadded:: 14.0
 """
+
+FieldTuple = Tuple[str, bytes, str]
+"""Alias for return type of `InputFile.field_tuple`."""
+UploadFileDict = Dict[str, FieldTuple]
+"""Dictionary containing file data to be uploaded to the API."""

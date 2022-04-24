@@ -19,14 +19,15 @@
 """This module contains the StringRegexHandler class."""
 
 import re
-from typing import TYPE_CHECKING, Callable, Match, Optional, Pattern, TypeVar, Union
+from typing import TYPE_CHECKING, Match, Optional, Pattern, TypeVar, Union
 
+from telegram._utils.types import DVInput
 from telegram.ext import Handler
-from telegram.ext._utils.types import CCT
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram.ext._utils.types import CCT, HandlerCallback
+from telegram._utils.defaultvalue import DEFAULT_TRUE
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher
+    from telegram.ext import Application
 
 RT = TypeVar('RT')
 
@@ -38,28 +39,33 @@ class StringRegexHandler(Handler[str, CCT]):
     function is used to determine if an update should be handled by this handler.
 
     Note:
-        This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
+        This handler is not used to handle Telegram :class:`telegram.Update`, but strings manually
         put in the queue. For example to send messages with the bot using command line or API.
 
     Warning:
-        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
-        callback (:obj:`callable`): The callback function for this handler.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        callback (:term:`coroutine function`): The callback function for this handler.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
 
     """
 
@@ -68,13 +74,10 @@ class StringRegexHandler(Handler[str, CCT]):
     def __init__(
         self,
         pattern: Union[str, Pattern],
-        callback: Callable[[str, CCT], RT],
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        callback: HandlerCallback[str, CCT, RT],
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
-        super().__init__(
-            callback,
-            run_async=run_async,
-        )
+        super().__init__(callback, block=block)
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
@@ -82,13 +85,13 @@ class StringRegexHandler(Handler[str, CCT]):
         self.pattern = pattern
 
     def check_update(self, update: object) -> Optional[Match]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:obj:`object`): The incoming update.
 
         Returns:
-            :obj:`bool`
+            :obj:`None` | :obj:`re.match`
 
         """
         if isinstance(update, str):
@@ -101,7 +104,7 @@ class StringRegexHandler(Handler[str, CCT]):
         self,
         context: CCT,
         update: str,
-        dispatcher: 'Dispatcher',
+        application: 'Application',
         check_result: Optional[Match],
     ) -> None:
         """Add the result of ``re.match(pattern, update)`` to :attr:`CallbackContext.matches` as

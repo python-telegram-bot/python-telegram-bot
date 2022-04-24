@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains objects that represents stickers."""
+"""This module contains objects that represent stickers."""
 
 from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
 
@@ -35,7 +35,7 @@ class Sticker(_BaseThumbedMedium):
     considered equal, if their :attr:`file_unique_id` is equal.
 
     Note:
-        As of v13.11 ``is_video`` is a required argument and therefore the order of the
+        As of v13.11 :paramref:`is_video` is a required argument and therefore the order of the
         arguments had to be changed. Use keyword arguments to make sure that the arguments are
         passed correctly.
 
@@ -51,8 +51,8 @@ class Sticker(_BaseThumbedMedium):
         is_video (:obj:`bool`): :obj:`True`, if the sticker is a video sticker.
 
             .. versionadded:: 13.11
-        thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the .WEBP or .JPG
-            format.
+        thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
+            ``.JPG`` format.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
         set_name (:obj:`str`, optional): Name of the sticker set to which the sticker
             belongs.
@@ -73,8 +73,8 @@ class Sticker(_BaseThumbedMedium):
         is_video (:obj:`bool`): :obj:`True`, if the sticker is a video sticker.
 
             .. versionadded:: 13.11
-        thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the .webp or .jpg
-            format.
+        thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the ``.WEBP`` or
+            ``.JPG`` format.
         emoji (:obj:`str`): Optional. Emoji associated with the sticker.
         set_name (:obj:`str`): Optional. Name of the sticker set to which the sticker belongs.
         mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
@@ -148,7 +148,7 @@ class StickerSet(TelegramObject):
     considered equal, if their :attr:`name` is equal.
 
     Note:
-        As of v13.11 ``is_video`` is a required argument and therefore the order of the
+        As of v13.11 :paramref:`is_video` is a required argument and therefore the order of the
         arguments had to be changed. Use keyword arguments to make sure that the arguments are
         passed correctly.
 
@@ -241,12 +241,12 @@ class MaskPosition(TelegramObject):
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
             One of :attr:`FOREHEAD`, :attr:`EYES`, :attr:`MOUTH`, or :attr:`CHIN`.
         x_shift (:obj:`float`): Shift by X-axis measured in widths of the mask scaled to the face
-            size, from left to right. For example, choosing -1.0 will place mask just to the left
-            of the default mask position.
+            size, from left to right. For example, choosing ``-1.0`` will place mask just to the
+            left of the default mask position.
         y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
-            size, from top to bottom. For example, 1.0 will place the mask just below the default
-            mask position.
-        scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
+            size, from top to bottom. For example, ``1.0`` will place the mask just below the
+            default mask position.
+        scale (:obj:`float`): Mask scaling coefficient. For example, ``2.0`` means double size.
 
     Attributes:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
@@ -255,7 +255,7 @@ class MaskPosition(TelegramObject):
             size, from left to right.
         y_shift (:obj:`float`): Shift by Y-axis measured in heights of the mask scaled to the face
             size, from top to bottom.
-        scale (:obj:`float`): Mask scaling coefficient. For example, 2.0 means double size.
+        scale (:obj:`float`): Mask scaling coefficient. For example, ``2.0`` means double size.
 
     """
 

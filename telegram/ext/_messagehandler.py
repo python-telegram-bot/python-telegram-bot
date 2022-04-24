@@ -17,25 +17,26 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the MessageHandler class."""
-from typing import TYPE_CHECKING, Callable, Dict, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, Optional, TypeVar, Union
 
 from telegram import Update
+from telegram._utils.types import DVInput
 from telegram.ext import filters as filters_module, Handler
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
+from telegram._utils.defaultvalue import DEFAULT_TRUE
 
-from telegram.ext._utils.types import CCT
+from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher
+    from telegram.ext import Application
 
 RT = TypeVar('RT')
 
 
 class MessageHandler(Handler[Update, CCT]):
-    """Handler class to handle telegram messages. They might contain text, media or status updates.
+    """Handler class to handle Telegram messages. They might contain text, media or status updates.
 
     Warning:
-        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
@@ -47,23 +48,25 @@ class MessageHandler(Handler[Update, CCT]):
             :attr:`telegram.Update.channel_post` and :attr:`telegram.Update.edited_channel_post`.
             If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
             argument.
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
-
-    Raises:
-        ValueError
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
         filters (:class:`telegram.ext.filters.BaseFilter`): Only allow updates with these Filters.
             See :mod:`telegram.ext.filters` for a full list of all available filters.
-        callback (:obj:`callable`): The callback function for this handler.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        callback (:term:`coroutine function`): The callback function for this handler.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
 
     """
 
@@ -72,15 +75,15 @@ class MessageHandler(Handler[Update, CCT]):
     def __init__(
         self,
         filters: filters_module.BaseFilter,
-        callback: Callable[[Update, CCT], RT],
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        callback: HandlerCallback[Update, CCT, RT],
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
 
-        super().__init__(callback, run_async=run_async)
+        super().__init__(callback, block=block)
         self.filters = filters if filters is not None else filters_module.ALL
 
     def check_update(self, update: object) -> Optional[Union[bool, Dict[str, list]]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.
@@ -90,14 +93,14 @@ class MessageHandler(Handler[Update, CCT]):
 
         """
         if isinstance(update, Update):
-            return self.filters.check_update(update)
+            return self.filters.check_update(update) or False
         return None
 
     def collect_additional_context(
         self,
         context: CCT,
         update: Update,
-        dispatcher: 'Dispatcher',
+        application: 'Application',
         check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
         """Adds possible output of data filters to the :class:`CallbackContext`."""

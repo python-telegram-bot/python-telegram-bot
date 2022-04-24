@@ -5,11 +5,11 @@
 """
 Simple Bot to send timed Telegram messages.
 
-This Bot uses the Updater class to handle the bot and the JobQueue to send
+This Bot uses the Application class to handle the bot and the JobQueue to send
 timed messages.
 
 First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
+the Application and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 
 Usage:
@@ -21,30 +21,29 @@ bot.
 import logging
 
 from telegram import Update
-from telegram.ext import CommandHandler, Updater, CallbackContext
+from telegram.ext import CommandHandler, Application, CallbackContext
 
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-logger = logging.getLogger(__name__)
 
 
 # Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
+# context.
 # Best practice would be to replace context with an underscore,
 # since context is an unused local variable.
 # This being an example and not having context present confusing beginners,
 # we decided to have it present as context.
-def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends explanation on how to use the bot."""
-    update.message.reply_text('Hi! Use /set <seconds> to set a timer')
+    await update.message.reply_text('Hi! Use /set <seconds> to set a timer')
 
 
-def alarm(context: CallbackContext.DEFAULT_TYPE) -> None:
+async def alarm(context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
     job = context.job
-    context.bot.send_message(job.context, text='Beep!')
+    await context.bot.send_message(job.chat_id, text=f'Beep! {job.context} seconds are over!')
 
 
 def remove_job_if_exists(name: str, context: CallbackContext.DEFAULT_TYPE) -> bool:
@@ -57,57 +56,48 @@ def remove_job_if_exists(name: str, context: CallbackContext.DEFAULT_TYPE) -> bo
     return True
 
 
-def set_timer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def set_timer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Add a job to the queue."""
-    chat_id = update.message.chat_id
+    chat_id = update.effective_message.chat_id
     try:
         # args[0] should contain the time for the timer in seconds
         due = int(context.args[0])
         if due < 0:
-            update.message.reply_text('Sorry we can not go back to future!')
+            await update.message.reply_text('Sorry we can not go back to future!')
             return
 
         job_removed = remove_job_if_exists(str(chat_id), context)
-        context.job_queue.run_once(alarm, due, context=chat_id, name=str(chat_id))
+        context.job_queue.run_once(alarm, due, chat_id=chat_id, name=str(chat_id), context=due)
 
         text = 'Timer successfully set!'
         if job_removed:
             text += ' Old one was removed.'
-        update.message.reply_text(text)
+        await update.message.reply_text(text)
 
     except (IndexError, ValueError):
-        update.message.reply_text('Usage: /set <seconds>')
+        await update.effective_message.reply_text('Usage: /set <seconds>')
 
 
-def unset(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def unset(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
     job_removed = remove_job_if_exists(str(chat_id), context)
     text = 'Timer successfully cancelled!' if job_removed else 'You have no active timer.'
-    update.message.reply_text(text)
+    await update.message.reply_text(text)
 
 
 def main() -> None:
     """Run bot."""
-    # Create the Updater and pass it your bot's token.
-    updater = Updater.builder().token("TOKEN").build()
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("TOKEN").build()
 
     # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("help", start))
-    dispatcher.add_handler(CommandHandler("set", set_timer))
-    dispatcher.add_handler(CommandHandler("unset", unset))
+    application.add_handler(CommandHandler(["start", "help"], start))
+    application.add_handler(CommandHandler("set", set_timer))
+    application.add_handler(CommandHandler("unset", unset))
 
-    # Start the Bot
-    updater.start_polling()
-
-    # Block until you press Ctrl-C or the process receives SIGINT, SIGTERM or
-    # SIGABRT. This should be used most of the time, since start_polling() is
-    # non-blocking and will stop the bot gracefully.
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 
 if __name__ == '__main__':

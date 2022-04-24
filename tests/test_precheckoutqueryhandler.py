@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -80,7 +80,7 @@ class TestPreCheckoutQueryHandler:
     test_flag = False
 
     def test_slot_behaviour(self, mro_slots):
-        inst = PreCheckoutQueryHandler(self.callback_context)
+        inst = PreCheckoutQueryHandler(self.callback)
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -89,12 +89,12 @@ class TestPreCheckoutQueryHandler:
     def reset(self):
         self.test_flag = False
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, Update)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and isinstance(context.user_data, dict)
             and context.chat_data is None
@@ -103,12 +103,14 @@ class TestPreCheckoutQueryHandler:
         )
 
     def test_other_update_types(self, false_update):
-        handler = PreCheckoutQueryHandler(self.callback_context)
+        handler = PreCheckoutQueryHandler(self.callback)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp, pre_checkout_query):
-        handler = PreCheckoutQueryHandler(self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context(self, app, pre_checkout_query):
+        handler = PreCheckoutQueryHandler(self.callback)
+        app.add_handler(handler)
 
-        dp.process_update(pre_checkout_query)
+        async with app:
+            await app.process_update(pre_checkout_query)
         assert self.test_flag

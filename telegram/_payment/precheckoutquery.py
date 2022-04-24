@@ -35,7 +35,7 @@ class PreCheckoutQuery(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Note:
-        In Python :keyword:`from` is a reserved word, :paramref:`from_user`
+        In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
     Args:
         id (:obj:`str`): Unique query identifier.
@@ -114,25 +114,31 @@ class PreCheckoutQuery(TelegramObject):
 
         return cls(bot=bot, **data)
 
-    def answer(  # pylint: disable=invalid-name
+    async def answer(  # pylint: disable=invalid-name
         self,
         ok: bool,
         error_message: str = None,
-        timeout: ODVInput[float] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """Shortcut for::
 
-            bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
+             await bot.answer_pre_checkout_query(update.pre_checkout_query.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.answer_pre_checkout_query`.
 
         """
-        return self.get_bot().answer_pre_checkout_query(
+        return await self.get_bot().answer_pre_checkout_query(
             pre_checkout_query_id=self.id,
             ok=ok,
             error_message=error_message,
-            timeout=timeout,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )

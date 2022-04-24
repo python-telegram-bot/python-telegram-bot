@@ -16,7 +16,7 @@ from telegram.ext import (
     CallbackQueryHandler,
     InvalidCallbackData,
     PicklePersistence,
-    Updater,
+    Application,
     CallbackContext,
 )
 
@@ -28,25 +28,25 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends a message with 5 inline buttons attached."""
     number_list: List[int] = []
-    update.message.reply_text('Please choose:', reply_markup=build_keyboard(number_list))
+    await update.message.reply_text('Please choose:', reply_markup=build_keyboard(number_list))
 
 
-def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Displays info on how to use the bot."""
-    update.message.reply_text(
+    await update.message.reply_text(
         "Use /start to test this bot. Use /clear to clear the stored data so that you can see "
         "what happens, if the button data is not available. "
     )
 
 
-def clear(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def clear(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Clears the callback data cache"""
     context.bot.callback_data_cache.clear_callback_data()
     context.bot.callback_data_cache.clear_callback_queries()
-    update.effective_message.reply_text('All clear!')
+    await update.effective_message.reply_text('All clear!')
 
 
 def build_keyboard(current_list: List[int]) -> InlineKeyboardMarkup:
@@ -56,10 +56,10 @@ def build_keyboard(current_list: List[int]) -> InlineKeyboardMarkup:
     )
 
 
-def list_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def list_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
-    query.answer()
+    await query.answer()
     # Get the data from the callback_data.
     # If you're using a type checker like MyPy, you'll have to use typing.cast
     # to make the checker get the expected type of the callback_data
@@ -67,7 +67,7 @@ def list_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     # append the number to the list
     number_list.append(number)
 
-    query.edit_message_text(
+    await query.edit_message_text(
         text=f"So far you've selected {number_list}. Choose the next item:",
         reply_markup=build_keyboard(number_list),
     )
@@ -76,10 +76,10 @@ def list_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     context.drop_callback_data(query)
 
 
-def handle_invalid_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def handle_invalid_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Informs the user that the button is no longer available."""
-    update.callback_query.answer()
-    update.effective_message.edit_text(
+    await update.callback_query.answer()
+    await update.effective_message.edit_text(
         'Sorry, I could not process this button click 😕 Please send /start to get a new keyboard.'
     )
 
@@ -88,29 +88,25 @@ def main() -> None:
     """Run the bot."""
     # We use persistence to demonstrate how buttons can still work after the bot was restarted
     persistence = PicklePersistence(filepath='arbitrarycallbackdatabot')
-    # Create the Updater and pass it your bot's token.
-    updater = (
-        Updater.builder()
+    # Create the Application and pass it your bot's token.
+    application = (
+        Application.builder()
         .token("TOKEN")
         .persistence(persistence)
         .arbitrary_callback_data(True)
         .build()
     )
 
-    updater.dispatcher.add_handler(CommandHandler('start', start))
-    updater.dispatcher.add_handler(CommandHandler('help', help_command))
-    updater.dispatcher.add_handler(CommandHandler('clear', clear))
-    updater.dispatcher.add_handler(
+    application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler('help', help_command))
+    application.add_handler(CommandHandler('clear', clear))
+    application.add_handler(
         CallbackQueryHandler(handle_invalid_button, pattern=InvalidCallbackData)
     )
-    updater.dispatcher.add_handler(CallbackQueryHandler(list_button))
+    application.add_handler(CallbackQueryHandler(list_button))
 
-    # Start the Bot
-    updater.start_polling()
-
-    # Run the bot until the user presses Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling()
 
 
 if __name__ == '__main__':

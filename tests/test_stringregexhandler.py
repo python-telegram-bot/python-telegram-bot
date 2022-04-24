@@ -16,9 +16,10 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from queue import Queue
+import asyncio
 
 import pytest
+import re
 
 from telegram import (
     Bot,
@@ -72,7 +73,7 @@ class TestStringRegexHandler:
     test_flag = False
 
     def test_slot_behaviour(self, mro_slots):
-        inst = StringRegexHandler('pfft', self.callback_context)
+        inst = StringRegexHandler('pfft', self.callback)
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -81,52 +82,53 @@ class TestStringRegexHandler:
     def reset(self):
         self.test_flag = False
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, str)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
         )
 
-    def callback_context_pattern(self, update, context):
+    async def callback_pattern(self, update, context):
         if context.matches[0].groups():
             self.test_flag = context.matches[0].groups() == ('t', ' message')
         if context.matches[0].groupdict():
             self.test_flag = context.matches[0].groupdict() == {'begin': 't', 'end': ' message'}
 
-    def test_basic(self, dp):
-        handler = StringRegexHandler('(?P<begin>.*)est(?P<end>.*)', self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize('compile', (True, False))
+    async def test_basic(self, app, compile):
+        pattern = '(?P<begin>.*)est(?P<end>.*)'
+        if compile:
+            pattern = re.compile('(?P<begin>.*)est(?P<end>.*)')
+        handler = StringRegexHandler(pattern, self.callback)
+        app.add_handler(handler)
 
         assert handler.check_update('test message')
-        dp.process_update('test message')
+        async with app:
+            await app.process_update('test message')
         assert self.test_flag
 
         assert not handler.check_update('does not match')
 
     def test_other_update_types(self, false_update):
-        handler = StringRegexHandler('test', self.callback_context)
+        handler = StringRegexHandler('test', self.callback)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp):
-        handler = StringRegexHandler(r'(t)est(.*)', self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context_pattern(self, app):
+        handler = StringRegexHandler(r'(t)est(.*)', self.callback_pattern)
+        app.add_handler(handler)
 
-        dp.process_update('test message')
-        assert self.test_flag
+        async with app:
+            await app.process_update('test message')
+            assert self.test_flag
 
-    def test_context_pattern(self, dp):
-        handler = StringRegexHandler(r'(t)est(.*)', self.callback_context_pattern)
-        dp.add_handler(handler)
+            app.remove_handler(handler)
+            handler = StringRegexHandler(r'(t)est(.*)', self.callback_pattern)
+            app.add_handler(handler)
 
-        dp.process_update('test message')
-        assert self.test_flag
-
-        dp.remove_handler(handler)
-        handler = StringRegexHandler(r'(t)est(.*)', self.callback_context_pattern)
-        dp.add_handler(handler)
-
-        dp.process_update('test message')
-        assert self.test_flag
+            await app.process_update('test message')
+            assert self.test_flag

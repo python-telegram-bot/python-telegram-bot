@@ -18,47 +18,51 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the StringCommandHandler class."""
 
-from typing import TYPE_CHECKING, Callable, List, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, List, Optional
 
+from telegram._utils.types import DVInput
 from telegram.ext import Handler
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-from telegram.ext._utils.types import CCT
+from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram.ext._utils.types import CCT, HandlerCallback, RT
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher
-
-RT = TypeVar('RT')
+    from telegram.ext import Application
 
 
 class StringCommandHandler(Handler[str, CCT]):
     """Handler class to handle string commands. Commands are string updates that start with ``/``.
-    The handler will add a ``list`` to the
+    The handler will add a :obj:`list` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
     which is the text following the command split on single whitespace characters.
 
     Note:
-        This handler is not used to handle Telegram :attr:`telegram.Update`, but strings manually
+        This handler is not used to handle Telegram :class:`telegram.Update`, but strings manually
         put in the queue. For example to send messages with the bot using command line or API.
 
     Warning:
-        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
         command (:obj:`str`): The command this handler should listen for.
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
-        callback (:obj:`callable`): The callback function for this handler.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        callback (:term:`coroutine function`): The callback function for this handler.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
 
     """
 
@@ -67,23 +71,20 @@ class StringCommandHandler(Handler[str, CCT]):
     def __init__(
         self,
         command: str,
-        callback: Callable[[str, CCT], RT],
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        callback: HandlerCallback[str, CCT, RT],
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
-        super().__init__(
-            callback,
-            run_async=run_async,
-        )
+        super().__init__(callback, block=block)
         self.command = command
 
     def check_update(self, update: object) -> Optional[List[str]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:obj:`object`): The incoming update.
 
         Returns:
-            :obj:`bool`
+            List[:obj:`str`]: List containing the text command split on whitespace.
 
         """
         if isinstance(update, str) and update.startswith('/'):
@@ -96,7 +97,7 @@ class StringCommandHandler(Handler[str, CCT]):
         self,
         context: CCT,
         update: str,
-        dispatcher: 'Dispatcher',
+        application: 'Application',
         check_result: Optional[List[str]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single

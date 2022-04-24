@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from queue import Queue
+import asyncio
 
 import pytest
 
@@ -72,7 +72,7 @@ class TestStringCommandHandler:
     test_flag = False
 
     def test_slot_behaviour(self, mro_slots):
-        inst = StringCommandHandler('sleepy', self.callback_context)
+        inst = StringCommandHandler('sleepy', self.callback)
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
@@ -81,38 +81,42 @@ class TestStringCommandHandler:
     def reset(self):
         self.test_flag = False
 
-    def callback_context(self, update, context):
+    async def callback(self, update, context):
         self.test_flag = (
             isinstance(context, CallbackContext)
             and isinstance(context.bot, Bot)
             and isinstance(update, str)
-            and isinstance(context.update_queue, Queue)
+            and isinstance(context.update_queue, asyncio.Queue)
             and isinstance(context.job_queue, JobQueue)
             and context.user_data is None
             and context.chat_data is None
             and isinstance(context.bot_data, dict)
         )
 
-    def callback_context_args(self, update, context):
+    async def callback_args(self, update, context):
         self.test_flag = context.args == ['one', 'two']
 
     def test_other_update_types(self, false_update):
-        handler = StringCommandHandler('test', self.callback_context)
+        handler = StringCommandHandler('test', self.callback)
         assert not handler.check_update(false_update)
 
-    def test_context(self, dp):
-        handler = StringCommandHandler('test', self.callback_context)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context(self, app):
+        handler = StringCommandHandler('test', self.callback)
+        app.add_handler(handler)
 
-        dp.process_update('/test')
+        async with app:
+            await app.process_update('/test')
         assert self.test_flag
 
-    def test_context_args(self, dp):
-        handler = StringCommandHandler('test', self.callback_context_args)
-        dp.add_handler(handler)
+    @pytest.mark.asyncio
+    async def test_context_args(self, app):
+        handler = StringCommandHandler('test', self.callback_args)
+        app.add_handler(handler)
 
-        dp.process_update('/test')
-        assert not self.test_flag
+        async with app:
+            await app.process_update('/test')
+            assert not self.test_flag
 
-        dp.process_update('/test one two')
-        assert self.test_flag
+            await app.process_update('/test one two')
+            assert self.test_flag

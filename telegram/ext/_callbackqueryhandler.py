@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackQueryHandler class."""
-
+import asyncio
 import re
 from typing import (
     TYPE_CHECKING,
@@ -31,18 +31,20 @@ from typing import (
 )
 
 from telegram import Update
+from telegram._utils.types import DVInput
 from telegram.ext import Handler
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_FALSE
-from telegram.ext._utils.types import CCT
+from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
-    from telegram.ext import Dispatcher
+    from telegram.ext import Application
 
 RT = TypeVar('RT')
 
 
 class CallbackQueryHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram callback queries. Optionally based on a regex.
+    """Handler class to handle Telegram :attr:`callback queries <telegram.Update.callback_query>`.
+    Optionally based on a regex.
 
     Read the documentation of the :mod:`re` module for more information.
 
@@ -59,22 +61,25 @@ class CallbackQueryHandler(Handler[Update, CCT]):
           .. versionadded:: 13.6
 
     Warning:
-        When setting :paramref:`run_async` to :obj:`True`, you cannot rely on adding custom
+        When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        callback (:obj:`callable`): The callback function for this handler. Will be called when
-            :attr:`check_update` has determined that an update should be processed by this handler.
-            Callback signature: ``def callback(update: Update, context: CallbackContext)``
+        callback (:term:`coroutine function`): The callback function for this handler. Will be
+            called when :meth:`check_update` has determined that an update should be processed by
+            this handler. Callback signature::
+
+                async def callback(update: Update, context: CallbackContext)
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        pattern (:obj:`str` | `Pattern` | :obj:`callable` | :obj:`type`, optional):
+        pattern (:obj:`str` | :func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`, \
+            optional):
             Pattern to test :attr:`telegram.CallbackQuery.data` against. If a string or a regex
             pattern is passed, :func:`re.match` is used on :attr:`telegram.CallbackQuery.data` to
             determine if an update should be handled by this handler. If your bot allows arbitrary
-            objects as ``callback_data``, non-strings will be accepted. To filter arbitrary
-            objects you may pass
+            objects as :paramref:`~telegram.InlineKeyboardButton.callback_data`, non-strings will
+            be accepted. To filter arbitrary objects you may pass:
 
                 * a callable, accepting exactly one argument, namely the
                   :attr:`telegram.CallbackQuery.data`. It must return :obj:`True` or
@@ -87,17 +92,20 @@ class CallbackQueryHandler(Handler[Update, CCT]):
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
-            Defaults to :obj:`False`.
+        block (:obj:`bool`, optional): Determines whether the return value of the callback should
+            be awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
-        callback (:obj:`callable`): The callback function for this handler.
-        pattern (`Pattern` | :obj:`callable` | :obj:`type`): Optional. Regex pattern, callback or
-            type to test :attr:`telegram.CallbackQuery.data` against.
+        callback (:term:`coroutine function`): The callback function for this handler.
+        pattern (:func:`re.Pattern <re.compile>` | :obj:`callable` | :obj:`type`): Optional.
+            Regex pattern, callback or type to test :attr:`telegram.CallbackQuery.data` against.
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.
-        run_async (:obj:`bool`): Determines whether the callback will run asynchronously.
+        block (:obj:`bool`): Determines whether the return value of the callback should be
+            awaited before processing the next handler in
+            :meth:`telegram.ext.Application.process_update`.
 
     """
 
@@ -105,14 +113,16 @@ class CallbackQueryHandler(Handler[Update, CCT]):
 
     def __init__(
         self,
-        callback: Callable[[Update, CCT], RT],
+        callback: HandlerCallback[Update, CCT, RT],
         pattern: Union[str, Pattern, type, Callable[[object], Optional[bool]]] = None,
-        run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
+        block: DVInput[bool] = DEFAULT_TRUE,
     ):
-        super().__init__(
-            callback,
-            run_async=run_async,
-        )
+        super().__init__(callback, block=block)
+
+        if callable(pattern) and asyncio.iscoroutinefunction(pattern):
+            raise TypeError(
+                'The `pattern` must not be a coroutine function! Use an ordinary function instead.'
+            )
 
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
@@ -120,7 +130,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         self.pattern = pattern
 
     def check_update(self, update: object) -> Optional[Union[bool, object]]:
-        """Determines whether an update should be passed to this handlers :attr:`callback`.
+        """Determines whether an update should be passed to this handler's :attr:`callback`.
 
         Args:
             update (:class:`telegram.Update` | :obj:`object`): Incoming update.
@@ -149,7 +159,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        dispatcher: 'Dispatcher',
+        application: 'Application',
         check_result: Union[bool, Match],
     ) -> None:
         """Add the result of ``re.match(pattern, update.callback_query.data)`` to

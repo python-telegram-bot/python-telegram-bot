@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 """The setup and build script for the python-telegram-bot library."""
 import subprocess
-import sys
 from pathlib import Path
+import sys
 
 from setuptools import setup, find_packages
-
-UPSTREAM_URLLIB3_FLAG = '--with-upstream-urllib3'
 
 
 def get_requirements(raw=False):
@@ -33,11 +31,6 @@ def get_packages_requirements(raw=False):
         exclude.append('telegram.ext*')
 
     packs = find_packages(exclude=exclude)
-    # Allow for a package install to not use the vendored urllib3
-    if UPSTREAM_URLLIB3_FLAG in sys.argv:
-        sys.argv.remove(UPSTREAM_URLLIB3_FLAG)
-        reqs.append('urllib3 >= 1.19.1')
-        packs = [x for x in packs if not x.startswith('telegram.vendor.ptb_urllib3')]
 
     return packs, reqs
 
@@ -79,7 +72,7 @@ def get_setup_kwargs(raw=False):
         install_requires=requirements,
         extras_require={
             'json': 'ujson',
-            'socks': 'PySocks',
+            'socks': 'httpx[socks]',
             # 3.4-3.4.3 contained some cyclical import bugs
             'passport': 'cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3',
         },

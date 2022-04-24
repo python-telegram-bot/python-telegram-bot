@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+
 import os
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from flaky import flaky
 
 from telegram import ChatPhoto, Voice, Bot
 from telegram.error import TelegramError
+from telegram.request import RequestData
 from tests.conftest import (
     expect_bad_request,
     check_shortcut_call,
@@ -41,11 +43,14 @@ def chatphoto_file():
 
 
 @pytest.fixture(scope='function')
-def chat_photo(bot, super_group_id):
-    def func():
-        return bot.get_chat(super_group_id, timeout=50).photo
+@pytest.mark.asyncio
+async def chat_photo(bot, super_group_id):
+    async def func():
+        return (await bot.get_chat(super_group_id, read_timeout=50)).photo
 
-    return expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
+    return await expect_bad_request(
+        func, 'Type of file mismatch', 'Telegram did not accept the file.'
+    )
 
 
 class TestChatPhoto:
@@ -61,39 +66,49 @@ class TestChatPhoto:
         assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"
 
     @flaky(3, 1)
-    def test_send_all_args(self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file):
-        def func():
-            assert bot.set_chat_photo(super_group_id, chatphoto_file)
+    @pytest.mark.asyncio
+    async def test_send_all_args(
+        self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file
+    ):
+        async def func():
+            assert await bot.set_chat_photo(super_group_id, chatphoto_file)
 
-        expect_bad_request(func, 'Type of file mismatch', 'Telegram did not accept the file.')
+        await expect_bad_request(
+            func, 'Type of file mismatch', 'Telegram did not accept the file.'
+        )
 
     @flaky(3, 1)
-    def test_get_and_download(self, bot, chat_photo):
+    @pytest.mark.asyncio
+    async def test_get_and_download(self, bot, chat_photo):
         jpg_file = Path('telegram.jpg')
-        new_file = bot.get_file(chat_photo.small_file_id)
+        if jpg_file.is_file():
+            jpg_file.unlink()
+
+        new_file = await bot.get_file(chat_photo.small_file_id)
 
         assert new_file.file_id == chat_photo.small_file_id
         assert new_file.file_path.startswith('https://')
 
-        new_file.download(jpg_file)
+        await new_file.download(jpg_file)
 
         assert jpg_file.is_file()
 
-        new_file = bot.get_file(chat_photo.big_file_id)
+        new_file = await bot.get_file(chat_photo.big_file_id)
 
         assert new_file.file_id == chat_photo.big_file_id
         assert new_file.file_path.startswith('https://')
 
-        new_file.download(jpg_file)
+        await new_file.download(jpg_file)
 
         assert jpg_file.is_file()
 
-    def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
-        def test(url, data, **kwargs):
-            return data['photo'] == chat_photo
+    @pytest.mark.asyncio
+    async def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters['photo'] == chat_photo.to_dict()
 
-        monkeypatch.setattr(bot.request, 'post', test)
-        message = bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        message = await bot.set_chat_photo(photo=chat_photo, chat_id=super_group_id)
         assert message
 
     def test_de_json(self, bot, chat_photo):
@@ -109,7 +124,8 @@ class TestChatPhoto:
         assert chat_photo.small_file_unique_id == self.chatphoto_small_file_unique_id
         assert chat_photo.big_file_unique_id == self.chatphoto_big_file_unique_id
 
-    def test_to_dict(self, chat_photo):
+    @pytest.mark.asyncio
+    async def test_to_dict(self, chat_photo):
         chat_photo_dict = chat_photo.to_dict()
 
         assert isinstance(chat_photo_dict, dict)
@@ -119,42 +135,49 @@ class TestChatPhoto:
         assert chat_photo_dict['big_file_unique_id'] == chat_photo.big_file_unique_id
 
     @flaky(3, 1)
-    def test_error_send_empty_file(self, bot, super_group_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file(self, bot, super_group_id):
         chatphoto_file = open(os.devnull, 'rb')
 
         with pytest.raises(TelegramError):
-            bot.set_chat_photo(chat_id=super_group_id, photo=chatphoto_file)
+            await bot.set_chat_photo(chat_id=super_group_id, photo=chatphoto_file)
 
     @flaky(3, 1)
-    def test_error_send_empty_file_id(self, bot, super_group_id):
+    @pytest.mark.asyncio
+    async def test_error_send_empty_file_id(self, bot, super_group_id):
         with pytest.raises(TelegramError):
-            bot.set_chat_photo(chat_id=super_group_id, photo='')
+            await bot.set_chat_photo(chat_id=super_group_id, photo='')
 
-    def test_error_send_without_required_args(self, bot, super_group_id):
+    @pytest.mark.asyncio
+    async def test_error_send_without_required_args(self, bot, super_group_id):
         with pytest.raises(TypeError):
-            bot.set_chat_photo(chat_id=super_group_id)
+            await bot.set_chat_photo(chat_id=super_group_id)
 
-    def test_get_small_file_instance_method(self, monkeypatch, chat_photo):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_small_file_instance_method(self, monkeypatch, chat_photo):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == chat_photo.small_file_id
 
         assert check_shortcut_signature(ChatPhoto.get_small_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(chat_photo.get_small_file, chat_photo.get_bot(), 'get_file')
-        assert check_defaults_handling(chat_photo.get_small_file, chat_photo.get_bot())
+        assert await check_shortcut_call(
+            chat_photo.get_small_file, chat_photo.get_bot(), 'get_file'
+        )
+        assert await check_defaults_handling(chat_photo.get_small_file, chat_photo.get_bot())
 
         monkeypatch.setattr(chat_photo.get_bot(), 'get_file', make_assertion)
-        assert chat_photo.get_small_file()
+        assert await chat_photo.get_small_file()
 
-    def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
-        def make_assertion(*_, **kwargs):
+    @pytest.mark.asyncio
+    async def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
+        async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == chat_photo.big_file_id
 
         assert check_shortcut_signature(ChatPhoto.get_big_file, Bot.get_file, ['file_id'], [])
-        assert check_shortcut_call(chat_photo.get_big_file, chat_photo.get_bot(), 'get_file')
-        assert check_defaults_handling(chat_photo.get_big_file, chat_photo.get_bot())
+        assert await check_shortcut_call(chat_photo.get_big_file, chat_photo.get_bot(), 'get_file')
+        assert await check_defaults_handling(chat_photo.get_big_file, chat_photo.get_bot())
 
         monkeypatch.setattr(chat_photo.get_bot(), 'get_file', make_assertion)
-        assert chat_photo.get_big_file()
+        assert await chat_photo.get_big_file()
 
     def test_equality(self):
         a = ChatPhoto(

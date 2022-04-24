@@ -19,7 +19,7 @@ from telegram.constants import ParseMode
 from telegram.ext import (
     CommandHandler,
     ChatMemberHandler,
-    Updater,
+    Application,
     CallbackContext,
 )
 
@@ -68,7 +68,7 @@ def extract_status_change(
     return was_member, is_member
 
 
-def track_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def track_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Tracks the chats the bot is in."""
     result = extract_status_change(update.my_chat_member)
     if result is None:
@@ -103,7 +103,7 @@ def track_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
             context.bot_data.setdefault("channel_ids", set()).discard(chat.id)
 
 
-def show_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def show_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Shows which chats the bot is in"""
     user_ids = ", ".join(str(uid) for uid in context.bot_data.setdefault("user_ids", set()))
     group_ids = ", ".join(str(gid) for gid in context.bot_data.setdefault("group_ids", set()))
@@ -113,10 +113,10 @@ def show_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
         f" Moreover it is a member of the groups with IDs {group_ids} "
         f"and administrator in the channels with IDs {channel_ids}."
     )
-    update.effective_message.reply_text(text)
+    await update.effective_message.reply_text(text)
 
 
-def greet_chat_members(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def greet_chat_members(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Greets new users in chats and announces when someone leaves"""
     result = extract_status_change(update.chat_member)
     if result is None:
@@ -127,12 +127,12 @@ def greet_chat_members(update: Update, context: CallbackContext.DEFAULT_TYPE) ->
     member_name = update.chat_member.new_chat_member.user.mention_html()
 
     if not was_member and is_member:
-        update.effective_chat.send_message(
+        await update.effective_chat.send_message(
             f"{member_name} was added by {cause_name}. Welcome!",
             parse_mode=ParseMode.HTML,
         )
     elif was_member and not is_member:
-        update.effective_chat.send_message(
+        await update.effective_chat.send_message(
             f"{member_name} is no longer with us. Thanks a lot, {cause_name} ...",
             parse_mode=ParseMode.HTML,
         )
@@ -140,28 +140,20 @@ def greet_chat_members(update: Update, context: CallbackContext.DEFAULT_TYPE) ->
 
 def main() -> None:
     """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    updater = Updater.builder().token("TOKEN").build()
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("TOKEN").build()
 
     # Keep track of which chats the bot is in
-    dispatcher.add_handler(ChatMemberHandler(track_chats, ChatMemberHandler.MY_CHAT_MEMBER))
-    dispatcher.add_handler(CommandHandler("show_chats", show_chats))
+    application.add_handler(ChatMemberHandler(track_chats, ChatMemberHandler.MY_CHAT_MEMBER))
+    application.add_handler(CommandHandler("show_chats", show_chats))
 
     # Handle members joining/leaving chats.
-    dispatcher.add_handler(ChatMemberHandler(greet_chat_members, ChatMemberHandler.CHAT_MEMBER))
+    application.add_handler(ChatMemberHandler(greet_chat_members, ChatMemberHandler.CHAT_MEMBER))
 
-    # Start the Bot
+    # Run the bot until the user presses Ctrl-C
     # We pass 'allowed_updates' handle *all* updates including `chat_member` updates
     # To reset this, simply pass `allowed_updates=[]`
-    updater.start_polling(allowed_updates=Update.ALL_TYPES)
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
