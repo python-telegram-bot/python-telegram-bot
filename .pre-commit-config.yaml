@@ -3,14 +3,12 @@
 #   * the additional_dependencies here match requirements.txt
 repos:
 -   repo: https://github.com/psf/black
-    rev: 21.9b0
+    rev: 22.3.0
     hooks:
     -   id: black
         args:
         - --diff
         - --check
-        additional_dependencies:
-          - click==8.0.2
 -   repo: https://gitlab.com/pycqa/flake8
     rev: 4.0.1
     hooks:
