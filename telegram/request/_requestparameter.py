@@ -46,13 +46,13 @@ class RequestParameter:
 
     Args:
         name (:obj:`str`): The name of the parameter.
-        value (:obj:`object` | :obj:None`): The value of the parameter. Must be JSON-dumpable.
+        value (:obj:`object` | :obj:`None`): The value of the parameter. Must be JSON-dumpable.
         input_files (List[:class:`telegram.InputFile`], optional): A list of files that should be
             uploaded along with this parameter.
 
     Attributes:
         name (:obj:`str`): The name of the parameter.
-        value (:obj:`object` | :obj:None`): The value of the parameter.
+        value (:obj:`object` | :obj:`None`): The value of the parameter.
         input_files (List[:class:`telegram.InputFile` | :obj:`None`): A list of files that should
             be uploaded along with this parameter.
     """
@@ -114,9 +114,7 @@ class RequestParameter:
             return value.value, []
         if isinstance(value, InputFile):
             if value.attach_uri:
-                return value.attach_uri, [
-                    value,
-                ]
+                return value.attach_uri, [value]
             return None, [value]
 
         if isinstance(value, InputMedia) and isinstance(value.media, InputFile):

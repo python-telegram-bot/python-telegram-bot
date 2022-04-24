@@ -55,7 +55,7 @@ class InputFile:
 
     Attributes:
         input_file_content (:obj:`bytes`): The binary content of the file to send.
-        attach_name (:obj:`str`, Optional ): If present, the parameter this file belongs to in
+        attach_name (:obj:`str`): Optional. If present, the parameter this file belongs to in
             the request to Telegram should point to the multipart data via a an URI of the form
             ``attach://<attach_name>`` URI.
         filename (:obj:`str`): Filename for the file to be sent.
