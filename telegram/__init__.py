@@ -111,6 +111,10 @@ __all__ = (  # Keep this alphabetically ordered
     'Location',
     'LoginUrl',
     'MaskPosition',
+    'MenuButton',
+    'MenuButtonCommands',
+    'MenuButtonDefault',
+    'MenuButtonWebApp',
     'Message',
     'MessageAutoDeleteTimerChanged',
     'MessageEntity',
@@ -211,6 +215,7 @@ from ._replykeyboardremove import ReplyKeyboardRemove
 from ._forcereply import ForceReply
 from ._files.inputfile import InputFile
 from ._files.file import File
+from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._messageentity import MessageEntity
 from ._messageid import MessageId
 from ._games.game import Game

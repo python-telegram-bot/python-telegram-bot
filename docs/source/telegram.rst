@@ -48,6 +48,10 @@ telegram package
     telegram.keyboardbuttonpolltype
     telegram.location
     telegram.loginurl
+    telegram.menubutton
+    telegram.menubuttoncommands
+    telegram.menubuttondefault
+    telegram.menubuttonwebapp
     telegram.message
     telegram.messageautodeletetimerchanged
     telegram.messageid

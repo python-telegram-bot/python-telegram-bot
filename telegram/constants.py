@@ -52,6 +52,7 @@ __all__ = [
     'InputMediaType',
     'LocationLimit',
     'MaskPosition',
+    'MenuButtonType',
     'MessageAttachmentType',
     'MessageEntityType',
     'MessageLimit',
@@ -466,8 +467,23 @@ class MaskPosition(StringEnum):
     """:obj:`str`: Mask position for a sticker on the chin."""
 
 
+class MenuButtonType(StringEnum):
+    """This enum contains the available types of :class:`telegram.MenuButton`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    COMMANDS = 'commands'
+    """:obj:`str`: The type of :class:`telegram.MenuButtonCommands`."""
+    WEB_APP = 'web_app'
+    """:obj:`str`: The type of :class:`telegram.MenuButtonWebApp`."""
+    DEFAULT = 'default'
+    """:obj:`str`: The type of :class:`telegram.MenuButtonDefault`."""
+
+
 class MessageAttachmentType(StringEnum):
-    """This enum contains the available types of :class:`telegram.Message` that can bee seens
+    """This enum contains the available types of :class:`telegram.Message` that can be seen
     as attachment. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
