@@ -239,7 +239,7 @@ class Message(TelegramObject):
         web_app_data (:class:`telegram.WebAppData`, optional): Service message: data sent by a Web
             App.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -358,7 +358,7 @@ class Message(TelegramObject):
         web_app_data (:class:`telegram.WebAppData`): Optional. Service message: data sent by a Web
             App.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.

@@ -30,7 +30,7 @@ class SentWebAppMessage(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`inline_message_id` are equal.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
 
     Args:
         inline_message_id (:obj:`str`, optional): Identifier of the sent inline message. Available

@@ -60,7 +60,7 @@ class KeyboardButton(TelegramObject):
             The Web App will be able to send a :attr:`Message.web_app_data` service message.
             Available in private chats only.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
 
     Attributes:
         text (:obj:`str`): Text of the button.
@@ -70,7 +70,7 @@ class KeyboardButton(TelegramObject):
         web_app (:class:`WebAppInfo`): Optional. If the described Web App will be launched when the
             button is pressed.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
     """
 
     __slots__ = ('request_location', 'request_contact', 'request_poll', 'text', 'web_app')

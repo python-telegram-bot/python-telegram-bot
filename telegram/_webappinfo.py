@@ -31,7 +31,7 @@ class WebAppInfo(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`url` are equal.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
 
     Args:
         url (:obj:`str`): An HTTPS URL of a Web App to be opened with additional data as specified
