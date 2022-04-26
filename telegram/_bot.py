@@ -6053,17 +6053,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to create new sticker set owned by a user.
         The bot will be able to edit the created sticker set.
-        You must use exactly one of the fields ``png_sticker``, ``tgs_sticker``, or
-        ``webm_sticker``.
+        You must use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`, or
+        :paramref:`webm_sticker`.
 
         Warning:
-            As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
-            arguments had to be changed. Use keyword arguments to make sure that the arguments are
-            passed correctly.
+            As of API 4.7 :paramref:`png_sticker` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
 
         Note:
-            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
-            disk ``open(filename, 'rb')``
+            The :paramref:`png_sticker` and :paramref:`tgs_sticker` argument can be either a
+            file_id, an URL or a file from disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -6167,19 +6167,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> bool:
         """
         Use this method to add a new sticker to a set created by the bot.
-        You **must** use exactly one of the fields ``png_sticker``, ``tgs_sticker`` or
-        ``webm_sticker``. Animated stickers can be added to animated sticker sets and only to them.
-        Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120
-        stickers.
+        You **must** use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`
+        or :paramref:`webm_sticker`. Animated stickers can be added to animated sticker sets and
+        only to them. Animated sticker sets can have up to 50 stickers. Static sticker sets can
+        have up to 120 stickers.
 
         Warning:
-            As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
-            arguments had to be changed. Use keyword arguments to make sure that the arguments are
-            passed correctly.
+            As of API 4.7 :paramref:`png_sticker` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
 
         Note:
-            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
-            disk ``open(filename, 'rb')``
+            The :paramref:`png_sticker` and :paramref:`tgs_sticker` argument can be either a
+            file_id, an URL or a file from disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -6371,7 +6371,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         only.
 
         Note:
-            The thumb can be either a file_id, an URL or a file from disk ``open(filename, 'rb')``
+            The :paramref:`thumb` can be either a file_id, an URL or a file from disk
+            ``open(filename, 'rb')``
 
         Args:
             name (:obj:`str`): Sticker set name
