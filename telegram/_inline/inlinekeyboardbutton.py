@@ -57,9 +57,7 @@ class InlineKeyboardButton(TelegramObject):
 
           .. versionchanged:: 13.6
 
-        * After Bot API 6.0, only ``HTTPS`` links will be allowed in :paramref:`login_url`.
-
-          .. versionchanged:: 14.0
+        * After Bot API 6.1, only ``HTTPS`` links will be allowed in :paramref:`login_url`.
 
     Args:
         text (:obj:`str`): Label text on the button.
@@ -72,8 +70,8 @@ class InlineKeyboardButton(TelegramObject):
         login_url (:class:`telegram.LoginUrl`, optional): An ``HTTPS`` URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
 
-            .. versionchanged:: 14.0
-                Only ``HTTPS`` links are allowed after Bot API 6.0.
+            Caution:
+                Only ``HTTPS`` links are allowed after Bot API 6.1.
         callback_data (:obj:`str` | :obj:`object`, optional): Data to be sent in a callback query
             to the bot when button is pressed, UTF-8 1-64 bytes. If the bot instance allows
             arbitrary callback data, anything can be passed.
@@ -115,8 +113,8 @@ class InlineKeyboardButton(TelegramObject):
         login_url (:class:`telegram.LoginUrl`): Optional. An ``HTTPS`` URL used to automatically
             authorize the user. Can be used as a replacement for the Telegram Login Widget.
 
-            .. versionchanged:: 14.0
-                Only ``HTTPS`` links are allowed after Bot API 6.0.
+            Caution:
+                Only ``HTTPS`` links are allowed after Bot API 6.1.
         callback_data (:obj:`str` | :obj:`object`): Optional. Data to be sent in a callback query
             to the bot when button is pressed, UTF-8 1-64 bytes.
         web_app (:obj:`telegram.WebAppInfo`): Optional. Description of the `Web App

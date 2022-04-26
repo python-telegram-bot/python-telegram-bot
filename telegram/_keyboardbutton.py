@@ -57,8 +57,8 @@ class KeyboardButton(TelegramObject):
             private chats only.
         web_app (:class:`WebAppInfo`, optional): If specified, the described `Web App
             <https://core.telegram.org/bots/webapps>`_ will be launched when the button is pressed.
-            The Web App will be able to send a ``“web_app_data”`` service message. Available in
-            private chats only.
+            The Web App will be able to send a :attr:`Message.web_app_data` service message.
+            Available in private chats only.
 
             .. versionadded:: 14.0
 

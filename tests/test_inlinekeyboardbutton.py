@@ -63,7 +63,7 @@ class TestInlineKeyboardButton:
             inline_keyboard_button.switch_inline_query_current_chat
             == self.switch_inline_query_current_chat
         )
-        assert isinstance(inline_keyboard_button.callback_game, type(self.callback_game))
+        assert isinstance(inline_keyboard_button.callback_game, CallbackGame)
         assert inline_keyboard_button.pay == self.pay
         assert inline_keyboard_button.login_url == self.login_url
         assert inline_keyboard_button.web_app == self.web_app
@@ -116,10 +116,13 @@ class TestInlineKeyboardButton:
             == self.switch_inline_query_current_chat
         )
         # CallbackGame has empty _id_attrs, so just test if the class is created.
-        assert isinstance(inline_keyboard_button.callback_game, type(self.callback_game))
+        assert isinstance(inline_keyboard_button.callback_game, CallbackGame)
         assert inline_keyboard_button.pay == self.pay
         assert inline_keyboard_button.login_url == self.login_url
         assert inline_keyboard_button.web_app == self.web_app
+
+        none = InlineKeyboardButton.de_json({}, bot)
+        assert none is None
 
     def test_equality(self):
         a = InlineKeyboardButton('text', callback_data='data')

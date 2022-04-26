@@ -78,6 +78,9 @@ class TestKeyboardButton:
         assert inline_keyboard_button.request_poll == self.request_poll
         assert inline_keyboard_button.web_app == self.web_app
 
+        none = KeyboardButton.de_json({}, None)
+        assert none is None
+
     def test_equality(self):
         a = KeyboardButton('test', request_contact=True)
         b = KeyboardButton('test', request_contact=True)

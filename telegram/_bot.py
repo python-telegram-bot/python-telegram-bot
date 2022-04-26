@@ -95,7 +95,6 @@ from telegram import (
     InlineKeyboardMarkup,
     ChatInviteLink,
     SentWebAppMessage,
-    InlineQueryResult,
     MenuButton,
 )
 from telegram.error import InvalidToken, TelegramError
@@ -115,6 +114,7 @@ if TYPE_CHECKING:
         InputMediaVideo,
         LabeledPrice,
         MessageEntity,
+        InlineQueryResult,
     )
 
 RT = TypeVar('RT')
@@ -4791,7 +4791,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def answer_web_app_query(
         self,
         web_app_query_id: str,
-        result: InlineQueryResult,
+        result: 'InlineQueryResult',
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,

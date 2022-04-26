@@ -1012,7 +1012,6 @@ class TestBot:
                 'web_app_query_id': '12345',
                 'result': result.to_dict(),
             }
-            print(type(request_data.parameters['result']['type']))  # TODO: this is an enum!
             web_app_msg = SentWebAppMessage('321').to_dict()
             return web_app_msg
 
