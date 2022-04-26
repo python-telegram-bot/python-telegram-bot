@@ -56,8 +56,11 @@ from telegram import (
     InputMedia,
     SentWebAppMessage,
     ChatAdministratorRights,
+    MenuButton,
+    MenuButtonWebApp,
+    WebAppInfo,
 )
-from telegram.constants import ChatAction, ParseMode, InlineQueryLimit
+from telegram.constants import ChatAction, ParseMode, InlineQueryLimit, MenuButtonType
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.error import BadRequest, InvalidToken, NetworkError, TelegramError
 from telegram._utils.datetime import from_timestamp, to_timestamp
@@ -2515,6 +2518,20 @@ class TestBot:
         assert my_admin_rights_ch.can_promote_members is my_rights.can_promote_members
         assert my_admin_rights_ch.can_restrict_members is my_rights.can_restrict_members
         assert my_admin_rights_ch.can_pin_messages is None  # Not returned for channels
+
+    @pytest.mark.asyncio
+    async def test_get_set_chat_menu_button(self, bot, chat_id):
+        # Test our chat menu button is commands-
+        menu_button = await bot.get_chat_menu_button()
+        assert isinstance(menu_button, MenuButton)
+        assert menu_button.type == MenuButtonType.COMMANDS
+        # Test setting our chat menu button to Webapp.
+        my_menu = MenuButtonWebApp('click me!', WebAppInfo('https://telegram.org/'))
+        await bot.set_chat_menu_button(chat_id, my_menu)
+        menu_button = await bot.get_chat_menu_button(chat_id)
+        assert menu_button.type == MenuButtonType.WEB_APP
+        assert menu_button.text == my_menu.text
+        assert menu_button.web_app.url == my_menu.web_app.url
 
     @flaky(3, 1)
     @pytest.mark.asyncio
