@@ -44,6 +44,11 @@ class TestSentWebAppMessage:
         assert isinstance(sent_web_app_message_dict, dict)
         assert sent_web_app_message_dict['inline_message_id'] == self.inline_message_id
 
+    def test_de_json(self, bot):
+        data = {'inline_message_id': self.inline_message_id}
+        m = SentWebAppMessage.de_json(data, None)
+        assert m.inline_message_id == self.inline_message_id
+
     def test_equality(self):
         a = SentWebAppMessage(self.inline_message_id)
         b = SentWebAppMessage(self.inline_message_id)

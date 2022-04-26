@@ -41,6 +41,12 @@ class TestWebAppInfo:
         assert isinstance(web_app_info_dict, dict)
         assert web_app_info_dict['url'] == self.url
 
+    def test_de_json(self, bot):
+        json_dict = {'url': self.url}
+        web_app_info = WebAppInfo.de_json(json_dict, bot)
+
+        assert web_app_info.url == self.url
+
     def test_equality(self):
         a = WebAppInfo(self.url)
         b = WebAppInfo(self.url)

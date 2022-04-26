@@ -46,6 +46,13 @@ class TestWebAppData:
         assert web_app_data_dict['data'] == self.data
         assert web_app_data_dict['button_text'] == self.button_text
 
+    def test_de_json(self, bot):
+        json_dict = {'data': self.data, 'button_text': self.button_text}
+        web_app_data = WebAppData.de_json(json_dict, bot)
+
+        assert web_app_data.data == self.data
+        assert web_app_data.button_text == self.button_text
+
     def test_equality(self):
         a = WebAppData(self.data, self.button_text)
         b = WebAppData(self.data, self.button_text)
