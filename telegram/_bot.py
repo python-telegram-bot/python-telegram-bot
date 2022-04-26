@@ -95,6 +95,7 @@ from telegram import (
     InlineKeyboardMarkup,
     ChatInviteLink,
     SentWebAppMessage,
+    ChatAdministratorRights,
 )
 from telegram.error import InvalidToken, TelegramError
 from telegram.constants import InlineQueryLimit
@@ -6841,6 +6842,131 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs=api_kwargs,
             protect_content=protect_content,
         )
+
+    @_log
+    async def get_my_default_administrator_rights(
+        self,
+        for_channels: bool = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> ChatAdministratorRights:
+        """Use this method to get the current default administrator rights of the bot.
+
+        .. versionadded:: 20.0
+
+        .. seealso:: :meth:`set_my_default_administrator_rights`
+
+        Args:
+            for_channels (:obj:`bool`, optional): Pass :obj:`True` to get default administrator
+                rights of the bot in channels. Otherwise, default administrator rights of the bot
+                for groups and supergroups will be returned.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.ChatAdministratorRights`: On success.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {}
+
+        if for_channels is not None:
+            data['for_channels'] = for_channels
+
+        result = await self._post(
+            'getMyDefaultAdministratorRights',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return ChatAdministratorRights.de_json(result, self)  # type: ignore[return-value,arg-type]
+
+    @_log
+    async def set_my_default_administrator_rights(
+        self,
+        rights: ChatAdministratorRights = None,
+        for_channels: bool = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Use this method to change the default administrator rights requested by the bot when
+        it's added as an administrator to groups or channels. These rights will be suggested to
+        users, but they are are free to modify the list before adding the bot.
+
+        .. versionadded:: 20.0
+
+        .. seealso:: :meth:`get_my_default_administrator_rights`
+
+        Args:
+            rights (:obj:`telegram.ChatAdministratorRights`, optional): A
+                :obj:`telegram.ChatAdministratorRights` object describing new default administrator
+                rights. If not specified, the default administrator rights will be cleared.
+            for_channels (:obj:`bool`, optional): Pass :obj:`True` to change the default
+                administrator rights of the bot in channels. Otherwise, the default administrator
+                rights of the bot for groups and supergroups will be changed.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: Returns :obj:`True` on success.
+
+        Raises:
+            :obj:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {}
+
+        if rights is not None:
+            data['rights'] = rights
+
+        if for_channels is not None:
+            data['for_channels'] = for_channels
+
+        result = await self._post(
+            'setMyDefaultAdministratorRights',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return result  # type: ignore[return-value]
 
     @_log
     async def get_my_commands(

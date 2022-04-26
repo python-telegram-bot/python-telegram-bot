@@ -163,6 +163,10 @@
       - Used for deleting the list of commands
     * - :meth:`~telegram.Bot.get_my_commands`
       - Used for obtaining the list of commands
+    * - :meth:`~telegram.Bot.get_my_default_administrator_rights`
+      - Used for obtaining the default administrator rights for the bot
+    * - :meth:`~telegram.Bot.set_my_default_administrator_rights`
+      - Used for setting the default administrator rights for the bot
     * - :meth:`~telegram.Bot.leave_chat`
       - Used for leaving a chat
 

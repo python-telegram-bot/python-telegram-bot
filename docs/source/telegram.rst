@@ -17,6 +17,7 @@ telegram package
     telegram.botcommandscopechatmember
     telegram.callbackquery
     telegram.chat
+    telegram.chatadministratorrights
     telegram.chatinvitelink
     telegram.chatjoinrequest
     telegram.chatlocation

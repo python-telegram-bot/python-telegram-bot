@@ -37,6 +37,7 @@ __all__ = (  # Keep this alphabetically ordered
     'CallbackGame',
     'CallbackQuery',
     'Chat',
+    'ChatAdministratorRights',
     'ChatInviteLink',
     'ChatJoinRequest',
     'ChatLocation',
@@ -181,6 +182,7 @@ from ._games.callbackgame import CallbackGame
 from ._user import User
 from ._files.chatphoto import ChatPhoto
 from ._chat import Chat
+from ._chatadministratorrights import ChatAdministratorRights
 from ._chatlocation import ChatLocation
 from ._chatinvitelink import ChatInviteLink
 from ._chatjoinrequest import ChatJoinRequest

@@ -55,6 +55,7 @@ from telegram import (
     File,
     InputMedia,
     SentWebAppMessage,
+    ChatAdministratorRights,
 )
 from telegram.constants import ChatAction, ParseMode, InlineQueryLimit
 from telegram.ext import ExtBot, InvalidCallbackData
@@ -2489,6 +2490,31 @@ class TestBot:
                 await default_bot.send_message(
                     chat_id, 'test', reply_to_message_id=reply_to_message.message_id
                 )
+
+    @pytest.mark.asyncio
+    async def test_get_set_my_default_administrator_rights(self, bot):
+        # Test that my default administrator rights for group are as all False
+        await bot.set_my_default_administrator_rights()
+        my_admin_rights_grp = await bot.get_my_default_administrator_rights()
+        assert isinstance(my_admin_rights_grp, ChatAdministratorRights)
+        assert all(not getattr(my_admin_rights_grp, at) for at in my_admin_rights_grp.__slots__)
+
+        # Test setting my default admin rights for channel
+        my_rights = ChatAdministratorRights.all_rights()
+        await bot.set_my_default_administrator_rights(my_rights, for_channels=True)
+        my_admin_rights_ch = await bot.get_my_default_administrator_rights(for_channels=True)
+        # tg bug? is_anonymous, can_invite_users is False despite setting it True for channels:
+        assert my_admin_rights_ch.is_anonymous is not my_rights.is_anonymous
+        assert my_admin_rights_ch.can_invite_users is not my_rights.can_invite_users
+
+        assert my_admin_rights_ch.can_manage_chat is my_rights.can_manage_chat
+        assert my_admin_rights_ch.can_delete_messages is my_rights.can_delete_messages
+        assert my_admin_rights_ch.can_edit_messages is my_rights.can_edit_messages
+        assert my_admin_rights_ch.can_post_messages is my_rights.can_post_messages
+        assert my_admin_rights_ch.can_change_info is my_rights.can_change_info
+        assert my_admin_rights_ch.can_promote_members is my_rights.can_promote_members
+        assert my_admin_rights_ch.can_restrict_members is my_rights.can_restrict_members
+        assert my_admin_rights_ch.can_pin_messages is None  # Not returned for channels
 
     @flaky(3, 1)
     @pytest.mark.asyncio
