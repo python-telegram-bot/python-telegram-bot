@@ -82,9 +82,9 @@ class MenuButton(TelegramObject):
             cls.DEFAULT: MenuButtonDefault,
         }
 
-        if cls is MenuButton:
-            return _class_mapping.get(data['type'], cls)(**data, bot=bot)
-        return cls(**data)
+        if cls is MenuButton and data['type'] in _class_mapping:
+            return _class_mapping[data['type']].de_json(data, bot=bot)
+        return cls(**data, bot=bot)
 
     COMMANDS: ClassVar[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""
@@ -102,6 +102,8 @@ class MenuButtonCommands(MenuButton):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.COMMANDS`.
     """
+
+    __slots__ = ()
 
     def __init__(self, **_kwargs: Any):
         super().__init__(type=constants.MenuButtonType.COMMANDS)
@@ -150,6 +152,12 @@ class MenuButtonWebApp(MenuButton):
 
         return cls(bot=bot, **data)
 
+    def to_dict(self) -> JSONDict:
+        """See :meth:`telegram.TelegramObject.to_dict`."""
+        data = super().to_dict()
+        data['web_app'] = self.web_app.to_dict()
+        return data
+
 
 class MenuButtonDefault(MenuButton):
     """Describes that no specific value for the menu button was set.
@@ -159,6 +167,8 @@ class MenuButtonDefault(MenuButton):
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.DEFAULT`.
     """
+
+    __slots__ = ()
 
     def __init__(self, **_kwargs: Any):
         super().__init__(type=constants.MenuButtonType.DEFAULT)
