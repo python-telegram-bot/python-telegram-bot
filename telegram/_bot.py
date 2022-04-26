@@ -7660,3 +7660,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     """Alias for :meth:`set_chat_menu_button`"""
     setChatMenuButton = get_chat_menu_button
     """Alias for :meth:`get_chat_menu_button`"""
+    getMyDefaultAdministratorRights = get_my_default_administrator_rights
+    """Alias for :meth:`get_my_default_administrator_rights`"""
+    setMyDefaultAdministratorRights = set_my_default_administrator_rights
+    """Alias for :meth:`set_my_default_administrator_rights`"""

@@ -94,6 +94,9 @@ class TestWebhookInfo:
             self.last_synchronization_error_date
         )
 
+        none = WebhookInfo.de_json(None, bot)
+        assert none is None
+
     def test_equality(self):
         a = WebhookInfo(
             url=self.url,
