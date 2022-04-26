@@ -1404,10 +1404,10 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             await bot.set_menu_button(chat_id=update.effective_chat.id, *args, **kwargs)
+             await bot.set_chat_menu_button(chat_id=update.effective_chat.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.set_menu_button`.
+        :meth:`telegram.Bot.set_chat_menu_button`.
 
         Caution:
             Can only work, if the chat is a private chat.
@@ -1437,10 +1437,10 @@ class User(TelegramObject):
     ) -> MenuButton:
         """Shortcut for::
 
-             await bot.get_menu_button(chat_id=update.effective_user.id, *args, **kwargs)
+             await bot.get_chat_menu_button(chat_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
-        :meth:`telegram.Bot.set_menu_button`.
+        :meth:`telegram.Bot.get_chat_menu_button`.
 
         Caution:
             Can only work, if the chat is a private chat.

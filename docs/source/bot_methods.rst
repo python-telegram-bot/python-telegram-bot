@@ -167,6 +167,10 @@
       - Used for obtaining the default administrator rights for the bot
     * - :meth:`~telegram.Bot.set_my_default_administrator_rights`
       - Used for setting the default administrator rights for the bot
+    * - :meth:`~telegram.Bot.get_chat_menu_button`
+      - Used for obtaining the menu button of a private chat or the default menu button
+    * - :meth:`~telegram.Bot.set_chat_menu_button`
+      - Used for setting the menu button of a private chat or the default menu button
     * - :meth:`~telegram.Bot.leave_chat`
       - Used for leaving a chat
 
