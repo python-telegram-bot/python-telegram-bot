@@ -117,6 +117,8 @@ class MenuButtonWebApp(MenuButton):
     considered equal, if their :attr:`type`, :attr:`text` and :attr:`web_app`
     are equal.
 
+    .. versionadded:: 20.0
+
     Args:
         text (:obj:`str`): Text of the button.
         web_app (:class:`telegram.WebAppInfo`): Description of the Web App that will be launched
