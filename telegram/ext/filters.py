@@ -1691,6 +1691,7 @@ class StatusUpdate:
                 or StatusUpdate.VIDEO_CHAT_STARTED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
                 or StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
+                or StatusUpdate.WEB_APP_DATA.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -1865,6 +1866,18 @@ class StatusUpdate:
     .. versionadded:: 13.4
     .. versionchanged:: 20.0
         This filter was formerly named ``VOICE_CHAT_PARTICIPANTS_INVITED``
+    """
+
+    class _WebAppData(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.web_app_data)
+
+    WEB_APP_DATA = _WebAppData(name="filters.StatusUpdate.WEB_APP_DATA")
+    """Messages that contain :attr:`telegram.Message.web_app_data`.
+
+    .. versionadded:: 20.0
     """
 
 

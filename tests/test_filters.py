@@ -943,6 +943,11 @@ class TestFilters:
         assert filters.StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
         update.message.video_chat_participants_invited = None
 
+        update.message.web_app_data = 'data'
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.WEB_APP_DATA.check_update(update)
+        update.message.web_app_data = None
+
     def test_filters_forwarded(self, update):
         assert not filters.FORWARDED.check_update(update)
         update.message.forward_date = datetime.datetime.utcnow()
