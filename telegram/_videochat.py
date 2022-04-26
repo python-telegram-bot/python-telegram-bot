@@ -77,31 +77,27 @@ class VideoChatEnded(TelegramObject):
 
 class VideoChatParticipantsInvited(TelegramObject):
     """
-    This object represents a service message about
-    new members invited to a video chat.
+    This object represents a service message about new members invited to a video chat.
 
     Objects of this class are comparable in terms of equality.
-    Two objects of this class are considered equal, if their
-    :attr:`users` are equal.
+    Two objects of this class are considered equal, if their :attr:`users` are equal.
 
     .. versionadded:: 13.4
     .. versionchanged:: 20.0
         This class was renamed from ``VoiceChatParticipantsInvited`` in accordance to Bot API 6.0.
 
     Args:
-        users (List[:class:`telegram.User`], optional):  New members that
-            were invited to the video chat.
+        users (List[:class:`telegram.User`]): New members that were invited to the video chat.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        users (List[:class:`telegram.User`]): Optional. New members that
-            were invited to the video chat.
+        users (List[:class:`telegram.User`]): New members that were invited to the video chat.
 
     """
 
     __slots__ = ('users',)
 
-    def __init__(self, users: List[User] = None, **_kwargs: object) -> None:
+    def __init__(self, users: List[User], **_kwargs: object) -> None:
         self.users = users
         self._id_attrs = (self.users,)
 
