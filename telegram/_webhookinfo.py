@@ -47,6 +47,10 @@ class WebhookInfo(TelegramObject):
             connections to the webhook for update delivery.
         allowed_updates (List[:obj:`str`], optional): A list of update types the bot is subscribed
             to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
+        last_synchronization_error_date (:obj:`int`, optional): Unix time of the most recent error
+            that happened when trying to synchronize available updates with Telegram datacenters.
+
+            .. versionadded:: 20.0
 
     Attributes:
         url (:obj:`str`): Webhook URL.
@@ -59,7 +63,10 @@ class WebhookInfo(TelegramObject):
             connections.
         allowed_updates (List[:obj:`str`]): Optional. A list of update types the bot is subscribed
             to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
+        last_synchronization_error_date (:obj:`int`): Optional. Unix time of the most recent error
+            that happened when trying to synchronize available updates with Telegram datacenters.
 
+            .. versionadded:: 20.0
     """
 
     __slots__ = (
@@ -71,6 +78,7 @@ class WebhookInfo(TelegramObject):
         'last_error_message',
         'pending_update_count',
         'has_custom_certificate',
+        'last_synchronization_error_date',
     )
 
     def __init__(
@@ -83,6 +91,7 @@ class WebhookInfo(TelegramObject):
         max_connections: int = None,
         allowed_updates: List[str] = None,
         ip_address: str = None,
+        last_synchronization_error_date: int = None,
         **_kwargs: Any,
     ):
         # Required
@@ -96,6 +105,7 @@ class WebhookInfo(TelegramObject):
         self.last_error_message = last_error_message
         self.max_connections = max_connections
         self.allowed_updates = allowed_updates
+        self.last_synchronization_error_date = last_synchronization_error_date
 
         self._id_attrs = (
             self.url,

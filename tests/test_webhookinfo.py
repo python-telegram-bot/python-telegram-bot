@@ -32,6 +32,7 @@ def webhook_info():
         last_error_date=TestWebhookInfo.last_error_date,
         max_connections=TestWebhookInfo.max_connections,
         allowed_updates=TestWebhookInfo.allowed_updates,
+        last_synchronization_error_date=TestWebhookInfo.last_synchronization_error_date,
     )
 
 
@@ -43,6 +44,7 @@ class TestWebhookInfo:
     last_error_date = time.time()
     max_connections = 42
     allowed_updates = ['type1', 'type2']
+    last_synchronization_error_date = time.time()
 
     def test_slot_behaviour(self, webhook_info, mro_slots):
         for attr in webhook_info.__slots__:
@@ -59,6 +61,10 @@ class TestWebhookInfo:
         assert webhook_info_dict['max_connections'] == self.max_connections
         assert webhook_info_dict['allowed_updates'] == self.allowed_updates
         assert webhook_info_dict['ip_address'] == self.ip_address
+        assert (
+            webhook_info_dict['last_synchronization_error_date']
+            == self.last_synchronization_error_date
+        )
 
     def test_equality(self):
         a = WebhookInfo(
@@ -67,6 +73,7 @@ class TestWebhookInfo:
             pending_update_count=self.pending_update_count,
             last_error_date=self.last_error_date,
             max_connections=self.max_connections,
+            last_synchronization_error_date=self.last_synchronization_error_date,
         )
         b = WebhookInfo(
             url=self.url,

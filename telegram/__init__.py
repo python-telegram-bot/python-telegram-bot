@@ -177,6 +177,7 @@ from ._botcommand import BotCommand
 from ._webappdata import WebAppData
 from ._webappinfo import WebAppInfo
 from ._sentwebappmessage import SentWebAppMessage
+from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._loginurl import LoginUrl
 from ._games.callbackgame import CallbackGame
 from ._user import User
@@ -217,7 +218,6 @@ from ._replykeyboardremove import ReplyKeyboardRemove
 from ._forcereply import ForceReply
 from ._files.inputfile import InputFile
 from ._files.file import File
-from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._messageentity import MessageEntity
 from ._messageid import MessageId
 from ._games.game import Game
