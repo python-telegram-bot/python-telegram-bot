@@ -24,8 +24,9 @@ Unless noted otherwise, all constants in this module were extracted from the
     Since v14.0, most of the constants in this module are grouped into enums.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.7`. Telegram Bot API version supported by this
-        version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
+    BOT_API_VERSION (:obj:`str`): :tg-const:`telegram.constants.BOT_API_VERSION`. Telegram Bot API 
+        version supported by this version of `python-telegram-bot`. Also available as 
+        ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
@@ -69,7 +70,7 @@ from typing import List
 
 from telegram._utils.enum import StringEnum
 
-BOT_API_VERSION = '5.7'
+BOT_API_VERSION = '6.0'
 
 # constants above this line are tested
 
