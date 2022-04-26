@@ -96,6 +96,7 @@ from telegram import (
     ChatInviteLink,
     SentWebAppMessage,
     InlineQueryResult,
+    MenuButton,
 )
 from telegram.error import InvalidToken, TelegramError
 from telegram.constants import InlineQueryLimit
@@ -7243,6 +7244,112 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
         return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
 
+    @_log
+    async def set_chat_menu_button(
+        self,
+        chat_id: int = None,
+        menu_button: MenuButton = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Use this method to change the bot's menu button in a private chat, or the default menu
+        button.
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int`, optional): Unique identifier for the target private chat. If not
+                specified, default bot's menu button will be changed
+            menu_button (:class:`telegram.MenuButton`, optional): An object for the new bot's menu
+                button. Defaults to :class:`telegram.MenuButtonDefault`.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        data: JSONDict = {}
+        if chat_id is not None:
+            data['chat_id'] = chat_id
+        if menu_button is not None:
+            data['menu_button'] = menu_button
+
+        return await self._post(  # type: ignore[return-value]
+            'setChatMenuButton',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def get_chat_menu_button(
+        self,
+        chat_id: int = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> MenuButton:
+        """Use this method to get the current value of the bot's menu button in a private chat, or
+        the default menu button.
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int`, optional): Unique identifier for the target private chat. If not
+                specified, default bot's menu button will be returned.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.MenuButton`: On success, the current menu button is returned.
+        """
+        data = {}
+        if chat_id is not None:
+            data['chat_id'] = chat_id
+
+        result = await self._post(
+            'getChatMenuButton',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return MenuButton.de_json(result, bot=self)  # type: ignore[return-value, arg-type]
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
@@ -7423,3 +7530,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     """Alias for :meth:`log_out`"""
     copyMessage = copy_message
     """Alias for :meth:`copy_message`"""
+    getChatMenuButton = set_chat_menu_button
+    """Alias for :meth:`set_chat_menu_button`"""
+    setChatMenuButton = get_chat_menu_button
+    """Alias for :meth:`get_chat_menu_button`"""
