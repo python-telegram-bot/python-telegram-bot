@@ -474,6 +474,8 @@ class MenuButtonType(StringEnum):
     .. versionadded:: 20.0
     """
 
+    __slots__ = ()
+
     COMMANDS = 'commands'
     """:obj:`str`: The type of :class:`telegram.MenuButtonCommands`."""
     WEB_APP = 'web_app'
