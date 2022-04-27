@@ -8,10 +8,11 @@ flake8==4.0.1
 pylint==2.13.7
 mypy==0.950
 pyupgrade==2.31.0
+isort==5.10.1
 
 pytest==7.0.1
 pytest-asyncio==0.16.0
 
-flaky
-beautifulsoup4
-wheel
+flaky  # Used for flaky tests (flaky decorator)
+beautifulsoup4  # used in test_official for parsing tg docs
+wheel  # TODO ??

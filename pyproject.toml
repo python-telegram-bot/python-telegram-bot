@@ -8,3 +8,7 @@ skip-string-normalization = true
 # see https://github.com/psf/black/issues/1778
 force-exclude = '^(?!/(telegram|examples|tests)/).*\.py$'
 include = '(telegram|examples|tests)/.*\.py$'
+
+[tool.isort]  # make sure that the config values are the same in pre-commit-config
+profile = "black"
+line_length = 99

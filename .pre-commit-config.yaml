@@ -67,3 +67,10 @@ repos:
         files: ^(telegram|examples|tests)/.*\.py$
         args:
           - --py37-plus
+-   repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+    -   id: isort
+        name: isort (python)
+        # compatibility with black
+        args: ["--profile", "black", "--filter-files", "-l", "-99"]
