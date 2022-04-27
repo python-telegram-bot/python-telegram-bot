@@ -8,19 +8,22 @@
 .. The toctrees are hidden such that they don't reander on the start page but still include the contents into the documentation.
 
 .. toctree::
+   :hidden:
+   :caption: Reference
+
    telegram
-   :hidden:
-
-.. toctree::
    telegram.ext
-   :hidden:
-
-.. toctree::
    telegram_auxil
-   :hidden:
 
 .. toctree::
-   changelog
    :hidden:
+   :caption: Project
+
+   changelog
+   contributing
+   Website <https://python-telegram-bot.org>
+   Telegram Channel <https://t.me/pythontelegrambotchannel/>
+   Telegram User Group <https://t.me/pythontelegrambotgroup/>
+   Code of Conduct <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/CODE_OF_CONDUCT.md>
 
 

@@ -1,10 +1,11 @@
+=================
 How To Contribute
 =================
 
 Every open source project lives from the generous help by contributors that sacrifice their time and ``python-telegram-bot`` is no different. To make participation as pleasant as possible, this project adheres to the `Code of Conduct`_ by the Python Software Foundation.
 
 Setting things up
------------------
+=================
 
 1. Fork the ``python-telegram-bot`` repository to your GitHub account.
 
@@ -35,7 +36,7 @@ Setting things up
       $ pre-commit install
 
 Finding something to do
-#######################
+=======================
 
 If you already know what you'd like to work on, you can skip this section.
 
@@ -46,7 +47,7 @@ Another great way to start contributing is by writing tests. Tests are really im
 That being said, we want to mention that we are very hesitant about adding new requirements to our projects. If you intend to do this, please state this in an issue and get a verification from one of the maintainers.
 
 Instructions for making a code change
-#####################################
+=====================================
 
 The central development branch is ``master``, which should be clean and ready for release at any time. In general, all changes should be done as feature branches based off of ``master``.
 
@@ -93,13 +94,13 @@ Here's how to make a one-off code change.
 
    - Before making a commit ensure that all automated tests still pass:
 
-     .. code-block::
+     .. code-block:: bash
 
         $ pytest -v
 
      To run ``test_official`` (particularly useful if you made API changes), run
 
-     .. code-block::
+     .. code-block:: bash
 
         $ export TEST_OFFICIAL=true
 
@@ -107,7 +108,7 @@ Here's how to make a one-off code change.
 
    - If you want run style & type checks before committing run
 
-     .. code-block::
+     .. code-block:: bash
 
         $ pre-commit run -a
 
@@ -208,10 +209,10 @@ for new to make relevant changes if said lines don't do what they are supposed t
 
 
 Style commandments
-------------------
+==================
 
 Assert comparison order
-#######################
+-----------------------
 
 Assert statements should compare in **actual** == **expected** order.
 For example (assuming ``test_call`` is the thing being tested):
@@ -225,7 +226,7 @@ For example (assuming ``test_call`` is the thing being tested):
     assert 5 == test_call()
 
 Properly calling callables
-##########################
+--------------------------
 
 Methods, functions and classes can specify optional parameters (with default
 values) using Python's keyword arg syntax. When providing a value to such a
@@ -243,7 +244,7 @@ This gives us the flexibility to re-order arguments and more importantly
 to add new required arguments. It's also more explicit and easier to read.
 
 Properly defining optional arguments
-####################################
+------------------------------------
 
 It's always good to not initialize optional arguments at class creation,
 instead use ``**kwargs`` to get them. It's well known Telegram API can
