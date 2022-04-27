@@ -71,12 +71,12 @@ telegram package
     telegram.userprofilephotos
     telegram.venue
     telegram.video
+    telegram.videochatended
+    telegram.videochatparticipantsinvited
+    telegram.videochatscheduled
+    telegram.videochatstarted
     telegram.videonote
     telegram.voice
-    telegram.videochatstarted
-    telegram.videochatended
-    telegram.videochatscheduled
-    telegram.videochatparticipantsinvited
     telegram.webappdata
     telegram.webappinfo
     telegram.webhookinfo

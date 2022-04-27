@@ -2078,6 +2078,8 @@ class Chat(TelegramObject):
         Caution:
             Can only work, if the chat is a private chat.
 
+        ..seealso:: :meth:`get_menu_button`
+
         .. versionadded:: 20.0
 
         Returns:
@@ -2110,6 +2112,8 @@ class Chat(TelegramObject):
 
         Caution:
             Can only work, if the chat is a private chat.
+
+        ..seealso:: :meth:`set_menu_button`
 
         .. versionadded:: 20.0
 

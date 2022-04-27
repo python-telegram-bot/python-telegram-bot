@@ -59,6 +59,8 @@ from telegram import (
     MenuButton,
     MenuButtonWebApp,
     WebAppInfo,
+    MenuButtonCommands,
+    MenuButtonDefault,
 )
 from telegram.constants import ChatAction, ParseMode, InlineQueryLimit, MenuButtonType
 from telegram.ext import ExtBot, InvalidCallbackData
@@ -2524,14 +2526,21 @@ class TestBot:
         # Test our chat menu button is commands-
         menu_button = await bot.get_chat_menu_button()
         assert isinstance(menu_button, MenuButton)
+        assert isinstance(menu_button, MenuButtonCommands)
         assert menu_button.type == MenuButtonType.COMMANDS
+
         # Test setting our chat menu button to Webapp.
         my_menu = MenuButtonWebApp('click me!', WebAppInfo('https://telegram.org/'))
         await bot.set_chat_menu_button(chat_id, my_menu)
         menu_button = await bot.get_chat_menu_button(chat_id)
+        assert isinstance(menu_button, MenuButtonWebApp)
         assert menu_button.type == MenuButtonType.WEB_APP
         assert menu_button.text == my_menu.text
         assert menu_button.web_app.url == my_menu.web_app.url
+
+        await bot.set_chat_menu_button(chat_id=chat_id, menu_button=MenuButtonDefault())
+        menu_button = await bot.get_chat_menu_button(chat_id=chat_id)
+        assert isinstance(menu_button, MenuButtonDefault)
 
     @flaky(3, 1)
     @pytest.mark.asyncio

@@ -6856,9 +6856,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> ChatAdministratorRights:
         """Use this method to get the current default administrator rights of the bot.
 
-        .. versionadded:: 20.0
-
         .. seealso:: :meth:`set_my_default_administrator_rights`
+
+        .. versionadded:: 20.0
 
         Args:
             for_channels (:obj:`bool`, optional): Pass :obj:`True` to get default administrator
@@ -6917,9 +6917,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         it's added as an administrator to groups or channels. These rights will be suggested to
         users, but they are are free to modify the list before adding the bot.
 
-        .. versionadded:: 20.0
-
         .. seealso:: :meth:`get_my_default_administrator_rights`
+
+        .. versionadded:: 20.0
 
         Args:
             rights (:obj:`telegram.ChatAdministratorRights`, optional): A
@@ -7384,6 +7384,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """Use this method to change the bot's menu button in a private chat, or the default menu
         button.
 
+        .. seealso:: :meth:`get_chat_menu_button`, :meth:`telegram.Chat.set_menu_button`,
+            :meth:`telegram.User.set_menu_button`
+
         .. versionadded:: 20.0
 
         Args:
@@ -7437,6 +7440,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> MenuButton:
         """Use this method to get the current value of the bot's menu button in a private chat, or
         the default menu button.
+
+        .. seealso:: :meth:`set_chat_menu_button`, :meth:`telegram.Chat.get_menu_button`,
+            :meth:`telegram.User.get_menu_button`
 
         .. versionadded:: 20.0
 

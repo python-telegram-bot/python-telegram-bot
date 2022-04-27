@@ -160,7 +160,7 @@ class ChatMemberAdministrator(ChatMember):
 
     .. versionadded:: 13.7
     .. versionchanged:: 20.0
-       Argument and attribute ``can_manage_voice_chats`` where renamed to
+       Argument and attribute ``can_manage_voice_chats`` were renamed to
        :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
        Bot API 6.0.
 
