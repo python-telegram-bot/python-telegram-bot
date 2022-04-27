@@ -10,7 +10,7 @@ mypy==0.950
 pyupgrade==2.31.0
 isort==5.10.1
 
-pytest==7.0.1
+pytest==7.1.2
 pytest-asyncio==0.16.0
 
 flaky  # Used for flaky tests (flaky decorator)
