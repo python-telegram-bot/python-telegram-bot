@@ -68,7 +68,7 @@ class ForceReply(TelegramObject):
 
     def __init__(
         self,
-        selective: bool = False,
+        selective: bool = None,
         input_field_placeholder: str = None,
         **_kwargs: Any,
     ):

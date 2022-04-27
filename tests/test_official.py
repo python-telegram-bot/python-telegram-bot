@@ -25,6 +25,7 @@ import pytest
 from bs4 import BeautifulSoup
 
 import telegram
+from telegram._utils.defaultvalue import DefaultValue
 from tests.conftest import env_var_2_bool
 
 IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
@@ -77,15 +78,26 @@ def check_method(h4):
     sig = inspect.signature(method, follow_wrapped=True)
 
     checked = []
-    for parameter in table:
-        param = sig.parameters.get(parameter[0])
-        assert param is not None, f"Parameter {parameter[0]} not found in {method.__name__}"
+    for tg_parameter in table:  # Iterates through each row in the table
+        param = sig.parameters.get(
+            tg_parameter[0]
+        )  # parameter[0] is first element (the param name)
+        assert param is not None, f"Parameter {tg_parameter[0]} not found in {method.__name__}"
 
         # TODO: Check type via docstring
         assert check_required_param(
-            parameter, param.name, sig, method.__name__
+            tg_parameter, param, method.__name__
         ), f"Param {param.name!r} of method {method.__name__!r} requirement mismatch!"
-        checked.append(parameter[0])
+
+        # Now we will check that we don't pass default values if the parameter is not required.
+        # parameter[2] can either be Required/Yes or a paragraph where the first word has that info
+        telegram_param_required = is_parameter_required_by_tg(tg_parameter[2])
+
+        if not telegram_param_required:
+            default_arg_none = check_defaults_type(param)
+            assert default_arg_none, f"Param {param.name!r} of {method.__name__!r} should be None"
+
+        checked.append(tg_parameter[0])
 
     ignored = IGNORED_PARAMETERS.copy()
     if name == "getUpdates":
@@ -124,8 +136,8 @@ def check_object(h4):
     sig = inspect.signature(obj.__init__, follow_wrapped=True)
 
     checked = set()
-    for parameter in table:
-        field = parameter[0]
+    for tg_parameter in table:
+        field: str = tg_parameter[0]  # From telegram docs
         if field == "from":
             field = "from_user"
         elif (
@@ -148,8 +160,15 @@ def check_object(h4):
         assert param is not None, f"Attribute {field} not found in {obj.__name__}"
         # TODO: Check type via docstring
         assert check_required_param(
-            parameter, field, sig, obj.__name__
+            tg_parameter, param, obj.__name__
         ), f"{obj.__name__!r} parameter {param.name!r} requirement mismatch"
+
+        telegram_param_required = is_parameter_required_by_tg(tg_parameter[2])
+
+        if not telegram_param_required:
+            default_arg_none = check_defaults_type(param)
+            assert default_arg_none, f"Param {param.name!r} of {obj.__name__!r} should be `None`"
+
         checked.add(field)
 
     ignored = IGNORED_PARAMETERS.copy()
@@ -175,24 +194,34 @@ def check_object(h4):
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
 
-def check_required_param(
-    param_desc: List[str], param_name: str, sig: inspect.Signature, method_or_obj_name: str
-) -> bool:
-    """Checks if the method/class parameter is a required/optional param as per Telegram docs."""
-    if len(param_desc) == 4:  # this means that there is a dedicated 'Required' column present.
-        # Handle cases where we provide convenience intentionally-
-        if param_name in ignored_param_requirements.get(method_or_obj_name, {}):
-            return True
-        is_required = True if param_desc[2] in {"Required", "Yes"} else False
-        is_ours_required = sig.parameters[param_name].default is inspect.Signature.empty
-        return is_required is is_ours_required
+def is_parameter_required_by_tg(field: str) -> bool:
+    if field in {"Required", "Yes"}:
+        return True
+    if field.split(".", 1)[0] == "Optional":  # splits the sentence and extracts first word
+        return False
+    else:
+        return True
 
-    if len(param_desc) == 3:  # The docs mention the requirement in the description for classes...
-        if param_name in ignored_param_requirements.get(method_or_obj_name, {}):
-            return True
-        is_required = False if param_desc[2].split(".", 1)[0] == "Optional" else True
-        is_ours_required = sig.parameters[param_name].default is inspect.Signature.empty
-        return is_required is is_ours_required
+
+def check_required_param(
+    param_desc: List[str], param: inspect.Parameter, method_or_obj_name: str
+) -> bool:
+    """Checks if the method/class parameter is a required/optional param as per Telegram docs.
+
+    Returns:
+        :obj:`bool`: The boolean returned represents whether our parameter's requirement (optional
+        or required) is the same as Telegram's or not.
+    """
+    is_ours_required = param.default is inspect.Signature.empty
+    telegram_requires = is_parameter_required_by_tg(param_desc[2])
+    # Handle cases where we provide convenience intentionally-
+    if param.name in ignored_param_requirements.get(method_or_obj_name, {}):
+        return True
+    return telegram_requires is is_ours_required
+
+
+def check_defaults_type(ptb_param: inspect.Parameter) -> bool:
+    return True if DefaultValue.get_value(ptb_param.default) is None else False
 
 
 argvalues = []

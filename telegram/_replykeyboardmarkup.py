@@ -41,12 +41,12 @@ class ReplyKeyboardMarkup(TelegramObject):
             each represented by an Array of :class:`telegram.KeyboardButton` objects.
         resize_keyboard (:obj:`bool`, optional): Requests clients to resize the keyboard vertically
             for optimal fit (e.g., make the keyboard smaller if there are just two rows of
-            buttons). Defaults to :obj:`False`, in which case the custom keyboard is always of the
+            buttons). Defaults to :obj:`None`, in which case the custom keyboard is always of the
             same height as the app's standard keyboard.
         one_time_keyboard (:obj:`bool`, optional): Requests clients to hide the keyboard as soon as
             it's been used. The keyboard will still be available, but clients will automatically
             display the usual letter-keyboard in the chat - the user can press a special button in
-            the input field to see the custom keyboard again. Defaults to :obj:`False`.
+            the input field to see the custom keyboard again. Defaults to :obj:`None`.
         selective (:obj:`bool`, optional): Use this parameter if you want to show the keyboard to
             specific users only. Targets:
 
@@ -55,7 +55,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
                original message.
 
-            Defaults to :obj:`False`.
+            Defaults to :obj:`None`.
 
         input_field_placeholder (:obj:`str`, optional): The placeholder to be shown in the input
             field when the keyboard is active; 1-64 characters.
@@ -88,9 +88,9 @@ class ReplyKeyboardMarkup(TelegramObject):
     def __init__(
         self,
         keyboard: Sequence[Sequence[Union[str, KeyboardButton]]],
-        resize_keyboard: bool = False,
-        one_time_keyboard: bool = False,
-        selective: bool = False,
+        resize_keyboard: bool = None,
+        one_time_keyboard: bool = None,
+        selective: bool = None,
         input_field_placeholder: str = None,
         **_kwargs: Any,
     ):
