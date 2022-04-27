@@ -22,18 +22,18 @@ from copy import deepcopy
 
 import pytest
 
-from telegram._utils.datetime import to_timestamp
 from telegram import (
-    User,
     ChatMember,
-    ChatMemberOwner,
     ChatMemberAdministrator,
-    ChatMemberMember,
-    ChatMemberRestricted,
-    ChatMemberLeft,
     ChatMemberBanned,
+    ChatMemberLeft,
+    ChatMemberMember,
+    ChatMemberOwner,
+    ChatMemberRestricted,
     Dice,
+    User,
 )
+from telegram._utils.datetime import to_timestamp
 
 ignored = ['self', '_kwargs']
 

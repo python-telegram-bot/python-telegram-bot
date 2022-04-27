@@ -9,13 +9,7 @@ Basic example for a bot that uses inline keyboards. For an in-depth explanation,
 import logging
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import (
-    CommandHandler,
-    CallbackQueryHandler,
-    Application,
-    CallbackContext,
-)
-
+from telegram.ext import Application, CallbackContext, CallbackQueryHandler, CommandHandler
 
 # Enable logging
 logging.basicConfig(

@@ -15,19 +15,18 @@ bot.
 """
 
 import logging
-from typing import Tuple, Dict, Any
+from typing import Any, Dict, Tuple
 
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    CommandHandler,
-    MessageHandler,
-    filters,
-    ConversationHandler,
-    CallbackQueryHandler,
     Application,
     CallbackContext,
+    CallbackQueryHandler,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters,
 )
-
 
 # Enable logging
 logging.basicConfig(

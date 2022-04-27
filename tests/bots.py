@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Provide a bot to tests"""
-import json
 import base64
+import json
 import os
 import random
 

@@ -10,24 +10,23 @@ one the user sends the bot
 import logging
 
 from telegram import (
-    Poll,
     KeyboardButton,
     KeyboardButtonPollType,
+    Poll,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
     Update,
 )
 from telegram.constants import ParseMode
 from telegram.ext import (
-    CommandHandler,
-    PollAnswerHandler,
-    PollHandler,
-    MessageHandler,
-    filters,
     Application,
     CallbackContext,
+    CommandHandler,
+    MessageHandler,
+    PollAnswerHandler,
+    PollHandler,
+    filters,
 )
-
 
 # Enable logging
 logging.basicConfig(

@@ -20,14 +20,14 @@ bot.
 
 import logging
 
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update, helpers
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, helpers
 from telegram.constants import ParseMode
 from telegram.ext import (
-    CommandHandler,
-    CallbackQueryHandler,
-    filters,
     Application,
     CallbackContext,
+    CallbackQueryHandler,
+    CommandHandler,
+    filters,
 )
 
 # Enable logging

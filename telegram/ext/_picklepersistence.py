@@ -22,25 +22,14 @@ import pickle
 from copy import deepcopy
 from pathlib import Path
 from sys import version_info as py_ver
-from typing import (
-    Any,
-    Dict,
-    Optional,
-    Tuple,
-    overload,
-    cast,
-    Type,
-    Set,
-    Callable,
-    TypeVar,
-)
+from typing import Any, Callable, Dict, Optional, Set, Tuple, Type, TypeVar, cast, overload
 
 from telegram import Bot, TelegramObject
 from telegram._utils.types import FilePathInput
 from telegram._utils.warnings import warn
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._contexttypes import ContextTypes
-from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData, ConversationKey
+from telegram.ext._utils.types import BD, CD, UD, CDCData, ConversationDict, ConversationKey
 
 _REPLACED_KNOWN_BOT = "a known bot replaced by PTB's PicklePersistence"
 _REPLACED_UNKNOWN_BOT = "an unknown bot replaced by PTB's PicklePersistence"

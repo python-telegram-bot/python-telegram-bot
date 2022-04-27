@@ -21,16 +21,15 @@ from copy import deepcopy
 import pytest
 
 from telegram import (
-    PassportData,
-    PassportFile,
     Bot,
-    File,
-    PassportElementErrorSelfie,
-    PassportElementErrorDataField,
     Credentials,
+    File,
+    PassportData,
+    PassportElementErrorDataField,
+    PassportElementErrorSelfie,
+    PassportFile,
 )
 from telegram.error import PassportDecryptionError
-
 
 # Note: All classes in telegram.credentials (except EncryptedCredentials) aren't directly tested
 # here, although they are implicitly tested. Testing for those classes was too much work and not

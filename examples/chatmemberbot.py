@@ -12,16 +12,11 @@ bot.
 """
 
 import logging
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
-from telegram import Update, Chat, ChatMember, ChatMemberUpdated
+from telegram import Chat, ChatMember, ChatMemberUpdated, Update
 from telegram.constants import ParseMode
-from telegram.ext import (
-    CommandHandler,
-    ChatMemberHandler,
-    Application,
-    CallbackContext,
-)
+from telegram.ext import Application, CallbackContext, ChatMemberHandler, CommandHandler
 
 # Enable logging
 

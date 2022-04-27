@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains objects representing Telegram bot command scopes."""
-from typing import Any, Union, Optional, TYPE_CHECKING, Dict, Type, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Optional, Type, Union
 
 from telegram import TelegramObject, constants
 from telegram._utils.types import JSONDict

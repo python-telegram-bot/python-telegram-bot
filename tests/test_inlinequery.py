@@ -19,8 +19,8 @@
 
 import pytest
 
-from telegram import User, Location, InlineQuery, Update, Bot
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from telegram import Bot, InlineQuery, Location, Update, User
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')

@@ -18,8 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import PassportFile, PassportElementError, Bot, File
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from telegram import Bot, File, PassportElementError, PassportFile
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')

@@ -21,34 +21,33 @@
 from copy import copy
 from datetime import datetime
 from typing import (
-    Union,
-    cast,
-    List,
+    TYPE_CHECKING,
     Callable,
+    Dict,
+    List,
     Optional,
+    Sequence,
     Tuple,
     TypeVar,
-    TYPE_CHECKING,
-    Sequence,
-    Dict,
+    Union,
+    cast,
     no_type_check,
 )
 
 from telegram import (
     Bot,
-    Message,
-    InlineKeyboardMarkup,
-    Poll,
-    MessageId,
-    Update,
-    Chat,
     CallbackQuery,
+    Chat,
+    InlineKeyboardMarkup,
     InputMedia,
+    Message,
+    MessageId,
+    Poll,
+    Update,
 )
-
-from telegram._utils.types import JSONDict, ODVInput, DVInput, ReplyMarkup
-from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.datetime import to_timestamp
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
+from telegram._utils.types import DVInput, JSONDict, ODVInput, ReplyMarkup
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.request import BaseRequest
 

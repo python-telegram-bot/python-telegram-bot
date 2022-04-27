@@ -20,7 +20,7 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup
+from telegram import InlineKeyboardMarkup, InlineQueryResult
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:

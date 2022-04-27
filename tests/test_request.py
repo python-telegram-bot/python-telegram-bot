@@ -23,7 +23,7 @@ import json
 from collections import defaultdict
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Tuple, Any, Coroutine, Callable
+from typing import Any, Callable, Coroutine, Tuple
 
 import httpx
 import pytest
@@ -31,27 +31,27 @@ from flaky import flaky
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import (
-    TelegramError,
+    BadRequest,
     ChatMigrated,
-    RetryAfter,
-    NetworkError,
+    Conflict,
     Forbidden,
     InvalidToken,
-    BadRequest,
-    Conflict,
+    NetworkError,
+    RetryAfter,
+    TelegramError,
     TimedOut,
 )
 from telegram.request._httpxrequest import HTTPXRequest
 
 # We only need the first fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
-    mixed_rqs,
-    mixed_params,
     file_params,
-    inputfiles,
-    simple_params,
-    input_media_video,
     input_media_photo,
+    input_media_video,
+    inputfiles,
+    mixed_params,
+    mixed_rqs,
+    simple_params,
 )
 
 

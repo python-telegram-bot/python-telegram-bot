@@ -20,7 +20,7 @@ import datetime
 
 import pytest
 
-from telegram import InputFile, MessageEntity, InputMediaPhoto, InputMediaVideo
+from telegram import InputFile, InputMediaPhoto, InputMediaVideo, MessageEntity
 from telegram.constants import ChatType
 from telegram.request._requestparameter import RequestParameter
 from tests.conftest import data_file

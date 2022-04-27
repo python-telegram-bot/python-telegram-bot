@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram.ext import ContextTypes, CallbackContext
+from telegram.ext import CallbackContext, ContextTypes
 
 
 class SubClass(CallbackContext):

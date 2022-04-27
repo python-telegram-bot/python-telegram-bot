@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import importlib
+import inspect
 import os
 from pathlib import Path
-import inspect
 
 included = {  # These modules/classes intentionally have __dict__.
     'CallbackContext',

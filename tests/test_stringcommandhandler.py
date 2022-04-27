@@ -22,17 +22,17 @@ import pytest
 
 from telegram import (
     Bot,
-    Update,
-    Message,
-    User,
-    Chat,
     CallbackQuery,
-    InlineQuery,
+    Chat,
     ChosenInlineResult,
-    ShippingQuery,
+    InlineQuery,
+    Message,
     PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import StringCommandHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, JobQueue, StringCommandHandler
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 

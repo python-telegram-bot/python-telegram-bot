@@ -17,14 +17,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import datetime as dtm
+
 import pytest
 
 from telegram import (
-    VoiceChatStarted,
+    User,
     VoiceChatEnded,
     VoiceChatParticipantsInvited,
-    User,
     VoiceChatScheduled,
+    VoiceChatStarted,
 )
 from telegram._utils.datetime import to_timestamp
 

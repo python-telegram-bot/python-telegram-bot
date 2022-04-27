@@ -19,7 +19,7 @@
 """This module contains objects related to Telegram voice chats."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram import TelegramObject, User
 from telegram._utils.datetime import from_timestamp, to_timestamp

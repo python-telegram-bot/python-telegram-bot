@@ -20,7 +20,7 @@
 import pytest
 from flaky import flaky
 
-from telegram import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
 
 
 @pytest.fixture(scope='class')

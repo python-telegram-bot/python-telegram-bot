@@ -16,24 +16,24 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import re
 import asyncio
+import re
 
 import pytest
 
 from telegram import (
-    Message,
-    Update,
-    Chat,
     Bot,
-    User,
     CallbackQuery,
-    InlineQuery,
+    Chat,
     ChosenInlineResult,
-    ShippingQuery,
+    InlineQuery,
+    Message,
     PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import filters, MessageHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, JobQueue, MessageHandler, filters
 from telegram.ext.filters import MessageFilter
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')

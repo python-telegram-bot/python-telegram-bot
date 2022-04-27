@@ -24,7 +24,7 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple, Dict, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn

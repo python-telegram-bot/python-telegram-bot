@@ -12,14 +12,13 @@ from typing import List, Tuple, cast
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    CommandHandler,
-    CallbackQueryHandler,
-    InvalidCallbackData,
-    PicklePersistence,
     Application,
     CallbackContext,
+    CallbackQueryHandler,
+    CommandHandler,
+    InvalidCallbackData,
+    PicklePersistence,
 )
-
 
 # Enable logging
 logging.basicConfig(

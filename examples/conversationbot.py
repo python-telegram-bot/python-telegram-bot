@@ -18,14 +18,13 @@ import logging
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
-    CommandHandler,
-    MessageHandler,
-    filters,
-    ConversationHandler,
     Application,
     CallbackContext,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters,
 )
-
 
 # Enable logging
 logging.basicConfig(

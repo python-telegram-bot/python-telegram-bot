@@ -17,23 +17,23 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import re
 
 import pytest
-import re
 
 from telegram import (
     Bot,
-    Update,
-    Message,
-    User,
-    Chat,
     CallbackQuery,
-    InlineQuery,
+    Chat,
     ChosenInlineResult,
-    ShippingQuery,
+    InlineQuery,
+    Message,
     PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import StringRegexHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, JobQueue, StringRegexHandler
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 

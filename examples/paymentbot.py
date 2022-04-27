@@ -8,15 +8,14 @@ import logging
 
 from telegram import LabeledPrice, ShippingOption, Update
 from telegram.ext import (
-    CommandHandler,
-    MessageHandler,
-    filters,
-    PreCheckoutQueryHandler,
-    ShippingQueryHandler,
     Application,
     CallbackContext,
+    CommandHandler,
+    MessageHandler,
+    PreCheckoutQueryHandler,
+    ShippingQueryHandler,
+    filters,
 )
-
 
 # Enable logging
 logging.basicConfig(

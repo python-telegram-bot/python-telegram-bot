@@ -19,9 +19,9 @@
 
 import pytest
 
-from telegram import Chat, ChatPermissions, ChatLocation, Location, Bot, User
+from telegram import Bot, Chat, ChatLocation, ChatPermissions, Location, User
 from telegram.constants import ChatAction
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')

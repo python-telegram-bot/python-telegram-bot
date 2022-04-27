@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
-from typing import Union, List, Tuple, Optional
+from typing import List, Optional, Tuple, Union
 
 from telegram import (
     Animation,
     Audio,
     Document,
     InputFile,
+    MessageEntity,
     PhotoSize,
     TelegramObject,
     Video,
-    MessageEntity,
 )
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input

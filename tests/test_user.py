@@ -18,9 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Update, User, Bot, InlineKeyboardButton
+from telegram import Bot, InlineKeyboardButton, Update, User
 from telegram.helpers import escape_markdown
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='function')

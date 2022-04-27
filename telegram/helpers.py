@@ -32,14 +32,8 @@ __all__ = (
 )
 
 import re
-
 from html import escape
-
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram.constants import MessageType
 

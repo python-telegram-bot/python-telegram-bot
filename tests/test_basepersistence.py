@@ -29,21 +29,21 @@ from typing import NamedTuple
 import pytest
 from flaky import flaky
 
-from telegram import User, Chat, InlineKeyboardMarkup, InlineKeyboardButton, Bot, Update
+from telegram import Bot, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Update, User
 from telegram.ext import (
-    ApplicationBuilder,
-    PersistenceInput,
-    BasePersistence,
     Application,
-    ConversationHandler,
-    MessageHandler,
-    filters,
-    Handler,
+    ApplicationBuilder,
     ApplicationHandlerStop,
+    BasePersistence,
     CallbackContext,
+    ConversationHandler,
+    Handler,
+    MessageHandler,
+    PersistenceInput,
+    filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import make_message_update, DictApplication
+from tests.conftest import DictApplication, make_message_update
 
 
 class HandlerStates(int, enum.Enum):

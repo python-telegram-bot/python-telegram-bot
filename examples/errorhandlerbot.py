@@ -10,7 +10,7 @@ import traceback
 
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import CommandHandler, Application, CallbackContext
+from telegram.ext import Application, CallbackContext, CommandHandler
 
 # Enable logging
 logging.basicConfig(

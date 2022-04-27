@@ -34,28 +34,26 @@ from threading import Thread
 
 import pytest
 
-from telegram import Bot, Message, User, MessageEntity, Chat
+from telegram import Bot, Chat, Message, MessageEntity, User
+from telegram.error import TelegramError
 from telegram.ext import (
-    JobQueue,
-    CallbackContext,
-    ApplicationBuilder,
     Application,
+    ApplicationBuilder,
+    ApplicationHandlerStop,
+    CallbackContext,
+    CommandHandler,
     ContextTypes,
+    Defaults,
+    Handler,
+    JobQueue,
+    MessageHandler,
     PicklePersistence,
+    TypeHandler,
     Updater,
     filters,
-    MessageHandler,
-    Handler,
-    ApplicationHandlerStop,
-    CommandHandler,
-    TypeHandler,
-    Defaults,
 )
-
-from telegram.error import TelegramError
 from telegram.warnings import PTBUserWarning
-
-from tests.conftest import make_message_update, PROJECT_ROOT_PATH, send_webhook_message, call_after
+from tests.conftest import PROJECT_ROOT_PATH, call_after, make_message_update, send_webhook_message
 
 
 class CustomContext(CallbackContext):

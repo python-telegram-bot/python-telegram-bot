@@ -16,13 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import re
 import asyncio
+import re
 
 import pytest
 
-from telegram import Message, Update, Chat, Bot
-from telegram.ext import CommandHandler, filters, CallbackContext, JobQueue, PrefixHandler
+from telegram import Bot, Chat, Message, Update
+from telegram.ext import CallbackContext, CommandHandler, JobQueue, PrefixHandler, filters
 from tests.conftest import (
     make_command_message,
     make_command_update,

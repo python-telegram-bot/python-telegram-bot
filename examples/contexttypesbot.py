@@ -14,16 +14,16 @@ import logging
 from collections import defaultdict
 from typing import DefaultDict, Optional, Set
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
 from telegram.ext import (
-    CommandHandler,
-    CallbackContext,
-    ContextTypes,
-    CallbackQueryHandler,
-    TypeHandler,
-    ExtBot,
     Application,
+    CallbackContext,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    ExtBot,
+    TypeHandler,
 )
 
 # Enable logging

@@ -18,20 +18,20 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
-from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Tuple, Union
 
-from telegram import Message, TelegramObject, User, Location, constants
+from telegram import Location, Message, TelegramObject, User, constants
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput, DVInput, ReplyMarkup
+from telegram._utils.types import DVInput, JSONDict, ODVInput, ReplyMarkup
 
 if TYPE_CHECKING:
     from telegram import (
         Bot,
         GameHighScore,
         InlineKeyboardMarkup,
-        MessageId,
         InputMedia,
         MessageEntity,
+        MessageId,
     )
 
 

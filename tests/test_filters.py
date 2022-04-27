@@ -17,23 +17,23 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
+import re
 
 import pytest
 
 from telegram import (
-    Message,
-    User,
-    Chat,
-    MessageEntity,
-    Document,
-    Update,
-    Dice,
     CallbackQuery,
+    Chat,
+    Dice,
+    Document,
+    Message,
+    MessageEntity,
     Sticker,
+    Update,
+    User,
 )
 from telegram.ext import filters
-import inspect
-import re
 
 
 @pytest.fixture(scope='function')

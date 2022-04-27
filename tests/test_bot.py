@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import datetime as dtm
 import inspect
 import logging
-import socket
 import pickle
+import socket
 import time
-import datetime as dtm
 from collections import defaultdict
 
 import pytest
@@ -31,44 +31,44 @@ from flaky import flaky
 
 from telegram import (
     Bot,
+    BotCommand,
+    BotCommandScopeChat,
+    CallbackQuery,
+    Chat,
+    ChatPermissions,
+    Dice,
+    File,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    InlineQueryResultArticle,
+    InlineQueryResultDocument,
+    InlineQueryResultVoice,
+    InputMedia,
+    InputTextMessageContent,
+    LabeledPrice,
+    Message,
+    MessageEntity,
+    Poll,
+    PollOption,
+    ShippingOption,
     Update,
     User,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    InlineQueryResultArticle,
-    InputTextMessageContent,
-    ShippingOption,
-    LabeledPrice,
-    ChatPermissions,
-    Poll,
-    BotCommand,
-    InlineQueryResultDocument,
-    Dice,
-    MessageEntity,
-    CallbackQuery,
-    Message,
-    Chat,
-    InlineQueryResultVoice,
-    PollOption,
-    BotCommandScopeChat,
-    File,
-    InputMedia,
 )
-from telegram.constants import ChatAction, ParseMode, InlineQueryLimit
-from telegram.ext import ExtBot, InvalidCallbackData
-from telegram.error import BadRequest, InvalidToken, NetworkError, TelegramError
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
+from telegram.constants import ChatAction, InlineQueryLimit, ParseMode
+from telegram.error import BadRequest, InvalidToken, NetworkError, TelegramError
+from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
-from telegram.request import RequestData, BaseRequest, HTTPXRequest
+from telegram.request import BaseRequest, HTTPXRequest, RequestData
+from tests.bots import FALLBACKS
 from tests.conftest import (
-    expect_bad_request,
-    check_defaults_handling,
     GITHUB_ACTION,
     build_kwargs,
+    check_defaults_handling,
     data_file,
+    expect_bad_request,
 )
-from tests.bots import FALLBACKS
 
 
 def to_camel_case(snake_str):

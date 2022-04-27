@@ -15,15 +15,15 @@ Send /start to initiate the conversation.
 Press Ctrl-C on the command line to stop the bot.
 """
 import logging
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    CommandHandler,
-    CallbackQueryHandler,
-    ConversationHandler,
     Application,
     CallbackContext,
+    CallbackQueryHandler,
+    CommandHandler,
+    ConversationHandler,
 )
-
 
 # Enable logging
 logging.basicConfig(

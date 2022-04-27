@@ -11,8 +11,7 @@ import logging
 from typing import NoReturn
 
 from telegram import Bot
-from telegram.error import NetworkError, Forbidden
-
+from telegram.error import Forbidden, NetworkError
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO

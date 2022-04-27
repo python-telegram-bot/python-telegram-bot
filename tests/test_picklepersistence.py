@@ -17,21 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import gzip
 import os
 import pickle
-import gzip
 from pathlib import Path
 
 import pytest
 
+from telegram import Bot, Chat, Message, TelegramObject, Update, User
+from telegram.ext import ContextTypes, PersistenceInput, PicklePersistence
 from telegram.warnings import PTBUserWarning
-
-from telegram import Update, Message, User, Chat, Bot, TelegramObject
-from telegram.ext import (
-    PicklePersistence,
-    ContextTypes,
-    PersistenceInput,
-)
 
 
 @pytest.fixture(autouse=True)

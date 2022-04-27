@@ -20,47 +20,40 @@ import asyncio
 import datetime
 import functools
 import inspect
-
 import os
 import re
 from pathlib import Path
-from typing import Callable, List, Iterable, Any, Dict, Optional
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pytest
 import pytz
 from httpx import AsyncClient, Response
 
 from telegram import (
-    Message,
-    User,
-    Chat,
-    MessageEntity,
-    Update,
-    InlineQuery,
+    Bot,
     CallbackQuery,
-    ShippingQuery,
-    PreCheckoutQuery,
+    Chat,
+    ChatPermissions,
     ChosenInlineResult,
     File,
-    ChatPermissions,
-    Bot,
+    InlineQuery,
     InlineQueryResultArticle,
-    InputTextMessageContent,
     InlineQueryResultCachedPhoto,
     InputMediaPhoto,
+    InputTextMessageContent,
+    Message,
+    MessageEntity,
+    PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import ODVInput
 from telegram.constants import InputMediaType
-from telegram.ext import (
-    Application,
-    Defaults,
-    ExtBot,
-    ApplicationBuilder,
-    Updater,
-)
-from telegram.ext.filters import UpdateFilter, MessageFilter
-from telegram.error import BadRequest, TimedOut, RetryAfter
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_NONE
+from telegram.error import BadRequest, RetryAfter, TimedOut
+from telegram.ext import Application, ApplicationBuilder, Defaults, ExtBot, Updater
+from telegram.ext.filters import MessageFilter, UpdateFilter
 from telegram.request import RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from tests.bots import get_bot

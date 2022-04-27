@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
 import os
 import time
-import datetime as dtm
 from importlib import reload
 from unittest import mock
 
@@ -26,7 +26,6 @@ import pytest
 
 from telegram._utils import datetime as tg_dtm
 from telegram.ext import Defaults
-
 
 # sample time specification values categorised into absolute / delta / time-of-day
 from tests.conftest import env_var_2_bool

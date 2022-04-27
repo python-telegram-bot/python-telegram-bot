@@ -27,13 +27,8 @@ import time
 import pytest
 import pytz
 from flaky import flaky
-from telegram.ext import (
-    JobQueue,
-    Job,
-    CallbackContext,
-    ContextTypes,
-    ApplicationBuilder,
-)
+
+from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
 
 
 class CustomContext(CallbackContext):

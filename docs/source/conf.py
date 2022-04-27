@@ -11,11 +11,11 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-import subprocess
-import re
-import sys
-import os
 import inspect
+import os
+import re
+import subprocess
+import sys
 from enum import Enum
 from pathlib import Path
 from typing import Tuple

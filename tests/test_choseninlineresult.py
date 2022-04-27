@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import User, ChosenInlineResult, Location, Voice
+from telegram import ChosenInlineResult, Location, User, Voice
 
 
 @pytest.fixture(scope='class')

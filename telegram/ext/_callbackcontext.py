@@ -21,20 +21,20 @@
 from asyncio import Queue
 from typing import (
     TYPE_CHECKING,
+    Coroutine,
     Dict,
+    Generic,
     List,
     Match,
     NoReturn,
     Optional,
     Tuple,
-    Generic,
     Type,
-    Coroutine,
 )
 
-from telegram import Update, CallbackQuery
+from telegram import CallbackQuery, Update
 from telegram.ext import ExtBot
-from telegram.ext._utils.types import UD, CD, BD, BT, JQ  # pylint: disable=unused-import
+from telegram.ext._utils.types import BD, BT, CD, JQ, UD  # pylint: disable=unused-import
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue

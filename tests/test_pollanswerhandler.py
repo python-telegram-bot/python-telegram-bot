@@ -21,18 +21,18 @@ import asyncio
 import pytest
 
 from telegram import (
-    Update,
-    CallbackQuery,
     Bot,
-    Message,
-    User,
+    CallbackQuery,
     Chat,
-    PollAnswer,
     ChosenInlineResult,
-    ShippingQuery,
+    Message,
+    PollAnswer,
     PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import PollAnswerHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, JobQueue, PollAnswerHandler
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 

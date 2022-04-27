@@ -17,17 +17,16 @@ bot.
 import logging
 from typing import Dict
 
-from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
-    CommandHandler,
-    MessageHandler,
-    filters,
-    ConversationHandler,
-    PicklePersistence,
     Application,
     CallbackContext,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    PicklePersistence,
+    filters,
 )
-
 
 # Enable logging
 logging.basicConfig(

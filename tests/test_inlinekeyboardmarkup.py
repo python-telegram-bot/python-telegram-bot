@@ -21,9 +21,9 @@ import pytest
 from flaky import flaky
 
 from telegram import (
+    ForceReply,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    ForceReply,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )

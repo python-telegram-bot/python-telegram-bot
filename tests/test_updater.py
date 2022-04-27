@@ -25,26 +25,17 @@ from random import randrange
 
 import pytest
 
-from telegram import (
-    Bot,
-    Update,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-)
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram.error import InvalidToken, TelegramError, TimedOut, RetryAfter
-from telegram.ext import (
-    Updater,
-    ExtBot,
-    InvalidCallbackData,
-)
+from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
+from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from telegram.ext._utils.webhookhandler import WebhookServer
 from telegram.request import HTTPXRequest
 from tests.conftest import (
-    make_message_update,
-    make_message,
     DictBot,
     data_file,
+    make_message,
+    make_message_update,
     send_webhook_message,
 )
 

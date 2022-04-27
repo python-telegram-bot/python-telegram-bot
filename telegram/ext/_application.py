@@ -26,44 +26,44 @@ from collections import defaultdict
 from contextlib import AbstractAsyncContextManager
 from copy import deepcopy
 from pathlib import Path
-from types import TracebackType, MappingProxyType
+from types import MappingProxyType, TracebackType
 from typing import (
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Union,
-    Generic,
-    TypeVar,
     TYPE_CHECKING,
-    Type,
-    Tuple,
-    Coroutine,
     Any,
-    Set,
-    Mapping,
+    Callable,
+    Coroutine,
     DefaultDict,
-    Sequence,
+    Dict,
+    Generic,
+    List,
+    Mapping,
     NoReturn,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
 )
 
 from telegram import Update
+from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
 from telegram._utils.types import DVInput, ODVInput
+from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext import BasePersistence, ContextTypes, ExtBot, Updater
-from telegram.ext._handler import Handler
 from telegram.ext._callbackdatacache import CallbackDataCache
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_TRUE, DEFAULT_NONE
-from telegram._utils.warnings import warn
-from telegram.ext._utils.trackingdict import TrackingDict
-from telegram.ext._utils.types import CCT, UD, CD, BD, BT, JQ, HandlerCallback, ConversationKey
+from telegram.ext._handler import Handler
 from telegram.ext._utils.stack import was_called_by
+from telegram.ext._utils.trackingdict import TrackingDict
+from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD, ConversationKey, HandlerCallback
 
 if TYPE_CHECKING:
     from telegram import Message
-    from telegram.ext._jobqueue import Job
-    from telegram.ext._applicationbuilder import InitApplicationBuilder
     from telegram.ext import ConversationHandler
+    from telegram.ext._applicationbuilder import InitApplicationBuilder
+    from telegram.ext._jobqueue import Job
 
 DEFAULT_GROUP: int = 0
 

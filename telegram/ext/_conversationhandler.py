@@ -19,43 +19,42 @@
 # pylint: disable=no-self-use
 """This module contains the ConversationHandler."""
 import asyncio
-import logging
 import datetime
+import logging
 from dataclasses import dataclass
 from typing import (  # pylint: disable=unused-import  # for the "Any" import
     TYPE_CHECKING,
+    Any,
+    ClassVar,
     Dict,
+    Generic,
     List,
     NoReturn,
     Optional,
-    Union,
-    Tuple,
-    cast,
-    ClassVar,
-    Any,
     Set,
-    Generic,
+    Tuple,
+    Union,
+    cast,
 )
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
 from telegram._utils.types import DVInput
+from telegram._utils.warnings import warn
 from telegram.ext import (
+    ApplicationHandlerStop,
     CallbackContext,
     CallbackQueryHandler,
     ChosenInlineResultHandler,
-    ApplicationHandlerStop,
+    ExtBot,
     Handler,
     InlineQueryHandler,
     StringCommandHandler,
     StringRegexHandler,
     TypeHandler,
-    ExtBot,
 )
-from telegram._utils.warnings import warn
 from telegram.ext._utils.trackingdict import TrackingDict
-from telegram.ext._utils.types import ConversationDict, ConversationKey
-from telegram.ext._utils.types import CCT
+from telegram.ext._utils.types import CCT, ConversationDict, ConversationKey
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
@@ -301,10 +300,10 @@ class ConversationHandler(Handler[Update, CCT]):
     ):
         # these imports need to be here because of circular import error otherwise
         from telegram.ext import (  # pylint: disable=import-outside-toplevel
-            ShippingQueryHandler,
-            PreCheckoutQueryHandler,
-            PollHandler,
             PollAnswerHandler,
+            PollHandler,
+            PreCheckoutQueryHandler,
+            ShippingQueryHandler,
         )
 
         # self.block is what the Application checks and we want it to always run CH in a blocking

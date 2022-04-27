@@ -21,7 +21,7 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 from telegram import (
     Animation,
@@ -34,10 +34,12 @@ from telegram import (
     InlineKeyboardMarkup,
     Invoice,
     Location,
+    MessageAutoDeleteTimerChanged,
     MessageEntity,
     PassportData,
     PhotoSize,
     Poll,
+    ProximityAlertTriggered,
     Sticker,
     SuccessfulPayment,
     TelegramObject,
@@ -46,30 +48,28 @@ from telegram import (
     Video,
     VideoNote,
     Voice,
-    VoiceChatStarted,
     VoiceChatEnded,
     VoiceChatParticipantsInvited,
-    ProximityAlertTriggered,
-    MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
+    VoiceChatStarted,
 )
-from telegram.constants import ParseMode, MessageAttachmentType
-from telegram.helpers import escape_markdown
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
-from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput, ReplyMarkup
+from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram.constants import MessageAttachmentType, ParseMode
+from telegram.helpers import escape_markdown
 
 if TYPE_CHECKING:
     from telegram import (
         Bot,
         GameHighScore,
         InputMedia,
-        MessageId,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
         LabeledPrice,
+        MessageId,
     )
 
 

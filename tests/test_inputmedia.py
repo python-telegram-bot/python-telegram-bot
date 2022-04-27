@@ -20,13 +20,13 @@ import pytest
 from flaky import flaky
 
 from telegram import (
-    InputMediaVideo,
-    InputMediaPhoto,
-    InputMediaAnimation,
-    Message,
     InputFile,
+    InputMediaAnimation,
     InputMediaAudio,
     InputMediaDocument,
+    InputMediaPhoto,
+    InputMediaVideo,
+    Message,
     MessageEntity,
 )
 from telegram.constants import ParseMode
@@ -34,6 +34,8 @@ from telegram.constants import ParseMode
 # noinspection PyUnresolvedReferences
 from telegram.error import BadRequest
 from telegram.request import RequestData
+from tests.conftest import data_file, expect_bad_request
+
 from .test_animation import animation, animation_file  # noqa: F401
 
 # noinspection PyUnresolvedReferences
@@ -43,11 +45,10 @@ from .test_audio import audio, audio_file  # noqa: F401
 from .test_document import document, document_file  # noqa: F401
 
 # noinspection PyUnresolvedReferences
-from .test_photo import _photo, photo_file, photo, thumb  # noqa: F401
+from .test_photo import _photo, photo, photo_file, thumb  # noqa: F401
 
 # noinspection PyUnresolvedReferences
 from .test_video import video, video_file  # noqa: F401
-from tests.conftest import expect_bad_request, data_file
 
 
 @pytest.fixture(scope='class')

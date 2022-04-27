@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import os
 import inspect
+import os
 from typing import List
 
-import pytest
 import httpx
+import pytest
 from bs4 import BeautifulSoup
 
 import telegram

@@ -21,40 +21,40 @@ from datetime import datetime
 import pytest
 
 from telegram import (
-    Update,
-    Message,
-    User,
-    MessageEntity,
-    Chat,
-    Audio,
-    Document,
     Animation,
-    Game,
-    PhotoSize,
-    Sticker,
-    Video,
-    Voice,
-    VideoNote,
+    Audio,
+    Bot,
+    Chat,
     Contact,
-    Location,
-    Venue,
+    Dice,
+    Document,
+    Game,
     Invoice,
-    SuccessfulPayment,
+    Location,
+    Message,
+    MessageAutoDeleteTimerChanged,
+    MessageEntity,
     PassportData,
+    PhotoSize,
     Poll,
     PollOption,
     ProximityAlertTriggered,
-    Dice,
-    Bot,
-    VoiceChatStarted,
+    Sticker,
+    SuccessfulPayment,
+    Update,
+    User,
+    Venue,
+    Video,
+    VideoNote,
+    Voice,
     VoiceChatEnded,
     VoiceChatParticipantsInvited,
-    MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
+    VoiceChatStarted,
 )
-from telegram.constants import ParseMode, ChatAction
+from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 from tests.test_passport import RAW_PASSPORT_DATA
 
 

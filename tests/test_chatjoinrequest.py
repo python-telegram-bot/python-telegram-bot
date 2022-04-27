@@ -21,9 +21,9 @@ import datetime
 import pytest
 import pytz
 
-from telegram import ChatJoinRequest, User, Chat, ChatInviteLink, Bot
+from telegram import Bot, Chat, ChatInviteLink, ChatJoinRequest, User
 from telegram._utils.datetime import to_timestamp
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')

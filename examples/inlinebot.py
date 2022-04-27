@@ -13,12 +13,12 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 import logging
-from uuid import uuid4
 from html import escape
+from uuid import uuid4
 
 from telegram import InlineQueryResultArticle, InputTextMessageContent, Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, InlineQueryHandler, CommandHandler, CallbackContext
+from telegram.ext import Application, CallbackContext, CommandHandler, InlineQueryHandler
 
 # Enable logging
 logging.basicConfig(

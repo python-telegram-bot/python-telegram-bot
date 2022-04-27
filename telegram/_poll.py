@@ -20,7 +20,7 @@
 
 import datetime
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Optional
 
 from telegram import MessageEntity, TelegramObject, User, constants
 from telegram._utils.datetime import from_timestamp, to_timestamp

@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """The setup and build script for the python-telegram-bot library."""
 import subprocess
-from pathlib import Path
 import sys
+from pathlib import Path
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 
 def get_requirements(raw=False):

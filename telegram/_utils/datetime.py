@@ -29,7 +29,7 @@ Warning:
 """
 import datetime as dtm
 import time
-from typing import Union, Optional
+from typing import Optional, Union
 
 # in PTB-Raw we don't have pytz, so we make a little workaround here
 DTM_UTC = dtm.timezone.utc

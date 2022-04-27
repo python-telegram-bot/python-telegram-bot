@@ -22,14 +22,14 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import PhotoSize, Animation, Voice, MessageEntity, Bot
+from telegram import Animation, Bot, MessageEntity, PhotoSize, Voice
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
 from tests.conftest import (
+    check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    check_defaults_handling,
     data_file,
 )
 

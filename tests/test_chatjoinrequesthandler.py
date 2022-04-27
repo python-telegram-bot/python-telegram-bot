@@ -16,27 +16,26 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import datetime
 import asyncio
+import datetime
 
 import pytest
 import pytz
 
 from telegram import (
-    Update,
     Bot,
-    Message,
-    User,
-    Chat,
     CallbackQuery,
-    ChosenInlineResult,
-    ShippingQuery,
-    PreCheckoutQuery,
-    ChatJoinRequest,
+    Chat,
     ChatInviteLink,
+    ChatJoinRequest,
+    ChosenInlineResult,
+    Message,
+    PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import CallbackContext, JobQueue, ChatJoinRequestHandler
-
+from telegram.ext import CallbackContext, ChatJoinRequestHandler, JobQueue
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 

@@ -24,22 +24,12 @@ Warning:
     the changelog.
 """
 from pathlib import Path
-from typing import (
-    IO,
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 if TYPE_CHECKING:
     from telegram import InputFile  # noqa: F401
+    from telegram import ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove
     from telegram._utils.defaultvalue import DefaultValue  # noqa: F401
-    from telegram import InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply
 
 FileLike = Union[IO[bytes], 'InputFile']
 """Either a bytes-stream (e.g. open file handler) or a :class:`telegram.InputFile`."""

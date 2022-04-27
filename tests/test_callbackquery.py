@@ -19,8 +19,8 @@
 
 import pytest
 
-from telegram import CallbackQuery, User, Message, Chat, Audio, Bot
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from telegram import Audio, Bot, CallbackQuery, Chat, Message, User
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='function', params=['message', 'inline'])

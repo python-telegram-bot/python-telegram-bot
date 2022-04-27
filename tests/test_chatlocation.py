@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import Location, ChatLocation, User
+from telegram import ChatLocation, Location, User
 
 
 @pytest.fixture(scope='class')

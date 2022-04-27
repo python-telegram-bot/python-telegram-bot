@@ -16,10 +16,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import pytest
 import time
 
-from telegram import WebhookInfo, LoginUrl
+import pytest
+
+from telegram import LoginUrl, WebhookInfo
 
 
 @pytest.fixture(scope='class')

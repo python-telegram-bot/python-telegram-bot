@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import KeyboardButton, InlineKeyboardButton, KeyboardButtonPollType
+from telegram import InlineKeyboardButton, KeyboardButton, KeyboardButtonPollType
 
 
 @pytest.fixture(scope='class')

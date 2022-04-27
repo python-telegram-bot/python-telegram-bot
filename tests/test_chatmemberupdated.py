@@ -23,14 +23,15 @@ import pytest
 import pytz
 
 from telegram import (
-    User,
+    Chat,
+    ChatInviteLink,
     ChatMember,
     ChatMemberAdministrator,
-    Chat,
     ChatMemberUpdated,
     ChatInviteLink,
     ChatMemberOwner,
     ChatMemberBanned,
+    User,
 )
 from telegram._utils.datetime import to_timestamp
 

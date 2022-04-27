@@ -89,24 +89,24 @@ __all__ = (
 
 import mimetypes
 import re
-
 from abc import ABC, abstractmethod
 from typing import (
     Dict,
     FrozenSet,
     List,
     Match,
+    NoReturn,
     Optional,
     Pattern,
     Set,
     Tuple,
     Union,
     cast,
-    NoReturn,
 )
 
-from telegram import Chat as TGChat, Message, MessageEntity, Update, User as TGUser
-
+from telegram import Chat as TGChat
+from telegram import Message, MessageEntity, Update
+from telegram import User as TGUser
 from telegram._utils.types import SLT
 from telegram.constants import DiceEmoji as DiceEmojiEnum
 

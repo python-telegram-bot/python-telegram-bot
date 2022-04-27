@@ -42,8 +42,8 @@ except ImportError:
     CRYPTO_INSTALLED = False
 
 from telegram import TelegramObject
-from telegram.error import PassportDecryptionError
 from telegram._utils.types import JSONDict
+from telegram.error import PassportDecryptionError
 
 if TYPE_CHECKING:
     from telegram import Bot

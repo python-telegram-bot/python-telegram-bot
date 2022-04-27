@@ -21,26 +21,25 @@
 import asyncio
 import functools
 import logging
-from contextlib import AbstractAsyncContextManager
 import pickle
+from contextlib import AbstractAsyncContextManager
 from datetime import datetime
 from types import TracebackType
-
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
+    Dict,
     List,
+    NoReturn,
     Optional,
+    Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
-    no_type_check,
-    Dict,
     cast,
-    Sequence,
-    Any,
-    NoReturn,
-    Type,
+    no_type_check,
 )
 
 try:
@@ -64,6 +63,7 @@ from telegram import (
     BotCommand,
     BotCommandScope,
     Chat,
+    ChatInviteLink,
     ChatMember,
     ChatPermissions,
     ChatPhoto,
@@ -71,6 +71,7 @@ from telegram import (
     Document,
     File,
     GameHighScore,
+    InlineKeyboardMarkup,
     InputMedia,
     Location,
     MaskPosition,
@@ -91,25 +92,23 @@ from telegram import (
     VideoNote,
     Voice,
     WebhookInfo,
-    InlineKeyboardMarkup,
-    ChatInviteLink,
 )
-from telegram.error import InvalidToken, TelegramError
-from telegram.constants import InlineQueryLimit
-from telegram.request import BaseRequest, RequestData
-from telegram.request._requestparameter import RequestParameter
-from telegram.request._httpxrequest import HTTPXRequest
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
-from telegram._utils.types import FileInput, JSONDict, ODVInput, DVInput, ReplyMarkup
+from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram.constants import InlineQueryLimit
+from telegram.error import InvalidToken, TelegramError
+from telegram.request import BaseRequest, RequestData
+from telegram.request._httpxrequest import HTTPXRequest
+from telegram.request._requestparameter import RequestParameter
 
 if TYPE_CHECKING:
     from telegram import (
+        InlineQueryResult,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        InlineQueryResult,
         LabeledPrice,
         MessageEntity,
     )

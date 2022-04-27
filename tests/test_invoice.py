@@ -19,7 +19,7 @@
 import pytest
 from flaky import flaky
 
-from telegram import LabeledPrice, Invoice
+from telegram import Invoice, LabeledPrice
 from telegram.error import BadRequest
 from telegram.request import RequestData
 

@@ -15,12 +15,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import pytest
-
 from datetime import datetime, timedelta, timezone
 
+import pytest
 
-from telegram import Poll, PollOption, PollAnswer, User, MessageEntity
+from telegram import MessageEntity, Poll, PollAnswer, PollOption, User
 from telegram._utils.datetime import to_timestamp
 
 

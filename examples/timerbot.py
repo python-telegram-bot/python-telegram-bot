@@ -21,7 +21,7 @@ bot.
 import logging
 
 from telegram import Update
-from telegram.ext import CommandHandler, Application, CallbackContext
+from telegram.ext import Application, CallbackContext, CommandHandler
 
 # Enable logging
 logging.basicConfig(

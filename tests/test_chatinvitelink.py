@@ -20,7 +20,7 @@ import datetime
 
 import pytest
 
-from telegram import User, ChatInviteLink
+from telegram import ChatInviteLink, User
 from telegram._utils.datetime import to_timestamp
 
 
