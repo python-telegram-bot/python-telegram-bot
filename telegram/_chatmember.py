@@ -178,6 +178,8 @@ class ChatMemberAdministrator(ChatMember):
             administrator can delete messages of other users.
         can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
             administrator can manage video chats.
+
+            .. versionadded:: 20.0
         can_restrict_members (:obj:`bool`): :obj:`True`, if the
             administrator can restrict, ban or unban chat members.
         can_promote_members (:obj:`bool`): :obj:`True`, if the administrator
@@ -213,6 +215,8 @@ class ChatMemberAdministrator(ChatMember):
             administrator can delete messages of other users.
         can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
             administrator can manage video chats.
+
+            .. versionadded:: 20.0
         can_restrict_members (:obj:`bool`): :obj:`True`, if the
             administrator can restrict, ban or unban chat members.
         can_promote_members (:obj:`bool`): :obj:`True`, if the administrator

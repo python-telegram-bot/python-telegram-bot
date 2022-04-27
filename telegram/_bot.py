@@ -7657,9 +7657,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     copyMessage = copy_message
     """Alias for :meth:`copy_message`"""
     getChatMenuButton = get_chat_menu_button
-    """Alias for :meth:`set_chat_menu_button`"""
-    setChatMenuButton = set_chat_menu_button
     """Alias for :meth:`get_chat_menu_button`"""
+    setChatMenuButton = set_chat_menu_button
+    """Alias for :meth:`set_chat_menu_button`"""
     getMyDefaultAdministratorRights = get_my_default_administrator_rights
     """Alias for :meth:`get_my_default_administrator_rights`"""
     setMyDefaultAdministratorRights = set_my_default_administrator_rights

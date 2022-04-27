@@ -157,7 +157,7 @@ class Message(TelegramObject):
             the file.
         video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
             about the video message.
-        new_chat_members (List[:class:`telegram.User`], optional): New members that were added to
+        new_chat_members (List[:class:`telegram.User`], optional): New members that where added to
             the group or supergroup and information about them (the bot itself may be one of these
             members).
         caption (:obj:`str`, optional): Caption for the animation, audio, document, photo, video

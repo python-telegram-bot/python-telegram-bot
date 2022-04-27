@@ -81,7 +81,7 @@ class InlineKeyboardButton(TelegramObject):
             using the method :meth:`~telegram.Bot.answer_web_app_query`. Available only in
             private chats between a user and the bot.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
         switch_inline_query (:obj:`str`, optional): If set, pressing the button will prompt the
             user to select one of their chats, open that chat and insert the bot's username and the
             specified inline query in the input field. Can be empty, in which case just the bot's
@@ -123,7 +123,7 @@ class InlineKeyboardButton(TelegramObject):
             using the method :meth:`~telegram.Bot.answer_web_app_query`. Available only in
             private chats between a user and the bot.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
         switch_inline_query (:obj:`str`): Optional. Will prompt the user to select one of their
             chats, open that chat and insert the bot's username and the specified inline query in
             the input field. Can be empty, in which case just the bot's username will be inserted.

@@ -70,7 +70,6 @@ def parse_table(h4) -> List[List[str]]:
 
 def check_method(h4):
     name = h4.text  # name of the method in telegram's docs.
-    print(name)
     method = getattr(telegram.Bot, name)  # Retrieve our lib method
     table = parse_table(h4)
 
