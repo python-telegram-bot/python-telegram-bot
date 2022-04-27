@@ -129,7 +129,7 @@ class ChatPermissions(TelegramObject):
         :obj:`True`. This is e.g. useful when unrestricting a chat member with
         :meth:`telegram.Bot.restrict_chat_member`.
 
-        .. versionadded:: 14.0
+        .. versionadded:: 20.0
         """
         return cls(True, True, True, True, True, True, True, True)
 
@@ -139,6 +139,6 @@ class ChatPermissions(TelegramObject):
         This method returns an :class:`ChatPermisisons` instance
         with all attributes set to :obj:`False`.
 
-        .. versionadded:: 14.0
+        .. versionadded:: 2.0
         """
         return cls(False, False, False, False, False, False, False, False)
