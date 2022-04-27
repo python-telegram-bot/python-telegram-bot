@@ -13,7 +13,7 @@ httpx ~= 0.22.0
 tornado~=6.1
 
 # Cachetools and APS don't have a strict stability policy.
-# Let's be cautious for.
+# Let's be cautious for now.
 cachetools~=5.0.0
 APScheduler~=3.9.1
 
