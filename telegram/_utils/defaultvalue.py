@@ -29,7 +29,7 @@ Warning:
 """
 from typing import Generic, overload, Union, TypeVar
 
-DVType = TypeVar('DVType', bound=object)
+DVType = TypeVar('DVType', bound=object)  # pylint: disable=invalid-name
 OT = TypeVar('OT', bound=object)
 
 

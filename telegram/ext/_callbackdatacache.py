@@ -23,7 +23,7 @@ from datetime import datetime
 from typing import Dict, Tuple, Union, Optional, MutableMapping, TYPE_CHECKING, cast
 from uuid import uuid4
 
-from cachetools import LRUCache  # pylint: disable=import-error
+from cachetools import LRUCache
 
 from telegram import (
     InlineKeyboardMarkup,

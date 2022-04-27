@@ -67,7 +67,7 @@ if TYPE_CHECKING:
 
 DEFAULT_GROUP: int = 0
 
-_AppType = TypeVar('_AppType', bound="Application")
+_AppType = TypeVar('_AppType', bound="Application")  # pylint: disable=invalid-name
 _RT = TypeVar('_RT')
 _STOP_SIGNAL = object()
 
@@ -1420,7 +1420,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             for (
                 callback,
                 block,
-            ) in self.error_handlers.items():  # pylint: disable=redefined-outer-name
+            ) in self.error_handlers.items():
                 context = self.context_types.context.from_error(
                     update=update,
                     error=error,

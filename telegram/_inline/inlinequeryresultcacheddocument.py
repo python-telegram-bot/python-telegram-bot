@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram InlineQueryResultCachedDocument."""
 
 from typing import TYPE_CHECKING, Any, Union, Tuple, List

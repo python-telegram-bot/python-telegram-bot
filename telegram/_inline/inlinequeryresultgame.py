@@ -54,7 +54,7 @@ class InlineQueryResultGame(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.GAME, id)
-        self.id = id  # pylint: disable=redefined-builtin
+        self.id = id
         self.game_short_name = game_short_name
 
         self.reply_markup = reply_markup

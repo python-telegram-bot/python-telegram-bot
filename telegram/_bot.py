@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=no-name-in-module, no-self-argument, not-callable, no-member, too-many-arguments
-# pylint: disable=too-many-public-methods
+# pylint: disable=no-self-argument, not-callable, no-member, too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -2638,7 +2637,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries
         from the json data.
         """
-        # pylint: disable=protected-access
         if hasattr(res, 'parse_mode'):
             res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, 'input_message_content') and res.input_message_content:

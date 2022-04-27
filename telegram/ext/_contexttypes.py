@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=no-self-use
 """This module contains the auxiliary class ContextTypes."""
 from typing import Type, Generic, overload, Dict, TYPE_CHECKING  # pylint: disable=unused-import
 
@@ -24,7 +23,7 @@ from telegram.ext._callbackcontext import CallbackContext
 from telegram.ext._utils.types import CCT, UD, CD, BD
 
 if TYPE_CHECKING:
-    from telegram.ext._extbot import ExtBot  # pylint: disable=unused-import
+    from telegram.ext._extbot import ExtBot
 
 
 class ContextTypes(Generic[CCT, UD, CD, BD]):

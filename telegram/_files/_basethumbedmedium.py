@@ -26,7 +26,8 @@ from telegram._utils.types import JSONDict
 if TYPE_CHECKING:
     from telegram import Bot
 
-ThumbedMT = TypeVar('ThumbedMT', bound='_BaseThumbedMedium', covariant=True)
+# pylint: disable=invalid-name
+ThumbedMT_co = TypeVar('ThumbedMT_co', bound='_BaseThumbedMedium', covariant=True)
 
 
 class _BaseThumbedMedium(_BaseMedium):
@@ -73,7 +74,9 @@ class _BaseThumbedMedium(_BaseMedium):
         self.thumb = thumb
 
     @classmethod
-    def de_json(cls: Type[ThumbedMT], data: Optional[JSONDict], bot: 'Bot') -> Optional[ThumbedMT]:
+    def de_json(
+        cls: Type[ThumbedMT_co], data: Optional[JSONDict], bot: 'Bot'
+    ) -> Optional[ThumbedMT_co]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

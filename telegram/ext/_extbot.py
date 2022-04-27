@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=no-name-in-module, no-self-argument, not-callable, invalid-name, no-member
-# pylint: disable=too-many-arguments, too-many-public-methods
+# pylint: disable=too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -299,7 +298,7 @@ class ExtBot(Bot):
 
         return updates
 
-    def _effective_inline_results(  # pylint: disable=no-self-use
+    def _effective_inline_results(
         self,
         results: Union[
             Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]

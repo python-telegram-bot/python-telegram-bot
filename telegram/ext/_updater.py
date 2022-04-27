@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
-_UpdaterType = TypeVar('_UpdaterType', bound="Updater")
+_UpdaterType = TypeVar('_UpdaterType', bound="Updater")  # pylint: disable=invalid-name
 
 
 class Updater(AbstractAsyncContextManager):

@@ -55,7 +55,7 @@ a local file path as string, :class:`pathlib.Path` or the file contents as :obj:
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
 
-DVType = TypeVar('DVType')
+DVType = TypeVar('DVType')  # pylint: disable=invalid-name
 ODVInput = Optional[Union['DefaultValue[DVType]', DVType]]
 """Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
 as ``Optional[Union[DefaultValue, type]]``."""

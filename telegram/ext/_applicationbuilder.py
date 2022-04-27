@@ -45,7 +45,9 @@ if TYPE_CHECKING:
 
 # Type hinting is a bit complicated here because we try to get to a sane level of
 # leveraging generics and therefore need a number of type variables.
-InBT = TypeVar('InBT', bound=Bot)  # 'In' stands for input - used in parameters of methods below
+# 'In' stands for input - used in parameters of methods below
+# pylint: disable=invalid-name
+InBT = TypeVar('InBT', bound=Bot)
 InJQ = TypeVar('InJQ', bound=Union[None, JobQueue])
 InCCT = TypeVar('InCCT', bound='CallbackContext')
 InUD = TypeVar('InUD')
