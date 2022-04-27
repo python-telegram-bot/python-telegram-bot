@@ -231,7 +231,7 @@ html_theme_options = {
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = f"python-telegram-bot<br>v{version}"
+html_title = f"python-telegram-bot<br> v{version}"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
