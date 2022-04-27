@@ -86,9 +86,9 @@ class _BotPickler(pickle.Pickler):
             # Here we define a private dispatch_table, because we want to preserve the bot
             # attribute of objects so persistent_id works as intended. Otherwise, the bot attribute
             # is deleted in __getstate__, which is used during regular pickling (via pickle.dumps)
-            self.dispatch_table = copyreg.dispatch_table.copy()  # type: ignore[attr-defined]
+            self.dispatch_table = copyreg.dispatch_table.copy()
             for obj in _all_subclasses(TelegramObject):
-                self.dispatch_table[obj] = _custom_reduction  # type: ignore[index]
+                self.dispatch_table[obj] = _custom_reduction
         super().__init__(*args, **kwargs)
 
     def reducer_override(  # pylint: disable=no-self-use

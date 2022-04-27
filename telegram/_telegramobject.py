@@ -147,7 +147,7 @@ class TelegramObject:
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
         for cls in self.__class__.__mro__[:-1]:
-            for key in cls.__slots__:
+            for key in cls.__slots__:  # type: ignore[attr-defined]
                 if not include_private and key.startswith('_'):
                     continue
 

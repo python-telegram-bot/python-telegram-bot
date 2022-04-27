@@ -82,7 +82,7 @@ class BotCommandScopeType(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = ()
 
     DEFAULT = 'default'
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeDefault`."""
@@ -108,7 +108,7 @@ class CallbackQueryLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = ()
 
     ANSWER_CALLBACK_QUERY_TEXT_LENGTH = 200
     """:obj:`int`: Maximum number of characters for the ``text`` parameter of
@@ -122,7 +122,7 @@ class ChatAction(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = ()
 
     CHOOSE_STICKER = 'choose_sticker'
     """:obj:`str`: Chat action indicating that the bot is selecting a sticker."""
@@ -155,7 +155,7 @@ class ChatID(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = ()
 
     ANONYMOUS_ADMIN = 1087968824
     """:obj:`int`: User ID in groups for messages sent by anonymous admins.
@@ -190,7 +190,7 @@ class ChatInviteLinkLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = ()
 
     MEMBER_LIMIT = 99999
     """:obj:`int`: Maximum value allowed for the ``member_limit`` parameter of
@@ -207,7 +207,7 @@ class ChatMemberStatus(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     ADMINISTRATOR = 'administrator'
     """:obj:`str`: A :class:`telegram.ChatMember` who is administrator of the chat."""
@@ -230,7 +230,7 @@ class ChatType(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     SENDER = 'sender'
     """:obj:`str`: A :class:`telegram.Chat` that represents the chat of a :class:`telegram.User`
@@ -253,7 +253,7 @@ class DiceEmoji(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     DICE = '🎲'
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎲``."""
@@ -276,7 +276,7 @@ class FileSizeLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     FILESIZE_DOWNLOAD = int(20e6)  # (20MB)
     """:obj:`int`: Bots can download files of up to 20MB in size."""
@@ -293,7 +293,7 @@ class FloodLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     MESSAGES_PER_SECOND_PER_CHAT = 1
     """:obj:`int`: The number of messages that can be sent per second in a particular chat.
@@ -318,7 +318,7 @@ class InlineKeyboardMarkupLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     TOTAL_BUTTON_NUMBER = 100
     """:obj:`int`: Maximum number of buttons that can be attached to a message.
@@ -341,7 +341,7 @@ class InputMediaType(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     ANIMATION = 'animation'
     """:obj:`str`: Type of :class:`telegram.InputMediaAnimation`."""
@@ -363,7 +363,7 @@ class InlineQueryLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     RESULTS = 50
     """:obj:`int`: Maximum number of results that can be passed to
@@ -380,7 +380,7 @@ class InlineQueryResultType(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     AUDIO = 'audio'
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultAudio` and
@@ -432,7 +432,7 @@ class LocationLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     HORIZONTAL_ACCURACY = 1500
     """:obj:`int`: Maximum radius of uncertainty for the location, measured in meters."""
@@ -454,7 +454,7 @@ class MaskPosition(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     FOREHEAD = 'forehead'
     """:obj:`str`: Mask position for a sticker on the forehead."""
@@ -474,7 +474,7 @@ class MessageAttachmentType(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     # Make sure that all constants here are also listed in the MessageType Enum!
     # (Enums are not extendable)
@@ -522,7 +522,7 @@ class MessageEntityType(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     MENTION = 'mention'
     """:obj:`str`: Message entities representing a mention."""
@@ -566,7 +566,7 @@ class MessageLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     TEXT_LENGTH = 4096
     """:obj:`int`: Maximum number of characters for a text message."""
@@ -590,7 +590,7 @@ class MessageType(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     # Make sure that all attachment type constants are also listed in the
     # MessageAttachmentType Enum! (Enums are not extendable)
@@ -676,7 +676,7 @@ class ParseMode(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     MARKDOWN = 'Markdown'
     """:obj:`str`: Markdown parse mode.
@@ -699,7 +699,7 @@ class PollLimit(IntEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     QUESTION_LENGTH = 300
     """:obj:`str`: Maximum number of characters of the polls question."""
@@ -717,7 +717,7 @@ class PollType(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     REGULAR = 'regular'
     """:obj:`str`: regular polls."""
@@ -732,7 +732,7 @@ class UpdateType(StringEnum):
     .. versionadded:: 14.0
     """
 
-    __slots__ = ()  # type: ignore[misc]
+    __slots__ = () 
 
     MESSAGE = 'message'
     """:obj:`str`: Updates with :attr:`telegram.Update.message`."""

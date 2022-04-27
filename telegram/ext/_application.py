@@ -466,7 +466,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 _logger.debug('Loop for updating persistence started')
 
             if self.job_queue:
-                await self.job_queue.start()
+                await self.job_queue.start()  # type: ignore[union-attr]
                 _logger.debug('JobQueue started')
 
             self.__update_fetcher_task = asyncio.create_task(
@@ -517,7 +517,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         if self.job_queue:
             _logger.debug('Waiting for running jobs to finish')
-            await self.job_queue.stop(wait=True)
+            await self.job_queue.stop(wait=True)  # type: ignore[union-attr]
             _logger.debug('JobQueue stopped')
 
         _logger.debug('Waiting for `create_task` calls to be processed')

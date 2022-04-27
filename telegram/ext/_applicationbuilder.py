@@ -254,7 +254,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         application: Application[
             BT, CCT, UD, CD, BD, JQ
-        ] = DefaultValue.get_value(  # type: ignore[call-arg]  # pylint: disable=not-callable
+        ] = DefaultValue.get_value(  # pylint: disable=not-callable
             self._application_class
         )(
             bot=bot,
