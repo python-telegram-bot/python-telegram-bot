@@ -79,7 +79,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
         Finally, ``ConversationHandler``, does *not* handle (edited) channel posts.
 
-    .. _`FAQ`: https://git.io/JtcyU
+    .. _`FAQ`: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Frequently-Asked-Questions#what-do-the-per_-settings-in-conversationhandler-do
 
     The first collection, a ``list`` named :attr:`entry_points`, is used to initiate the
     conversation, for example with a :class:`telegram.ext.CommandHandler` or

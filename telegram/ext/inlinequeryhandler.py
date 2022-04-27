@@ -55,7 +55,7 @@ class InlineQueryHandler(Handler[Update, CCT]):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://git.io/fxJuV for more info.
+        https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for more info.
 
     Warning:
         * When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom

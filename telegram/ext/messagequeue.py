@@ -50,7 +50,7 @@ class DelayQueue(threading.Thread):
 
     .. deprecated:: 13.3
        :class:`telegram.ext.DelayQueue` in its current form is deprecated and will be reinvented
-       in a future release. See `this thread <https://git.io/JtDbF>`_ for a list of known bugs.
+       in a future release. See `this thread <https://github.com/python-telegram-bot/python-telegram-bot/issues/2139>`_ for a list of known bugs.
 
     Args:
         queue (:obj:`Queue`, optional): Used to pass callbacks to thread. Creates ``Queue``
@@ -92,7 +92,7 @@ class DelayQueue(threading.Thread):
     ):
         warnings.warn(
             'DelayQueue in its current form is deprecated and will be reinvented in a future '
-            'release. See https://git.io/JtDbF for a list of known bugs.',
+            'release. See https://github.com/python-telegram-bot/python-telegram-bot/issues/2139 for a list of known bugs.',
             category=TelegramDeprecationWarning,
         )
 
@@ -194,7 +194,7 @@ class MessageQueue:
 
     .. deprecated:: 13.3
        :class:`telegram.ext.MessageQueue` in its current form is deprecated and will be reinvented
-       in a future release. See `this thread <https://git.io/JtDbF>`_ for a list of known bugs.
+       in a future release. See `this thread <https://github.com/python-telegram-bot/python-telegram-bot/issues/2139>`_ for a list of known bugs.
 
     Args:
         all_burst_limit (:obj:`int`, optional): Number of maximum *all-type* callbacks to process
@@ -226,7 +226,7 @@ class MessageQueue:
     ):
         warnings.warn(
             'MessageQueue in its current form is deprecated and will be reinvented in a future '
-            'release. See https://git.io/JtDbF for a list of known bugs.',
+            'release. See https://github.com/python-telegram-bot/python-telegram-bot/issues/2139 for a list of known bugs.',
             category=TelegramDeprecationWarning,
         )
 
