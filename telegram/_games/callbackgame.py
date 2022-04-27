@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram CallbackGame."""
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class CallbackGame(TelegramObject):

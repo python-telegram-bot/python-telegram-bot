@@ -20,7 +20,8 @@
 
 from typing import Any
 
-from telegram import InlineKeyboardMarkup, InlineQueryResult
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram.constants import InlineQueryResultType
 
 

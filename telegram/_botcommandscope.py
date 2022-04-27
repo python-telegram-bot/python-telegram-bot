@@ -20,7 +20,8 @@
 """This module contains objects representing Telegram bot command scopes."""
 from typing import TYPE_CHECKING, Any, ClassVar, Dict, Optional, Type, Union
 
-from telegram import TelegramObject, constants
+from telegram import constants
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:

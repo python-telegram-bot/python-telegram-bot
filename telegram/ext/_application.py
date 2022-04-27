@@ -47,14 +47,17 @@ from typing import (
     Union,
 )
 
-from telegram import Update
+from telegram._update import Update
 from telegram._utils.defaultvalue import DEFAULT_NONE, DEFAULT_TRUE, DefaultValue
 from telegram._utils.types import DVInput, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
-from telegram.ext import BasePersistence, ContextTypes, ExtBot, Updater
+from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._callbackdatacache import CallbackDataCache
+from telegram.ext._contexttypes import ContextTypes
+from telegram.ext._extbot import ExtBot
 from telegram.ext._handler import Handler
+from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD, ConversationKey, HandlerCallback

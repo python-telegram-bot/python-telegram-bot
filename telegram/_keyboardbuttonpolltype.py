@@ -19,7 +19,7 @@
 """This module contains an object that represents a type of a Telegram Poll."""
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class KeyboardButtonPollType(TelegramObject):

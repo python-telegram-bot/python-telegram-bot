@@ -20,14 +20,10 @@
 from base64 import b64decode
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import (
-    IdDocumentData,
-    PassportFile,
-    PersonalDetails,
-    ResidentialAddress,
-    TelegramObject,
-)
 from telegram._passport.credentials import decrypt_json
+from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
+from telegram._passport.passportfile import PassportFile
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:

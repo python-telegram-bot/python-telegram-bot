@@ -20,8 +20,10 @@
 
 from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
 
-from telegram import PhotoSize, TelegramObject, constants
+from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files.photosize import PhotoSize
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:

@@ -20,8 +20,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Generic, NamedTuple, NoReturn, Optional
 
-from telegram import Bot
-from telegram.ext import ExtBot
+from telegram._bot import Bot
+from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import BD, CD, UD, CDCData, ConversationDict, ConversationKey
 
 

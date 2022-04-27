@@ -21,7 +21,10 @@
 import sys
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from telegram import Animation, MessageEntity, PhotoSize, TelegramObject
+from telegram._files.animation import Animation
+from telegram._files.photosize import PhotoSize
+from telegram._messageentity import MessageEntity
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:

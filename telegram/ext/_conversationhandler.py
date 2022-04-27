@@ -41,18 +41,16 @@ from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
 from telegram._utils.types import DVInput
 from telegram._utils.warnings import warn
-from telegram.ext import (
-    ApplicationHandlerStop,
-    CallbackContext,
-    CallbackQueryHandler,
-    ChosenInlineResultHandler,
-    ExtBot,
-    Handler,
-    InlineQueryHandler,
-    StringCommandHandler,
-    StringRegexHandler,
-    TypeHandler,
-)
+from telegram.ext._application import ApplicationHandlerStop
+from telegram.ext._callbackcontext import CallbackContext
+from telegram.ext._callbackqueryhandler import CallbackQueryHandler
+from telegram.ext._choseninlineresulthandler import ChosenInlineResultHandler
+from telegram.ext._extbot import ExtBot
+from telegram.ext._handler import Handler
+from telegram.ext._inlinequeryhandler import InlineQueryHandler
+from telegram.ext._stringcommandhandler import StringCommandHandler
+from telegram.ext._stringregexhandler import StringRegexHandler
+from telegram.ext._typehandler import TypeHandler
 from telegram.ext._utils.trackingdict import TrackingDict
 from telegram.ext._utils.types import CCT, ConversationDict, ConversationKey
 

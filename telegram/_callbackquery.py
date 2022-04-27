@@ -20,7 +20,11 @@
 """This module contains an object that represents a Telegram CallbackQuery"""
 from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Tuple, Union
 
-from telegram import Location, Message, TelegramObject, User, constants
+from telegram import constants
+from telegram._files.location import Location
+from telegram._message import Message
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import DVInput, JSONDict, ODVInput, ReplyMarkup
 

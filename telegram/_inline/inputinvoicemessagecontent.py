@@ -20,7 +20,8 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import InputMessageContent, LabeledPrice
+from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._payment.labeledprice import LabeledPrice
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:

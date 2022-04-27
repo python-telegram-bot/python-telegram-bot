@@ -57,45 +57,41 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
-from telegram import (
-    Animation,
-    Audio,
-    BotCommand,
-    BotCommandScope,
-    Chat,
-    ChatInviteLink,
-    ChatMember,
-    ChatPermissions,
-    ChatPhoto,
-    Contact,
-    Document,
-    File,
-    GameHighScore,
-    InlineKeyboardMarkup,
-    InputMedia,
-    Location,
-    MaskPosition,
-    Message,
-    MessageId,
-    PassportElementError,
-    PhotoSize,
-    Poll,
-    ShippingOption,
-    Sticker,
-    StickerSet,
-    TelegramObject,
-    Update,
-    User,
-    UserProfilePhotos,
-    Venue,
-    Video,
-    VideoNote,
-    Voice,
-    WebhookInfo,
-)
+from telegram._botcommand import BotCommand
+from telegram._botcommandscope import BotCommandScope
+from telegram._chat import Chat
+from telegram._chatinvitelink import ChatInviteLink
+from telegram._chatmember import ChatMember
+from telegram._chatpermissions import ChatPermissions
+from telegram._files.animation import Animation
+from telegram._files.audio import Audio
+from telegram._files.chatphoto import ChatPhoto
+from telegram._files.contact import Contact
+from telegram._files.document import Document
+from telegram._files.file import File
+from telegram._files.inputmedia import InputMedia
+from telegram._files.location import Location
+from telegram._files.photosize import PhotoSize
+from telegram._files.sticker import MaskPosition, Sticker, StickerSet
+from telegram._files.venue import Venue
+from telegram._files.video import Video
+from telegram._files.videonote import VideoNote
+from telegram._files.voice import Voice
+from telegram._games.gamehighscore import GameHighScore
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._message import Message
+from telegram._messageid import MessageId
+from telegram._passport.passportelementerrors import PassportElementError
+from telegram._payment.shippingoption import ShippingOption
+from telegram._poll import Poll
+from telegram._telegramobject import TelegramObject
+from telegram._update import Update
+from telegram._user import User
+from telegram._userprofilephotos import UserProfilePhotos
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit
 from telegram.error import InvalidToken, TelegramError
 from telegram.request import BaseRequest, RequestData

@@ -20,7 +20,7 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 if TYPE_CHECKING:
     from telegram import CallbackGame, LoginUrl

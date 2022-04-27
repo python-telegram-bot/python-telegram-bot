@@ -32,8 +32,9 @@ from typing import (
     Type,
 )
 
-from telegram import CallbackQuery, Update
-from telegram.ext import ExtBot
+from telegram._callbackquery import CallbackQuery
+from telegram._update import Update
+from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import BD, BT, CD, JQ, UD  # pylint: disable=unused-import
 
 if TYPE_CHECKING:

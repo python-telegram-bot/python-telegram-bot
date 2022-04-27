@@ -20,7 +20,7 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 

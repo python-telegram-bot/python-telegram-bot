@@ -20,7 +20,8 @@
 
 from typing import Any, List, Sequence, Union
 
-from telegram import KeyboardButton, TelegramObject
+from telegram._keyboardbutton import KeyboardButton
+from telegram._telegramobject import TelegramObject
 from telegram._utils.markup import check_keyboard_type
 from telegram._utils.types import JSONDict
 

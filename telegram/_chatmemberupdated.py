@@ -20,7 +20,11 @@
 import datetime
 from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
 
-from telegram import Chat, ChatInviteLink, ChatMember, TelegramObject, User
+from telegram._chat import Chat
+from telegram._chatinvitelink import ChatInviteLink
+from telegram._chatmember import ChatMember
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.types import JSONDict
 

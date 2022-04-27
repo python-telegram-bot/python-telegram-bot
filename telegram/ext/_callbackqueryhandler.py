@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Callable, Match, Optional, Pattern, TypeVar, U
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput
-from telegram.ext import Handler
+from telegram.ext._handler import Handler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:

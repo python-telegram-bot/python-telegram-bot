@@ -20,7 +20,8 @@
 
 from typing import Any
 
-from telegram import KeyboardButtonPollType, TelegramObject
+from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
+from telegram._telegramobject import TelegramObject
 
 
 class KeyboardButton(TelegramObject):

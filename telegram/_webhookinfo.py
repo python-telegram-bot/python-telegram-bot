@@ -20,7 +20,7 @@
 
 from typing import Any, List
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class WebhookInfo(TelegramObject):

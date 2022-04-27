@@ -21,8 +21,9 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
 
-from telegram import TelegramObject, constants
+from telegram import constants
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
+from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram.helpers import mention_html as helpers_mention_html

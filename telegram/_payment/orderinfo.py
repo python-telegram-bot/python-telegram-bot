@@ -20,7 +20,8 @@
 
 from typing import TYPE_CHECKING, Any, Optional
 
-from telegram import ShippingAddress, TelegramObject
+from telegram._payment.shippingaddress import ShippingAddress
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:

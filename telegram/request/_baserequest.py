@@ -41,7 +41,7 @@ from telegram.error import (
     RetryAfter,
     TelegramError,
 )
-from telegram.request import RequestData
+from telegram.request._requestdata import RequestData
 
 RT = TypeVar('RT', bound='BaseRequest')
 

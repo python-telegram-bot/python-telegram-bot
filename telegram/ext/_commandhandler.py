@@ -23,8 +23,8 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypeVar, Union
 from telegram import MessageEntity, Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import SLT, DVInput
-from telegram.ext import Handler
 from telegram.ext import filters as filters_module
+from telegram.ext._handler import Handler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:

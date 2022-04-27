@@ -19,7 +19,7 @@
 """This module contains an object that represents an instance of a Telegram MessageId."""
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class MessageId(TelegramObject):

@@ -20,7 +20,10 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import ShippingAddress, ShippingOption, TelegramObject, User
+from telegram._payment.shippingaddress import ShippingAddress
+from telegram._payment.shippingoption import ShippingOption
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 

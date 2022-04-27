@@ -19,16 +19,14 @@
 """Base class for Telegram InputMedia Objects."""
 from typing import List, Optional, Tuple, Union
 
-from telegram import (
-    Animation,
-    Audio,
-    Document,
-    InputFile,
-    MessageEntity,
-    PhotoSize,
-    TelegramObject,
-    Video,
-)
+from telegram._files.animation import Animation
+from telegram._files.audio import Audio
+from telegram._files.document import Document
+from telegram._files.inputfile import InputFile
+from telegram._files.photosize import PhotoSize
+from telegram._files.video import Video
+from telegram._messageentity import MessageEntity
+from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput

@@ -21,10 +21,15 @@ from asyncio import Queue
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, Generic, Optional, Type, TypeVar, Union
 
-from telegram import Bot
+from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FilePathInput, ODVInput
-from telegram.ext import Application, CallbackContext, ContextTypes, ExtBot, JobQueue, Updater
+from telegram.ext._application import Application
+from telegram.ext._callbackcontext import CallbackContext
+from telegram.ext._contexttypes import ContextTypes
+from telegram.ext._extbot import ExtBot
+from telegram.ext._jobqueue import JobQueue
+from telegram.ext._updater import Updater
 from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD
 from telegram.request import BaseRequest
 from telegram.request._httpxrequest import HTTPXRequest

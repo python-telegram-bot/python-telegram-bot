@@ -25,7 +25,8 @@ import httpx
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import ODVInput
 from telegram.error import NetworkError, TimedOut
-from telegram.request import BaseRequest, RequestData
+from telegram.request._baserequest import BaseRequest
+from telegram.request._requestdata import RequestData
 
 # Note to future devs:
 # Proxies are currently only tested manually. The httpx development docs have a nice guide on that:
