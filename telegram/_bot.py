@@ -4832,11 +4832,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-            Returns:
-                :obj:`bool`: On success, :obj:`True` is returned.
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
 
-            Raises:
-                :class:`telegram.error.TelegramError`
+        Raises:
+            :class:`telegram.error.TelegramError`
         """
         data: JSONDict = {
             'chat_id': chat_id,
