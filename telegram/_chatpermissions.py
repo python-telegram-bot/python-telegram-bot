@@ -126,7 +126,7 @@ class ChatPermissions(TelegramObject):
     def all_permissions(cls) -> 'ChatPermissions':
         """
         This method returns the ChatPermissions object with all attributes set to :obj:`True`.
-        This is e.g. useful when unrestricting a ChatMember with
+        This is e.g. useful when unrestricting a chat member with
         :meth:`telegram.Bot.restrict_chat_member`.
 
         .. versionadded:: 14.0
