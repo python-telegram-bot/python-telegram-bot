@@ -80,8 +80,8 @@ def check_method(h4):
     checked = []
     for tg_parameter in table:  # Iterates through each row in the table
         param = sig.parameters.get(
-            tg_parameter[0]
-        )  # parameter[0] is first element (the param name)
+            tg_parameter[0]  # parameter[0] is first element (the param name)
+        )
         assert param is not None, f"Parameter {tg_parameter[0]} not found in {method.__name__}"
 
         # TODO: Check type via docstring
@@ -224,29 +224,32 @@ def check_defaults_type(ptb_param: inspect.Parameter) -> bool:
     return True if DefaultValue.get_value(ptb_param.default) is None else False
 
 
+to_run = env_var_2_bool(os.getenv("TEST_OFFICIAL"))
 argvalues = []
 names = []
-request = httpx.get("https://core.telegram.org/bots/api")
-soup = BeautifulSoup(request.text, "html.parser")
 
-for thing in soup.select("h4 > a.anchor"):
-    # Methods and types don't have spaces in them, luckily all other sections of the docs do
-    # TODO: don't depend on that
-    if "-" not in thing["name"]:
-        h4 = thing.parent
+if to_run:
+    argvalues = []
+    names = []
+    request = httpx.get("https://core.telegram.org/bots/api")
+    soup = BeautifulSoup(request.text, "html.parser")
 
-        # Is it a method
-        if h4.text[0].lower() == h4.text[0]:
-            argvalues.append((check_method, h4))
-            names.append(h4.text)
-        elif h4.text not in IGNORED_OBJECTS:  # Or a type/object
-            argvalues.append((check_object, h4))
-            names.append(h4.text)
+    for thing in soup.select("h4 > a.anchor"):
+        # Methods and types don't have spaces in them, luckily all other sections of the docs do
+        # TODO: don't depend on that
+        if "-" not in thing["name"]:
+            h4 = thing.parent
+
+            # Is it a method
+            if h4.text[0].lower() == h4.text[0]:
+                argvalues.append((check_method, h4))
+                names.append(h4.text)
+            elif h4.text not in IGNORED_OBJECTS:  # Or a type/object
+                argvalues.append((check_object, h4))
+                names.append(h4.text)
 
 
+@pytest.mark.skipif(not to_run, reason="test_official is not enabled")
 @pytest.mark.parametrize(("method", "data"), argvalues=argvalues, ids=names)
-@pytest.mark.skipif(
-    not env_var_2_bool(os.getenv("TEST_OFFICIAL")), reason="test_official is not enabled"
-)
 def test_official(method, data):
     method(data)
