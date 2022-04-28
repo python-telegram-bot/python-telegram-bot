@@ -7,11 +7,11 @@ black==22.3.0
 flake8==4.0.1
 pylint==2.13.7
 mypy==0.950
-pyupgrade==2.31.0
+pyupgrade==2.32.0
 isort==5.10.1
 
 pytest==7.1.2
-pytest-asyncio==0.16.0
+pytest-asyncio==0.18.3
 
 flaky  # Used for flaky tests (flaky decorator)
 beautifulsoup4  # used in test_official for parsing tg docs
