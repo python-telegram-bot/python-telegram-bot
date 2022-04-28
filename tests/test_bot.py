@@ -710,7 +710,7 @@ class TestBot:
         )
 
         if close_date:
-            close_date = dtm.datetime.utcnow() + dtm.timedelta(seconds=5.1)
+            close_date = dtm.datetime.utcnow() + dtm.timedelta(seconds=5.05)
 
         message = await bot.send_poll(
             chat_id=super_group_id,
@@ -722,7 +722,7 @@ class TestBot:
             open_period=open_period,
             close_date=close_date,
         )
-        await asyncio.sleep(3.2)
+        await asyncio.sleep(5.1)
         new_message = await bot.edit_message_reply_markup(
             chat_id=super_group_id,
             message_id=message.message_id,
@@ -754,7 +754,7 @@ class TestBot:
         msg.poll.close_date = msg.poll.close_date.astimezone(aware_close_date.tzinfo)
         assert abs(msg.poll.close_date - aware_close_date) <= dtm.timedelta(seconds=5)
 
-        await asyncio.sleep(2.1)
+        await asyncio.sleep(5.1)
 
         new_message = await tz_bot.edit_message_reply_markup(
             chat_id=super_group_id,
