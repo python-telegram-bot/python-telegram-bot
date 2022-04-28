@@ -528,9 +528,8 @@ class TestStickerSet:
         file_id = video_sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
-    @flaky(10, 1)
+    @flaky(3, 1)
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
-        await asyncio.sleep(1)
         assert await bot.set_sticker_set_thumb(
             f'test_by_{bot.username}', chat_id, sticker_set_thumb_file
         )

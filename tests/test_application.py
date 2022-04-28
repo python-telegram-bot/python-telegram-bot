@@ -1175,7 +1175,7 @@ class TestApplication:
 
     async def test_create_task_cancel_task(self, app):
         async def callback():
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)
 
         async def error(update_arg, context):
             self.received = update_arg, context.error
