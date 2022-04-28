@@ -97,7 +97,7 @@ class TestChatInviteLink:
         assert invite_link.creates_join_request == self.creates_join_request
         assert invite_link.is_primary == self.primary
         assert invite_link.is_revoked == self.revoked
-        assert invite_link.expire_date - self.expire_date < datetime.timedelta(seconds=1)
+        assert abs(invite_link.expire_date - self.expire_date) < datetime.timedelta(seconds=1)
         assert to_timestamp(invite_link.expire_date) == to_timestamp(self.expire_date)
         assert invite_link.member_limit == self.member_limit
         assert invite_link.name == self.name

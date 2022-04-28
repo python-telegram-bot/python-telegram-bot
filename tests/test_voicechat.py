@@ -165,7 +165,7 @@ class TestVoiceChatScheduled:
         json_dict = {'start_date': to_timestamp(self.start_date)}
         voice_chat_scheduled = VoiceChatScheduled.de_json(json_dict, bot)
 
-        assert voice_chat_scheduled.start_date - self.start_date < dtm.timedelta(seconds=1)
+        assert abs(voice_chat_scheduled.start_date - self.start_date) < dtm.timedelta(seconds=1)
 
     def test_to_dict(self):
         voice_chat_scheduled = VoiceChatScheduled(self.start_date)

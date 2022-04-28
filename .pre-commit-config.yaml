@@ -23,8 +23,6 @@ repos:
           #  run pylint across multiple cpu cores to speed it up-
           # https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
           - --jobs=0
-          # Warns about unused pylint ignores:
-          - --enable=useless-suppression
 
         additional_dependencies:
           - httpx >= 0.20.0,<1.0
@@ -71,6 +69,5 @@ repos:
     rev: 5.10.1
     hooks:
     -   id: isort
-        name: isort (python)
-        # compatibility with black
-        args: ["--profile", "black", "--filter-files", "-l", "-99"]
+        name: isort
+        args: ["--diff"]  # -diff will not apply the changes, just show them

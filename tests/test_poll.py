@@ -190,7 +190,7 @@ class TestPoll:
         assert poll.explanation == self.explanation
         assert poll.explanation_entities == self.explanation_entities
         assert poll.open_period == self.open_period
-        assert poll.close_date - self.close_date < timedelta(seconds=1)
+        assert abs(poll.close_date - self.close_date) < timedelta(seconds=1)
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
 
     def test_to_dict(self, poll):

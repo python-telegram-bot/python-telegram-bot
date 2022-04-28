@@ -15,4 +15,4 @@ pytest-asyncio==0.16.0
 
 flaky  # Used for flaky tests (flaky decorator)
 beautifulsoup4  # used in test_official for parsing tg docs
-wheel  # TODO ??
+wheel  # required for building the wheels for releases

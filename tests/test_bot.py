@@ -2137,7 +2137,7 @@ class TestBot:
         )
         assert invite_link.invite_link != ''
         assert not invite_link.invite_link.endswith('...')
-        assert invite_link.expire_date - aware_time_in_future < dtm.timedelta(seconds=1)
+        assert abs(invite_link.expire_date - aware_time_in_future) < dtm.timedelta(seconds=1)
         assert invite_link.member_limit == 10
 
         add_seconds = dtm.timedelta(0, 80)
@@ -2153,7 +2153,9 @@ class TestBot:
             name='NewName',
         )
         assert edited_invite_link.invite_link == invite_link.invite_link
-        assert edited_invite_link.expire_date - aware_time_in_future < dtm.timedelta(seconds=1)
+        assert abs(edited_invite_link.expire_date - aware_time_in_future) < dtm.timedelta(
+            seconds=1
+        )
         assert edited_invite_link.name == 'NewName'
         assert edited_invite_link.member_limit == 20
 
@@ -2188,7 +2190,7 @@ class TestBot:
         )
         assert invite_link.invite_link != ''
         assert not invite_link.invite_link.endswith('...')
-        assert invite_link.expire_date - aware_expire_date < dtm.timedelta(seconds=1)
+        assert abs(invite_link.expire_date - aware_expire_date) < dtm.timedelta(seconds=1)
         assert invite_link.member_limit == 10
 
         add_seconds = dtm.timedelta(0, 80)
@@ -2203,7 +2205,7 @@ class TestBot:
             name='NewName',
         )
         assert edited_invite_link.invite_link == invite_link.invite_link
-        assert edited_invite_link.expire_date - aware_expire_date < dtm.timedelta(seconds=1)
+        assert abs(edited_invite_link.expire_date - aware_expire_date) < dtm.timedelta(seconds=1)
         assert edited_invite_link.name == 'NewName'
         assert edited_invite_link.member_limit == 20
 
