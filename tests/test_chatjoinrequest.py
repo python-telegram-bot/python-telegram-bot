@@ -119,7 +119,6 @@ class TestChatJoinRequest:
         assert a != f
         assert hash(a) != hash(f)
 
-    @pytest.mark.asyncio
     async def test_approve(self, monkeypatch, chat_join_request):
         async def make_assertion(*_, **kwargs):
             chat_id_test = kwargs['chat_id'] == chat_join_request.chat.id
@@ -142,7 +141,6 @@ class TestChatJoinRequest:
         )
         assert await chat_join_request.approve()
 
-    @pytest.mark.asyncio
     async def test_decline(self, monkeypatch, chat_join_request):
         async def make_assertion(*_, **kwargs):
             chat_id_test = kwargs['chat_id'] == chat_join_request.chat.id

@@ -132,7 +132,6 @@ class TestChatJoinRequestHandler:
         assert not handler.check_update(false_update)
         assert not handler.check_update(True)
 
-    @pytest.mark.asyncio
     async def test_context(self, app, chat_join_request_update):
         handler = ChatJoinRequestHandler(callback=self.callback)
         app.add_handler(handler)

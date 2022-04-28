@@ -101,7 +101,6 @@ class TestPollAnswerHandler:
         handler = PollAnswerHandler(self.callback)
         assert not handler.check_update(false_update)
 
-    @pytest.mark.asyncio
     async def test_context(self, app, poll_answer):
         handler = PollAnswerHandler(self.callback)
         app.add_handler(handler)

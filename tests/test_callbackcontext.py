@@ -178,7 +178,6 @@ class TestCallbackContext:
         finally:
             app.bot = bot
 
-    @pytest.mark.asyncio
     async def test_drop_callback_data(self, bot, monkeypatch, chat_id):
         app = ApplicationBuilder().token(bot.token).arbitrary_callback_data(True).build()
 

@@ -146,7 +146,6 @@ class DictApplication(Application):
 
 
 @pytest.fixture(scope='session')
-@pytest.mark.asyncio
 async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
     async with make_bot(bot_info) as _bot:
@@ -154,7 +153,6 @@ async def bot(bot_info):
 
 
 @pytest.fixture(scope='session')
-@pytest.mark.asyncio
 async def raw_bot(bot_info):
     """Makes an regular Bot instance with the given bot_info"""
     async with DictBot(
@@ -203,7 +201,6 @@ def provider_token(bot_info):
 
 
 @pytest.fixture(scope='function')
-@pytest.mark.asyncio
 async def app(bot_info):
     # We build a new bot each time so that we use `app` in a context manager without problems
     application = (
@@ -216,7 +213,6 @@ async def app(bot_info):
 
 
 @pytest.fixture(scope='function')
-@pytest.mark.asyncio
 async def updater(bot_info):
     # We build a new bot each time so that we use `updater` in a context manager without problems
     up = Updater(bot=make_bot(bot_info), update_queue=asyncio.Queue())

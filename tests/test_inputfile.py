@@ -132,7 +132,6 @@ class TestInputFile:
             == 'blah.jpg'
         )
 
-    @pytest.mark.asyncio
     async def test_send_bytes(self, bot, chat_id):
         # We test this here and not at the respective test modules because it's not worth
         # duplicating the test for the different methods
@@ -144,7 +143,6 @@ class TestInputFile:
 
         assert out.read().decode('utf-8') == 'PTB Rocks! ⅞'
 
-    @pytest.mark.asyncio
     async def test_send_string(self, bot, chat_id):
         # We test this here and not at the respective test modules because it's not worth
         # duplicating the test for the different methods

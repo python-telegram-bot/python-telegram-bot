@@ -173,7 +173,6 @@ class TestMessageHandler:
         handler = MessageHandler(DataFilter(), self.callback)
         assert handler.check_update(Update(0, message)) is False
 
-    @pytest.mark.asyncio
     async def test_context(self, app, message):
         handler = MessageHandler(
             None,
@@ -197,7 +196,6 @@ class TestMessageHandler:
             await app.process_update(Update(0, edited_channel_post=message))
             assert self.test_flag
 
-    @pytest.mark.asyncio
     async def test_context_regex(self, app, message):
         handler = MessageHandler(filters.Regex('one two'), self.callback_regex1)
         app.add_handler(handler)
@@ -211,7 +209,6 @@ class TestMessageHandler:
             await app.process_update(Update(0, message))
             assert self.test_flag
 
-    @pytest.mark.asyncio
     async def test_context_multiple_regex(self, app, message):
         handler = MessageHandler(filters.Regex('one') & filters.Regex('two'), self.callback_regex2)
         app.add_handler(handler)

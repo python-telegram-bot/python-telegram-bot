@@ -71,7 +71,6 @@ class TestVenue:
         assert venue.google_place_id == self.google_place_id
         assert venue.google_place_type == self.google_place_type
 
-    @pytest.mark.asyncio
     async def test_send_with_venue(self, monkeypatch, bot, chat_id, venue):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
@@ -100,7 +99,6 @@ class TestVenue:
         ],
         indirect=['default_bot'],
     )
-    @pytest.mark.asyncio
     async def test_send_venue_default_allow_sending_without_reply(
         self, default_bot, chat_id, venue, custom
     ):
@@ -126,7 +124,6 @@ class TestVenue:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
     async def test_send_venue_default_protect_content(self, default_bot, chat_id, venue):
         protected = await default_bot.send_venue(chat_id, venue=venue)
@@ -134,7 +131,6 @@ class TestVenue:
         unprotected = await default_bot.send_venue(chat_id, venue=venue, protect_content=False)
         assert not unprotected.has_protected_content
 
-    @pytest.mark.asyncio
     async def test_send_venue_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either venue or latitude, longitude, address and'):
             await bot.send_venue(chat_id=chat_id)

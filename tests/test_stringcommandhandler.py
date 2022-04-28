@@ -100,7 +100,6 @@ class TestStringCommandHandler:
         handler = StringCommandHandler('test', self.callback)
         assert not handler.check_update(false_update)
 
-    @pytest.mark.asyncio
     async def test_context(self, app):
         handler = StringCommandHandler('test', self.callback)
         app.add_handler(handler)
@@ -109,7 +108,6 @@ class TestStringCommandHandler:
             await app.process_update('/test')
         assert self.test_flag
 
-    @pytest.mark.asyncio
     async def test_context_args(self, app):
         handler = StringCommandHandler('test', self.callback_args)
         app.add_handler(handler)

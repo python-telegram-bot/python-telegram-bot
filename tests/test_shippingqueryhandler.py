@@ -110,7 +110,6 @@ class TestShippingQueryHandler:
         handler = ShippingQueryHandler(self.callback)
         assert not handler.check_update(false_update)
 
-    @pytest.mark.asyncio
     async def test_context(self, app, shiping_query):
         handler = ShippingQueryHandler(self.callback)
         app.add_handler(handler)

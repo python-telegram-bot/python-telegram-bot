@@ -106,7 +106,6 @@ class TestPreCheckoutQueryHandler:
         handler = PreCheckoutQueryHandler(self.callback)
         assert not handler.check_update(false_update)
 
-    @pytest.mark.asyncio
     async def test_context(self, app, pre_checkout_query):
         handler = PreCheckoutQueryHandler(self.callback)
         app.add_handler(handler)

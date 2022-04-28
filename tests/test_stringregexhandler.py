@@ -97,7 +97,6 @@ class TestStringRegexHandler:
         if context.matches[0].groupdict():
             self.test_flag = context.matches[0].groupdict() == {'begin': 't', 'end': ' message'}
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('compile', (True, False))
     async def test_basic(self, app, compile):
         pattern = '(?P<begin>.*)est(?P<end>.*)'
@@ -117,7 +116,6 @@ class TestStringRegexHandler:
         handler = StringRegexHandler('test', self.callback)
         assert not handler.check_update(false_update)
 
-    @pytest.mark.asyncio
     async def test_context_pattern(self, app):
         handler = StringRegexHandler(r'(t)est(.*)', self.callback_pattern)
         app.add_handler(handler)

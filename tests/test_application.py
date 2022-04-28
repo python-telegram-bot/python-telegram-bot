@@ -113,7 +113,6 @@ class TestApplication:
         ):
             self.received = context.error.message
 
-    @pytest.mark.asyncio
     async def test_slot_behaviour(self, bot, mro_slots):
         async with ApplicationBuilder().token(bot.token).build() as app:
             for at in app.__slots__:
@@ -201,7 +200,6 @@ class TestApplication:
         assert isinstance(application.chat_data[1], float)
         assert isinstance(application.bot_data, complex)
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('updater', (True, False))
     async def test_initialize(self, bot, monkeypatch, updater):
         """Initialization of persistence is tested test_basepersistence"""
@@ -223,7 +221,6 @@ class TestApplication:
             await ApplicationBuilder().token(bot.token).updater(None).build().initialize()
             assert self.test_flag == {'bot'}
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('updater', (True, False))
     async def test_shutdown(self, bot, monkeypatch, updater):
         """Shutdown of persistence is tested in test_basepersistence"""
@@ -249,7 +246,6 @@ class TestApplication:
                 pass
             assert self.test_flag == {'bot'}
 
-    @pytest.mark.asyncio
     async def test_multiple_inits_and_shutdowns(self, app, monkeypatch):
         self.received = defaultdict(int)
 
@@ -273,7 +269,6 @@ class TestApplication:
         assert self.received['init'] == 2
         assert self.received['shutdown'] == 2
 
-    @pytest.mark.asyncio
     async def test_multiple_init_cycles(self, app):
         # nothing really to assert - this should just not fail
         async with app:
@@ -281,12 +276,10 @@ class TestApplication:
         async with app:
             await app.bot.get_me()
 
-    @pytest.mark.asyncio
     async def test_start_without_initialize(self, app):
         with pytest.raises(RuntimeError, match='not initialized'):
             await app.start()
 
-    @pytest.mark.asyncio
     async def test_shutdown_while_running(self, app):
         async with app:
             await app.start()
@@ -294,7 +287,6 @@ class TestApplication:
                 await app.shutdown()
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_start_not_running_after_failure(self, bot, monkeypatch):
         def start(_):
             raise Exception('Test Exception')
@@ -307,7 +299,6 @@ class TestApplication:
                 await app.start()
             assert app.running is False
 
-    @pytest.mark.asyncio
     async def test_context_manager(self, monkeypatch, app):
         self.test_flag = set()
 
@@ -325,7 +316,6 @@ class TestApplication:
 
         assert self.test_flag == {'initialize', 'stop'}
 
-    @pytest.mark.asyncio
     async def test_context_manager_exception_on_init(self, monkeypatch, app):
         async def initialize(*args, **kwargs):
             raise RuntimeError('initialize')
@@ -363,7 +353,6 @@ class TestApplication:
         builder_1.token(app.bot.token)
         builder_2.token(app.bot.token)
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('job_queue', (True, False))
     async def test_start_stop_processing_updates(self, bot, job_queue):
         # TODO: repeat a similar test for create_task, persistence processing and job queue
@@ -418,7 +407,6 @@ class TestApplication:
 
             await app.updater.stop()
 
-    @pytest.mark.asyncio
     async def test_error_start_stop_twice(self, app):
         async with app:
             await app.start()
@@ -431,7 +419,6 @@ class TestApplication:
             with pytest.raises(RuntimeError, match='not running'):
                 await app.stop()
 
-    @pytest.mark.asyncio
     async def test_one_context_per_update(self, app):
         self.received = None
 
@@ -464,7 +451,6 @@ class TestApplication:
         with pytest.raises(TypeError, match='group is not int'):
             app.add_handler(handler, 'one')
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('group_empty', (True, False))
     async def test_add_remove_handler(self, app, group_empty):
         handler = MessageHandler(filters.ALL, self.callback_increase_count)
@@ -483,7 +469,6 @@ class TestApplication:
             assert self.count == 1
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_add_remove_handler_non_default_group(self, app):
         handler = MessageHandler(filters.ALL, self.callback_increase_count)
         app.add_handler(handler, group=2)
@@ -492,7 +477,6 @@ class TestApplication:
         app.remove_handler(handler, group=2)
 
     #
-    @pytest.mark.asyncio
     async def test_handler_order_in_group(self, app):
         app.add_handler(MessageHandler(filters.PHOTO, self.callback_set_count(1)))
         app.add_handler(MessageHandler(filters.ALL, self.callback_set_count(2)))
@@ -504,7 +488,6 @@ class TestApplication:
             assert self.count == 2
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_groups(self, app):
         app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count))
         app.add_handler(MessageHandler(filters.ALL, self.callback_increase_count), group=2)
@@ -517,7 +500,6 @@ class TestApplication:
             assert self.count == 3
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_add_handlers(self, app):
         """Tests both add_handler & add_handlers together & confirms the correct insertion
         order"""
@@ -588,7 +570,6 @@ class TestApplication:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_check_update(self, app):
         class TestHandler(Handler):
             def check_update(_, update: object):
@@ -611,7 +592,6 @@ class TestApplication:
             await asyncio.sleep(0.05)
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_flow_stop(self, app, bot):
         passed = []
 
@@ -648,7 +628,6 @@ class TestApplication:
             await app.process_update(update)
             assert passed == ['start1']
 
-    @pytest.mark.asyncio
     async def test_flow_stop_by_error_handler(self, app, bot):
         passed = []
         exception = Exception('General excepition')
@@ -678,7 +657,6 @@ class TestApplication:
             await app.process_update(1)
             assert passed == ['start1', 'error', exception]
 
-    @pytest.mark.asyncio
     async def test_error_in_handler_part_1(self, app):
         app.add_handler(
             MessageHandler(
@@ -699,7 +677,6 @@ class TestApplication:
         # Higher groups should still be called
         assert self.count == 42
 
-    @pytest.mark.asyncio
     async def test_error_in_handler_part_2(self, app, bot):
         passed = []
         err = Exception('General exception')
@@ -743,7 +720,6 @@ class TestApplication:
             await app.process_update(update)
             assert passed == ['start1', 'error', err, 'start3']
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('block', (True, False))
     async def test_error_handler(self, app, block):
         app.add_error_handler(self.error_handler_context)
@@ -772,7 +748,6 @@ class TestApplication:
             assert len(caplog.records) == 1
             assert caplog.records[-1].getMessage().startswith('The callback is already registered')
 
-    @pytest.mark.asyncio
     async def test_error_handler_that_raises_errors(self, app, caplog):
         """Make sure that errors raised in error handlers don't break the main loop of the
         application
@@ -811,7 +786,6 @@ class TestApplication:
 
                 await app.stop()
 
-    @pytest.mark.asyncio
     async def test_custom_context_error_handler(self, bot):
         async def error_handler(_, context):
             self.received = (
@@ -841,7 +815,6 @@ class TestApplication:
             await asyncio.sleep(0.05)
             assert self.received == (CustomContext, float, complex, int)
 
-    @pytest.mark.asyncio
     async def test_custom_context_handler_callback(self, bot):
         def callback(_, context):
             self.received = (
@@ -868,7 +841,6 @@ class TestApplication:
             await asyncio.sleep(0.05)
             assert self.received == (CustomContext, float, complex, int)
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         'check,expected',
         [(True, True), (None, False), (False, False), ({}, True), ('', True), ('check', True)],
@@ -902,7 +874,6 @@ class TestApplication:
             else:
                 assert self.received is None
 
-    @pytest.mark.asyncio
     async def test_non_blocking_handler(self, app):
         event = asyncio.Event()
 
@@ -926,7 +897,6 @@ class TestApplication:
             assert self.count == 42
             assert task.done()
 
-    @pytest.mark.asyncio
     async def test_non_blocking_handler_applicationhandlerstop(self, app, recwarn):
         async def callback(update, context):
             raise ApplicationHandlerStop
@@ -949,7 +919,6 @@ class TestApplication:
             Path(recwarn[0].filename) == PROJECT_ROOT_PATH / 'telegram' / 'ext' / '_application.py'
         ), "incorrect stacklevel!"
 
-    @pytest.mark.asyncio
     async def test_non_blocking_no_error_handler(self, app, caplog):
         app.add_handler(TypeHandler(object, self.callback_raise_error, block=False))
 
@@ -964,7 +933,6 @@ class TestApplication:
                 )
                 await app.stop()
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('handler_block', (True, False))
     async def test_non_blocking_error_handler(self, app, handler_block):
         event = asyncio.Event()
@@ -992,7 +960,6 @@ class TestApplication:
             assert self.received == 'done'
             assert task.done()
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('handler_block', (True, False))
     async def test_non_blocking_error_handler_applicationhandlerstop(
         self, app, recwarn, handler_block
@@ -1023,7 +990,6 @@ class TestApplication:
         ), "incorrect stacklevel!"
 
     @pytest.mark.parametrize(['block', 'expected_output'], [(False, 0), (True, 5)])
-    @pytest.mark.asyncio
     async def test_default_block_error_handler(self, bot, block, expected_output):
         async def error_handler(*args, **kwargs):
             await asyncio.sleep(0.1)
@@ -1040,7 +1006,6 @@ class TestApplication:
             assert self.count == 5
 
     @pytest.mark.parametrize(['block', 'expected_output'], [(False, 0), (True, 5)])
-    @pytest.mark.asyncio
     async def test_default_block_handler(self, bot, block, expected_output):
         app = Application.builder().token(bot.token).defaults(Defaults(block=block)).build()
         async with app:
@@ -1051,7 +1016,6 @@ class TestApplication:
             await asyncio.sleep(0.15)
             assert self.count == 5
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('handler_block', (True, False))
     @pytest.mark.parametrize('error_handler_block', (True, False))
     async def test_nonblocking_handler_raises_and_non_blocking_error_handler_raises(
@@ -1147,7 +1111,6 @@ class TestApplication:
         app.drop_user_data(u_id)
         assert app.user_data == expected
 
-    @pytest.mark.asyncio
     async def test_create_task_basic(self, app):
         async def callback():
             await asyncio.sleep(0.05)
@@ -1162,7 +1125,6 @@ class TestApplication:
         assert self.count == 42
         assert out == 43
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('running', (True, False))
     async def test_create_task_awaiting_warning(self, app, running, recwarn):
         async def callback():
@@ -1188,7 +1150,6 @@ class TestApplication:
                 assert not task.done()
                 await task
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('update', (None, object()))
     async def test_create_task_error_handling(self, app, update):
         exception = RuntimeError('TestError')
@@ -1212,7 +1173,6 @@ class TestApplication:
         assert self.received[0] is update
         assert self.received[1] is exception
 
-    @pytest.mark.asyncio
     async def test_create_task_cancel_task(self, app):
         async def callback():
             await asyncio.sleep(10)
@@ -1238,7 +1198,6 @@ class TestApplication:
             # make sure that the cancelled task doesn't block the stopping of the app
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_await_create_task_tasks_on_stop(self, app):
         event_1 = asyncio.Event()
         event_2 = asyncio.Event()
@@ -1264,7 +1223,6 @@ class TestApplication:
             await asyncio.sleep(0.05)
             assert stop_task.done()
 
-    @pytest.mark.asyncio
     async def test_no_concurrent_updates(self, app):
         queue = asyncio.Queue()
         event_1 = asyncio.Event()
@@ -1293,7 +1251,6 @@ class TestApplication:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('concurrent_updates', (15, 50, 100))
     async def test_concurrent_updates(self, bot, concurrent_updates):
         # We don't test with `True` since the large number of parallel coroutines quickly leads
@@ -1329,7 +1286,6 @@ class TestApplication:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_concurrent_updates_done_on_shutdown(self, bot):
         app = Application.builder().token(bot.token).concurrent_updates(True).build()
         event = asyncio.Event()

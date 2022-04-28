@@ -120,7 +120,6 @@ class TestChatMemberHandler:
         ],
         ids=['MY_CHAT_MEMBER', 'CHAT_MEMBER', 'ANY_CHAT_MEMBER'],
     )
-    @pytest.mark.asyncio
     async def test_chat_member_types(
         self, app, chat_member_updated, chat_member, expected, allowed_types
     ):
@@ -147,7 +146,6 @@ class TestChatMemberHandler:
         assert not handler.check_update(false_update)
         assert not handler.check_update(True)
 
-    @pytest.mark.asyncio
     async def test_context(self, app, chat_member):
         handler = ChatMemberHandler(self.callback)
         app.add_handler(handler)

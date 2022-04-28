@@ -50,7 +50,6 @@ class TestTypeHandler:
             and isinstance(context.bot_data, dict)
         )
 
-    @pytest.mark.asyncio
     async def test_basic(self, app):
         handler = TypeHandler(dict, self.callback)
         app.add_handler(handler)

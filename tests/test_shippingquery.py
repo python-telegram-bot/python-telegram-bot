@@ -70,7 +70,6 @@ class TestShippingQuery:
         assert shipping_query_dict['from'] == shipping_query.from_user.to_dict()
         assert shipping_query_dict['shipping_address'] == shipping_query.shipping_address.to_dict()
 
-    @pytest.mark.asyncio
     async def test_answer(self, monkeypatch, shipping_query):
         async def make_assertion(*_, **kwargs):
             return kwargs['shipping_query_id'] == shipping_query.id

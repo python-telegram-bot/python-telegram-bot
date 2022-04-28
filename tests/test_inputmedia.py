@@ -432,7 +432,6 @@ def media_group(photo, thumb):  # noqa: F811
 
 class TestSendMediaGroup:
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_media_group_photo(self, bot, chat_id, media_group):
         messages = await bot.send_media_group(chat_id, media_group)
         assert isinstance(messages, list)
@@ -445,7 +444,6 @@ class TestSendMediaGroup:
         )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_media_group_all_args(self, bot, chat_id, media_group):
         m1 = await bot.send_message(chat_id, text="test")
         messages = await bot.send_media_group(
@@ -466,7 +464,6 @@ class TestSendMediaGroup:
         assert all(mes.has_protected_content for mes in messages)
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_media_group_custom_filename(
         self,
         bot,
@@ -497,7 +494,6 @@ class TestSendMediaGroup:
         with pytest.raises(Exception, match='Test was successful'):
             await bot.send_media_group(chat_id, media)
 
-    @pytest.mark.asyncio
     async def test_send_media_group_with_thumbs(
         self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):
@@ -514,7 +510,6 @@ class TestSendMediaGroup:
             await bot.send_media_group(chat_id, [input_video, input_video])
 
     @flaky(3, 1)  # noqa: F811
-    @pytest.mark.asyncio
     async def test_send_media_group_new_files(
         self,
         bot,
@@ -552,7 +547,6 @@ class TestSendMediaGroup:
         ],
         indirect=['default_bot'],
     )
-    @pytest.mark.asyncio
     async def test_send_media_group_default_allow_sending_without_reply(
         self, default_bot, chat_id, media_group, custom
     ):
@@ -578,7 +572,6 @@ class TestSendMediaGroup:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
     async def test_send_media_group_default_protect_content(
         self, chat_id, media_group, default_bot
@@ -591,7 +584,6 @@ class TestSendMediaGroup:
         assert not all(msg.has_protected_content for msg in unprotected)
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_edit_message_media(self, bot, chat_id, media_group):
         messages = await bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
@@ -602,7 +594,6 @@ class TestSendMediaGroup:
         assert isinstance(new_message, Message)
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
         messages = await bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
@@ -612,7 +603,6 @@ class TestSendMediaGroup:
         )
         assert isinstance(new_message, Message)
 
-    @pytest.mark.asyncio
     async def test_edit_message_media_with_thumb(
         self, bot, chat_id, video_file, photo_file, monkeypatch  # noqa: F811
     ):
@@ -635,7 +625,6 @@ class TestSendMediaGroup:
         'default_bot', [{'parse_mode': ParseMode.HTML}], indirect=True, ids=['HTML-Bot']
     )
     @pytest.mark.parametrize('media_type', ['animation', 'document', 'audio', 'photo', 'video'])
-    @pytest.mark.asyncio
     async def test_edit_message_media_default_parse_mode(
         self,
         chat_id,
