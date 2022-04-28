@@ -14,16 +14,18 @@
    telegram
    telegram.ext
    telegram_auxil
+   Telegrams Bot API Docs <https://core.telegram.org/bots/api>
 
 .. toctree::
    :hidden:
    :caption: Project
 
    changelog
-   contributing
    Website <https://python-telegram-bot.org>
+   GitHub Repository <https://github.com/python-telegram-bot/python-telegram-bot/>
    Telegram Channel <https://t.me/pythontelegrambotchannel/>
    Telegram User Group <https://t.me/pythontelegrambotgroup/>
-   Code of Conduct <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/CODE_OF_CONDUCT.md>
+   contributing
+   coc
 
 
