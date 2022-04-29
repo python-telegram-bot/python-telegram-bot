@@ -4801,8 +4801,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to restrict a user in a supergroup. The bot must be an administrator in
         the supergroup for this to work and must have the appropriate admin rights. Pass
-        :obj:`True` for all boolean parameters in :class:`telegram.ChatPermissions` to lift
-        restrictions from a user.
+        :obj:`True` for all boolean parameters to lift restrictions from a user.
+
+        .. seealso:: :meth:`telegram.ChatPermissions.all_permissions`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
