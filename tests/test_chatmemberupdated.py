@@ -255,5 +255,5 @@ class TestChatMemberUpdated:
         diff = chat_member_updated.difference()
         assert diff.pop('is_anonymous') == (False, None)
         assert diff.pop('until_date') == (None, datetime.datetime(2021, 1, 1))
-        assert diff.pop('status') == (ChatMember.CREATOR, ChatMember.KICKED)
+        assert diff.pop('status') == (ChatMember.OWNER, ChatMember.BANNED)
         assert diff == {}
