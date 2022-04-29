@@ -2,6 +2,8 @@ name: Warning maintainers
 on:
   pull_request_target:
     paths: examples/**
+permissions:
+ pull-requests: write
 jobs:
   job:
     runs-on: ubuntu-latest
