@@ -20,7 +20,7 @@
 import pytest
 
 from telegram import Chat, ChatPermissions, ChatLocation, Location, Bot, User
-from telegram.constants import ChatAction
+from telegram.constants import ChatAction, ChatType
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
 
 
@@ -121,6 +121,12 @@ class TestChat:
         assert chat_dict['has_protected_content'] == chat.has_protected_content
         assert chat_dict['linked_chat_id'] == chat.linked_chat_id
         assert chat_dict['location'] == chat.location.to_dict()
+
+    def test_enum_init(self):
+        chat = Chat(id=1, type='foo')
+        assert chat.type == 'foo'
+        chat = Chat(id=1, type='private')
+        assert chat.type is ChatType.PRIVATE
 
     def test_link(self, chat):
         assert chat.link == f'https://t.me/{chat.username}'

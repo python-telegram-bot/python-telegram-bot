@@ -50,7 +50,7 @@ def extract_status_change(
         old_status
         in [
             ChatMember.MEMBER,
-            ChatMember.CREATOR,
+            ChatMember.OWNER,
             ChatMember.ADMINISTRATOR,
         ]
         or (old_status == ChatMember.RESTRICTED and old_is_member is True)
@@ -59,7 +59,7 @@ def extract_status_change(
         new_status
         in [
             ChatMember.MEMBER,
-            ChatMember.CREATOR,
+            ChatMember.OWNER,
             ChatMember.ADMINISTRATOR,
         ]
         or (new_status == ChatMember.RESTRICTED and new_is_member is True)
