@@ -1617,10 +1617,12 @@ class TestApplication:
     )
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
     def test_run_stop_signal_warning_windows(self, bot, method, recwarn, monkeypatch):
-        async def raise_method(*args, **kwargs):
+        def raise_method(*args, **kwargs):
             raise RuntimeError('Prevent Actually Running')
 
-        monkeypatch.setattr(Application, 'initialize', raise_method)
+        monkeypatch.setattr(
+            Application, 'initialize', call_after(Application.initialize, raise_method)
+        )
         app = ApplicationBuilder().token(bot.token).build()
 
         with pytest.raises(RuntimeError, match='Prevent Actually Running'):
