@@ -26,6 +26,7 @@ from telegram._chatlocation import ChatLocation
 from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
 from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 
@@ -229,7 +230,7 @@ class Chat(TelegramObject):
     ):
         # Required
         self.id = int(id)  # pylint: disable=invalid-name
-        self.type = type
+        self.type = enum.get_member(constants.ChatType, type, type)
         # Optionals
         self.title = title
         self.username = username

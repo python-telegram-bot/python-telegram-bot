@@ -75,8 +75,8 @@ def chat_member_updated():
         Chat(1, 'chat'),
         User(1, '', False),
         from_timestamp(int(time.time())),
-        ChatMember(User(1, '', False), ChatMember.CREATOR),
-        ChatMember(User(1, '', False), ChatMember.CREATOR),
+        ChatMember(User(1, '', False), ChatMember.OWNER),
+        ChatMember(User(1, '', False), ChatMember.OWNER),
     )
 
 

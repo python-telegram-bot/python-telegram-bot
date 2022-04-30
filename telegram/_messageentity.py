@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils import enum
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -76,7 +77,7 @@ class MessageEntity(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.type = type
+        self.type = enum.get_member(constants.MessageEntityType, type, type)
         self.offset = offset
         self.length = length
         # Optionals

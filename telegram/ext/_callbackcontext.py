@@ -38,6 +38,7 @@ from telegram.ext._utils.types import BD, BT, CD, UD  # pylint: disable=unused-i
 
 if TYPE_CHECKING:
     from asyncio import Queue
+
     from telegram.ext import Application, Job, JobQueue
     from telegram.ext._utils.types import CCT, JQ
 
