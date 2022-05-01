@@ -336,9 +336,7 @@ class TestUpdater:
                     await updater.start_polling(bootstrap_retries=retries)
             else:
                 with pytest.raises(TelegramError, match=str(retries + 1)):
-                    await updater.start_polling(
-                        bootstrap_retries=retries,
-                    )
+                    await updater.start_polling(bootstrap_retries=retries)
 
     @pytest.mark.parametrize(
         'error,callback_should_be_called',
