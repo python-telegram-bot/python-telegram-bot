@@ -23,6 +23,7 @@ import inspect
 import os
 import re
 from pathlib import Path
+import sys
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pytest
@@ -88,6 +89,11 @@ def env_var_2_bool(env_var: object) -> bool:
 # session. See https://github.com/pytest-dev/pytest-asyncio/issues/68 for more details.
 @pytest.fixture(scope='session')
 def event_loop(request):
+    # ever since ProactorEventLoop became the default in Win 3.8+, the app crashes after the loop
+    # is closed. Hence, we use SelectorEventLoop on Windows to avoid this. See
+    # https://github.com/python/cpython/issues/83413, https://github.com/encode/httpx/issues/914
+    if sys.version_info[0] == 3 and sys.version_info[1] >= 8 and sys.platform.startswith('win'):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     # loop.close() # instead of closing here, do that at the every end of the test session

@@ -557,3 +557,8 @@ class TestHTTPXRequest:
         done, pending = await asyncio.wait({task_1, task_2}, return_when=asyncio.ALL_COMPLETED)
         assert len(done) == 2
         assert len(pending) == 0
+        try:  # retrieve exceptions from tasks
+            task_1.exception()
+            task_2.exception()
+        except (asyncio.CancelledError, asyncio.InvalidStateError):
+            pass

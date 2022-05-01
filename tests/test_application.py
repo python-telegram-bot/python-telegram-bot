@@ -1620,9 +1620,7 @@ class TestApplication:
         def raise_method(*args, **kwargs):
             raise RuntimeError('Prevent Actually Running')
 
-        monkeypatch.setattr(
-            Application, 'initialize', call_after(Application.initialize, raise_method)
-        )
+        monkeypatch.setattr(Application, 'initialize', Application.initialize, raise_method)
         app = ApplicationBuilder().token(bot.token).build()
 
         with pytest.raises(RuntimeError, match='Prevent Actually Running'):
