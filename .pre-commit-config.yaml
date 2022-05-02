@@ -1,6 +1,11 @@
 # Make sure that
 #   * the revs specified here match requirements-dev.txt
 #   * the additional_dependencies here match requirements.txt
+
+ci:
+    autofix_prs: false
+    autoupdate_schedule: monthly
+
 repos:
 -   repo: https://github.com/psf/black
     rev: 22.3.0
