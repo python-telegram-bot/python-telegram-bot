@@ -429,7 +429,10 @@ def call_after(function: Callable, after: Callable):
 
         async def wrapped(*args, **kwargs):
             out = await function(*args, **kwargs)
-            after(out)
+            if asyncio.iscoroutinefunction(after):
+                await after(out)
+            else:
+                after(out)
             return out
 
     else:

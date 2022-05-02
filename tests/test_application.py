@@ -205,21 +205,27 @@ class TestApplication:
         """Initialization of persistence is tested test_basepersistence"""
         self.test_flag = set()
 
-        async def initialize_bot(*args, **kwargs):
+        async def after_initialize_bot(*args, **kwargs):
             self.test_flag.add('bot')
 
-        async def initialize_updater(*args, **kwargs):
+        async def after_initialize_updater(*args, **kwargs):
             self.test_flag.add('updater')
 
-        monkeypatch.setattr(Bot, 'initialize', initialize_bot)
-        monkeypatch.setattr(Updater, 'initialize', initialize_updater)
+        monkeypatch.setattr(Bot, 'initialize', call_after(Bot.initialize, after_initialize_bot))
+        monkeypatch.setattr(
+            Updater, 'initialize', call_after(Updater.initialize, after_initialize_updater)
+        )
 
         if updater:
-            await ApplicationBuilder().token(bot.token).build().initialize()
+            app = ApplicationBuilder().token(bot.token).build()
+            await app.initialize()
             assert self.test_flag == {'bot', 'updater'}
+            await app.shutdown()
         else:
-            await ApplicationBuilder().token(bot.token).updater(None).build().initialize()
+            app = ApplicationBuilder().token(bot.token).updater(None).build()
+            await app.initialize()
             assert self.test_flag == {'bot'}
+            await app.shutdown()
 
     @pytest.mark.parametrize('updater', (True, False))
     async def test_shutdown(self, bot, monkeypatch, updater):
@@ -249,14 +255,16 @@ class TestApplication:
     async def test_multiple_inits_and_shutdowns(self, app, monkeypatch):
         self.received = defaultdict(int)
 
-        async def initialize(*args, **kargs):
+        async def after_initialize(*args, **kargs):
             self.received['init'] += 1
 
-        async def shutdown(*args, **kwargs):
+        async def after_shutdown(*args, **kwargs):
             self.received['shutdown'] += 1
 
-        monkeypatch.setattr(app.bot, 'initialize', initialize)
-        monkeypatch.setattr(app.bot, 'shutdown', shutdown)
+        monkeypatch.setattr(
+            app.bot, 'initialize', call_after(app.bot.initialize, after_initialize)
+        )
+        monkeypatch.setattr(app.bot, 'shutdown', call_after(app.bot.shutdown, after_shutdown))
 
         await app.initialize()
         await app.initialize()
@@ -302,14 +310,18 @@ class TestApplication:
     async def test_context_manager(self, monkeypatch, app):
         self.test_flag = set()
 
-        async def initialize(*args, **kwargs):
+        async def after_initialize(*args, **kwargs):
             self.test_flag.add('initialize')
 
-        async def shutdown(*args, **kwargs):
+        async def after_shutdown(*args, **kwargs):
             self.test_flag.add('stop')
 
-        monkeypatch.setattr(Application, 'initialize', initialize)
-        monkeypatch.setattr(Application, 'shutdown', shutdown)
+        monkeypatch.setattr(
+            Application, 'initialize', call_after(Application.initialize, after_initialize)
+        )
+        monkeypatch.setattr(
+            Application, 'shutdown', call_after(Application.shutdown, after_shutdown)
+        )
 
         async with app:
             pass
@@ -317,14 +329,18 @@ class TestApplication:
         assert self.test_flag == {'initialize', 'stop'}
 
     async def test_context_manager_exception_on_init(self, monkeypatch, app):
-        async def initialize(*args, **kwargs):
+        async def after_initialize(*args, **kwargs):
             raise RuntimeError('initialize')
 
-        async def shutdown(*args):
+        async def after_shutdown(*args):
             self.test_flag = 'stop'
 
-        monkeypatch.setattr(Application, 'initialize', initialize)
-        monkeypatch.setattr(Application, 'shutdown', shutdown)
+        monkeypatch.setattr(
+            Application, 'initialize', call_after(Application.initialize, after_initialize)
+        )
+        monkeypatch.setattr(
+            Application, 'shutdown', call_after(Application.shutdown, after_shutdown)
+        )
 
         with pytest.raises(RuntimeError, match='initialize'):
             async with app:
@@ -1572,19 +1588,28 @@ class TestApplication:
         async def raise_method(*args, **kwargs):
             raise RuntimeError('Test Exception')
 
-        async def shutdown(*args, **kwargs):
-            shutdowns.append(True)
+        def after_shutdown(name):
+            def _after_shutdown(*args, **kwargs):
+                shutdowns.append(name)
+
+            return _after_shutdown
 
         monkeypatch.setattr(Application, method, raise_method)
-        monkeypatch.setattr(Application, 'shutdown', shutdown)
-        monkeypatch.setattr(Updater, 'shutdown', shutdown)
+        monkeypatch.setattr(
+            Application,
+            'shutdown',
+            call_after(Application.shutdown, after_shutdown('application')),
+        )
+        monkeypatch.setattr(
+            Updater, 'shutdown', call_after(Updater.shutdown, after_shutdown('updater'))
+        )
         app = ApplicationBuilder().token(bot.token).build()
         with pytest.raises(RuntimeError, match='Test Exception'):
             app.run_polling(close_loop=False)
 
         assert not app.running
         assert not app.updater.running
-        assert shutdowns == [True, True]
+        assert set(shutdowns) == {'application', 'updater'}
 
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
     @pytest.mark.filterwarnings('ignore::telegram.warnings.PTBUserWarning')
@@ -1594,12 +1619,21 @@ class TestApplication:
         async def raise_method(*args, **kwargs):
             raise RuntimeError('Test Exception')
 
-        async def shutdown(*args, **kwargs):
-            shutdowns.append(True)
+        def after_shutdown(name):
+            def _after_shutdown(*args, **kwargs):
+                shutdowns.append(name)
+
+            return _after_shutdown
 
         monkeypatch.setattr(Updater, method, raise_method)
-        monkeypatch.setattr(Application, 'shutdown', shutdown)
-        monkeypatch.setattr(Updater, 'shutdown', shutdown)
+        monkeypatch.setattr(
+            Application,
+            'shutdown',
+            call_after(Application.shutdown, after_shutdown('application')),
+        )
+        monkeypatch.setattr(
+            Updater, 'shutdown', call_after(Updater.shutdown, after_shutdown('updater'))
+        )
         app = ApplicationBuilder().token(bot.token).build()
         with pytest.raises(RuntimeError, match='Test Exception'):
             if 'polling' in method:
@@ -1609,7 +1643,7 @@ class TestApplication:
 
         assert not app.running
         assert not app.updater.running
-        assert shutdowns == [True, True]
+        assert set(shutdowns) == {'application', 'updater'}
 
     @pytest.mark.skipif(
         platform.system() != 'Windows',
@@ -1617,7 +1651,7 @@ class TestApplication:
     )
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
     def test_run_stop_signal_warning_windows(self, bot, method, recwarn, monkeypatch):
-        def raise_method(*args, **kwargs):
+        async def raise_method(*args, **kwargs):
             raise RuntimeError('Prevent Actually Running')
 
         monkeypatch.setattr(Application, 'initialize', raise_method)
