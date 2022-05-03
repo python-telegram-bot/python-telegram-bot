@@ -145,15 +145,33 @@ Or you can install from source with:
     $ cd python-telegram-bot
     $ python setup.py install
 
+-----------------------------
+Dependencies & Their Versions
+-----------------------------
+
+``python-telegram-bot`` tries to use as few 3rd party dependencies as possible.
+However, for some features using a 3rd party library is more sane than implementing the functionality again.
+The dependencies are:
+
+* `httpx ~= 0.22.0 <https://www.python-httpx.org>`_ for ``telegram.request.HTTPXRequest``, the default networking backend
+* `tornado~=6.1 <https://www.tornadoweb.org/en/stable/>`_ for ``telegram.ext.Updater.start_webhook``
+* `cachetools~=5.0.0 <https://cachetools.readthedocs.io/en/latest/>`_ for ``telegram.ext.CallbackDataCache``
+* `APScheduler~=3.9.1 <https://apscheduler.readthedocs.io/en/3.x/>`_ for ``telegram.ext.JobQueue``
+
+``python-telegram-bot`` is most useful when used along with additional libraries.
+To minimize dependency conflicts, we try to be liberal in terms of version requirements on the dependencies.
+On the other hand, we have to ensure stability of ``python-telegram-bot``, which is why we do apply version bounds.
+If you encounter dependency conflicts due to these bounds, feel free to reach out.
+
 ---------------------
 Optional Dependencies
 ---------------------
 
 PTB can be installed with optional dependencies:
 
-* ``pip install python-telegram-bot[passport]`` installs the `cryptography <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
-* ``pip install python-telegram-bot[json]`` installs the `ujson <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
-* ``pip install python-telegram-bot[socks]`` installs the `PySocks <https://pypi.org/project/PySocks/>`_ library. Use this, if you want to work behind a Socks5 server.
+* ``pip install python-telegram-bot[passport]`` installs the `cryptography>=3.0 <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``pip install python-telegram-bot[json]`` installs the `ujson>=4.0.0 <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
+* ``pip install python-telegram-bot[socks]`` installs ``httpx[socks]``. Use this, if you want to work behind a Socks5 server.
 
 ===============
 Getting started

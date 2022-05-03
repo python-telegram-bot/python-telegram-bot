@@ -1,8 +1,21 @@
 # Make sure to install those as additional_dependencies in the
 # pre-commit hooks for pylint & mypy
+# Also update the readme accordingly
+
+# When dependencies release new versions and tests succeed, we should try to expand the allowed
+# versions and only increase the lower bound if necessary
+
+# httpx has no stable release yet, so let's be cautious for now
 httpx ~= 0.22.0
 # only telegram.ext: # Keep this line here; used in setup(-raw).py
-tornado>=6.1
-APScheduler==3.8.1
+
+# tornado is rather stable, but let's not allow the next mayor release without prior testing
+tornado~=6.1
+
+# Cachetools and APS don't have a strict stability policy.
+# Let's be cautious for now.
+cachetools~=5.0.0
+APScheduler~=3.9.1
+
+# pytz is required by APS and just needs the lower bound due to #2120
 pytz>=2018.6
-cachetools==4.2.2
