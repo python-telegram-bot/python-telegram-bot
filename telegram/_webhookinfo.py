@@ -18,9 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
 
-from typing import Any, List
+from typing import Any, List, Optional, TYPE_CHECKING
 
 from telegram import TelegramObject
+from telegram._utils.types import JSONDict
+from telegram._utils.datetime import from_timestamp
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class WebhookInfo(TelegramObject):
@@ -47,6 +52,10 @@ class WebhookInfo(TelegramObject):
             connections to the webhook for update delivery.
         allowed_updates (List[:obj:`str`], optional): A list of update types the bot is subscribed
             to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
+        last_synchronization_error_date (:obj:`int`, optional): Unix time of the most recent error
+            that happened when trying to synchronize available updates with Telegram datacenters.
+
+            .. versionadded:: 20.0
 
     Attributes:
         url (:obj:`str`): Webhook URL.
@@ -59,7 +68,10 @@ class WebhookInfo(TelegramObject):
             connections.
         allowed_updates (List[:obj:`str`]): Optional. A list of update types the bot is subscribed
             to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
+        last_synchronization_error_date (:obj:`int`): Optional. Unix time of the most recent error
+            that happened when trying to synchronize available updates with Telegram datacenters.
 
+            .. versionadded:: 20.0
     """
 
     __slots__ = (
@@ -71,6 +83,7 @@ class WebhookInfo(TelegramObject):
         'last_error_message',
         'pending_update_count',
         'has_custom_certificate',
+        'last_synchronization_error_date',
     )
 
     def __init__(
@@ -83,6 +96,7 @@ class WebhookInfo(TelegramObject):
         max_connections: int = None,
         allowed_updates: List[str] = None,
         ip_address: str = None,
+        last_synchronization_error_date: int = None,
         **_kwargs: Any,
     ):
         # Required
@@ -96,6 +110,7 @@ class WebhookInfo(TelegramObject):
         self.last_error_message = last_error_message
         self.max_connections = max_connections
         self.allowed_updates = allowed_updates
+        self.last_synchronization_error_date = last_synchronization_error_date
 
         self._id_attrs = (
             self.url,
@@ -107,3 +122,18 @@ class WebhookInfo(TelegramObject):
             self.max_connections,
             self.allowed_updates,
         )
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['WebhookInfo']:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data['last_error_date'] = from_timestamp(data.get('last_error_date'))
+        data['last_synchronization_error_date'] = from_timestamp(
+            data.get('last_synchronization_error_date')
+        )
+
+        return cls(bot=bot, **data)

@@ -18,9 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram KeyboardButton."""
 
-from typing import Any
+from typing import TYPE_CHECKING, Any, Optional
 
-from telegram import TelegramObject, KeyboardButtonPollType
+from telegram import TelegramObject, KeyboardButtonPollType, WebAppInfo
+from telegram._utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class KeyboardButton(TelegramObject):
@@ -35,9 +39,11 @@ class KeyboardButton(TelegramObject):
     Note:
         * Optional fields are mutually exclusive.
         * :attr:`request_contact` and :attr:`request_location` options will only work in Telegram
-          versions released after 9 April, 2016. Older clients will ignore them.
+          versions released after 9 April, 2016. Older clients will display unsupported message.
         * :attr:`request_poll` option will only work in Telegram versions released after 23
-          January, 2020. Older clients will receive unsupported message.
+          January, 2020. Older clients will display unsupported message.
+        * :attr:`web_app` option will only work in Telegram versions released after 16 April, 2022.
+          Older clients will display unsupported message.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -49,16 +55,25 @@ class KeyboardButton(TelegramObject):
         request_poll (:class:`KeyboardButtonPollType`, optional): If specified, the user will be
             asked to create a poll and send it to the bot when the button is pressed. Available in
             private chats only.
+        web_app (:class:`WebAppInfo`, optional): If specified, the described `Web App
+            <https://core.telegram.org/bots/webapps>`_ will be launched when the button is pressed.
+            The Web App will be able to send a :attr:`Message.web_app_data` service message.
+            Available in private chats only.
+
+            .. versionadded:: 20.0
 
     Attributes:
         text (:obj:`str`): Text of the button.
         request_contact (:obj:`bool`): Optional. The user's phone number will be sent.
         request_location (:obj:`bool`): Optional. The user's current location will be sent.
         request_poll (:class:`KeyboardButtonPollType`): Optional. If the user should create a poll.
+        web_app (:class:`WebAppInfo`): Optional. If the described Web App will be launched when the
+            button is pressed.
 
+            .. versionadded:: 20.0
     """
 
-    __slots__ = ('request_location', 'request_contact', 'request_poll', 'text')
+    __slots__ = ('request_location', 'request_contact', 'request_poll', 'text', 'web_app')
 
     def __init__(
         self,
@@ -66,6 +81,7 @@ class KeyboardButton(TelegramObject):
         request_contact: bool = None,
         request_location: bool = None,
         request_poll: KeyboardButtonPollType = None,
+        web_app: WebAppInfo = None,
         **_kwargs: Any,
     ):
         # Required
@@ -74,6 +90,7 @@ class KeyboardButton(TelegramObject):
         self.request_contact = request_contact
         self.request_location = request_location
         self.request_poll = request_poll
+        self.web_app = web_app
 
         self._id_attrs = (
             self.text,
@@ -81,3 +98,16 @@ class KeyboardButton(TelegramObject):
             self.request_location,
             self.request_poll,
         )
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['KeyboardButton']:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        data['request_poll'] = KeyboardButtonPollType.de_json(data.get('request_poll'), bot)
+        data['web_app'] = WebAppInfo.de_json(data.get('web_app'), bot)
+
+        return cls(**data)
