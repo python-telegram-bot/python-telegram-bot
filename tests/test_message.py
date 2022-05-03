@@ -41,6 +41,7 @@ from telegram import (
     ProximityAlertTriggered,
     Sticker,
     SuccessfulPayment,
+    Update,
     User,
     Venue,
     Video,
