@@ -21,7 +21,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple
 
-from telegram import TelegramObject, constants
+from telegram import TelegramObject, constants, MenuButton
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.helpers import (
     mention_markdown as helpers_mention_markdown,
@@ -1386,6 +1386,70 @@ class User(TelegramObject):
         return await self.get_bot().decline_chat_join_request(
             user_id=self.id,
             chat_id=chat_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_menu_button(
+        self,
+        menu_button: MenuButton = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.set_chat_menu_button(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_menu_button`.
+
+        ..seealso:: :meth:`get_menu_button`
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().set_chat_menu_button(
+            chat_id=self.id,
+            menu_button=menu_button,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def get_menu_button(
+        self,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> MenuButton:
+        """Shortcut for::
+
+             await bot.get_chat_menu_button(chat_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_chat_menu_button`.
+
+        ..seealso:: :meth:`set_menu_button`
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :class:`telegram.MenuButton`: On success, the current menu button is returned.
+        """
+        return await self.get_bot().get_chat_menu_button(
+            chat_id=self.id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,

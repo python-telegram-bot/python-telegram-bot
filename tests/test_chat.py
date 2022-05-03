@@ -749,6 +749,44 @@ class TestChat:
         assert await chat.revoke_invite_link(invite_link=link)
 
     @pytest.mark.asyncio
+    async def test_instance_method_get_menu_button(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.get_menu_button, Bot.get_chat_menu_button, ['chat_id'], []
+        )
+        assert await check_shortcut_call(
+            chat.get_menu_button,
+            chat.get_bot(),
+            'get_chat_menu_button',
+            shortcut_kwargs=['chat_id'],
+        )
+        assert await check_defaults_handling(chat.get_menu_button, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), 'get_chat_menu_button', make_assertion)
+        assert await chat.get_menu_button()
+
+    @pytest.mark.asyncio
+    async def test_instance_method_set_menu_button(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['menu_button'] == 'menu_button'
+
+        assert check_shortcut_signature(
+            Chat.set_menu_button, Bot.set_chat_menu_button, ['chat_id'], []
+        )
+        assert await check_shortcut_call(
+            chat.set_menu_button,
+            chat.get_bot(),
+            'set_chat_menu_button',
+            shortcut_kwargs=['chat_id'],
+        )
+        assert await check_defaults_handling(chat.set_menu_button, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), 'set_chat_menu_button', make_assertion)
+        assert await chat.set_menu_button(menu_button='menu_button')
+
+    @pytest.mark.asyncio
     async def test_approve_join_request(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['user_id'] == 42

@@ -37,6 +37,7 @@ __all__ = (  # Keep this alphabetically ordered
     'CallbackGame',
     'CallbackQuery',
     'Chat',
+    'ChatAdministratorRights',
     'ChatInviteLink',
     'ChatJoinRequest',
     'ChatLocation',
@@ -111,6 +112,10 @@ __all__ = (  # Keep this alphabetically ordered
     'Location',
     'LoginUrl',
     'MaskPosition',
+    'MenuButton',
+    'MenuButtonCommands',
+    'MenuButtonDefault',
+    'MenuButtonWebApp',
     'Message',
     'MessageAutoDeleteTimerChanged',
     'MessageEntity',
@@ -141,6 +146,7 @@ __all__ = (  # Keep this alphabetically ordered
     'ResidentialAddress',
     'SecureData',
     'SecureValue',
+    'SentWebAppMessage',
     'ShippingAddress',
     'ShippingOption',
     'ShippingQuery',
@@ -153,22 +159,31 @@ __all__ = (  # Keep this alphabetically ordered
     'UserProfilePhotos',
     'Venue',
     'Video',
+    'VideoChatEnded',
+    'VideoChatParticipantsInvited',
+    'VideoChatScheduled',
+    'VideoChatStarted',
     'VideoNote',
     'Voice',
-    'VoiceChatStarted',
-    'VoiceChatEnded',
-    'VoiceChatScheduled',
-    'VoiceChatParticipantsInvited',
     'warnings',
+    'WebAppData',
+    'WebAppInfo',
     'WebhookInfo',
 )
 
 
 from ._telegramobject import TelegramObject
 from ._botcommand import BotCommand
+from ._webappdata import WebAppData
+from ._webappinfo import WebAppInfo
+from ._sentwebappmessage import SentWebAppMessage
+from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
+from ._loginurl import LoginUrl
+from ._games.callbackgame import CallbackGame
 from ._user import User
 from ._files.chatphoto import ChatPhoto
 from ._chat import Chat
+from ._chatadministratorrights import ChatAdministratorRights
 from ._chatlocation import ChatLocation
 from ._chatinvitelink import ChatInviteLink
 from ._chatjoinrequest import ChatJoinRequest
@@ -207,15 +222,13 @@ from ._messageentity import MessageEntity
 from ._messageid import MessageId
 from ._games.game import Game
 from ._poll import Poll, PollOption, PollAnswer
-from ._voicechat import (
-    VoiceChatStarted,
-    VoiceChatEnded,
-    VoiceChatParticipantsInvited,
-    VoiceChatScheduled,
+from ._videochat import (
+    VideoChatStarted,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
 )
-from ._loginurl import LoginUrl
 from ._proximityalerttriggered import ProximityAlertTriggered
-from ._games.callbackgame import CallbackGame
 from ._payment.shippingaddress import ShippingAddress
 from ._payment.orderinfo import OrderInfo
 from ._payment.successfulpayment import SuccessfulPayment

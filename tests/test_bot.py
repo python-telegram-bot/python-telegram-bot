@@ -54,8 +54,15 @@ from telegram import (
     BotCommandScopeChat,
     File,
     InputMedia,
+    SentWebAppMessage,
+    ChatAdministratorRights,
+    MenuButton,
+    MenuButtonWebApp,
+    WebAppInfo,
+    MenuButtonCommands,
+    MenuButtonDefault,
 )
-from telegram.constants import ChatAction, ParseMode, InlineQueryLimit
+from telegram.constants import ChatAction, ParseMode, InlineQueryLimit, MenuButtonType
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.error import BadRequest, InvalidToken, NetworkError, TelegramError
 from telegram._utils.datetime import from_timestamp, to_timestamp
@@ -999,6 +1006,27 @@ class TestBot:
         assert await bot.send_chat_action(chat_id, chat_action)
         with pytest.raises(BadRequest, match='Wrong parameter action'):
             await bot.send_chat_action(chat_id, 'unknown action')
+
+    @pytest.mark.asyncio
+    async def test_answer_web_app_query(self, bot, monkeypatch):
+        params = False
+        # For now just test that our internals pass the correct data
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            nonlocal params
+            params = request_data.parameters == {
+                'web_app_query_id': '12345',
+                'result': result.to_dict(),
+            }
+            web_app_msg = SentWebAppMessage('321').to_dict()
+            return web_app_msg
+
+        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        result = InlineQueryResultArticle('1', 'title', InputTextMessageContent('text'))
+        web_app_msg = await bot.answer_web_app_query('12345', result)
+        assert params, "something went wrong with passing arguments to the request"
+        assert isinstance(web_app_msg, SentWebAppMessage)
+        assert web_app_msg.inline_message_id == '321'
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     @pytest.mark.asyncio
@@ -2021,7 +2049,7 @@ class TestBot:
                 can_pin_messages=True,
                 can_promote_members=True,
                 can_manage_chat=True,
-                can_manage_voice_chats=True,
+                can_manage_video_chats=True,
             )
 
         # Test that we pass the correct params to TG
@@ -2040,7 +2068,7 @@ class TestBot:
                 and data.get('can_pin_messages') == 8
                 and data.get('can_promote_members') == 9
                 and data.get('can_manage_chat') == 10
-                and data.get('can_manage_voice_chats') == 11
+                and data.get('can_manage_video_chats') == 11
             )
 
         monkeypatch.setattr(bot, '_post', make_assertion)
@@ -2057,7 +2085,7 @@ class TestBot:
             can_pin_messages=8,
             can_promote_members=9,
             can_manage_chat=10,
-            can_manage_voice_chats=11,
+            can_manage_video_chats=11,
         )
 
     @flaky(3, 1)
@@ -2467,6 +2495,52 @@ class TestBot:
                 await default_bot.send_message(
                     chat_id, 'test', reply_to_message_id=reply_to_message.message_id
                 )
+
+    @pytest.mark.asyncio
+    async def test_get_set_my_default_administrator_rights(self, bot):
+        # Test that my default administrator rights for group are as all False
+        await bot.set_my_default_administrator_rights()
+        my_admin_rights_grp = await bot.get_my_default_administrator_rights()
+        assert isinstance(my_admin_rights_grp, ChatAdministratorRights)
+        assert all(not getattr(my_admin_rights_grp, at) for at in my_admin_rights_grp.__slots__)
+
+        # Test setting my default admin rights for channel
+        my_rights = ChatAdministratorRights.all_rights()
+        await bot.set_my_default_administrator_rights(my_rights, for_channels=True)
+        my_admin_rights_ch = await bot.get_my_default_administrator_rights(for_channels=True)
+        # tg bug? is_anonymous, can_invite_users is False despite setting it True for channels:
+        assert my_admin_rights_ch.is_anonymous is not my_rights.is_anonymous
+        assert my_admin_rights_ch.can_invite_users is not my_rights.can_invite_users
+
+        assert my_admin_rights_ch.can_manage_chat is my_rights.can_manage_chat
+        assert my_admin_rights_ch.can_delete_messages is my_rights.can_delete_messages
+        assert my_admin_rights_ch.can_edit_messages is my_rights.can_edit_messages
+        assert my_admin_rights_ch.can_post_messages is my_rights.can_post_messages
+        assert my_admin_rights_ch.can_change_info is my_rights.can_change_info
+        assert my_admin_rights_ch.can_promote_members is my_rights.can_promote_members
+        assert my_admin_rights_ch.can_restrict_members is my_rights.can_restrict_members
+        assert my_admin_rights_ch.can_pin_messages is None  # Not returned for channels
+
+    @pytest.mark.asyncio
+    async def test_get_set_chat_menu_button(self, bot, chat_id):
+        # Test our chat menu button is commands-
+        menu_button = await bot.get_chat_menu_button()
+        assert isinstance(menu_button, MenuButton)
+        assert isinstance(menu_button, MenuButtonCommands)
+        assert menu_button.type == MenuButtonType.COMMANDS
+
+        # Test setting our chat menu button to Webapp.
+        my_menu = MenuButtonWebApp('click me!', WebAppInfo('https://telegram.org/'))
+        await bot.set_chat_menu_button(chat_id, my_menu)
+        menu_button = await bot.get_chat_menu_button(chat_id)
+        assert isinstance(menu_button, MenuButtonWebApp)
+        assert menu_button.type == MenuButtonType.WEB_APP
+        assert menu_button.text == my_menu.text
+        assert menu_button.web_app.url == my_menu.web_app.url
+
+        await bot.set_chat_menu_button(chat_id=chat_id, menu_button=MenuButtonDefault())
+        menu_button = await bot.get_chat_menu_button(chat_id=chat_id)
+        assert isinstance(menu_button, MenuButtonDefault)
 
     @flaky(3, 1)
     @pytest.mark.asyncio
