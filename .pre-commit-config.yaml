@@ -25,10 +25,10 @@ repos:
           #  run pylint across multiple cpu cores to speed it up-
           - --jobs=0  # See https://pylint.pycqa.org/en/latest/user_guide/run.html?#parallel-execution to know more
         additional_dependencies:
-          - httpx >= 0.20.0,<1.0
-          - tornado>=6.1
-          - APScheduler==3.6.3
-          - cachetools==4.2.2
+          - httpx~=0.22.0
+          - tornado~=6.1
+          - APScheduler~=3.9.1
+          - cachetools~=5.0.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.910
@@ -41,10 +41,10 @@ repos:
           - types-pytz
           - types-cryptography
           - types-cachetools
-          - httpx >= 0.20.0,<1.0
-          - tornado>=6.1
-          - APScheduler==3.6.3
-          - cachetools==4.2.2
+          - httpx~=0.22.0
+          - tornado~=6.1
+          - APScheduler~=3.9.1
+          - cachetools~=5.0.0
           - . # this basically does `pip install -e .`
     - id: mypy
       name: mypy-examples
@@ -53,10 +53,9 @@ repos:
         - --no-strict-optional
         - --follow-imports=silent
       additional_dependencies:
-        - certifi
-        - tornado>=6.1
-        - APScheduler==3.6.3
-        - cachetools==4.2.2
+        - tornado~=6.1
+        - APScheduler~=3.9.1
+        - cachetools~=5.0.0
         - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
     rev: v2.29.0
