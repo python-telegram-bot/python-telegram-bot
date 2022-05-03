@@ -37,6 +37,7 @@ __all__ = (  # Keep this alphabetically ordered
     'CallbackGame',
     'CallbackQuery',
     'Chat',
+    'ChatAdministratorRights',
     'ChatInviteLink',
     'ChatJoinRequest',
     'ChatLocation',
@@ -111,6 +112,10 @@ __all__ = (  # Keep this alphabetically ordered
     'Location',
     'LoginUrl',
     'MaskPosition',
+    'MenuButton',
+    'MenuButtonCommands',
+    'MenuButtonDefault',
+    'MenuButtonWebApp',
     'Message',
     'MessageAutoDeleteTimerChanged',
     'MessageEntity',
@@ -141,6 +146,7 @@ __all__ = (  # Keep this alphabetically ordered
     'ResidentialAddress',
     'SecureData',
     'SecureValue',
+    'SentWebAppMessage',
     'ShippingAddress',
     'ShippingOption',
     'ShippingQuery',
@@ -153,13 +159,15 @@ __all__ = (  # Keep this alphabetically ordered
     'UserProfilePhotos',
     'Venue',
     'Video',
+    'VideoChatEnded',
+    'VideoChatParticipantsInvited',
+    'VideoChatScheduled',
+    'VideoChatStarted',
     'VideoNote',
     'Voice',
-    'VoiceChatStarted',
-    'VoiceChatEnded',
-    'VoiceChatScheduled',
-    'VoiceChatParticipantsInvited',
     'warnings',
+    'WebAppData',
+    'WebAppInfo',
     'WebhookInfo',
 )
 
@@ -178,6 +186,7 @@ from ._botcommandscope import (
 )
 from ._callbackquery import CallbackQuery
 from ._chat import Chat
+from ._chatadministratorrights import ChatAdministratorRights
 from ._chatinvitelink import ChatInviteLink
 from ._chatjoinrequest import ChatJoinRequest
 from ._chatlocation import ChatLocation
@@ -253,6 +262,7 @@ from ._inline.inputvenuemessagecontent import InputVenueMessageContent
 from ._keyboardbutton import KeyboardButton
 from ._keyboardbuttonpolltype import KeyboardButtonPollType
 from ._loginurl import LoginUrl
+from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
 from ._message import Message
 from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
 from ._messageentity import MessageEntity
@@ -293,15 +303,18 @@ from ._poll import Poll, PollAnswer, PollOption
 from ._proximityalerttriggered import ProximityAlertTriggered
 from ._replykeyboardmarkup import ReplyKeyboardMarkup
 from ._replykeyboardremove import ReplyKeyboardRemove
+from ._sentwebappmessage import SentWebAppMessage
 from ._telegramobject import TelegramObject
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos
 from ._version import __version__, bot_api_version  # noqa: F401
-from ._voicechat import (
-    VoiceChatEnded,
-    VoiceChatParticipantsInvited,
-    VoiceChatScheduled,
-    VoiceChatStarted,
+from ._videochat import (
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
+    VideoChatStarted,
 )
+from ._webappdata import WebAppData
+from ._webappinfo import WebAppInfo
 from ._webhookinfo import WebhookInfo

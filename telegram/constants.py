@@ -24,8 +24,9 @@ Unless noted otherwise, all constants in this module were extracted from the
     Since v14.0, most of the constants in this module are grouped into enums.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `5.7`. Telegram Bot API version supported by this
-        version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
+    BOT_API_VERSION (:obj:`str`): :tg-const:`telegram.constants.BOT_API_VERSION`. Telegram Bot API
+        version supported by this version of `python-telegram-bot`. Also available as
+        ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
@@ -52,6 +53,7 @@ __all__ = [
     'InputMediaType',
     'LocationLimit',
     'MaskPosition',
+    'MenuButtonType',
     'MessageAttachmentType',
     'MessageEntityType',
     'MessageLimit',
@@ -68,7 +70,7 @@ from typing import List
 
 from telegram._utils.enum import StringEnum
 
-BOT_API_VERSION = '5.7'
+BOT_API_VERSION = '6.0'
 
 # constants above this line are tested
 
@@ -466,8 +468,25 @@ class MaskPosition(StringEnum):
     """:obj:`str`: Mask position for a sticker on the chin."""
 
 
+class MenuButtonType(StringEnum):
+    """This enum contains the available types of :class:`telegram.MenuButton`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    COMMANDS = 'commands'
+    """:obj:`str`: The type of :class:`telegram.MenuButtonCommands`."""
+    WEB_APP = 'web_app'
+    """:obj:`str`: The type of :class:`telegram.MenuButtonWebApp`."""
+    DEFAULT = 'default'
+    """:obj:`str`: The type of :class:`telegram.MenuButtonDefault`."""
+
+
 class MessageAttachmentType(StringEnum):
-    """This enum contains the available types of :class:`telegram.Message` that can bee seens
+    """This enum contains the available types of :class:`telegram.Message` that can be seen
     as attachment. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
 
@@ -659,14 +678,14 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.pinned_message`."""
     PROXIMITY_ALERT_TRIGGERED = 'proximity_alert_triggered'
     """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
-    VOICE_CHAT_SCHEDULED = 'voice_chat_scheduled'
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_scheduled`."""
-    VOICE_CHAT_STARTED = 'voice_chat_started'
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_started`."""
-    VOICE_CHAT_ENDED = 'voice_chat_ended'
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_ended`."""
-    VOICE_CHAT_PARTICIPANTS_INVITED = 'voice_chat_participants_invited'
-    """:obj:`str`: Messages with :attr:`telegram.Message.voice_chat_participants_invited`."""
+    VIDEO_CHAT_SCHEDULED = 'video_chat_scheduled'
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_scheduled`."""
+    VIDEO_CHAT_STARTED = 'video_chat_started'
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_started`."""
+    VIDEO_CHAT_ENDED = 'video_chat_ended'
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_ended`."""
+    VIDEO_CHAT_PARTICIPANTS_INVITED = 'video_chat_participants_invited'
+    """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_participants_invited`."""
 
 
 class ParseMode(StringEnum):

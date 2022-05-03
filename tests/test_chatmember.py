@@ -59,7 +59,7 @@ class CMDefaults:
     can_add_web_page_previews: bool = True
     is_member: bool = True
     can_manage_chat: bool = True
-    can_manage_voice_chats: bool = True
+    can_manage_video_chats: bool = True
 
 
 def chat_member_owner():
@@ -73,7 +73,7 @@ def chat_member_administrator():
         CMDefaults.is_anonymous,
         CMDefaults.can_manage_chat,
         CMDefaults.can_delete_messages,
-        CMDefaults.can_manage_voice_chats,
+        CMDefaults.can_manage_video_chats,
         CMDefaults.can_restrict_members,
         CMDefaults.can_promote_members,
         CMDefaults.can_change_info,
