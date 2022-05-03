@@ -19,7 +19,7 @@ repos:
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
-    rev: v2.13.7
+    rev: v2.13.8
     hooks:
     -   id: pylint
         files: ^(telegram|examples)/.*\.py$
