@@ -24,6 +24,7 @@ import sys
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, ClassVar
 
 from telegram import MessageEntity, TelegramObject, User, constants
+from telegram._utils import enum
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.types import JSONDict
 
@@ -189,7 +190,7 @@ class Poll(TelegramObject):
         self.total_voter_count = total_voter_count
         self.is_closed = is_closed
         self.is_anonymous = is_anonymous
-        self.type = type
+        self.type = enum.get_member(constants.PollType, type, type)
         self.allows_multiple_answers = allows_multiple_answers
         self.correct_option_id = correct_option_id
         self.explanation = explanation

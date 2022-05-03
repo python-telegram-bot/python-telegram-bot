@@ -8,6 +8,9 @@ on:
     branches: 
       - master
       - v14
+  schedule:
+    # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
+    - cron: '7 3 * * 1,5'
 
 jobs:
   pytest:
@@ -15,7 +18,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ['3.7', '3.8', '3.9', '3.10']
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: False
     steps:

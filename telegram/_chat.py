@@ -22,6 +22,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional, ClassVar, Union, Tuple, Any
 
 from telegram import ChatPhoto, TelegramObject, constants
+from telegram._utils import enum
 from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput, ReplyMarkup
 from telegram._utils.defaultvalue import DEFAULT_NONE
 
@@ -228,7 +229,7 @@ class Chat(TelegramObject):
     ):
         # Required
         self.id = int(id)  # pylint: disable=invalid-name
-        self.type = type
+        self.type = enum.get_member(constants.ChatType, type, type)
         # Optionals
         self.title = title
         self.username = username

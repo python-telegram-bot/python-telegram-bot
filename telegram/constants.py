@@ -211,10 +211,10 @@ class ChatMemberStatus(StringEnum):
 
     ADMINISTRATOR = 'administrator'
     """:obj:`str`: A :class:`telegram.ChatMember` who is administrator of the chat."""
-    CREATOR = 'creator'
-    """:obj:`str`: A :class:`telegram.ChatMember` who is the creator of the chat."""
-    KICKED = 'kicked'
-    """:obj:`str`: A :class:`telegram.ChatMember` who was kicked from the chat."""
+    OWNER = 'creator'
+    """:obj:`str`: A :class:`telegram.ChatMember` who is the owner of the chat."""
+    BANNED = 'kicked'
+    """:obj:`str`: A :class:`telegram.ChatMember` who was banned in the chat."""
     LEFT = 'left'
     """:obj:`str`: A :class:`telegram.ChatMember` who has left the chat."""
     MEMBER = 'member'
