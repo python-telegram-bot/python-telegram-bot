@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import InlineKeyboardButton, LoginUrl
+from telegram import InlineKeyboardButton, LoginUrl, WebAppInfo, CallbackGame
 
 
 @pytest.fixture(scope='class')
@@ -33,6 +33,7 @@ def inline_keyboard_button():
         callback_game=TestInlineKeyboardButton.callback_game,
         pay=TestInlineKeyboardButton.pay,
         login_url=TestInlineKeyboardButton.login_url,
+        web_app=TestInlineKeyboardButton.web_app,
     )
 
 
@@ -42,9 +43,10 @@ class TestInlineKeyboardButton:
     callback_data = 'callback data'
     switch_inline_query = 'switch_inline_query'
     switch_inline_query_current_chat = 'switch_inline_query_current_chat'
-    callback_game = 'callback_game'
+    callback_game = CallbackGame()
     pay = 'pay'
     login_url = LoginUrl("http://google.com")
+    web_app = WebAppInfo(url="https://example.com")
 
     def test_slot_behaviour(self, inline_keyboard_button, mro_slots):
         inst = inline_keyboard_button
@@ -61,9 +63,10 @@ class TestInlineKeyboardButton:
             inline_keyboard_button.switch_inline_query_current_chat
             == self.switch_inline_query_current_chat
         )
-        assert inline_keyboard_button.callback_game == self.callback_game
+        assert isinstance(inline_keyboard_button.callback_game, CallbackGame)
         assert inline_keyboard_button.pay == self.pay
         assert inline_keyboard_button.login_url == self.login_url
+        assert inline_keyboard_button.web_app == self.web_app
 
     def test_to_dict(self, inline_keyboard_button):
         inline_keyboard_button_dict = inline_keyboard_button.to_dict()
@@ -80,11 +83,15 @@ class TestInlineKeyboardButton:
             inline_keyboard_button_dict['switch_inline_query_current_chat']
             == inline_keyboard_button.switch_inline_query_current_chat
         )
-        assert inline_keyboard_button_dict['callback_game'] == inline_keyboard_button.callback_game
+        assert (
+            inline_keyboard_button_dict['callback_game']
+            == inline_keyboard_button.callback_game.to_dict()
+        )
         assert inline_keyboard_button_dict['pay'] == inline_keyboard_button.pay
         assert (
             inline_keyboard_button_dict['login_url'] == inline_keyboard_button.login_url.to_dict()
         )  # NOQA: E127
+        assert inline_keyboard_button_dict['web_app'] == inline_keyboard_button.web_app.to_dict()
 
     def test_de_json(self, bot):
         json_dict = {
@@ -93,7 +100,9 @@ class TestInlineKeyboardButton:
             'callback_data': self.callback_data,
             'switch_inline_query': self.switch_inline_query,
             'switch_inline_query_current_chat': self.switch_inline_query_current_chat,
-            'callback_game': self.callback_game,
+            'callback_game': self.callback_game.to_dict(),
+            'web_app': self.web_app.to_dict(),
+            'login_url': self.login_url.to_dict(),
             'pay': self.pay,
         }
 
@@ -106,8 +115,14 @@ class TestInlineKeyboardButton:
             inline_keyboard_button.switch_inline_query_current_chat
             == self.switch_inline_query_current_chat
         )
-        assert inline_keyboard_button.callback_game == self.callback_game
+        # CallbackGame has empty _id_attrs, so just test if the class is created.
+        assert isinstance(inline_keyboard_button.callback_game, CallbackGame)
         assert inline_keyboard_button.pay == self.pay
+        assert inline_keyboard_button.login_url == self.login_url
+        assert inline_keyboard_button.web_app == self.web_app
+
+        none = InlineKeyboardButton.de_json({}, bot)
+        assert none is None
 
     def test_equality(self):
         a = InlineKeyboardButton('text', callback_data='data')

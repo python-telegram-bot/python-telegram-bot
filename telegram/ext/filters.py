@@ -1691,10 +1691,11 @@ class StatusUpdate:
                 or StatusUpdate.PINNED_MESSAGE.check_update(update)
                 or StatusUpdate.CONNECTED_WEBSITE.check_update(update)
                 or StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
-                or StatusUpdate.VOICE_CHAT_SCHEDULED.check_update(update)
-                or StatusUpdate.VOICE_CHAT_STARTED.check_update(update)
-                or StatusUpdate.VOICE_CHAT_ENDED.check_update(update)
-                or StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_SCHEDULED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_STARTED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
+                or StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
+                or StatusUpdate.WEB_APP_DATA.check_update(update)
             )
 
     ALL = _All(name="filters.StatusUpdate.ALL")
@@ -1813,54 +1814,74 @@ class StatusUpdate:
     )
     """Messages that contain :attr:`telegram.Message.proximity_alert_triggered`."""
 
-    class _VoiceChatEnded(MessageFilter):
+    class _VideoChatEnded(MessageFilter):
         __slots__ = ()
 
         def filter(self, message: Message) -> bool:
-            return bool(message.voice_chat_ended)
+            return bool(message.video_chat_ended)
 
-    VOICE_CHAT_ENDED = _VoiceChatEnded(name="filters.StatusUpdate.VOICE_CHAT_ENDED")
-    """Messages that contain :attr:`telegram.Message.voice_chat_ended`.
+    VIDEO_CHAT_ENDED = _VideoChatEnded(name="filters.StatusUpdate.VIDEO_CHAT_ENDED")
+    """Messages that contain :attr:`telegram.Message.video_chat_ended`.
 
     .. versionadded:: 13.4
+    .. versionchanged:: 20.0
+        This filter was formerly named ``VOICE_CHAT_ENDED``
     """
 
-    class _VoiceChatScheduled(MessageFilter):
+    class _VideoChatScheduled(MessageFilter):
         __slots__ = ()
 
         def filter(self, message: Message) -> bool:
-            return bool(message.voice_chat_scheduled)
+            return bool(message.video_chat_scheduled)
 
-    VOICE_CHAT_SCHEDULED = _VoiceChatScheduled(name="filters.StatusUpdate.VOICE_CHAT_SCHEDULED")
-    """Messages that contain :attr:`telegram.Message.voice_chat_scheduled`.
+    VIDEO_CHAT_SCHEDULED = _VideoChatScheduled(name="filters.StatusUpdate.VIDEO_CHAT_SCHEDULED")
+    """Messages that contain :attr:`telegram.Message.video_chat_scheduled`.
 
     .. versionadded:: 13.5
+    .. versionchanged:: 20.0
+        This filter was formerly named ``VOICE_CHAT_SCHEDULED``
     """
 
-    class _VoiceChatStarted(MessageFilter):
+    class _VideoChatStarted(MessageFilter):
         __slots__ = ()
 
         def filter(self, message: Message) -> bool:
-            return bool(message.voice_chat_started)
+            return bool(message.video_chat_started)
 
-    VOICE_CHAT_STARTED = _VoiceChatStarted(name="filters.StatusUpdate.VOICE_CHAT_STARTED")
-    """Messages that contain :attr:`telegram.Message.voice_chat_started`.
+    VIDEO_CHAT_STARTED = _VideoChatStarted(name="filters.StatusUpdate.VIDEO_CHAT_STARTED")
+    """Messages that contain :attr:`telegram.Message.video_chat_started`.
 
     .. versionadded:: 13.4
+    .. versionchanged:: 20.0
+        This filter was formerly named ``VOICE_CHAT_STARTED``
     """
 
-    class _VoiceChatParticipantsInvited(MessageFilter):
+    class _VideoChatParticipantsInvited(MessageFilter):
         __slots__ = ()
 
         def filter(self, message: Message) -> bool:
-            return bool(message.voice_chat_participants_invited)
+            return bool(message.video_chat_participants_invited)
 
-    VOICE_CHAT_PARTICIPANTS_INVITED = _VoiceChatParticipantsInvited(
-        "filters.StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED"
+    VIDEO_CHAT_PARTICIPANTS_INVITED = _VideoChatParticipantsInvited(
+        "filters.StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED"
     )
-    """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`.
+    """Messages that contain :attr:`telegram.Message.video_chat_participants_invited`.
 
     .. versionadded:: 13.4
+    .. versionchanged:: 20.0
+        This filter was formerly named ``VOICE_CHAT_PARTICIPANTS_INVITED``
+    """
+
+    class _WebAppData(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.web_app_data)
+
+    WEB_APP_DATA = _WebAppData(name="filters.StatusUpdate.WEB_APP_DATA")
+    """Messages that contain :attr:`telegram.Message.web_app_data`.
+
+    .. versionadded:: 20.0
     """
 
 

@@ -20,11 +20,11 @@ import datetime as dtm
 import pytest
 
 from telegram import (
-    VoiceChatStarted,
-    VoiceChatEnded,
-    VoiceChatParticipantsInvited,
+    VideoChatStarted,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
     User,
-    VoiceChatScheduled,
+    VideoChatScheduled,
 )
 from telegram._utils.datetime import to_timestamp
 
@@ -39,50 +39,50 @@ def user2():
     return User(first_name='Mister Test', id=124, is_bot=False)
 
 
-class TestVoiceChatStarted:
+class TestVideoChatStarted:
     def test_slot_behaviour(self, mro_slots):
-        action = VoiceChatStarted()
+        action = VideoChatStarted()
         for attr in action.__slots__:
             assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self):
-        voice_chat_started = VoiceChatStarted.de_json({}, None)
-        assert isinstance(voice_chat_started, VoiceChatStarted)
+        video_chat_started = VideoChatStarted.de_json({}, None)
+        assert isinstance(video_chat_started, VideoChatStarted)
 
     def test_to_dict(self):
-        voice_chat_started = VoiceChatStarted()
-        voice_chat_dict = voice_chat_started.to_dict()
-        assert voice_chat_dict == {}
+        video_chat_started = VideoChatStarted()
+        video_chat_dict = video_chat_started.to_dict()
+        assert video_chat_dict == {}
 
 
-class TestVoiceChatEnded:
+class TestVideoChatEnded:
     duration = 100
 
     def test_slot_behaviour(self, mro_slots):
-        action = VoiceChatEnded(8)
+        action = VideoChatEnded(8)
         for attr in action.__slots__:
             assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self):
         json_dict = {'duration': self.duration}
-        voice_chat_ended = VoiceChatEnded.de_json(json_dict, None)
+        video_chat_ended = VideoChatEnded.de_json(json_dict, None)
 
-        assert voice_chat_ended.duration == self.duration
+        assert video_chat_ended.duration == self.duration
 
     def test_to_dict(self):
-        voice_chat_ended = VoiceChatEnded(self.duration)
-        voice_chat_dict = voice_chat_ended.to_dict()
+        video_chat_ended = VideoChatEnded(self.duration)
+        video_chat_dict = video_chat_ended.to_dict()
 
-        assert isinstance(voice_chat_dict, dict)
-        assert voice_chat_dict["duration"] == self.duration
+        assert isinstance(video_chat_dict, dict)
+        assert video_chat_dict["duration"] == self.duration
 
     def test_equality(self):
-        a = VoiceChatEnded(100)
-        b = VoiceChatEnded(100)
-        c = VoiceChatEnded(50)
-        d = VoiceChatStarted()
+        a = VideoChatEnded(100)
+        b = VideoChatEnded(100)
+        c = VideoChatEnded(50)
+        d = VideoChatStarted()
 
         assert a == b
         assert hash(a) == hash(b)
@@ -94,44 +94,44 @@ class TestVoiceChatEnded:
         assert hash(a) != hash(d)
 
 
-class TestVoiceChatParticipantsInvited:
+class TestVideoChatParticipantsInvited:
     def test_slot_behaviour(self, mro_slots, user1):
-        action = VoiceChatParticipantsInvited([user1])
+        action = VideoChatParticipantsInvited([user1])
         for attr in action.__slots__:
             assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self, user1, user2, bot):
         json_data = {"users": [user1.to_dict(), user2.to_dict()]}
-        voice_chat_participants = VoiceChatParticipantsInvited.de_json(json_data, bot)
+        video_chat_participants = VideoChatParticipantsInvited.de_json(json_data, bot)
 
-        assert isinstance(voice_chat_participants.users, list)
-        assert voice_chat_participants.users[0] == user1
-        assert voice_chat_participants.users[1] == user2
-        assert voice_chat_participants.users[0].id == user1.id
-        assert voice_chat_participants.users[1].id == user2.id
+        assert isinstance(video_chat_participants.users, list)
+        assert video_chat_participants.users[0] == user1
+        assert video_chat_participants.users[1] == user2
+        assert video_chat_participants.users[0].id == user1.id
+        assert video_chat_participants.users[1].id == user2.id
 
     @pytest.mark.parametrize('use_users', (True, False))
     def test_to_dict(self, user1, user2, use_users):
-        voice_chat_participants = VoiceChatParticipantsInvited(
+        video_chat_participants = VideoChatParticipantsInvited(
             [user1, user2] if use_users else None
         )
-        voice_chat_dict = voice_chat_participants.to_dict()
+        video_chat_dict = video_chat_participants.to_dict()
 
-        assert isinstance(voice_chat_dict, dict)
+        assert isinstance(video_chat_dict, dict)
         if use_users:
-            assert voice_chat_dict["users"] == [user1.to_dict(), user2.to_dict()]
-            assert voice_chat_dict["users"][0]["id"] == user1.id
-            assert voice_chat_dict["users"][1]["id"] == user2.id
+            assert video_chat_dict["users"] == [user1.to_dict(), user2.to_dict()]
+            assert video_chat_dict["users"][0]["id"] == user1.id
+            assert video_chat_dict["users"][1]["id"] == user2.id
         else:
-            assert voice_chat_dict == {}
+            assert video_chat_dict == {}
 
     def test_equality(self, user1, user2):
-        a = VoiceChatParticipantsInvited([user1])
-        b = VoiceChatParticipantsInvited([user1])
-        c = VoiceChatParticipantsInvited([user1, user2])
-        d = VoiceChatParticipantsInvited(None)
-        e = VoiceChatStarted()
+        a = VideoChatParticipantsInvited([user1])
+        b = VideoChatParticipantsInvited([user1])
+        c = VideoChatParticipantsInvited([user1, user2])
+        d = VideoChatParticipantsInvited(None)
+        e = VideoChatStarted()
 
         assert a == b
         assert hash(a) == hash(b)
@@ -146,38 +146,38 @@ class TestVoiceChatParticipantsInvited:
         assert hash(a) != hash(e)
 
 
-class TestVoiceChatScheduled:
+class TestVideoChatScheduled:
     start_date = dtm.datetime.utcnow()
 
     def test_slot_behaviour(self, mro_slots):
-        inst = VoiceChatScheduled(self.start_date)
+        inst = VideoChatScheduled(self.start_date)
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self):
-        assert pytest.approx(VoiceChatScheduled(start_date=self.start_date) == self.start_date)
+        assert pytest.approx(VideoChatScheduled(start_date=self.start_date) == self.start_date)
 
     def test_de_json(self, bot):
-        assert VoiceChatScheduled.de_json({}, bot=bot) is None
+        assert VideoChatScheduled.de_json({}, bot=bot) is None
 
         json_dict = {'start_date': to_timestamp(self.start_date)}
-        voice_chat_scheduled = VoiceChatScheduled.de_json(json_dict, bot)
+        video_chat_scheduled = VideoChatScheduled.de_json(json_dict, bot)
 
-        assert pytest.approx(voice_chat_scheduled.start_date == self.start_date)
+        assert pytest.approx(video_chat_scheduled.start_date == self.start_date)
 
     def test_to_dict(self):
-        voice_chat_scheduled = VoiceChatScheduled(self.start_date)
-        voice_chat_scheduled_dict = voice_chat_scheduled.to_dict()
+        video_chat_scheduled = VideoChatScheduled(self.start_date)
+        video_chat_scheduled_dict = video_chat_scheduled.to_dict()
 
-        assert isinstance(voice_chat_scheduled_dict, dict)
-        assert voice_chat_scheduled_dict["start_date"] == to_timestamp(self.start_date)
+        assert isinstance(video_chat_scheduled_dict, dict)
+        assert video_chat_scheduled_dict["start_date"] == to_timestamp(self.start_date)
 
     def test_equality(self):
-        a = VoiceChatScheduled(self.start_date)
-        b = VoiceChatScheduled(self.start_date)
-        c = VoiceChatScheduled(dtm.datetime.utcnow() + dtm.timedelta(seconds=5))
-        d = VoiceChatStarted()
+        a = VideoChatScheduled(self.start_date)
+        b = VideoChatScheduled(self.start_date)
+        c = VideoChatScheduled(dtm.datetime.utcnow() + dtm.timedelta(seconds=5))
+        d = VideoChatStarted()
 
         assert a == b
         assert hash(a) == hash(b)

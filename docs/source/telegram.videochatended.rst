@@ -1,7 +1,7 @@
-telegram.VoiceChatEnded
+telegram.VideoChatEnded
 =======================
 
-.. autoclass:: telegram.VoiceChatEnded
+.. autoclass:: telegram.VideoChatEnded
     :members:
     :show-inheritance:
 

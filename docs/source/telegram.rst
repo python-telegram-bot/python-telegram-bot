@@ -17,6 +17,7 @@ telegram package
     telegram.botcommandscopechatmember
     telegram.callbackquery
     telegram.chat
+    telegram.chatadministratorrights
     telegram.chatinvitelink
     telegram.chatjoinrequest
     telegram.chatlocation
@@ -48,6 +49,10 @@ telegram package
     telegram.keyboardbuttonpolltype
     telegram.location
     telegram.loginurl
+    telegram.menubutton
+    telegram.menubuttoncommands
+    telegram.menubuttondefault
+    telegram.menubuttonwebapp
     telegram.message
     telegram.messageautodeletetimerchanged
     telegram.messageid
@@ -59,18 +64,21 @@ telegram package
     telegram.proximityalerttriggered
     telegram.replykeyboardremove
     telegram.replykeyboardmarkup
+    telegram.sentwebappmessage
     telegram.telegramobject
     telegram.update
     telegram.user
     telegram.userprofilephotos
     telegram.venue
     telegram.video
+    telegram.videochatended
+    telegram.videochatparticipantsinvited
+    telegram.videochatscheduled
+    telegram.videochatstarted
     telegram.videonote
     telegram.voice
-    telegram.voicechatstarted
-    telegram.voicechatended
-    telegram.voicechatscheduled
-    telegram.voicechatparticipantsinvited
+    telegram.webappdata
+    telegram.webappinfo
     telegram.webhookinfo
 
 Stickers

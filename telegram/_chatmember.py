@@ -161,6 +161,10 @@ class ChatMemberAdministrator(ChatMember):
     Represents a chat member that has some additional privileges.
 
     .. versionadded:: 13.7
+    .. versionchanged:: 20.0
+       Argument and attribute ``can_manage_voice_chats`` were renamed to
+       :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
+       Bot API 6.0.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -174,8 +178,10 @@ class ChatMemberAdministrator(ChatMember):
             and ignore slow mode. Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the
             administrator can delete messages of other users.
-        can_manage_voice_chats (:obj:`bool`): :obj:`True`, if the
-            administrator can manage voice chats.
+        can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
+            administrator can manage video chats.
+
+            .. versionadded:: 20.0
         can_restrict_members (:obj:`bool`): :obj:`True`, if the
             administrator can restrict, ban or unban chat members.
         can_promote_members (:obj:`bool`): :obj:`True`, if the administrator
@@ -209,8 +215,10 @@ class ChatMemberAdministrator(ChatMember):
             and ignore slow mode. Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the
             administrator can delete messages of other users.
-        can_manage_voice_chats (:obj:`bool`): :obj:`True`, if the
-            administrator can manage voice chats.
+        can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
+            administrator can manage video chats.
+
+            .. versionadded:: 20.0
         can_restrict_members (:obj:`bool`): :obj:`True`, if the
             administrator can restrict, ban or unban chat members.
         can_promote_members (:obj:`bool`): :obj:`True`, if the administrator
@@ -236,7 +244,7 @@ class ChatMemberAdministrator(ChatMember):
         'is_anonymous',
         'can_manage_chat',
         'can_delete_messages',
-        'can_manage_voice_chats',
+        'can_manage_video_chats',
         'can_restrict_members',
         'can_promote_members',
         'can_change_info',
@@ -254,7 +262,7 @@ class ChatMemberAdministrator(ChatMember):
         is_anonymous: bool,
         can_manage_chat: bool,
         can_delete_messages: bool,
-        can_manage_voice_chats: bool,
+        can_manage_video_chats: bool,
         can_restrict_members: bool,
         can_promote_members: bool,
         can_change_info: bool,
@@ -270,7 +278,7 @@ class ChatMemberAdministrator(ChatMember):
         self.is_anonymous = is_anonymous
         self.can_manage_chat = can_manage_chat
         self.can_delete_messages = can_delete_messages
-        self.can_manage_voice_chats = can_manage_voice_chats
+        self.can_manage_video_chats = can_manage_video_chats
         self.can_restrict_members = can_restrict_members
         self.can_promote_members = can_promote_members
         self.can_change_info = can_change_info

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import KeyboardButton, InlineKeyboardButton, KeyboardButtonPollType
+from telegram import KeyboardButton, InlineKeyboardButton, KeyboardButtonPollType, WebAppInfo
 
 
 @pytest.fixture(scope='class')
@@ -28,6 +28,7 @@ def keyboard_button():
         request_location=TestKeyboardButton.request_location,
         request_contact=TestKeyboardButton.request_contact,
         request_poll=TestKeyboardButton.request_poll,
+        web_app=TestKeyboardButton.web_app,
     )
 
 
@@ -36,6 +37,7 @@ class TestKeyboardButton:
     request_location = True
     request_contact = True
     request_poll = KeyboardButtonPollType("quiz")
+    web_app = WebAppInfo(url="https://example.com")
 
     def test_slot_behaviour(self, keyboard_button, mro_slots):
         inst = keyboard_button
@@ -48,6 +50,7 @@ class TestKeyboardButton:
         assert keyboard_button.request_location == self.request_location
         assert keyboard_button.request_contact == self.request_contact
         assert keyboard_button.request_poll == self.request_poll
+        assert keyboard_button.web_app == self.web_app
 
     def test_to_dict(self, keyboard_button):
         keyboard_button_dict = keyboard_button.to_dict()
@@ -57,6 +60,26 @@ class TestKeyboardButton:
         assert keyboard_button_dict['request_location'] == keyboard_button.request_location
         assert keyboard_button_dict['request_contact'] == keyboard_button.request_contact
         assert keyboard_button_dict['request_poll'] == keyboard_button.request_poll.to_dict()
+        assert keyboard_button_dict['web_app'] == keyboard_button.web_app.to_dict()
+
+    def test_de_json(self, bot):
+        json_dict = {
+            'text': self.text,
+            'request_location': self.request_location,
+            'request_contact': self.request_contact,
+            'request_poll': self.request_poll.to_dict(),
+            'web_app': self.web_app.to_dict(),
+        }
+
+        inline_keyboard_button = KeyboardButton.de_json(json_dict, None)
+        assert inline_keyboard_button.text == self.text
+        assert inline_keyboard_button.request_location == self.request_location
+        assert inline_keyboard_button.request_contact == self.request_contact
+        assert inline_keyboard_button.request_poll == self.request_poll
+        assert inline_keyboard_button.web_app == self.web_app
+
+        none = KeyboardButton.de_json({}, None)
+        assert none is None
 
     def test_equality(self):
         a = KeyboardButton('test', request_contact=True)
