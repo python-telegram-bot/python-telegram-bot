@@ -90,11 +90,8 @@ def check_method(h4):
         ), f"Param {param.name!r} of method {method.__name__!r} requirement mismatch!"
 
         # Now we will check that we don't pass default values if the parameter is not required.
-        # parameter[2] can either be Required/Yes or a paragraph where the first word has that info
-        telegram_param_required = is_parameter_required_by_tg(tg_parameter[2])
-
-        if not telegram_param_required:
-            default_arg_none = check_defaults_type(param)
+        if param.default is not inspect.Parameter.empty:  # If there is a default argument...
+            default_arg_none = check_defaults_type(param)  # check if it's None
             assert default_arg_none, f"Param {param.name!r} of {method.__name__!r} should be None"
 
         checked.append(tg_parameter[0])
@@ -163,10 +160,8 @@ def check_object(h4):
             tg_parameter, param, obj.__name__
         ), f"{obj.__name__!r} parameter {param.name!r} requirement mismatch"
 
-        telegram_param_required = is_parameter_required_by_tg(tg_parameter[2])
-
-        if not telegram_param_required:
-            default_arg_none = check_defaults_type(param)
+        if param.default is not inspect.Parameter.empty:  # If there is a default argument...
+            default_arg_none = check_defaults_type(param)  # check if its None
             assert default_arg_none, f"Param {param.name!r} of {obj.__name__!r} should be `None`"
 
         checked.add(field)
@@ -212,7 +207,7 @@ def check_required_param(
         :obj:`bool`: The boolean returned represents whether our parameter's requirement (optional
         or required) is the same as Telegram's or not.
     """
-    is_ours_required = param.default is inspect.Signature.empty
+    is_ours_required = param.default is inspect.Parameter.empty
     telegram_requires = is_parameter_required_by_tg(param_desc[2])
     # Handle cases where we provide convenience intentionally-
     if param.name in ignored_param_requirements.get(method_or_obj_name, {}):
