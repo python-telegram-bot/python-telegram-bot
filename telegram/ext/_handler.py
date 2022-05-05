@@ -38,6 +38,16 @@ class Handler(Generic[UT, CCT], ABC):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    This class is a :class:`~typing.Generic` class and accepts two type variables:
+
+    1. The type of the updates that this handler will handle. :meth:`check_update` must only accept
+       updates of this type and the first argument of the :paramref:`callback` function will be
+       handled this type of objects.
+    2. The type of the second argument of :paramref:`callback`. For this type variable, one should
+       usually provide a :class:`~typing.TypeVar` that is also used in the annotation for
+       :paramref:`callback`. That way, a type checker can check whether this handler and the
+       :attr:`callback` fit the definition of the :class:`~Application`.
+
     .. versionchanged:: 20.0
         The attribute ``run_async`` is now :paramref:`block`.
 

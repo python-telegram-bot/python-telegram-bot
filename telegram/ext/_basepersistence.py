@@ -98,7 +98,20 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
        :class:`telegram.TelegramObject`, one may call :meth:`set_bot` to ensure that shortcuts like
        :meth:`telegram.Message.reply_text` are available.
 
+    This class is a :class:`~typing.Generic` class and accepts three type variables:
+
+    1. The type of the second argument of :meth:`update_user_data`, which must coincide with the
+       type of the second argument of :meth:`refresh_user_data` and the values in the dictionary
+       returned by :meth:`get_user_data`.
+    2. The type of the second argument of :meth:`update_chat_data`, which must coincide with the
+       type of the second argument of :meth:`refresh_chat_data` and the values in the dictionary
+       returned by :meth:`get_chat_data`.
+    3. The type of the argument of :meth:`update_bot_data`, which must coincide with the
+       type of the argument of :meth:`refresh_bot_data` and the return value of
+       :meth:`get_bot_data`.
+
     .. versionchanged:: 20.0
+
         * The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.
         * ``insert/replace_bot`` was dropped. Serialization of bot instances now needs to be
           handled by the specific implementation - see above note.
