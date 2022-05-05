@@ -35,7 +35,7 @@ __all__ = (
     'TimedOut',
 )
 
-from typing import Tuple, Union, Optional
+from typing import Optional, Tuple, Union
 
 
 def _lstrip_str(in_s: str, lstr: str) -> str:

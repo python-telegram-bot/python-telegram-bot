@@ -20,17 +20,17 @@
 import pytest
 
 from telegram import (
-    Update,
-    Message,
-    Chat,
-    User,
     Bot,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
     CallbackQuery,
+    Chat,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+    Update,
+    User,
 )
-from telegram.ext import CallbackContext, ApplicationBuilder
 from telegram.error import TelegramError
+from telegram.ext import ApplicationBuilder, CallbackContext
 
 """
 CallbackContext.refresh_data is tested in TestBasePersistence
@@ -178,7 +178,6 @@ class TestCallbackContext:
         finally:
             app.bot = bot
 
-    @pytest.mark.asyncio
     async def test_drop_callback_data(self, bot, monkeypatch, chat_id):
         app = ApplicationBuilder().token(bot.token).arbitrary_callback_data(True).build()
 

@@ -67,7 +67,6 @@ class TestContact:
         assert contact.last_name == self.last_name
         assert contact.user_id == self.user_id
 
-    @pytest.mark.asyncio
     async def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
@@ -90,7 +89,6 @@ class TestContact:
         ],
         indirect=['default_bot'],
     )
-    @pytest.mark.asyncio
     async def test_send_contact_default_allow_sending_without_reply(
         self, default_bot, chat_id, contact, custom
     ):
@@ -116,7 +114,6 @@ class TestContact:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
     async def test_send_contact_default_protect_content(self, chat_id, default_bot, contact):
         protected = await default_bot.send_contact(chat_id, contact=contact)
@@ -126,7 +123,6 @@ class TestContact:
         )
         assert not unprotected.has_protected_content
 
-    @pytest.mark.asyncio
     async def test_send_contact_without_required(self, bot, chat_id):
         with pytest.raises(ValueError, match='Either contact or phone_number and first_name'):
             await bot.send_contact(chat_id=chat_id)

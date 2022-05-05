@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import Dice, BotCommand
+from telegram import BotCommand, Dice
 
 
 @pytest.fixture(scope="class", params=Dice.ALL_EMOJI)

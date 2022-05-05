@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=no-name-in-module, no-self-argument, not-callable, no-member, too-many-arguments
-# pylint: disable=too-many-public-methods
+# pylint: disable=no-self-argument, not-callable, no-member, too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -22,26 +21,25 @@
 import asyncio
 import functools
 import logging
-from contextlib import AbstractAsyncContextManager
 import pickle
+from contextlib import AbstractAsyncContextManager
 from datetime import datetime
 from types import TracebackType
-
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
+    Dict,
     List,
+    NoReturn,
     Optional,
+    Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
-    no_type_check,
-    Dict,
     cast,
-    Sequence,
-    Any,
-    NoReturn,
-    Type,
+    no_type_check,
 )
 
 try:
@@ -59,63 +57,59 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
-from telegram import (
-    Animation,
-    Audio,
-    BotCommand,
-    BotCommandScope,
-    Chat,
-    ChatMember,
-    ChatPermissions,
-    ChatPhoto,
-    Contact,
-    Document,
-    File,
-    GameHighScore,
-    InputMedia,
-    Location,
-    MaskPosition,
-    Message,
-    MessageId,
-    PassportElementError,
-    PhotoSize,
-    Poll,
-    ShippingOption,
-    Sticker,
-    StickerSet,
-    TelegramObject,
-    Update,
-    User,
-    UserProfilePhotos,
-    Venue,
-    Video,
-    VideoNote,
-    Voice,
-    WebhookInfo,
-    InlineKeyboardMarkup,
-    ChatInviteLink,
-    SentWebAppMessage,
-    ChatAdministratorRights,
-    MenuButton,
-)
-from telegram.error import InvalidToken, TelegramError
-from telegram.constants import InlineQueryLimit
-from telegram.request import BaseRequest, RequestData
-from telegram.request._requestparameter import RequestParameter
-from telegram.request._httpxrequest import HTTPXRequest
+from telegram._botcommand import BotCommand
+from telegram._botcommandscope import BotCommandScope
+from telegram._chat import Chat
+from telegram._chatadministratorrights import ChatAdministratorRights
+from telegram._chatinvitelink import ChatInviteLink
+from telegram._chatmember import ChatMember
+from telegram._chatpermissions import ChatPermissions
+from telegram._files.animation import Animation
+from telegram._files.audio import Audio
+from telegram._files.chatphoto import ChatPhoto
+from telegram._files.contact import Contact
+from telegram._files.document import Document
+from telegram._files.file import File
+from telegram._files.inputmedia import InputMedia
+from telegram._files.location import Location
+from telegram._files.photosize import PhotoSize
+from telegram._files.sticker import MaskPosition, Sticker, StickerSet
+from telegram._files.venue import Venue
+from telegram._files.video import Video
+from telegram._files.videonote import VideoNote
+from telegram._files.voice import Voice
+from telegram._games.gamehighscore import GameHighScore
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._menubutton import MenuButton
+from telegram._message import Message
+from telegram._messageid import MessageId
+from telegram._passport.passportelementerrors import PassportElementError
+from telegram._payment.shippingoption import ShippingOption
+from telegram._poll import Poll
+from telegram._sentwebappmessage import SentWebAppMessage
+from telegram._telegramobject import TelegramObject
+from telegram._update import Update
+from telegram._user import User
+from telegram._userprofilephotos import UserProfilePhotos
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
-from telegram._utils.types import FileInput, JSONDict, ODVInput, DVInput, ReplyMarkup
+from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._webhookinfo import WebhookInfo
+from telegram.constants import InlineQueryLimit
+from telegram.error import InvalidToken, TelegramError
+from telegram.request import BaseRequest, RequestData
+from telegram.request._httpxrequest import HTTPXRequest
+from telegram.request._requestparameter import RequestParameter
 
 if TYPE_CHECKING:
     from telegram import (
+        InlineQueryResult,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
         LabeledPrice,
         MessageEntity,
-        InlineQueryResult,
     )
 
 RT = TypeVar('RT')
@@ -552,7 +546,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        self._bot_user = User.de_json(result, self)  # type: ignore[return-value, arg-type]
+        self._bot_user = User.de_json(result, self)  # type: ignore[arg-type]
         return self._bot_user  # type: ignore[return-value]
 
     @_log
@@ -2641,7 +2635,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries
         from the json data.
         """
-        # pylint: disable=protected-access
         if hasattr(res, 'parse_mode'):
             res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, 'input_message_content') and res.input_message_content:
@@ -2832,7 +2825,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs=api_kwargs,
         )
 
-        return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value, arg-type]
+        return UserProfilePhotos.de_json(result, self)  # type: ignore[arg-type]
 
     @_log
     async def get_file(

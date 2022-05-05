@@ -17,8 +17,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains classes that handle the networking backend of ``python-telegram-bot``."""
 
-from ._requestdata import RequestData
 from ._baserequest import BaseRequest
 from ._httpxrequest import HTTPXRequest
+from ._requestdata import RequestData
 
 __all__ = ('BaseRequest', 'HTTPXRequest', 'RequestData')

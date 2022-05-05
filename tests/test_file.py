@@ -88,17 +88,14 @@ class TestFile:
         assert file_dict['file_size'] == file.file_size
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
             await bot.get_file(file_id='')
 
-    @pytest.mark.asyncio
     async def test_download_mutually_exclusive(self, file):
         with pytest.raises(ValueError, match='`custom_path` and `out` are mutually exclusive'):
             await file.download('custom_path', 'out')
 
-    @pytest.mark.asyncio
     async def test_download(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return self.file_content
@@ -111,14 +108,12 @@ class TestFile:
         finally:
             out_file.unlink()
 
-    @pytest.mark.asyncio
     async def test_download_local_file(self, local_file):
         assert await local_file.download() == Path(local_file.file_path)
 
     @pytest.mark.parametrize(
         'custom_path_type', [str, Path], ids=['str custom_path', 'pathlib.Path custom_path']
     )
-    @pytest.mark.asyncio
     async def test_download_custom_path(self, monkeypatch, file, custom_path_type):
         async def test(*args, **kwargs):
             return self.file_content
@@ -137,7 +132,6 @@ class TestFile:
     @pytest.mark.parametrize(
         'custom_path_type', [str, Path], ids=['str custom_path', 'pathlib.Path custom_path']
     )
-    @pytest.mark.asyncio
     async def test_download_custom_path_local_file(self, local_file, custom_path_type):
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
@@ -149,7 +143,6 @@ class TestFile:
             os.close(file_handle)
             custom_path.unlink()
 
-    @pytest.mark.asyncio
     async def test_download_no_filename(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return self.file_content
@@ -165,7 +158,6 @@ class TestFile:
         finally:
             out_file.unlink()
 
-    @pytest.mark.asyncio
     async def test_download_file_obj(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return self.file_content
@@ -178,7 +170,6 @@ class TestFile:
             out_fobj.seek(0)
             assert out_fobj.read() == self.file_content
 
-    @pytest.mark.asyncio
     async def test_download_file_obj_local_file(self, local_file):
         with TemporaryFile() as custom_fobj:
             out_fobj = await local_file.download(out=custom_fobj)
@@ -187,7 +178,6 @@ class TestFile:
             out_fobj.seek(0)
             assert out_fobj.read() == self.file_content
 
-    @pytest.mark.asyncio
     async def test_download_bytearray(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return self.file_content
@@ -205,7 +195,6 @@ class TestFile:
         assert buf2[len(buf) :] == buf
         assert buf2[: len(buf)] == buf
 
-    @pytest.mark.asyncio
     async def test_download_bytearray_local_file(self, local_file):
         # Check that a download to a newly allocated bytearray works.
         buf = await local_file.download_as_bytearray()

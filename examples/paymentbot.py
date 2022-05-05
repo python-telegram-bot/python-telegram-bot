@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """Basic example for a bot that can receive payment from user."""
@@ -8,15 +8,14 @@ import logging
 
 from telegram import LabeledPrice, ShippingOption, Update
 from telegram.ext import (
-    CommandHandler,
-    MessageHandler,
-    filters,
-    PreCheckoutQueryHandler,
-    ShippingQueryHandler,
     Application,
     CallbackContext,
+    CommandHandler,
+    MessageHandler,
+    PreCheckoutQueryHandler,
+    ShippingQueryHandler,
+    filters,
 )
-
 
 # Enable logging
 logging.basicConfig(

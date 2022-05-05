@@ -23,27 +23,18 @@ import ssl
 from contextlib import AbstractAsyncContextManager
 from pathlib import Path
 from types import TracebackType
-from typing import (
-    Callable,
-    List,
-    Optional,
-    Union,
-    TypeVar,
-    TYPE_CHECKING,
-    Coroutine,
-    Type,
-)
+from typing import TYPE_CHECKING, Callable, Coroutine, List, Optional, Type, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
-from telegram.error import InvalidToken, RetryAfter, TimedOut, TelegramError
+from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 from telegram.ext._utils.webhookhandler import WebhookAppClass, WebhookServer
 
 if TYPE_CHECKING:
     from telegram import Bot
 
 
-_UpdaterType = TypeVar('_UpdaterType', bound="Updater")
+_UpdaterType = TypeVar('_UpdaterType', bound="Updater")  # pylint: disable=invalid-name
 
 
 class Updater(AbstractAsyncContextManager):

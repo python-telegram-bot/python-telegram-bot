@@ -17,14 +17,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import datetime as dtm
+
 import pytest
 
 from telegram import (
-    VideoChatStarted,
+    User,
     VideoChatEnded,
     VideoChatParticipantsInvited,
-    User,
     VideoChatScheduled,
+    VideoChatStarted,
 )
 from telegram._utils.datetime import to_timestamp
 
@@ -147,7 +148,7 @@ class TestVideoChatParticipantsInvited:
 
 
 class TestVideoChatScheduled:
-    start_date = dtm.datetime.utcnow()
+    start_date = dtm.datetime.now(dtm.timezone.utc)
 
     def test_slot_behaviour(self, mro_slots):
         inst = VideoChatScheduled(self.start_date)
@@ -156,7 +157,7 @@ class TestVideoChatScheduled:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self):
-        assert pytest.approx(VideoChatScheduled(start_date=self.start_date) == self.start_date)
+        assert VideoChatScheduled(self.start_date).start_date == self.start_date
 
     def test_de_json(self, bot):
         assert VideoChatScheduled.de_json({}, bot=bot) is None
@@ -164,7 +165,7 @@ class TestVideoChatScheduled:
         json_dict = {'start_date': to_timestamp(self.start_date)}
         video_chat_scheduled = VideoChatScheduled.de_json(json_dict, bot)
 
-        assert pytest.approx(video_chat_scheduled.start_date == self.start_date)
+        assert abs(video_chat_scheduled.start_date - self.start_date) < dtm.timedelta(seconds=1)
 
     def test_to_dict(self):
         video_chat_scheduled = VideoChatScheduled(self.start_date)

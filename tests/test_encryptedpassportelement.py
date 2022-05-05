@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import EncryptedPassportElement, PassportFile, PassportElementError
+from telegram import EncryptedPassportElement, PassportElementError, PassportFile
 
 
 @pytest.fixture(scope='class')

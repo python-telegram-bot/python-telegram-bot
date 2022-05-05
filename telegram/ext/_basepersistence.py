@@ -18,18 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
 from abc import ABC, abstractmethod
-from typing import (
-    Dict,
-    Optional,
-    Generic,
-    NamedTuple,
-    NoReturn,
-)
+from typing import Dict, Generic, NamedTuple, NoReturn, Optional
 
-from telegram import Bot
-from telegram.ext import ExtBot
-
-from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData, ConversationKey
+from telegram._bot import Bot
+from telegram.ext._extbot import ExtBot
+from telegram.ext._utils.types import BD, CD, UD, CDCData, ConversationDict, ConversationKey
 
 
 class PersistenceInput(NamedTuple):  # skipcq: PYL-E0239

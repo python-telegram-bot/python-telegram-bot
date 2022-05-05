@@ -16,11 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from datetime import datetime
-import pytest
 import time
+from datetime import datetime
 
-from telegram import WebhookInfo, LoginUrl
+import pytest
+
+from telegram import LoginUrl, WebhookInfo
 from telegram._utils.datetime import from_timestamp
 
 

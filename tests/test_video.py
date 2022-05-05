@@ -22,14 +22,14 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Video, Voice, PhotoSize, MessageEntity, Bot
+from telegram import Bot, MessageEntity, PhotoSize, Video, Voice
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
 from tests.conftest import (
+    check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    check_defaults_handling,
     data_file,
 )
 
@@ -42,7 +42,6 @@ def video_file():
 
 
 @pytest.fixture(scope='class')
-@pytest.mark.asyncio
 async def video(bot, chat_id):
     with data_file('telegram.mp4').open('rb') as f:
         return (await bot.send_video(chat_id, video=f, read_timeout=50)).video
@@ -94,7 +93,6 @@ class TestVideo:
         assert video.mime_type == self.mime_type
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_all_args(self, bot, chat_id, video_file, video, thumb_file):
         message = await bot.send_video(
             chat_id,
@@ -130,7 +128,6 @@ class TestVideo:
         assert message.has_protected_content
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_video_custom_filename(self, bot, chat_id, video_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return list(request_data.multipart_data.values())[0][0] == 'custom_filename'
@@ -140,7 +137,6 @@ class TestVideo:
         assert await bot.send_video(chat_id, video_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_get_and_download(self, bot, video):
         path = Path('telegram.mp4')
         if path.is_file():
@@ -158,7 +154,6 @@ class TestVideo:
         assert path.is_file()
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_mp4_file_url(self, bot, chat_id, video):
         message = await bot.send_video(chat_id, self.video_file_url, caption=self.caption)
 
@@ -184,7 +179,6 @@ class TestVideo:
         assert message.caption == self.caption
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_video_caption_entities(self, bot, chat_id, video):
         test_string = 'Italic Bold Code'
         entities = [
@@ -200,13 +194,11 @@ class TestVideo:
         assert message.caption_entities == entities
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_resend(self, bot, chat_id, video):
         message = await bot.send_video(chat_id, video.file_id)
 
         assert message.video == video
 
-    @pytest.mark.asyncio
     async def test_send_with_video(self, monkeypatch, bot, chat_id, video):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters['video'] == video.file_id
@@ -217,7 +209,6 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    @pytest.mark.asyncio
     async def test_send_video_default_parse_mode_1(self, default_bot, chat_id, video):
         test_string = 'Italic Bold Code'
         test_markdown_string = '_Italic_ *Bold* `Code`'
@@ -228,7 +219,6 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    @pytest.mark.asyncio
     async def test_send_video_default_parse_mode_2(self, default_bot, chat_id, video):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
@@ -240,7 +230,6 @@ class TestVideo:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    @pytest.mark.asyncio
     async def test_send_video_default_parse_mode_3(self, default_bot, chat_id, video):
         test_markdown_string = '_Italic_ *Bold* `Code`'
 
@@ -251,7 +240,6 @@ class TestVideo:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
     async def test_send_video_default_protect_content(self, chat_id, default_bot, video):
         protected = await default_bot.send_video(chat_id, video)
@@ -259,7 +247,6 @@ class TestVideo:
         unprotected = await default_bot.send_video(chat_id, video, protect_content=False)
         assert not unprotected.has_protected_content
 
-    @pytest.mark.asyncio
     async def test_send_video_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -284,7 +271,6 @@ class TestVideo:
         ],
         indirect=['default_bot'],
     )
-    @pytest.mark.asyncio
     async def test_send_video_default_allow_sending_without_reply(
         self, default_bot, chat_id, video, custom
     ):
@@ -345,23 +331,19 @@ class TestVideo:
         assert video_dict['file_name'] == video.file_name
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_video(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_video(chat_id, '')
 
-    @pytest.mark.asyncio
     async def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             await bot.send_video(chat_id=chat_id)
 
-    @pytest.mark.asyncio
     async def test_get_file_instance_method(self, monkeypatch, video):
         async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == video.file_id

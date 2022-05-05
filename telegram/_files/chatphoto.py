@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ChatPhoto."""
 from typing import TYPE_CHECKING, Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 

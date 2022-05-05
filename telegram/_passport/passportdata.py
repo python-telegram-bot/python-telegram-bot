@@ -20,7 +20,9 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
+from telegram._passport.credentials import EncryptedCredentials
+from telegram._passport.encryptedpassportelement import EncryptedPassportElement
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:

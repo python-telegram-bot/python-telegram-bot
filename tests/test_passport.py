@@ -21,16 +21,15 @@ from copy import deepcopy
 import pytest
 
 from telegram import (
-    PassportData,
-    PassportFile,
     Bot,
-    File,
-    PassportElementErrorSelfie,
-    PassportElementErrorDataField,
     Credentials,
+    File,
+    PassportData,
+    PassportElementErrorDataField,
+    PassportElementErrorSelfie,
+    PassportFile,
 )
 from telegram.error import PassportDecryptionError
-
 
 # Note: All classes in telegram.credentials (except EncryptedCredentials) aren't directly tested
 # here, although they are implicitly tested. Testing for those classes was too much work and not
@@ -427,7 +426,6 @@ class TestPassport:
         with pytest.raises(ValueError):
             Bot(bot.token, private_key=b'Invalid key!')
 
-    @pytest.mark.asyncio
     async def test_passport_data_okay_with_non_crypto_bot(self, bot):
         async with Bot(bot.token) as b:
             assert PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
@@ -439,7 +437,6 @@ class TestPassport:
         with pytest.raises(PassportDecryptionError):
             assert passport_data.decrypted_data
 
-    @pytest.mark.asyncio
     async def test_wrong_key(self, bot):
         short_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIBOQIBAAJBAKU+OZ2jJm7sCA/ec4gngNZhXYPu+DZ/TAwSMl0W7vAPXAsLplBk\r\nO8l6IBHx8N0ZC4Bc65mO3b2G8YAzqndyqH8CAwEAAQJAWOx3jQFzeVXDsOaBPdAk\r\nYTncXVeIc6tlfUl9mOLyinSbRNCy1XicOiOZFgH1rRKOGIC1235QmqxFvdecySoY\r\nwQIhAOFeGgeX9CrEPuSsd9+kqUcA2avCwqdQgSdy2qggRFyJAiEAu7QHT8JQSkHU\r\nDELfzrzc24AhjyG0z1DpGZArM8COascCIDK42SboXj3Z2UXiQ0CEcMzYNiVgOisq\r\nBUd5pBi+2mPxAiAM5Z7G/Sv1HjbKrOGh29o0/sXPhtpckEuj5QMC6E0gywIgFY6S\r\nNjwrAA+cMmsgY0O2fAzEKkDc5YiFsiXaGaSS4eA=\r\n-----END RSA PRIVATE KEY-----"
         async with Bot(bot.token, private_key=short_key) as b:
@@ -453,7 +450,6 @@ class TestPassport:
             with pytest.raises(PassportDecryptionError):
                 assert passport_data.decrypted_data
 
-    @pytest.mark.asyncio
     async def test_mocked_download_passport_file(self, passport_data, monkeypatch):
         # The files are not coming from our test bot, therefore the file id is invalid/wrong
         # when coming from this bot, so we monkeypatch the call, to make sure that Bot.get_file
@@ -472,7 +468,6 @@ class TestPassport:
         assert file._credentials.file_hash == self.driver_license_selfie_credentials_file_hash
         assert file._credentials.secret == self.driver_license_selfie_credentials_secret
 
-    @pytest.mark.asyncio
     async def test_mocked_set_passport_data_errors(self, monkeypatch, bot, chat_id, passport_data):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.parameters

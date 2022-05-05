@@ -24,7 +24,7 @@ Warning:
     the changelog.
 """
 from enum import Enum
-from typing import TypeVar, Union, Type
+from typing import Type, TypeVar, Union
 
 _A = TypeVar('_A')
 _B = TypeVar('_B')

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """Simple inline keyboard bot with multiple CallbackQueryHandlers.
@@ -15,15 +15,15 @@ Send /start to initiate the conversation.
 Press Ctrl-C on the command line to stop the bot.
 """
 import logging
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    CommandHandler,
-    CallbackQueryHandler,
-    ConversationHandler,
     Application,
     CallbackContext,
+    CallbackQueryHandler,
+    CommandHandler,
+    ConversationHandler,
 )
-
 
 # Enable logging
 logging.basicConfig(

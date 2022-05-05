@@ -21,9 +21,9 @@ import pytest
 from flaky import flaky
 
 from telegram import (
+    ForceReply,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    ForceReply,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
 )
@@ -49,7 +49,6 @@ class TestInlineKeyboardMarkup:
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_message_with_inline_keyboard_markup(
         self, bot, chat_id, inline_keyboard_markup
     ):
@@ -98,7 +97,6 @@ class TestInlineKeyboardMarkup:
         with pytest.raises(ValueError):
             InlineKeyboardMarkup(InlineKeyboardButton('b1', '1'))
 
-    @pytest.mark.asyncio
     async def test_expected_values_empty_switch(self, inline_keyboard_markup, bot, monkeypatch):
         async def make_assertion(
             url,

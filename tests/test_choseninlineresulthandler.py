@@ -21,18 +21,18 @@ import asyncio
 import pytest
 
 from telegram import (
-    Update,
-    Chat,
     Bot,
-    ChosenInlineResult,
-    User,
-    Message,
     CallbackQuery,
+    Chat,
+    ChosenInlineResult,
     InlineQuery,
-    ShippingQuery,
+    Message,
     PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import ChosenInlineResultHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, ChosenInlineResultHandler, JobQueue
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
@@ -127,7 +127,6 @@ class TestChosenInlineResultHandler:
         handler = ChosenInlineResultHandler(self.callback_basic)
         assert not handler.check_update(false_update)
 
-    @pytest.mark.asyncio
     async def test_context(self, app, chosen_inline_result):
         handler = ChosenInlineResultHandler(self.callback)
         app.add_handler(handler)
@@ -145,7 +144,6 @@ class TestChosenInlineResultHandler:
         assert not handler.check_update(chosen_inline_result)
         chosen_inline_result.chosen_inline_result.result_id = 'result_id'
 
-    @pytest.mark.asyncio
     async def test_context_pattern(self, app, chosen_inline_result):
         handler = ChosenInlineResultHandler(
             self.callback_pattern, pattern=r'(?P<begin>.*)ult(?P<end>.*)'

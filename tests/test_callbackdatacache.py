@@ -24,12 +24,8 @@ from uuid import uuid4
 import pytest
 import pytz
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message, User, Chat
-from telegram.ext._callbackdatacache import (
-    CallbackDataCache,
-    _KeyboardData,
-    InvalidCallbackData,
-)
+from telegram import CallbackQuery, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Message, User
+from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
 
 
 @pytest.fixture(scope='function')

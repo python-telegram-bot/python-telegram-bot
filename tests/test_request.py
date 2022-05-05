@@ -23,7 +23,7 @@ import json
 from collections import defaultdict
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Tuple, Any, Coroutine, Callable
+from typing import Any, Callable, Coroutine, Tuple
 
 import httpx
 import pytest
@@ -31,27 +31,27 @@ from flaky import flaky
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import (
-    TelegramError,
+    BadRequest,
     ChatMigrated,
-    RetryAfter,
-    NetworkError,
+    Conflict,
     Forbidden,
     InvalidToken,
-    BadRequest,
-    Conflict,
+    NetworkError,
+    RetryAfter,
+    TelegramError,
     TimedOut,
 )
 from telegram.request._httpxrequest import HTTPXRequest
 
 # We only need the first fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
-    mixed_rqs,
-    mixed_params,
     file_params,
-    inputfiles,
-    simple_params,
-    input_media_video,
     input_media_photo,
+    input_media_video,
+    inputfiles,
+    mixed_params,
+    mixed_rqs,
+    simple_params,
 )
 
 
@@ -65,7 +65,6 @@ def mocker_factory(
 
 
 @pytest.fixture(scope='function')
-@pytest.mark.asyncio
 async def httpx_request():
     async with HTTPXRequest() as rq:
         yield rq
@@ -86,7 +85,6 @@ class TestRequest:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    @pytest.mark.asyncio
     async def test_context_manager(self, monkeypatch):
         async def initialize():
             self.test_flag = ['initialize']
@@ -104,7 +102,6 @@ class TestRequest:
 
         assert self.test_flag == ['initialize', 'stop']
 
-    @pytest.mark.asyncio
     async def test_context_manager_exception_on_init(self, monkeypatch):
         async def initialize():
             raise RuntimeError('initialize')
@@ -123,7 +120,6 @@ class TestRequest:
 
         assert self.test_flag == 'stop'
 
-    @pytest.mark.asyncio
     async def test_replaced_unprintable_char(self, monkeypatch, httpx_request):
         """Clients can send arbitrary bytes in callback data. Make sure that we just replace
         those
@@ -134,7 +130,6 @@ class TestRequest:
 
         assert await httpx_request.post(None, None, None) == 'test_string�'
 
-    @pytest.mark.asyncio
     async def test_illegal_json_response(self, monkeypatch, httpx_request: HTTPXRequest):
         # for proper JSON it should be `"result":` instead of `result:`
         server_response = b'{result: "test_string"}'
@@ -144,7 +139,6 @@ class TestRequest:
         with pytest.raises(TelegramError, match='Invalid server response'):
             await httpx_request.post(None, None, None)
 
-    @pytest.mark.asyncio
     async def test_chat_migrated(self, monkeypatch, httpx_request: HTTPXRequest):
         server_response = b'{"ok": "False", "parameters": {"migrate_to_chat_id": "123"}}'
 
@@ -159,7 +153,6 @@ class TestRequest:
 
         assert exc_info.value.new_chat_id == 123
 
-    @pytest.mark.asyncio
     async def test_retry_after(self, monkeypatch, httpx_request: HTTPXRequest):
         server_response = b'{"ok": "False", "parameters": {"retry_after": "42"}}'
 
@@ -174,7 +167,6 @@ class TestRequest:
 
         assert exc_info.value.retry_after == 42.0
 
-    @pytest.mark.asyncio
     async def test_unknown_request_params(self, monkeypatch, httpx_request: HTTPXRequest):
         server_response = b'{"ok": "False", "parameters": {"unknown": "42"}}'
 
@@ -190,7 +182,6 @@ class TestRequest:
         ):
             await httpx_request.post(None, None, None)
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('description', [True, False])
     async def test_error_description(self, monkeypatch, httpx_request: HTTPXRequest, description):
         response_data = {"ok": "False"}
@@ -222,7 +213,6 @@ class TestRequest:
             with pytest.raises(NetworkError, match='Bad Gateway'):
                 await httpx_request.post(None, None, None)
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         'code, exception_class',
         [
@@ -249,7 +239,6 @@ class TestRequest:
         with pytest.raises(exception_class, match='Test Message'):
             await httpx_request.post(None, None, None)
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         ['exception', 'catch_class', 'match'],
         [
@@ -276,7 +265,6 @@ class TestRequest:
         with pytest.raises(catch_class, match=match):
             await httpx_request.post(None, None, None)
 
-    @pytest.mark.asyncio
     async def test_retrieve(self, monkeypatch, httpx_request):
         """Here we just test that retrieve gives us the raw bytes instead of trying to parse them
         as json
@@ -287,7 +275,6 @@ class TestRequest:
 
         assert await httpx_request.retrieve(None, None) == server_response
 
-    @pytest.mark.asyncio
     async def test_timeout_propagation(self, monkeypatch, httpx_request):
         async def make_assertion(*args, **kwargs):
             self.test_flag = (
@@ -346,7 +333,6 @@ class TestHTTPXRequest:
         )
         assert request._client.timeout == httpx.Timeout(connect=43, read=44, write=45, pool=46)
 
-    @pytest.mark.asyncio
     async def test_multiple_inits_and_shutdowns(self, monkeypatch):
         self.test_flag = defaultdict(int)
 
@@ -377,7 +363,6 @@ class TestHTTPXRequest:
         assert self.test_flag['init'] == 1
         assert self.test_flag['shutdown'] == 1
 
-    @pytest.mark.asyncio
     async def test_multiple_init_cycles(self):
         # nothing really to assert - this should just not fail
         httpx_request = HTTPXRequest()
@@ -386,13 +371,11 @@ class TestHTTPXRequest:
         async with httpx_request:
             await httpx_request.do_request(url='https://python-telegram-bot.org', method='GET')
 
-    @pytest.mark.asyncio
     async def test_do_request_after_shutdown(self, httpx_request):
         await httpx_request.shutdown()
         with pytest.raises(RuntimeError, match='not initialized'):
             await httpx_request.do_request(url='url', method='GET')
 
-    @pytest.mark.asyncio
     async def test_context_manager(self, monkeypatch):
         async def initialize():
             self.test_flag = ['initialize']
@@ -410,7 +393,6 @@ class TestHTTPXRequest:
 
         assert self.test_flag == ['initialize', 'stop']
 
-    @pytest.mark.asyncio
     async def test_context_manager_exception_on_init(self, monkeypatch):
         async def initialize():
             raise RuntimeError('initialize')
@@ -429,7 +411,6 @@ class TestHTTPXRequest:
 
         assert self.test_flag == 'stop'
 
-    @pytest.mark.asyncio
     async def test_do_request_default_timeouts(self, monkeypatch):
         default_timeouts = httpx.Timeout(connect=42, read=43, write=44, pool=45)
 
@@ -449,7 +430,6 @@ class TestHTTPXRequest:
 
         assert self.test_flag
 
-    @pytest.mark.asyncio
     async def test_do_request_manual_timeouts(self, monkeypatch, httpx_request):
         default_timeouts = httpx.Timeout(connect=42, read=43, write=44, pool=45)
         manual_timeouts = httpx.Timeout(connect=52, read=53, write=54, pool=55)
@@ -477,7 +457,6 @@ class TestHTTPXRequest:
 
         assert self.test_flag
 
-    @pytest.mark.asyncio
     async def test_do_request_params_no_data(self, monkeypatch, httpx_request):
         async def make_assertion(self, **kwargs):
             method_assertion = kwargs.get('method') == 'method'
@@ -492,7 +471,6 @@ class TestHTTPXRequest:
         code, _ = await httpx_request.do_request(method='method', url='url')
         assert code == HTTPStatus.OK
 
-    @pytest.mark.asyncio
     async def test_do_request_params_with_data(
         self, monkeypatch, httpx_request, mixed_rqs  # noqa: 9811
     ):
@@ -513,7 +491,6 @@ class TestHTTPXRequest:
         )
         assert code == HTTPStatus.OK
 
-    @pytest.mark.asyncio
     async def test_do_request_return_value(self, monkeypatch, httpx_request):
         async def make_assertion(self, method, url, headers, timeout, files, data):
             return httpx.Response(123, content=b'content')
@@ -526,7 +503,6 @@ class TestHTTPXRequest:
         assert code == 123
         assert content == b'content'
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         ['raised_class', 'expected_class'],
         [(httpx.TimeoutException, TimedOut), (httpx.HTTPError, NetworkError)],
@@ -545,7 +521,6 @@ class TestHTTPXRequest:
                 'url',
             )
 
-    @pytest.mark.asyncio
     async def test_do_request_pool_timeout(self, monkeypatch):
         async def request(_, **kwargs):
             if self.test_flag is None:
@@ -564,7 +539,6 @@ class TestHTTPXRequest:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_do_request_wait_for_pool(self, monkeypatch, httpx_request):
         """The pool logic is buried rather deeply in httpxcore, so we make actual requests here
         instead of mocking"""
@@ -583,3 +557,8 @@ class TestHTTPXRequest:
         done, pending = await asyncio.wait({task_1, task_2}, return_when=asyncio.ALL_COMPLETED)
         assert len(done) == 2
         assert len(pending) == 0
+        try:  # retrieve exceptions from tasks
+            task_1.exception()
+            task_2.exception()
+        except (asyncio.CancelledError, asyncio.InvalidStateError):
+            pass

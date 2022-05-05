@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-
 try:
     import ujson as json
 except ImportError:
@@ -95,14 +94,12 @@ class TestDictPersistence:
     """Just tests the DictPersistence interface. Integration of persistence into Applictation
     is tested in TestBasePersistence!"""
 
-    @pytest.mark.asyncio
     async def test_slot_behaviour(self, mro_slots, recwarn):
         inst = DictPersistence()
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    @pytest.mark.asyncio
     async def test_no_json_given(self):
         dict_persistence = DictPersistence()
         assert await dict_persistence.get_user_data() == {}
@@ -111,7 +108,6 @@ class TestDictPersistence:
         assert await dict_persistence.get_callback_data() is None
         assert await dict_persistence.get_conversations('noname') == {}
 
-    @pytest.mark.asyncio
     async def test_bad_json_string_given(self):
         bad_user_data = 'thisisnojson99900()))('
         bad_chat_data = 'thisisnojson99900()))('
@@ -129,7 +125,6 @@ class TestDictPersistence:
         with pytest.raises(TypeError, match='conversations'):
             DictPersistence(conversations_json=bad_conversations)
 
-    @pytest.mark.asyncio
     async def test_invalid_json_string_given(self):
         bad_user_data = '["this", "is", "json"]'
         bad_chat_data = '["this", "is", "json"]'
@@ -158,7 +153,6 @@ class TestDictPersistence:
         with pytest.raises(TypeError, match='conversations'):
             DictPersistence(conversations_json=bad_conversations)
 
-    @pytest.mark.asyncio
     async def test_good_json_input(
         self, user_data_json, chat_data_json, bot_data_json, conversations_json, callback_data_json
     ):
@@ -204,13 +198,11 @@ class TestDictPersistence:
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
-    @pytest.mark.asyncio
     async def test_good_json_input_callback_data_none(self):
         dict_persistence = DictPersistence(callback_data_json='null')
         assert dict_persistence.callback_data is None
         assert dict_persistence.callback_data_json == 'null'
 
-    @pytest.mark.asyncio
     async def test_dict_outputs(
         self,
         user_data,
@@ -236,7 +228,6 @@ class TestDictPersistence:
         assert dict_persistence.bot_data == bot_data
         assert dict_persistence.conversations == conversations
 
-    @pytest.mark.asyncio
     async def test_json_outputs(
         self, user_data_json, chat_data_json, bot_data_json, callback_data_json, conversations_json
     ):
@@ -252,7 +243,6 @@ class TestDictPersistence:
         assert dict_persistence.callback_data_json == callback_data_json
         assert dict_persistence.conversations_json == conversations_json
 
-    @pytest.mark.asyncio
     async def test_updating(
         self,
         user_data_json,
@@ -335,7 +325,6 @@ class TestDictPersistence:
             == DictPersistence._encode_conversations_to_json({"name1": {(123, 123): 5}})
         )
 
-    @pytest.mark.asyncio
     async def test_no_data_on_init(
         self, bot_data, user_data, chat_data, conversations, callback_data
     ):
@@ -364,7 +353,6 @@ class TestDictPersistence:
         assert dict_persistence.conversations['name'] == {(1, 1): 'new_state'}
         assert dict_persistence.callback_data == callback_data
 
-    @pytest.mark.asyncio
     async def test_no_json_dumping_if_data_did_not_change(
         self, bot_data, user_data, chat_data, conversations, callback_data, monkeypatch
     ):

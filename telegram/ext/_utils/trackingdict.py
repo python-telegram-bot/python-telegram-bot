@@ -25,17 +25,8 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from typing import (
-    TypeVar,
-    Set,
-    ClassVar,
-    Union,
-    Tuple,
-    List,
-    Mapping,
-    Generic,
-)
 from collections import UserDict
+from typing import ClassVar, Generic, List, Mapping, Set, Tuple, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 

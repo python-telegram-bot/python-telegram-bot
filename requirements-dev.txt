@@ -3,17 +3,16 @@ cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3
 
 pre-commit
 # Make sure that the versions specified here match the pre-commit settings!
-black==21.9b0
-# hardpinned dependency for black
-click==8.0.2
+black==22.3.0
 flake8==4.0.1
-pylint==2.12.1
-mypy==0.910
-pyupgrade==2.29.0
+pylint==2.13.8
+mypy==0.950
+pyupgrade==2.32.0
+isort==5.10.1
 
-pytest==6.2.5
-pytest-asyncio==0.16.0
+pytest==7.1.2
+pytest-asyncio==0.18.3
 
-flaky
-beautifulsoup4
-wheel
+flaky  # Used for flaky tests (flaky decorator)
+beautifulsoup4  # used in test_official for parsing tg docs
+wheel  # required for building the wheels for releases

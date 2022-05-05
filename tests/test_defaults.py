@@ -17,11 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-import pytest
 import inspect
 
-from telegram.ext import Defaults
+import pytest
+
 from telegram import User
+from telegram.ext import Defaults
 
 
 class TestDefault:

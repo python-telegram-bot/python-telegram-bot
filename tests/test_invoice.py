@@ -19,7 +19,7 @@
 import pytest
 from flaky import flaky
 
-from telegram import LabeledPrice, Invoice
+from telegram import Invoice, LabeledPrice
 from telegram.error import BadRequest
 from telegram.request import RequestData
 
@@ -81,7 +81,6 @@ class TestInvoice:
         assert invoice_dict['total_amount'] == invoice.total_amount
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_required_args_only(self, bot, chat_id, provider_token):
         message = await bot.send_invoice(
             chat_id=chat_id,
@@ -100,7 +99,6 @@ class TestInvoice:
         assert message.invoice.total_amount == self.total_amount
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_all_args(self, bot, chat_id, provider_token, monkeypatch):
         message = await bot.send_invoice(
             chat_id,
@@ -195,7 +193,6 @@ class TestInvoice:
             protect_content=True,
         )
 
-    @pytest.mark.asyncio
     async def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             # depends on whether we're using ujson
@@ -228,7 +225,6 @@ class TestInvoice:
         ],
         indirect=['default_bot'],
     )
-    @pytest.mark.asyncio
     async def test_send_invoice_default_allow_sending_without_reply(
         self, default_bot, chat_id, custom, provider_token
     ):
@@ -273,7 +269,6 @@ class TestInvoice:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
     async def test_send_invoice_default_protect_content(
         self, chat_id, default_bot, provider_token

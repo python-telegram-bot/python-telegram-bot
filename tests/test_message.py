@@ -21,41 +21,41 @@ from datetime import datetime
 import pytest
 
 from telegram import (
-    Update,
-    Message,
-    User,
-    MessageEntity,
-    Chat,
-    Audio,
-    Document,
     Animation,
-    Game,
-    PhotoSize,
-    Sticker,
-    Video,
-    Voice,
-    VideoNote,
+    Audio,
+    Bot,
+    Chat,
     Contact,
-    Location,
-    Venue,
+    Dice,
+    Document,
+    Game,
     Invoice,
-    SuccessfulPayment,
+    Location,
+    Message,
+    MessageAutoDeleteTimerChanged,
+    MessageEntity,
     PassportData,
+    PhotoSize,
     Poll,
     PollOption,
     ProximityAlertTriggered,
-    Dice,
-    Bot,
-    VideoChatStarted,
+    Sticker,
+    SuccessfulPayment,
+    Update,
+    User,
+    Venue,
+    Video,
     VideoChatEnded,
     VideoChatParticipantsInvited,
-    MessageAutoDeleteTimerChanged,
     VideoChatScheduled,
+    VideoChatStarted,
+    VideoNote,
+    Voice,
     WebAppData,
 )
-from telegram.constants import ParseMode, ChatAction
+from telegram.constants import ChatAction, ParseMode
 from telegram.ext import Defaults
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 from tests.test_passport import RAW_PASSPORT_DATA
 
 
@@ -338,7 +338,6 @@ class TestMessage:
             assert getattr(message, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
 
-    @pytest.mark.asyncio
     async def test_parse_entity(self):
         text = (
             b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
@@ -351,7 +350,6 @@ class TestMessage:
         with pytest.raises(RuntimeError, match='Message has no'):
             Message(message_id=1, date=self.date, chat=self.chat).parse_entity(entity)
 
-    @pytest.mark.asyncio
     async def test_parse_caption_entity(self):
         caption = (
             b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
@@ -366,7 +364,6 @@ class TestMessage:
         with pytest.raises(RuntimeError, match='Message has no'):
             Message(message_id=1, date=self.date, chat=self.chat).parse_entity(entity)
 
-    @pytest.mark.asyncio
     async def test_parse_entities(self):
         text = (
             b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
@@ -380,7 +377,6 @@ class TestMessage:
         assert message.parse_entities(MessageEntity.URL) == {entity: 'http://google.com'}
         assert message.parse_entities() == {entity: 'http://google.com', entity_2: 'h'}
 
-    @pytest.mark.asyncio
     async def test_parse_caption_entities(self):
         text = (
             b'\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467'
@@ -633,7 +629,6 @@ class TestMessage:
         )
         assert expected == message.caption_markdown
 
-    @pytest.mark.asyncio
     async def test_parse_entities_url_emoji(self):
         url = b'http://github.com/?unicode=\\u2713\\U0001f469'.decode('unicode-escape')
         text = 'some url'
@@ -711,7 +706,6 @@ class TestMessage:
                 )
                 assert not condition, 'effective_attachment was None even though it should not be'
 
-    @pytest.mark.asyncio
     async def test_reply_text(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -733,7 +727,6 @@ class TestMessage:
         assert await message.reply_text('test', quote=True)
         assert await message.reply_text('test', reply_to_message_id=message.message_id, quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_markdown(self, monkeypatch, message):
         test_md_string = (
             r'Test for <*bold*, _ita_\__lic_, `code`, '
@@ -768,7 +761,6 @@ class TestMessage:
             self.test_message.text_markdown, reply_to_message_id=message.message_id, quote=True
         )
 
-    @pytest.mark.asyncio
     async def test_reply_markdown_v2(self, monkeypatch, message):
         test_md_string = (
             r'__Test__ for <*bold*, _ita\_lic_, `\\\`code`, '
@@ -806,7 +798,6 @@ class TestMessage:
             quote=True,
         )
 
-    @pytest.mark.asyncio
     async def test_reply_html(self, monkeypatch, message):
         test_html_string = (
             '<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, '
@@ -845,7 +836,6 @@ class TestMessage:
             self.test_message_v2.text_html, reply_to_message_id=message.message_id, quote=True
         )
 
-    @pytest.mark.asyncio
     async def test_reply_media_group(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -868,7 +858,6 @@ class TestMessage:
         assert await message.reply_media_group(media='reply_media_group')
         assert await message.reply_media_group(media='reply_media_group', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_photo(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -889,7 +878,6 @@ class TestMessage:
         assert await message.reply_photo(photo='test_photo')
         assert await message.reply_photo(photo='test_photo', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_audio(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -910,7 +898,6 @@ class TestMessage:
         assert await message.reply_audio(audio='test_audio')
         assert await message.reply_audio(audio='test_audio', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_document(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -933,7 +920,6 @@ class TestMessage:
         assert await message.reply_document(document='test_document')
         assert await message.reply_document(document='test_document', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_animation(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -956,7 +942,6 @@ class TestMessage:
         assert await message.reply_animation(animation='test_animation')
         assert await message.reply_animation(animation='test_animation', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_sticker(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -977,7 +962,6 @@ class TestMessage:
         assert await message.reply_sticker(sticker='test_sticker')
         assert await message.reply_sticker(sticker='test_sticker', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_video(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -998,7 +982,6 @@ class TestMessage:
         assert await message.reply_video(video='test_video')
         assert await message.reply_video(video='test_video', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_video_note(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -1021,7 +1004,6 @@ class TestMessage:
         assert await message.reply_video_note(video_note='test_video_note')
         assert await message.reply_video_note(video_note='test_video_note', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_voice(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -1042,7 +1024,6 @@ class TestMessage:
         assert await message.reply_voice(voice='test_voice')
         assert await message.reply_voice(voice='test_voice', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_location(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -1065,7 +1046,6 @@ class TestMessage:
         assert await message.reply_location(location='test_location')
         assert await message.reply_location(location='test_location', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_venue(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -1086,7 +1066,6 @@ class TestMessage:
         assert await message.reply_venue(venue='test_venue')
         assert await message.reply_venue(venue='test_venue', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_contact(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -1107,7 +1086,6 @@ class TestMessage:
         assert await message.reply_contact(contact='test_contact')
         assert await message.reply_contact(contact='test_contact', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_poll(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -1127,7 +1105,6 @@ class TestMessage:
         assert await message.reply_poll(question='test_poll', options=['1', '2', '3'])
         assert await message.reply_poll(question='test_poll', quote=True, options=['1', '2', '3'])
 
-    @pytest.mark.asyncio
     async def test_reply_dice(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -1146,7 +1123,6 @@ class TestMessage:
         assert await message.reply_dice(disable_notification=True)
         assert await message.reply_dice(disable_notification=True, quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_action(self, monkeypatch, message: Message):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == message.chat_id
@@ -1164,7 +1140,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'send_chat_action', make_assertion)
         assert await message.reply_chat_action(action=ChatAction.TYPING)
 
-    @pytest.mark.asyncio
     async def test_reply_game(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             return (
@@ -1179,7 +1154,6 @@ class TestMessage:
         assert await message.reply_game(game_short_name='test_game')
         assert await message.reply_game(game_short_name='test_game', quote=True)
 
-    @pytest.mark.asyncio
     async def test_reply_invoice(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             title = kwargs['title'] == 'title'
@@ -1217,7 +1191,6 @@ class TestMessage:
         )
 
     @pytest.mark.parametrize('disable_notification,protected', [(False, True), (True, False)])
-    @pytest.mark.asyncio
     async def test_forward(self, monkeypatch, message, disable_notification, protected):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == 123456
@@ -1240,7 +1213,6 @@ class TestMessage:
         assert not await message.forward(635241)
 
     @pytest.mark.parametrize('disable_notification,protected', [(True, False), (False, True)])
-    @pytest.mark.asyncio
     async def test_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 
@@ -1282,7 +1254,6 @@ class TestMessage:
         assert not await message.copy(635241)
 
     @pytest.mark.parametrize('disable_notification,protected', [(True, False), (False, True)])
-    @pytest.mark.asyncio
     async def test_reply_copy(self, monkeypatch, message, disable_notification, protected):
         keyboard = [[1, 2]]
 
@@ -1343,7 +1314,6 @@ class TestMessage:
             protect_content=protected,
         )
 
-    @pytest.mark.asyncio
     async def test_edit_text(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1369,7 +1339,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'edit_message_text', make_assertion)
         assert await message.edit_text(text='test')
 
-    @pytest.mark.asyncio
     async def test_edit_caption(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1395,7 +1364,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'edit_message_caption', make_assertion)
         assert await message.edit_caption(caption='new caption')
 
-    @pytest.mark.asyncio
     async def test_edit_media(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1421,7 +1389,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'edit_message_media', make_assertion)
         assert await message.edit_media('my_media')
 
-    @pytest.mark.asyncio
     async def test_edit_reply_markup(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1447,7 +1414,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'edit_message_reply_markup', make_assertion)
         assert await message.edit_reply_markup(reply_markup=[['1', '2']])
 
-    @pytest.mark.asyncio
     async def test_edit_live_location(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1474,7 +1440,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'edit_message_live_location', make_assertion)
         assert await message.edit_live_location(latitude=1, longitude=2)
 
-    @pytest.mark.asyncio
     async def test_stop_live_location(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1499,7 +1464,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'stop_message_live_location', make_assertion)
         assert await message.stop_live_location()
 
-    @pytest.mark.asyncio
     async def test_set_game_score(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1526,7 +1490,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'set_game_score', make_assertion)
         assert await message.set_game_score(user_id=1, score=2)
 
-    @pytest.mark.asyncio
     async def test_get_game_high_scores(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1552,7 +1515,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'get_game_high_scores', make_assertion)
         assert await message.get_game_high_scores(user_id=1)
 
-    @pytest.mark.asyncio
     async def test_delete(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1568,7 +1530,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'delete_message', make_assertion)
         assert await message.delete()
 
-    @pytest.mark.asyncio
     async def test_stop_poll(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1584,7 +1545,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'stop_poll', make_assertion)
         assert await message.stop_poll()
 
-    @pytest.mark.asyncio
     async def test_pin(self, monkeypatch, message):
         async def make_assertion(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id
@@ -1600,7 +1560,6 @@ class TestMessage:
         monkeypatch.setattr(message.get_bot(), 'pin_chat_message', make_assertion)
         assert await message.pin()
 
-    @pytest.mark.asyncio
     async def test_unpin(self, monkeypatch, message):
         async def make_assertion(*args, **kwargs):
             chat_id = kwargs['chat_id'] == message.chat_id

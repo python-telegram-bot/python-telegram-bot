@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 99
-target-version = ['py37']
+target-version = ['py37', 'py38', 'py39', 'py310']
 skip-string-normalization = true
 
 # We need to force-exclude the negated include pattern
@@ -8,3 +8,7 @@ skip-string-normalization = true
 # see https://github.com/psf/black/issues/1778
 force-exclude = '^(?!/(telegram|examples|tests)/).*\.py$'
 include = '(telegram|examples|tests)/.*\.py$'
+
+[tool.isort]  # black config
+profile = "black"
+line_length = 99

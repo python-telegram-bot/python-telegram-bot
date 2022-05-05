@@ -22,16 +22,16 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Sticker, PhotoSize, InputFile, MessageEntity, Bot
+from telegram import Bot, InputFile, MessageEntity, PhotoSize, Sticker
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
 from tests.conftest import (
-    expect_bad_request,
+    check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    check_defaults_handling,
     data_file,
+    expect_bad_request,
 )
 
 
@@ -43,7 +43,6 @@ def photo_file():
 
 
 @pytest.fixture(scope='class')
-@pytest.mark.asyncio
 async def _photo(bot, chat_id):
     async def func():
         with data_file('telegram.jpg').open('rb') as f:
@@ -102,7 +101,6 @@ class TestPhoto:
         assert thumb.file_size == 1477
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_photo_all_args(self, bot, chat_id, photo_file, thumb, photo):
         message = await bot.send_photo(
             chat_id,
@@ -129,7 +127,6 @@ class TestPhoto:
         assert message.has_protected_content
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_photo_custom_filename(self, bot, chat_id, photo_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return list(request_data.multipart_data.values())[0][0] == 'custom_filename'
@@ -139,7 +136,6 @@ class TestPhoto:
         assert await bot.send_photo(chat_id, photo_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_photo_parse_mode_markdown(self, bot, chat_id, photo_file, thumb, photo):
         message = await bot.send_photo(
             chat_id, photo_file, caption=self.caption, parse_mode='Markdown'
@@ -160,7 +156,6 @@ class TestPhoto:
         assert len(message.caption_entities) == 1
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_photo_parse_mode_html(self, bot, chat_id, photo_file, thumb, photo):
         message = await bot.send_photo(
             chat_id, photo_file, caption=self.caption, parse_mode='HTML'
@@ -181,7 +176,6 @@ class TestPhoto:
         assert len(message.caption_entities) == 1
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_photo_caption_entities(self, bot, chat_id, photo_file, thumb, photo):
         test_string = 'Italic Bold Code'
         entities = [
@@ -198,7 +192,6 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    @pytest.mark.asyncio
     async def test_send_photo_default_parse_mode_1(
         self, default_bot, chat_id, photo_file, thumb, photo
     ):
@@ -211,7 +204,6 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    @pytest.mark.asyncio
     async def test_send_photo_default_parse_mode_2(
         self, default_bot, chat_id, photo_file, thumb, photo
     ):
@@ -225,7 +217,6 @@ class TestPhoto:
 
     @flaky(3, 1)
     @pytest.mark.parametrize('default_bot', [{'parse_mode': 'Markdown'}], indirect=True)
-    @pytest.mark.asyncio
     async def test_send_photo_default_parse_mode_3(
         self, default_bot, chat_id, photo_file, thumb, photo
     ):
@@ -238,7 +229,6 @@ class TestPhoto:
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
     async def test_send_photo_default_protect_content(self, chat_id, default_bot, photo):
         protected = await default_bot.send_photo(chat_id, photo)
@@ -246,7 +236,6 @@ class TestPhoto:
         unprotected = await default_bot.send_photo(chat_id, photo, protect_content=False)
         assert not unprotected.has_protected_content
 
-    @pytest.mark.asyncio
     async def test_send_photo_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -271,7 +260,6 @@ class TestPhoto:
         ],
         indirect=['default_bot'],
     )
-    @pytest.mark.asyncio
     async def test_send_photo_default_allow_sending_without_reply(
         self, default_bot, chat_id, photo_file, thumb, photo, custom
     ):
@@ -297,7 +285,6 @@ class TestPhoto:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_get_and_download(self, bot, photo):
         path = Path('telegram.jpg')
         if path.is_file():
@@ -314,7 +301,6 @@ class TestPhoto:
         assert path.is_file()
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_url_jpg_file(self, bot, chat_id, thumb, photo):
         message = await bot.send_photo(chat_id, photo=self.photo_file_url)
 
@@ -331,7 +317,6 @@ class TestPhoto:
         assert message.photo[-1].file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_url_png_file(self, bot, chat_id):
         message = await bot.send_photo(
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=chat_id
@@ -346,7 +331,6 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_url_gif_file(self, bot, chat_id):
         message = await bot.send_photo(
             photo='http://dummyimage.com/600x400/000/fff.png&text=telegram', chat_id=chat_id
@@ -361,7 +345,6 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_file_unicode_filename(self, bot, chat_id):
         """
         Regression test for https://github.com/python-telegram-bot/python-telegram-bot/issues/1202
@@ -378,7 +361,6 @@ class TestPhoto:
         assert photo.file_unique_id != ''
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_bytesio_jpg_file(self, bot, chat_id):
         filepath = data_file('telegram_no_standard_header.jpg')
 
@@ -406,7 +388,6 @@ class TestPhoto:
         assert photo.height == 720
         assert photo.file_size == 33372
 
-    @pytest.mark.asyncio
     async def test_send_with_photosize(self, monkeypatch, bot, chat_id, photo):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters['photo'] == photo.file_id
@@ -416,7 +397,6 @@ class TestPhoto:
         assert message
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_resend(self, bot, chat_id, photo, thumb):
         message = await bot.send_photo(chat_id=chat_id, photo=photo.file_id)
 
@@ -459,23 +439,19 @@ class TestPhoto:
         assert photo_dict['file_size'] == photo.file_size
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_photo(chat_id=chat_id, photo=open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_photo(chat_id=chat_id, photo='')
 
-    @pytest.mark.asyncio
     async def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             await bot.send_photo(chat_id=chat_id)
 
-    @pytest.mark.asyncio
     async def test_get_file_instance_method(self, monkeypatch, photo):
         async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == photo.file_id

@@ -19,39 +19,39 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
 
-from telegram import TelegramObject, constants, MenuButton
+from telegram import constants
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
-from telegram.helpers import (
-    mention_markdown as helpers_mention_markdown,
-    mention_html as helpers_mention_html,
-)
+from telegram._menubutton import MenuButton
+from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput, ReplyMarkup
+from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram.helpers import mention_html as helpers_mention_html
+from telegram.helpers import mention_markdown as helpers_mention_markdown
 
 if TYPE_CHECKING:
     from telegram import (
+        Animation,
+        Audio,
         Bot,
-        Message,
-        UserProfilePhotos,
-        MessageId,
+        Contact,
+        Document,
+        InlineKeyboardMarkup,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        MessageEntity,
-        PhotoSize,
-        Audio,
-        Contact,
-        Document,
-        InlineKeyboardMarkup,
         LabeledPrice,
         Location,
-        Animation,
+        Message,
+        MessageEntity,
+        MessageId,
+        PhotoSize,
         Sticker,
-        Video,
+        UserProfilePhotos,
         Venue,
+        Video,
         VideoNote,
         Voice,
     )

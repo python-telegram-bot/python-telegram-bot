@@ -18,15 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains methods to make POST and GET requests using the httpx library."""
 import logging
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import httpx
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import ODVInput
-from telegram.error import TimedOut, NetworkError
-from telegram.request import BaseRequest, RequestData
-
+from telegram.error import NetworkError, TimedOut
+from telegram.request._baserequest import BaseRequest
+from telegram.request._requestdata import RequestData
 
 # Note to future devs:
 # Proxies are currently only tested manually. The httpx development docs have a nice guide on that:

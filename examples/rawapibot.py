@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=global-statement
 """Simple Bot to reply to Telegram messages.
 
 This is built on the API wrapper, see echobot.py to see the same example built
@@ -11,8 +10,7 @@ import logging
 from typing import NoReturn
 
 from telegram import Bot
-from telegram.error import NetworkError, Forbidden
-
+from telegram.error import Forbidden, NetworkError
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO

@@ -19,43 +19,40 @@
 # pylint: disable=no-self-use
 """This module contains the ConversationHandler."""
 import asyncio
-import logging
 import datetime
+import logging
 from dataclasses import dataclass
 from typing import (  # pylint: disable=unused-import  # for the "Any" import
     TYPE_CHECKING,
+    Any,
+    ClassVar,
     Dict,
+    Generic,
     List,
     NoReturn,
     Optional,
-    Union,
-    Tuple,
-    cast,
-    ClassVar,
-    Any,
     Set,
-    Generic,
+    Tuple,
+    Union,
+    cast,
 )
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE, DefaultValue
 from telegram._utils.types import DVInput
-from telegram.ext import (
-    CallbackContext,
-    CallbackQueryHandler,
-    ChosenInlineResultHandler,
-    ApplicationHandlerStop,
-    Handler,
-    InlineQueryHandler,
-    StringCommandHandler,
-    StringRegexHandler,
-    TypeHandler,
-    ExtBot,
-)
 from telegram._utils.warnings import warn
+from telegram.ext._application import ApplicationHandlerStop
+from telegram.ext._callbackcontext import CallbackContext
+from telegram.ext._callbackqueryhandler import CallbackQueryHandler
+from telegram.ext._choseninlineresulthandler import ChosenInlineResultHandler
+from telegram.ext._extbot import ExtBot
+from telegram.ext._handler import Handler
+from telegram.ext._inlinequeryhandler import InlineQueryHandler
+from telegram.ext._stringcommandhandler import StringCommandHandler
+from telegram.ext._stringregexhandler import StringRegexHandler
+from telegram.ext._typehandler import TypeHandler
 from telegram.ext._utils.trackingdict import TrackingDict
-from telegram.ext._utils.types import ConversationDict, ConversationKey
-from telegram.ext._utils.types import CCT
+from telegram.ext._utils.types import CCT, ConversationDict, ConversationKey
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
@@ -301,10 +298,10 @@ class ConversationHandler(Handler[Update, CCT]):
     ):
         # these imports need to be here because of circular import error otherwise
         from telegram.ext import (  # pylint: disable=import-outside-toplevel
-            ShippingQueryHandler,
-            PreCheckoutQueryHandler,
-            PollHandler,
             PollAnswerHandler,
+            PollHandler,
+            PreCheckoutQueryHandler,
+            ShippingQueryHandler,
         )
 
         # self.block is what the Application checks and we want it to always run CH in a blocking

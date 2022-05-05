@@ -18,23 +18,19 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, Any, Optional, ClassVar, List
+from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
 
-from telegram import (
-    CallbackQuery,
-    ChosenInlineResult,
-    InlineQuery,
-    Message,
-    Poll,
-    PollAnswer,
-    PreCheckoutQuery,
-    ShippingQuery,
-    TelegramObject,
-    ChatMemberUpdated,
-    constants,
-    ChatJoinRequest,
-)
-
+from telegram import constants
+from telegram._callbackquery import CallbackQuery
+from telegram._chatjoinrequest import ChatJoinRequest
+from telegram._chatmemberupdated import ChatMemberUpdated
+from telegram._choseninlineresult import ChosenInlineResult
+from telegram._inline.inlinequery import InlineQuery
+from telegram._message import Message
+from telegram._payment.precheckoutquery import PreCheckoutQuery
+from telegram._payment.shippingquery import ShippingQuery
+from telegram._poll import Poll, PollAnswer
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:

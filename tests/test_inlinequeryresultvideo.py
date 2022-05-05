@@ -20,10 +20,10 @@ import pytest
 
 from telegram import (
     InlineKeyboardButton,
-    InputTextMessageContent,
-    InlineQueryResultVideo,
     InlineKeyboardMarkup,
+    InlineQueryResultVideo,
     InlineQueryResultVoice,
+    InputTextMessageContent,
     MessageEntity,
 )
 

@@ -21,28 +21,27 @@ import abc
 from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from types import TracebackType
-from typing import Union, Tuple, Type, Optional, ClassVar, TypeVar
+from typing import ClassVar, Optional, Tuple, Type, TypeVar, Union
 
 try:
     import ujson as json
 except ImportError:
     import json  # type: ignore[no-redef]
 
+from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
+from telegram._utils.types import JSONDict, ODVInput
 from telegram._version import __version__ as ptb_ver
-from telegram.request import RequestData
-
 from telegram.error import (
-    TelegramError,
     BadRequest,
     ChatMigrated,
     Conflict,
+    Forbidden,
     InvalidToken,
     NetworkError,
     RetryAfter,
-    Forbidden,
+    TelegramError,
 )
-from telegram._utils.types import JSONDict, ODVInput
-from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
+from telegram.request._requestdata import RequestData
 
 RT = TypeVar('RT', bound='BaseRequest')
 

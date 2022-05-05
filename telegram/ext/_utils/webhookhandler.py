@@ -28,7 +28,7 @@ import tornado.web
 from tornado.httpserver import HTTPServer
 
 from telegram import Update
-from telegram.ext import ExtBot
+from telegram.ext._extbot import ExtBot
 
 if TYPE_CHECKING:
     from telegram import Bot

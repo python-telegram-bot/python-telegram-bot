@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """This example showcases how PTBs "arbitrary callback data" feature can be used.
@@ -12,14 +12,13 @@ from typing import List, Tuple, cast
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    CommandHandler,
-    CallbackQueryHandler,
-    InvalidCallbackData,
-    PicklePersistence,
     Application,
     CallbackContext,
+    CallbackQueryHandler,
+    CommandHandler,
+    InvalidCallbackData,
+    PicklePersistence,
 )
-
 
 # Enable logging
 logging.basicConfig(

@@ -20,20 +20,14 @@
 import logging
 import time
 from datetime import datetime
-from typing import Dict, Tuple, Union, Optional, MutableMapping, TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Dict, MutableMapping, Optional, Tuple, Union, cast
 from uuid import uuid4
 
-from cachetools import LRUCache  # pylint: disable=import-error
+from cachetools import LRUCache
 
-from telegram import (
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    CallbackQuery,
-    Message,
-    User,
-)
-from telegram.error import TelegramError
+from telegram import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message, User
 from telegram._utils.datetime import to_float_timestamp
+from telegram.error import TelegramError
 from telegram.ext._utils.types import CDCData
 
 if TYPE_CHECKING:

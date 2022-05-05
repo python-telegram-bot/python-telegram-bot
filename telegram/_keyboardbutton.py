@@ -20,8 +20,10 @@
 
 from typing import TYPE_CHECKING, Any, Optional
 
-from telegram import TelegramObject, KeyboardButtonPollType, WebAppInfo
+from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._webappinfo import WebAppInfo
 
 if TYPE_CHECKING:
     from telegram import Bot

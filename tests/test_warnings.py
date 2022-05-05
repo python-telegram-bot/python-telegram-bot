@@ -16,13 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
 
 import pytest
 
 from telegram._utils.warnings import warn
-from telegram.warnings import PTBUserWarning, PTBRuntimeWarning, PTBDeprecationWarning
+from telegram.warnings import PTBDeprecationWarning, PTBRuntimeWarning, PTBUserWarning
 from tests.conftest import PROJECT_ROOT_PATH
 
 

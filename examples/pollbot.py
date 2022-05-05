@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -10,24 +10,23 @@ one the user sends the bot
 import logging
 
 from telegram import (
-    Poll,
     KeyboardButton,
     KeyboardButtonPollType,
+    Poll,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
     Update,
 )
 from telegram.constants import ParseMode
 from telegram.ext import (
-    CommandHandler,
-    PollAnswerHandler,
-    PollHandler,
-    MessageHandler,
-    filters,
     Application,
     CallbackContext,
+    CommandHandler,
+    MessageHandler,
+    PollAnswerHandler,
+    PollHandler,
+    filters,
 )
-
 
 # Enable logging
 logging.basicConfig(

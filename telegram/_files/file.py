@@ -23,8 +23,8 @@ from base64 import b64decode
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Optional, Union
 
-from telegram import TelegramObject
 from telegram._passport.credentials import decrypt
+from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import is_local_file
 from telegram._utils.types import FilePathInput, ODVInput
