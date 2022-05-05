@@ -53,63 +53,63 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     """
 
-    __slots__ = ('_context', '_bot_data', '_chat_data', '_user_data')
+    __slots__ = ("_context", "_bot_data", "_chat_data", "_user_data")
 
     # overload signatures generated with
     # https://gist.github.com/Bibo-Joshi/399382cda537fb01bd86b13c3d03a956
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[ExtBot, Dict, Dict, Dict], Dict, Dict, Dict]',
+        self: "ContextTypes[CallbackContext[ExtBot, Dict, Dict, Dict], Dict, Dict, Dict]",
     ):
         ...
 
     @overload
-    def __init__(self: 'ContextTypes[CCT, Dict, Dict, Dict]', context: Type[CCT]):
+    def __init__(self: "ContextTypes[CCT, Dict, Dict, Dict]", context: Type[CCT]):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[ExtBot, UD, Dict, Dict], UD, Dict, Dict]',
+        self: "ContextTypes[CallbackContext[ExtBot, UD, Dict, Dict], UD, Dict, Dict]",
         user_data: Type[UD],
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[ExtBot, Dict, CD, Dict], Dict, CD, Dict]',
+        self: "ContextTypes[CallbackContext[ExtBot, Dict, CD, Dict], Dict, CD, Dict]",
         chat_data: Type[CD],
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[ExtBot, Dict, Dict, BD], Dict, Dict, BD]',
+        self: "ContextTypes[CallbackContext[ExtBot, Dict, Dict, BD], Dict, Dict, BD]",
         bot_data: Type[BD],
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, UD, Dict, Dict]', context: Type[CCT], user_data: Type[UD]
+        self: "ContextTypes[CCT, UD, Dict, Dict]", context: Type[CCT], user_data: Type[UD]
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, Dict, CD, Dict]', context: Type[CCT], chat_data: Type[CD]
+        self: "ContextTypes[CCT, Dict, CD, Dict]", context: Type[CCT], chat_data: Type[CD]
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, Dict, Dict, BD]', context: Type[CCT], bot_data: Type[BD]
+        self: "ContextTypes[CCT, Dict, Dict, BD]", context: Type[CCT], bot_data: Type[BD]
     ):
         ...
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[ExtBot, UD, CD, Dict], UD, CD, Dict]',
+        self: "ContextTypes[CallbackContext[ExtBot, UD, CD, Dict], UD, CD, Dict]",
         user_data: Type[UD],
         chat_data: Type[CD],
     ):
@@ -117,7 +117,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[ExtBot, UD, Dict, BD], UD, Dict, BD]',
+        self: "ContextTypes[CallbackContext[ExtBot, UD, Dict, BD], UD, Dict, BD]",
         user_data: Type[UD],
         bot_data: Type[BD],
     ):
@@ -125,7 +125,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[ExtBot, Dict, CD, BD], Dict, CD, BD]',
+        self: "ContextTypes[CallbackContext[ExtBot, Dict, CD, BD], Dict, CD, BD]",
         chat_data: Type[CD],
         bot_data: Type[BD],
     ):
@@ -133,7 +133,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, UD, CD, Dict]',
+        self: "ContextTypes[CCT, UD, CD, Dict]",
         context: Type[CCT],
         user_data: Type[UD],
         chat_data: Type[CD],
@@ -142,7 +142,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, UD, Dict, BD]',
+        self: "ContextTypes[CCT, UD, Dict, BD]",
         context: Type[CCT],
         user_data: Type[UD],
         bot_data: Type[BD],
@@ -151,7 +151,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, Dict, CD, BD]',
+        self: "ContextTypes[CCT, Dict, CD, BD]",
         context: Type[CCT],
         chat_data: Type[CD],
         bot_data: Type[BD],
@@ -160,7 +160,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CallbackContext[ExtBot, UD, CD, BD], UD, CD, BD]',
+        self: "ContextTypes[CallbackContext[ExtBot, UD, CD, BD], UD, CD, BD]",
         user_data: Type[UD],
         chat_data: Type[CD],
         bot_data: Type[BD],
@@ -169,7 +169,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     @overload
     def __init__(
-        self: 'ContextTypes[CCT, UD, CD, BD]',
+        self: "ContextTypes[CCT, UD, CD, BD]",
         context: Type[CCT],
         user_data: Type[UD],
         chat_data: Type[CD],
@@ -185,7 +185,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
         user_data=dict,
     ):
         if not issubclass(context, CallbackContext):
-            raise ValueError('context must be a subclass of CallbackContext.')
+            raise ValueError("context must be a subclass of CallbackContext.")
 
         # We make all those only accessible via properties because we don't currently support
         # changing this at runtime, so overriding the attributes doesn't make sense

@@ -110,7 +110,7 @@ def to_float_timestamp(
     if reference_timestamp is None:
         reference_timestamp = time.time()
     elif isinstance(time_object, dtm.datetime):
-        raise ValueError('t is an (absolute) datetime while reference_timestamp is not None')
+        raise ValueError("t is an (absolute) datetime while reference_timestamp is not None")
 
     if isinstance(time_object, dtm.timedelta):
         return reference_timestamp + time_object.total_seconds()
@@ -140,7 +140,7 @@ def to_float_timestamp(
             time_object = _localize(time_object, tzinfo)
         return _datetime_to_float_timestamp(time_object)
 
-    raise TypeError(f'Unable to convert {type(time_object).__name__} object to timestamp')
+    raise TypeError(f"Unable to convert {type(time_object).__name__} object to timestamp")
 
 
 def to_timestamp(

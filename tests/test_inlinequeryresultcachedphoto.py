@@ -28,7 +28,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_cached_photo():
     return InlineQueryResultCachedPhoto(
         TestInlineQueryResultCachedPhoto.id_,
@@ -44,21 +44,21 @@ def inline_query_result_cached_photo():
 
 
 class TestInlineQueryResultCachedPhoto:
-    id_ = 'id'
-    type_ = 'photo'
-    photo_file_id = 'photo file id'
-    title = 'title'
-    description = 'description'
-    caption = 'caption'
-    parse_mode = 'HTML'
+    id_ = "id"
+    type_ = "photo"
+    photo_file_id = "photo file id"
+    title = "title"
+    description = "description"
+    caption = "caption"
+    parse_mode = "HTML"
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_cached_photo, mro_slots):
         inst = inline_query_result_cached_photo
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_cached_photo):
@@ -83,47 +83,47 @@ class TestInlineQueryResultCachedPhoto:
 
         assert isinstance(inline_query_result_cached_photo_dict, dict)
         assert (
-            inline_query_result_cached_photo_dict['type'] == inline_query_result_cached_photo.type
+            inline_query_result_cached_photo_dict["type"] == inline_query_result_cached_photo.type
         )
-        assert inline_query_result_cached_photo_dict['id'] == inline_query_result_cached_photo.id
+        assert inline_query_result_cached_photo_dict["id"] == inline_query_result_cached_photo.id
         assert (
-            inline_query_result_cached_photo_dict['photo_file_id']
+            inline_query_result_cached_photo_dict["photo_file_id"]
             == inline_query_result_cached_photo.photo_file_id
         )
         assert (
-            inline_query_result_cached_photo_dict['title']
+            inline_query_result_cached_photo_dict["title"]
             == inline_query_result_cached_photo.title
         )
         assert (
-            inline_query_result_cached_photo_dict['description']
+            inline_query_result_cached_photo_dict["description"]
             == inline_query_result_cached_photo.description
         )
         assert (
-            inline_query_result_cached_photo_dict['caption']
+            inline_query_result_cached_photo_dict["caption"]
             == inline_query_result_cached_photo.caption
         )
         assert (
-            inline_query_result_cached_photo_dict['parse_mode']
+            inline_query_result_cached_photo_dict["parse_mode"]
             == inline_query_result_cached_photo.parse_mode
         )
-        assert inline_query_result_cached_photo_dict['caption_entities'] == [
+        assert inline_query_result_cached_photo_dict["caption_entities"] == [
             ce.to_dict() for ce in inline_query_result_cached_photo.caption_entities
         ]
         assert (
-            inline_query_result_cached_photo_dict['input_message_content']
+            inline_query_result_cached_photo_dict["input_message_content"]
             == inline_query_result_cached_photo.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_cached_photo_dict['reply_markup']
+            inline_query_result_cached_photo_dict["reply_markup"]
             == inline_query_result_cached_photo.reply_markup.to_dict()
         )
 
     def test_equality(self):
         a = InlineQueryResultCachedPhoto(self.id_, self.photo_file_id)
         b = InlineQueryResultCachedPhoto(self.id_, self.photo_file_id)
-        c = InlineQueryResultCachedPhoto(self.id_, '')
-        d = InlineQueryResultCachedPhoto('', self.photo_file_id)
-        e = InlineQueryResultCachedVoice(self.id_, '', '')
+        c = InlineQueryResultCachedPhoto(self.id_, "")
+        d = InlineQueryResultCachedPhoto("", self.photo_file_id)
+        e = InlineQueryResultCachedVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

@@ -21,7 +21,7 @@ import pytest
 from telegram import PassportElementErrorFrontSide, PassportElementErrorSelfie
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def passport_element_error_front_side():
     return PassportElementErrorFrontSide(
         TestPassportElementErrorFrontSide.type_,
@@ -31,15 +31,15 @@ def passport_element_error_front_side():
 
 
 class TestPassportElementErrorFrontSide:
-    source = 'front_side'
-    type_ = 'test_type'
-    file_hash = 'file_hash'
-    message = 'Error message'
+    source = "front_side"
+    type_ = "test_type"
+    file_hash = "file_hash"
+    message = "Error message"
 
     def test_slot_behaviour(self, passport_element_error_front_side, mro_slots):
         inst = passport_element_error_front_side
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, passport_element_error_front_side):
@@ -53,28 +53,28 @@ class TestPassportElementErrorFrontSide:
 
         assert isinstance(passport_element_error_front_side_dict, dict)
         assert (
-            passport_element_error_front_side_dict['source']
+            passport_element_error_front_side_dict["source"]
             == passport_element_error_front_side.source
         )
         assert (
-            passport_element_error_front_side_dict['type']
+            passport_element_error_front_side_dict["type"]
             == passport_element_error_front_side.type
         )
         assert (
-            passport_element_error_front_side_dict['file_hash']
+            passport_element_error_front_side_dict["file_hash"]
             == passport_element_error_front_side.file_hash
         )
         assert (
-            passport_element_error_front_side_dict['message']
+            passport_element_error_front_side_dict["message"]
             == passport_element_error_front_side.message
         )
 
     def test_equality(self):
         a = PassportElementErrorFrontSide(self.type_, self.file_hash, self.message)
         b = PassportElementErrorFrontSide(self.type_, self.file_hash, self.message)
-        c = PassportElementErrorFrontSide(self.type_, '', '')
-        d = PassportElementErrorFrontSide('', self.file_hash, '')
-        e = PassportElementErrorFrontSide('', '', self.message)
+        c = PassportElementErrorFrontSide(self.type_, "", "")
+        d = PassportElementErrorFrontSide("", self.file_hash, "")
+        e = PassportElementErrorFrontSide("", "", self.message)
         f = PassportElementErrorSelfie(self.type_, self.file_hash, self.message)
 
         assert a == b

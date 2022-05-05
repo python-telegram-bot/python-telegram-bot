@@ -36,33 +36,33 @@ they are related to a specific class, then they are also available as attributes
 """
 
 __all__ = [
-    'BOT_API_VERSION',
-    'BotCommandScopeType',
-    'CallbackQueryLimit',
-    'ChatAction',
-    'ChatID',
-    'ChatInviteLinkLimit',
-    'ChatMemberStatus',
-    'ChatType',
-    'DiceEmoji',
-    'FileSizeLimit',
-    'FloodLimit',
-    'InlineKeyboardMarkupLimit',
-    'InlineQueryLimit',
-    'InlineQueryResultType',
-    'InputMediaType',
-    'LocationLimit',
-    'MaskPosition',
-    'MenuButtonType',
-    'MessageAttachmentType',
-    'MessageEntityType',
-    'MessageLimit',
-    'MessageType',
-    'ParseMode',
-    'PollLimit',
-    'PollType',
-    'SUPPORTED_WEBHOOK_PORTS',
-    'UpdateType',
+    "BOT_API_VERSION",
+    "BotCommandScopeType",
+    "CallbackQueryLimit",
+    "ChatAction",
+    "ChatID",
+    "ChatInviteLinkLimit",
+    "ChatMemberStatus",
+    "ChatType",
+    "DiceEmoji",
+    "FileSizeLimit",
+    "FloodLimit",
+    "InlineKeyboardMarkupLimit",
+    "InlineQueryLimit",
+    "InlineQueryResultType",
+    "InputMediaType",
+    "LocationLimit",
+    "MaskPosition",
+    "MenuButtonType",
+    "MessageAttachmentType",
+    "MessageEntityType",
+    "MessageLimit",
+    "MessageType",
+    "ParseMode",
+    "PollLimit",
+    "PollType",
+    "SUPPORTED_WEBHOOK_PORTS",
+    "UpdateType",
 ]
 
 from enum import IntEnum
@@ -70,7 +70,7 @@ from typing import List
 
 from telegram._utils.enum import StringEnum
 
-BOT_API_VERSION = '6.0'
+BOT_API_VERSION = "6.0"
 
 # constants above this line are tested
 
@@ -86,19 +86,19 @@ class BotCommandScopeType(StringEnum):
 
     __slots__ = ()
 
-    DEFAULT = 'default'
+    DEFAULT = "default"
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeDefault`."""
-    ALL_PRIVATE_CHATS = 'all_private_chats'
+    ALL_PRIVATE_CHATS = "all_private_chats"
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeAllPrivateChats`."""
-    ALL_GROUP_CHATS = 'all_group_chats'
+    ALL_GROUP_CHATS = "all_group_chats"
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeAllGroupChats`."""
-    ALL_CHAT_ADMINISTRATORS = 'all_chat_administrators'
+    ALL_CHAT_ADMINISTRATORS = "all_chat_administrators"
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeAllChatAdministrators`."""
-    CHAT = 'chat'
+    CHAT = "chat"
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeChat`."""
-    CHAT_ADMINISTRATORS = 'chat_administrators'
+    CHAT_ADMINISTRATORS = "chat_administrators"
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeChatAdministrators`."""
-    CHAT_MEMBER = 'chat_member'
+    CHAT_MEMBER = "chat_member"
     """:obj:`str`: The type of :class:`telegram.BotCommandScopeChatMember`."""
 
 
@@ -126,27 +126,27 @@ class ChatAction(StringEnum):
 
     __slots__ = ()
 
-    CHOOSE_STICKER = 'choose_sticker'
+    CHOOSE_STICKER = "choose_sticker"
     """:obj:`str`: Chat action indicating that the bot is selecting a sticker."""
-    FIND_LOCATION = 'find_location'
+    FIND_LOCATION = "find_location"
     """:obj:`str`: Chat action indicating that the bot is selecting a location."""
-    RECORD_VOICE = 'record_voice'
+    RECORD_VOICE = "record_voice"
     """:obj:`str`: Chat action indicating that the bot is recording a voice message."""
-    RECORD_VIDEO = 'record_video'
+    RECORD_VIDEO = "record_video"
     """:obj:`str`: Chat action indicating that the bot is recording a video."""
-    RECORD_VIDEO_NOTE = 'record_video_note'
+    RECORD_VIDEO_NOTE = "record_video_note"
     """:obj:`str`: Chat action indicating that the bot is recording a video note."""
-    TYPING = 'typing'
+    TYPING = "typing"
     """:obj:`str`: A chat indicating the bot is typing."""
-    UPLOAD_VOICE = 'upload_voice'
+    UPLOAD_VOICE = "upload_voice"
     """:obj:`str`: Chat action indicating that the bot is uploading a voice message."""
-    UPLOAD_DOCUMENT = 'upload_document'
+    UPLOAD_DOCUMENT = "upload_document"
     """:obj:`str`: Chat action indicating that the bot is uploading a document."""
-    UPLOAD_PHOTO = 'upload_photo'
+    UPLOAD_PHOTO = "upload_photo"
     """:obj:`str`: Chat action indicating that the bot is uploading a photo."""
-    UPLOAD_VIDEO = 'upload_video'
+    UPLOAD_VIDEO = "upload_video"
     """:obj:`str`: Chat action indicating that the bot is uploading a video."""
-    UPLOAD_VIDEO_NOTE = 'upload_video_note'
+    UPLOAD_VIDEO_NOTE = "upload_video_note"
     """:obj:`str`: Chat action indicating that the bot is uploading a video note."""
 
 
@@ -211,17 +211,17 @@ class ChatMemberStatus(StringEnum):
 
     __slots__ = ()
 
-    ADMINISTRATOR = 'administrator'
+    ADMINISTRATOR = "administrator"
     """:obj:`str`: A :class:`telegram.ChatMember` who is administrator of the chat."""
-    OWNER = 'creator'
+    OWNER = "creator"
     """:obj:`str`: A :class:`telegram.ChatMember` who is the owner of the chat."""
-    BANNED = 'kicked'
+    BANNED = "kicked"
     """:obj:`str`: A :class:`telegram.ChatMember` who was banned in the chat."""
-    LEFT = 'left'
+    LEFT = "left"
     """:obj:`str`: A :class:`telegram.ChatMember` who has left the chat."""
-    MEMBER = 'member'
+    MEMBER = "member"
     """:obj:`str`: A :class:`telegram.ChatMember` who is a member of the chat."""
-    RESTRICTED = 'restricted'
+    RESTRICTED = "restricted"
     """:obj:`str`: A :class:`telegram.ChatMember` who was restricted in this chat."""
 
 
@@ -234,16 +234,16 @@ class ChatType(StringEnum):
 
     __slots__ = ()
 
-    SENDER = 'sender'
+    SENDER = "sender"
     """:obj:`str`: A :class:`telegram.Chat` that represents the chat of a :class:`telegram.User`
     sending an :class:`telegram.InlineQuery`. """
-    PRIVATE = 'private'
+    PRIVATE = "private"
     """:obj:`str`: A :class:`telegram.Chat` that is private."""
-    GROUP = 'group'
+    GROUP = "group"
     """:obj:`str`: A :class:`telegram.Chat` that is a group."""
-    SUPERGROUP = 'supergroup'
+    SUPERGROUP = "supergroup"
     """:obj:`str`: A :class:`telegram.Chat` that is a supergroup."""
-    CHANNEL = 'channel'
+    CHANNEL = "channel"
     """:obj:`str`: A :class:`telegram.Chat` that is a channel."""
 
 
@@ -257,17 +257,17 @@ class DiceEmoji(StringEnum):
 
     __slots__ = ()
 
-    DICE = '🎲'
+    DICE = "🎲"
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎲``."""
-    DARTS = '🎯'
+    DARTS = "🎯"
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎯``."""
-    BASKETBALL = '🏀'
+    BASKETBALL = "🏀"
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🏀``."""
-    FOOTBALL = '⚽'
+    FOOTBALL = "⚽"
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``⚽``."""
-    SLOT_MACHINE = '🎰'
+    SLOT_MACHINE = "🎰"
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎰``."""
-    BOWLING = '🎳'
+    BOWLING = "🎳"
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎳``."""
 
 
@@ -345,15 +345,15 @@ class InputMediaType(StringEnum):
 
     __slots__ = ()
 
-    ANIMATION = 'animation'
+    ANIMATION = "animation"
     """:obj:`str`: Type of :class:`telegram.InputMediaAnimation`."""
-    DOCUMENT = 'document'
+    DOCUMENT = "document"
     """:obj:`str`: Type of :class:`telegram.InputMediaDocument`."""
-    AUDIO = 'audio'
+    AUDIO = "audio"
     """:obj:`str`: Type of :class:`telegram.InputMediaAudio`."""
-    PHOTO = 'photo'
+    PHOTO = "photo"
     """:obj:`str`: Type of :class:`telegram.InputMediaPhoto`."""
-    VIDEO = 'video'
+    VIDEO = "video"
     """:obj:`str`: Type of :class:`telegram.InputMediaVideo`."""
 
 
@@ -384,45 +384,45 @@ class InlineQueryResultType(StringEnum):
 
     __slots__ = ()
 
-    AUDIO = 'audio'
+    AUDIO = "audio"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultAudio` and
     :class:`telegram.InlineQueryResultCachedAudio`.
     """
-    DOCUMENT = 'document'
+    DOCUMENT = "document"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultDocument` and
     :class:`telegram.InlineQueryResultCachedDocument`.
     """
-    GIF = 'gif'
+    GIF = "gif"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultGif` and
     :class:`telegram.InlineQueryResultCachedGif`.
     """
-    MPEG4GIF = 'mpeg4_gif'
+    MPEG4GIF = "mpeg4_gif"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultMpeg4Gif` and
     :class:`telegram.InlineQueryResultCachedMpeg4Gif`.
     """
-    PHOTO = 'photo'
+    PHOTO = "photo"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultPhoto` and
     :class:`telegram.InlineQueryResultCachedPhoto`.
     """
-    STICKER = 'sticker'
+    STICKER = "sticker"
     """:obj:`str`: Type of and :class:`telegram.InlineQueryResultCachedSticker`."""
-    VIDEO = 'video'
+    VIDEO = "video"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultVideo` and
     :class:`telegram.InlineQueryResultCachedVideo`.
     """
-    VOICE = 'voice'
+    VOICE = "voice"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultVoice` and
     :class:`telegram.InlineQueryResultCachedVoice`.
     """
-    ARTICLE = 'article'
+    ARTICLE = "article"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultArticle`."""
-    CONTACT = 'contact'
+    CONTACT = "contact"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultContact`."""
-    GAME = 'game'
+    GAME = "game"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultGame`."""
-    LOCATION = 'location'
+    LOCATION = "location"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultLocation`."""
-    VENUE = 'venue'
+    VENUE = "venue"
     """:obj:`str`: Type of :class:`telegram.InlineQueryResultVenue`."""
 
 
@@ -458,13 +458,13 @@ class MaskPosition(StringEnum):
 
     __slots__ = ()
 
-    FOREHEAD = 'forehead'
+    FOREHEAD = "forehead"
     """:obj:`str`: Mask position for a sticker on the forehead."""
-    EYES = 'eyes'
+    EYES = "eyes"
     """:obj:`str`: Mask position for a sticker on the eyes."""
-    MOUTH = 'mouth'
+    MOUTH = "mouth"
     """:obj:`str`: Mask position for a sticker on the mouth."""
-    CHIN = 'chin'
+    CHIN = "chin"
     """:obj:`str`: Mask position for a sticker on the chin."""
 
 
@@ -477,11 +477,11 @@ class MenuButtonType(StringEnum):
 
     __slots__ = ()
 
-    COMMANDS = 'commands'
+    COMMANDS = "commands"
     """:obj:`str`: The type of :class:`telegram.MenuButtonCommands`."""
-    WEB_APP = 'web_app'
+    WEB_APP = "web_app"
     """:obj:`str`: The type of :class:`telegram.MenuButtonWebApp`."""
-    DEFAULT = 'default'
+    DEFAULT = "default"
     """:obj:`str`: The type of :class:`telegram.MenuButtonDefault`."""
 
 
@@ -498,39 +498,39 @@ class MessageAttachmentType(StringEnum):
     # Make sure that all constants here are also listed in the MessageType Enum!
     # (Enums are not extendable)
 
-    ANIMATION = 'animation'
+    ANIMATION = "animation"
     """:obj:`str`: Messages with :attr:`telegram.Message.animation`."""
-    AUDIO = 'audio'
+    AUDIO = "audio"
     """:obj:`str`: Messages with :attr:`telegram.Message.audio`."""
-    CONTACT = 'contact'
+    CONTACT = "contact"
     """:obj:`str`: Messages with :attr:`telegram.Message.contact`."""
-    DICE = 'dice'
+    DICE = "dice"
     """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
-    DOCUMENT = 'document'
+    DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
-    GAME = 'game'
+    GAME = "game"
     """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
-    INVOICE = 'invoice'
+    INVOICE = "invoice"
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
-    LOCATION = 'location'
+    LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
-    PASSPORT_DATA = 'passport_data'
+    PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
-    PHOTO = 'photo'
+    PHOTO = "photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.photo`."""
-    POLL = 'poll'
+    POLL = "poll"
     """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
-    STICKER = 'sticker'
+    STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
-    SUCCESSFUL_PAYMENT = 'successful_payment'
+    SUCCESSFUL_PAYMENT = "successful_payment"
     """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
-    VIDEO = 'video'
+    VIDEO = "video"
     """:obj:`str`: Messages with :attr:`telegram.Message.video`."""
-    VIDEO_NOTE = 'video_note'
+    VIDEO_NOTE = "video_note"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_note`."""
-    VOICE = 'voice'
+    VOICE = "voice"
     """:obj:`str`: Messages with :attr:`telegram.Message.voice`."""
-    VENUE = 'venue'
+    VENUE = "venue"
     """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
 
 
@@ -543,37 +543,37 @@ class MessageEntityType(StringEnum):
 
     __slots__ = ()
 
-    MENTION = 'mention'
+    MENTION = "mention"
     """:obj:`str`: Message entities representing a mention."""
-    HASHTAG = 'hashtag'
+    HASHTAG = "hashtag"
     """:obj:`str`: Message entities representing a hashtag."""
-    CASHTAG = 'cashtag'
+    CASHTAG = "cashtag"
     """:obj:`str`: Message entities representing a cashtag."""
-    PHONE_NUMBER = 'phone_number'
+    PHONE_NUMBER = "phone_number"
     """:obj:`str`: Message entities representing a phone number."""
-    BOT_COMMAND = 'bot_command'
+    BOT_COMMAND = "bot_command"
     """:obj:`str`: Message entities representing a bot command."""
-    URL = 'url'
+    URL = "url"
     """:obj:`str`: Message entities representing a url."""
-    EMAIL = 'email'
+    EMAIL = "email"
     """:obj:`str`: Message entities representing a email."""
-    BOLD = 'bold'
+    BOLD = "bold"
     """:obj:`str`: Message entities representing bold text."""
-    ITALIC = 'italic'
+    ITALIC = "italic"
     """:obj:`str`: Message entities representing italic text."""
-    CODE = 'code'
+    CODE = "code"
     """:obj:`str`: Message entities representing monowidth string."""
-    PRE = 'pre'
+    PRE = "pre"
     """:obj:`str`: Message entities representing monowidth block."""
-    TEXT_LINK = 'text_link'
+    TEXT_LINK = "text_link"
     """:obj:`str`: Message entities representing clickable text URLs."""
-    TEXT_MENTION = 'text_mention'
+    TEXT_MENTION = "text_mention"
     """:obj:`str`: Message entities representing text mention for users without usernames."""
-    UNDERLINE = 'underline'
+    UNDERLINE = "underline"
     """:obj:`str`: Message entities representing underline text."""
-    STRIKETHROUGH = 'strikethrough'
+    STRIKETHROUGH = "strikethrough"
     """:obj:`str`: Message entities representing strikethrough text."""
-    SPOILER = 'spoiler'
+    SPOILER = "spoiler"
     """:obj:`str`: Message entities representing spoiler text."""
 
 
@@ -615,76 +615,76 @@ class MessageType(StringEnum):
     # MessageAttachmentType Enum! (Enums are not extendable)
 
     # -------------------------------------------------- Attachment types
-    ANIMATION = 'animation'
+    ANIMATION = "animation"
     """:obj:`str`: Messages with :attr:`telegram.Message.animation`."""
-    AUDIO = 'audio'
+    AUDIO = "audio"
     """:obj:`str`: Messages with :attr:`telegram.Message.audio`."""
-    CONTACT = 'contact'
+    CONTACT = "contact"
     """:obj:`str`: Messages with :attr:`telegram.Message.contact`."""
-    DICE = 'dice'
+    DICE = "dice"
     """:obj:`str`: Messages with :attr:`telegram.Message.dice`."""
-    DOCUMENT = 'document'
+    DOCUMENT = "document"
     """:obj:`str`: Messages with :attr:`telegram.Message.document`."""
-    GAME = 'game'
+    GAME = "game"
     """:obj:`str`: Messages with :attr:`telegram.Message.game`."""
-    INVOICE = 'invoice'
+    INVOICE = "invoice"
     """:obj:`str`: Messages with :attr:`telegram.Message.invoice`."""
-    LOCATION = 'location'
+    LOCATION = "location"
     """:obj:`str`: Messages with :attr:`telegram.Message.location`."""
-    PASSPORT_DATA = 'passport_data'
+    PASSPORT_DATA = "passport_data"
     """:obj:`str`: Messages with :attr:`telegram.Message.passport_data`."""
-    PHOTO = 'photo'
+    PHOTO = "photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.photo`."""
-    POLL = 'poll'
+    POLL = "poll"
     """:obj:`str`: Messages with :attr:`telegram.Message.poll`."""
-    STICKER = 'sticker'
+    STICKER = "sticker"
     """:obj:`str`: Messages with :attr:`telegram.Message.sticker`."""
-    SUCCESSFUL_PAYMENT = 'successful_payment'
+    SUCCESSFUL_PAYMENT = "successful_payment"
     """:obj:`str`: Messages with :attr:`telegram.Message.successful_payment`."""
-    VIDEO = 'video'
+    VIDEO = "video"
     """:obj:`str`: Messages with :attr:`telegram.Message.video`."""
-    VIDEO_NOTE = 'video_note'
+    VIDEO_NOTE = "video_note"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_note`."""
-    VOICE = 'voice'
+    VOICE = "voice"
     """:obj:`str`: Messages with :attr:`telegram.Message.voice`."""
-    VENUE = 'venue'
+    VENUE = "venue"
     """:obj:`str`: Messages with :attr:`telegram.Message.venue`."""
     # -------------------------------------------------- Other types
-    TEXT = 'text'
+    TEXT = "text"
     """:obj:`str`: Messages with :attr:`telegram.Message.text`."""
-    NEW_CHAT_MEMBERS = 'new_chat_members'
+    NEW_CHAT_MEMBERS = "new_chat_members"
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_members`."""
-    LEFT_CHAT_MEMBER = 'left_chat_member'
+    LEFT_CHAT_MEMBER = "left_chat_member"
     """:obj:`str`: Messages with :attr:`telegram.Message.left_chat_member`."""
-    NEW_CHAT_TITLE = 'new_chat_title'
+    NEW_CHAT_TITLE = "new_chat_title"
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_title`."""
-    NEW_CHAT_PHOTO = 'new_chat_photo'
+    NEW_CHAT_PHOTO = "new_chat_photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.new_chat_photo`."""
-    DELETE_CHAT_PHOTO = 'delete_chat_photo'
+    DELETE_CHAT_PHOTO = "delete_chat_photo"
     """:obj:`str`: Messages with :attr:`telegram.Message.delete_chat_photo`."""
-    GROUP_CHAT_CREATED = 'group_chat_created'
+    GROUP_CHAT_CREATED = "group_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.group_chat_created`."""
-    SUPERGROUP_CHAT_CREATED = 'supergroup_chat_created'
+    SUPERGROUP_CHAT_CREATED = "supergroup_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.supergroup_chat_created`."""
-    CHANNEL_CHAT_CREATED = 'channel_chat_created'
+    CHANNEL_CHAT_CREATED = "channel_chat_created"
     """:obj:`str`: Messages with :attr:`telegram.Message.channel_chat_created`."""
-    MESSAGE_AUTO_DELETE_TIMER_CHANGED = 'message_auto_delete_timer_changed'
+    MESSAGE_AUTO_DELETE_TIMER_CHANGED = "message_auto_delete_timer_changed"
     """:obj:`str`: Messages with :attr:`telegram.Message.message_auto_delete_timer_changed`."""
-    MIGRATE_TO_CHAT_ID = 'migrate_to_chat_id'
+    MIGRATE_TO_CHAT_ID = "migrate_to_chat_id"
     """:obj:`str`: Messages with :attr:`telegram.Message.migrate_to_chat_id`."""
-    MIGRATE_FROM_CHAT_ID = 'migrate_from_chat_id'
+    MIGRATE_FROM_CHAT_ID = "migrate_from_chat_id"
     """:obj:`str`: Messages with :attr:`telegram.Message.migrate_from_chat_id`."""
-    PINNED_MESSAGE = 'pinned_message'
+    PINNED_MESSAGE = "pinned_message"
     """:obj:`str`: Messages with :attr:`telegram.Message.pinned_message`."""
-    PROXIMITY_ALERT_TRIGGERED = 'proximity_alert_triggered'
+    PROXIMITY_ALERT_TRIGGERED = "proximity_alert_triggered"
     """:obj:`str`: Messages with :attr:`telegram.Message.proximity_alert_triggered`."""
-    VIDEO_CHAT_SCHEDULED = 'video_chat_scheduled'
+    VIDEO_CHAT_SCHEDULED = "video_chat_scheduled"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_scheduled`."""
-    VIDEO_CHAT_STARTED = 'video_chat_started'
+    VIDEO_CHAT_STARTED = "video_chat_started"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_started`."""
-    VIDEO_CHAT_ENDED = 'video_chat_ended'
+    VIDEO_CHAT_ENDED = "video_chat_ended"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_ended`."""
-    VIDEO_CHAT_PARTICIPANTS_INVITED = 'video_chat_participants_invited'
+    VIDEO_CHAT_PARTICIPANTS_INVITED = "video_chat_participants_invited"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_participants_invited`."""
 
 
@@ -697,16 +697,16 @@ class ParseMode(StringEnum):
 
     __slots__ = ()
 
-    MARKDOWN = 'Markdown'
+    MARKDOWN = "Markdown"
     """:obj:`str`: Markdown parse mode.
 
     Note:
         :attr:`MARKDOWN` is a legacy mode, retained by Telegram for backward compatibility.
         You should use :attr:`MARKDOWN_V2` instead.
     """
-    MARKDOWN_V2 = 'MarkdownV2'
+    MARKDOWN_V2 = "MarkdownV2"
     """:obj:`str`: Markdown parse mode version 2."""
-    HTML = 'HTML'
+    HTML = "HTML"
     """:obj:`str`: HTML parse mode."""
 
 
@@ -738,9 +738,9 @@ class PollType(StringEnum):
 
     __slots__ = ()
 
-    REGULAR = 'regular'
+    REGULAR = "regular"
     """:obj:`str`: regular polls."""
-    QUIZ = 'quiz'
+    QUIZ = "quiz"
     """:obj:`str`: quiz polls."""
 
 
@@ -753,31 +753,31 @@ class UpdateType(StringEnum):
 
     __slots__ = ()
 
-    MESSAGE = 'message'
+    MESSAGE = "message"
     """:obj:`str`: Updates with :attr:`telegram.Update.message`."""
-    EDITED_MESSAGE = 'edited_message'
+    EDITED_MESSAGE = "edited_message"
     """:obj:`str`: Updates with :attr:`telegram.Update.edited_message`."""
-    CHANNEL_POST = 'channel_post'
+    CHANNEL_POST = "channel_post"
     """:obj:`str`: Updates with :attr:`telegram.Update.channel_post`."""
-    EDITED_CHANNEL_POST = 'edited_channel_post'
+    EDITED_CHANNEL_POST = "edited_channel_post"
     """:obj:`str`: Updates with :attr:`telegram.Update.edited_channel_post`."""
-    INLINE_QUERY = 'inline_query'
+    INLINE_QUERY = "inline_query"
     """:obj:`str`: Updates with :attr:`telegram.Update.inline_query`."""
-    CHOSEN_INLINE_RESULT = 'chosen_inline_result'
+    CHOSEN_INLINE_RESULT = "chosen_inline_result"
     """:obj:`str`: Updates with :attr:`telegram.Update.chosen_inline_result`."""
-    CALLBACK_QUERY = 'callback_query'
+    CALLBACK_QUERY = "callback_query"
     """:obj:`str`: Updates with :attr:`telegram.Update.callback_query`."""
-    SHIPPING_QUERY = 'shipping_query'
+    SHIPPING_QUERY = "shipping_query"
     """:obj:`str`: Updates with :attr:`telegram.Update.shipping_query`."""
-    PRE_CHECKOUT_QUERY = 'pre_checkout_query'
+    PRE_CHECKOUT_QUERY = "pre_checkout_query"
     """:obj:`str`: Updates with :attr:`telegram.Update.pre_checkout_query`."""
-    POLL = 'poll'
+    POLL = "poll"
     """:obj:`str`: Updates with :attr:`telegram.Update.poll`."""
-    POLL_ANSWER = 'poll_answer'
+    POLL_ANSWER = "poll_answer"
     """:obj:`str`: Updates with :attr:`telegram.Update.poll_answer`."""
-    MY_CHAT_MEMBER = 'my_chat_member'
+    MY_CHAT_MEMBER = "my_chat_member"
     """:obj:`str`: Updates with :attr:`telegram.Update.my_chat_member`."""
-    CHAT_MEMBER = 'chat_member'
+    CHAT_MEMBER = "chat_member"
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_member`."""
-    CHAT_JOIN_REQUEST = 'chat_join_request'
+    CHAT_JOIN_REQUEST = "chat_join_request"
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""

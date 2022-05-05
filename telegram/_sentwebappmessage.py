@@ -42,7 +42,7 @@ class SentWebAppMessage(TelegramObject):
             the message.
     """
 
-    __slots__ = ('inline_message_id',)
+    __slots__ = ("inline_message_id",)
 
     def __init__(self, inline_message_id: str = None, **_kwargs: Any):
         # Optionals

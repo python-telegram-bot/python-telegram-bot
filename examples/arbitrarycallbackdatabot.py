@@ -22,7 +22,7 @@ from telegram.ext import (
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends a message with 5 inline buttons attached."""
     number_list: List[int] = []
-    await update.message.reply_text('Please choose:', reply_markup=build_keyboard(number_list))
+    await update.message.reply_text("Please choose:", reply_markup=build_keyboard(number_list))
 
 
 async def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
@@ -45,7 +45,7 @@ async def clear(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Clears the callback data cache"""
     context.bot.callback_data_cache.clear_callback_data()
     context.bot.callback_data_cache.clear_callback_queries()
-    await update.effective_message.reply_text('All clear!')
+    await update.effective_message.reply_text("All clear!")
 
 
 def build_keyboard(current_list: List[int]) -> InlineKeyboardMarkup:
@@ -79,14 +79,14 @@ async def handle_invalid_button(update: Update, context: CallbackContext.DEFAULT
     """Informs the user that the button is no longer available."""
     await update.callback_query.answer()
     await update.effective_message.edit_text(
-        'Sorry, I could not process this button click 😕 Please send /start to get a new keyboard.'
+        "Sorry, I could not process this button click 😕 Please send /start to get a new keyboard."
     )
 
 
 def main() -> None:
     """Run the bot."""
     # We use persistence to demonstrate how buttons can still work after the bot was restarted
-    persistence = PicklePersistence(filepath='arbitrarycallbackdatabot')
+    persistence = PicklePersistence(filepath="arbitrarycallbackdatabot")
     # Create the Application and pass it your bot's token.
     application = (
         Application.builder()
@@ -96,9 +96,9 @@ def main() -> None:
         .build()
     )
 
-    application.add_handler(CommandHandler('start', start))
-    application.add_handler(CommandHandler('help', help_command))
-    application.add_handler(CommandHandler('clear', clear))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("clear", clear))
     application.add_handler(
         CallbackQueryHandler(handle_invalid_button, pattern=InvalidCallbackData)
     )
@@ -108,5 +108,5 @@ def main() -> None:
     application.run_polling()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

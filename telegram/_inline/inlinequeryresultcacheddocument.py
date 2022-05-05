@@ -80,14 +80,14 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'document_file_id',
-        'caption',
-        'title',
-        'description',
-        'parse_mode',
-        'input_message_content',
+        "reply_markup",
+        "caption_entities",
+        "document_file_id",
+        "caption",
+        "title",
+        "description",
+        "parse_mode",
+        "input_message_content",
     )
 
     def __init__(
@@ -98,7 +98,7 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         description: str = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,

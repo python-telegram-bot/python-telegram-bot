@@ -30,7 +30,7 @@ from telegram.ext import (
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -65,8 +65,8 @@ END = ConversationHandler.END
 # Helper
 def _name_switcher(level: str) -> Tuple[str, str]:
     if level == PARENTS:
-        return 'Father', 'Mother'
-    return 'Brother', 'Sister'
+        return "Father", "Mother"
+    return "Brother", "Sister"
 
 
 # Top level conversation callbacks
@@ -79,12 +79,12 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
 
     buttons = [
         [
-            InlineKeyboardButton(text='Add family member', callback_data=str(ADDING_MEMBER)),
-            InlineKeyboardButton(text='Add yourself', callback_data=str(ADDING_SELF)),
+            InlineKeyboardButton(text="Add family member", callback_data=str(ADDING_MEMBER)),
+            InlineKeyboardButton(text="Add yourself", callback_data=str(ADDING_SELF)),
         ],
         [
-            InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
-            InlineKeyboardButton(text='Done', callback_data=str(END)),
+            InlineKeyboardButton(text="Show data", callback_data=str(SHOWING)),
+            InlineKeyboardButton(text="Done", callback_data=str(END)),
         ],
     ]
     keyboard = InlineKeyboardMarkup(buttons)
@@ -106,8 +106,8 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
 async def adding_self(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Add information about yourself."""
     context.user_data[CURRENT_LEVEL] = SELF
-    text = 'Okay, please tell me about yourself.'
-    button = InlineKeyboardButton(text='Add info', callback_data=str(MALE))
+    text = "Okay, please tell me about yourself."
+    button = InlineKeyboardButton(text="Add info", callback_data=str(MALE))
     keyboard = InlineKeyboardMarkup.from_button(button)
 
     await update.callback_query.answer()
@@ -122,9 +122,9 @@ async def show_data(update: Update, context: CallbackContext.DEFAULT_TYPE) -> st
     def pretty_print(data: Dict[str, Any], level: str) -> str:
         people = data.get(level)
         if not people:
-            return '\nNo information yet.'
+            return "\nNo information yet."
 
-        return_str = ''
+        return_str = ""
         if level == SELF:
             for person in data[level]:
                 return_str += f"\nName: {person.get(NAME, '-')}, Age: {person.get(AGE, '-')}"
@@ -143,7 +143,7 @@ async def show_data(update: Update, context: CallbackContext.DEFAULT_TYPE) -> st
     text += f"\n\nParents:{pretty_print(user_data, PARENTS)}"
     text += f"\n\nChildren:{pretty_print(user_data, CHILDREN)}"
 
-    buttons = [[InlineKeyboardButton(text='Back', callback_data=str(END))]]
+    buttons = [[InlineKeyboardButton(text="Back", callback_data=str(END))]]
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.callback_query.answer()
@@ -155,7 +155,7 @@ async def show_data(update: Update, context: CallbackContext.DEFAULT_TYPE) -> st
 
 async def stop(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """End Conversation by command."""
-    await update.message.reply_text('Okay, bye.')
+    await update.message.reply_text("Okay, bye.")
 
     return END
 
@@ -164,7 +164,7 @@ async def end(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     """End conversation from InlineKeyboardButton."""
     await update.callback_query.answer()
 
-    text = 'See you around!'
+    text = "See you around!"
     await update.callback_query.edit_message_text(text=text)
 
     return END
@@ -173,15 +173,15 @@ async def end(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
 # Second level conversation callbacks
 async def select_level(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Choose to add a parent or a child."""
-    text = 'You may add a parent or a child. Also you can show the gathered data or go back.'
+    text = "You may add a parent or a child. Also you can show the gathered data or go back."
     buttons = [
         [
-            InlineKeyboardButton(text='Add parent', callback_data=str(PARENTS)),
-            InlineKeyboardButton(text='Add child', callback_data=str(CHILDREN)),
+            InlineKeyboardButton(text="Add parent", callback_data=str(PARENTS)),
+            InlineKeyboardButton(text="Add child", callback_data=str(CHILDREN)),
         ],
         [
-            InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
-            InlineKeyboardButton(text='Back', callback_data=str(END)),
+            InlineKeyboardButton(text="Show data", callback_data=str(SHOWING)),
+            InlineKeyboardButton(text="Back", callback_data=str(END)),
         ],
     ]
     keyboard = InlineKeyboardMarkup(buttons)
@@ -197,18 +197,18 @@ async def select_gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -
     level = update.callback_query.data
     context.user_data[CURRENT_LEVEL] = level
 
-    text = 'Please choose, whom to add.'
+    text = "Please choose, whom to add."
 
     male, female = _name_switcher(level)
 
     buttons = [
         [
-            InlineKeyboardButton(text=f'Add {male}', callback_data=str(MALE)),
-            InlineKeyboardButton(text=f'Add {female}', callback_data=str(FEMALE)),
+            InlineKeyboardButton(text=f"Add {male}", callback_data=str(MALE)),
+            InlineKeyboardButton(text=f"Add {female}", callback_data=str(FEMALE)),
         ],
         [
-            InlineKeyboardButton(text='Show data', callback_data=str(SHOWING)),
-            InlineKeyboardButton(text='Back', callback_data=str(END)),
+            InlineKeyboardButton(text="Show data", callback_data=str(SHOWING)),
+            InlineKeyboardButton(text="Back", callback_data=str(END)),
         ],
     ]
     keyboard = InlineKeyboardMarkup(buttons)
@@ -232,9 +232,9 @@ async def select_feature(update: Update, context: CallbackContext.DEFAULT_TYPE) 
     """Select a feature to update for the person."""
     buttons = [
         [
-            InlineKeyboardButton(text='Name', callback_data=str(NAME)),
-            InlineKeyboardButton(text='Age', callback_data=str(AGE)),
-            InlineKeyboardButton(text='Done', callback_data=str(END)),
+            InlineKeyboardButton(text="Name", callback_data=str(NAME)),
+            InlineKeyboardButton(text="Age", callback_data=str(AGE)),
+            InlineKeyboardButton(text="Done", callback_data=str(END)),
         ]
     ]
     keyboard = InlineKeyboardMarkup(buttons)
@@ -242,13 +242,13 @@ async def select_feature(update: Update, context: CallbackContext.DEFAULT_TYPE) 
     # If we collect features for a new person, clear the cache and save the gender
     if not context.user_data.get(START_OVER):
         context.user_data[FEATURES] = {GENDER: update.callback_query.data}
-        text = 'Please select a feature to update.'
+        text = "Please select a feature to update."
 
         await update.callback_query.answer()
         await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     # But after we do that, we need to send a new message
     else:
-        text = 'Got it! Please select a feature to update.'
+        text = "Got it! Please select a feature to update."
         await update.message.reply_text(text=text, reply_markup=keyboard)
 
     context.user_data[START_OVER] = False
@@ -258,7 +258,7 @@ async def select_feature(update: Update, context: CallbackContext.DEFAULT_TYPE) 
 async def ask_for_input(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Prompt user to input data for selected feature."""
     context.user_data[CURRENT_FEATURE] = update.callback_query.data
-    text = 'Okay, tell me.'
+    text = "Okay, tell me."
 
     await update.callback_query.answer()
     await update.callback_query.edit_message_text(text=text)
@@ -296,7 +296,7 @@ async def end_describing(update: Update, context: CallbackContext.DEFAULT_TYPE) 
 
 async def stop_nested(update: Update, context: CallbackContext.DEFAULT_TYPE) -> str:
     """Completely end conversation from within nested conversation."""
-    await update.message.reply_text('Okay, bye.')
+    await update.message.reply_text("Okay, bye.")
 
     return STOPPING
 
@@ -310,18 +310,18 @@ def main() -> None:
     description_conv = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(
-                select_feature, pattern='^' + str(MALE) + '$|^' + str(FEMALE) + '$'
+                select_feature, pattern="^" + str(MALE) + "$|^" + str(FEMALE) + "$"
             )
         ],
         states={
             SELECTING_FEATURE: [
-                CallbackQueryHandler(ask_for_input, pattern='^(?!' + str(END) + ').*$')
+                CallbackQueryHandler(ask_for_input, pattern="^(?!" + str(END) + ").*$")
             ],
             TYPING: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_input)],
         },
         fallbacks=[
-            CallbackQueryHandler(end_describing, pattern='^' + str(END) + '$'),
-            CommandHandler('stop', stop_nested),
+            CallbackQueryHandler(end_describing, pattern="^" + str(END) + "$"),
+            CommandHandler("stop", stop_nested),
         ],
         map_to_parent={
             # Return to second level menu
@@ -333,17 +333,17 @@ def main() -> None:
 
     # Set up second level ConversationHandler (adding a person)
     add_member_conv = ConversationHandler(
-        entry_points=[CallbackQueryHandler(select_level, pattern='^' + str(ADDING_MEMBER) + '$')],
+        entry_points=[CallbackQueryHandler(select_level, pattern="^" + str(ADDING_MEMBER) + "$")],
         states={
             SELECTING_LEVEL: [
-                CallbackQueryHandler(select_gender, pattern=f'^{PARENTS}$|^{CHILDREN}$')
+                CallbackQueryHandler(select_gender, pattern=f"^{PARENTS}$|^{CHILDREN}$")
             ],
             SELECTING_GENDER: [description_conv],
         },
         fallbacks=[
-            CallbackQueryHandler(show_data, pattern='^' + str(SHOWING) + '$'),
-            CallbackQueryHandler(end_second_level, pattern='^' + str(END) + '$'),
-            CommandHandler('stop', stop_nested),
+            CallbackQueryHandler(show_data, pattern="^" + str(SHOWING) + "$"),
+            CallbackQueryHandler(end_second_level, pattern="^" + str(END) + "$"),
+            CommandHandler("stop", stop_nested),
         ],
         map_to_parent={
             # After showing data return to top level menu
@@ -360,20 +360,20 @@ def main() -> None:
     # conversation, we need to make sure the top level conversation can also handle them
     selection_handlers = [
         add_member_conv,
-        CallbackQueryHandler(show_data, pattern='^' + str(SHOWING) + '$'),
-        CallbackQueryHandler(adding_self, pattern='^' + str(ADDING_SELF) + '$'),
-        CallbackQueryHandler(end, pattern='^' + str(END) + '$'),
+        CallbackQueryHandler(show_data, pattern="^" + str(SHOWING) + "$"),
+        CallbackQueryHandler(adding_self, pattern="^" + str(ADDING_SELF) + "$"),
+        CallbackQueryHandler(end, pattern="^" + str(END) + "$"),
     ]
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[CommandHandler("start", start)],
         states={
-            SHOWING: [CallbackQueryHandler(start, pattern='^' + str(END) + '$')],
+            SHOWING: [CallbackQueryHandler(start, pattern="^" + str(END) + "$")],
             SELECTING_ACTION: selection_handlers,
             SELECTING_LEVEL: selection_handlers,
             DESCRIBING_SELF: [description_conv],
-            STOPPING: [CommandHandler('start', start)],
+            STOPPING: [CommandHandler("start", start)],
         },
-        fallbacks=[CommandHandler('stop', stop)],
+        fallbacks=[CommandHandler("stop", stop)],
     )
 
     application.add_handler(conv_handler)
@@ -382,5 +382,5 @@ def main() -> None:
     application.run_polling()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

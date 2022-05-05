@@ -55,7 +55,7 @@ if TYPE_CHECKING:
     from telegram import InlineQueryResult, MessageEntity
     from telegram.ext import Defaults
 
-HandledTypes = TypeVar('HandledTypes', bound=Union[Message, CallbackQuery, Chat])
+HandledTypes = TypeVar("HandledTypes", bound=Union[Message, CallbackQuery, Chat])
 
 
 class ExtBot(Bot):
@@ -87,18 +87,18 @@ class ExtBot(Bot):
 
     """
 
-    __slots__ = ('arbitrary_callback_data', 'callback_data_cache', '_defaults')
+    __slots__ = ("arbitrary_callback_data", "callback_data_cache", "_defaults")
 
     def __init__(
         self,
         token: str,
-        base_url: str = 'https://api.telegram.org/bot',
-        base_file_url: str = 'https://api.telegram.org/file/bot',
+        base_url: str = "https://api.telegram.org/bot",
+        base_file_url: str = "https://api.telegram.org/file/bot",
         request: BaseRequest = None,
         get_updates_request: BaseRequest = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
-        defaults: 'Defaults' = None,
+        defaults: "Defaults" = None,
         arbitrary_callback_data: Union[bool, int] = False,
     ):
         super().__init__(
@@ -122,7 +122,7 @@ class ExtBot(Bot):
         self.callback_data_cache: CallbackDataCache = CallbackDataCache(bot=self, maxsize=maxsize)
 
     @property
-    def defaults(self) -> Optional['Defaults']:
+    def defaults(self) -> Optional["Defaults"]:
         """The :class:`telegram.ext.Defaults` used by this bot, if any."""
         # This is a property because defaults shouldn't be changed at runtime
         return self._defaults
@@ -159,7 +159,7 @@ class ExtBot(Bot):
             # 3)
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
                 val.parse_mode = self.defaults.parse_mode if self.defaults else None
-            elif key == 'media' and isinstance(val, list):
+            elif key == "media" and isinstance(val, list):
                 for media in val:
                     if media.parse_mode is DEFAULT_NONE:
                         media.parse_mode = self.defaults.parse_mode if self.defaults else None
@@ -300,11 +300,11 @@ class ExtBot(Bot):
     def _effective_inline_results(
         self,
         results: Union[
-            Sequence['InlineQueryResult'], Callable[[int], Optional[Sequence['InlineQueryResult']]]
+            Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
         next_offset: str = None,
         current_offset: str = None,
-    ) -> Tuple[Sequence['InlineQueryResult'], Optional[str]]:
+    ) -> Tuple[Sequence["InlineQueryResult"], Optional[str]]:
         """This method is called by Bot.answer_inline_query to build the actual results list.
         Overriding this to call self._replace_keyboard suffices
         """
@@ -319,7 +319,7 @@ class ExtBot(Bot):
         for result in effective_results:
             # All currently existingInlineQueryResults have a reply_markup, but future ones
             # might not have. Better be save than sorry
-            if not hasattr(result, 'reply_markup'):
+            if not hasattr(result, "reply_markup"):
                 results.append(result)
             else:
                 # We build a new result in case the user wants to use the same object in
@@ -332,23 +332,23 @@ class ExtBot(Bot):
         return results, next_offset
 
     @no_type_check  # mypy doesn't play too well with hasattr
-    def _insert_defaults_for_ilq_results(self, res: 'InlineQueryResult') -> None:
+    def _insert_defaults_for_ilq_results(self, res: "InlineQueryResult") -> None:
         """This method is called by Bot.answer_inline_query to replace `DefaultValue(obj)` with
         `obj`.
         Overriding this to call insert the actual desired default values.
         """
-        if hasattr(res, 'parse_mode') and res.parse_mode is DEFAULT_NONE:
+        if hasattr(res, "parse_mode") and res.parse_mode is DEFAULT_NONE:
             res.parse_mode = self.defaults.parse_mode if self.defaults else None
-        if hasattr(res, 'input_message_content') and res.input_message_content:
+        if hasattr(res, "input_message_content") and res.input_message_content:
             if (
-                hasattr(res.input_message_content, 'parse_mode')
+                hasattr(res.input_message_content, "parse_mode")
                 and res.input_message_content.parse_mode is DEFAULT_NONE
             ):
                 res.input_message_content.parse_mode = (
                     self.defaults.parse_mode if self.defaults else None
                 )
             if (
-                hasattr(res.input_message_content, 'disable_web_page_preview')
+                hasattr(res.input_message_content, "disable_web_page_preview")
                 and res.input_message_content.disable_web_page_preview is DEFAULT_NONE
             ):
                 res.input_message_content.disable_web_page_preview = (
@@ -385,7 +385,7 @@ class ExtBot(Bot):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,

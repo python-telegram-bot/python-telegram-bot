@@ -21,7 +21,7 @@ import pytest
 from telegram import ChatAdministratorRights
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def chat_admin_rights():
     return ChatAdministratorRights(
         can_change_info=True,
@@ -42,22 +42,22 @@ class TestChatAdministratorRights:
     def test_slot_behaviour(self, chat_admin_rights, mro_slots):
         inst = chat_admin_rights
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, bot, chat_admin_rights):
         json_dict = {
-            'can_change_info': True,
-            'can_delete_messages': True,
-            'can_invite_users': True,
-            'can_pin_messages': True,
-            'can_promote_members': True,
-            'can_restrict_members': True,
-            'can_post_messages': True,
-            'can_edit_messages': True,
-            'can_manage_chat': True,
-            'can_manage_video_chats': True,
-            'is_anonymous': True,
+            "can_change_info": True,
+            "can_delete_messages": True,
+            "can_invite_users": True,
+            "can_pin_messages": True,
+            "can_promote_members": True,
+            "can_restrict_members": True,
+            "can_post_messages": True,
+            "can_edit_messages": True,
+            "can_manage_chat": True,
+            "can_manage_video_chats": True,
+            "is_anonymous": True,
         }
         chat_administrator_rights_de = ChatAdministratorRights.de_json(json_dict, bot)
 
@@ -68,17 +68,17 @@ class TestChatAdministratorRights:
         admin_rights_dict = car.to_dict()
 
         assert isinstance(admin_rights_dict, dict)
-        assert admin_rights_dict['can_change_info'] == car.can_change_info
-        assert admin_rights_dict['can_delete_messages'] == car.can_delete_messages
-        assert admin_rights_dict['can_invite_users'] == car.can_invite_users
-        assert admin_rights_dict['can_pin_messages'] == car.can_pin_messages
-        assert admin_rights_dict['can_promote_members'] == car.can_promote_members
-        assert admin_rights_dict['can_restrict_members'] == car.can_restrict_members
-        assert admin_rights_dict['can_post_messages'] == car.can_post_messages
-        assert admin_rights_dict['can_edit_messages'] == car.can_edit_messages
-        assert admin_rights_dict['can_manage_chat'] == car.can_manage_chat
-        assert admin_rights_dict['is_anonymous'] == car.is_anonymous
-        assert admin_rights_dict['can_manage_video_chats'] == car.can_manage_video_chats
+        assert admin_rights_dict["can_change_info"] == car.can_change_info
+        assert admin_rights_dict["can_delete_messages"] == car.can_delete_messages
+        assert admin_rights_dict["can_invite_users"] == car.can_invite_users
+        assert admin_rights_dict["can_pin_messages"] == car.can_pin_messages
+        assert admin_rights_dict["can_promote_members"] == car.can_promote_members
+        assert admin_rights_dict["can_restrict_members"] == car.can_restrict_members
+        assert admin_rights_dict["can_post_messages"] == car.can_post_messages
+        assert admin_rights_dict["can_edit_messages"] == car.can_edit_messages
+        assert admin_rights_dict["can_manage_chat"] == car.can_manage_chat
+        assert admin_rights_dict["is_anonymous"] == car.is_anonymous
+        assert admin_rights_dict["can_manage_video_chats"] == car.can_manage_video_chats
 
     def test_equality(self):
         a = ChatAdministratorRights(True, False, False, False, False, False, False, False)

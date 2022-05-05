@@ -21,7 +21,7 @@ import pytest
 from telegram import InlineKeyboardButton, KeyboardButton, KeyboardButtonPollType, WebAppInfo
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def keyboard_button():
     return KeyboardButton(
         TestKeyboardButton.text,
@@ -33,7 +33,7 @@ def keyboard_button():
 
 
 class TestKeyboardButton:
-    text = 'text'
+    text = "text"
     request_location = True
     request_contact = True
     request_poll = KeyboardButtonPollType("quiz")
@@ -42,7 +42,7 @@ class TestKeyboardButton:
     def test_slot_behaviour(self, keyboard_button, mro_slots):
         inst = keyboard_button
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, keyboard_button):
@@ -56,19 +56,19 @@ class TestKeyboardButton:
         keyboard_button_dict = keyboard_button.to_dict()
 
         assert isinstance(keyboard_button_dict, dict)
-        assert keyboard_button_dict['text'] == keyboard_button.text
-        assert keyboard_button_dict['request_location'] == keyboard_button.request_location
-        assert keyboard_button_dict['request_contact'] == keyboard_button.request_contact
-        assert keyboard_button_dict['request_poll'] == keyboard_button.request_poll.to_dict()
-        assert keyboard_button_dict['web_app'] == keyboard_button.web_app.to_dict()
+        assert keyboard_button_dict["text"] == keyboard_button.text
+        assert keyboard_button_dict["request_location"] == keyboard_button.request_location
+        assert keyboard_button_dict["request_contact"] == keyboard_button.request_contact
+        assert keyboard_button_dict["request_poll"] == keyboard_button.request_poll.to_dict()
+        assert keyboard_button_dict["web_app"] == keyboard_button.web_app.to_dict()
 
     def test_de_json(self, bot):
         json_dict = {
-            'text': self.text,
-            'request_location': self.request_location,
-            'request_contact': self.request_contact,
-            'request_poll': self.request_poll.to_dict(),
-            'web_app': self.web_app.to_dict(),
+            "text": self.text,
+            "request_location": self.request_location,
+            "request_contact": self.request_contact,
+            "request_poll": self.request_poll.to_dict(),
+            "web_app": self.web_app.to_dict(),
         }
 
         inline_keyboard_button = KeyboardButton.de_json(json_dict, None)
@@ -82,10 +82,10 @@ class TestKeyboardButton:
         assert none is None
 
     def test_equality(self):
-        a = KeyboardButton('test', request_contact=True)
-        b = KeyboardButton('test', request_contact=True)
-        c = KeyboardButton('Test', request_location=True)
-        d = InlineKeyboardButton('test', callback_data='test')
+        a = KeyboardButton("test", request_contact=True)
+        b = KeyboardButton("test", request_contact=True)
+        c = KeyboardButton("Test", request_location=True)
+        d = InlineKeyboardButton("test", callback_data="test")
 
         assert a == b
         assert hash(a) == hash(b)

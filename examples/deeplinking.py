@@ -73,7 +73,7 @@ async def deep_linked_level_2(update: Update, context: CallbackContext.DEFAULT_T
     """Reached through the SO_COOL payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_ENTITIES)
-    text = f"You can also mask the deep-linked URLs as links: <a href=\"{url}\">▶️ CLICK HERE</a>."
+    text = f'You can also mask the deep-linked URLs as links: <a href="{url}">▶️ CLICK HERE</a>.'
     await update.message.reply_text(text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
 
 

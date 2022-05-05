@@ -45,7 +45,7 @@ class UserProfilePhotos(TelegramObject):
 
     """
 
-    __slots__ = ('photos', 'total_count')
+    __slots__ = ("photos", "total_count")
 
     def __init__(self, total_count: int, photos: List[List[PhotoSize]], **_kwargs: Any):
         # Required
@@ -55,14 +55,14 @@ class UserProfilePhotos(TelegramObject):
         self._id_attrs = (self.total_count, self.photos)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['UserProfilePhotos']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["UserProfilePhotos"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['photos'] = [PhotoSize.de_list(photo, bot) for photo in data['photos']]
+        data["photos"] = [PhotoSize.de_list(photo, bot) for photo in data["photos"]]
 
         return cls(**data)
 
@@ -70,9 +70,9 @@ class UserProfilePhotos(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['photos'] = []
+        data["photos"] = []
         for photo in self.photos:
-            data['photos'].append([x.to_dict() for x in photo])
+            data["photos"].append([x.to_dict() for x in photo])
 
         return data
 

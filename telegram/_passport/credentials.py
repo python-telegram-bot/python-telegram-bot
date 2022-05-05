@@ -73,8 +73,8 @@ def decrypt(secret, hash, data):
     """
     if not CRYPTO_INSTALLED:
         raise RuntimeError(
-            'To use Telegram Passports, PTB must be installed via `pip install '
-            'python-telegram-bot[passport]`.'
+            "To use Telegram Passports, PTB must be installed via `pip install "
+            "python-telegram-bot[passport]`."
         )
     # Make a SHA512 hash of secret + update
     digest = Hash(SHA512(), backend=default_backend())
@@ -101,7 +101,7 @@ def decrypt(secret, hash, data):
 @no_type_check
 def decrypt_json(secret, hash, data):
     """Decrypts data using secret and hash and then decodes utf-8 string and loads json"""
-    return json.loads(decrypt(secret, hash, data).decode('utf-8'))
+    return json.loads(decrypt(secret, hash, data).decode("utf-8"))
 
 
 class EncryptedCredentials(TelegramObject):
@@ -134,14 +134,14 @@ class EncryptedCredentials(TelegramObject):
     """
 
     __slots__ = (
-        'hash',
-        'secret',
-        'data',
-        '_decrypted_secret',
-        '_decrypted_data',
+        "hash",
+        "secret",
+        "data",
+        "_decrypted_secret",
+        "_decrypted_data",
     )
 
-    def __init__(self, data: str, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
+    def __init__(self, data: str, hash: str, secret: str, bot: "Bot" = None, **_kwargs: Any):
         # Required
         self.data = data
         self.hash = hash
@@ -151,7 +151,7 @@ class EncryptedCredentials(TelegramObject):
 
         self.set_bot(bot)
         self._decrypted_secret: Optional[str] = None
-        self._decrypted_data: Optional['Credentials'] = None
+        self._decrypted_data: Optional["Credentials"] = None
 
     @property
     def decrypted_secret(self) -> str:
@@ -165,8 +165,8 @@ class EncryptedCredentials(TelegramObject):
         if self._decrypted_secret is None:
             if not CRYPTO_INSTALLED:
                 raise RuntimeError(
-                    'To use Telegram Passports, PTB must be installed via `pip install '
-                    'python-telegram-bot[passport]`.'
+                    "To use Telegram Passports, PTB must be installed via `pip install "
+                    "python-telegram-bot[passport]`."
                 )
             # Try decrypting according to step 1 at
             # https://core.telegram.org/passport#decrypting-data
@@ -185,7 +185,7 @@ class EncryptedCredentials(TelegramObject):
         return self._decrypted_secret
 
     @property
-    def decrypted_data(self) -> 'Credentials':
+    def decrypted_data(self) -> "Credentials":
         """
         :class:`telegram.Credentials`: Lazily decrypt and return credentials data. This object
             also contains the user specified nonce as
@@ -210,9 +210,9 @@ class Credentials(TelegramObject):
         nonce (:obj:`str`): Bot-specified nonce
     """
 
-    __slots__ = ('nonce', 'secure_data')
+    __slots__ = ("nonce", "secure_data")
 
-    def __init__(self, secure_data: 'SecureData', nonce: str, bot: 'Bot' = None, **_kwargs: Any):
+    def __init__(self, secure_data: "SecureData", nonce: str, bot: "Bot" = None, **_kwargs: Any):
         # Required
         self.secure_data = secure_data
         self.nonce = nonce
@@ -220,14 +220,14 @@ class Credentials(TelegramObject):
         self.set_bot(bot)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Credentials']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Credentials"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['secure_data'] = SecureData.de_json(data.get('secure_data'), bot=bot)
+        data["secure_data"] = SecureData.de_json(data.get("secure_data"), bot=bot)
 
         return cls(bot=bot, **data)
 
@@ -261,33 +261,33 @@ class SecureData(TelegramObject):
     """
 
     __slots__ = (
-        'utility_bill',
-        'personal_details',
-        'temporary_registration',
-        'address',
-        'driver_license',
-        'rental_agreement',
-        'internal_passport',
-        'identity_card',
-        'bank_statement',
-        'passport',
-        'passport_registration',
+        "utility_bill",
+        "personal_details",
+        "temporary_registration",
+        "address",
+        "driver_license",
+        "rental_agreement",
+        "internal_passport",
+        "identity_card",
+        "bank_statement",
+        "passport",
+        "passport_registration",
     )
 
     def __init__(
         self,
-        personal_details: 'SecureValue' = None,
-        passport: 'SecureValue' = None,
-        internal_passport: 'SecureValue' = None,
-        driver_license: 'SecureValue' = None,
-        identity_card: 'SecureValue' = None,
-        address: 'SecureValue' = None,
-        utility_bill: 'SecureValue' = None,
-        bank_statement: 'SecureValue' = None,
-        rental_agreement: 'SecureValue' = None,
-        passport_registration: 'SecureValue' = None,
-        temporary_registration: 'SecureValue' = None,
-        bot: 'Bot' = None,
+        personal_details: "SecureValue" = None,
+        passport: "SecureValue" = None,
+        internal_passport: "SecureValue" = None,
+        driver_license: "SecureValue" = None,
+        identity_card: "SecureValue" = None,
+        address: "SecureValue" = None,
+        utility_bill: "SecureValue" = None,
+        bank_statement: "SecureValue" = None,
+        rental_agreement: "SecureValue" = None,
+        passport_registration: "SecureValue" = None,
+        temporary_registration: "SecureValue" = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         # Optionals
@@ -306,28 +306,28 @@ class SecureData(TelegramObject):
         self.set_bot(bot)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureData']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SecureData"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['temporary_registration'] = SecureValue.de_json(
-            data.get('temporary_registration'), bot=bot
+        data["temporary_registration"] = SecureValue.de_json(
+            data.get("temporary_registration"), bot=bot
         )
-        data['passport_registration'] = SecureValue.de_json(
-            data.get('passport_registration'), bot=bot
+        data["passport_registration"] = SecureValue.de_json(
+            data.get("passport_registration"), bot=bot
         )
-        data['rental_agreement'] = SecureValue.de_json(data.get('rental_agreement'), bot=bot)
-        data['bank_statement'] = SecureValue.de_json(data.get('bank_statement'), bot=bot)
-        data['utility_bill'] = SecureValue.de_json(data.get('utility_bill'), bot=bot)
-        data['address'] = SecureValue.de_json(data.get('address'), bot=bot)
-        data['identity_card'] = SecureValue.de_json(data.get('identity_card'), bot=bot)
-        data['driver_license'] = SecureValue.de_json(data.get('driver_license'), bot=bot)
-        data['internal_passport'] = SecureValue.de_json(data.get('internal_passport'), bot=bot)
-        data['passport'] = SecureValue.de_json(data.get('passport'), bot=bot)
-        data['personal_details'] = SecureValue.de_json(data.get('personal_details'), bot=bot)
+        data["rental_agreement"] = SecureValue.de_json(data.get("rental_agreement"), bot=bot)
+        data["bank_statement"] = SecureValue.de_json(data.get("bank_statement"), bot=bot)
+        data["utility_bill"] = SecureValue.de_json(data.get("utility_bill"), bot=bot)
+        data["address"] = SecureValue.de_json(data.get("address"), bot=bot)
+        data["identity_card"] = SecureValue.de_json(data.get("identity_card"), bot=bot)
+        data["driver_license"] = SecureValue.de_json(data.get("driver_license"), bot=bot)
+        data["internal_passport"] = SecureValue.de_json(data.get("internal_passport"), bot=bot)
+        data["passport"] = SecureValue.de_json(data.get("passport"), bot=bot)
+        data["personal_details"] = SecureValue.de_json(data.get("personal_details"), bot=bot)
 
         return cls(bot=bot, **data)
 
@@ -359,17 +359,17 @@ class SecureValue(TelegramObject):
 
     """
 
-    __slots__ = ('data', 'front_side', 'reverse_side', 'selfie', 'files', 'translation')
+    __slots__ = ("data", "front_side", "reverse_side", "selfie", "files", "translation")
 
     def __init__(
         self,
-        data: 'DataCredentials' = None,
-        front_side: 'FileCredentials' = None,
-        reverse_side: 'FileCredentials' = None,
-        selfie: 'FileCredentials' = None,
-        files: List['FileCredentials'] = None,
-        translation: List['FileCredentials'] = None,
-        bot: 'Bot' = None,
+        data: "DataCredentials" = None,
+        front_side: "FileCredentials" = None,
+        reverse_side: "FileCredentials" = None,
+        selfie: "FileCredentials" = None,
+        files: List["FileCredentials"] = None,
+        translation: List["FileCredentials"] = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         self.data = data
@@ -382,19 +382,19 @@ class SecureValue(TelegramObject):
         self.set_bot(bot)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SecureValue']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SecureValue"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['data'] = DataCredentials.de_json(data.get('data'), bot=bot)
-        data['front_side'] = FileCredentials.de_json(data.get('front_side'), bot=bot)
-        data['reverse_side'] = FileCredentials.de_json(data.get('reverse_side'), bot=bot)
-        data['selfie'] = FileCredentials.de_json(data.get('selfie'), bot=bot)
-        data['files'] = FileCredentials.de_list(data.get('files'), bot=bot)
-        data['translation'] = FileCredentials.de_list(data.get('translation'), bot=bot)
+        data["data"] = DataCredentials.de_json(data.get("data"), bot=bot)
+        data["front_side"] = FileCredentials.de_json(data.get("front_side"), bot=bot)
+        data["reverse_side"] = FileCredentials.de_json(data.get("reverse_side"), bot=bot)
+        data["selfie"] = FileCredentials.de_json(data.get("selfie"), bot=bot)
+        data["files"] = FileCredentials.de_list(data.get("files"), bot=bot)
+        data["translation"] = FileCredentials.de_list(data.get("translation"), bot=bot)
 
         return cls(bot=bot, **data)
 
@@ -402,8 +402,8 @@ class SecureValue(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['files'] = [p.to_dict() for p in self.files]  # type: ignore[union-attr]
-        data['translation'] = [p.to_dict() for p in self.translation]  # type: ignore[union-attr]
+        data["files"] = [p.to_dict() for p in self.files]  # type: ignore[union-attr]
+        data["translation"] = [p.to_dict() for p in self.translation]  # type: ignore[union-attr]
 
         return data
 
@@ -411,9 +411,9 @@ class SecureValue(TelegramObject):
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
 
-    __slots__ = ('hash', 'secret', 'file_hash', 'data_hash')
+    __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
-    def __init__(self, hash: str, secret: str, bot: 'Bot' = None, **_kwargs: Any):
+    def __init__(self, hash: str, secret: str, bot: "Bot" = None, **_kwargs: Any):
         self.hash = hash
         self.secret = secret
 
@@ -447,8 +447,8 @@ class DataCredentials(_CredentialsBase):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        del data['file_hash']
-        del data['hash']
+        del data["file_hash"]
+        del data["hash"]
 
         return data
 
@@ -476,7 +476,7 @@ class FileCredentials(_CredentialsBase):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        del data['data_hash']
-        del data['hash']
+        del data["data_hash"]
+        del data["hash"]
 
         return data

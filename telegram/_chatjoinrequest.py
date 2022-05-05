@@ -65,7 +65,7 @@ class ChatJoinRequest(TelegramObject):
 
     """
 
-    __slots__ = ('chat', 'from_user', 'date', 'bio', 'invite_link')
+    __slots__ = ("chat", "from_user", "date", "bio", "invite_link")
 
     def __init__(
         self,
@@ -74,7 +74,7 @@ class ChatJoinRequest(TelegramObject):
         date: datetime.datetime,
         bio: str = None,
         invite_link: ChatInviteLink = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         # Required
@@ -90,17 +90,17 @@ class ChatJoinRequest(TelegramObject):
         self._id_attrs = (self.chat, self.from_user, self.date)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChatJoinRequest']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatJoinRequest"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['chat'] = Chat.de_json(data.get('chat'), bot)
-        data['from_user'] = User.de_json(data.get('from'), bot)
-        data['date'] = from_timestamp(data.get('date', None))
-        data['invite_link'] = ChatInviteLink.de_json(data.get('invite_link'), bot)
+        data["chat"] = Chat.de_json(data.get("chat"), bot)
+        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["date"] = from_timestamp(data.get("date", None))
+        data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)
 
         return cls(bot=bot, **data)
 
@@ -108,7 +108,7 @@ class ChatJoinRequest(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['date'] = to_timestamp(self.date)
+        data["date"] = to_timestamp(self.date)
 
         return data
 

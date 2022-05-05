@@ -28,7 +28,7 @@ from telegram.error import TelegramError
 from tests.conftest import data_file
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def file(bot):
     return File(
         TestFile.file_id,
@@ -39,37 +39,37 @@ def file(bot):
     )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def local_file(bot):
     return File(
         TestFile.file_id,
         TestFile.file_unique_id,
-        file_path=str(data_file('local_file.txt')),
+        file_path=str(data_file("local_file.txt")),
         file_size=TestFile.file_size,
         bot=bot,
     )
 
 
 class TestFile:
-    file_id = 'NOTVALIDDOESNOTMATTER'
-    file_unique_id = 'adc3145fd2e84d95b64d68eaa22aa33e'
+    file_id = "NOTVALIDDOESNOTMATTER"
+    file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
     file_path = (
-        'https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3'
+        "https://api.org/file/bot133505823:AAHZFMHno3mzVLErU5b5jJvaeG--qUyLyG0/document/file_3"
     )
     file_size = 28232
-    file_content = 'Saint-Saëns'.encode()  # Intentionally contains unicode chars.
+    file_content = "Saint-Saëns".encode()  # Intentionally contains unicode chars.
 
     def test_slot_behaviour(self, file, mro_slots):
         for attr in file.__slots__:
-            assert getattr(file, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(file, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(file)) == len(set(mro_slots(file))), "duplicate slot"
 
     def test_de_json(self, bot):
         json_dict = {
-            'file_id': self.file_id,
-            'file_unique_id': self.file_unique_id,
-            'file_path': self.file_path,
-            'file_size': self.file_size,
+            "file_id": self.file_id,
+            "file_unique_id": self.file_unique_id,
+            "file_path": self.file_path,
+            "file_size": self.file_size,
         }
         new_file = File.de_json(json_dict, bot)
 
@@ -82,25 +82,25 @@ class TestFile:
         file_dict = file.to_dict()
 
         assert isinstance(file_dict, dict)
-        assert file_dict['file_id'] == file.file_id
-        assert file_dict['file_unique_id'] == file.file_unique_id
-        assert file_dict['file_path'] == file.file_path
-        assert file_dict['file_size'] == file.file_size
+        assert file_dict["file_id"] == file.file_id
+        assert file_dict["file_unique_id"] == file.file_unique_id
+        assert file_dict["file_path"] == file.file_path
+        assert file_dict["file_size"] == file.file_size
 
     @flaky(3, 1)
     async def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
-            await bot.get_file(file_id='')
+            await bot.get_file(file_id="")
 
     async def test_download_mutually_exclusive(self, file):
-        with pytest.raises(ValueError, match='`custom_path` and `out` are mutually exclusive'):
-            await file.download('custom_path', 'out')
+        with pytest.raises(ValueError, match="`custom_path` and `out` are mutually exclusive"):
+            await file.download("custom_path", "out")
 
     async def test_download(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr(file.get_bot().request, 'retrieve', test)
+        monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         out_file = await file.download()
 
         try:
@@ -112,13 +112,13 @@ class TestFile:
         assert await local_file.download() == Path(local_file.file_path)
 
     @pytest.mark.parametrize(
-        'custom_path_type', [str, Path], ids=['str custom_path', 'pathlib.Path custom_path']
+        "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]
     )
     async def test_download_custom_path(self, monkeypatch, file, custom_path_type):
         async def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr(file.get_bot().request, 'retrieve', test)
+        monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
         try:
@@ -130,7 +130,7 @@ class TestFile:
             custom_path.unlink()
 
     @pytest.mark.parametrize(
-        'custom_path_type', [str, Path], ids=['str custom_path', 'pathlib.Path custom_path']
+        "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]
     )
     async def test_download_custom_path_local_file(self, local_file, custom_path_type):
         file_handle, custom_path = mkstemp()
@@ -149,7 +149,7 @@ class TestFile:
 
         file.file_path = None
 
-        monkeypatch.setattr(file.get_bot().request, 'retrieve', test)
+        monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         out_file = await file.download()
 
         assert str(out_file)[-len(file.file_id) :] == file.file_id
@@ -162,7 +162,7 @@ class TestFile:
         async def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr(file.get_bot().request, 'retrieve', test)
+        monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         with TemporaryFile() as custom_fobj:
             out_fobj = await file.download(out=custom_fobj)
             assert out_fobj is custom_fobj
@@ -182,7 +182,7 @@ class TestFile:
         async def test(*args, **kwargs):
             return self.file_content
 
-        monkeypatch.setattr(file.get_bot().request, 'retrieve', test)
+        monkeypatch.setattr(file.get_bot().request, "retrieve", test)
 
         # Check that a download to a newly allocated bytearray works.
         buf = await file.download_as_bytearray()
@@ -209,9 +209,9 @@ class TestFile:
 
     def test_equality(self, bot):
         a = File(self.file_id, self.file_unique_id, bot)
-        b = File('', self.file_unique_id, bot)
+        b = File("", self.file_unique_id, bot)
         c = File(self.file_id, self.file_unique_id, None)
-        d = File('', '', bot)
+        d = File("", "", bot)
         e = Voice(self.file_id, self.file_unique_id, 0)
 
         assert a == b

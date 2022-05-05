@@ -51,7 +51,7 @@ class PollOption(TelegramObject):
 
     """
 
-    __slots__ = ('voter_count', 'text')
+    __slots__ = ("voter_count", "text")
 
     def __init__(self, text: str, voter_count: int, **_kwargs: Any):
         self.text = text
@@ -83,7 +83,7 @@ class PollAnswer(TelegramObject):
 
     """
 
-    __slots__ = ('option_ids', 'user', 'poll_id')
+    __slots__ = ("option_ids", "user", "poll_id")
 
     def __init__(self, poll_id: str, user: User, option_ids: List[int], **_kwargs: Any):
         self.poll_id = poll_id
@@ -93,14 +93,14 @@ class PollAnswer(TelegramObject):
         self._id_attrs = (self.poll_id, self.user, tuple(self.option_ids))
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PollAnswer']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["PollAnswer"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['user'] = User.de_json(data.get('user'), bot)
+        data["user"] = User.de_json(data.get("user"), bot)
 
         return cls(**data)
 
@@ -154,19 +154,19 @@ class Poll(TelegramObject):
     """
 
     __slots__ = (
-        'total_voter_count',
-        'allows_multiple_answers',
-        'open_period',
-        'options',
-        'type',
-        'explanation_entities',
-        'is_anonymous',
-        'close_date',
-        'is_closed',
-        'id',
-        'explanation',
-        'question',
-        'correct_option_id',
+        "total_voter_count",
+        "allows_multiple_answers",
+        "open_period",
+        "options",
+        "type",
+        "explanation_entities",
+        "is_anonymous",
+        "close_date",
+        "is_closed",
+        "id",
+        "explanation",
+        "question",
+        "correct_option_id",
     )
 
     def __init__(
@@ -203,16 +203,16 @@ class Poll(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Poll']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Poll"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['options'] = [PollOption.de_json(option, bot) for option in data['options']]
-        data['explanation_entities'] = MessageEntity.de_list(data.get('explanation_entities'), bot)
-        data['close_date'] = from_timestamp(data.get('close_date'))
+        data["options"] = [PollOption.de_json(option, bot) for option in data["options"]]
+        data["explanation_entities"] = MessageEntity.de_list(data.get("explanation_entities"), bot)
+        data["close_date"] = from_timestamp(data.get("close_date"))
 
         return cls(**data)
 
@@ -220,10 +220,10 @@ class Poll(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['options'] = [x.to_dict() for x in self.options]
+        data["options"] = [x.to_dict() for x in self.options]
         if self.explanation_entities:
-            data['explanation_entities'] = [e.to_dict() for e in self.explanation_entities]
-        data['close_date'] = to_timestamp(data.get('close_date'))
+            data["explanation_entities"] = [e.to_dict() for e in self.explanation_entities]
+        data["close_date"] = to_timestamp(data.get("close_date"))
 
         return data
 
@@ -252,10 +252,10 @@ class Poll(TelegramObject):
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xFFFF:
             return self.explanation[entity.offset : entity.offset + entity.length]
-        entity_text = self.explanation.encode('utf-16-le')
+        entity_text = self.explanation.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
-        return entity_text.decode('utf-16-le')
+        return entity_text.decode("utf-16-le")
 
     def parse_explanation_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
         """

@@ -24,12 +24,12 @@ from telegram import ChatInviteLink, User
 from telegram._utils.datetime import to_timestamp
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def creator():
-    return User(1, 'First name', False)
+    return User(1, "First name", False)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def invite_link(creator):
     return ChatInviteLink(
         TestChatInviteLink.link,
@@ -52,21 +52,21 @@ class TestChatInviteLink:
     revoked = False
     expire_date = datetime.datetime.now(datetime.timezone.utc)
     member_limit = 42
-    name = 'LinkName'
+    name = "LinkName"
     pending_join_request_count = 42
 
     def test_slot_behaviour(self, mro_slots, invite_link):
         for attr in invite_link.__slots__:
-            assert getattr(invite_link, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invite_link)) == len(set(mro_slots(invite_link))), "duplicate slot"
 
     def test_de_json_required_args(self, bot, creator):
         json_dict = {
-            'invite_link': self.link,
-            'creator': creator.to_dict(),
-            'creates_join_request': self.creates_join_request,
-            'is_primary': self.primary,
-            'is_revoked': self.revoked,
+            "invite_link": self.link,
+            "creator": creator.to_dict(),
+            "creates_join_request": self.creates_join_request,
+            "is_primary": self.primary,
+            "is_revoked": self.revoked,
         }
 
         invite_link = ChatInviteLink.de_json(json_dict, bot)
@@ -79,15 +79,15 @@ class TestChatInviteLink:
 
     def test_de_json_all_args(self, bot, creator):
         json_dict = {
-            'invite_link': self.link,
-            'creator': creator.to_dict(),
-            'creates_join_request': self.creates_join_request,
-            'is_primary': self.primary,
-            'is_revoked': self.revoked,
-            'expire_date': to_timestamp(self.expire_date),
-            'member_limit': str(self.member_limit),
-            'name': self.name,
-            'pending_join_request_count': str(self.pending_join_request_count),
+            "invite_link": self.link,
+            "creator": creator.to_dict(),
+            "creates_join_request": self.creates_join_request,
+            "is_primary": self.primary,
+            "is_revoked": self.revoked,
+            "expire_date": to_timestamp(self.expire_date),
+            "member_limit": str(self.member_limit),
+            "name": self.name,
+            "pending_join_request_count": str(self.pending_join_request_count),
         }
 
         invite_link = ChatInviteLink.de_json(json_dict, bot)
@@ -106,26 +106,26 @@ class TestChatInviteLink:
     def test_to_dict(self, invite_link):
         invite_link_dict = invite_link.to_dict()
         assert isinstance(invite_link_dict, dict)
-        assert invite_link_dict['creator'] == invite_link.creator.to_dict()
-        assert invite_link_dict['invite_link'] == invite_link.invite_link
-        assert invite_link_dict['creates_join_request'] == invite_link.creates_join_request
-        assert invite_link_dict['is_primary'] == self.primary
-        assert invite_link_dict['is_revoked'] == self.revoked
-        assert invite_link_dict['expire_date'] == to_timestamp(self.expire_date)
-        assert invite_link_dict['member_limit'] == self.member_limit
-        assert invite_link_dict['name'] == self.name
-        assert invite_link_dict['pending_join_request_count'] == self.pending_join_request_count
+        assert invite_link_dict["creator"] == invite_link.creator.to_dict()
+        assert invite_link_dict["invite_link"] == invite_link.invite_link
+        assert invite_link_dict["creates_join_request"] == invite_link.creates_join_request
+        assert invite_link_dict["is_primary"] == self.primary
+        assert invite_link_dict["is_revoked"] == self.revoked
+        assert invite_link_dict["expire_date"] == to_timestamp(self.expire_date)
+        assert invite_link_dict["member_limit"] == self.member_limit
+        assert invite_link_dict["name"] == self.name
+        assert invite_link_dict["pending_join_request_count"] == self.pending_join_request_count
 
     def test_equality(self):
-        a = ChatInviteLink("link", User(1, '', False), True, True, True)
-        b = ChatInviteLink("link", User(1, '', False), True, True, True)
-        c = ChatInviteLink("link", User(2, '', False), True, True, True)
-        d1 = ChatInviteLink("link", User(1, '', False), False, True, True)
-        d2 = ChatInviteLink("link", User(1, '', False), True, False, True)
-        d3 = ChatInviteLink("link", User(1, '', False), True, True, False)
-        e = ChatInviteLink("notalink", User(1, '', False), True, False, True)
-        f = ChatInviteLink("notalink", User(1, '', False), True, True, True)
-        g = User(1, '', False)
+        a = ChatInviteLink("link", User(1, "", False), True, True, True)
+        b = ChatInviteLink("link", User(1, "", False), True, True, True)
+        c = ChatInviteLink("link", User(2, "", False), True, True, True)
+        d1 = ChatInviteLink("link", User(1, "", False), False, True, True)
+        d2 = ChatInviteLink("link", User(1, "", False), True, False, True)
+        d3 = ChatInviteLink("link", User(1, "", False), True, True, False)
+        e = ChatInviteLink("notalink", User(1, "", False), True, False, True)
+        f = ChatInviteLink("notalink", User(1, "", False), True, True, True)
+        g = User(1, "", False)
 
         assert a == b
         assert hash(a) == hash(b)

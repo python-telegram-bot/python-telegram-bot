@@ -46,7 +46,7 @@ class InputContactMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = ('vcard', 'first_name', 'last_name', 'phone_number')
+    __slots__ = ("vcard", "first_name", "last_name", "phone_number")
 
     def __init__(
         self,

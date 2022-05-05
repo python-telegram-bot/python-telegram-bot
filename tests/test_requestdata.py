@@ -33,80 +33,80 @@ from telegram.request._requestparameter import RequestParameter
 from tests.conftest import data_file
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def inputfiles() -> Dict[bool, InputFile]:
-    return {True: InputFile(obj='data', attach=True), False: InputFile(obj='data', attach=False)}
+    return {True: InputFile(obj="data", attach=True), False: InputFile(obj="data", attach=False)}
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def input_media_video() -> InputMediaVideo:
     return InputMediaVideo(
-        media=data_file('telegram.mp4').read_bytes(),
-        thumb=data_file('telegram.jpg').read_bytes(),
+        media=data_file("telegram.mp4").read_bytes(),
+        thumb=data_file("telegram.jpg").read_bytes(),
         parse_mode=None,
     )
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def input_media_photo() -> InputMediaPhoto:
     return InputMediaPhoto(
-        media=data_file('telegram.jpg').read_bytes(),
+        media=data_file("telegram.jpg").read_bytes(),
         parse_mode=None,
     )
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def simple_params() -> Dict[str, Any]:
     return {
-        'string': 'string',
-        'integer': 1,
-        'tg_object': MessageEntity('type', 1, 1),
-        'list': [1, 'string', MessageEntity('type', 1, 1)],
+        "string": "string",
+        "integer": 1,
+        "tg_object": MessageEntity("type", 1, 1),
+        "list": [1, "string", MessageEntity("type", 1, 1)],
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def simple_jsons() -> Dict[str, Any]:
     return {
-        'string': 'string',
-        'integer': json.dumps(1),
-        'tg_object': MessageEntity('type', 1, 1).to_json(),
-        'list': json.dumps([1, 'string', MessageEntity('type', 1, 1).to_dict()]),
+        "string": "string",
+        "integer": json.dumps(1),
+        "tg_object": MessageEntity("type", 1, 1).to_json(),
+        "list": json.dumps([1, "string", MessageEntity("type", 1, 1).to_dict()]),
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def simple_rqs(simple_params) -> RequestData:
     return RequestData(
         [RequestParameter.from_input(key, value) for key, value in simple_params.items()]
     )
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def file_params(inputfiles, input_media_video, input_media_photo) -> Dict[str, Any]:
     return {
-        'inputfile_attach': inputfiles[True],
-        'inputfile_no_attach': inputfiles[False],
-        'inputmedia': input_media_video,
-        'inputmedia_list': [input_media_video, input_media_photo],
+        "inputfile_attach": inputfiles[True],
+        "inputfile_no_attach": inputfiles[False],
+        "inputmedia": input_media_video,
+        "inputmedia_list": [input_media_video, input_media_photo],
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def file_jsons(inputfiles, input_media_video, input_media_photo) -> Dict[str, Any]:
     input_media_video_dict = input_media_video.to_dict()
-    input_media_video_dict['media'] = input_media_video.media.attach_uri
-    input_media_video_dict['thumb'] = input_media_video.thumb.attach_uri
+    input_media_video_dict["media"] = input_media_video.media.attach_uri
+    input_media_video_dict["thumb"] = input_media_video.thumb.attach_uri
     input_media_photo_dict = input_media_photo.to_dict()
-    input_media_photo_dict['media'] = input_media_photo.media.attach_uri
+    input_media_photo_dict["media"] = input_media_photo.media.attach_uri
     return {
-        'inputfile_attach': inputfiles[True].attach_uri,
-        'inputmedia': json.dumps(input_media_video_dict),
-        'inputmedia_list': json.dumps([input_media_video_dict, input_media_photo_dict]),
+        "inputfile_attach": inputfiles[True].attach_uri,
+        "inputmedia": json.dumps(input_media_video_dict),
+        "inputmedia_list": json.dumps([input_media_video_dict, input_media_photo_dict]),
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def file_rqs(file_params) -> RequestData:
     return RequestData(
         [RequestParameter.from_input(key, value) for key, value in file_params.items()]
@@ -137,7 +137,7 @@ def mixed_rqs(mixed_params) -> RequestData:
 class TestRequestData:
     def test_slot_behaviour(self, simple_rqs, mro_slots):
         for attr in simple_rqs.__slots__:
-            assert getattr(simple_rqs, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(simple_rqs, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(simple_rqs)) == len(set(mro_slots(simple_rqs))), "duplicate slot"
 
     def test_contains_files(self, simple_rqs, file_rqs, mixed_rqs):
@@ -149,21 +149,21 @@ class TestRequestData:
         self, simple_rqs, file_rqs, mixed_rqs, inputfiles, input_media_video, input_media_photo
     ):
         simple_params_expected = {
-            'string': 'string',
-            'integer': 1,
-            'tg_object': MessageEntity('type', 1, 1).to_dict(),
-            'list': [1, 'string', MessageEntity('type', 1, 1).to_dict()],
+            "string": "string",
+            "integer": 1,
+            "tg_object": MessageEntity("type", 1, 1).to_dict(),
+            "list": [1, "string", MessageEntity("type", 1, 1).to_dict()],
         }
         video_value = {
-            'media': input_media_video.media.attach_uri,
-            'thumb': input_media_video.thumb.attach_uri,
-            'type': input_media_video.type,
+            "media": input_media_video.media.attach_uri,
+            "thumb": input_media_video.thumb.attach_uri,
+            "type": input_media_video.type,
         }
-        photo_value = {'media': input_media_photo.media.attach_uri, 'type': input_media_photo.type}
+        photo_value = {"media": input_media_photo.media.attach_uri, "type": input_media_photo.type}
         file_params_expected = {
-            'inputfile_attach': inputfiles[True].attach_uri,
-            'inputmedia': video_value,
-            'inputmedia_list': [video_value, photo_value],
+            "inputfile_attach": inputfiles[True].attach_uri,
+            "inputmedia": video_value,
+            "inputmedia_list": [video_value, photo_value],
         }
         mixed_params_expected = simple_params_expected.copy()
         mixed_params_expected.update(file_params_expected)
@@ -197,7 +197,7 @@ class TestRequestData:
     ):
         expected = {
             inputfiles[True].attach_name: inputfiles[True].field_tuple,
-            'inputfile_no_attach': inputfiles[False].field_tuple,
+            "inputfile_no_attach": inputfiles[False].field_tuple,
             input_media_photo.media.attach_name: input_media_photo.media.field_tuple,
             input_media_video.media.attach_name: input_media_video.media.field_tuple,
             input_media_video.thumb.attach_name: input_media_video.thumb.field_tuple,
@@ -209,24 +209,24 @@ class TestRequestData:
     def test_url_encoding(self, monkeypatch):
         data = RequestData(
             [
-                RequestParameter.from_input('chat_id', 123),
-                RequestParameter.from_input('text', 'Hello there/!'),
+                RequestParameter.from_input("chat_id", 123),
+                RequestParameter.from_input("text", "Hello there/!"),
             ]
         )
-        expected_params = 'chat_id=123&text=Hello+there%2F%21'
-        expected_url = 'https://te.st/method?' + expected_params
+        expected_params = "chat_id=123&text=Hello+there%2F%21"
+        expected_url = "https://te.st/method?" + expected_params
         assert data.url_encoded_parameters() == expected_params
-        assert data.parametrized_url('https://te.st/method') == expected_url
+        assert data.parametrized_url("https://te.st/method") == expected_url
 
-        expected_params = 'chat_id=123&text=Hello%20there/!'
-        expected_url = 'https://te.st/method?' + expected_params
+        expected_params = "chat_id=123&text=Hello%20there/!"
+        expected_url = "https://te.st/method?" + expected_params
         assert (
-            data.url_encoded_parameters(encode_kwargs={'quote_via': quote, 'safe': '/!'})
+            data.url_encoded_parameters(encode_kwargs={"quote_via": quote, "safe": "/!"})
             == expected_params
         )
         assert (
             data.parametrized_url(
-                'https://te.st/method', encode_kwargs={'quote_via': quote, 'safe': '/!'}
+                "https://te.st/method", encode_kwargs={"quote_via": quote, "safe": "/!"}
             )
             == expected_url
         )

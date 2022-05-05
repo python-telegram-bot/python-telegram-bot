@@ -13,7 +13,7 @@ from telegram import Bot
 from telegram.error import Forbidden, NetworkError
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ async def echo(bot: Bot, update_id: int) -> int:
     return update_id
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:  # Ignore exception when Ctrl-C is pressed

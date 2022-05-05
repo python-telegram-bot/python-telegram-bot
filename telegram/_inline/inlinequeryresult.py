@@ -46,7 +46,7 @@ class InlineQueryResult(TelegramObject):
 
     """
 
-    __slots__ = ('type', 'id')
+    __slots__ = ("type", "id")
 
     def __init__(self, type: str, id: str, **_kwargs: Any):  # pylint: disable=invalid-name
         # Required
@@ -61,10 +61,10 @@ class InlineQueryResult(TelegramObject):
 
         # pylint: disable=no-member
         if (
-            hasattr(self, 'caption_entities')
+            hasattr(self, "caption_entities")
             and self.caption_entities  # type: ignore[attr-defined]
         ):
-            data['caption_entities'] = [
+            data["caption_entities"] = [
                 ce.to_dict() for ce in self.caption_entities  # type: ignore[attr-defined]
             ]
 

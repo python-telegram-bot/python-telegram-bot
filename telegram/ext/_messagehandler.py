@@ -29,7 +29,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 if TYPE_CHECKING:
     from telegram.ext import Application
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 class MessageHandler(Handler[Update, CCT]):
@@ -70,7 +70,7 @@ class MessageHandler(Handler[Update, CCT]):
 
     """
 
-    __slots__ = ('filters',)
+    __slots__ = ("filters",)
 
     def __init__(
         self,
@@ -100,7 +100,7 @@ class MessageHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        application: 'Application',
+        application: "Application",
         check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
         """Adds possible output of data filters to the :class:`CallbackContext`."""

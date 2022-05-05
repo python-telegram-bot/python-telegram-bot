@@ -22,28 +22,28 @@ import pytest
 from telegram import ChosenInlineResult, Location, User, Voice
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def user():
-    return User(1, 'First name', False)
+    return User(1, "First name", False)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def chosen_inline_result(user):
     return ChosenInlineResult(TestChosenInlineResult.result_id, user, TestChosenInlineResult.query)
 
 
 class TestChosenInlineResult:
-    result_id = 'result id'
-    query = 'query text'
+    result_id = "result id"
+    query = "query text"
 
     def test_slot_behaviour(self, chosen_inline_result, mro_slots):
         inst = chosen_inline_result
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json_required(self, bot, user):
-        json_dict = {'result_id': self.result_id, 'from': user.to_dict(), 'query': self.query}
+        json_dict = {"result_id": self.result_id, "from": user.to_dict(), "query": self.query}
         result = ChosenInlineResult.de_json(json_dict, bot)
 
         assert result.result_id == self.result_id
@@ -53,11 +53,11 @@ class TestChosenInlineResult:
     def test_de_json_all(self, bot, user):
         loc = Location(-42.003, 34.004)
         json_dict = {
-            'result_id': self.result_id,
-            'from': user.to_dict(),
-            'query': self.query,
-            'location': loc.to_dict(),
-            'inline_message_id': 'a random id',
+            "result_id": self.result_id,
+            "from": user.to_dict(),
+            "query": self.query,
+            "location": loc.to_dict(),
+            "inline_message_id": "a random id",
         }
         result = ChosenInlineResult.de_json(json_dict, bot)
 
@@ -65,22 +65,22 @@ class TestChosenInlineResult:
         assert result.from_user == user
         assert result.query == self.query
         assert result.location == loc
-        assert result.inline_message_id == 'a random id'
+        assert result.inline_message_id == "a random id"
 
     def test_to_dict(self, chosen_inline_result):
         chosen_inline_result_dict = chosen_inline_result.to_dict()
 
         assert isinstance(chosen_inline_result_dict, dict)
-        assert chosen_inline_result_dict['result_id'] == chosen_inline_result.result_id
-        assert chosen_inline_result_dict['from'] == chosen_inline_result.from_user.to_dict()
-        assert chosen_inline_result_dict['query'] == chosen_inline_result.query
+        assert chosen_inline_result_dict["result_id"] == chosen_inline_result.result_id
+        assert chosen_inline_result_dict["from"] == chosen_inline_result.from_user.to_dict()
+        assert chosen_inline_result_dict["query"] == chosen_inline_result.query
 
     def test_equality(self, user):
-        a = ChosenInlineResult(self.result_id, user, 'Query', '')
-        b = ChosenInlineResult(self.result_id, user, 'Query', '')
-        c = ChosenInlineResult(self.result_id, user, '', '')
-        d = ChosenInlineResult('', user, 'Query', '')
-        e = Voice(self.result_id, 'unique_id', 0)
+        a = ChosenInlineResult(self.result_id, user, "Query", "")
+        b = ChosenInlineResult(self.result_id, user, "Query", "")
+        c = ChosenInlineResult(self.result_id, user, "", "")
+        d = ChosenInlineResult("", user, "Query", "")
+        e = Voice(self.result_id, "unique_id", 0)
 
         assert a == b
         assert hash(a) == hash(b)

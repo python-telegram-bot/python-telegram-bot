@@ -49,12 +49,12 @@ class InvalidCallbackData(TelegramError):
             be found.
     """
 
-    __slots__ = ('callback_data',)
+    __slots__ = ("callback_data",)
 
     def __init__(self, callback_data: str = None) -> None:
         super().__init__(
-            'The object belonging to this callback_data was deleted or the callback_data was '
-            'manipulated.'
+            "The object belonging to this callback_data was deleted or the callback_data was "
+            "manipulated."
         )
         self.callback_data = callback_data
 
@@ -63,7 +63,7 @@ class InvalidCallbackData(TelegramError):
 
 
 class _KeyboardData:
-    __slots__ = ('keyboard_uuid', 'button_data', 'access_time')
+    __slots__ = ("keyboard_uuid", "button_data", "access_time")
 
     def __init__(
         self, keyboard_uuid: str, access_time: float = None, button_data: Dict[str, object] = None
@@ -112,11 +112,11 @@ class CallbackDataCache:
 
     """
 
-    __slots__ = ('bot', 'maxsize', '_keyboard_data', '_callback_queries', 'logger')
+    __slots__ = ("bot", "maxsize", "_keyboard_data", "_callback_queries", "logger")
 
     def __init__(
         self,
-        bot: 'ExtBot',
+        bot: "ExtBot",
         maxsize: int = 1024,
         persistent_data: CDCData = None,
     ):
@@ -196,7 +196,7 @@ class CallbackDataCache:
         """
         uuid = uuid4().hex
         keyboard_data.button_data[uuid] = callback_data
-        return f'{keyboard_data.keyboard_uuid}{uuid}'
+        return f"{keyboard_data.keyboard_uuid}{uuid}"
 
     def __get_keyboard_uuid_and_button_data(
         self, callback_data: str
@@ -354,7 +354,7 @@ class CallbackDataCache:
             keyboard_uuid = self._callback_queries.pop(callback_query.id)
             self.__drop_keyboard(keyboard_uuid)
         except KeyError as exc:
-            raise KeyError('CallbackQuery was not found in cache.') from exc
+            raise KeyError("CallbackQuery was not found in cache.") from exc
 
     def __drop_keyboard(self, keyboard_uuid: str) -> None:
         try:

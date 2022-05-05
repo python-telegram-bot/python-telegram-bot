@@ -22,7 +22,7 @@ from flaky import flaky
 from telegram import ReplyKeyboardRemove
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def reply_keyboard_remove():
     return ReplyKeyboardRemove(selective=TestReplyKeyboardRemove.selective)
 
@@ -34,16 +34,16 @@ class TestReplyKeyboardRemove:
     def test_slot_behaviour(self, reply_keyboard_remove, mro_slots):
         inst = reply_keyboard_remove
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     @flaky(3, 1)
     async def test_send_message_with_reply_keyboard_remove(
         self, bot, chat_id, reply_keyboard_remove
     ):
-        message = await bot.send_message(chat_id, 'Text', reply_markup=reply_keyboard_remove)
+        message = await bot.send_message(chat_id, "Text", reply_markup=reply_keyboard_remove)
 
-        assert message.text == 'Text'
+        assert message.text == "Text"
 
     def test_expected_values(self, reply_keyboard_remove):
         assert reply_keyboard_remove.remove_keyboard == self.remove_keyboard
@@ -53,6 +53,6 @@ class TestReplyKeyboardRemove:
         reply_keyboard_remove_dict = reply_keyboard_remove.to_dict()
 
         assert (
-            reply_keyboard_remove_dict['remove_keyboard'] == reply_keyboard_remove.remove_keyboard
+            reply_keyboard_remove_dict["remove_keyboard"] == reply_keyboard_remove.remove_keyboard
         )
-        assert reply_keyboard_remove_dict['selective'] == reply_keyboard_remove.selective
+        assert reply_keyboard_remove_dict["selective"] == reply_keyboard_remove.selective

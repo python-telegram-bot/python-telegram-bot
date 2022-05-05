@@ -38,7 +38,7 @@ from telegram.request import HTTPXRequest
 from .conftest import PRIVATE_KEY, data_file
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def builder():
     return ApplicationBuilder()
 
@@ -46,11 +46,11 @@ def builder():
 class TestApplicationBuilder:
     def test_slot_behaviour(self, builder, mro_slots):
         for attr in builder.__slots__:
-            assert getattr(builder, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(builder, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(builder)) == len(set(mro_slots(builder))), "duplicate slot"
 
     def test_build_without_token(self, builder):
-        with pytest.raises(RuntimeError, match='No bot token was set.'):
+        with pytest.raises(RuntimeError, match="No bot token was set."):
             builder.build()
 
     def test_build_custom_bot(self, builder, bot):
@@ -66,7 +66,7 @@ class TestApplicationBuilder:
             proxies: object
             limits: object
 
-        monkeypatch.setattr(httpx, 'AsyncClient', Client)
+        monkeypatch.setattr(httpx, "AsyncClient", Client)
 
         app = builder.token(bot.token).build()
 
@@ -75,9 +75,9 @@ class TestApplicationBuilder:
 
         assert isinstance(app.bot, ExtBot)
         assert isinstance(app.bot.request, HTTPXRequest)
-        assert 'api.telegram.org' in app.bot.base_url
+        assert "api.telegram.org" in app.bot.base_url
         assert bot.token in app.bot.base_url
-        assert 'api.telegram.org' in app.bot.base_file_url
+        assert "api.telegram.org" in app.bot.base_file_url
         assert bot.token in app.bot.base_file_url
         assert app.bot.private_key is None
         assert app.bot.arbitrary_callback_data is False
@@ -108,59 +108,59 @@ class TestApplicationBuilder:
         assert app.persistence is None
 
     @pytest.mark.parametrize(
-        'method, description', _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
+        "method, description", _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
     )
     def test_mutually_exclusive_for_bot(self, builder, method, description):
         # First test that e.g. `bot` can't be set if `request` was already set
         # We pass the private key since `private_key` is the only method that doesn't just save
         # the passed value
-        getattr(builder, method)(data_file('private.key'))
-        with pytest.raises(RuntimeError, match=f'`bot` may only be set, if no {description}'):
+        getattr(builder, method)(data_file("private.key"))
+        with pytest.raises(RuntimeError, match=f"`bot` may only be set, if no {description}"):
             builder.bot(None)
 
         # Now test that `request` can't be set if `bot` was already set
         builder = builder.__class__()
         builder.bot(None)
-        with pytest.raises(RuntimeError, match=f'`{method}` may only be set, if no bot instance'):
-            getattr(builder, method)(data_file('private.key'))
+        with pytest.raises(RuntimeError, match=f"`{method}` may only be set, if no bot instance"):
+            getattr(builder, method)(data_file("private.key"))
 
     @pytest.mark.parametrize(
-        'method',
+        "method",
         (
-            'connection_pool_size',
-            'connect_timeout',
-            'pool_timeout',
-            'read_timeout',
-            'write_timeout',
-            'proxy_url',
-            'bot',
-            'updater',
+            "connection_pool_size",
+            "connect_timeout",
+            "pool_timeout",
+            "read_timeout",
+            "write_timeout",
+            "proxy_url",
+            "bot",
+            "updater",
         ),
     )
     def test_mutually_exclusive_for_request(self, builder, method):
         builder.request(1)
 
         with pytest.raises(
-            RuntimeError, match=f'`{method}` may only be set, if no request instance'
+            RuntimeError, match=f"`{method}` may only be set, if no request instance"
         ):
-            getattr(builder, method)(data_file('private.key'))
+            getattr(builder, method)(data_file("private.key"))
 
         builder = ApplicationBuilder()
         getattr(builder, method)(1)
-        with pytest.raises(RuntimeError, match='`request` may only be set, if no'):
+        with pytest.raises(RuntimeError, match="`request` may only be set, if no"):
             builder.request(1)
 
     @pytest.mark.parametrize(
-        'method',
+        "method",
         (
-            'get_updates_connection_pool_size',
-            'get_updates_connect_timeout',
-            'get_updates_pool_timeout',
-            'get_updates_read_timeout',
-            'get_updates_write_timeout',
-            'get_updates_proxy_url',
-            'bot',
-            'updater',
+            "get_updates_connection_pool_size",
+            "get_updates_connect_timeout",
+            "get_updates_pool_timeout",
+            "get_updates_read_timeout",
+            "get_updates_write_timeout",
+            "get_updates_proxy_url",
+            "bot",
+            "updater",
         ),
     )
     def test_mutually_exclusive_for_get_updates_request(self, builder, method):
@@ -168,32 +168,32 @@ class TestApplicationBuilder:
 
         with pytest.raises(
             RuntimeError,
-            match=f'`{method}` may only be set, if no get_updates_request instance',
+            match=f"`{method}` may only be set, if no get_updates_request instance",
         ):
-            getattr(builder, method)(data_file('private.key'))
+            getattr(builder, method)(data_file("private.key"))
 
         builder = ApplicationBuilder()
         getattr(builder, method)(1)
-        with pytest.raises(RuntimeError, match='`get_updates_request` may only be set, if no'):
+        with pytest.raises(RuntimeError, match="`get_updates_request` may only be set, if no"):
             builder.get_updates_request(1)
 
     @pytest.mark.parametrize(
-        'method',
+        "method",
         [
-            'get_updates_connection_pool_size',
-            'get_updates_connect_timeout',
-            'get_updates_pool_timeout',
-            'get_updates_read_timeout',
-            'get_updates_write_timeout',
-            'get_updates_proxy_url',
-            'connection_pool_size',
-            'connect_timeout',
-            'pool_timeout',
-            'read_timeout',
-            'write_timeout',
-            'proxy_url',
-            'bot',
-            'update_queue',
+            "get_updates_connection_pool_size",
+            "get_updates_connect_timeout",
+            "get_updates_pool_timeout",
+            "get_updates_read_timeout",
+            "get_updates_write_timeout",
+            "get_updates_proxy_url",
+            "connection_pool_size",
+            "connect_timeout",
+            "pool_timeout",
+            "read_timeout",
+            "write_timeout",
+            "proxy_url",
+            "bot",
+            "update_queue",
         ]
         + [entry[0] for entry in _BOT_CHECKS],
     )
@@ -202,31 +202,31 @@ class TestApplicationBuilder:
 
         with pytest.raises(
             RuntimeError,
-            match=f'`{method}` may only be set, if no updater',
+            match=f"`{method}` may only be set, if no updater",
         ):
-            getattr(builder, method)(data_file('private.key'))
+            getattr(builder, method)(data_file("private.key"))
 
         builder = ApplicationBuilder()
-        getattr(builder, method)(data_file('private.key'))
-        with pytest.raises(RuntimeError, match=f'`updater` may only be set, if no {method}'):
+        getattr(builder, method)(data_file("private.key"))
+        with pytest.raises(RuntimeError, match=f"`updater` may only be set, if no {method}"):
             builder.updater(1)
 
     @pytest.mark.parametrize(
-        'method',
+        "method",
         [
-            'get_updates_connection_pool_size',
-            'get_updates_connect_timeout',
-            'get_updates_pool_timeout',
-            'get_updates_read_timeout',
-            'get_updates_write_timeout',
-            'get_updates_proxy_url',
-            'connection_pool_size',
-            'connect_timeout',
-            'pool_timeout',
-            'read_timeout',
-            'write_timeout',
-            'proxy_url',
-            'bot',
+            "get_updates_connection_pool_size",
+            "get_updates_connect_timeout",
+            "get_updates_pool_timeout",
+            "get_updates_read_timeout",
+            "get_updates_write_timeout",
+            "get_updates_proxy_url",
+            "connection_pool_size",
+            "connect_timeout",
+            "pool_timeout",
+            "read_timeout",
+            "write_timeout",
+            "proxy_url",
+            "bot",
         ]
         + [entry[0] for entry in _BOT_CHECKS],
     )
@@ -235,17 +235,17 @@ class TestApplicationBuilder:
         # Since the parameters themself are tested in the other tests, we here just make sure
         # that no exception is raised
         builder.updater(None)
-        getattr(builder, method)(data_file('private.key'))
+        getattr(builder, method)(data_file("private.key"))
 
         builder = ApplicationBuilder()
-        getattr(builder, method)(data_file('private.key'))
+        getattr(builder, method)(data_file("private.key"))
         builder.updater(None)
 
     def test_all_bot_args_custom(self, builder, bot, monkeypatch):
         defaults = Defaults()
         request = HTTPXRequest()
         get_updates_request = HTTPXRequest()
-        builder.token(bot.token).base_url('base_url').base_file_url('base_file_url').private_key(
+        builder.token(bot.token).base_url("base_url").base_file_url("base_file_url").private_key(
             PRIVATE_KEY
         ).defaults(defaults).arbitrary_callback_data(42).request(request).get_updates_request(
             get_updates_request
@@ -257,8 +257,8 @@ class TestApplicationBuilder:
         # other means that the parameters are passed correctly
 
         assert built_bot.token == bot.token
-        assert built_bot.base_url == 'base_url' + bot.token
-        assert built_bot.base_file_url == 'base_file_url' + bot.token
+        assert built_bot.base_url == "base_url" + bot.token
+        assert built_bot.base_file_url == "base_file_url" + bot.token
         assert built_bot.defaults is defaults
         assert built_bot.request is request
         assert built_bot._request[0] is get_updates_request
@@ -271,18 +271,18 @@ class TestApplicationBuilder:
             proxies: object
             limits: object
 
-        monkeypatch.setattr(httpx, 'AsyncClient', Client)
+        monkeypatch.setattr(httpx, "AsyncClient", Client)
 
         builder = ApplicationBuilder().token(bot.token)
         builder.connection_pool_size(1).connect_timeout(2).pool_timeout(3).read_timeout(
             4
-        ).write_timeout(5).proxy_url('proxy_url')
+        ).write_timeout(5).proxy_url("proxy_url")
         app = builder.build()
         client = app.bot.request._client
 
         assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
         assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
-        assert client.proxies == 'proxy_url'
+        assert client.proxies == "proxy_url"
 
         builder = ApplicationBuilder().token(bot.token)
         builder.get_updates_connection_pool_size(1).get_updates_connect_timeout(
@@ -290,14 +290,14 @@ class TestApplicationBuilder:
         ).get_updates_pool_timeout(3).get_updates_read_timeout(4).get_updates_write_timeout(
             5
         ).get_updates_proxy_url(
-            'proxy_url'
+            "proxy_url"
         )
         app = builder.build()
         client = app.bot._request[0]._client
 
         assert client.timeout == httpx.Timeout(pool=3, connect=2, read=4, write=5)
         assert client.limits == httpx.Limits(max_connections=1, max_keepalive_connections=1)
-        assert client.proxies == 'proxy_url'
+        assert client.proxies == "proxy_url"
 
     def test_custom_application_class(self, bot, builder):
         class CustomApplication(Application):
@@ -305,7 +305,7 @@ class TestApplicationBuilder:
                 super().__init__(**kwargs)
                 self.arg = arg
 
-        builder.application_class(CustomApplication, kwargs={'arg': 2}).token(bot.token)
+        builder.application_class(CustomApplication, kwargs={"arg": 2}).token(bot.token)
 
         app = builder.build()
         assert isinstance(app, CustomApplication)
@@ -313,7 +313,7 @@ class TestApplicationBuilder:
 
     def test_all_application_args_custom(self, builder, bot, monkeypatch):
         job_queue = JobQueue()
-        persistence = PicklePersistence('file_path')
+        persistence = PicklePersistence("file_path")
         update_queue = asyncio.Queue()
         context_types = ContextTypes()
         concurrent_updates = 123
@@ -341,15 +341,15 @@ class TestApplicationBuilder:
         assert app.bot is updater.bot
         assert app.update_queue is updater.update_queue
 
-    @pytest.mark.parametrize('input_type', ('bytes', 'str', 'Path'))
+    @pytest.mark.parametrize("input_type", ("bytes", "str", "Path"))
     def test_all_private_key_input_types(self, builder, bot, input_type):
-        private_key = data_file('private.key')
-        password = data_file('private_key.password')
+        private_key = data_file("private.key")
+        password = data_file("private_key.password")
 
-        if input_type == 'bytes':
+        if input_type == "bytes":
             private_key = private_key.read_bytes()
             password = password.read_bytes()
-        if input_type == 'str':
+        if input_type == "str":
             private_key = str(private_key)
             password = str(password)
 

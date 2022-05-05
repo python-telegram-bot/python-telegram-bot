@@ -43,17 +43,17 @@ class WebhookServer:
     """Thin wrapper around ``tornado.httpserver.HTTPServer``."""
 
     __slots__ = (
-        '_http_server',
-        'listen',
-        'port',
-        '_logger',
-        'is_running',
-        '_server_lock',
-        '_shutdown_lock',
+        "_http_server",
+        "listen",
+        "port",
+        "_logger",
+        "is_running",
+        "_server_lock",
+        "_shutdown_lock",
     )
 
     def __init__(
-        self, listen: str, port: int, webhook_app: 'WebhookAppClass', ssl_ctx: Optional[SSLContext]
+        self, listen: str, port: int, webhook_app: "WebhookAppClass", ssl_ctx: Optional[SSLContext]
     ):
         self._http_server = HTTPServer(webhook_app, ssl_options=ssl_ctx)
         self.listen = listen
@@ -71,23 +71,23 @@ class WebhookServer:
             if ready is not None:
                 ready.set()
 
-            self._logger.debug('Webhook Server started.')
+            self._logger.debug("Webhook Server started.")
 
     async def shutdown(self) -> None:
         async with self._shutdown_lock:
             if not self.is_running:
-                self._logger.debug('Webhook Server is already shut down. Returning')
+                self._logger.debug("Webhook Server is already shut down. Returning")
                 return
             self.is_running = False
             self._http_server.stop()
             await self._http_server.close_all_connections()
-            self._logger.debug('Webhook Server stopped')
+            self._logger.debug("Webhook Server stopped")
 
 
 class WebhookAppClass(tornado.web.Application):
     """Application used in the Webserver"""
 
-    def __init__(self, webhook_path: str, bot: 'Bot', update_queue: asyncio.Queue):
+    def __init__(self, webhook_path: str, bot: "Bot", update_queue: asyncio.Queue):
         self.shared_objects = {"bot": bot, "update_queue": update_queue}
         handlers = [(rf"{webhook_path}/?", TelegramHandler, self.shared_objects)]  # noqa
         tornado.web.Application.__init__(self, handlers)  # type: ignore
@@ -100,11 +100,11 @@ class WebhookAppClass(tornado.web.Application):
 class TelegramHandler(tornado.web.RequestHandler):
     """Handler that processes incoming requests from Telegram"""
 
-    __slots__ = ('bot', 'update_queue', '_logger')
+    __slots__ = ("bot", "update_queue", "_logger")
 
     SUPPORTED_METHODS = ("POST",)  # type: ignore[assignment]
 
-    def initialize(self, bot: 'Bot', update_queue: asyncio.Queue) -> None:
+    def initialize(self, bot: "Bot", update_queue: asyncio.Queue) -> None:
         """Initialize for each request - that's the interface provided by tornado"""
         # pylint: disable=attribute-defined-outside-init
         self.bot = bot
@@ -117,25 +117,25 @@ class TelegramHandler(tornado.web.RequestHandler):
 
     async def post(self) -> None:
         """Handle incoming POST request"""
-        self._logger.debug('Webhook triggered')
+        self._logger.debug("Webhook triggered")
         self._validate_post()
 
         json_string = self.request.body.decode()
         data = json.loads(json_string)
         self.set_status(HTTPStatus.OK)
-        self._logger.debug('Webhook received data: %s', json_string)
+        self._logger.debug("Webhook received data: %s", json_string)
 
         try:
             update = Update.de_json(data, self.bot)
         except Exception as exc:
             self._logger.critical(
-                'Something went wrong processing the data received from Telegram. '
-                'Received data was *not* processed!',
+                "Something went wrong processing the data received from Telegram. "
+                "Received data was *not* processed!",
                 exc_info=exc,
             )
 
         if update:
-            self._logger.debug('Received Update with ID %d on Webhook', update.update_id)
+            self._logger.debug("Received Update with ID %d on Webhook", update.update_id)
 
             # handle arbitrary callback data, if necessary
             if isinstance(self.bot, ExtBot):
@@ -146,7 +146,7 @@ class TelegramHandler(tornado.web.RequestHandler):
     def _validate_post(self) -> None:
         """Only accept requests with content type JSON"""
         ct_header = self.request.headers.get("Content-Type", None)
-        if ct_header != 'application/json':
+        if ct_header != "application/json":
             raise tornado.web.HTTPError(HTTPStatus.FORBIDDEN)
 
     def log_exception(

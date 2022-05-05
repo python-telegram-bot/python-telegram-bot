@@ -60,7 +60,7 @@ class VideoNote(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ('duration', 'length')
+    __slots__ = ("duration", "length")
 
     def __init__(
         self,
@@ -70,7 +70,7 @@ class VideoNote(_BaseThumbedMedium):
         duration: int,
         thumb: PhotoSize = None,
         file_size: int = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         super().__init__(

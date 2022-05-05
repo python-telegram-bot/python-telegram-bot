@@ -64,13 +64,13 @@ class SuccessfulPayment(TelegramObject):
     """
 
     __slots__ = (
-        'invoice_payload',
-        'shipping_option_id',
-        'currency',
-        'order_info',
-        'telegram_payment_charge_id',
-        'provider_payment_charge_id',
-        'total_amount',
+        "invoice_payload",
+        "shipping_option_id",
+        "currency",
+        "order_info",
+        "telegram_payment_charge_id",
+        "provider_payment_charge_id",
+        "total_amount",
     )
 
     def __init__(
@@ -95,13 +95,13 @@ class SuccessfulPayment(TelegramObject):
         self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['SuccessfulPayment']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SuccessfulPayment"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['order_info'] = OrderInfo.de_json(data.get('order_info'), bot)
+        data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
 
         return cls(**data)

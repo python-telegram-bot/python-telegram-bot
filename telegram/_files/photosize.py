@@ -56,7 +56,7 @@ class PhotoSize(_BaseMedium):
 
     """
 
-    __slots__ = ('width', 'height')
+    __slots__ = ("width", "height")
 
     def __init__(
         self,
@@ -65,7 +65,7 @@ class PhotoSize(_BaseMedium):
         width: int,
         height: int,
         file_size: int = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         super().__init__(

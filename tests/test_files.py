@@ -27,15 +27,15 @@ from tests.conftest import TEST_DATA_PATH, data_file
 
 class TestFiles:
     @pytest.mark.parametrize(
-        'string,expected',
+        "string,expected",
         [
-            (str(data_file('game.gif')), True),
+            (str(data_file("game.gif")), True),
             (str(TEST_DATA_PATH), False),
-            (str(data_file('game.gif')), True),
+            (str(data_file("game.gif")), True),
             (str(TEST_DATA_PATH), False),
-            (data_file('game.gif'), True),
+            (data_file("game.gif"), True),
             (TEST_DATA_PATH, False),
-            ('https:/api.org/file/botTOKEN/document/file_3', False),
+            ("https:/api.org/file/botTOKEN/document/file_3", False),
             (None, False),
         ],
     )
@@ -43,18 +43,18 @@ class TestFiles:
         assert telegram._utils.files.is_local_file(string) == expected
 
     @pytest.mark.parametrize(
-        'string,expected',
+        "string,expected",
         [
-            (data_file('game.gif'), data_file('game.gif').as_uri()),
+            (data_file("game.gif"), data_file("game.gif").as_uri()),
             (TEST_DATA_PATH, TEST_DATA_PATH),
-            ('file://foobar', 'file://foobar'),
-            (str(data_file('game.gif')), data_file('game.gif').as_uri()),
+            ("file://foobar", "file://foobar"),
+            (str(data_file("game.gif")), data_file("game.gif").as_uri()),
             (str(TEST_DATA_PATH), str(TEST_DATA_PATH)),
-            (data_file('game.gif'), data_file('game.gif').as_uri()),
+            (data_file("game.gif"), data_file("game.gif").as_uri()),
             (TEST_DATA_PATH, TEST_DATA_PATH),
             (
-                'https:/api.org/file/botTOKEN/document/file_3',
-                'https:/api.org/file/botTOKEN/document/file_3',
+                "https:/api.org/file/botTOKEN/document/file_3",
+                "https:/api.org/file/botTOKEN/document/file_3",
             ),
         ],
     )
@@ -62,45 +62,45 @@ class TestFiles:
         assert telegram._utils.files.parse_file_input(string) == expected
 
     def test_parse_file_input_file_like(self):
-        source_file = data_file('game.gif')
-        with source_file.open('rb') as file:
+        source_file = data_file("game.gif")
+        with source_file.open("rb") as file:
             parsed = telegram._utils.files.parse_file_input(file)
 
         assert isinstance(parsed, InputFile)
-        assert parsed.filename == 'game.gif'
+        assert parsed.filename == "game.gif"
 
-        with source_file.open('rb') as file:
-            parsed = telegram._utils.files.parse_file_input(file, filename='test_file')
+        with source_file.open("rb") as file:
+            parsed = telegram._utils.files.parse_file_input(file, filename="test_file")
 
         assert isinstance(parsed, InputFile)
-        assert parsed.filename == 'test_file'
+        assert parsed.filename == "test_file"
 
     def test_parse_file_input_bytes(self):
-        source_file = data_file('text_file.txt')
+        source_file = data_file("text_file.txt")
         parsed = telegram._utils.files.parse_file_input(source_file.read_bytes())
 
         assert isinstance(parsed, InputFile)
-        assert parsed.filename == 'application.octet-stream'
+        assert parsed.filename == "application.octet-stream"
 
         parsed = telegram._utils.files.parse_file_input(
-            source_file.read_bytes(), filename='test_file'
+            source_file.read_bytes(), filename="test_file"
         )
 
         assert isinstance(parsed, InputFile)
-        assert parsed.filename == 'test_file'
+        assert parsed.filename == "test_file"
 
     def test_parse_file_input_tg_object(self):
-        animation = Animation('file_id', 'unique_id', 1, 1, 1)
-        assert telegram._utils.files.parse_file_input(animation, Animation) == 'file_id'
+        animation = Animation("file_id", "unique_id", 1, 1, 1)
+        assert telegram._utils.files.parse_file_input(animation, Animation) == "file_id"
         assert telegram._utils.files.parse_file_input(animation, MessageEntity) is animation
 
-    @pytest.mark.parametrize('obj', [{1: 2}, [1, 2], (1, 2)])
+    @pytest.mark.parametrize("obj", [{1: 2}, [1, 2], (1, 2)])
     def test_parse_file_input_other(self, obj):
         assert telegram._utils.files.parse_file_input(obj) is obj
 
-    @pytest.mark.parametrize('attach', [True, False])
+    @pytest.mark.parametrize("attach", [True, False])
     def test_parse_file_input_attach(self, attach):
-        source_file = data_file('text_file.txt')
+        source_file = data_file("text_file.txt")
         parsed = telegram._utils.files.parse_file_input(source_file.read_bytes(), attach=attach)
 
         assert isinstance(parsed, InputFile)

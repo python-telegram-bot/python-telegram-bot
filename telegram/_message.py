@@ -367,66 +367,66 @@ class Message(TelegramObject):
 
     # fmt: on
     __slots__ = (
-        'reply_markup',
-        'audio',
-        'contact',
-        'migrate_to_chat_id',
-        'forward_signature',
-        'chat',
-        'successful_payment',
-        'game',
-        'text',
-        'forward_sender_name',
-        'document',
-        'new_chat_title',
-        'forward_date',
-        'group_chat_created',
-        'media_group_id',
-        'caption',
-        'video',
-        'entities',
-        'via_bot',
-        'new_chat_members',
-        'connected_website',
-        'animation',
-        'migrate_from_chat_id',
-        'forward_from',
-        'sticker',
-        'location',
-        'venue',
-        'edit_date',
-        'reply_to_message',
-        'passport_data',
-        'pinned_message',
-        'forward_from_chat',
-        'new_chat_photo',
-        'message_id',
-        'delete_chat_photo',
-        'from_user',
-        'author_signature',
-        'proximity_alert_triggered',
-        'sender_chat',
-        'dice',
-        'forward_from_message_id',
-        'caption_entities',
-        'voice',
-        'date',
-        'supergroup_chat_created',
-        'poll',
-        'left_chat_member',
-        'photo',
-        'channel_chat_created',
-        'invoice',
-        'video_note',
-        '_effective_attachment',
-        'message_auto_delete_timer_changed',
-        'video_chat_ended',
-        'video_chat_participants_invited',
-        'video_chat_started',
-        'video_chat_scheduled',
-        'is_automatic_forward',
-        'has_protected_content',
-        'web_app_data',
+        "reply_markup",
+        "audio",
+        "contact",
+        "migrate_to_chat_id",
+        "forward_signature",
+        "chat",
+        "successful_payment",
+        "game",
+        "text",
+        "forward_sender_name",
+        "document",
+        "new_chat_title",
+        "forward_date",
+        "group_chat_created",
+        "media_group_id",
+        "caption",
+        "video",
+        "entities",
+        "via_bot",
+        "new_chat_members",
+        "connected_website",
+        "animation",
+        "migrate_from_chat_id",
+        "forward_from",
+        "sticker",
+        "location",
+        "venue",
+        "edit_date",
+        "reply_to_message",
+        "passport_data",
+        "pinned_message",
+        "forward_from_chat",
+        "new_chat_photo",
+        "message_id",
+        "delete_chat_photo",
+        "from_user",
+        "author_signature",
+        "proximity_alert_triggered",
+        "sender_chat",
+        "dice",
+        "forward_from_message_id",
+        "caption_entities",
+        "voice",
+        "date",
+        "supergroup_chat_created",
+        "poll",
+        "left_chat_member",
+        "photo",
+        "channel_chat_created",
+        "invoice",
+        "video_note",
+        "_effective_attachment",
+        "message_auto_delete_timer_changed",
+        "video_chat_ended",
+        "video_chat_participants_invited",
+        "video_chat_started",
+        "video_chat_scheduled",
+        "is_automatic_forward",
+        "has_protected_content",
+        "web_app_data",
     )
 
     def __init__(
@@ -439,11 +439,11 @@ class Message(TelegramObject):
         forward_from_chat: Chat = None,
         forward_from_message_id: int = None,
         forward_date: datetime.datetime = None,
-        reply_to_message: 'Message' = None,
+        reply_to_message: "Message" = None,
         edit_date: datetime.datetime = None,
         text: str = None,
-        entities: List['MessageEntity'] = None,
-        caption_entities: List['MessageEntity'] = None,
+        entities: List["MessageEntity"] = None,
+        caption_entities: List["MessageEntity"] = None,
         audio: Audio = None,
         document: Document = None,
         game: Game = None,
@@ -466,7 +466,7 @@ class Message(TelegramObject):
         channel_chat_created: bool = False,
         migrate_to_chat_id: int = None,
         migrate_from_chat_id: int = None,
-        pinned_message: 'Message' = None,
+        pinned_message: "Message" = None,
         invoice: Invoice = None,
         successful_payment: SuccessfulPayment = None,
         forward_signature: str = None,
@@ -478,7 +478,7 @@ class Message(TelegramObject):
         poll: Poll = None,
         forward_sender_name: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         dice: Dice = None,
         via_bot: User = None,
         proximity_alert_triggered: ProximityAlertTriggered = None,
@@ -580,62 +580,62 @@ class Message(TelegramObject):
         return None
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Message']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Message"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.get('from'), bot)
-        data['sender_chat'] = Chat.de_json(data.get('sender_chat'), bot)
-        data['date'] = from_timestamp(data['date'])
-        data['chat'] = Chat.de_json(data.get('chat'), bot)
-        data['entities'] = MessageEntity.de_list(data.get('entities'), bot)
-        data['caption_entities'] = MessageEntity.de_list(data.get('caption_entities'), bot)
-        data['forward_from'] = User.de_json(data.get('forward_from'), bot)
-        data['forward_from_chat'] = Chat.de_json(data.get('forward_from_chat'), bot)
-        data['forward_date'] = from_timestamp(data.get('forward_date'))
-        data['reply_to_message'] = Message.de_json(data.get('reply_to_message'), bot)
-        data['edit_date'] = from_timestamp(data.get('edit_date'))
-        data['audio'] = Audio.de_json(data.get('audio'), bot)
-        data['document'] = Document.de_json(data.get('document'), bot)
-        data['animation'] = Animation.de_json(data.get('animation'), bot)
-        data['game'] = Game.de_json(data.get('game'), bot)
-        data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
-        data['sticker'] = Sticker.de_json(data.get('sticker'), bot)
-        data['video'] = Video.de_json(data.get('video'), bot)
-        data['voice'] = Voice.de_json(data.get('voice'), bot)
-        data['video_note'] = VideoNote.de_json(data.get('video_note'), bot)
-        data['contact'] = Contact.de_json(data.get('contact'), bot)
-        data['location'] = Location.de_json(data.get('location'), bot)
-        data['venue'] = Venue.de_json(data.get('venue'), bot)
-        data['new_chat_members'] = User.de_list(data.get('new_chat_members'), bot)
-        data['left_chat_member'] = User.de_json(data.get('left_chat_member'), bot)
-        data['new_chat_photo'] = PhotoSize.de_list(data.get('new_chat_photo'), bot)
-        data['message_auto_delete_timer_changed'] = MessageAutoDeleteTimerChanged.de_json(
-            data.get('message_auto_delete_timer_changed'), bot
+        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
+        data["date"] = from_timestamp(data["date"])
+        data["chat"] = Chat.de_json(data.get("chat"), bot)
+        data["entities"] = MessageEntity.de_list(data.get("entities"), bot)
+        data["caption_entities"] = MessageEntity.de_list(data.get("caption_entities"), bot)
+        data["forward_from"] = User.de_json(data.get("forward_from"), bot)
+        data["forward_from_chat"] = Chat.de_json(data.get("forward_from_chat"), bot)
+        data["forward_date"] = from_timestamp(data.get("forward_date"))
+        data["reply_to_message"] = Message.de_json(data.get("reply_to_message"), bot)
+        data["edit_date"] = from_timestamp(data.get("edit_date"))
+        data["audio"] = Audio.de_json(data.get("audio"), bot)
+        data["document"] = Document.de_json(data.get("document"), bot)
+        data["animation"] = Animation.de_json(data.get("animation"), bot)
+        data["game"] = Game.de_json(data.get("game"), bot)
+        data["photo"] = PhotoSize.de_list(data.get("photo"), bot)
+        data["sticker"] = Sticker.de_json(data.get("sticker"), bot)
+        data["video"] = Video.de_json(data.get("video"), bot)
+        data["voice"] = Voice.de_json(data.get("voice"), bot)
+        data["video_note"] = VideoNote.de_json(data.get("video_note"), bot)
+        data["contact"] = Contact.de_json(data.get("contact"), bot)
+        data["location"] = Location.de_json(data.get("location"), bot)
+        data["venue"] = Venue.de_json(data.get("venue"), bot)
+        data["new_chat_members"] = User.de_list(data.get("new_chat_members"), bot)
+        data["left_chat_member"] = User.de_json(data.get("left_chat_member"), bot)
+        data["new_chat_photo"] = PhotoSize.de_list(data.get("new_chat_photo"), bot)
+        data["message_auto_delete_timer_changed"] = MessageAutoDeleteTimerChanged.de_json(
+            data.get("message_auto_delete_timer_changed"), bot
         )
-        data['pinned_message'] = Message.de_json(data.get('pinned_message'), bot)
-        data['invoice'] = Invoice.de_json(data.get('invoice'), bot)
-        data['successful_payment'] = SuccessfulPayment.de_json(data.get('successful_payment'), bot)
-        data['passport_data'] = PassportData.de_json(data.get('passport_data'), bot)
-        data['poll'] = Poll.de_json(data.get('poll'), bot)
-        data['dice'] = Dice.de_json(data.get('dice'), bot)
-        data['via_bot'] = User.de_json(data.get('via_bot'), bot)
-        data['proximity_alert_triggered'] = ProximityAlertTriggered.de_json(
-            data.get('proximity_alert_triggered'), bot
+        data["pinned_message"] = Message.de_json(data.get("pinned_message"), bot)
+        data["invoice"] = Invoice.de_json(data.get("invoice"), bot)
+        data["successful_payment"] = SuccessfulPayment.de_json(data.get("successful_payment"), bot)
+        data["passport_data"] = PassportData.de_json(data.get("passport_data"), bot)
+        data["poll"] = Poll.de_json(data.get("poll"), bot)
+        data["dice"] = Dice.de_json(data.get("dice"), bot)
+        data["via_bot"] = User.de_json(data.get("via_bot"), bot)
+        data["proximity_alert_triggered"] = ProximityAlertTriggered.de_json(
+            data.get("proximity_alert_triggered"), bot
         )
-        data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-        data['video_chat_scheduled'] = VideoChatScheduled.de_json(
-            data.get('video_chat_scheduled'), bot
+        data["reply_markup"] = InlineKeyboardMarkup.de_json(data.get("reply_markup"), bot)
+        data["video_chat_scheduled"] = VideoChatScheduled.de_json(
+            data.get("video_chat_scheduled"), bot
         )
-        data['video_chat_started'] = VideoChatStarted.de_json(data.get('video_chat_started'), bot)
-        data['video_chat_ended'] = VideoChatEnded.de_json(data.get('video_chat_ended'), bot)
-        data['video_chat_participants_invited'] = VideoChatParticipantsInvited.de_json(
-            data.get('video_chat_participants_invited'), bot
+        data["video_chat_started"] = VideoChatStarted.de_json(data.get("video_chat_started"), bot)
+        data["video_chat_ended"] = VideoChatEnded.de_json(data.get("video_chat_ended"), bot)
+        data["video_chat_participants_invited"] = VideoChatParticipantsInvited.de_json(
+            data.get("video_chat_participants_invited"), bot
         )
-        data['web_app_data'] = WebAppData.de_json(data.get('web_app_data'), bot)
+        data["web_app_data"] = WebAppData.de_json(data.get("web_app_data"), bot)
 
         return cls(bot=bot, **data)
 
@@ -706,22 +706,22 @@ class Message(TelegramObject):
         data = super().to_dict()
 
         # Required
-        data['date'] = to_timestamp(self.date)
+        data["date"] = to_timestamp(self.date)
         # Optionals
         if self.forward_date:
-            data['forward_date'] = to_timestamp(self.forward_date)
+            data["forward_date"] = to_timestamp(self.forward_date)
         if self.edit_date:
-            data['edit_date'] = to_timestamp(self.edit_date)
+            data["edit_date"] = to_timestamp(self.edit_date)
         if self.photo:
-            data['photo'] = [p.to_dict() for p in self.photo]
+            data["photo"] = [p.to_dict() for p in self.photo]
         if self.entities:
-            data['entities'] = [e.to_dict() for e in self.entities]
+            data["entities"] = [e.to_dict() for e in self.entities]
         if self.caption_entities:
-            data['caption_entities'] = [e.to_dict() for e in self.caption_entities]
+            data["caption_entities"] = [e.to_dict() for e in self.caption_entities]
         if self.new_chat_photo:
-            data['new_chat_photo'] = [p.to_dict() for p in self.new_chat_photo]
+            data["new_chat_photo"] = [p.to_dict() for p in self.new_chat_photo]
         if self.new_chat_members:
-            data['new_chat_members'] = [u.to_dict() for u in self.new_chat_members]
+            data["new_chat_members"] = [u.to_dict() for u in self.new_chat_members]
 
         return data
 
@@ -737,7 +737,7 @@ class Message(TelegramObject):
         else:
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
             # logic into ExtBot
-            if hasattr(self.get_bot(), 'defaults') and self.get_bot().defaults:  # type: ignore
+            if hasattr(self.get_bot(), "defaults") and self.get_bot().defaults:  # type: ignore
                 default_quote = self.get_bot().defaults.quote  # type: ignore[attr-defined]
             else:
                 default_quote = None
@@ -760,10 +760,10 @@ class Message(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_message(update.effective_message.chat_id, *args, **kwargs)
@@ -812,10 +812,10 @@ class Message(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             await bot.send_message(
@@ -874,10 +874,10 @@ class Message(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             await bot.send_message(
@@ -932,10 +932,10 @@ class Message(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
             await bot.send_message(
@@ -980,7 +980,7 @@ class Message(TelegramObject):
     async def reply_media_group(
         self,
         media: List[
-            Union['InputMediaAudio', 'InputMediaDocument', 'InputMediaPhoto', 'InputMediaVideo']
+            Union["InputMediaAudio", "InputMediaDocument", "InputMediaPhoto", "InputMediaVideo"]
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
@@ -992,7 +992,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> List['Message']:
+    ) -> List["Message"]:
         """Shortcut for::
 
              await bot.send_media_group(update.effective_message.chat_id, *args, **kwargs)
@@ -1028,7 +1028,7 @@ class Message(TelegramObject):
 
     async def reply_photo(
         self,
-        photo: Union[FileInput, 'PhotoSize'],
+        photo: Union[FileInput, "PhotoSize"],
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
@@ -1040,11 +1040,11 @@ class Message(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_photo(update.effective_message.chat_id, *args, **kwargs)
@@ -1083,7 +1083,7 @@ class Message(TelegramObject):
 
     async def reply_audio(
         self,
-        audio: Union[FileInput, 'Audio'],
+        audio: Union[FileInput, "Audio"],
         duration: int = None,
         performer: str = None,
         title: str = None,
@@ -1099,11 +1099,11 @@ class Message(TelegramObject):
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_audio(update.effective_message.chat_id, *args, **kwargs)
@@ -1146,7 +1146,7 @@ class Message(TelegramObject):
 
     async def reply_document(
         self,
-        document: Union[FileInput, 'Document'],
+        document: Union[FileInput, "Document"],
         filename: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -1161,10 +1161,10 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_document(update.effective_message.chat_id, *args, **kwargs)
@@ -1205,7 +1205,7 @@ class Message(TelegramObject):
 
     async def reply_animation(
         self,
-        animation: Union[FileInput, 'Animation'],
+        animation: Union[FileInput, "Animation"],
         duration: int = None,
         width: int = None,
         height: int = None,
@@ -1221,11 +1221,11 @@ class Message(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_animation(update.effective_message.chat_id, *args, **kwargs)
@@ -1268,7 +1268,7 @@ class Message(TelegramObject):
 
     async def reply_sticker(
         self,
-        sticker: Union[FileInput, 'Sticker'],
+        sticker: Union[FileInput, "Sticker"],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
@@ -1280,7 +1280,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_sticker(update.effective_message.chat_id, *args, **kwargs)
@@ -1315,7 +1315,7 @@ class Message(TelegramObject):
 
     async def reply_video(
         self,
-        video: Union[FileInput, 'Video'],
+        video: Union[FileInput, "Video"],
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -1332,11 +1332,11 @@ class Message(TelegramObject):
         thumb: FileInput = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_video(update.effective_message.chat_id, *args, **kwargs)
@@ -1380,7 +1380,7 @@ class Message(TelegramObject):
 
     async def reply_video_note(
         self,
-        video_note: Union[FileInput, 'VideoNote'],
+        video_note: Union[FileInput, "VideoNote"],
         duration: int = None,
         length: int = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -1396,7 +1396,7 @@ class Message(TelegramObject):
         filename: str = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_video_note(update.effective_message.chat_id, *args, **kwargs)
@@ -1435,7 +1435,7 @@ class Message(TelegramObject):
 
     async def reply_voice(
         self,
-        voice: Union[FileInput, 'Voice'],
+        voice: Union[FileInput, "Voice"],
         duration: int = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
@@ -1448,11 +1448,11 @@ class Message(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_voice(update.effective_message.chat_id, *args, **kwargs)
@@ -1510,7 +1510,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_location(update.effective_message.chat_id, *args, **kwargs)
@@ -1571,7 +1571,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_venue(update.effective_message.chat_id, *args, **kwargs)
@@ -1630,7 +1630,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_contact(update.effective_message.chat_id, *args, **kwargs)
@@ -1689,10 +1689,10 @@ class Message(TelegramObject):
         close_date: Union[int, datetime.datetime] = None,
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
+        explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_poll(update.effective_message.chat_id, *args, **kwargs)
@@ -1750,7 +1750,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_dice(update.effective_message.chat_id, *args, **kwargs)
@@ -1819,7 +1819,7 @@ class Message(TelegramObject):
         game_short_name: str,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'InlineKeyboardMarkup' = None,
+        reply_markup: "InlineKeyboardMarkup" = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1828,7 +1828,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_game(update.effective_message.chat_id, *args, **kwargs)
@@ -1870,7 +1870,7 @@ class Message(TelegramObject):
         payload: str,
         provider_token: str,
         currency: str,
-        prices: List['LabeledPrice'],
+        prices: List["LabeledPrice"],
         start_parameter: str = None,
         photo_url: str = None,
         photo_size: int = None,
@@ -1883,7 +1883,7 @@ class Message(TelegramObject):
         is_flexible: bool = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
-        reply_markup: 'InlineKeyboardMarkup' = None,
+        reply_markup: "InlineKeyboardMarkup" = None,
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
@@ -1897,7 +1897,7 @@ class Message(TelegramObject):
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.send_invoice(update.effective_message.chat_id, *args, **kwargs)
@@ -1970,7 +1970,7 @@ class Message(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'Message':
+    ) -> "Message":
         """Shortcut for::
 
              await bot.forward_message(
@@ -2013,7 +2013,7 @@ class Message(TelegramObject):
         chat_id: Union[int, str],
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
@@ -2024,7 +2024,7 @@ class Message(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'MessageId':
+    ) -> "MessageId":
         """Shortcut for::
 
              await bot.copy_message(
@@ -2066,7 +2066,7 @@ class Message(TelegramObject):
         message_id: int,
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Union[Tuple['MessageEntity', ...], List['MessageEntity']] = None,
+        caption_entities: Union[Tuple["MessageEntity", ...], List["MessageEntity"]] = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
@@ -2078,7 +2078,7 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
-    ) -> 'MessageId':
+    ) -> "MessageId":
         """Shortcut for::
 
              await bot.copy_message(
@@ -2134,8 +2134,8 @@ class Message(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
-    ) -> Union['Message', bool]:
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+    ) -> Union["Message", bool]:
         """Shortcut for::
 
              await bot.edit_message_text(
@@ -2180,8 +2180,8 @@ class Message(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
-    ) -> Union['Message', bool]:
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+    ) -> Union["Message", bool]:
         """Shortcut for::
 
              await bot.edit_message_caption(
@@ -2218,14 +2218,14 @@ class Message(TelegramObject):
 
     async def edit_media(
         self,
-        media: 'InputMedia',
+        media: "InputMedia",
         reply_markup: InlineKeyboardMarkup = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> Union['Message', bool]:
+    ) -> Union["Message", bool]:
         """Shortcut for::
 
              await bot.edit_message_media(
@@ -2260,13 +2260,13 @@ class Message(TelegramObject):
 
     async def edit_reply_markup(
         self,
-        reply_markup: Optional['InlineKeyboardMarkup'] = None,
+        reply_markup: Optional["InlineKeyboardMarkup"] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> Union['Message', bool]:
+    ) -> Union["Message", bool]:
         """Shortcut for::
 
              await bot.edit_message_reply_markup(
@@ -2311,7 +2311,7 @@ class Message(TelegramObject):
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
-    ) -> Union['Message', bool]:
+    ) -> Union["Message", bool]:
         """Shortcut for::
 
              await bot.edit_message_live_location(
@@ -2356,7 +2356,7 @@ class Message(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> Union['Message', bool]:
+    ) -> Union["Message", bool]:
         """Shortcut for::
 
              await bot.stop_message_live_location(
@@ -2398,7 +2398,7 @@ class Message(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> Union['Message', bool]:
+    ) -> Union["Message", bool]:
         """Shortcut for::
 
              await bot.set_game_score(
@@ -2439,7 +2439,7 @@ class Message(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List['GameHighScore']:
+    ) -> List["GameHighScore"]:
         """Shortcut for::
 
              await bot.get_game_high_scores(
@@ -2620,9 +2620,9 @@ class Message(TelegramObject):
         if sys.maxunicode == 0xFFFF:
             return self.text[entity.offset : entity.offset + entity.length]
 
-        entity_text = self.text.encode('utf-16-le')
+        entity_text = self.text.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
-        return entity_text.decode('utf-16-le')
+        return entity_text.decode("utf-16-le")
 
     def parse_caption_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
@@ -2650,9 +2650,9 @@ class Message(TelegramObject):
         if sys.maxunicode == 0xFFFF:
             return self.caption[entity.offset : entity.offset + entity.length]
 
-        entity_text = self.caption.encode('utf-16-le')
+        entity_text = self.caption.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
-        return entity_text.decode('utf-16-le')
+        return entity_text.decode("utf-16-le")
 
     def parse_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
         """
@@ -2729,9 +2729,9 @@ class Message(TelegramObject):
             return None
 
         if sys.maxunicode != 0xFFFF:
-            message_text = message_text.encode('utf-16-le')  # type: ignore
+            message_text = message_text.encode("utf-16-le")  # type: ignore
 
-        html_text = ''
+        html_text = ""
         last_offset = 0
 
         sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
@@ -2763,20 +2763,20 @@ class Message(TelegramObject):
                 elif entity.type == MessageEntity.URL and urled:
                     insert = f'<a href="{text}">{text}</a>'
                 elif entity.type == MessageEntity.BOLD:
-                    insert = f'<b>{text}</b>'
+                    insert = f"<b>{text}</b>"
                 elif entity.type == MessageEntity.ITALIC:
-                    insert = f'<i>{text}</i>'
+                    insert = f"<i>{text}</i>"
                 elif entity.type == MessageEntity.CODE:
-                    insert = f'<code>{text}</code>'
+                    insert = f"<code>{text}</code>"
                 elif entity.type == MessageEntity.PRE:
                     if entity.language:
                         insert = f'<pre><code class="{entity.language}">{text}</code></pre>'
                     else:
-                        insert = f'<pre>{text}</pre>'
+                        insert = f"<pre>{text}</pre>"
                 elif entity.type == MessageEntity.UNDERLINE:
-                    insert = f'<u>{text}</u>'
+                    insert = f"<u>{text}</u>"
                 elif entity.type == MessageEntity.STRIKETHROUGH:
-                    insert = f'<s>{text}</s>'
+                    insert = f"<s>{text}</s>"
                 elif entity.type == MessageEntity.SPOILER:
                     insert = f'<span class="tg-spoiler">{text}</span>'
                 else:
@@ -2792,7 +2792,7 @@ class Message(TelegramObject):
                             escape(
                                 message_text[  # type: ignore
                                     last_offset * 2 : (entity.offset - offset) * 2
-                                ].decode('utf-16-le')
+                                ].decode("utf-16-le")
                             )
                             + insert
                         )
@@ -2803,7 +2803,7 @@ class Message(TelegramObject):
                         html_text += (
                             message_text[  # type: ignore
                                 last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode('utf-16-le')
+                            ].decode("utf-16-le")
                             + insert
                         )
 
@@ -2814,13 +2814,13 @@ class Message(TelegramObject):
                 html_text += escape(message_text[last_offset:])
             else:
                 html_text += escape(
-                    message_text[last_offset * 2 :].decode('utf-16-le')  # type: ignore
+                    message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
                 )
         else:
             if sys.maxunicode == 0xFFFF:
                 html_text += message_text[last_offset:]
             else:
-                html_text += message_text[last_offset * 2 :].decode('utf-16-le')  # type: ignore
+                html_text += message_text[last_offset * 2 :].decode("utf-16-le")  # type: ignore
 
         return html_text
 
@@ -2902,9 +2902,9 @@ class Message(TelegramObject):
             return None
 
         if sys.maxunicode != 0xFFFF:
-            message_text = message_text.encode('utf-16-le')  # type: ignore
+            message_text = message_text.encode("utf-16-le")  # type: ignore
 
-        markdown_text = ''
+        markdown_text = ""
         last_offset = 0
 
         sorted_entities = sorted(entities.items(), key=(lambda item: item[0].offset))
@@ -2927,7 +2927,7 @@ class Message(TelegramObject):
                 if nested_entities:
                     if version < 2:
                         raise ValueError(
-                            'Nested entities are not supported for Markdown version 1'
+                            "Nested entities are not supported for Markdown version 1"
                         )
 
                     text = Message._parse_markdown(
@@ -2946,22 +2946,22 @@ class Message(TelegramObject):
                         url = escape_markdown(
                             entity.url, version=version, entity_type=MessageEntity.TEXT_LINK
                         )
-                    insert = f'[{text}]({url})'
+                    insert = f"[{text}]({url})"
                 elif entity.type == MessageEntity.TEXT_MENTION and entity.user:
-                    insert = f'[{text}](tg://user?id={entity.user.id})'
+                    insert = f"[{text}](tg://user?id={entity.user.id})"
                 elif entity.type == MessageEntity.URL and urled:
                     if version == 1:
                         link = orig_text
                     else:
                         link = text
-                    insert = f'[{link}]({orig_text})'
+                    insert = f"[{link}]({orig_text})"
                 elif entity.type == MessageEntity.BOLD:
-                    insert = f'*{text}*'
+                    insert = f"*{text}*"
                 elif entity.type == MessageEntity.ITALIC:
-                    insert = f'_{text}_'
+                    insert = f"_{text}_"
                 elif entity.type == MessageEntity.CODE:
                     # Monospace needs special escaping. Also can't have entities nested within
-                    insert = f'`{escape_markdown(orig_text, version, MessageEntity.CODE)}`'
+                    insert = f"`{escape_markdown(orig_text, version, MessageEntity.CODE)}`"
 
                 elif entity.type == MessageEntity.PRE:
                     # Monospace needs special escaping. Also can't have entities nested within
@@ -2969,25 +2969,25 @@ class Message(TelegramObject):
                         orig_text, version=version, entity_type=MessageEntity.PRE
                     )
                     if entity.language:
-                        prefix = f'```{entity.language}\n'
+                        prefix = f"```{entity.language}\n"
                     else:
-                        if code.startswith('\\'):
-                            prefix = '```'
+                        if code.startswith("\\"):
+                            prefix = "```"
                         else:
-                            prefix = '```\n'
-                    insert = f'{prefix}{code}```'
+                            prefix = "```\n"
+                    insert = f"{prefix}{code}```"
                 elif entity.type == MessageEntity.UNDERLINE:
                     if version == 1:
                         raise ValueError(
-                            'Underline entities are not supported for Markdown version 1'
+                            "Underline entities are not supported for Markdown version 1"
                         )
-                    insert = f'__{text}__'
+                    insert = f"__{text}__"
                 elif entity.type == MessageEntity.STRIKETHROUGH:
                     if version == 1:
                         raise ValueError(
-                            'Strikethrough entities are not supported for Markdown version 1'
+                            "Strikethrough entities are not supported for Markdown version 1"
                         )
-                    insert = f'~{text}~'
+                    insert = f"~{text}~"
                 elif entity.type == MessageEntity.SPOILER:
                     if version == 1:
                         raise ValueError(
@@ -3010,7 +3010,7 @@ class Message(TelegramObject):
                             escape_markdown(
                                 message_text[  # type: ignore
                                     last_offset * 2 : (entity.offset - offset) * 2
-                                ].decode('utf-16-le'),
+                                ].decode("utf-16-le"),
                                 version=version,
                             )
                             + insert
@@ -3024,7 +3024,7 @@ class Message(TelegramObject):
                         markdown_text += (
                             message_text[  # type: ignore
                                 last_offset * 2 : (entity.offset - offset) * 2
-                            ].decode('utf-16-le')
+                            ].decode("utf-16-le")
                             + insert
                         )
 
@@ -3035,7 +3035,7 @@ class Message(TelegramObject):
                 markdown_text += escape_markdown(message_text[last_offset:], version=version)
             else:
                 markdown_text += escape_markdown(
-                    message_text[last_offset * 2 :].decode('utf-16-le'),  # type: ignore
+                    message_text[last_offset * 2 :].decode("utf-16-le"),  # type: ignore
                     version=version,
                 )
         else:
@@ -3043,7 +3043,7 @@ class Message(TelegramObject):
                 markdown_text += message_text[last_offset:]
             else:
                 markdown_text += message_text[last_offset * 2 :].decode(  # type: ignore
-                    'utf-16-le'
+                    "utf-16-le"
                 )
 
         return markdown_text

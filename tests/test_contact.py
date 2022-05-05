@@ -25,7 +25,7 @@ from telegram.error import BadRequest
 from telegram.request import RequestData
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def contact():
     return Contact(
         TestContact.phone_number,
@@ -36,18 +36,18 @@ def contact():
 
 
 class TestContact:
-    phone_number = '+11234567890'
-    first_name = 'Leandro'
-    last_name = 'Toledo'
+    phone_number = "+11234567890"
+    first_name = "Leandro"
+    last_name = "Toledo"
     user_id = 23
 
     def test_slot_behaviour(self, contact, mro_slots):
         for attr in contact.__slots__:
-            assert getattr(contact, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(contact)) == len(set(mro_slots(contact))), "duplicate slot"
 
     def test_de_json_required(self, bot):
-        json_dict = {'phone_number': self.phone_number, 'first_name': self.first_name}
+        json_dict = {"phone_number": self.phone_number, "first_name": self.first_name}
         contact = Contact.de_json(json_dict, bot)
 
         assert contact.phone_number == self.phone_number
@@ -55,10 +55,10 @@ class TestContact:
 
     def test_de_json_all(self, bot):
         json_dict = {
-            'phone_number': self.phone_number,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'user_id': self.user_id,
+            "phone_number": self.phone_number,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "user_id": self.user_id,
         }
         contact = Contact.de_json(json_dict, bot)
 
@@ -70,29 +70,29 @@ class TestContact:
     async def test_send_with_contact(self, monkeypatch, bot, chat_id, contact):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.json_parameters
-            phone = data['phone_number'] == contact.phone_number
-            first = data['first_name'] == contact.first_name
-            last = data['last_name'] == contact.last_name
+            phone = data["phone_number"] == contact.phone_number
+            first = data["first_name"] == contact.first_name
+            last = data["last_name"] == contact.last_name
             return phone and first and last
 
-        monkeypatch.setattr(bot.request, 'post', make_assertion)
+        monkeypatch.setattr(bot.request, "post", make_assertion)
         message = await bot.send_contact(contact=contact, chat_id=chat_id)
         assert message
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
-        'default_bot,custom',
+        "default_bot,custom",
         [
-            ({'allow_sending_without_reply': True}, None),
-            ({'allow_sending_without_reply': False}, None),
-            ({'allow_sending_without_reply': False}, True),
+            ({"allow_sending_without_reply": True}, None),
+            ({"allow_sending_without_reply": False}, None),
+            ({"allow_sending_without_reply": False}, True),
         ],
-        indirect=['default_bot'],
+        indirect=["default_bot"],
     )
     async def test_send_contact_default_allow_sending_without_reply(
         self, default_bot, chat_id, contact, custom
     ):
-        reply_to_message = await default_bot.send_message(chat_id, 'test')
+        reply_to_message = await default_bot.send_message(chat_id, "test")
         await reply_to_message.delete()
         if custom is not None:
             message = await default_bot.send_contact(
@@ -108,13 +108,13 @@ class TestContact:
             )
             assert message.reply_to_message is None
         else:
-            with pytest.raises(BadRequest, match='message not found'):
+            with pytest.raises(BadRequest, match="message not found"):
                 await default_bot.send_contact(
                     chat_id, contact=contact, reply_to_message_id=reply_to_message.message_id
                 )
 
     @flaky(3, 1)
-    @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
+    @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_contact_default_protect_content(self, chat_id, default_bot, contact):
         protected = await default_bot.send_contact(chat_id, contact=contact)
         assert protected.has_protected_content
@@ -124,24 +124,24 @@ class TestContact:
         assert not unprotected.has_protected_content
 
     async def test_send_contact_without_required(self, bot, chat_id):
-        with pytest.raises(ValueError, match='Either contact or phone_number and first_name'):
+        with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
             await bot.send_contact(chat_id=chat_id)
 
     def test_to_dict(self, contact):
         contact_dict = contact.to_dict()
 
         assert isinstance(contact_dict, dict)
-        assert contact_dict['phone_number'] == contact.phone_number
-        assert contact_dict['first_name'] == contact.first_name
-        assert contact_dict['last_name'] == contact.last_name
-        assert contact_dict['user_id'] == contact.user_id
+        assert contact_dict["phone_number"] == contact.phone_number
+        assert contact_dict["first_name"] == contact.first_name
+        assert contact_dict["last_name"] == contact.last_name
+        assert contact_dict["user_id"] == contact.user_id
 
     def test_equality(self):
         a = Contact(self.phone_number, self.first_name)
         b = Contact(self.phone_number, self.first_name)
-        c = Contact(self.phone_number, '')
-        d = Contact('', self.first_name)
-        e = Voice('', 'unique_id', 0)
+        c = Contact(self.phone_number, "")
+        d = Contact("", self.first_name)
+        e = Voice("", "unique_id", 0)
 
         assert a == b
         assert hash(a) == hash(b)

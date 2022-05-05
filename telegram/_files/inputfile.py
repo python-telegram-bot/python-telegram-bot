@@ -27,7 +27,7 @@ from uuid import uuid4
 
 from telegram._utils.types import FieldTuple
 
-_DEFAULT_MIME_TYPE = 'application/octet-stream'
+_DEFAULT_MIME_TYPE = "application/octet-stream"
 logger = logging.getLogger(__name__)
 
 
@@ -62,7 +62,7 @@ class InputFile:
 
     """
 
-    __slots__ = ('filename', 'attach_name', 'input_file_content', 'mimetype')
+    __slots__ = ("filename", "attach_name", "input_file_content", "mimetype")
 
     def __init__(
         self, obj: Union[IO[bytes], bytes, str], filename: str = None, attach: bool = False
@@ -70,14 +70,14 @@ class InputFile:
         if isinstance(obj, bytes):
             self.input_file_content = obj
         elif isinstance(obj, str):
-            self.input_file_content = obj.encode('utf-8')
+            self.input_file_content = obj.encode("utf-8")
         else:
             self.input_file_content = obj.read()
-        self.attach_name: Optional[str] = 'attached' + uuid4().hex if attach else None
+        self.attach_name: Optional[str] = "attached" + uuid4().hex if attach else None
 
         if (
             not filename
-            and hasattr(obj, 'name')
+            and hasattr(obj, "name")
             and not isinstance(obj.name, int)  # type: ignore[union-attr]
         ):
             filename = Path(obj.name).name  # type: ignore[union-attr]
@@ -90,7 +90,7 @@ class InputFile:
         else:
             self.mimetype = _DEFAULT_MIME_TYPE
 
-        self.filename = filename or self.mimetype.replace('/', '.')
+        self.filename = filename or self.mimetype.replace("/", ".")
 
     @staticmethod
     def is_image(stream: bytes) -> Optional[str]:
@@ -107,7 +107,7 @@ class InputFile:
         try:
             image = imghdr.what(None, stream)
             if image:
-                return f'image/{image}'
+                return f"image/{image}"
             return None
         except Exception:
             logger.debug(
@@ -129,4 +129,4 @@ class InputFile:
         """URI to insert into the JSON data for uploading the file. Returns :obj:`None`, if
         :attr:`attach_name` is :obj:`None`.
         """
-        return f'attach://{self.attach_name}' if self.attach_name else None
+        return f"attach://{self.attach_name}" if self.attach_name else None

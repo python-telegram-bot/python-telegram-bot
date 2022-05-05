@@ -25,18 +25,18 @@ from pathlib import Path
 
 
 def test_public_submodules_dunder_all():
-    modules_to_search = list(Path('telegram').rglob('*.py'))
+    modules_to_search = list(Path("telegram").rglob("*.py"))
 
     for mod_path in modules_to_search:
         path = str(mod_path)
         folder = mod_path.parent
 
-        if 'vendor' in path:  # skip anything vendor related
+        if "vendor" in path:  # skip anything vendor related
             continue
 
-        if mod_path.name == '__init__.py' and '_' not in path[:-11]:  # init of public submodules
+        if mod_path.name == "__init__.py" and "_" not in path[:-11]:  # init of public submodules
             mod = load_module(mod_path)
-            assert hasattr(mod, '__all__'), f"{folder}'s __init__ does not have an __all__!"
+            assert hasattr(mod, "__all__"), f"{folder}'s __init__ does not have an __all__!"
 
             pub_mods = get_public_submodules_in_folder(folder)
             cond = all(pub_mod in mod.__all__ for pub_mod in pub_mods)
@@ -44,20 +44,20 @@ def test_public_submodules_dunder_all():
             assert cond, f"{path}'s __all__ should contain all public submodules ({pub_mods})!"
             continue
 
-        if '_' in path:  # skip private modules
+        if "_" in path:  # skip private modules
             continue
 
         mod = load_module(mod_path)
-        assert hasattr(mod, '__all__'), f"{mod_path.name} does not have an __all__!"
+        assert hasattr(mod, "__all__"), f"{mod_path.name} does not have an __all__!"
 
 
 def load_module(path: Path):
     if path.name == "__init__.py":
-        mod_name = str(path.parent).replace(os.sep, '.')  # telegram(.ext) format
+        mod_name = str(path.parent).replace(os.sep, ".")  # telegram(.ext) format
     else:
-        mod_name = f"{path.parent}.{path.stem}".replace(os.sep, '.')  # telegram(.ext).(...) format
+        mod_name = f"{path.parent}.{path.stem}".replace(os.sep, ".")  # telegram(.ext).(...) format
     return importlib.import_module(mod_name)
 
 
 def get_public_submodules_in_folder(path: Path):
-    return [i.stem for i in path.glob('[!_]*.py')]
+    return [i.stem for i in path.glob("[!_]*.py")]
