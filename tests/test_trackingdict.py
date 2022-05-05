@@ -22,14 +22,14 @@ import pytest
 from telegram.ext._utils.trackingdict import TrackingDict
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def td() -> TrackingDict:
     td = TrackingDict()
     td.update_no_track({1: 1})
     return td
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def data() -> dict:
     return {1: 1}
 
@@ -37,7 +37,7 @@ def data() -> dict:
 class TestTrackingDict:
     def test_slot_behaviour(self, td, mro_slots):
         for attr in td.__slots__:
-            assert getattr(td, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(td, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(td)) == len(set(mro_slots(td))), "duplicate slot"
 
     def test_representations(self, td, data):
@@ -57,7 +57,7 @@ class TestTrackingDict:
         assert td != TrackingDict()
         assert TrackingDict() != td
         td_2 = TrackingDict()
-        td_2['foo'] = 7
+        td_2["foo"] = 7
         assert td != td_2
         assert td_2 != td
         assert td != 1

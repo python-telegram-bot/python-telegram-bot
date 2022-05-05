@@ -24,20 +24,20 @@ from telegram import BotCommand, Dice
 
 @pytest.fixture(scope="class")
 def bot_command():
-    return BotCommand(command='start', description='A command')
+    return BotCommand(command="start", description="A command")
 
 
 class TestBotCommand:
-    command = 'start'
-    description = 'A command'
+    command = "start"
+    description = "A command"
 
     def test_slot_behaviour(self, bot_command, mro_slots):
         for attr in bot_command.__slots__:
-            assert getattr(bot_command, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(bot_command, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(bot_command)) == len(set(mro_slots(bot_command))), "duplicate slot"
 
     def test_de_json(self, bot):
-        json_dict = {'command': self.command, 'description': self.description}
+        json_dict = {"command": self.command, "description": self.description}
         bot_command = BotCommand.de_json(json_dict, bot)
 
         assert bot_command.command == self.command
@@ -49,15 +49,15 @@ class TestBotCommand:
         bot_command_dict = bot_command.to_dict()
 
         assert isinstance(bot_command_dict, dict)
-        assert bot_command_dict['command'] == bot_command.command
-        assert bot_command_dict['description'] == bot_command.description
+        assert bot_command_dict["command"] == bot_command.command
+        assert bot_command_dict["description"] == bot_command.description
 
     def test_equality(self):
-        a = BotCommand('start', 'some description')
-        b = BotCommand('start', 'some description')
-        c = BotCommand('start', 'some other description')
-        d = BotCommand('hepl', 'some description')
-        e = Dice(4, 'emoji')
+        a = BotCommand("start", "some description")
+        b = BotCommand("start", "some description")
+        c = BotCommand("start", "some other description")
+        d = BotCommand("hepl", "some description")
+        e = Dice(4, "emoji")
 
         assert a == b
         assert hash(a) == hash(b)

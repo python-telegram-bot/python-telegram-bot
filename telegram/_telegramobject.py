@@ -32,7 +32,7 @@ from telegram._utils.warnings import warn
 if TYPE_CHECKING:
     from telegram import Bot
 
-TO_co = TypeVar('TO_co', bound='TelegramObject', covariant=True)
+TO_co = TypeVar("TO_co", bound="TelegramObject", covariant=True)
 
 
 class TelegramObject:
@@ -58,13 +58,13 @@ class TelegramObject:
     # https://www.python.org/dev/peps/pep-0526/#class-and-instance-variable-annotations
     if TYPE_CHECKING:
         _id_attrs: Tuple[object, ...]
-        _bot: Optional['Bot']
+        _bot: Optional["Bot"]
     # Adding slots reduces memory usage & allows for faster attribute access.
     # Only instance variables should be added to __slots__.
-    __slots__ = ('_id_attrs', '_bot')
+    __slots__ = ("_id_attrs", "_bot")
 
     # pylint: disable=unused-argument
-    def __new__(cls, *args: object, **kwargs: object) -> 'TelegramObject':
+    def __new__(cls, *args: object, **kwargs: object) -> "TelegramObject":
         # We add _id_attrs in __new__ instead of __init__ since we want to add this to the slots
         # w/o calling __init__ in all of the subclasses.
         instance = super().__new__(cls)
@@ -76,8 +76,8 @@ class TelegramObject:
         return str(self.to_dict())
 
     def __getitem__(self, item: str) -> object:
-        if item == 'from':
-            item = 'from_user'
+        if item == "from":
+            item = "from_user"
         try:
             return getattr(self, item)
         except AttributeError as exc:
@@ -148,22 +148,22 @@ class TelegramObject:
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
         for cls in self.__class__.__mro__[:-1]:
             for key in cls.__slots__:  # type: ignore[attr-defined]
-                if not include_private and key.startswith('_'):
+                if not include_private and key.startswith("_"):
                     continue
 
                 value = getattr(self, key, None)
                 if value is not None:
-                    if recursive and hasattr(value, 'to_dict'):
+                    if recursive and hasattr(value, "to_dict"):
                         data[key] = value.to_dict()
                     else:
                         data[key] = value
                 elif not recursive:
                     data[key] = value
 
-        if recursive and data.get('from_user'):
-            data['from'] = data.pop('from_user', None)
+        if recursive and data.get("from_user"):
+            data["from"] = data.pop("from_user", None)
         if remove_bot:
-            data.pop('_bot', None)
+            data.pop("_bot", None)
         return data
 
     @staticmethod
@@ -171,7 +171,7 @@ class TelegramObject:
         return None if data is None else data.copy()
 
     @classmethod
-    def de_json(cls: Type[TO_co], data: Optional[JSONDict], bot: 'Bot') -> Optional[TO_co]:
+    def de_json(cls: Type[TO_co], data: Optional[JSONDict], bot: "Bot") -> Optional[TO_co]:
         """Converts JSON data to a Telegram object.
 
         Args:
@@ -193,7 +193,7 @@ class TelegramObject:
 
     @classmethod
     def de_list(
-        cls: Type[TO_co], data: Optional[List[JSONDict]], bot: 'Bot'
+        cls: Type[TO_co], data: Optional[List[JSONDict]], bot: "Bot"
     ) -> List[Optional[TO_co]]:
         """Converts JSON data to a list of Telegram objects.
 
@@ -226,7 +226,7 @@ class TelegramObject:
         """
         return self._get_attrs(recursive=True)
 
-    def get_bot(self) -> 'Bot':
+    def get_bot(self) -> "Bot":
         """Returns the :class:`telegram.Bot` instance associated with this object.
 
         .. seealso:: :meth:`set_bot`
@@ -238,11 +238,11 @@ class TelegramObject:
         """
         if self._bot is None:
             raise RuntimeError(
-                'This object has no bot associated with it. Shortcuts cannot be used.'
+                "This object has no bot associated with it. Shortcuts cannot be used."
             )
         return self._bot
 
-    def set_bot(self, bot: Optional['Bot']) -> None:
+    def set_bot(self, bot: Optional["Bot"]) -> None:
         """Sets the :class:`telegram.Bot` instance associated with this object.
 
         .. seealso:: :meth:`get_bot`

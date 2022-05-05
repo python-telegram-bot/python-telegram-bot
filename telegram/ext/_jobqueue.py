@@ -49,12 +49,12 @@ class JobQueue:
 
     """
 
-    __slots__ = ('_application', 'scheduler', '_executor')
+    __slots__ = ("_application", "scheduler", "_executor")
 
     def __init__(self) -> None:
-        self._application: 'Optional[weakref.ReferenceType[Application]]' = None
+        self._application: "Optional[weakref.ReferenceType[Application]]" = None
         self._executor = AsyncIOExecutor()
-        self.scheduler = AsyncIOScheduler(timezone=pytz.utc, executors={'default': self._executor})
+        self.scheduler = AsyncIOScheduler(timezone=pytz.utc, executors={"default": self._executor})
 
     def _tz_now(self) -> datetime.datetime:
         return datetime.datetime.now(self.scheduler.timezone)
@@ -93,7 +93,7 @@ class JobQueue:
             return date_time
         return time
 
-    def set_application(self, application: 'Application') -> None:
+    def set_application(self, application: "Application") -> None:
         """Set the application to be used by this JobQueue.
 
         Args:
@@ -104,18 +104,18 @@ class JobQueue:
         if isinstance(application.bot, ExtBot) and application.bot.defaults:
             self.scheduler.configure(
                 timezone=application.bot.defaults.tzinfo or pytz.utc,
-                executors={'default': self._executor},
+                executors={"default": self._executor},
             )
 
     @property
-    def application(self) -> 'Application':
+    def application(self) -> "Application":
         """The application this JobQueue is associated with."""
         if self._application is None:
-            raise RuntimeError('No application was set for this JobQueue.')
+            raise RuntimeError("No application was set for this JobQueue.")
         application = self._application()
         if application is not None:
             return application
-        raise RuntimeError('The application instance is no longer alive.')
+        raise RuntimeError("The application instance is no longer alive.")
 
     def run_once(
         self,
@@ -126,7 +126,7 @@ class JobQueue:
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new :class:`Job` instance that runs once and adds it to the queue.
 
         Args:
@@ -186,7 +186,7 @@ class JobQueue:
         j = self.scheduler.add_job(
             job.run,
             name=name,
-            trigger='date',
+            trigger="date",
             run_date=date_time,
             args=(self.application,),
             timezone=date_time.tzinfo or self.scheduler.timezone,
@@ -207,7 +207,7 @@ class JobQueue:
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new :class:`Job` instance that runs at specified intervals and adds it to the
         queue.
 
@@ -295,7 +295,7 @@ class JobQueue:
 
         j = self.scheduler.add_job(
             job.run,
-            trigger='interval',
+            trigger="interval",
             args=(self.application,),
             start_date=dt_first,
             end_date=dt_last,
@@ -317,7 +317,7 @@ class JobQueue:
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
 
         .. versionchanged:: 14.0
@@ -368,10 +368,10 @@ class JobQueue:
 
         j = self.scheduler.add_job(
             job.run,
-            trigger='cron',
+            trigger="cron",
             args=(self.application,),
             name=name,
-            day='last' if day == -1 else day,
+            day="last" if day == -1 else day,
             hour=when.hour,
             minute=when.minute,
             second=when.second,
@@ -391,7 +391,7 @@ class JobQueue:
         chat_id: int = None,
         user_id: int = None,
         job_kwargs: JSONDict = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new :class:`Job` that runs on a daily basis and adds it to the queue.
 
         Note:
@@ -445,8 +445,8 @@ class JobQueue:
             job.run,
             name=name,
             args=(self.application,),
-            trigger='cron',
-            day_of_week=','.join([str(d) for d in days]),
+            trigger="cron",
+            day_of_week=",".join([str(d) for d in days]),
             hour=time.hour,
             minute=time.minute,
             second=time.second,
@@ -465,7 +465,7 @@ class JobQueue:
         name: str = None,
         chat_id: int = None,
         user_id: int = None,
-    ) -> 'Job':
+    ) -> "Job":
         """Creates a new custom defined :class:`Job`.
 
         Args:
@@ -535,14 +535,14 @@ class JobQueue:
             # so give it a tiny bit of time to actually shut down.
             await asyncio.sleep(0.01)
 
-    def jobs(self) -> Tuple['Job', ...]:
+    def jobs(self) -> Tuple["Job", ...]:
         """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`."""
         return tuple(
             Job._from_aps_job(job)  # pylint: disable=protected-access
             for job in self.scheduler.get_jobs()
         )
 
-    def get_jobs_by_name(self, name: str) -> Tuple['Job', ...]:
+    def get_jobs_by_name(self, name: str) -> Tuple["Job", ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
         in the :class:`JobQueue`.
         """
@@ -599,14 +599,14 @@ class Job:
     """
 
     __slots__ = (
-        'callback',
-        'context',
-        'name',
-        '_removed',
-        '_enabled',
-        'job',
-        'chat_id',
-        'user_id',
+        "callback",
+        "context",
+        "name",
+        "_removed",
+        "_enabled",
+        "job",
+        "chat_id",
+        "user_id",
     )
 
     def __init__(
@@ -630,7 +630,7 @@ class Job:
 
         self.job = cast(APSJob, job)  # skipcq: PTC-W0052
 
-    async def run(self, application: 'Application') -> None:
+    async def run(self, application: "Application") -> None:
         """Executes the callback function independently of the jobs schedule. Also calls
         :meth:`telegram.ext.Application.update_persistence`.
 
@@ -644,7 +644,7 @@ class Job:
         # We shield the task such that the job isn't cancelled mid-run
         await asyncio.shield(self._run(application))
 
-    async def _run(self, application: 'Application') -> None:
+    async def _run(self, application: "Application") -> None:
         try:
             context = application.context_types.context.from_job(self, application)
             await context.refresh_data()
@@ -695,7 +695,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def _from_aps_job(cls, job: APSJob) -> 'Job':
+    def _from_aps_job(cls, job: APSJob) -> "Job":
         return job.func.__self__
 
     def __getattr__(self, item: str) -> object:

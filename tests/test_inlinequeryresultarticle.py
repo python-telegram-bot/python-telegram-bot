@@ -28,7 +28,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_article():
     return InlineQueryResultArticle(
         TestInlineQueryResultArticle.id_,
@@ -45,22 +45,22 @@ def inline_query_result_article():
 
 
 class TestInlineQueryResultArticle:
-    id_ = 'id'
-    type_ = 'article'
-    title = 'title'
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
-    url = 'url'
+    id_ = "id"
+    type_ = "article"
+    title = "title"
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
+    url = "url"
     hide_url = True
-    description = 'description'
-    thumb_url = 'thumb url'
+    description = "description"
+    thumb_url = "thumb url"
     thumb_height = 10
     thumb_width = 15
 
     def test_slot_behaviour(self, inline_query_result_article, mro_slots, recwarn):
         inst = inline_query_result_article
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_article):
@@ -83,41 +83,41 @@ class TestInlineQueryResultArticle:
         inline_query_result_article_dict = inline_query_result_article.to_dict()
 
         assert isinstance(inline_query_result_article_dict, dict)
-        assert inline_query_result_article_dict['type'] == inline_query_result_article.type
-        assert inline_query_result_article_dict['id'] == inline_query_result_article.id
-        assert inline_query_result_article_dict['title'] == inline_query_result_article.title
+        assert inline_query_result_article_dict["type"] == inline_query_result_article.type
+        assert inline_query_result_article_dict["id"] == inline_query_result_article.id
+        assert inline_query_result_article_dict["title"] == inline_query_result_article.title
         assert (
-            inline_query_result_article_dict['input_message_content']
+            inline_query_result_article_dict["input_message_content"]
             == inline_query_result_article.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_article_dict['reply_markup']
+            inline_query_result_article_dict["reply_markup"]
             == inline_query_result_article.reply_markup.to_dict()
         )
-        assert inline_query_result_article_dict['url'] == inline_query_result_article.url
-        assert inline_query_result_article_dict['hide_url'] == inline_query_result_article.hide_url
+        assert inline_query_result_article_dict["url"] == inline_query_result_article.url
+        assert inline_query_result_article_dict["hide_url"] == inline_query_result_article.hide_url
         assert (
-            inline_query_result_article_dict['description']
+            inline_query_result_article_dict["description"]
             == inline_query_result_article.description
         )
         assert (
-            inline_query_result_article_dict['thumb_url'] == inline_query_result_article.thumb_url
+            inline_query_result_article_dict["thumb_url"] == inline_query_result_article.thumb_url
         )
         assert (
-            inline_query_result_article_dict['thumb_height']
+            inline_query_result_article_dict["thumb_height"]
             == inline_query_result_article.thumb_height
         )
         assert (
-            inline_query_result_article_dict['thumb_width']
+            inline_query_result_article_dict["thumb_width"]
             == inline_query_result_article.thumb_width
         )
 
     def test_equality(self):
         a = InlineQueryResultArticle(self.id_, self.title, self.input_message_content)
         b = InlineQueryResultArticle(self.id_, self.title, self.input_message_content)
-        c = InlineQueryResultArticle(self.id_, '', self.input_message_content)
-        d = InlineQueryResultArticle('', self.title, self.input_message_content)
-        e = InlineQueryResultAudio(self.id_, '', '')
+        c = InlineQueryResultArticle(self.id_, "", self.input_message_content)
+        d = InlineQueryResultArticle("", self.title, self.input_message_content)
+        e = InlineQueryResultAudio(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

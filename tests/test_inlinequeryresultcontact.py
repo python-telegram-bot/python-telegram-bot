@@ -27,7 +27,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_contact():
     return InlineQueryResultContact(
         TestInlineQueryResultContact.id_,
@@ -43,21 +43,21 @@ def inline_query_result_contact():
 
 
 class TestInlineQueryResultContact:
-    id_ = 'id'
-    type_ = 'contact'
-    phone_number = 'phone_number'
-    first_name = 'first_name'
-    last_name = 'last_name'
-    thumb_url = 'thumb url'
+    id_ = "id"
+    type_ = "contact"
+    phone_number = "phone_number"
+    first_name = "first_name"
+    last_name = "last_name"
+    thumb_url = "thumb url"
     thumb_width = 10
     thumb_height = 15
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_contact, mro_slots):
         inst = inline_query_result_contact
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_contact):
@@ -79,45 +79,45 @@ class TestInlineQueryResultContact:
         inline_query_result_contact_dict = inline_query_result_contact.to_dict()
 
         assert isinstance(inline_query_result_contact_dict, dict)
-        assert inline_query_result_contact_dict['id'] == inline_query_result_contact.id
-        assert inline_query_result_contact_dict['type'] == inline_query_result_contact.type
+        assert inline_query_result_contact_dict["id"] == inline_query_result_contact.id
+        assert inline_query_result_contact_dict["type"] == inline_query_result_contact.type
         assert (
-            inline_query_result_contact_dict['phone_number']
+            inline_query_result_contact_dict["phone_number"]
             == inline_query_result_contact.phone_number
         )
         assert (
-            inline_query_result_contact_dict['first_name']
+            inline_query_result_contact_dict["first_name"]
             == inline_query_result_contact.first_name
         )
         assert (
-            inline_query_result_contact_dict['last_name'] == inline_query_result_contact.last_name
+            inline_query_result_contact_dict["last_name"] == inline_query_result_contact.last_name
         )
         assert (
-            inline_query_result_contact_dict['thumb_url'] == inline_query_result_contact.thumb_url
+            inline_query_result_contact_dict["thumb_url"] == inline_query_result_contact.thumb_url
         )
         assert (
-            inline_query_result_contact_dict['thumb_width']
+            inline_query_result_contact_dict["thumb_width"]
             == inline_query_result_contact.thumb_width
         )
         assert (
-            inline_query_result_contact_dict['thumb_height']
+            inline_query_result_contact_dict["thumb_height"]
             == inline_query_result_contact.thumb_height
         )
         assert (
-            inline_query_result_contact_dict['input_message_content']
+            inline_query_result_contact_dict["input_message_content"]
             == inline_query_result_contact.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_contact_dict['reply_markup']
+            inline_query_result_contact_dict["reply_markup"]
             == inline_query_result_contact.reply_markup.to_dict()
         )
 
     def test_equality(self):
         a = InlineQueryResultContact(self.id_, self.phone_number, self.first_name)
         b = InlineQueryResultContact(self.id_, self.phone_number, self.first_name)
-        c = InlineQueryResultContact(self.id_, '', self.first_name)
-        d = InlineQueryResultContact('', self.phone_number, self.first_name)
-        e = InlineQueryResultVoice(self.id_, '', '')
+        c = InlineQueryResultContact(self.id_, "", self.first_name)
+        d = InlineQueryResultContact("", self.phone_number, self.first_name)
+        e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

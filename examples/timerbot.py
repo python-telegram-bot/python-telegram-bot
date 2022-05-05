@@ -25,7 +25,7 @@ from telegram.ext import Application, CallbackContext, CommandHandler
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 
@@ -37,13 +37,13 @@ logging.basicConfig(
 # we decided to have it present as context.
 async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends explanation on how to use the bot."""
-    await update.message.reply_text('Hi! Use /set <seconds> to set a timer')
+    await update.message.reply_text("Hi! Use /set <seconds> to set a timer")
 
 
 async def alarm(context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
     job = context.job
-    await context.bot.send_message(job.chat_id, text=f'Beep! {job.context} seconds are over!')
+    await context.bot.send_message(job.chat_id, text=f"Beep! {job.context} seconds are over!")
 
 
 def remove_job_if_exists(name: str, context: CallbackContext.DEFAULT_TYPE) -> bool:
@@ -63,26 +63,26 @@ async def set_timer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> No
         # args[0] should contain the time for the timer in seconds
         due = int(context.args[0])
         if due < 0:
-            await update.message.reply_text('Sorry we can not go back to future!')
+            await update.message.reply_text("Sorry we can not go back to future!")
             return
 
         job_removed = remove_job_if_exists(str(chat_id), context)
         context.job_queue.run_once(alarm, due, chat_id=chat_id, name=str(chat_id), context=due)
 
-        text = 'Timer successfully set!'
+        text = "Timer successfully set!"
         if job_removed:
-            text += ' Old one was removed.'
+            text += " Old one was removed."
         await update.message.reply_text(text)
 
     except (IndexError, ValueError):
-        await update.effective_message.reply_text('Usage: /set <seconds>')
+        await update.effective_message.reply_text("Usage: /set <seconds>")
 
 
 async def unset(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
     job_removed = remove_job_if_exists(str(chat_id), context)
-    text = 'Timer successfully cancelled!' if job_removed else 'You have no active timer.'
+    text = "Timer successfully cancelled!" if job_removed else "You have no active timer."
     await update.message.reply_text(text)
 
 
@@ -100,5 +100,5 @@ def main() -> None:
     application.run_polling()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

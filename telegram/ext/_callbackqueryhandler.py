@@ -30,7 +30,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 if TYPE_CHECKING:
     from telegram.ext import Application
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 class CallbackQueryHandler(Handler[Update, CCT]):
@@ -100,7 +100,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
 
     """
 
-    __slots__ = ('pattern',)
+    __slots__ = ("pattern",)
 
     def __init__(
         self,
@@ -112,7 +112,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
 
         if callable(pattern) and asyncio.iscoroutinefunction(pattern):
             raise TypeError(
-                'The `pattern` must not be a coroutine function! Use an ordinary function instead.'
+                "The `pattern` must not be a coroutine function! Use an ordinary function instead."
             )
 
         if isinstance(pattern, str):
@@ -150,7 +150,7 @@ class CallbackQueryHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        application: 'Application',
+        application: "Application",
         check_result: Union[bool, Match],
     ) -> None:
         """Add the result of ``re.match(pattern, update.callback_query.data)`` to

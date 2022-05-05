@@ -35,12 +35,12 @@ from telegram import (
 )
 from telegram._utils.datetime import to_timestamp
 
-ignored = ['self', '_kwargs']
+ignored = ["self", "_kwargs"]
 
 
 class CMDefaults:
-    user = User(1, 'First name', False)
-    custom_title: str = 'PTB'
+    user = User(1, "First name", False)
+    custom_title: str = "PTB"
     is_anonymous: bool = True
     until_date: datetime.datetime = to_timestamp(datetime.datetime.utcnow())
     can_be_edited: bool = False
@@ -115,7 +115,7 @@ def chat_member_banned():
 
 def make_json_dict(instance: ChatMember, include_optional_args: bool = False) -> dict:
     """Used to make the json dict which we use for testing de_json. Similar to iter_args()"""
-    json_dict = {'status': instance.status}
+    json_dict = {"status": instance.status}
     sig = inspect.signature(instance.__class__.__init__)
 
     for param in sig.parameters.values():
@@ -125,7 +125,7 @@ def make_json_dict(instance: ChatMember, include_optional_args: bool = False) ->
         val = getattr(instance, param.name)
         # Compulsory args-
         if param.default is inspect.Parameter.empty:
-            if hasattr(val, 'to_dict'):  # convert the user object or any future ones to dict.
+            if hasattr(val, "to_dict"):  # convert the user object or any future ones to dict.
                 val = val.to_dict()
             json_dict[param.name] = val
 
@@ -176,7 +176,7 @@ class TestChatMemberTypes:
     def test_slot_behaviour(self, chat_member_type, mro_slots):
         inst = chat_member_type
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json_required_args(self, bot, chat_member_type):
@@ -201,11 +201,11 @@ class TestChatMemberTypes:
             assert c_mem_type_at == const_c_mem_at
 
     def test_de_json_invalid_status(self, chat_member_type, bot):
-        json_dict = {'status': 'invalid', 'user': CMDefaults.user.to_dict()}
+        json_dict = {"status": "invalid", "user": CMDefaults.user.to_dict()}
         chat_member_type = ChatMember.de_json(json_dict, bot)
 
         assert type(chat_member_type) is ChatMember
-        assert chat_member_type.status == 'invalid'
+        assert chat_member_type.status == "invalid"
 
     def test_de_json_subclass(self, chat_member_type, bot, chat_id):
         """This makes sure that e.g. ChatMemberAdministrator(data, bot) never returns a
@@ -218,15 +218,15 @@ class TestChatMemberTypes:
         chat_member_dict = chat_member_type.to_dict()
 
         assert isinstance(chat_member_dict, dict)
-        assert chat_member_dict['status'] == chat_member_type.status
-        assert chat_member_dict['user'] == chat_member_type.user.to_dict()
+        assert chat_member_dict["status"] == chat_member_type.status
+        assert chat_member_dict["user"] == chat_member_type.user.to_dict()
 
     def test_equality(self, chat_member_type):
-        a = ChatMember(status='status', user=CMDefaults.user)
-        b = ChatMember(status='status', user=CMDefaults.user)
+        a = ChatMember(status="status", user=CMDefaults.user)
+        b = ChatMember(status="status", user=CMDefaults.user)
         c = chat_member_type
         d = deepcopy(chat_member_type)
-        e = Dice(4, 'emoji')
+        e = Dice(4, "emoji")
 
         assert a == b
         assert hash(a) == hash(b)

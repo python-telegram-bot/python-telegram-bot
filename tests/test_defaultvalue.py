@@ -26,7 +26,7 @@ class TestDefaultValue:
     def test_slot_behaviour(self, mro_slots):
         inst = DefaultValue(1)
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_identity(self):
@@ -36,7 +36,7 @@ class TestDefaultValue:
         assert df_1 != df_2
 
     @pytest.mark.parametrize(
-        'value,expected',
+        "value,expected",
         [
             ({}, False),
             ({1: 2}, True),
@@ -53,11 +53,11 @@ class TestDefaultValue:
         assert bool(DefaultValue(value)) == expected
 
     @pytest.mark.parametrize(
-        'value', ['string', 1, True, [1, 2, 3], {1: 3}, DefaultValue(1), User(1, 'first', False)]
+        "value", ["string", 1, True, [1, 2, 3], {1: 3}, DefaultValue(1), User(1, "first", False)]
     )
     def test_string_representations(self, value):
         df = DefaultValue(value)
-        assert str(df) == f'DefaultValue({value})'
+        assert str(df) == f"DefaultValue({value})"
         assert repr(df) == repr(value)
 
     def test_as_function_argument(self):

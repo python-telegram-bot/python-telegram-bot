@@ -24,11 +24,11 @@
 """
 
 __all__ = (
-    'create_deep_linked_url',
-    'effective_message_type',
-    'escape_markdown',
-    'mention_html',
-    'mention_markdown',
+    "create_deep_linked_url",
+    "effective_message_type",
+    "escape_markdown",
+    "mention_html",
+    "mention_markdown",
 )
 
 import re
@@ -56,18 +56,18 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
             ``version=2``, will be ignored else.
     """
     if int(version) == 1:
-        escape_chars = r'_*`['
+        escape_chars = r"_*`["
     elif int(version) == 2:
-        if entity_type in ['pre', 'code']:
-            escape_chars = r'\`'
-        elif entity_type == 'text_link':
-            escape_chars = r'\)'
+        if entity_type in ["pre", "code"]:
+            escape_chars = r"\`"
+        elif entity_type == "text_link":
+            escape_chars = r"\)"
         else:
-            escape_chars = r'_*[]()~`>#+-=|{}.!'
+            escape_chars = r"_*[]()~`>#+-=|{}.!"
     else:
-        raise ValueError('Markdown version must be either 1 or 2!')
+        raise ValueError("Markdown version must be either 1 or 2!")
 
-    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+    return re.sub(f"([{re.escape(escape_chars)}])", r"\\\1", text)
 
 
 def mention_html(user_id: Union[int, str], name: str) -> str:
@@ -93,10 +93,10 @@ def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> s
     Returns:
         :obj:`str`: The inline mention for the user as Markdown.
     """
-    return f'[{escape_markdown(name, version=version)}](tg://user?id={user_id})'
+    return f"[{escape_markdown(name, version=version)}](tg://user?id={user_id})"
 
 
-def effective_message_type(entity: Union['Message', 'Update']) -> Optional[str]:
+def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
     """
     Extracts the type of message as a string identifier from a :class:`telegram.Message` or a
     :class:`telegram.Update`.
@@ -156,22 +156,22 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
     if bot_username is None or len(bot_username) <= 3:
         raise ValueError("You must provide a valid bot_username.")
 
-    base_url = f'https://t.me/{bot_username}'
+    base_url = f"https://t.me/{bot_username}"
     if not payload:
         return base_url
 
     if len(payload) > 64:
         raise ValueError("The deep-linking payload must not exceed 64 characters.")
 
-    if not re.match(r'^[A-Za-z0-9_-]+$', payload):
+    if not re.match(r"^[A-Za-z0-9_-]+$", payload):
         raise ValueError(
             "Only the following characters are allowed for deep-linked "
             "URLs: A-Z, a-z, 0-9, _ and -"
         )
 
     if group:
-        key = 'startgroup'
+        key = "startgroup"
     else:
-        key = 'start'
+        key = "start"
 
-    return f'{base_url}?{key}={payload}'
+    return f"{base_url}?{key}={payload}"

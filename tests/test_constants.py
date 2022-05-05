@@ -29,8 +29,8 @@ from tests.conftest import data_file
 
 
 class StrEnumTest(StringEnum):
-    FOO = 'foo'
-    BAR = 'bar'
+    FOO = "foo"
+    BAR = "bar"
 
 
 class IntEnumTest(IntEnum):
@@ -47,9 +47,9 @@ class TestConstants:
             key
             for key, member in constants.__dict__.items()
             if (
-                not key.startswith('_')
+                not key.startswith("_")
                 # exclude imported stuff
-                and getattr(member, '__module__', 'telegram.constants') == 'telegram.constants'
+                and getattr(member, "__module__", "telegram.constants") == "telegram.constants"
             )
         }
         actual = set(constants.__all__)
@@ -58,25 +58,25 @@ class TestConstants:
         ), f"Members {expected - actual} were not listed in constants.__all__"
 
     def test_to_json(self):
-        assert json.dumps(StrEnumTest.FOO) == json.dumps('foo')
+        assert json.dumps(StrEnumTest.FOO) == json.dumps("foo")
         assert json.dumps(IntEnumTest.FOO) == json.dumps(1)
 
     def test_string_representation(self):
-        assert repr(StrEnumTest.FOO) == '<StrEnumTest.FOO>'
-        assert str(StrEnumTest.FOO) == 'StrEnumTest.FOO'
+        assert repr(StrEnumTest.FOO) == "<StrEnumTest.FOO>"
+        assert str(StrEnumTest.FOO) == "StrEnumTest.FOO"
 
     def test_string_inheritance(self):
         assert isinstance(StrEnumTest.FOO, str)
-        assert StrEnumTest.FOO + StrEnumTest.BAR == 'foobar'
-        assert StrEnumTest.FOO.replace('o', 'a') == 'faa'
+        assert StrEnumTest.FOO + StrEnumTest.BAR == "foobar"
+        assert StrEnumTest.FOO.replace("o", "a") == "faa"
 
         assert StrEnumTest.FOO == StrEnumTest.FOO
-        assert StrEnumTest.FOO == 'foo'
+        assert StrEnumTest.FOO == "foo"
         assert StrEnumTest.FOO != StrEnumTest.BAR
-        assert StrEnumTest.FOO != 'bar'
+        assert StrEnumTest.FOO != "bar"
         assert StrEnumTest.FOO != object()
 
-        assert hash(StrEnumTest.FOO) == hash('foo')
+        assert hash(StrEnumTest.FOO) == hash("foo")
 
     def test_int_inheritance(self):
         assert isinstance(IntEnumTest.FOO, int)
@@ -92,24 +92,24 @@ class TestConstants:
 
     @flaky(3, 1)
     async def test_max_message_length(self, bot, chat_id):
-        await bot.send_message(chat_id=chat_id, text='a' * constants.MessageLimit.TEXT_LENGTH)
+        await bot.send_message(chat_id=chat_id, text="a" * constants.MessageLimit.TEXT_LENGTH)
 
         with pytest.raises(
             BadRequest,
-            match='Message is too long',
+            match="Message is too long",
         ):
             await bot.send_message(
-                chat_id=chat_id, text='a' * (constants.MessageLimit.TEXT_LENGTH + 1)
+                chat_id=chat_id, text="a" * (constants.MessageLimit.TEXT_LENGTH + 1)
             )
 
     @flaky(3, 1)
     async def test_max_caption_length(self, bot, chat_id):
-        good_caption = 'a' * constants.MessageLimit.CAPTION_LENGTH
-        with data_file('telegram.png').open('rb') as f:
+        good_caption = "a" * constants.MessageLimit.CAPTION_LENGTH
+        with data_file("telegram.png").open("rb") as f:
             good_msg = await bot.send_photo(photo=f, caption=good_caption, chat_id=chat_id)
         assert good_msg.caption == good_caption
 
-        bad_caption = good_caption + 'Z'
+        bad_caption = good_caption + "Z"
         match = "Media_caption_too_long"
-        with pytest.raises(BadRequest, match=match), data_file('telegram.png').open('rb') as f:
+        with pytest.raises(BadRequest, match=match), data_file("telegram.png").open("rb") as f:
             await bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)

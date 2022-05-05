@@ -64,7 +64,7 @@ class Animation(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ('duration', 'height', 'file_name', 'mime_type', 'width')
+    __slots__ = ("duration", "height", "file_name", "mime_type", "width")
 
     def __init__(
         self,
@@ -77,7 +77,7 @@ class Animation(_BaseThumbedMedium):
         file_name: str = None,
         mime_type: str = None,
         file_size: int = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         super().__init__(

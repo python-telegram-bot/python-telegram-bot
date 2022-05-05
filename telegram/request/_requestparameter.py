@@ -59,7 +59,7 @@ class RequestParameter:
             be uploaded along with this parameter.
     """
 
-    __slots__ = ('name', 'value', 'input_files')
+    __slots__ = ("name", "value", "input_files")
 
     name: str
     value: object
@@ -124,16 +124,16 @@ class RequestParameter:
             # value.media in case the same value is reused for another request
             data = value.to_dict()
             if value.media.attach_uri:
-                data['media'] = value.media.attach_uri
+                data["media"] = value.media.attach_uri
             else:
-                data.pop('media', None)
+                data.pop("media", None)
 
-            thumb = data.get('thumb', None)
+            thumb = data.get("thumb", None)
             if isinstance(thumb, InputFile):
                 if thumb.attach_uri:
-                    data['thumb'] = thumb.attach_uri
+                    data["thumb"] = thumb.attach_uri
                 else:
-                    data.pop('thumb', None)
+                    data.pop("thumb", None)
                 return data, [value.media, thumb]
 
             return data, [value.media]
@@ -143,7 +143,7 @@ class RequestParameter:
         return value, []
 
     @classmethod
-    def from_input(cls, key: str, value: object) -> 'RequestParameter':
+    def from_input(cls, key: str, value: object) -> "RequestParameter":
         """Builds an instance of this class for a given key-value pair that represents the raw
         input as passed along from a method of :class:`telegram.Bot`.
         """

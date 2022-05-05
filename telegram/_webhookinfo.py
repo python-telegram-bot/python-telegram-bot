@@ -75,15 +75,15 @@ class WebhookInfo(TelegramObject):
     """
 
     __slots__ = (
-        'allowed_updates',
-        'url',
-        'max_connections',
-        'last_error_date',
-        'ip_address',
-        'last_error_message',
-        'pending_update_count',
-        'has_custom_certificate',
-        'last_synchronization_error_date',
+        "allowed_updates",
+        "url",
+        "max_connections",
+        "last_error_date",
+        "ip_address",
+        "last_error_message",
+        "pending_update_count",
+        "has_custom_certificate",
+        "last_synchronization_error_date",
     )
 
     def __init__(
@@ -124,16 +124,16 @@ class WebhookInfo(TelegramObject):
         )
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['WebhookInfo']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["WebhookInfo"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['last_error_date'] = from_timestamp(data.get('last_error_date'))
-        data['last_synchronization_error_date'] = from_timestamp(
-            data.get('last_synchronization_error_date')
+        data["last_error_date"] = from_timestamp(data.get("last_error_date"))
+        data["last_synchronization_error_date"] = from_timestamp(
+            data.get("last_synchronization_error_date")
         )
 
         return cls(bot=bot, **data)

@@ -29,8 +29,8 @@ Warning:
 """
 from typing import Generic, TypeVar, Union, overload
 
-DVType = TypeVar('DVType', bound=object)  # pylint: disable=invalid-name
-OT = TypeVar('OT', bound=object)
+DVType = TypeVar("DVType", bound=object)  # pylint: disable=invalid-name
+OT = TypeVar("OT", bound=object)
 
 
 class DefaultValue(Generic[DVType]):
@@ -81,7 +81,7 @@ class DefaultValue(Generic[DVType]):
 
     """
 
-    __slots__ = ('value',)
+    __slots__ = ("value",)
 
     def __init__(self, value: DVType = None):
         self.value = value
@@ -91,7 +91,7 @@ class DefaultValue(Generic[DVType]):
 
     @overload
     @staticmethod
-    def get_value(obj: 'DefaultValue[OT]') -> OT:
+    def get_value(obj: "DefaultValue[OT]") -> OT:
         ...
 
     @overload
@@ -100,7 +100,7 @@ class DefaultValue(Generic[DVType]):
         ...
 
     @staticmethod
-    def get_value(obj: Union[OT, 'DefaultValue[OT]']) -> OT:
+    def get_value(obj: Union[OT, "DefaultValue[OT]"]) -> OT:
         """Shortcut for::
 
             return obj.value if isinstance(obj, DefaultValue) else obj
@@ -115,7 +115,7 @@ class DefaultValue(Generic[DVType]):
 
     # This is mostly here for readability during debugging
     def __str__(self) -> str:
-        return f'DefaultValue({self.value})'
+        return f"DefaultValue({self.value})"
 
     # This is here to have the default instances nicely rendered in the docs
     def __repr__(self) -> str:

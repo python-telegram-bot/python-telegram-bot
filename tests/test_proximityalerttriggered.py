@@ -31,21 +31,21 @@ def proximity_alert_triggered():
 
 
 class TestProximityAlertTriggered:
-    traveler = User(1, 'foo', False)
-    watcher = User(2, 'bar', False)
+    traveler = User(1, "foo", False)
+    watcher = User(2, "bar", False)
     distance = 42
 
     def test_slot_behaviour(self, proximity_alert_triggered, mro_slots):
         inst = proximity_alert_triggered
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, bot):
         json_dict = {
-            'traveler': self.traveler.to_dict(),
-            'watcher': self.watcher.to_dict(),
-            'distance': self.distance,
+            "traveler": self.traveler.to_dict(),
+            "watcher": self.watcher.to_dict(),
+            "distance": self.distance,
         }
         proximity_alert_triggered = ProximityAlertTriggered.de_json(json_dict, bot)
 
@@ -60,22 +60,22 @@ class TestProximityAlertTriggered:
 
         assert isinstance(proximity_alert_triggered_dict, dict)
         assert (
-            proximity_alert_triggered_dict['traveler']
+            proximity_alert_triggered_dict["traveler"]
             == proximity_alert_triggered.traveler.to_dict()
         )
         assert (
-            proximity_alert_triggered_dict['watcher']
+            proximity_alert_triggered_dict["watcher"]
             == proximity_alert_triggered.watcher.to_dict()
         )
-        assert proximity_alert_triggered_dict['distance'] == proximity_alert_triggered.distance
+        assert proximity_alert_triggered_dict["distance"] == proximity_alert_triggered.distance
 
     def test_equality(self, proximity_alert_triggered):
         a = proximity_alert_triggered
-        b = ProximityAlertTriggered(User(1, 'John', False), User(2, 'Doe', False), 42)
-        c = ProximityAlertTriggered(User(3, 'John', False), User(2, 'Doe', False), 42)
-        d = ProximityAlertTriggered(User(1, 'John', False), User(3, 'Doe', False), 42)
-        e = ProximityAlertTriggered(User(1, 'John', False), User(2, 'Doe', False), 43)
-        f = BotCommand('start', 'description')
+        b = ProximityAlertTriggered(User(1, "John", False), User(2, "Doe", False), 42)
+        c = ProximityAlertTriggered(User(3, "John", False), User(2, "Doe", False), 42)
+        d = ProximityAlertTriggered(User(1, "John", False), User(3, "Doe", False), 42)
+        e = ProximityAlertTriggered(User(1, "John", False), User(2, "Doe", False), 43)
+        f = BotCommand("start", "description")
 
         assert a == b
         assert hash(a) == hash(b)

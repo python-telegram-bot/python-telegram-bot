@@ -88,17 +88,17 @@ class InlineQueryResultPhoto(InlineQueryResult):
     """
 
     __slots__ = (
-        'photo_url',
-        'reply_markup',
-        'caption_entities',
-        'photo_width',
-        'caption',
-        'title',
-        'description',
-        'parse_mode',
-        'input_message_content',
-        'photo_height',
-        'thumb_url',
+        "photo_url",
+        "reply_markup",
+        "caption_entities",
+        "photo_width",
+        "caption",
+        "title",
+        "description",
+        "parse_mode",
+        "input_message_content",
+        "photo_height",
+        "thumb_url",
     )
 
     def __init__(
@@ -112,7 +112,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         description: str = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,

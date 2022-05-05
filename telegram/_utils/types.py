@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from telegram import ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove
     from telegram._utils.defaultvalue import DefaultValue  # noqa: F401
 
-FileLike = Union[IO[bytes], 'InputFile']
+FileLike = Union[IO[bytes], "InputFile"]
 """Either a bytes-stream (e.g. open file handler) or a :class:`telegram.InputFile`."""
 
 FilePathInput = Union[str, Path]
@@ -45,11 +45,11 @@ a local file path as string, :class:`pathlib.Path` or the file contents as :obj:
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
 
-DVType = TypeVar('DVType')  # pylint: disable=invalid-name
-ODVInput = Optional[Union['DefaultValue[DVType]', DVType]]
+DVType = TypeVar("DVType")  # pylint: disable=invalid-name
+ODVInput = Optional[Union["DefaultValue[DVType]", DVType]]
 """Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
 as ``Optional[Union[DefaultValue, type]]``."""
-DVInput = Union['DefaultValue[DVType]', DVType]
+DVInput = Union["DefaultValue[DVType]", DVType]
 """Generic type for bot method parameters which can have defaults. ``DVInput[type]`` is the same
 as ``Union[DefaultValue, type]``."""
 
@@ -58,7 +58,7 @@ SLT = Union[RT, List[RT], Tuple[RT, ...]]
 """Single instance or list/tuple of instances."""
 
 ReplyMarkup = Union[
-    'InlineKeyboardMarkup', 'ReplyKeyboardMarkup', 'ReplyKeyboardRemove', 'ForceReply'
+    "InlineKeyboardMarkup", "ReplyKeyboardMarkup", "ReplyKeyboardRemove", "ForceReply"
 ]
 """Type alias for reply markup objects.
 

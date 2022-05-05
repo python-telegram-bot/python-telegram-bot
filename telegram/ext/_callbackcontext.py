@@ -104,7 +104,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     else:
         # Somewhat silly workaround so that accessing the attribute
         # doesn't only work while type checking
-        DEFAULT_TYPE = 'CallbackContext[ExtBot, Dict, Dict, Dict]'  # pylint: disable-all
+        DEFAULT_TYPE = "CallbackContext[ExtBot, Dict, Dict, Dict]"  # pylint: disable-all
         """Shortcut for the type annotation for the `context` argument that's correct for the
         default settings, i.e. if :class:`telegram.ext.ContextTypes` is not used.
 
@@ -118,29 +118,29 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         """
 
     __slots__ = (
-        '_application',
-        '_chat_id_and_data',
-        '_user_id_and_data',
-        'args',
-        'matches',
-        'error',
-        'job',
-        'coroutine',
-        '__dict__',
+        "_application",
+        "_chat_id_and_data",
+        "_user_id_and_data",
+        "args",
+        "matches",
+        "error",
+        "job",
+        "coroutine",
+        "__dict__",
     )
 
-    def __init__(self: 'CCT', application: 'Application[BT, CCT, UD, CD, BD, JQ]'):
+    def __init__(self: "CCT", application: "Application[BT, CCT, UD, CD, BD, JQ]"):
         self._application = application
         self._chat_id_and_data: Optional[Tuple[int, CD]] = None
         self._user_id_and_data: Optional[Tuple[int, UD]] = None
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match]] = None
         self.error: Optional[Exception] = None
-        self.job: Optional['Job'] = None
+        self.job: Optional["Job"] = None
         self.coroutine: Optional[Coroutine] = None
 
     @property
-    def application(self) -> 'Application[BT, CCT, UD, CD, BD, JQ]':
+    def application(self) -> "Application[BT, CCT, UD, CD, BD, JQ]":
         """:class:`telegram.ext.Application`: The application associated with this context."""
         return self._application
 
@@ -242,21 +242,21 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         if isinstance(self.bot, ExtBot):
             if not self.bot.arbitrary_callback_data:
                 raise RuntimeError(
-                    'This telegram.ext.ExtBot instance does not use arbitrary callback data.'
+                    "This telegram.ext.ExtBot instance does not use arbitrary callback data."
                 )
             self.bot.callback_data_cache.drop_data(callback_query)
         else:
-            raise RuntimeError('telegram.Bot does not allow for arbitrary callback data.')
+            raise RuntimeError("telegram.Bot does not allow for arbitrary callback data.")
 
     @classmethod
     def from_error(
-        cls: Type['CCT'],
+        cls: Type["CCT"],
         update: object,
         error: Exception,
-        application: 'Application[BT, CCT, UD, CD, BD, JQ]',
-        job: 'Job' = None,
+        application: "Application[BT, CCT, UD, CD, BD, JQ]",
+        job: "Job" = None,
         coroutine: Coroutine = None,
-    ) -> 'CCT':
+    ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
         handlers.
@@ -287,10 +287,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @classmethod
     def from_update(
-        cls: Type['CCT'],
+        cls: Type["CCT"],
         update: object,
-        application: 'Application[BT, CCT, UD, CD, BD, JQ]',
-    ) -> 'CCT':
+        application: "Application[BT, CCT, UD, CD, BD, JQ]",
+    ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
         handlers.
@@ -325,10 +325,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @classmethod
     def from_job(
-        cls: Type['CCT'],
-        job: 'Job',
-        application: 'Application[BT, CCT, UD, CD, BD, JQ]',
-    ) -> 'CCT':
+        cls: Type["CCT"],
+        job: "Job",
+        application: "Application[BT, CCT, UD, CD, BD, JQ]",
+    ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
         job callback.
@@ -373,7 +373,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.bot
 
     @property
-    def job_queue(self) -> Optional['JobQueue']:
+    def job_queue(self) -> Optional["JobQueue"]:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
@@ -382,7 +382,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.job_queue
 
     @property
-    def update_queue(self) -> 'Queue[object]':
+    def update_queue(self) -> "Queue[object]":
         """
         :class:`asyncio.Queue`: The :class:`asyncio.Queue` instance used by the
             :class:`telegram.ext.Application` and (usually) the :class:`telegram.ext.Updater`

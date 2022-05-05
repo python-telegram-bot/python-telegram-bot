@@ -84,7 +84,7 @@ class HTTPXRequest(BaseRequest):
                 connections in the connection pool!
     """
 
-    __slots__ = ('_client', '_client_kwargs')
+    __slots__ = ("_client", "_client_kwargs")
 
     def __init__(
         self,
@@ -124,7 +124,7 @@ class HTTPXRequest(BaseRequest):
     async def shutdown(self) -> None:
         """See :meth:`BaseRequest.shutdown`."""
         if self._client.is_closed:
-            _logger.debug('This HTTPXRequest is already shut down. Returning.')
+            _logger.debug("This HTTPXRequest is already shut down. Returning.")
             return
 
         await self._client.aclose()
@@ -141,7 +141,7 @@ class HTTPXRequest(BaseRequest):
     ) -> Tuple[int, bytes]:
         """See :meth:`BaseRequest.do_request`."""
         if self._client.is_closed:
-            raise RuntimeError('This HTTPXRequest is not initialized!')
+            raise RuntimeError("This HTTPXRequest is not initialized!")
 
         # If user did not specify timeouts (for e.g. in a bot method), use the default ones when we
         # created this instance.
@@ -174,7 +174,7 @@ class HTTPXRequest(BaseRequest):
             res = await self._client.request(
                 method=method,
                 url=url,
-                headers={'User-Agent': self.USER_AGENT},
+                headers={"User-Agent": self.USER_AGENT},
                 timeout=timeout,
                 files=files,
                 data=data,
@@ -183,15 +183,15 @@ class HTTPXRequest(BaseRequest):
             if isinstance(err, httpx.PoolTimeout):
                 raise TimedOut(
                     message=(
-                        'Pool timeout: All connections in the connection pool are occupied. '
-                        'Request was *not* sent to Telegram. Consider adjusting the connection '
-                        'pool size or the pool timeout.'
+                        "Pool timeout: All connections in the connection pool are occupied. "
+                        "Request was *not* sent to Telegram. Consider adjusting the connection "
+                        "pool size or the pool timeout."
                     )
                 ) from err
             raise TimedOut from err
         except httpx.HTTPError as err:
             # HTTPError must come last as its the base httpx exception class
             # TODO p4: do something smart here; for now just raise NetworkError
-            raise NetworkError(f'httpx HTTPError: {err}') from err
+            raise NetworkError(f"httpx HTTPError: {err}") from err
 
         return res.status_code, res.content

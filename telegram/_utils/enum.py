@@ -26,9 +26,9 @@ Warning:
 from enum import Enum
 from typing import Type, TypeVar, Union
 
-_A = TypeVar('_A')
-_B = TypeVar('_B')
-_Enum = TypeVar('_Enum', bound=Enum)
+_A = TypeVar("_A")
+_B = TypeVar("_B")
+_Enum = TypeVar("_Enum", bound=Enum)
 
 
 def get_member(enum: Type[_Enum], value: _A, default: _B) -> Union[_Enum, _A, _B]:
@@ -49,4 +49,4 @@ class StringEnum(str, Enum):
     __slots__ = ()
 
     def __repr__(self) -> str:
-        return f'<{self.__class__.__name__}.{self.name}>'
+        return f"<{self.__class__.__name__}.{self.name}>"

@@ -37,55 +37,55 @@ from telegram import (
 )
 from telegram.ext import CallbackContext, ChatJoinRequestHandler, JobQueue
 
-message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
+message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
 params = [
-    {'message': message},
-    {'edited_message': message},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
-    {'channel_post': message},
-    {'edited_channel_post': message},
-    {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
-    {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
-    {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
+    {"message": message},
+    {"edited_message": message},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat", message=message)},
+    {"channel_post": message},
+    {"edited_channel_post": message},
+    {"chosen_inline_result": ChosenInlineResult("id", User(1, "", False), "")},
+    {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
+    {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
 
 ids = (
-    'message',
-    'edited_message',
-    'callback_query',
-    'channel_post',
-    'edited_channel_post',
-    'chosen_inline_result',
-    'shipping_query',
-    'pre_checkout_query',
-    'callback_query_without_message',
+    "message",
+    "edited_message",
+    "callback_query",
+    "channel_post",
+    "edited_channel_post",
+    "chosen_inline_result",
+    "shipping_query",
+    "pre_checkout_query",
+    "callback_query_without_message",
 )
 
 
-@pytest.fixture(scope='class', params=params, ids=ids)
+@pytest.fixture(scope="class", params=params, ids=ids)
 def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def time():
     return datetime.datetime.now(tz=pytz.utc)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def chat_join_request(time, bot):
     return ChatJoinRequest(
         chat=Chat(1, Chat.SUPERGROUP),
-        from_user=User(2, 'first_name', False),
+        from_user=User(2, "first_name", False),
         date=time,
-        bio='bio',
+        bio="bio",
         invite_link=ChatInviteLink(
-            'https://invite.link',
-            User(42, 'creator', False),
+            "https://invite.link",
+            User(42, "creator", False),
             creates_join_request=False,
-            name='InviteLink',
+            name="InviteLink",
             is_revoked=False,
             is_primary=False,
         ),
@@ -93,7 +93,7 @@ def chat_join_request(time, bot):
     )
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def chat_join_request_update(bot, chat_join_request):
     return Update(0, chat_join_request=chat_join_request)
 
@@ -104,7 +104,7 @@ class TestChatJoinRequestHandler:
     def test_slot_behaviour(self, mro_slots):
         action = ChatJoinRequestHandler(self.callback)
         for attr in action.__slots__:
-            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     @pytest.fixture(autouse=True)

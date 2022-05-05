@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 # pylint: disable=invalid-name
-ThumbedMT_co = TypeVar('ThumbedMT_co', bound='_BaseThumbedMedium', covariant=True)
+ThumbedMT_co = TypeVar("ThumbedMT_co", bound="_BaseThumbedMedium", covariant=True)
 
 
 class _BaseThumbedMedium(_BaseMedium):
@@ -58,7 +58,7 @@ class _BaseThumbedMedium(_BaseMedium):
 
     """
 
-    __slots__ = ('thumb',)
+    __slots__ = ("thumb",)
 
     def __init__(
         self,
@@ -66,7 +66,7 @@ class _BaseThumbedMedium(_BaseMedium):
         file_unique_id: str,
         file_size: int = None,
         thumb: PhotoSize = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
     ):
         super().__init__(
             file_id=file_id, file_unique_id=file_unique_id, file_size=file_size, bot=bot
@@ -75,7 +75,7 @@ class _BaseThumbedMedium(_BaseMedium):
 
     @classmethod
     def de_json(
-        cls: Type[ThumbedMT_co], data: Optional[JSONDict], bot: 'Bot'
+        cls: Type[ThumbedMT_co], data: Optional[JSONDict], bot: "Bot"
     ) -> Optional[ThumbedMT_co]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
@@ -83,6 +83,6 @@ class _BaseThumbedMedium(_BaseMedium):
         if not data:
             return None
 
-        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
+        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
 
         return cls(bot=bot, **data)

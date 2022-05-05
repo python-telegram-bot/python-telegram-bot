@@ -43,7 +43,7 @@ from telegram.error import (
 )
 from telegram.request._requestdata import RequestData
 
-RT = TypeVar('RT', bound='BaseRequest')
+RT = TypeVar("RT", bound="BaseRequest")
 
 
 class BaseRequest(
@@ -76,7 +76,7 @@ class BaseRequest(
 
     __slots__ = ()
 
-    USER_AGENT: ClassVar[str] = f'python-telegram-bot v{ptb_ver} (https://python-telegram-bot.org)'
+    USER_AGENT: ClassVar[str] = f"python-telegram-bot v{ptb_ver} (https://python-telegram-bot.org)"
     """:obj:`str`: A description that can be used as user agent for requests made to the Bot API.
     """
     DEFAULT_NONE: ClassVar = _DEFAULT_NONE
@@ -159,7 +159,7 @@ class BaseRequest(
         """
         result = await self._request_wrapper(
             url=url,
-            method='POST',
+            method="POST",
             request_data=request_data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -169,7 +169,7 @@ class BaseRequest(
         json_data = self._parse_json_response(result)
         # For successful requests, the results are in the 'result' entry
         # see https://core.telegram.org/bots/api#making-requests
-        return json_data['result']
+        return json_data["result"]
 
     async def retrieve(
         self,
@@ -210,7 +210,7 @@ class BaseRequest(
         """
         return await self._request_wrapper(
             url=url,
-            method='GET',
+            method="GET",
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -286,25 +286,25 @@ class BaseRequest(
 
         response_data = self._parse_json_response(payload)
 
-        description = response_data.get('description')
+        description = response_data.get("description")
         if description:
             message = description
         else:
-            message = 'Unknown HTTPError'
+            message = "Unknown HTTPError"
 
         # In some special cases, we can raise more informative exceptions:
         # see https://core.telegram.org/bots/api#responseparameters and
         # https://core.telegram.org/bots/api#making-requests
-        parameters = response_data.get('parameters')
+        parameters = response_data.get("parameters")
         if parameters:
-            migrate_to_chat_id = parameters.get('migrate_to_chat_id')
+            migrate_to_chat_id = parameters.get("migrate_to_chat_id")
             if migrate_to_chat_id:
                 raise ChatMigrated(migrate_to_chat_id)
-            retry_after = parameters.get('retry_after')
+            retry_after = parameters.get("retry_after")
             if retry_after:
                 raise RetryAfter(retry_after)
 
-            message += f'\nThe server response contained unknown parameters: {parameters}'
+            message += f"\nThe server response contained unknown parameters: {parameters}"
 
         if code == HTTPStatus.FORBIDDEN:
             raise Forbidden(message)
@@ -320,8 +320,8 @@ class BaseRequest(
         if code == HTTPStatus.CONFLICT:
             raise Conflict(message)
         if code == HTTPStatus.BAD_GATEWAY:
-            raise NetworkError(description or 'Bad Gateway')
-        raise NetworkError(f'{message} ({code})')
+            raise NetworkError(description or "Bad Gateway")
+        raise NetworkError(f"{message} ({code})")
 
     @staticmethod
     def _parse_json_response(json_payload: bytes) -> JSONDict:
@@ -333,11 +333,11 @@ class BaseRequest(
         Raises:
             TelegramError: If the data could not be json_loaded
         """
-        decoded_s = json_payload.decode('utf-8', 'replace')
+        decoded_s = json_payload.decode("utf-8", "replace")
         try:
             return json.loads(decoded_s)
         except ValueError as exc:
-            raise TelegramError('Invalid server response') from exc
+            raise TelegramError("Invalid server response") from exc
 
     @abc.abstractmethod
     async def do_request(

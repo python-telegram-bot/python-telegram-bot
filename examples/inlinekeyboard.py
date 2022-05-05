@@ -13,7 +13,7 @@ from telegram.ext import Application, CallbackContext, CallbackQueryHandler, Com
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -22,15 +22,15 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Sends a message with three inline buttons attached."""
     keyboard = [
         [
-            InlineKeyboardButton("Option 1", callback_data='1'),
-            InlineKeyboardButton("Option 2", callback_data='2'),
+            InlineKeyboardButton("Option 1", callback_data="1"),
+            InlineKeyboardButton("Option 2", callback_data="2"),
         ],
-        [InlineKeyboardButton("Option 3", callback_data='3')],
+        [InlineKeyboardButton("Option 3", callback_data="3")],
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text('Please choose:', reply_markup=reply_markup)
+    await update.message.reply_text("Please choose:", reply_markup=reply_markup)
 
 
 async def button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
@@ -54,13 +54,13 @@ def main() -> None:
     # Create the Application and pass it your bot's token.
     application = Application.builder().token("TOKEN").build()
 
-    application.add_handler(CommandHandler('start', start))
+    application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button))
-    application.add_handler(CommandHandler('help', help_command))
+    application.add_handler(CommandHandler("help", help_command))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

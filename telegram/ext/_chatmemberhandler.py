@@ -25,7 +25,7 @@ from telegram._utils.types import DVInput
 from telegram.ext._handler import Handler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 class ChatMemberHandler(Handler[Update, CCT]):
@@ -65,7 +65,7 @@ class ChatMemberHandler(Handler[Update, CCT]):
 
     """
 
-    __slots__ = ('chat_member_types',)
+    __slots__ = ("chat_member_types",)
     MY_CHAT_MEMBER: ClassVar[int] = -1
     """:obj:`int`: Used as a constant to handle only :attr:`telegram.Update.my_chat_member`."""
     CHAT_MEMBER: ClassVar[int] = 0

@@ -93,17 +93,17 @@ class ChatAdministratorRights(TelegramObject):
     """
 
     __slots__ = (
-        'is_anonymous',
-        'can_manage_chat',
-        'can_delete_messages',
-        'can_manage_video_chats',
-        'can_restrict_members',
-        'can_promote_members',
-        'can_change_info',
-        'can_invite_users',
-        'can_post_messages',
-        'can_edit_messages',
-        'can_pin_messages',
+        "is_anonymous",
+        "can_manage_chat",
+        "can_delete_messages",
+        "can_manage_video_chats",
+        "can_restrict_members",
+        "can_promote_members",
+        "can_change_info",
+        "can_invite_users",
+        "can_post_messages",
+        "can_edit_messages",
+        "can_pin_messages",
     )
 
     def __init__(
@@ -150,7 +150,7 @@ class ChatAdministratorRights(TelegramObject):
         )
 
     @classmethod
-    def all_rights(cls) -> 'ChatAdministratorRights':
+    def all_rights(cls) -> "ChatAdministratorRights":
         """
         This method returns the :class:`ChatAdministratorRights` object with all attributes set to
         :obj:`True`. This is e.g. useful when changing the bot's default administrator rights with
@@ -161,7 +161,7 @@ class ChatAdministratorRights(TelegramObject):
         return cls(True, True, True, True, True, True, True, True, True, True, True)
 
     @classmethod
-    def no_rights(cls) -> 'ChatAdministratorRights':
+    def no_rights(cls) -> "ChatAdministratorRights":
         """
         This method returns the :class:`ChatAdministratorRights` object with all attributes set to
         :obj:`False`.

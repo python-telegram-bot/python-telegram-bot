@@ -45,7 +45,7 @@ class RequestData:
             ``multipart/form-data``.
     """
 
-    __slots__ = ('_parameters', 'contains_files')
+    __slots__ = ("_parameters", "contains_files")
 
     def __init__(self, parameters: List[RequestParameter] = None):
         self._parameters = parameters or []
@@ -96,12 +96,12 @@ class RequestData:
                 along to :func:`urllib.parse.urlencode`.
         """
         url_parameters = self.url_encoded_parameters(encode_kwargs=encode_kwargs)
-        return f'{url}?{url_parameters}'
+        return f"{url}?{url_parameters}"
 
     @property
     def json_payload(self) -> bytes:
         """The parameters as UTF-8 encoded JSON payload."""
-        return json.dumps(self.json_parameters).encode('utf-8')
+        return json.dumps(self.json_parameters).encode("utf-8")
 
     @property
     def multipart_data(self) -> UploadFileDict:

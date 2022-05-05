@@ -87,13 +87,13 @@ class Sticker(_BaseThumbedMedium):
     """
 
     __slots__ = (
-        'emoji',
-        'height',
-        'is_animated',
-        'is_video',
-        'mask_position',
-        'set_name',
-        'width',
+        "emoji",
+        "height",
+        "is_animated",
+        "is_video",
+        "mask_position",
+        "set_name",
+        "width",
     )
 
     def __init__(
@@ -108,8 +108,8 @@ class Sticker(_BaseThumbedMedium):
         emoji: str = None,
         file_size: int = None,
         set_name: str = None,
-        mask_position: 'MaskPosition' = None,
-        bot: 'Bot' = None,
+        mask_position: "MaskPosition" = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         super().__init__(
@@ -130,15 +130,15 @@ class Sticker(_BaseThumbedMedium):
         self.mask_position = mask_position
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Sticker']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Sticker"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
-        data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
+        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
+        data["mask_position"] = MaskPosition.de_json(data.get("mask_position"), bot)
 
         return cls(bot=bot, **data)
 
@@ -181,13 +181,13 @@ class StickerSet(TelegramObject):
     """
 
     __slots__ = (
-        'contains_masks',
-        'is_animated',
-        'is_video',
-        'name',
-        'stickers',
-        'thumb',
-        'title',
+        "contains_masks",
+        "is_animated",
+        "is_video",
+        "name",
+        "stickers",
+        "thumb",
+        "title",
     )
 
     def __init__(
@@ -213,13 +213,13 @@ class StickerSet(TelegramObject):
         self._id_attrs = (self.name,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['StickerSet']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StickerSet"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         if not data:
             return None
 
-        data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
-        data['stickers'] = Sticker.de_list(data.get('stickers'), bot)
+        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
+        data["stickers"] = Sticker.de_list(data.get("stickers"), bot)
 
         return cls(bot=bot, **data)
 
@@ -227,7 +227,7 @@ class StickerSet(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['stickers'] = [s.to_dict() for s in data.get('stickers')]  # type: ignore[union-attr]
+        data["stickers"] = [s.to_dict() for s in data.get("stickers")]  # type: ignore[union-attr]
 
         return data
 
@@ -261,7 +261,7 @@ class MaskPosition(TelegramObject):
 
     """
 
-    __slots__ = ('point', 'scale', 'x_shift', 'y_shift')
+    __slots__ = ("point", "scale", "x_shift", "y_shift")
 
     FOREHEAD: ClassVar[str] = constants.MaskPosition.FOREHEAD
     """:const:`telegram.constants.MaskPosition.FOREHEAD`"""
@@ -281,7 +281,7 @@ class MaskPosition(TelegramObject):
         self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MaskPosition']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaskPosition"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 

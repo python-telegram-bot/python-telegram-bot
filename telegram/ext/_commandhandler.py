@@ -30,7 +30,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 if TYPE_CHECKING:
     from telegram.ext import Application
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 class CommandHandler(Handler[Update, CCT]):
@@ -87,7 +87,7 @@ class CommandHandler(Handler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`.
     """
 
-    __slots__ = ('command', 'filters')
+    __slots__ = ("command", "filters")
 
     def __init__(
         self,
@@ -103,8 +103,8 @@ class CommandHandler(Handler[Update, CCT]):
         else:
             self.command = [x.lower() for x in command]
         for comm in self.command:
-            if not re.match(r'^[\da-z_]{1,32}$', comm):
-                raise ValueError(f'Command `{comm}` is not a valid bot command')
+            if not re.match(r"^[\da-z_]{1,32}$", comm):
+                raise ValueError(f"Command `{comm}` is not a valid bot command")
 
         self.filters = filters if filters is not None else filters_module.UpdateType.MESSAGES
 
@@ -132,7 +132,7 @@ class CommandHandler(Handler[Update, CCT]):
             ):
                 command = message.text[1 : message.entities[0].length]
                 args = message.text.split()[1:]
-                command_parts = command.split('@')
+                command_parts = command.split("@")
                 command_parts.append(message.get_bot().username)
 
                 if not (
@@ -151,7 +151,7 @@ class CommandHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        application: 'Application',
+        application: "Application",
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single
@@ -238,7 +238,7 @@ class PrefixHandler(CommandHandler):
     """
 
     # 'prefix' is a class property, & 'command' is included in the superclass, so they're left out.
-    __slots__ = ('_prefix', '_command', '_commands')
+    __slots__ = ("_prefix", "_command", "_commands")
 
     def __init__(
         self,
@@ -254,7 +254,7 @@ class PrefixHandler(CommandHandler):
         self._commands: List[str] = []
 
         super().__init__(
-            'nocommand',
+            "nocommand",
             callback,
             filters=filters,
             block=block,

@@ -66,7 +66,7 @@ class StringCommandHandler(Handler[str, CCT]):
 
     """
 
-    __slots__ = ('command',)
+    __slots__ = ("command",)
 
     def __init__(
         self,
@@ -87,8 +87,8 @@ class StringCommandHandler(Handler[str, CCT]):
             List[:obj:`str`]: List containing the text command split on whitespace.
 
         """
-        if isinstance(update, str) and update.startswith('/'):
-            args = update[1:].split(' ')
+        if isinstance(update, str) and update.startswith("/"):
+            args = update[1:].split(" ")
             if args[0] == self.command:
                 return args[1:]
         return None
@@ -97,7 +97,7 @@ class StringCommandHandler(Handler[str, CCT]):
         self,
         context: CCT,
         update: str,
-        application: 'Application',
+        application: "Application",
         check_result: Optional[List[str]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single

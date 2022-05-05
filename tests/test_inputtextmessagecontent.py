@@ -22,7 +22,7 @@ from telegram import InputTextMessageContent, MessageEntity
 from telegram.constants import ParseMode
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def input_text_message_content():
     return InputTextMessageContent(
         TestInputTextMessageContent.message_text,
@@ -33,7 +33,7 @@ def input_text_message_content():
 
 
 class TestInputTextMessageContent:
-    message_text = '*message text*'
+    message_text = "*message text*"
     parse_mode = ParseMode.MARKDOWN
     entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
     disable_web_page_preview = True
@@ -41,7 +41,7 @@ class TestInputTextMessageContent:
     def test_slot_behaviour(self, input_text_message_content, mro_slots):
         inst = input_text_message_content
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, input_text_message_content):
@@ -55,24 +55,24 @@ class TestInputTextMessageContent:
 
         assert isinstance(input_text_message_content_dict, dict)
         assert (
-            input_text_message_content_dict['message_text']
+            input_text_message_content_dict["message_text"]
             == input_text_message_content.message_text
         )
         assert (
-            input_text_message_content_dict['parse_mode'] == input_text_message_content.parse_mode
+            input_text_message_content_dict["parse_mode"] == input_text_message_content.parse_mode
         )
-        assert input_text_message_content_dict['entities'] == [
+        assert input_text_message_content_dict["entities"] == [
             ce.to_dict() for ce in input_text_message_content.entities
         ]
         assert (
-            input_text_message_content_dict['disable_web_page_preview']
+            input_text_message_content_dict["disable_web_page_preview"]
             == input_text_message_content.disable_web_page_preview
         )
 
     def test_equality(self):
-        a = InputTextMessageContent('text')
-        b = InputTextMessageContent('text', parse_mode=ParseMode.HTML)
-        c = InputTextMessageContent('label')
+        a = InputTextMessageContent("text")
+        b = InputTextMessageContent("text", parse_mode=ParseMode.HTML)
+        c = InputTextMessageContent("label")
         d = ParseMode.HTML
 
         assert a == b

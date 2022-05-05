@@ -75,7 +75,7 @@ class KeyboardButton(TelegramObject):
             .. versionadded:: 20.0
     """
 
-    __slots__ = ('request_location', 'request_contact', 'request_poll', 'text', 'web_app')
+    __slots__ = ("request_location", "request_contact", "request_poll", "text", "web_app")
 
     def __init__(
         self,
@@ -102,14 +102,14 @@ class KeyboardButton(TelegramObject):
         )
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['KeyboardButton']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["KeyboardButton"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['request_poll'] = KeyboardButtonPollType.de_json(data.get('request_poll'), bot)
-        data['web_app'] = WebAppInfo.de_json(data.get('web_app'), bot)
+        data["request_poll"] = KeyboardButtonPollType.de_json(data.get("request_poll"), bot)
+        data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
         return cls(**data)

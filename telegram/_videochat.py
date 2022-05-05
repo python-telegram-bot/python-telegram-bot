@@ -68,7 +68,7 @@ class VideoChatEnded(TelegramObject):
 
     """
 
-    __slots__ = ('duration',)
+    __slots__ = ("duration",)
 
     def __init__(self, duration: int, **_kwargs: object) -> None:
         self.duration = int(duration) if duration is not None else None
@@ -95,7 +95,7 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     """
 
-    __slots__ = ('users',)
+    __slots__ = ("users",)
 
     def __init__(self, users: List[User], **_kwargs: object) -> None:
         self.users = users
@@ -103,15 +103,15 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: 'Bot'
-    ) -> Optional['VideoChatParticipantsInvited']:
+        cls, data: Optional[JSONDict], bot: "Bot"
+    ) -> Optional["VideoChatParticipantsInvited"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['users'] = User.de_list(data.get('users', []), bot)
+        data["users"] = User.de_list(data.get("users", []), bot)
         return cls(**data)
 
     def to_dict(self) -> JSONDict:
@@ -146,7 +146,7 @@ class VideoChatScheduled(TelegramObject):
 
     """
 
-    __slots__ = ('start_date',)
+    __slots__ = ("start_date",)
 
     def __init__(self, start_date: dtm.datetime, **_kwargs: object) -> None:
         self.start_date = start_date
@@ -154,14 +154,14 @@ class VideoChatScheduled(TelegramObject):
         self._id_attrs = (self.start_date,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['VideoChatScheduled']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["VideoChatScheduled"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['start_date'] = from_timestamp(data['start_date'])
+        data["start_date"] = from_timestamp(data["start_date"])
 
         return cls(**data, bot=bot)
 
@@ -170,6 +170,6 @@ class VideoChatScheduled(TelegramObject):
         data = super().to_dict()
 
         # Required
-        data['start_date'] = to_timestamp(self.start_date)
+        data["start_date"] = to_timestamp(self.start_date)
 
         return data

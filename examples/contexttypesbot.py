@@ -28,7 +28,7 @@ from telegram.ext import (
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
     @property
     def bot_user_ids(self) -> Set[int]:
         """Custom shortcut to access a value stored in the bot_data dict"""
-        return self.bot_data.setdefault('user_ids', set())
+        return self.bot_data.setdefault("user_ids", set())
 
     @property
     def message_clicks(self) -> Optional[int]:
@@ -64,11 +64,11 @@ class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
     def message_clicks(self, value: int) -> None:
         """Allow to change the count"""
         if not self._message_id:
-            raise RuntimeError('There is no message associated with this context object.')
+            raise RuntimeError("There is no message associated with this context object.")
         self.chat_data.clicks_per_message[self._message_id] = value
 
     @classmethod
-    def from_update(cls, update: object, application: 'Application') -> 'CustomContext':
+    def from_update(cls, update: object, application: "Application") -> "CustomContext":
         """Override from_update to set _message_id."""
         # Make sure to call super()
         context = super().from_update(update, application)
@@ -84,9 +84,9 @@ class CustomContext(CallbackContext[ExtBot, dict, ChatData, dict]):
 async def start(update: Update, context: CustomContext) -> None:
     """Display a message with a button."""
     await update.message.reply_html(
-        'This button was clicked <i>0</i> times.',
+        "This button was clicked <i>0</i> times.",
         reply_markup=InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton(text='Click me!', callback_data='button')
+            InlineKeyboardButton(text="Click me!", callback_data="button")
         ),
     )
 
@@ -96,9 +96,9 @@ async def count_click(update: Update, context: CustomContext) -> None:
     context.message_clicks += 1
     await update.callback_query.answer()
     await update.effective_message.edit_text(
-        f'This button was clicked <i>{context.message_clicks}</i> times.',
+        f"This button was clicked <i>{context.message_clicks}</i> times.",
         reply_markup=InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton(text='Click me!', callback_data='button')
+            InlineKeyboardButton(text="Click me!", callback_data="button")
         ),
         parse_mode=ParseMode.HTML,
     )
@@ -107,7 +107,7 @@ async def count_click(update: Update, context: CustomContext) -> None:
 async def print_users(update: Update, context: CustomContext) -> None:
     """Show which users have been using this bot."""
     await update.message.reply_text(
-        'The following user IDs have used this bot: '
+        "The following user IDs have used this bot: "
         f'{", ".join(map(str, context.bot_user_ids))}'
     )
 
@@ -132,5 +132,5 @@ def main() -> None:
     application.run_polling()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

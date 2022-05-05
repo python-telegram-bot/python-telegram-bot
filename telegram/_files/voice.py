@@ -56,7 +56,7 @@ class Voice(_BaseMedium):
 
     """
 
-    __slots__ = ('duration', 'mime_type')
+    __slots__ = ("duration", "mime_type")
 
     def __init__(
         self,
@@ -65,7 +65,7 @@ class Voice(_BaseMedium):
         duration: int,
         mime_type: str = None,
         file_size: int = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         super().__init__(

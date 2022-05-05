@@ -21,7 +21,7 @@
 .. versionadded:: 14.0
 """
 
-__all__ = ['PTBDeprecationWarning', 'PTBRuntimeWarning', 'PTBUserWarning']
+__all__ = ["PTBDeprecationWarning", "PTBRuntimeWarning", "PTBUserWarning"]
 
 
 class PTBUserWarning(UserWarning):

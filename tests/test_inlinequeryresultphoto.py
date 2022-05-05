@@ -28,7 +28,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_photo():
     return InlineQueryResultPhoto(
         TestInlineQueryResultPhoto.id_,
@@ -47,25 +47,25 @@ def inline_query_result_photo():
 
 
 class TestInlineQueryResultPhoto:
-    id_ = 'id'
-    type_ = 'photo'
-    photo_url = 'photo url'
+    id_ = "id"
+    type_ = "photo"
+    photo_url = "photo url"
     photo_width = 10
     photo_height = 15
-    thumb_url = 'thumb url'
-    title = 'title'
-    description = 'description'
-    caption = 'caption'
-    parse_mode = 'HTML'
+    thumb_url = "thumb url"
+    title = "title"
+    description = "description"
+    caption = "caption"
+    parse_mode = "HTML"
     caption_entities = [MessageEntity(MessageEntity.ITALIC, 0, 7)]
 
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_photo, mro_slots):
         inst = inline_query_result_photo
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_photo):
@@ -90,41 +90,41 @@ class TestInlineQueryResultPhoto:
         inline_query_result_photo_dict = inline_query_result_photo.to_dict()
 
         assert isinstance(inline_query_result_photo_dict, dict)
-        assert inline_query_result_photo_dict['type'] == inline_query_result_photo.type
-        assert inline_query_result_photo_dict['id'] == inline_query_result_photo.id
-        assert inline_query_result_photo_dict['photo_url'] == inline_query_result_photo.photo_url
+        assert inline_query_result_photo_dict["type"] == inline_query_result_photo.type
+        assert inline_query_result_photo_dict["id"] == inline_query_result_photo.id
+        assert inline_query_result_photo_dict["photo_url"] == inline_query_result_photo.photo_url
         assert (
-            inline_query_result_photo_dict['photo_width'] == inline_query_result_photo.photo_width
+            inline_query_result_photo_dict["photo_width"] == inline_query_result_photo.photo_width
         )
         assert (
-            inline_query_result_photo_dict['photo_height']
+            inline_query_result_photo_dict["photo_height"]
             == inline_query_result_photo.photo_height
         )
-        assert inline_query_result_photo_dict['thumb_url'] == inline_query_result_photo.thumb_url
-        assert inline_query_result_photo_dict['title'] == inline_query_result_photo.title
+        assert inline_query_result_photo_dict["thumb_url"] == inline_query_result_photo.thumb_url
+        assert inline_query_result_photo_dict["title"] == inline_query_result_photo.title
         assert (
-            inline_query_result_photo_dict['description'] == inline_query_result_photo.description
+            inline_query_result_photo_dict["description"] == inline_query_result_photo.description
         )
-        assert inline_query_result_photo_dict['caption'] == inline_query_result_photo.caption
-        assert inline_query_result_photo_dict['parse_mode'] == inline_query_result_photo.parse_mode
-        assert inline_query_result_photo_dict['caption_entities'] == [
+        assert inline_query_result_photo_dict["caption"] == inline_query_result_photo.caption
+        assert inline_query_result_photo_dict["parse_mode"] == inline_query_result_photo.parse_mode
+        assert inline_query_result_photo_dict["caption_entities"] == [
             ce.to_dict() for ce in inline_query_result_photo.caption_entities
         ]
         assert (
-            inline_query_result_photo_dict['input_message_content']
+            inline_query_result_photo_dict["input_message_content"]
             == inline_query_result_photo.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_photo_dict['reply_markup']
+            inline_query_result_photo_dict["reply_markup"]
             == inline_query_result_photo.reply_markup.to_dict()
         )
 
     def test_equality(self):
         a = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
         b = InlineQueryResultPhoto(self.id_, self.photo_url, self.thumb_url)
-        c = InlineQueryResultPhoto(self.id_, '', self.thumb_url)
-        d = InlineQueryResultPhoto('', self.photo_url, self.thumb_url)
-        e = InlineQueryResultVoice(self.id_, '', '')
+        c = InlineQueryResultPhoto(self.id_, "", self.thumb_url)
+        d = InlineQueryResultPhoto("", self.photo_url, self.thumb_url)
+        e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

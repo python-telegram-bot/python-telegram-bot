@@ -36,35 +36,35 @@ from telegram import (
 from telegram.ext import CallbackContext, JobQueue, MessageHandler, filters
 from telegram.ext.filters import MessageFilter
 
-message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
+message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
 params = [
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
-    {'inline_query': InlineQuery(1, User(1, '', False), '', '')},
-    {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
-    {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
-    {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat", message=message)},
+    {"inline_query": InlineQuery(1, User(1, "", False), "", "")},
+    {"chosen_inline_result": ChosenInlineResult("id", User(1, "", False), "")},
+    {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
+    {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
 
 ids = (
-    'callback_query',
-    'inline_query',
-    'chosen_inline_result',
-    'shipping_query',
-    'pre_checkout_query',
-    'callback_query_without_message',
+    "callback_query",
+    "inline_query",
+    "chosen_inline_result",
+    "shipping_query",
+    "pre_checkout_query",
+    "callback_query_without_message",
 )
 
 
-@pytest.fixture(scope='class', params=params, ids=ids)
+@pytest.fixture(scope="class", params=params, ids=ids)
 def false_update(request):
     return Update(update_id=1, **request.param)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def message(bot):
-    return Message(1, None, Chat(1, ''), from_user=User(1, '', False), bot=bot)
+    return Message(1, None, Chat(1, ""), from_user=User(1, "", False), bot=bot)
 
 
 class TestMessageHandler:
@@ -74,7 +74,7 @@ class TestMessageHandler:
     def test_slot_behaviour(self, mro_slots):
         handler = MessageHandler(filters.ALL, self.callback)
         for attr in handler.__slots__:
-            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
@@ -123,10 +123,10 @@ class TestMessageHandler:
     def test_with_filter(self, message):
         handler = MessageHandler(filters.ChatType.GROUP, self.callback)
 
-        message.chat.type = 'group'
+        message.chat.type = "group"
         assert handler.check_update(Update(0, message))
 
-        message.chat.type = 'private'
+        message.chat.type = "private"
         assert not handler.check_update(Update(0, message))
 
     def test_callback_query_with_filter(self, message):
@@ -161,7 +161,7 @@ class TestMessageHandler:
     def test_other_update_types(self, false_update):
         handler = MessageHandler(None, self.callback)
         assert not handler.check_update(false_update)
-        assert not handler.check_update('string')
+        assert not handler.check_update("string")
 
     def test_filters_returns_empty_dict(self):
         class DataFilter(MessageFilter):
@@ -197,27 +197,27 @@ class TestMessageHandler:
             assert self.test_flag
 
     async def test_context_regex(self, app, message):
-        handler = MessageHandler(filters.Regex('one two'), self.callback_regex1)
+        handler = MessageHandler(filters.Regex("one two"), self.callback_regex1)
         app.add_handler(handler)
 
         async with app:
-            message.text = 'not it'
+            message.text = "not it"
             await app.process_update(Update(0, message))
             assert not self.test_flag
 
-            message.text += ' one two now it is'
+            message.text += " one two now it is"
             await app.process_update(Update(0, message))
             assert self.test_flag
 
     async def test_context_multiple_regex(self, app, message):
-        handler = MessageHandler(filters.Regex('one') & filters.Regex('two'), self.callback_regex2)
+        handler = MessageHandler(filters.Regex("one") & filters.Regex("two"), self.callback_regex2)
         app.add_handler(handler)
 
         async with app:
-            message.text = 'not it'
+            message.text = "not it"
             await app.process_update(Update(0, message))
             assert not self.test_flag
 
-            message.text += ' one two now it is'
+            message.text += " one two now it is"
             await app.process_update(Update(0, message))
             assert self.test_flag

@@ -95,20 +95,20 @@ class TrackingPersistence(BasePersistence):
             self.fill()
 
     CALLBACK_DATA = (
-        [('uuid', time.time(), {'uuid4': 'callback_data'})],
-        {'query_id': 'keyboard_id'},
+        [("uuid", time.time(), {"uuid4": "callback_data"})],
+        {"query_id": "keyboard_id"},
     )
 
     def fill(self):
-        self.chat_data[1]['key'] = 'value'
-        self.chat_data[2]['foo'] = 'bar'
-        self.user_data[1]['key'] = 'value'
-        self.user_data[2]['foo'] = 'bar'
-        self.bot_data['key'] = 'value'
-        self.conversations['conv_1'][(1, 1)] = HandlerStates.STATE_1
-        self.conversations['conv_1'][(2, 2)] = HandlerStates.STATE_2
-        self.conversations['conv_2'][(3, 3)] = HandlerStates.STATE_3
-        self.conversations['conv_2'][(4, 4)] = HandlerStates.STATE_4
+        self.chat_data[1]["key"] = "value"
+        self.chat_data[2]["foo"] = "bar"
+        self.user_data[1]["key"] = "value"
+        self.user_data[2]["foo"] = "bar"
+        self.bot_data["key"] = "value"
+        self.conversations["conv_1"][(1, 1)] = HandlerStates.STATE_1
+        self.conversations["conv_1"][(2, 2)] = HandlerStates.STATE_2
+        self.conversations["conv_2"][(3, 3)] = HandlerStates.STATE_3
+        self.conversations["conv_2"][(4, 4)] = HandlerStates.STATE_4
         self.callback_data = self.CALLBACK_DATA
 
     def reset_tracking(self):
@@ -175,15 +175,15 @@ class TrackingPersistence(BasePersistence):
 
     async def refresh_user_data(self, user_id: int, user_data: dict):
         self.refreshed_user_ids[user_id] += 1
-        user_data['refreshed'] = True
+        user_data["refreshed"] = True
 
     async def refresh_chat_data(self, chat_id: int, chat_data: dict):
         self.refreshed_chat_ids[chat_id] += 1
-        chat_data['refreshed'] = True
+        chat_data["refreshed"] = True
 
     async def refresh_bot_data(self, bot_data: dict):
         self.refreshed_bot_data = True
-        bot_data['refreshed'] = True
+        bot_data["refreshed"] = True
 
     async def flush(self) -> None:
         self.flushed = True
@@ -204,14 +204,14 @@ class TrackingConversationHandler(ConversationHandler):
 
     @staticmethod
     def build_update(state: HandlerStates, chat_id: int):
-        user = User(id=chat_id, first_name='', is_bot=False)
-        chat = Chat(id=chat_id, type='')
+        user = User(id=chat_id, first_name="", is_bot=False)
+        chat = Chat(id=chat_id, type="")
         return make_message_update(message=str(state.value), user=user, chat=chat)
 
     @classmethod
     def build_handler(cls, state: HandlerStates, callback=None):
         return MessageHandler(
-            filters.Regex(f'^{state.value}$'),
+            filters.Regex(f"^{state.value}$"),
             callback or functools.partial(cls.callback, state=state),
         )
 
@@ -251,18 +251,18 @@ def build_conversation_handler(name: str, persistent: bool = True) -> Handler:
     return TrackingConversationHandler(name=name, persistent=persistent)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def papp(request, bot) -> Application:
     papp_input = request.param
     store_data = {}
     if papp_input.bot_data is not None:
-        store_data['bot_data'] = papp_input.bot_data
+        store_data["bot_data"] = papp_input.bot_data
     if papp_input.chat_data is not None:
-        store_data['chat_data'] = papp_input.chat_data
+        store_data["chat_data"] = papp_input.chat_data
     if papp_input.user_data is not None:
-        store_data['user_data'] = papp_input.user_data
+        store_data["user_data"] = papp_input.user_data
     if papp_input.callback_data is not None:
-        store_data['callback_data'] = papp_input.callback_data
+        store_data["callback_data"] = papp_input.callback_data
 
     app = build_papp(
         bot.token,
@@ -273,8 +273,8 @@ def papp(request, bot) -> Application:
 
     app.add_handlers(
         [
-            build_conversation_handler(name='conv_1', persistent=papp_input.conversations),
-            build_conversation_handler(name='conv_2', persistent=papp_input.conversations),
+            build_conversation_handler(name="conv_1", persistent=papp_input.conversations),
+            build_conversation_handler(name="conv_2", persistent=papp_input.conversations),
         ]
     )
 
@@ -282,17 +282,17 @@ def papp(request, bot) -> Application:
 
 
 # Decorator shortcuts
-default_papp = pytest.mark.parametrize('papp', [PappInput()], indirect=True)
-filled_papp = pytest.mark.parametrize('papp', [PappInput(fill_data=True)], indirect=True)
+default_papp = pytest.mark.parametrize("papp", [PappInput()], indirect=True)
+filled_papp = pytest.mark.parametrize("papp", [PappInput(fill_data=True)], indirect=True)
 papp_store_all_or_none = pytest.mark.parametrize(
-    'papp',
+    "papp",
     [
         PappInput(),
         PappInput(False, False, False, False),
     ],
     ids=(
-        'all_data',
-        'no_data',
+        "all_data",
+        "no_data",
     ),
     indirect=True,
 )
@@ -305,17 +305,17 @@ class TestBasePersistence:
     def job_callback(self, chat_id: int = None):
         async def callback(context):
             if context.user_data:
-                context.user_data['key'] = 'value'
+                context.user_data["key"] = "value"
             if context.chat_data:
-                context.chat_data['key'] = 'value'
-            context.bot_data['key'] = 'value'
+                context.chat_data["key"] = "value"
+            context.bot_data["key"] = "value"
 
             if chat_id:
                 await context.bot.send_message(
                     chat_id=chat_id,
-                    text='text',
+                    text="text",
                     reply_markup=InlineKeyboardMarkup.from_button(
-                        InlineKeyboardButton(text='text', callback_data='callback_data')
+                        InlineKeyboardButton(text="text", callback_data="callback_data")
                     ),
                 )
 
@@ -326,16 +326,16 @@ class TestBasePersistence:
             if sleep:
                 await asyncio.sleep(sleep)
 
-            context.user_data['key'] = 'value'
-            context.chat_data['key'] = 'value'
-            context.bot_data['key'] = 'value'
+            context.user_data["key"] = "value"
+            context.chat_data["key"] = "value"
+            context.bot_data["key"] = "value"
 
             if chat_id:
                 await context.bot.send_message(
                     chat_id=chat_id,
-                    text='text',
+                    text="text",
                     reply_markup=InlineKeyboardMarkup.from_button(
-                        InlineKeyboardButton(text='text', callback_data='callback_data')
+                        InlineKeyboardButton(text="text", callback_data="callback_data")
                     ),
                 )
             raise ApplicationHandlerStop
@@ -345,15 +345,15 @@ class TestBasePersistence:
     def test_slot_behaviour(self, mro_slots):
         inst = TrackingPersistence()
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         # We're interested in BasePersistence, not in the implementation
         slots = mro_slots(inst, only_parents=True)
         assert len(slots) == len(set(slots)), "duplicate slot"
 
-    @pytest.mark.parametrize('bot_data', (True, False))
-    @pytest.mark.parametrize('chat_data', (True, False))
-    @pytest.mark.parametrize('user_data', (True, False))
-    @pytest.mark.parametrize('callback_data', (True, False))
+    @pytest.mark.parametrize("bot_data", (True, False))
+    @pytest.mark.parametrize("chat_data", (True, False))
+    @pytest.mark.parametrize("user_data", (True, False))
+    @pytest.mark.parametrize("callback_data", (True, False))
     def test_init_store_data_update_interval(self, bot_data, chat_data, user_data, callback_data):
         store_data = PersistenceInput(
             bot_data=bot_data,
@@ -371,23 +371,23 @@ class TestBasePersistence:
         with pytest.raises(
             TypeError,
             match=(
-                'drop_chat_data, drop_user_data, flush, get_bot_data, get_callback_data, '
-                'get_chat_data, get_conversations, '
-                'get_user_data, refresh_bot_data, refresh_chat_data, '
-                'refresh_user_data, update_bot_data, update_callback_data, '
-                'update_chat_data, update_conversation, update_user_data'
+                "drop_chat_data, drop_user_data, flush, get_bot_data, get_callback_data, "
+                "get_chat_data, get_conversations, "
+                "get_user_data, refresh_bot_data, refresh_chat_data, "
+                "refresh_user_data, update_bot_data, update_callback_data, "
+                "update_chat_data, update_conversation, update_user_data"
             ),
         ):
             BasePersistence()
 
     @default_papp
     def test_update_interval_immutable(self, papp):
-        with pytest.raises(AttributeError, match='can not assign a new value to update_interval'):
+        with pytest.raises(AttributeError, match="can not assign a new value to update_interval"):
             papp.persistence.update_interval = 7
 
     @default_papp
     def test_set_bot_error(self, papp):
-        with pytest.raises(TypeError, match='when using telegram.ext.ExtBot'):
+        with pytest.raises(TypeError, match="when using telegram.ext.ExtBot"):
             papp.persistence.set_bot(Bot(papp.bot.token))
 
     def test_construction_with_bad_persistence(self, caplog, bot):
@@ -396,12 +396,12 @@ class TestBasePersistence:
                 self.store_data = PersistenceInput(False, False, False, False)
 
         with pytest.raises(
-            TypeError, match='persistence must be based on telegram.ext.BasePersistence'
+            TypeError, match="persistence must be based on telegram.ext.BasePersistence"
         ):
             ApplicationBuilder().bot(bot).persistence(MyPersistence()).build()
 
     @pytest.mark.parametrize(
-        'papp',
+        "papp",
         [PappInput(fill_data=True), PappInput(False, False, False, False, False, fill_data=True)],
         indirect=True,
     )
@@ -429,11 +429,11 @@ class TestBasePersistence:
 
             # We check just bot_data because we set all to the same value
             if papp.persistence.store_data.bot_data:
-                assert papp.chat_data[1]['key'] == 'value'
-                assert papp.chat_data[2]['foo'] == 'bar'
-                assert papp.user_data[1]['key'] == 'value'
-                assert papp.user_data[2]['foo'] == 'bar'
-                assert papp.bot_data == {'key': 'value'}
+                assert papp.chat_data[1]["key"] == "value"
+                assert papp.chat_data[2]["foo"] == "bar"
+                assert papp.user_data[1]["key"] == "value"
+                assert papp.user_data[2]["foo"] == "bar"
+                assert papp.bot_data == {"key": "value"}
                 assert (
                     papp.bot.callback_data_cache.persistence_data
                     == TrackingPersistence.CALLBACK_DATA
@@ -470,34 +470,34 @@ class TestBasePersistence:
                 )
 
     @pytest.mark.parametrize(
-        'papp',
+        "papp",
         [PappInput(fill_data=True)],
         indirect=True,
     )
     async def test_initialization_invalid_bot_data(self, papp: Application, monkeypatch):
         async def get_bot_data(*args, **kwargs):
-            return 'invalid'
+            return "invalid"
 
-        monkeypatch.setattr(papp.persistence, 'get_bot_data', get_bot_data)
+        monkeypatch.setattr(papp.persistence, "get_bot_data", get_bot_data)
 
-        with pytest.raises(ValueError, match='bot_data must be'):
+        with pytest.raises(ValueError, match="bot_data must be"):
             await papp.initialize()
 
     @pytest.mark.parametrize(
-        'papp',
+        "papp",
         [PappInput(fill_data=True)],
         indirect=True,
     )
-    @pytest.mark.parametrize('callback_data', ('invalid', (1, 2, 3)))
+    @pytest.mark.parametrize("callback_data", ("invalid", (1, 2, 3)))
     async def test_initialization_invalid_callback_data(
         self, papp: Application, callback_data, monkeypatch
     ):
         async def get_callback_data(*args, **kwargs):
             return callback_data
 
-        monkeypatch.setattr(papp.persistence, 'get_callback_data', get_callback_data)
+        monkeypatch.setattr(papp.persistence, "get_callback_data", get_callback_data)
 
-        with pytest.raises(ValueError, match='callback_data must be'):
+        with pytest.raises(ValueError, match="callback_data must be"):
             await papp.initialize()
 
     @filled_papp
@@ -505,8 +505,8 @@ class TestBasePersistence:
         context = CallbackContext(application=papp)
 
         # Set it up such that the handler has a conversation in progress that's not persisted
-        papp.persistence.conversations['conv_1'].pop((2, 2))
-        conversation = build_conversation_handler('conv_1', persistent=True)
+        papp.persistence.conversations["conv_1"].pop((2, 2))
+        conversation = build_conversation_handler("conv_1", persistent=True)
         update = TrackingConversationHandler.build_update(state=HandlerStates.END, chat_id=2)
         check = conversation.check_update(update=update)
         await conversation.handle_update(
@@ -539,7 +539,7 @@ class TestBasePersistence:
             assert len(recwarn) >= 1
             found = False
             for warning in recwarn:
-                if 'after `Application.initialize` was called' in str(warning.message):
+                if "after `Application.initialize` was called" in str(warning.message):
                     found = True
                     assert warning.category is PTBUserWarning
                     assert Path(warning.filename) == Path(__file__), "incorrect stacklevel!"
@@ -561,8 +561,8 @@ class TestBasePersistence:
             )
 
     def test_add_conversation_without_persistence(self, app):
-        with pytest.raises(ValueError, match='if application has no persistence'):
-            app.add_handler(build_conversation_handler('name', persistent=True))
+        with pytest.raises(ValueError, match="if application has no persistence"):
+            app.add_handler(build_conversation_handler("name", persistent=True))
 
     @default_papp
     async def test_add_conversation_handler_without_name(self, papp: Application):
@@ -571,7 +571,7 @@ class TestBasePersistence:
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
-        'papp',
+        "papp",
         [
             PappInput(update_interval=1.5),
         ],
@@ -585,7 +585,7 @@ class TestBasePersistence:
         async def update_persistence(*args, **kwargs):
             call_times.append(time.time())
 
-        monkeypatch.setattr(papp, 'update_persistence', update_persistence)
+        monkeypatch.setattr(papp, "update_persistence", update_persistence)
         async with papp:
             await papp.start()
             await asyncio.sleep(5)
@@ -631,8 +631,8 @@ class TestBasePersistence:
             else:
                 assert not papp.persistence.updated_chat_ids
             assert papp.persistence.updated_conversations == {
-                'conv_1': {(1, 1): 1},
-                'conv_2': {(1, 1): 1},
+                "conv_1": {(1, 1): 1},
+                "conv_2": {(1, 1): 1},
             }
 
             # Nothing should have been updated after handling nothing
@@ -655,7 +655,7 @@ class TestBasePersistence:
             # Nothing should have been updated after handling an update without associated
             # user/chat_data
             papp.persistence.reset_tracking()
-            await papp.process_update('string_update')
+            await papp.process_update("string_update")
             with caplog.at_level(logging.ERROR):
                 await papp.update_persistence()
             # Make sure that "nothing updated" is not just due to an error
@@ -754,14 +754,14 @@ class TestBasePersistence:
 
         # Make sure this this outside the context manager, which is where shutdown is called!
         assert papp.persistence.updated_bot_data
-        assert papp.persistence.bot_data == {'key': 'value', 'refreshed': True}
+        assert papp.persistence.bot_data == {"key": "value", "refreshed": True}
         assert papp.persistence.updated_callback_data
         assert papp.persistence.callback_data[1] == {}
         assert len(papp.persistence.callback_data[0]) == 1
         assert papp.persistence.updated_user_ids == {1: 1}
-        assert papp.persistence.user_data == {1: {'key': 'value', 'refreshed': True}}
+        assert papp.persistence.user_data == {1: {"key": "value", "refreshed": True}}
         assert papp.persistence.updated_chat_ids == {1: 1}
-        assert papp.persistence.chat_data == {1: {'key': 'value', 'refreshed': True}}
+        assert papp.persistence.chat_data == {1: {"key": "value", "refreshed": True}}
         assert not papp.persistence.updated_conversations
         assert not papp.persistence.conversations
         assert papp.persistence.flushed
@@ -794,20 +794,20 @@ class TestBasePersistence:
 
             assert papp.persistence.bot_data is not papp.bot_data
             if papp.persistence.store_data.bot_data:
-                assert papp.persistence.bot_data == {'key': 'value', 'refreshed': True}
+                assert papp.persistence.bot_data == {"key": "value", "refreshed": True}
             else:
                 assert not papp.persistence.bot_data
 
             assert papp.persistence.chat_data is not papp.chat_data
             if papp.persistence.store_data.chat_data:
-                assert papp.persistence.chat_data == {1: {'key': 'value', 'refreshed': True}}
+                assert papp.persistence.chat_data == {1: {"key": "value", "refreshed": True}}
                 assert papp.persistence.chat_data[1] is not papp.chat_data[1]
             else:
                 assert not papp.persistence.chat_data
 
             assert papp.persistence.user_data is not papp.user_data
             if papp.persistence.store_data.user_data:
-                assert papp.persistence.user_data == {1: {'key': 'value', 'refreshed': True}}
+                assert papp.persistence.user_data == {1: {"key": "value", "refreshed": True}}
                 assert papp.persistence.user_data[1] is not papp.chat_data[1]
             else:
                 assert not papp.persistence.user_data
@@ -852,20 +852,20 @@ class TestBasePersistence:
 
             assert papp.persistence.bot_data is not papp.bot_data
             if papp.persistence.store_data.bot_data:
-                assert papp.persistence.bot_data == {'key': 'value', 'refreshed': True}
+                assert papp.persistence.bot_data == {"key": "value", "refreshed": True}
             else:
                 assert not papp.persistence.bot_data
 
             assert papp.persistence.chat_data is not papp.chat_data
             if papp.persistence.store_data.chat_data:
-                assert papp.persistence.chat_data == {1: {'key': 'value', 'refreshed': True}}
+                assert papp.persistence.chat_data == {1: {"key": "value", "refreshed": True}}
                 assert papp.persistence.chat_data[1] is not papp.chat_data[1]
             else:
                 assert not papp.persistence.chat_data
 
             assert papp.persistence.user_data is not papp.user_data
             if papp.persistence.store_data.user_data:
-                assert papp.persistence.user_data == {1: {'key': 'value', 'refreshed': True}}
+                assert papp.persistence.user_data == {1: {"key": "value", "refreshed": True}}
                 assert papp.persistence.user_data[1] is not papp.chat_data[1]
             else:
                 assert not papp.persistence.user_data
@@ -882,7 +882,7 @@ class TestBasePersistence:
             assert not papp.persistence.conversations
 
     @default_papp
-    @pytest.mark.parametrize('delay_type', ('job', 'handler', 'task'))
+    @pytest.mark.parametrize("delay_type", ("job", "handler", "task"))
     async def test_update_persistence_loop_async_logic(
         self, papp: Application, delay_type: str, chat_id
     ):
@@ -892,10 +892,10 @@ class TestBasePersistence:
         update = TrackingConversationHandler.build_update(HandlerStates.STATE_1, chat_id=1)
 
         async with papp:
-            if delay_type == 'job':
+            if delay_type == "job":
                 await papp.job_queue.start()
                 papp.job_queue.run_once(self.job_callback(), when=sleep, chat_id=1, user_id=1)
-            elif delay_type == 'handler':
+            elif delay_type == "handler":
                 papp.add_handler(
                     MessageHandler(
                         filters.ALL,
@@ -938,64 +938,64 @@ class TestBasePersistence:
     @filled_papp
     async def test_drop_chat_data(self, papp: Application):
         async with papp:
-            assert papp.persistence.chat_data == {1: {'key': 'value'}, 2: {'foo': 'bar'}}
+            assert papp.persistence.chat_data == {1: {"key": "value"}, 2: {"foo": "bar"}}
             assert not papp.persistence.dropped_chat_ids
             assert not papp.persistence.updated_chat_ids
 
             papp.drop_chat_data(1)
 
-            assert papp.persistence.chat_data == {1: {'key': 'value'}, 2: {'foo': 'bar'}}
+            assert papp.persistence.chat_data == {1: {"key": "value"}, 2: {"foo": "bar"}}
             assert not papp.persistence.dropped_chat_ids
             assert not papp.persistence.updated_chat_ids
 
             await papp.update_persistence()
 
-            assert papp.persistence.chat_data == {2: {'foo': 'bar'}}
+            assert papp.persistence.chat_data == {2: {"foo": "bar"}}
             assert papp.persistence.dropped_chat_ids == {1: 1}
             assert not papp.persistence.updated_chat_ids
 
     @filled_papp
     async def test_drop_user_data(self, papp: Application):
         async with papp:
-            assert papp.persistence.user_data == {1: {'key': 'value'}, 2: {'foo': 'bar'}}
+            assert papp.persistence.user_data == {1: {"key": "value"}, 2: {"foo": "bar"}}
             assert not papp.persistence.dropped_user_ids
             assert not papp.persistence.updated_user_ids
 
             papp.drop_user_data(1)
 
-            assert papp.persistence.user_data == {1: {'key': 'value'}, 2: {'foo': 'bar'}}
+            assert papp.persistence.user_data == {1: {"key": "value"}, 2: {"foo": "bar"}}
             assert not papp.persistence.dropped_user_ids
             assert not papp.persistence.updated_user_ids
 
             await papp.update_persistence()
 
-            assert papp.persistence.user_data == {2: {'foo': 'bar'}}
+            assert papp.persistence.user_data == {2: {"foo": "bar"}}
             assert papp.persistence.dropped_user_ids == {1: 1}
             assert not papp.persistence.updated_user_ids
 
     @filled_papp
     async def test_migrate_chat_data(self, papp: Application):
         async with papp:
-            assert papp.persistence.chat_data == {1: {'key': 'value'}, 2: {'foo': 'bar'}}
+            assert papp.persistence.chat_data == {1: {"key": "value"}, 2: {"foo": "bar"}}
             assert not papp.persistence.dropped_chat_ids
             assert not papp.persistence.updated_chat_ids
 
             papp.migrate_chat_data(old_chat_id=1, new_chat_id=2)
 
-            assert papp.persistence.chat_data == {1: {'key': 'value'}, 2: {'foo': 'bar'}}
+            assert papp.persistence.chat_data == {1: {"key": "value"}, 2: {"foo": "bar"}}
             assert not papp.persistence.dropped_chat_ids
             assert not papp.persistence.updated_chat_ids
 
             await papp.update_persistence()
 
-            assert papp.persistence.chat_data == {2: {'key': 'value'}}
+            assert papp.persistence.chat_data == {2: {"key": "value"}}
             assert papp.persistence.dropped_chat_ids == {1: 1}
             assert papp.persistence.updated_chat_ids == {2: 1}
 
     async def test_errors_while_persisting(self, bot, caplog):
         class ErrorPersistence(TrackingPersistence):
             def raise_error(self):
-                raise Exception('PersistenceError')
+                raise Exception("PersistenceError")
 
             async def update_callback_data(self, data):
                 self.raise_error()
@@ -1021,8 +1021,8 @@ class TestBasePersistence:
         test_flag = []
 
         async def error(update, context):
-            test_flag.append(str(context.error) == 'PersistenceError')
-            raise Exception('ErrorHandlingError')
+            test_flag.append(str(context.error) == "PersistenceError")
+            raise Exception("ErrorHandlingError")
 
         app = ApplicationBuilder().token(bot.token).persistence(ErrorPersistence()).build()
 
@@ -1045,11 +1045,11 @@ class TestBasePersistence:
         assert test_flag == [True, True, True, True, True, True]
         for record in caplog.records:
             message = record.getMessage()
-            assert message.startswith('An error was raised and an uncaught')
+            assert message.startswith("An error was raised and an uncaught")
 
     @default_papp
     @pytest.mark.parametrize(
-        'delay_type', ('job', 'blocking_handler', 'nonblocking_handler', 'task')
+        "delay_type", ("job", "blocking_handler", "nonblocking_handler", "task")
     )
     async def test_update_persistence_after_exception(
         self, papp: Application, delay_type: str, chat_id
@@ -1079,15 +1079,15 @@ class TestBasePersistence:
             assert not papp.persistence.updated_conversations
             assert errors == 0
 
-            if delay_type == 'job':
+            if delay_type == "job":
                 await papp.job_queue.start()
                 papp.job_queue.run_once(raise_error, when=sleep, chat_id=1, user_id=1)
-            elif delay_type.endswith('_handler'):
+            elif delay_type.endswith("_handler"):
                 papp.add_handler(
                     MessageHandler(
                         filters.ALL,
                         raise_error,
-                        block=delay_type.startswith('blocking'),
+                        block=delay_type.startswith("blocking"),
                     )
                 )
                 await papp.process_update(update)
@@ -1130,7 +1130,7 @@ class TestBasePersistence:
             states={},
             fallbacks=[],
             persistent=True,
-            name='conv',
+            name="conv",
             block=False,
         )
         papp.add_handler(conversation)
@@ -1146,15 +1146,15 @@ class TestBasePersistence:
             await papp.update_persistence()
             await asyncio.sleep(0.01)
             # Conversation should have been updated with the current state, i.e. None
-            assert papp.persistence.updated_conversations == {'conv': ({(1, 1): 1})}
-            assert papp.persistence.conversations == {'conv': {(1, 1): None}}
+            assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
+            assert papp.persistence.conversations == {"conv": {(1, 1): None}}
 
             papp.persistence.reset_tracking()
             event.set()
             await asyncio.sleep(0.01)
             await papp.update_persistence()
-            assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
-            assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
+            assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.STATE_1}}
 
     async def test_non_blocking_conversations_raises_Exception(self, bot):
         papp = build_papp(token=bot.token)
@@ -1163,7 +1163,7 @@ class TestBasePersistence:
             return HandlerStates.STATE_1
 
         async def callback_2(_, __):
-            raise Exception('Test Exception')
+            raise Exception("Test Exception")
 
         conversation = ConversationHandler(
             entry_points=[
@@ -1178,7 +1178,7 @@ class TestBasePersistence:
             },
             fallbacks=[],
             persistent=True,
-            name='conv',
+            name="conv",
             block=False,
         )
         papp.add_handler(conversation)
@@ -1193,10 +1193,10 @@ class TestBasePersistence:
 
             await papp.update_persistence()
             await asyncio.sleep(0.05)
-            assert papp.persistence.updated_conversations == {'conv': ({(1, 1): 1})}
+            assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
             # The result of the pending state wasn't retrieved by the CH yet, so we must be in
             # state `None`
-            assert papp.persistence.conversations == {'conv': {(1, 1): None}}
+            assert papp.persistence.conversations == {"conv": {(1, 1): None}}
 
             await papp.process_update(
                 TrackingConversationHandler.build_update(HandlerStates.STATE_1, 1)
@@ -1205,9 +1205,9 @@ class TestBasePersistence:
             papp.persistence.reset_tracking()
             await asyncio.sleep(0.01)
             await papp.update_persistence()
-            assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
             # since the second callback raised an exception, the state must be the previous one!
-            assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
+            assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.STATE_1}}
 
     async def test_non_blocking_conversations_on_stop(self, bot):
         papp = build_papp(token=bot.token, update_interval=100)
@@ -1224,7 +1224,7 @@ class TestBasePersistence:
             states={},
             fallbacks=[],
             persistent=True,
-            name='conv',
+            name="conv",
             block=False,
         )
         papp.add_handler(conversation)
@@ -1246,8 +1246,8 @@ class TestBasePersistence:
         await papp.shutdown()
         await asyncio.sleep(0.01)
         # The pending state must have been resolved on shutdown!
-        assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
-        assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
+        assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
+        assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.STATE_1}}
 
     async def test_non_blocking_conversations_on_improper_stop(self, bot, caplog):
         papp = build_papp(token=bot.token, update_interval=100)
@@ -1264,7 +1264,7 @@ class TestBasePersistence:
             states={},
             fallbacks=[],
             persistent=True,
-            name='conv',
+            name="conv",
             block=False,
         )
         papp.add_handler(conversation)
@@ -1280,13 +1280,13 @@ class TestBasePersistence:
             await asyncio.sleep(0.01)
             # Because the app wasn't running, the pending state isn't ensured to be done on
             # shutdown - hence we expect the persistence to be updated with state `None`
-            assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
-            assert papp.persistence.conversations == {'conv': {(1, 1): None}}
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
+            assert papp.persistence.conversations == {"conv": {(1, 1): None}}
 
         # Ensure that we warn the user about this!
         found_record = None
         for record in caplog.records:
-            if record.getMessage().startswith('A ConversationHandlers state was not yet resolved'):
+            if record.getMessage().startswith("A ConversationHandlers state was not yet resolved"):
                 found_record = record
                 break
         assert found_record is not None
@@ -1301,9 +1301,9 @@ class TestBasePersistence:
             assert papp.persistence.updated_conversations == {}
 
             await papp.update_persistence()
-            assert papp.persistence.updated_conversations == {'conv_1': ({(1, 1): 1})}
+            assert papp.persistence.updated_conversations == {"conv_1": ({(1, 1): 1})}
             # This is the important part: the persistence is updated with `None` when the conv ends
-            assert papp.persistence.conversations == {'conv_1': {(1, 1): None}}
+            assert papp.persistence.conversations == {"conv_1": {(1, 1): None}}
 
     async def test_conversation_timeout(self, bot):
         # high update_interval so that we can instead manually call it
@@ -1319,7 +1319,7 @@ class TestBasePersistence:
             states={HandlerStates.STATE_1: []},
             fallbacks=[],
             persistent=True,
-            name='conv',
+            name="conv",
             conversation_timeout=3,
         )
         papp.add_handler(conversation)
@@ -1333,8 +1333,8 @@ class TestBasePersistence:
             )
             assert papp.persistence.updated_conversations == {}
             await papp.update_persistence()
-            assert papp.persistence.updated_conversations == {'conv': ({(1, 1): 1})}
-            assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
+            assert papp.persistence.updated_conversations == {"conv": ({(1, 1): 1})}
+            assert papp.persistence.conversations == {"conv": {(1, 1): HandlerStates.STATE_1}}
 
             papp.persistence.reset_tracking()
             await asyncio.sleep(4)
@@ -1344,8 +1344,8 @@ class TestBasePersistence:
             )
             await papp.update_persistence()
             # … and persistence should be updated with `None`
-            assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
-            assert papp.persistence.conversations == {'conv': {(1, 1): None}}
+            assert papp.persistence.updated_conversations == {"conv": {(1, 1): 1}}
+            assert papp.persistence.conversations == {"conv": {(1, 1): None}}
 
             await papp.stop()
 
@@ -1371,7 +1371,7 @@ class TestBasePersistence:
             },
             fallbacks=[],
             persistent=True,
-            name='grand_child',
+            name="grand_child",
             map_to_parent={HandlerStates.END: HandlerStates.STATE_2},
         )
 
@@ -1385,7 +1385,7 @@ class TestBasePersistence:
             },
             fallbacks=[],
             persistent=True,
-            name='child',
+            name="child",
             map_to_parent={HandlerStates.STATE_3: HandlerStates.STATE_2},
         )
 
@@ -1401,13 +1401,13 @@ class TestBasePersistence:
             },
             fallbacks=[],
             persistent=True,
-            name='parent',
+            name="parent",
         )
 
         papp.add_handler(parent)
-        papp.persistence.conversations['grand_child'][(1, 1)] = HandlerStates.STATE_1
-        papp.persistence.conversations['child'][(1, 1)] = HandlerStates.STATE_1
-        papp.persistence.conversations['parent'][(1, 1)] = HandlerStates.STATE_1
+        papp.persistence.conversations["grand_child"][(1, 1)] = HandlerStates.STATE_1
+        papp.persistence.conversations["child"][(1, 1)] = HandlerStates.STATE_1
+        papp.persistence.conversations["parent"][(1, 1)] = HandlerStates.STATE_1
 
         # Should load the stored data into the persistence so that the updates below are handled
         # accordingly
@@ -1430,13 +1430,13 @@ class TestBasePersistence:
         assert papp.persistence.updated_conversations == {}
         await papp.update_persistence()
         assert papp.persistence.updated_conversations == {
-            'grand_child': {(1, 1): 1},
-            'child': {(1, 1): 1},
+            "grand_child": {(1, 1): 1},
+            "child": {(1, 1): 1},
         }
         assert papp.persistence.conversations == {
-            'grand_child': {(1, 1): None},
-            'child': {(1, 1): HandlerStates.STATE_2},
-            'parent': {(1, 1): HandlerStates.STATE_1},
+            "grand_child": {(1, 1): None},
+            "child": {(1, 1): HandlerStates.STATE_2},
+            "parent": {(1, 1): HandlerStates.STATE_1},
         }
 
         papp.persistence.reset_tracking()
@@ -1445,12 +1445,12 @@ class TestBasePersistence:
         )
         await papp.update_persistence()
         assert papp.persistence.updated_conversations == {
-            'parent': {(1, 1): 1},
-            'child': {(1, 1): 1},
+            "parent": {(1, 1): 1},
+            "child": {(1, 1): 1},
         }
         assert papp.persistence.conversations == {
-            'child': {(1, 1): None},
-            'parent': {(1, 1): HandlerStates.STATE_2},
+            "child": {(1, 1): None},
+            "parent": {(1, 1): HandlerStates.STATE_2},
         }
 
         papp.persistence.reset_tracking()
@@ -1459,10 +1459,10 @@ class TestBasePersistence:
         )
         await papp.update_persistence()
         assert papp.persistence.updated_conversations == {
-            'parent': {(1, 1): 1},
+            "parent": {(1, 1): 1},
         }
         assert papp.persistence.conversations == {
-            'parent': {(1, 1): None},
+            "parent": {(1, 1): None},
         }
 
         await papp.shutdown()

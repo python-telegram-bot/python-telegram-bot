@@ -37,50 +37,50 @@ from telegram import (
 from telegram._utils.datetime import from_timestamp
 from telegram.ext import CallbackContext, ChatMemberHandler, JobQueue
 
-message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
+message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
 params = [
-    {'message': message},
-    {'edited_message': message},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
-    {'channel_post': message},
-    {'edited_channel_post': message},
-    {'chosen_inline_result': ChosenInlineResult('id', User(1, '', False), '')},
-    {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
-    {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
+    {"message": message},
+    {"edited_message": message},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat", message=message)},
+    {"channel_post": message},
+    {"edited_channel_post": message},
+    {"chosen_inline_result": ChosenInlineResult("id", User(1, "", False), "")},
+    {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
+    {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
 
 ids = (
-    'message',
-    'edited_message',
-    'callback_query',
-    'channel_post',
-    'edited_channel_post',
-    'chosen_inline_result',
-    'shipping_query',
-    'pre_checkout_query',
-    'callback_query_without_message',
+    "message",
+    "edited_message",
+    "callback_query",
+    "channel_post",
+    "edited_channel_post",
+    "chosen_inline_result",
+    "shipping_query",
+    "pre_checkout_query",
+    "callback_query_without_message",
 )
 
 
-@pytest.fixture(scope='class', params=params, ids=ids)
+@pytest.fixture(scope="class", params=params, ids=ids)
 def false_update(request):
     return Update(update_id=2, **request.param)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def chat_member_updated():
     return ChatMemberUpdated(
-        Chat(1, 'chat'),
-        User(1, '', False),
+        Chat(1, "chat"),
+        User(1, "", False),
         from_timestamp(int(time.time())),
-        ChatMember(User(1, '', False), ChatMember.OWNER),
-        ChatMember(User(1, '', False), ChatMember.OWNER),
+        ChatMember(User(1, "", False), ChatMember.OWNER),
+        ChatMember(User(1, "", False), ChatMember.OWNER),
     )
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def chat_member(bot, chat_member_updated):
     return Update(0, my_chat_member=chat_member_updated)
 
@@ -91,7 +91,7 @@ class TestChatMemberHandler:
     def test_slot_behaviour(self, mro_slots):
         action = ChatMemberHandler(self.callback)
         for attr in action.__slots__:
-            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
@@ -112,13 +112,13 @@ class TestChatMemberHandler:
         )
 
     @pytest.mark.parametrize(
-        argnames=['allowed_types', 'expected'],
+        argnames=["allowed_types", "expected"],
         argvalues=[
             (ChatMemberHandler.MY_CHAT_MEMBER, (True, False)),
             (ChatMemberHandler.CHAT_MEMBER, (False, True)),
             (ChatMemberHandler.ANY_CHAT_MEMBER, (True, True)),
         ],
-        ids=['MY_CHAT_MEMBER', 'CHAT_MEMBER', 'ANY_CHAT_MEMBER'],
+        ids=["MY_CHAT_MEMBER", "CHAT_MEMBER", "ANY_CHAT_MEMBER"],
     )
     async def test_chat_member_types(
         self, app, chat_member_updated, chat_member, expected, allowed_types

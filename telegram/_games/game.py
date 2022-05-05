@@ -71,12 +71,12 @@ class Game(TelegramObject):
     """
 
     __slots__ = (
-        'title',
-        'photo',
-        'description',
-        'text_entities',
-        'text',
-        'animation',
+        "title",
+        "photo",
+        "description",
+        "text_entities",
+        "text",
+        "animation",
     )
 
     def __init__(
@@ -101,16 +101,16 @@ class Game(TelegramObject):
         self._id_attrs = (self.title, self.description, self.photo)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Game']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Game"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['photo'] = PhotoSize.de_list(data.get('photo'), bot)
-        data['text_entities'] = MessageEntity.de_list(data.get('text_entities'), bot)
-        data['animation'] = Animation.de_json(data.get('animation'), bot)
+        data["photo"] = PhotoSize.de_list(data.get("photo"), bot)
+        data["text_entities"] = MessageEntity.de_list(data.get("text_entities"), bot)
+        data["animation"] = Animation.de_json(data.get("animation"), bot)
 
         return cls(**data)
 
@@ -118,9 +118,9 @@ class Game(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['photo'] = [p.to_dict() for p in self.photo]
+        data["photo"] = [p.to_dict() for p in self.photo]
         if self.text_entities:
-            data['text_entities'] = [x.to_dict() for x in self.text_entities]
+            data["text_entities"] = [x.to_dict() for x in self.text_entities]
 
         return data
 
@@ -149,10 +149,10 @@ class Game(TelegramObject):
         # Is it a narrow build, if so we don't need to convert
         if sys.maxunicode == 0xFFFF:
             return self.text[entity.offset : entity.offset + entity.length]
-        entity_text = self.text.encode('utf-16-le')
+        entity_text = self.text.encode("utf-16-le")
         entity_text = entity_text[entity.offset * 2 : (entity.offset + entity.length) * 2]
 
-        return entity_text.decode('utf-16-le')
+        return entity_text.decode("utf-16-le")
 
     def parse_text_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
         """

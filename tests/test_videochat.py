@@ -30,21 +30,21 @@ from telegram import (
 from telegram._utils.datetime import to_timestamp
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def user1():
-    return User(first_name='Misses Test', id=123, is_bot=False)
+    return User(first_name="Misses Test", id=123, is_bot=False)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def user2():
-    return User(first_name='Mister Test', id=124, is_bot=False)
+    return User(first_name="Mister Test", id=124, is_bot=False)
 
 
 class TestVideoChatStarted:
     def test_slot_behaviour(self, mro_slots):
         action = VideoChatStarted()
         for attr in action.__slots__:
-            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self):
@@ -63,11 +63,11 @@ class TestVideoChatEnded:
     def test_slot_behaviour(self, mro_slots):
         action = VideoChatEnded(8)
         for attr in action.__slots__:
-            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self):
-        json_dict = {'duration': self.duration}
+        json_dict = {"duration": self.duration}
         video_chat_ended = VideoChatEnded.de_json(json_dict, None)
 
         assert video_chat_ended.duration == self.duration
@@ -99,7 +99,7 @@ class TestVideoChatParticipantsInvited:
     def test_slot_behaviour(self, mro_slots, user1):
         action = VideoChatParticipantsInvited([user1])
         for attr in action.__slots__:
-            assert getattr(action, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self, user1, user2, bot):
@@ -112,7 +112,7 @@ class TestVideoChatParticipantsInvited:
         assert video_chat_participants.users[0].id == user1.id
         assert video_chat_participants.users[1].id == user2.id
 
-    @pytest.mark.parametrize('use_users', (True, False))
+    @pytest.mark.parametrize("use_users", (True, False))
     def test_to_dict(self, user1, user2, use_users):
         video_chat_participants = VideoChatParticipantsInvited(
             [user1, user2] if use_users else None
@@ -153,7 +153,7 @@ class TestVideoChatScheduled:
     def test_slot_behaviour(self, mro_slots):
         inst = VideoChatScheduled(self.start_date)
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self):
@@ -162,7 +162,7 @@ class TestVideoChatScheduled:
     def test_de_json(self, bot):
         assert VideoChatScheduled.de_json({}, bot=bot) is None
 
-        json_dict = {'start_date': to_timestamp(self.start_date)}
+        json_dict = {"start_date": to_timestamp(self.start_date)}
         video_chat_scheduled = VideoChatScheduled.de_json(json_dict, bot)
 
         assert abs(video_chat_scheduled.start_date - self.start_date) < dtm.timedelta(seconds=1)

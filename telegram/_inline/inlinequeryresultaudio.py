@@ -82,15 +82,15 @@ class InlineQueryResultAudio(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'caption',
-        'title',
-        'parse_mode',
-        'audio_url',
-        'performer',
-        'input_message_content',
-        'audio_duration',
+        "reply_markup",
+        "caption_entities",
+        "caption",
+        "title",
+        "parse_mode",
+        "audio_url",
+        "performer",
+        "input_message_content",
+        "audio_duration",
     )
 
     def __init__(
@@ -102,7 +102,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         audio_duration: int = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,
