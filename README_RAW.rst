@@ -20,7 +20,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-5.7-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-6.0-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -105,7 +105,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **5.7** are supported.
+All types and methods of the Telegram Bot API **6.0** are supported.
 
 ===========
 Concurrency
@@ -138,14 +138,29 @@ Note
 
 Installing the `.tar.gz` archive available on PyPi directly via `pip` will *not* work as expected, as `pip` does not recognize that it should use `setup-raw.py` instead of `setup.py`.
 
+-----------------------------
+Dependencies & Their Versions
+-----------------------------
+
+``python-telegram-bot`` tries to use as few 3rd party dependencies as possible.
+However, for some features using a 3rd party library is more sane than implementing the functionality again.
+The dependencies are:
+
+* `httpx ~= 0.22.0 <https://www.python-httpx.org>`_ for ``telegram.request.HTTPXRequest``, the default networking backend
+
+``python-telegram-bot`` is most useful when used along with additional libraries.
+To minimize dependency conflicts, we try to be liberal in terms of version requirements on the dependencies.
+On the other hand, we have to ensure stability of ``python-telegram-bot``, which is why we do apply version bounds.
+If you encounter dependency conflicts due to these bounds, feel free to reach out.
+
 ---------------------
 Optional Dependencies
 ---------------------
 
 PTB can be installed with optional dependencies:
 
-* ``pip install python-telegram-bot-raw[passport]`` installs the `cryptography <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
-* ``pip install python-telegram-bot-raw[json]`` installs the `ujson <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
+* ``pip install python-telegram-bot-raw[passport]`` installs the `cryptography>=3.0 <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``pip install python-telegram-bot-raw[json]`` installs the `ujson>=4.0.0 <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
 
 ===============
 Getting started

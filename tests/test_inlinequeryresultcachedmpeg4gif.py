@@ -19,11 +19,11 @@
 import pytest
 
 from telegram import (
-    InlineQueryResultCachedMpeg4Gif,
     InlineKeyboardButton,
-    InputTextMessageContent,
     InlineKeyboardMarkup,
+    InlineQueryResultCachedMpeg4Gif,
     InlineQueryResultCachedVoice,
+    InputTextMessageContent,
     MessageEntity,
 )
 

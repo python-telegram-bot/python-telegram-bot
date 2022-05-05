@@ -21,19 +21,19 @@ import asyncio
 import pytest
 
 from telegram import (
-    Update,
+    Bot,
+    CallbackQuery,
+    Chat,
+    ChosenInlineResult,
+    Message,
     Poll,
     PollOption,
-    Bot,
-    Message,
-    User,
-    Chat,
-    CallbackQuery,
-    ChosenInlineResult,
-    ShippingQuery,
     PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import PollHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, JobQueue, PollHandler
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
@@ -114,7 +114,6 @@ class TestPollHandler:
         handler = PollHandler(self.callback)
         assert not handler.check_update(false_update)
 
-    @pytest.mark.asyncio
     async def test_context(self, app, poll):
         handler = PollHandler(self.callback)
         app.add_handler(handler)

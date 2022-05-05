@@ -24,7 +24,7 @@ try:
 except ImportError:
     import json  # type: ignore[no-redef]
 
-from typing import TYPE_CHECKING, List, Optional, Type, TypeVar, Tuple, Dict, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -32,7 +32,7 @@ from telegram._utils.warnings import warn
 if TYPE_CHECKING:
     from telegram import Bot
 
-TO = TypeVar('TO', bound='TelegramObject', covariant=True)
+TO_co = TypeVar('TO_co', bound='TelegramObject', covariant=True)
 
 
 class TelegramObject:
@@ -101,7 +101,7 @@ class TelegramObject:
         for key, val in state.items():
             setattr(self, key, val)
 
-    def __deepcopy__(self: TO, memodict: dict) -> TO:
+    def __deepcopy__(self: TO_co, memodict: dict) -> TO_co:
         """This method deepcopies the object and sets the bot on the newly created copy."""
         bot = self._bot  # Save bot so we can set it after copying
         self.set_bot(None)  # set to None so it is not deepcopied
@@ -147,7 +147,7 @@ class TelegramObject:
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
         for cls in self.__class__.__mro__[:-1]:
-            for key in cls.__slots__:
+            for key in cls.__slots__:  # type: ignore[attr-defined]
                 if not include_private and key.startswith('_'):
                     continue
 
@@ -171,7 +171,7 @@ class TelegramObject:
         return None if data is None else data.copy()
 
     @classmethod
-    def de_json(cls: Type[TO], data: Optional[JSONDict], bot: 'Bot') -> Optional[TO]:
+    def de_json(cls: Type[TO_co], data: Optional[JSONDict], bot: 'Bot') -> Optional[TO_co]:
         """Converts JSON data to a Telegram object.
 
         Args:
@@ -192,7 +192,9 @@ class TelegramObject:
         return cls(bot=bot, **data)
 
     @classmethod
-    def de_list(cls: Type[TO], data: Optional[List[JSONDict]], bot: 'Bot') -> List[Optional[TO]]:
+    def de_list(
+        cls: Type[TO_co], data: Optional[List[JSONDict]], bot: 'Bot'
+    ) -> List[Optional[TO_co]]:
         """Converts JSON data to a list of Telegram objects.
 
         Args:
@@ -253,7 +255,6 @@ class TelegramObject:
         self._bot = bot
 
     def __eq__(self, other: object) -> bool:
-        # pylint: disable=no-member
         if isinstance(other, self.__class__):
             if self._id_attrs == ():
                 warn(
@@ -271,7 +272,6 @@ class TelegramObject:
         return super().__eq__(other)
 
     def __hash__(self) -> int:
-        # pylint: disable=no-member
         if self._id_attrs:
             return hash((self.__class__, self._id_attrs))
         return super().__hash__()

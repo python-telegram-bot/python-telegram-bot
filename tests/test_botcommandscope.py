@@ -21,15 +21,15 @@ from copy import deepcopy
 import pytest
 
 from telegram import (
-    Dice,
     BotCommandScope,
-    BotCommandScopeDefault,
-    BotCommandScopeAllPrivateChats,
-    BotCommandScopeAllGroupChats,
     BotCommandScopeAllChatAdministrators,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllPrivateChats,
     BotCommandScopeChat,
     BotCommandScopeChatAdministrators,
     BotCommandScopeChatMember,
+    BotCommandScopeDefault,
+    Dice,
 )
 
 

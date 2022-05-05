@@ -21,12 +21,12 @@ jobs:
         os: [ubuntu-latest]
       fail-fast: False
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Initialize vendored libs
         run:
           git submodule update --init --recursive
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies

@@ -29,12 +29,12 @@ Warning:
 """
 
 from pathlib import Path
-from typing import Optional, Union, Type, Any, cast, IO, TYPE_CHECKING
+from typing import IO, TYPE_CHECKING, Any, Optional, Type, Union, cast
 
 from telegram._utils.types import FileInput, FilePathInput
 
 if TYPE_CHECKING:
-    from telegram import TelegramObject, InputFile
+    from telegram import InputFile, TelegramObject
 
 
 def is_local_file(obj: Optional[FilePathInput]) -> bool:

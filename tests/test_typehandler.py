@@ -16,13 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from collections import OrderedDict
 import asyncio
+from collections import OrderedDict
 
 import pytest
 
 from telegram import Bot
-from telegram.ext import TypeHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, JobQueue, TypeHandler
 
 
 class TestTypeHandler:
@@ -50,7 +50,6 @@ class TestTypeHandler:
             and isinstance(context.bot_data, dict)
         )
 
-    @pytest.mark.asyncio
     async def test_basic(self, app):
         handler = TypeHandler(dict, self.callback)
         app.add_handler(handler)

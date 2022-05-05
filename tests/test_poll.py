@@ -15,13 +15,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+from datetime import datetime, timedelta, timezone
+
 import pytest
 
-from datetime import datetime
-
-
-from telegram import Poll, PollOption, PollAnswer, User, MessageEntity
+from telegram import MessageEntity, Poll, PollAnswer, PollOption, User
 from telegram._utils.datetime import to_timestamp
+from telegram.constants import PollType
 
 
 @pytest.fixture(scope="class")
@@ -157,7 +157,7 @@ class TestPoll:
     ).decode('unicode-escape')
     explanation_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     open_period = 42
-    close_date = datetime.utcnow()
+    close_date = datetime.now(timezone.utc)
 
     def test_de_json(self, bot):
         json_dict = {
@@ -191,7 +191,7 @@ class TestPoll:
         assert poll.explanation == self.explanation
         assert poll.explanation_entities == self.explanation_entities
         assert poll.open_period == self.open_period
-        assert pytest.approx(poll.close_date == self.close_date)
+        assert abs(poll.close_date - self.close_date) < timedelta(seconds=1)
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)
 
     def test_to_dict(self, poll):
@@ -210,6 +210,30 @@ class TestPoll:
         assert poll_dict['explanation_entities'] == [poll.explanation_entities[0].to_dict()]
         assert poll_dict['open_period'] == poll.open_period
         assert poll_dict['close_date'] == to_timestamp(poll.close_date)
+
+    def test_enum_init(self):
+        poll = Poll(
+            type='foo',
+            id='id',
+            question='question',
+            options=[],
+            total_voter_count=0,
+            is_closed=False,
+            is_anonymous=False,
+            allows_multiple_answers=False,
+        )
+        assert poll.type == 'foo'
+        poll = Poll(
+            type=PollType.QUIZ,
+            id='id',
+            question='question',
+            options=[],
+            total_voter_count=0,
+            is_closed=False,
+            is_anonymous=False,
+            allows_multiple_answers=False,
+        )
+        assert poll.type is PollType.QUIZ
 
     def test_parse_entity(self, poll):
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)

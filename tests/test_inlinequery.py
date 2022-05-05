@@ -19,8 +19,8 @@
 
 import pytest
 
-from telegram import User, Location, InlineQuery, Update, Bot
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from telegram import Bot, InlineQuery, Location, Update, User
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')
@@ -73,7 +73,6 @@ class TestInlineQuery:
         assert inline_query_dict['query'] == inline_query.query
         assert inline_query_dict['offset'] == inline_query.offset
 
-    @pytest.mark.asyncio
     async def test_answer(self, monkeypatch, inline_query):
         async def make_assertion(*_, **kwargs):
             return kwargs['inline_query_id'] == inline_query.id
@@ -89,12 +88,10 @@ class TestInlineQuery:
         monkeypatch.setattr(inline_query.get_bot(), 'answer_inline_query', make_assertion)
         assert await inline_query.answer(results=[])
 
-    @pytest.mark.asyncio
     async def test_answer_error(self, inline_query):
         with pytest.raises(ValueError, match='mutually exclusive'):
             await inline_query.answer(results=[], auto_pagination=True, current_offset='foobar')
 
-    @pytest.mark.asyncio
     async def test_answer_auto_pagination(self, monkeypatch, inline_query):
         async def make_assertion(*_, **kwargs):
             inline_query_id_matches = kwargs['inline_query_id'] == inline_query.id

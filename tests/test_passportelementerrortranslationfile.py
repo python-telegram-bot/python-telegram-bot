@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import PassportElementErrorTranslationFile, PassportElementErrorDataField
+from telegram import PassportElementErrorDataField, PassportElementErrorTranslationFile
 
 
 @pytest.fixture(scope='class')

@@ -18,9 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMember."""
 import datetime
-from typing import TYPE_CHECKING, Optional, ClassVar, Dict, Type
+from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
 
-from telegram import TelegramObject, User, constants
+from telegram import constants
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.types import JSONDict
 
@@ -43,16 +45,18 @@ class ChatMember(TelegramObject):
     considered equal, if their :attr:`user` and :attr:`status` are equal.
 
     .. versionchanged:: 14.0
-         As of Bot API 5.3, :class:`ChatMember` is nothing but the base class for the subclasses
-        listed above and is no longer returned directly by :meth:`~telegram.Bot.get_chat`.
-        Therefore, most of the arguments and attributes were removed and you should no longer
-        use :class:`ChatMember` directly.
+        * As of Bot API 5.3, :class:`ChatMember` is nothing but the base class for the subclasses
+          listed above and is no longer returned directly by :meth:`~telegram.Bot.get_chat`.
+          Therefore, most of the arguments and attributes were removed and you should no longer
+          use :class:`ChatMember` directly.
+        * The constant ``ChatMember.CREATOR`` was replaced by :attr:`~telegram.ChatMember.OWNER`
+        * The constant ``ChatMember.KICKED`` was replaced by :attr:`~telegram.ChatMember.BANNED`
 
     Args:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat. Can be
-            :attr:`~telegram.ChatMember.ADMINISTRATOR`, :attr:`~telegram.ChatMember.CREATOR`,
-            :attr:`~telegram.ChatMember.KICKED`, :attr:`~telegram.ChatMember.LEFT`,
+            :attr:`~telegram.ChatMember.ADMINISTRATOR`, :attr:`~telegram.ChatMember.OWNER`,
+            :attr:`~telegram.ChatMember.BANNED`, :attr:`~telegram.ChatMember.LEFT`,
             :attr:`~telegram.ChatMember.MEMBER` or :attr:`~telegram.ChatMember.RESTRICTED`.
 
     Attributes:
@@ -65,10 +69,10 @@ class ChatMember(TelegramObject):
 
     ADMINISTRATOR: ClassVar[str] = constants.ChatMemberStatus.ADMINISTRATOR
     """:const:`telegram.constants.ChatMemberStatus.ADMINISTRATOR`"""
-    CREATOR: ClassVar[str] = constants.ChatMemberStatus.CREATOR
-    """:const:`telegram.constants.ChatMemberStatus.CREATOR`"""
-    KICKED: ClassVar[str] = constants.ChatMemberStatus.KICKED
-    """:const:`telegram.constants.ChatMemberStatus.KICKED`"""
+    OWNER: ClassVar[str] = constants.ChatMemberStatus.OWNER
+    """:const:`telegram.constants.ChatMemberStatus.OWNER`"""
+    BANNED: ClassVar[str] = constants.ChatMemberStatus.BANNED
+    """:const:`telegram.constants.ChatMemberStatus.BANNED`"""
     LEFT: ClassVar[str] = constants.ChatMemberStatus.LEFT
     """:const:`telegram.constants.ChatMemberStatus.LEFT`"""
     MEMBER: ClassVar[str] = constants.ChatMemberStatus.MEMBER
@@ -95,12 +99,12 @@ class ChatMember(TelegramObject):
         data['until_date'] = from_timestamp(data.get('until_date', None))
 
         _class_mapping: Dict[str, Type['ChatMember']] = {
-            cls.CREATOR: ChatMemberOwner,
+            cls.OWNER: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
             cls.MEMBER: ChatMemberMember,
             cls.RESTRICTED: ChatMemberRestricted,
             cls.LEFT: ChatMemberLeft,
-            cls.KICKED: ChatMemberBanned,
+            cls.BANNED: ChatMemberBanned,
         }
 
         if cls is ChatMember:
@@ -132,7 +136,7 @@ class ChatMemberOwner(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always :tg-const:`telegram.ChatMember.CREATOR`.
+            always :tg-const:`telegram.ChatMember.OWNER`.
         user (:class:`telegram.User`): Information about the user.
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's
             presence in the chat is hidden.
@@ -149,7 +153,7 @@ class ChatMemberOwner(ChatMember):
         custom_title: str = None,
         **_kwargs: object,
     ):
-        super().__init__(status=ChatMember.CREATOR, user=user)
+        super().__init__(status=ChatMember.OWNER, user=user)
         self.is_anonymous = is_anonymous
         self.custom_title = custom_title
 
@@ -159,6 +163,10 @@ class ChatMemberAdministrator(ChatMember):
     Represents a chat member that has some additional privileges.
 
     .. versionadded:: 13.7
+    .. versionchanged:: 20.0
+       Argument and attribute ``can_manage_voice_chats`` were renamed to
+       :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
+       Bot API 6.0.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -172,8 +180,10 @@ class ChatMemberAdministrator(ChatMember):
             and ignore slow mode. Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the
             administrator can delete messages of other users.
-        can_manage_voice_chats (:obj:`bool`): :obj:`True`, if the
-            administrator can manage voice chats.
+        can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
+            administrator can manage video chats.
+
+            .. versionadded:: 20.0
         can_restrict_members (:obj:`bool`): :obj:`True`, if the
             administrator can restrict, ban or unban chat members.
         can_promote_members (:obj:`bool`): :obj:`True`, if the administrator
@@ -207,8 +217,10 @@ class ChatMemberAdministrator(ChatMember):
             and ignore slow mode. Implied by any other administrator privilege.
         can_delete_messages (:obj:`bool`): :obj:`True`, if the
             administrator can delete messages of other users.
-        can_manage_voice_chats (:obj:`bool`): :obj:`True`, if the
-            administrator can manage voice chats.
+        can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
+            administrator can manage video chats.
+
+            .. versionadded:: 20.0
         can_restrict_members (:obj:`bool`): :obj:`True`, if the
             administrator can restrict, ban or unban chat members.
         can_promote_members (:obj:`bool`): :obj:`True`, if the administrator
@@ -234,7 +246,7 @@ class ChatMemberAdministrator(ChatMember):
         'is_anonymous',
         'can_manage_chat',
         'can_delete_messages',
-        'can_manage_voice_chats',
+        'can_manage_video_chats',
         'can_restrict_members',
         'can_promote_members',
         'can_change_info',
@@ -252,7 +264,7 @@ class ChatMemberAdministrator(ChatMember):
         is_anonymous: bool,
         can_manage_chat: bool,
         can_delete_messages: bool,
-        can_manage_voice_chats: bool,
+        can_manage_video_chats: bool,
         can_restrict_members: bool,
         can_promote_members: bool,
         can_change_info: bool,
@@ -268,7 +280,7 @@ class ChatMemberAdministrator(ChatMember):
         self.is_anonymous = is_anonymous
         self.can_manage_chat = can_manage_chat
         self.can_delete_messages = can_delete_messages
-        self.can_manage_voice_chats = can_manage_voice_chats
+        self.can_manage_video_chats = can_manage_video_chats
         self.can_restrict_members = can_restrict_members
         self.can_promote_members = can_promote_members
         self.can_change_info = can_change_info
@@ -436,7 +448,7 @@ class ChatMemberBanned(ChatMember):
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
-            always :tg-const:`telegram.ChatMember.KICKED`.
+            always :tg-const:`telegram.ChatMember.BANNED`.
         user (:class:`telegram.User`): Information about the user.
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
@@ -446,5 +458,5 @@ class ChatMemberBanned(ChatMember):
     __slots__ = ('until_date',)
 
     def __init__(self, user: User, until_date: datetime.datetime, **_kwargs: object):
-        super().__init__(status=ChatMember.KICKED, user=user)
+        super().__init__(status=ChatMember.BANNED, user=user)
         self.until_date = until_date

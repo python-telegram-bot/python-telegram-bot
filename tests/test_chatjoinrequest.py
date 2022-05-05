@@ -21,9 +21,9 @@ import datetime
 import pytest
 import pytz
 
-from telegram import ChatJoinRequest, User, Chat, ChatInviteLink, Bot
+from telegram import Bot, Chat, ChatInviteLink, ChatJoinRequest, User
 from telegram._utils.datetime import to_timestamp
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')
@@ -72,7 +72,7 @@ class TestChatJoinRequest:
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user
-        assert pytest.approx(chat_join_request.date == time)
+        assert abs(chat_join_request.date - time) < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
 
         json_dict.update({'bio': self.bio, 'invite_link': self.invite_link.to_dict()})
@@ -80,7 +80,7 @@ class TestChatJoinRequest:
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user
-        assert pytest.approx(chat_join_request.date == time)
+        assert abs(chat_join_request.date - time) < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
         assert chat_join_request.bio == self.bio
         assert chat_join_request.invite_link == self.invite_link
@@ -119,7 +119,6 @@ class TestChatJoinRequest:
         assert a != f
         assert hash(a) != hash(f)
 
-    @pytest.mark.asyncio
     async def test_approve(self, monkeypatch, chat_join_request):
         async def make_assertion(*_, **kwargs):
             chat_id_test = kwargs['chat_id'] == chat_join_request.chat.id
@@ -142,7 +141,6 @@ class TestChatJoinRequest:
         )
         assert await chat_join_request.approve()
 
-    @pytest.mark.asyncio
     async def test_decline(self, monkeypatch, chat_join_request):
         async def make_assertion(*_, **kwargs):
             chat_id_test = kwargs['chat_id'] == chat_join_request.chat.id

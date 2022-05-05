@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputMessageContent."""
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class InputMessageContent(TelegramObject):

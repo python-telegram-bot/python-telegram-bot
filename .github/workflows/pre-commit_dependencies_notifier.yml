@@ -5,6 +5,8 @@ on:
       - requirements.txt
       - requirements-dev.txt
       - .pre-commit-config.yaml
+permissions:
+ pull-requests: write
 jobs:
   job:
     runs-on: ubuntu-latest

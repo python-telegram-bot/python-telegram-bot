@@ -11,11 +11,11 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-import subprocess
-import re
-import sys
-import os
 import inspect
+import os
+import re
+import subprocess
+import sys
 from enum import Enum
 from pathlib import Path
 from typing import Tuple
@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '4.3.2'
+needs_sphinx = '4.5.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -372,6 +372,9 @@ class TGConstXRefRole(PyXRefRole):
                 if isinstance(value, telegram.constants.FileSizeLimit):
                     return f'{int(value.value / 1e6)} MB', target
                 return repr(value.value), target
+            # Just for Bot API version number auto add in constants:
+            if isinstance(value, str) and target == 'telegram.constants.BOT_API_VERSION':
+                return value, target
             sphinx_logger.warning(
                 f'%s:%d: WARNING: Did not convert reference %s. :{CONSTANTS_ROLE}: is not supposed'
                 ' to be used with this type of target.',

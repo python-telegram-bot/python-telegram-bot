@@ -24,22 +24,12 @@ Warning:
     the changelog.
 """
 from pathlib import Path
-from typing import (
-    IO,
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 if TYPE_CHECKING:
     from telegram import InputFile  # noqa: F401
+    from telegram import ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove
     from telegram._utils.defaultvalue import DefaultValue  # noqa: F401
-    from telegram import InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply
 
 FileLike = Union[IO[bytes], 'InputFile']
 """Either a bytes-stream (e.g. open file handler) or a :class:`telegram.InputFile`."""
@@ -55,7 +45,7 @@ a local file path as string, :class:`pathlib.Path` or the file contents as :obj:
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""
 
-DVType = TypeVar('DVType')
+DVType = TypeVar('DVType')  # pylint: disable=invalid-name
 ODVInput = Optional[Union['DefaultValue[DVType]', DVType]]
 """Generic type for bot method parameters which can have defaults. ``ODVInput[type]`` is the same
 as ``Optional[Union[DefaultValue, type]]``."""

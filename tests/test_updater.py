@@ -25,26 +25,17 @@ from random import randrange
 
 import pytest
 
-from telegram import (
-    Bot,
-    Update,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-)
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram.error import InvalidToken, TelegramError, TimedOut, RetryAfter
-from telegram.ext import (
-    Updater,
-    ExtBot,
-    InvalidCallbackData,
-)
+from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
+from telegram.ext import ExtBot, InvalidCallbackData, Updater
 from telegram.ext._utils.webhookhandler import WebhookServer
 from telegram.request import HTTPXRequest
 from tests.conftest import (
-    make_message_update,
-    make_message,
     DictBot,
     data_file,
+    make_message,
+    make_message_update,
     send_webhook_message,
 )
 
@@ -75,7 +66,6 @@ class TestUpdater:
         self.received = update.message.text
         self.cb_handler_called.set()
 
-    @pytest.mark.asyncio
     async def test_slot_behaviour(self, updater, mro_slots):
         async with updater:
             for at in updater.__slots__:
@@ -89,7 +79,6 @@ class TestUpdater:
         assert updater.bot is bot
         assert updater.update_queue is queue
 
-    @pytest.mark.asyncio
     async def test_initialize(self, bot, monkeypatch):
         async def initialize_bot(*args, **kwargs):
             self.test_flag = True
@@ -102,7 +91,6 @@ class TestUpdater:
 
         assert self.test_flag
 
-    @pytest.mark.asyncio
     async def test_shutdown(self, bot, monkeypatch):
         async def shutdown_bot(*args, **kwargs):
             self.test_flag = True
@@ -116,7 +104,6 @@ class TestUpdater:
 
         assert self.test_flag
 
-    @pytest.mark.asyncio
     async def test_multiple_inits_and_shutdowns(self, updater, monkeypatch):
         self.test_flag = defaultdict(int)
 
@@ -139,7 +126,6 @@ class TestUpdater:
         assert self.test_flag['init'] == 1
         assert self.test_flag['shutdown'] == 1
 
-    @pytest.mark.asyncio
     async def test_multiple_init_cycles(self, updater):
         # nothing really to assert - this should just not fail
         async with updater:
@@ -147,13 +133,11 @@ class TestUpdater:
         async with updater:
             await updater.bot.get_me()
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
     async def test_start_without_initialize(self, updater, method):
         with pytest.raises(RuntimeError, match='not initialized'):
             await getattr(updater, method)()
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('method', ['start_polling', 'start_webhook'])
     async def test_shutdown_while_running(self, updater, method, monkeypatch):
         async def set_webhook(*args, **kwargs):
@@ -177,7 +161,6 @@ class TestUpdater:
                 await updater.shutdown()
             await updater.stop()
 
-    @pytest.mark.asyncio
     async def test_context_manager(self, monkeypatch, updater):
         async def initialize(*args, **kwargs):
             self.test_flag = ['initialize']
@@ -193,7 +176,6 @@ class TestUpdater:
 
         assert self.test_flag == ['initialize', 'stop']
 
-    @pytest.mark.asyncio
     async def test_context_manager_exception_on_init(self, monkeypatch, updater):
         async def initialize(*args, **kwargs):
             raise RuntimeError('initialize')
@@ -210,7 +192,6 @@ class TestUpdater:
 
         assert self.test_flag == 'stop'
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('drop_pending_updates', (True, False))
     async def test_polling_basic(self, monkeypatch, updater, drop_pending_updates):
         updates = asyncio.Queue()
@@ -267,7 +248,6 @@ class TestUpdater:
         assert self.message_count == 4
         assert self.received == [1, 2, 3, 4]
 
-    @pytest.mark.asyncio
     async def test_start_polling_already_running(self, updater):
         async with updater:
             await updater.start_polling()
@@ -278,7 +258,6 @@ class TestUpdater:
             with pytest.raises(RuntimeError, match='not running'):
                 await updater.stop()
 
-    @pytest.mark.asyncio
     async def test_start_polling_get_updates_parameters(self, updater, monkeypatch):
         update_queue = asyncio.Queue()
         await update_queue.put(Update(update_id=1))
@@ -338,7 +317,6 @@ class TestUpdater:
             await update_queue.join()
             await updater.stop()
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('exception_class', (InvalidToken, TelegramError))
     @pytest.mark.parametrize('retries', (3, 0))
     async def test_start_polling_bootstrap_retries(
@@ -358,9 +336,7 @@ class TestUpdater:
                     await updater.start_polling(bootstrap_retries=retries)
             else:
                 with pytest.raises(TelegramError, match=str(retries + 1)):
-                    await updater.start_polling(
-                        bootstrap_retries=retries,
-                    )
+                    await updater.start_polling(bootstrap_retries=retries)
 
     @pytest.mark.parametrize(
         'error,callback_should_be_called',
@@ -372,7 +348,6 @@ class TestUpdater:
         ids=('TelegramError', 'RetryAfter', 'TimedOut'),
     )
     @pytest.mark.parametrize('custom_error_callback', [True, False])
-    @pytest.mark.asyncio
     async def test_start_polling_exceptions_and_error_callback(
         self, monkeypatch, updater, error, callback_should_be_called, custom_error_callback, caplog
     ):
@@ -433,7 +408,6 @@ class TestUpdater:
                         assert 'Error while getting Updates: TestMessage' in records
             await updater.stop()
 
-    @pytest.mark.asyncio
     async def test_start_polling_unexpected_shutdown(self, updater, monkeypatch, caplog):
         update_queue = asyncio.Queue()
         await update_queue.put(Update(update_id=1))
@@ -469,7 +443,6 @@ class TestUpdater:
         # Make sure that the update_id offset wasn't increased
         assert self.message_count == 2
 
-    @pytest.mark.asyncio
     async def test_start_polling_not_running_after_failure(self, updater, monkeypatch):
         # Unfortunately we have to use some internal logic to trigger an exception
         async def _start_polling(*args, **kwargs):
@@ -482,7 +455,6 @@ class TestUpdater:
                 await updater.start_polling()
             assert updater.running is False
 
-    @pytest.mark.asyncio
     async def test_polling_update_de_json_fails(self, monkeypatch, updater, caplog):
         updates = asyncio.Queue()
         raise_exception = True
@@ -529,7 +501,6 @@ class TestUpdater:
             await updater.stop()
             assert not updater.running
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('ext_bot', [True, False])
     @pytest.mark.parametrize('drop_pending_updates', (True, False))
     async def test_webhook_basic(self, monkeypatch, updater, drop_pending_updates, ext_bot):
@@ -600,7 +571,6 @@ class TestUpdater:
             await updater.stop()
             assert not updater.running
 
-    @pytest.mark.asyncio
     async def test_start_webhook_already_running(self, updater, monkeypatch):
         async def return_true(*args, **kwargs):
             return True
@@ -619,7 +589,6 @@ class TestUpdater:
             with pytest.raises(RuntimeError, match='not running'):
                 await updater.stop()
 
-    @pytest.mark.asyncio
     async def test_start_webhook_parameters_passing(self, updater, monkeypatch):
         expected_delete_webhook = dict(
             drop_pending_updates=None,
@@ -698,7 +667,6 @@ class TestUpdater:
             await updater.stop()
 
     @pytest.mark.parametrize('invalid_data', [True, False], ids=('invalid data', 'valid data'))
-    @pytest.mark.asyncio
     async def test_webhook_arbitrary_callback_data(
         self, monkeypatch, updater, invalid_data, chat_id
     ):
@@ -754,7 +722,6 @@ class TestUpdater:
             updater.bot.callback_data_cache.clear_callback_data()
             updater.bot.callback_data_cache.clear_callback_queries()
 
-    @pytest.mark.asyncio
     async def test_webhook_invalid_ssl(self, monkeypatch, updater):
         async def return_true(*args, **kwargs):
             return True
@@ -779,7 +746,6 @@ class TestUpdater:
                 )
             assert updater.running is False
 
-    @pytest.mark.asyncio
     async def test_webhook_ssl_just_for_telegram(self, monkeypatch, updater):
         """Here we just test that the SSL info is pased to Telegram, but __not__ to the the
         webhook server"""
@@ -815,7 +781,6 @@ class TestUpdater:
             assert self.test_flag == [True, True]
             await updater.stop()
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('exception_class', (InvalidToken, TelegramError))
     @pytest.mark.parametrize('retries', (3, 0))
     async def test_start_webhook_bootstrap_retries(
@@ -839,7 +804,6 @@ class TestUpdater:
                         bootstrap_retries=retries,
                     )
 
-    @pytest.mark.asyncio
     async def test_webhook_invalid_posts(self, updater, monkeypatch):
         async def return_true(*args, **kwargs):
             return True
@@ -879,7 +843,6 @@ class TestUpdater:
 
             await updater.stop()
 
-    @pytest.mark.asyncio
     async def test_webhook_update_de_json_fails(self, monkeypatch, updater, caplog):
         async def delete_webhook(*args, **kwargs):
             return True

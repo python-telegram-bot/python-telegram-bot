@@ -21,7 +21,7 @@
 
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class PassportElementError(TelegramObject):

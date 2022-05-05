@@ -17,18 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram InputMedia Objects."""
-from typing import Union, List, Tuple, Optional
+from typing import List, Optional, Tuple, Union
 
-from telegram import (
-    Animation,
-    Audio,
-    Document,
-    InputFile,
-    PhotoSize,
-    TelegramObject,
-    Video,
-    MessageEntity,
-)
+from telegram._files.animation import Animation
+from telegram._files.audio import Audio
+from telegram._files.document import Document
+from telegram._files.inputfile import InputFile
+from telegram._files.photosize import PhotoSize
+from telegram._files.video import Video
+from telegram._messageentity import MessageEntity
+from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput
@@ -95,9 +93,7 @@ class InputMedia(TelegramObject):
         data = super().to_dict()
 
         if self.caption_entities:
-            data['caption_entities'] = [
-                ce.to_dict() for ce in self.caption_entities  # pylint: disable=not-an-iterable
-            ]
+            data['caption_entities'] = [ce.to_dict() for ce in self.caption_entities]
 
         return data
 

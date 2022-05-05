@@ -20,7 +20,7 @@ import datetime
 
 import pytest
 
-from telegram import InputFile, MessageEntity, InputMediaPhoto, InputMediaVideo
+from telegram import InputFile, InputMediaPhoto, InputMediaVideo, MessageEntity
 from telegram.constants import ChatType
 from telegram.request._requestparameter import RequestParameter
 from tests.conftest import data_file
@@ -80,14 +80,14 @@ class TestRequestParameter:
             ({1: 1.0}, {1: 1.0}),
             (ChatType.PRIVATE, 'private'),
             (MessageEntity('type', 1, 1), {'type': 'type', 'offset': 1, 'length': 1}),
-            (datetime.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5), 1573431976),
+            (datetime.datetime(2019, 11, 11, 0, 26, 16, 10**5), 1573431976),
             (
                 [
                     True,
                     'str',
                     MessageEntity('type', 1, 1),
                     ChatType.PRIVATE,
-                    datetime.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5),
+                    datetime.datetime(2019, 11, 11, 0, 26, 16, 10**5),
                 ],
                 [True, 'str', {'type': 'type', 'offset': 1, 'length': 1}, 'private', 1573431976],
             ),

@@ -23,13 +23,13 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Sticker, PhotoSize, StickerSet, Audio, MaskPosition, Bot
+from telegram import Audio, Bot, MaskPosition, PhotoSize, Sticker, StickerSet
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
 from tests.conftest import (
+    check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    check_defaults_handling,
     data_file,
 )
 
@@ -41,7 +41,6 @@ def sticker_file():
 
 
 @pytest.fixture(scope='class')
-@pytest.mark.asyncio
 async def sticker(bot, chat_id):
     with data_file('telegram.webp').open('rb') as f:
         return (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
@@ -54,7 +53,6 @@ def animated_sticker_file():
 
 
 @pytest.fixture(scope='class')
-@pytest.mark.asyncio
 async def animated_sticker(bot, chat_id):
     with data_file('telegram_animated_sticker.tgs').open('rb') as f:
         return (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
@@ -122,7 +120,6 @@ class TestSticker:
         assert sticker.thumb.file_size == self.thumb_file_size
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
         message = await bot.send_sticker(
             chat_id, sticker=sticker_file, disable_notification=False, protect_content=True
@@ -150,7 +147,6 @@ class TestSticker:
         assert message.has_protected_content
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_get_and_download(self, bot, sticker):
         path = Path('telegram.webp')
         if path.is_file():
@@ -168,14 +164,12 @@ class TestSticker:
         assert path.is_file()
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_resend(self, bot, chat_id, sticker):
         message = await bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)
 
         assert message.sticker == sticker
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_on_server_emoji(self, bot, chat_id):
         server_file_id = 'CAADAQADHAADyIsGAAFZfq1bphjqlgI'
         message = await bot.send_sticker(chat_id=chat_id, sticker=server_file_id)
@@ -183,7 +177,6 @@ class TestSticker:
         assert sticker.emoji == self.emoji
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_from_url(self, bot, chat_id):
         message = await bot.send_sticker(chat_id=chat_id, sticker=self.sticker_file_url)
         sticker = message.sticker
@@ -232,7 +225,6 @@ class TestSticker:
         assert json_sticker.file_size == self.file_size
         assert json_sticker.thumb == sticker.thumb
 
-    @pytest.mark.asyncio
     async def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters['sticker'] == sticker.file_id
@@ -241,7 +233,6 @@ class TestSticker:
         message = await bot.send_sticker(sticker=sticker, chat_id=chat_id)
         assert message
 
-    @pytest.mark.asyncio
     async def test_send_sticker_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -267,7 +258,6 @@ class TestSticker:
         ],
         indirect=['default_bot'],
     )
-    @pytest.mark.asyncio
     async def test_send_sticker_default_allow_sending_without_reply(
         self, default_bot, chat_id, sticker, custom
     ):
@@ -293,7 +283,6 @@ class TestSticker:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
     async def test_send_sticker_default_protect_content(self, chat_id, sticker, default_bot):
         protected = await default_bot.send_sticker(chat_id, sticker)
@@ -315,18 +304,15 @@ class TestSticker:
         assert sticker_dict['thumb'] == sticker.thumb.to_dict()
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_sticker(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_sticker(chat_id, '')
 
-    @pytest.mark.asyncio
     async def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             await bot.send_sticker(chat_id)
@@ -378,7 +364,6 @@ async def sticker_set(bot):
 
 
 @pytest.fixture(scope='function')
-@pytest.mark.asyncio
 async def animated_sticker_set(bot):
     ss = await bot.get_sticker_set(f'animated_test_by_{bot.username}')
     if len(ss.stickers) > 100:
@@ -393,7 +378,6 @@ async def animated_sticker_set(bot):
 
 
 @pytest.fixture(scope='function')
-@pytest.mark.asyncio
 async def video_sticker_set(bot):
     ss = await bot.get_sticker_set(f'video_test_by_{bot.username}')
     if len(ss.stickers) > 100:
@@ -442,7 +426,6 @@ class TestStickerSet:
         assert sticker_set.stickers == self.stickers
         assert sticker_set.thumb == sticker.thumb
 
-    @pytest.mark.asyncio
     async def test_create_sticker_set(
         self, bot, chat_id, sticker_file, animated_sticker_file, video_sticker_file
     ):
@@ -486,7 +469,6 @@ class TestStickerSet:
                     assert v
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
         with data_file('telegram_sticker.png').open('rb') as f:
             # chat_id was hardcoded as 95205500 but it stopped working for some reason
@@ -505,7 +487,6 @@ class TestStickerSet:
         )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_1_tgs(self, bot, chat_id):
         assert await bot.add_sticker_to_set(
             chat_id,
@@ -515,7 +496,6 @@ class TestStickerSet:
         )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_1_webm(self, bot, chat_id):
         with data_file('telegram_video_sticker.webm').open('rb') as f:
             assert await bot.add_sticker_to_set(
@@ -534,33 +514,27 @@ class TestStickerSet:
         assert sticker_set_dict['stickers'][0] == sticker_set.stickers[0].to_dict()
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_2_png(self, bot, sticker_set):
         file_id = sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_2_tgs(self, bot, animated_sticker_set):
         file_id = animated_sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_2_webm(self, bot, video_sticker_set):
         file_id = video_sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
-    @flaky(10, 1)
-    @pytest.mark.asyncio
+    @flaky(3, 1)
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
-        await asyncio.sleep(1)
         assert await bot.set_sticker_set_thumb(
             f'test_by_{bot.username}', chat_id, sticker_set_thumb_file
         )
 
     @flaky(10, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_3_tgs(
         self, bot, chat_id, animated_sticker_file, animated_sticker_set
     ):
@@ -580,27 +554,23 @@ class TestStickerSet:
         pass
 
     @flaky(10, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_4_png(self, bot, sticker_set):
         await asyncio.sleep(1)
         file_id = sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     @flaky(10, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_4_tgs(self, bot, animated_sticker_set):
         await asyncio.sleep(1)
         file_id = animated_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
     @flaky(10, 1)
-    @pytest.mark.asyncio
     async def test_bot_methods_4_webm(self, bot, video_sticker_set):
         await asyncio.sleep(1)
         file_id = video_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
-    @pytest.mark.asyncio
     async def test_upload_sticker_file_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -616,7 +586,6 @@ class TestStickerSet:
         assert test_flag
         monkeypatch.delattr(bot, '_post')
 
-    @pytest.mark.asyncio
     async def test_create_new_sticker_set_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -644,7 +613,6 @@ class TestStickerSet:
         assert test_flag
         monkeypatch.delattr(bot, '_post')
 
-    @pytest.mark.asyncio
     async def test_add_sticker_to_set_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -660,7 +628,6 @@ class TestStickerSet:
         assert test_flag
         monkeypatch.delattr(bot, '_post')
 
-    @pytest.mark.asyncio
     async def test_set_sticker_set_thumb_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -676,7 +643,6 @@ class TestStickerSet:
         assert test_flag
         monkeypatch.delattr(bot, '_post')
 
-    @pytest.mark.asyncio
     async def test_get_file_instance_method(self, monkeypatch, sticker):
         async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == sticker.file_id

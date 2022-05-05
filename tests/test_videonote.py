@@ -22,13 +22,13 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import VideoNote, Voice, PhotoSize, Bot
+from telegram import Bot, PhotoSize, VideoNote, Voice
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
 from tests.conftest import (
+    check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    check_defaults_handling,
     data_file,
 )
 
@@ -41,7 +41,6 @@ def video_note_file():
 
 
 @pytest.fixture(scope='class')
-@pytest.mark.asyncio
 async def video_note(bot, chat_id):
     with data_file('telegram2.mp4').open('rb') as f:
         return (await bot.send_video_note(chat_id, video_note=f, read_timeout=50)).video_note
@@ -85,7 +84,6 @@ class TestVideoNote:
         assert video_note.file_size == self.file_size
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
         message = await bot.send_video_note(
             chat_id,
@@ -112,7 +110,6 @@ class TestVideoNote:
         assert message.has_protected_content
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_video_note_custom_filename(
         self, bot, chat_id, video_note_file, monkeypatch
     ):
@@ -124,7 +121,6 @@ class TestVideoNote:
         assert await bot.send_video_note(chat_id, video_note_file, filename='custom_filename')
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_get_and_download(self, bot, video_note):
         path = Path('telegram2.mp4')
         if path.is_file():
@@ -142,13 +138,11 @@ class TestVideoNote:
         assert path.is_file()
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_resend(self, bot, chat_id, video_note):
         message = await bot.send_video_note(chat_id, video_note.file_id)
 
         assert message.video_note == video_note
 
-    @pytest.mark.asyncio
     async def test_send_with_video_note(self, monkeypatch, bot, chat_id, video_note):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.json_parameters['video_note'] == video_note.file_id
@@ -183,7 +177,6 @@ class TestVideoNote:
         assert video_note_dict['duration'] == video_note.duration
         assert video_note_dict['file_size'] == video_note.file_size
 
-    @pytest.mark.asyncio
     async def test_send_video_note_local_files(self, monkeypatch, bot, chat_id):
         # For just test that the correct paths are passed as we have no local bot API set up
         test_flag = False
@@ -208,7 +201,6 @@ class TestVideoNote:
         ],
         indirect=['default_bot'],
     )
-    @pytest.mark.asyncio
     async def test_send_video_note_default_allow_sending_without_reply(
         self, default_bot, chat_id, video_note, custom
     ):
@@ -234,7 +226,6 @@ class TestVideoNote:
                 )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_bot', [{'protect_content': True}], indirect=True)
     async def test_send_video_note_default_protect_content(self, chat_id, default_bot, video_note):
         protected = await default_bot.send_video_note(chat_id, video_note)
@@ -243,23 +234,19 @@ class TestVideoNote:
         assert not unprotected.has_protected_content
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_video_note(chat_id, open(os.devnull, 'rb'))
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_video_note(chat_id, '')
 
-    @pytest.mark.asyncio
     async def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             await bot.send_video_note(chat_id=chat_id)
 
-    @pytest.mark.asyncio
     async def test_get_file_instance_method(self, monkeypatch, video_note):
         async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == video_note.file_id

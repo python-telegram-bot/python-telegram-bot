@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import os
 import inspect
+import os
 from typing import List
 
-import pytest
 import httpx
+import pytest
 from bs4 import BeautifulSoup
 
 import telegram
@@ -132,6 +132,7 @@ def check_object(h4):
             name.startswith('InlineQueryResult')
             or name.startswith('InputMedia')
             or name.startswith('BotCommandScope')
+            or name.startswith('MenuButton')
         ) and field == 'type':
             continue
         elif (name.startswith('ChatMember')) and field == 'status':  # We autofill the status
@@ -159,6 +160,8 @@ def check_object(h4):
     if name == 'ChatMember':
         ignored |= {'user', 'status'}  # attributes common to all subclasses
     if name == 'BotCommandScope':
+        ignored |= {'type'}  # attributes common to all subclasses
+    if name == 'MenuButton':
         ignored |= {'type'}  # attributes common to all subclasses
     elif name in ('PassportFile', 'EncryptedPassportElement'):
         ignored |= {'credentials'}

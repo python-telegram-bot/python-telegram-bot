@@ -74,6 +74,8 @@
       - Used for answering a pre checkout query
     * - :meth:`~telegram.Bot.answer_shipping_query`
       - Used for answering a shipping query
+    * - :meth:`~telegram.Bot.answer_web_app_query`
+      - Used for answering a web app query
     * - :meth:`~telegram.Bot.edit_message_caption`
       - Used for editing captions
     * - :meth:`~telegram.Bot.edit_message_media`
@@ -161,6 +163,14 @@
       - Used for deleting the list of commands
     * - :meth:`~telegram.Bot.get_my_commands`
       - Used for obtaining the list of commands
+    * - :meth:`~telegram.Bot.get_my_default_administrator_rights`
+      - Used for obtaining the default administrator rights for the bot
+    * - :meth:`~telegram.Bot.set_my_default_administrator_rights`
+      - Used for setting the default administrator rights for the bot
+    * - :meth:`~telegram.Bot.get_chat_menu_button`
+      - Used for obtaining the menu button of a private chat or the default menu button
+    * - :meth:`~telegram.Bot.set_chat_menu_button`
+      - Used for setting the menu button of a private chat or the default menu button
     * - :meth:`~telegram.Bot.leave_chat`
       - Used for leaving a chat
 

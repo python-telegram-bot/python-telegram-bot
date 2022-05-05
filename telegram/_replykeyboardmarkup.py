@@ -18,11 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import Any, List, Union, Sequence
+from typing import Any, List, Sequence, Union
 
-from telegram import KeyboardButton, TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._keyboardbutton import KeyboardButton
+from telegram._telegramobject import TelegramObject
 from telegram._utils.markup import check_keyboard_type
+from telegram._utils.types import JSONDict
 
 
 class ReplyKeyboardMarkup(TelegramObject):

@@ -20,8 +20,7 @@ import re
 
 import pytest
 
-from telegram import Update, MessageEntity, Message
-from telegram import helpers
+from telegram import Message, MessageEntity, Update, helpers
 from telegram.constants import MessageType
 
 

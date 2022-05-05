@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that holds the parameters of a request to the Bot API."""
-from typing import List, Dict, Any, Union
+from typing import Any, Dict, List, Union
 from urllib.parse import urlencode
 
 from telegram._utils.types import UploadFileDict

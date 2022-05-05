@@ -18,21 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the InlineQueryHandler class."""
 import re
-from typing import (
-    TYPE_CHECKING,
-    Match,
-    Optional,
-    Pattern,
-    TypeVar,
-    Union,
-    cast,
-    List,
-)
+from typing import TYPE_CHECKING, List, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
-from telegram._utils.types import DVInput
-from telegram.ext import Handler
 from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.types import DVInput
+from telegram.ext._handler import Handler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:

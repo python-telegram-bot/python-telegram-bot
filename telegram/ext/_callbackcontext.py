@@ -18,27 +18,29 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=no-self-use
 """This module contains the CallbackContext class."""
-from asyncio import Queue
 from typing import (
     TYPE_CHECKING,
+    Coroutine,
     Dict,
+    Generic,
     List,
     Match,
     NoReturn,
     Optional,
     Tuple,
-    Generic,
     Type,
-    Coroutine,
 )
 
-from telegram import Update, CallbackQuery
-from telegram.ext import ExtBot
-from telegram.ext._utils.types import UD, CD, BD, BT, JQ  # pylint: disable=unused-import
+from telegram._callbackquery import CallbackQuery
+from telegram._update import Update
+from telegram.ext._extbot import ExtBot
+from telegram.ext._utils.types import BD, BT, CD, UD  # pylint: disable=unused-import
 
 if TYPE_CHECKING:
+    from asyncio import Queue
+
     from telegram.ext import Application, Job, JobQueue
-    from telegram.ext._utils.types import CCT
+    from telegram.ext._utils.types import CCT, JQ
 
 _STORING_DATA_WIKI = (
     "https://github.com/python-telegram-bot/python-telegram-bot"

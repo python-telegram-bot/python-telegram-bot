@@ -26,21 +26,21 @@ Warning:
     the changelog.
 """
 from typing import (
-    TypeVar,
     TYPE_CHECKING,
-    Tuple,
-    List,
-    Dict,
     Any,
-    Union,
     Callable,
     Coroutine,
+    Dict,
+    List,
     MutableMapping,
+    Tuple,
+    TypeVar,
+    Union,
 )
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, JobQueue, BasePersistence, Updater  # noqa: F401
     from telegram import Bot
+    from telegram.ext import BasePersistence, CallbackContext, JobQueue, Updater  # noqa: F401
 
 CCT = TypeVar('CCT', bound='CallbackContext')
 """An instance of :class:`telegram.ext.CallbackContext` or a custom subclass.

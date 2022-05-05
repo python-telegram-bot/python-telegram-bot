@@ -8,6 +8,9 @@ on:
     branches: 
       - master
       - v14
+  schedule:
+    # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
+    - cron: '7 3 * * 1,5'
 
 jobs:
   pytest:
@@ -15,13 +18,13 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ['3.7', '3.8', '3.9', '3.10']
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: False
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -59,7 +62,7 @@ jobs:
         shell: bash --noprofile --norc {0}
 
       - name: Submit coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           env_vars: OS,PYTHON
           name: ${{ matrix.os }}-${{ matrix.python-version }}
@@ -73,9 +76,9 @@ jobs:
         os: [ubuntu-latest]
       fail-fast: False
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -90,24 +93,3 @@ jobs:
         env:
           TEST_OFFICIAL: "true"
         shell: bash --noprofile --norc {0}
-  test_pre_commit:
-    name: test-pre-commit
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        python-version: [3.7]
-        os: [ubuntu-latest]
-      fail-fast: False
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -r requirements.txt
-          python -W ignore -m pip install -r requirements-dev.txt
-      - name: Run pre-commit tests
-        run: pre-commit run --all-files

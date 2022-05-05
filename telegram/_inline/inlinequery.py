@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=too-many-instance-attributes, too-many-arguments
+# pylint: disable=too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -19,9 +19,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional, Union, Callable, ClassVar, Sequence
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Optional, Sequence, Union
 
-from telegram import Location, TelegramObject, User, constants
+from telegram import constants
+from telegram._files.location import Location
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 

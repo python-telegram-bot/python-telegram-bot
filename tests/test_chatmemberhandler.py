@@ -16,26 +16,26 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import time
 import asyncio
+import time
 
 import pytest
 
 from telegram import (
-    Update,
     Bot,
-    Message,
-    User,
-    Chat,
     CallbackQuery,
-    ChosenInlineResult,
-    ShippingQuery,
-    PreCheckoutQuery,
-    ChatMemberUpdated,
+    Chat,
     ChatMember,
+    ChatMemberUpdated,
+    ChosenInlineResult,
+    Message,
+    PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import CallbackContext, JobQueue, ChatMemberHandler
 from telegram._utils.datetime import from_timestamp
+from telegram.ext import CallbackContext, ChatMemberHandler, JobQueue
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
@@ -75,8 +75,8 @@ def chat_member_updated():
         Chat(1, 'chat'),
         User(1, '', False),
         from_timestamp(int(time.time())),
-        ChatMember(User(1, '', False), ChatMember.CREATOR),
-        ChatMember(User(1, '', False), ChatMember.CREATOR),
+        ChatMember(User(1, '', False), ChatMember.OWNER),
+        ChatMember(User(1, '', False), ChatMember.OWNER),
     )
 
 
@@ -120,7 +120,6 @@ class TestChatMemberHandler:
         ],
         ids=['MY_CHAT_MEMBER', 'CHAT_MEMBER', 'ANY_CHAT_MEMBER'],
     )
-    @pytest.mark.asyncio
     async def test_chat_member_types(
         self, app, chat_member_updated, chat_member, expected, allowed_types
     ):
@@ -147,7 +146,6 @@ class TestChatMemberHandler:
         assert not handler.check_update(false_update)
         assert not handler.check_update(True)
 
-    @pytest.mark.asyncio
     async def test_context(self, app, chat_member):
         handler = ChatMemberHandler(self.callback)
         app.add_handler(handler)

@@ -20,10 +20,10 @@
 from typing import TYPE_CHECKING, Dict, Optional, TypeVar, Union
 
 from telegram import Update
-from telegram._utils.types import DVInput
-from telegram.ext import filters as filters_module, Handler
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-
+from telegram._utils.types import DVInput
+from telegram.ext import filters as filters_module
+from telegram.ext._handler import Handler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:

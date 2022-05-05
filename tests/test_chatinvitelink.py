@@ -20,7 +20,7 @@ import datetime
 
 import pytest
 
-from telegram import User, ChatInviteLink
+from telegram import ChatInviteLink, User
 from telegram._utils.datetime import to_timestamp
 
 
@@ -50,7 +50,7 @@ class TestChatInviteLink:
     creates_join_request = (False,)
     primary = True
     revoked = False
-    expire_date = datetime.datetime.utcnow()
+    expire_date = datetime.datetime.now(datetime.timezone.utc)
     member_limit = 42
     name = 'LinkName'
     pending_join_request_count = 42
@@ -97,7 +97,7 @@ class TestChatInviteLink:
         assert invite_link.creates_join_request == self.creates_join_request
         assert invite_link.is_primary == self.primary
         assert invite_link.is_revoked == self.revoked
-        assert pytest.approx(invite_link.expire_date == self.expire_date)
+        assert abs(invite_link.expire_date - self.expire_date) < datetime.timedelta(seconds=1)
         assert to_timestamp(invite_link.expire_date) == to_timestamp(self.expire_date)
         assert invite_link.member_limit == self.member_limit
         assert invite_link.name == self.name

@@ -19,11 +19,7 @@
 
 import pytest
 
-from telegram import (
-    InputInvoiceMessageContent,
-    LabeledPrice,
-    InputTextMessageContent,
-)
+from telegram import InputInvoiceMessageContent, InputTextMessageContent, LabeledPrice
 
 
 @pytest.fixture(scope='class')

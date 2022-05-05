@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=no-name-in-module, no-self-argument, not-callable, no-member, too-many-arguments
-# pylint: disable=too-many-public-methods
+# pylint: disable=no-self-argument, not-callable, no-member, too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -22,26 +21,25 @@
 import asyncio
 import functools
 import logging
-from contextlib import AbstractAsyncContextManager
 import pickle
+from contextlib import AbstractAsyncContextManager
 from datetime import datetime
 from types import TracebackType
-
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
+    Dict,
     List,
+    NoReturn,
     Optional,
+    Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
-    no_type_check,
-    Dict,
     cast,
-    Sequence,
-    Any,
-    NoReturn,
-    Type,
+    no_type_check,
 )
 
 try:
@@ -59,58 +57,57 @@ except ImportError:
     serialization = None  # type: ignore[assignment]
     CRYPTO_INSTALLED = False
 
-from telegram import (
-    Animation,
-    Audio,
-    BotCommand,
-    BotCommandScope,
-    Chat,
-    ChatMember,
-    ChatPermissions,
-    ChatPhoto,
-    Contact,
-    Document,
-    File,
-    GameHighScore,
-    InputMedia,
-    Location,
-    MaskPosition,
-    Message,
-    MessageId,
-    PassportElementError,
-    PhotoSize,
-    Poll,
-    ShippingOption,
-    Sticker,
-    StickerSet,
-    TelegramObject,
-    Update,
-    User,
-    UserProfilePhotos,
-    Venue,
-    Video,
-    VideoNote,
-    Voice,
-    WebhookInfo,
-    InlineKeyboardMarkup,
-    ChatInviteLink,
-)
-from telegram.error import InvalidToken, TelegramError
-from telegram.constants import InlineQueryLimit
-from telegram.request import BaseRequest, RequestData
-from telegram.request._requestparameter import RequestParameter
-from telegram.request._httpxrequest import HTTPXRequest
+from telegram._botcommand import BotCommand
+from telegram._botcommandscope import BotCommandScope
+from telegram._chat import Chat
+from telegram._chatadministratorrights import ChatAdministratorRights
+from telegram._chatinvitelink import ChatInviteLink
+from telegram._chatmember import ChatMember
+from telegram._chatpermissions import ChatPermissions
+from telegram._files.animation import Animation
+from telegram._files.audio import Audio
+from telegram._files.chatphoto import ChatPhoto
+from telegram._files.contact import Contact
+from telegram._files.document import Document
+from telegram._files.file import File
+from telegram._files.inputmedia import InputMedia
+from telegram._files.location import Location
+from telegram._files.photosize import PhotoSize
+from telegram._files.sticker import MaskPosition, Sticker, StickerSet
+from telegram._files.venue import Venue
+from telegram._files.video import Video
+from telegram._files.videonote import VideoNote
+from telegram._files.voice import Voice
+from telegram._games.gamehighscore import GameHighScore
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._menubutton import MenuButton
+from telegram._message import Message
+from telegram._messageid import MessageId
+from telegram._passport.passportelementerrors import PassportElementError
+from telegram._payment.shippingoption import ShippingOption
+from telegram._poll import Poll
+from telegram._sentwebappmessage import SentWebAppMessage
+from telegram._telegramobject import TelegramObject
+from telegram._update import Update
+from telegram._user import User
+from telegram._userprofilephotos import UserProfilePhotos
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
-from telegram._utils.types import FileInput, JSONDict, ODVInput, DVInput, ReplyMarkup
+from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._webhookinfo import WebhookInfo
+from telegram.constants import InlineQueryLimit
+from telegram.error import InvalidToken, TelegramError
+from telegram.request import BaseRequest, RequestData
+from telegram.request._httpxrequest import HTTPXRequest
+from telegram.request._requestparameter import RequestParameter
 
 if TYPE_CHECKING:
     from telegram import (
+        InlineQueryResult,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        InlineQueryResult,
         LabeledPrice,
         MessageEntity,
     )
@@ -549,7 +546,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
-        self._bot_user = User.de_json(result, self)  # type: ignore[return-value, arg-type]
+        self._bot_user = User.de_json(result, self)  # type: ignore[arg-type]
         return self._bot_user  # type: ignore[return-value]
 
     @_log
@@ -2638,7 +2635,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries
         from the json data.
         """
-        # pylint: disable=protected-access
         if hasattr(res, 'parse_mode'):
             res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, 'input_message_content') and res.input_message_content:
@@ -2829,7 +2825,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs=api_kwargs,
         )
 
-        return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value, arg-type]
+        return UserProfilePhotos.de_json(result, self)  # type: ignore[arg-type]
 
     @_log
     async def get_file(
@@ -4786,6 +4782,63 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return result  # type: ignore[return-value]
 
     @_log
+    async def answer_web_app_query(
+        self,
+        web_app_query_id: str,
+        result: 'InlineQueryResult',
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> SentWebAppMessage:
+        """Use this method to set the result of an interaction with a Web App and send a
+        corresponding message on behalf of the user to the chat from which the query originated.
+
+        .. versionadded:: 20.0
+
+        Args:
+            web_app_query_id (:obj:`str`): Unique identifier for the query to be answered.
+            result (:class:`telegram.InlineQueryResult`): An object describing the message to be
+                sent.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.SentWebAppMessage`: On success, a sent
+            :class:`telegram.SentWebAppMessage` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {'web_app_query_id': web_app_query_id, 'result': result}
+
+        api_result = await self._post(
+            'answerWebAppQuery',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return SentWebAppMessage.de_json(api_result, self)  # type: ignore[return-value, arg-type]
+
+    @_log
     async def restrict_chat_member(
         self,
         chat_id: Union[str, int],
@@ -4801,8 +4854,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to restrict a user in a supergroup. The bot must be an administrator in
         the supergroup for this to work and must have the appropriate admin rights. Pass
-        :obj:`True` for all boolean parameters in :class:`telegram.ChatPermissions` to lift
-        restrictions from a user.
+        :obj:`True` for all boolean parameters to lift restrictions from a user.
+
+        .. seealso:: :meth:`telegram.ChatPermissions.all_permissions`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4878,12 +4932,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         api_kwargs: JSONDict = None,
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
-        can_manage_voice_chats: bool = None,
+        can_manage_video_chats: bool = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
         an administrator in the chat for this to work and must have the appropriate admin rights.
         Pass :obj:`False` for all boolean parameters to demote a user.
+
+        .. versionchanged:: 20.0
+           The argument ``can_manage_voice_chats`` was renamed to
+           :paramref:`can_manage_video_chats` in accordance to Bot API 6.0.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -4898,10 +4956,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionadded:: 13.4
 
-            can_manage_voice_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
-                can manage voice chats.
+            can_manage_video_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
+                can manage video chats.
 
-                .. versionadded:: 13.4
+                .. versionadded:: 20.0
 
             can_change_info (:obj:`bool`, optional): Pass :obj:`True`, if the administrator can
                 change chat title, photo and other settings.
@@ -4965,8 +5023,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data['can_promote_members'] = can_promote_members
         if can_manage_chat is not None:
             data['can_manage_chat'] = can_manage_chat
-        if can_manage_voice_chats is not None:
-            data['can_manage_voice_chats'] = can_manage_voice_chats
+        if can_manage_video_chats is not None:
+            data['can_manage_video_chats'] = can_manage_video_chats
 
         result = await self._post(
             'promoteChatMember',
@@ -6781,6 +6839,131 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
 
     @_log
+    async def get_my_default_administrator_rights(
+        self,
+        for_channels: bool = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> ChatAdministratorRights:
+        """Use this method to get the current default administrator rights of the bot.
+
+        .. seealso:: :meth:`set_my_default_administrator_rights`
+
+        .. versionadded:: 20.0
+
+        Args:
+            for_channels (:obj:`bool`, optional): Pass :obj:`True` to get default administrator
+                rights of the bot in channels. Otherwise, default administrator rights of the bot
+                for groups and supergroups will be returned.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.ChatAdministratorRights`: On success.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {}
+
+        if for_channels is not None:
+            data['for_channels'] = for_channels
+
+        result = await self._post(
+            'getMyDefaultAdministratorRights',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return ChatAdministratorRights.de_json(result, self)  # type: ignore[return-value,arg-type]
+
+    @_log
+    async def set_my_default_administrator_rights(
+        self,
+        rights: ChatAdministratorRights = None,
+        for_channels: bool = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Use this method to change the default administrator rights requested by the bot when
+        it's added as an administrator to groups or channels. These rights will be suggested to
+        users, but they are are free to modify the list before adding the bot.
+
+        .. seealso:: :meth:`get_my_default_administrator_rights`
+
+        .. versionadded:: 20.0
+
+        Args:
+            rights (:obj:`telegram.ChatAdministratorRights`, optional): A
+                :obj:`telegram.ChatAdministratorRights` object describing new default administrator
+                rights. If not specified, the default administrator rights will be cleared.
+            for_channels (:obj:`bool`, optional): Pass :obj:`True` to change the default
+                administrator rights of the bot in channels. Otherwise, the default administrator
+                rights of the bot for groups and supergroups will be changed.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: Returns :obj:`True` on success.
+
+        Raises:
+            :obj:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {}
+
+        if rights is not None:
+            data['rights'] = rights
+
+        if for_channels is not None:
+            data['for_channels'] = for_channels
+
+        result = await self._post(
+            'setMyDefaultAdministratorRights',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+        return result  # type: ignore[return-value]
+
+    @_log
     async def get_my_commands(
         self,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7181,6 +7364,118 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
         return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
 
+    @_log
+    async def set_chat_menu_button(
+        self,
+        chat_id: int = None,
+        menu_button: MenuButton = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Use this method to change the bot's menu button in a private chat, or the default menu
+        button.
+
+        .. seealso:: :meth:`get_chat_menu_button`, :meth:`telegram.Chat.set_menu_button`,
+            :meth:`telegram.User.set_menu_button`
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int`, optional): Unique identifier for the target private chat. If not
+                specified, default bot's menu button will be changed
+            menu_button (:class:`telegram.MenuButton`, optional): An object for the new bot's menu
+                button. Defaults to :class:`telegram.MenuButtonDefault`.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        data: JSONDict = {}
+        if chat_id is not None:
+            data['chat_id'] = chat_id
+        if menu_button is not None:
+            data['menu_button'] = menu_button
+
+        return await self._post(  # type: ignore[return-value]
+            'setChatMenuButton',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def get_chat_menu_button(
+        self,
+        chat_id: int = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> MenuButton:
+        """Use this method to get the current value of the bot's menu button in a private chat, or
+        the default menu button.
+
+        .. seealso:: :meth:`set_chat_menu_button`, :meth:`telegram.Chat.get_menu_button`,
+            :meth:`telegram.User.get_menu_button`
+
+        .. versionadded:: 20.0
+
+        Args:
+            chat_id (:obj:`int`, optional): Unique identifier for the target private chat. If not
+                specified, default bot's menu button will be returned.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.MenuButton`: On success, the current menu button is returned.
+        """
+        data = {}
+        if chat_id is not None:
+            data['chat_id'] = chat_id
+
+        result = await self._post(
+            'getChatMenuButton',
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return MenuButton.de_json(result, bot=self)  # type: ignore[return-value, arg-type]
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
@@ -7293,6 +7588,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     """Alias for :meth:`answer_shipping_query`"""
     answerPreCheckoutQuery = answer_pre_checkout_query
     """Alias for :meth:`answer_pre_checkout_query`"""
+    answerWebAppQuery = answer_web_app_query
+    """Alias for :meth:`answer_web_app_query`"""
     restrictChatMember = restrict_chat_member
     """Alias for :meth:`restrict_chat_member`"""
     promoteChatMember = promote_chat_member
@@ -7359,3 +7656,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     """Alias for :meth:`log_out`"""
     copyMessage = copy_message
     """Alias for :meth:`copy_message`"""
+    getChatMenuButton = get_chat_menu_button
+    """Alias for :meth:`get_chat_menu_button`"""
+    setChatMenuButton = set_chat_menu_button
+    """Alias for :meth:`set_chat_menu_button`"""
+    getMyDefaultAdministratorRights = get_my_default_administrator_rights
+    """Alias for :meth:`get_my_default_administrator_rights`"""
+    setMyDefaultAdministratorRights = set_my_default_administrator_rights
+    """Alias for :meth:`set_my_default_administrator_rights`"""

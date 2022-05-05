@@ -17,23 +17,23 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
+import re
 
 import pytest
 
 from telegram import (
-    Message,
-    User,
-    Chat,
-    MessageEntity,
-    Document,
-    Update,
-    Dice,
     CallbackQuery,
+    Chat,
+    Dice,
+    Document,
+    Message,
+    MessageEntity,
     Sticker,
+    Update,
+    User,
 )
 from telegram.ext import filters
-import inspect
-import re
 
 
 @pytest.fixture(scope='function')
@@ -943,25 +943,30 @@ class TestFilters:
         assert filters.StatusUpdate.PROXIMITY_ALERT_TRIGGERED.check_update(update)
         update.message.proximity_alert_triggered = None
 
-        update.message.voice_chat_scheduled = 'scheduled'
+        update.message.video_chat_scheduled = 'scheduled'
         assert filters.StatusUpdate.ALL.check_update(update)
-        assert filters.StatusUpdate.VOICE_CHAT_SCHEDULED.check_update(update)
-        update.message.voice_chat_scheduled = None
+        assert filters.StatusUpdate.VIDEO_CHAT_SCHEDULED.check_update(update)
+        update.message.video_chat_scheduled = None
 
-        update.message.voice_chat_started = 'hello'
+        update.message.video_chat_started = 'hello'
         assert filters.StatusUpdate.ALL.check_update(update)
-        assert filters.StatusUpdate.VOICE_CHAT_STARTED.check_update(update)
-        update.message.voice_chat_started = None
+        assert filters.StatusUpdate.VIDEO_CHAT_STARTED.check_update(update)
+        update.message.video_chat_started = None
 
-        update.message.voice_chat_ended = 'bye'
+        update.message.video_chat_ended = 'bye'
         assert filters.StatusUpdate.ALL.check_update(update)
-        assert filters.StatusUpdate.VOICE_CHAT_ENDED.check_update(update)
-        update.message.voice_chat_ended = None
+        assert filters.StatusUpdate.VIDEO_CHAT_ENDED.check_update(update)
+        update.message.video_chat_ended = None
 
-        update.message.voice_chat_participants_invited = 'invited'
+        update.message.video_chat_participants_invited = 'invited'
         assert filters.StatusUpdate.ALL.check_update(update)
-        assert filters.StatusUpdate.VOICE_CHAT_PARTICIPANTS_INVITED.check_update(update)
-        update.message.voice_chat_participants_invited = None
+        assert filters.StatusUpdate.VIDEO_CHAT_PARTICIPANTS_INVITED.check_update(update)
+        update.message.video_chat_participants_invited = None
+
+        update.message.web_app_data = 'data'
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.WEB_APP_DATA.check_update(update)
+        update.message.web_app_data = None
 
     def test_filters_forwarded(self, update):
         assert not filters.FORWARDED.check_update(update)

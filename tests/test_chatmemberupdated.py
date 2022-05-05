@@ -23,12 +23,14 @@ import pytest
 import pytz
 
 from telegram import (
-    User,
+    Chat,
+    ChatInviteLink,
     ChatMember,
     ChatMemberAdministrator,
-    Chat,
+    ChatMemberBanned,
+    ChatMemberOwner,
     ChatMemberUpdated,
-    ChatInviteLink,
+    User,
 )
 from telegram._utils.datetime import to_timestamp
 
@@ -103,7 +105,7 @@ class TestChatMemberUpdated:
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user
-        assert pytest.approx(chat_member_updated.date == time)
+        assert abs(chat_member_updated.date - time) < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_member_updated.date) == to_timestamp(time)
         assert chat_member_updated.old_chat_member == old_chat_member
         assert chat_member_updated.new_chat_member == new_chat_member
@@ -125,7 +127,7 @@ class TestChatMemberUpdated:
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user
-        assert pytest.approx(chat_member_updated.date == time)
+        assert abs(chat_member_updated.date - time) < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_member_updated.date) == to_timestamp(time)
         assert chat_member_updated.old_chat_member == old_chat_member
         assert chat_member_updated.new_chat_member == new_chat_member
@@ -180,7 +182,7 @@ class TestChatMemberUpdated:
             Chat(1, 'chat'),
             User(1, '', False),
             time,
-            ChatMember(User(1, '', False), ChatMember.CREATOR),
+            ChatMember(User(1, '', False), ChatMember.OWNER),
             new_chat_member,
         )
         # wrong new_chat_member
@@ -189,10 +191,10 @@ class TestChatMemberUpdated:
             User(1, '', False),
             time,
             old_chat_member,
-            ChatMember(User(1, '', False), ChatMember.CREATOR),
+            ChatMember(User(1, '', False), ChatMember.OWNER),
         )
         # wrong type
-        g = ChatMember(User(1, '', False), ChatMember.CREATOR)
+        g = ChatMember(User(1, '', False), ChatMember.OWNER)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -210,7 +212,7 @@ class TestChatMemberUpdated:
         )
         assert chat_member_updated.difference() == {'status': ('old_status', 'new_status')}
 
-        # We deliberately change an optional argument here to make sure that comparision doesn't
+        # We deliberately change an optional argument here to make sure that comparison doesn't
         # just happens by id/required args
         new_user = User(1, 'First name', False, last_name='last name')
         new_chat_member.user = new_user
@@ -239,3 +241,19 @@ class TestChatMemberUpdated:
             chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
         )
         assert chat_member_updated.difference() == {optional_attribute: (old_value, new_value)}
+
+    def test_difference_different_classes(self, user, chat):
+        old_chat_member = ChatMemberOwner(user=user, is_anonymous=False)
+        new_chat_member = ChatMemberBanned(user=user, until_date=datetime.datetime(2021, 1, 1))
+        chat_member_updated = ChatMemberUpdated(
+            chat=chat,
+            from_user=user,
+            date=datetime.datetime.utcnow(),
+            old_chat_member=old_chat_member,
+            new_chat_member=new_chat_member,
+        )
+        diff = chat_member_updated.difference()
+        assert diff.pop('is_anonymous') == (False, None)
+        assert diff.pop('until_date') == (None, datetime.datetime(2021, 1, 1))
+        assert diff.pop('status') == (ChatMember.OWNER, ChatMember.BANNED)
+        assert diff == {}
