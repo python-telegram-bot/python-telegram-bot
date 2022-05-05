@@ -23,15 +23,15 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import ChatPhoto, Voice, Bot
+from telegram import Bot, ChatPhoto, Voice
 from telegram.error import TelegramError
 from telegram.request import RequestData
 from tests.conftest import (
-    expect_bad_request,
+    check_defaults_handling,
     check_shortcut_call,
     check_shortcut_signature,
-    check_defaults_handling,
     data_file,
+    expect_bad_request,
 )
 
 
@@ -43,7 +43,6 @@ def chatphoto_file():
 
 
 @pytest.fixture(scope='function')
-@pytest.mark.asyncio
 async def chat_photo(bot, super_group_id):
     async def func():
         return (await bot.get_chat(super_group_id, read_timeout=50)).photo
@@ -66,7 +65,6 @@ class TestChatPhoto:
         assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_all_args(
         self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file
     ):
@@ -78,7 +76,6 @@ class TestChatPhoto:
         )
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_get_and_download(self, bot, chat_photo):
         jpg_file = Path('telegram.jpg')
         if jpg_file.is_file():
@@ -102,7 +99,6 @@ class TestChatPhoto:
 
         assert jpg_file.is_file()
 
-    @pytest.mark.asyncio
     async def test_send_with_chat_photo(self, monkeypatch, bot, super_group_id, chat_photo):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters['photo'] == chat_photo.to_dict()
@@ -124,7 +120,6 @@ class TestChatPhoto:
         assert chat_photo.small_file_unique_id == self.chatphoto_small_file_unique_id
         assert chat_photo.big_file_unique_id == self.chatphoto_big_file_unique_id
 
-    @pytest.mark.asyncio
     async def test_to_dict(self, chat_photo):
         chat_photo_dict = chat_photo.to_dict()
 
@@ -135,7 +130,6 @@ class TestChatPhoto:
         assert chat_photo_dict['big_file_unique_id'] == chat_photo.big_file_unique_id
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file(self, bot, super_group_id):
         chatphoto_file = open(os.devnull, 'rb')
 
@@ -143,17 +137,14 @@ class TestChatPhoto:
             await bot.set_chat_photo(chat_id=super_group_id, photo=chatphoto_file)
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_error_send_empty_file_id(self, bot, super_group_id):
         with pytest.raises(TelegramError):
             await bot.set_chat_photo(chat_id=super_group_id, photo='')
 
-    @pytest.mark.asyncio
     async def test_error_send_without_required_args(self, bot, super_group_id):
         with pytest.raises(TypeError):
             await bot.set_chat_photo(chat_id=super_group_id)
 
-    @pytest.mark.asyncio
     async def test_get_small_file_instance_method(self, monkeypatch, chat_photo):
         async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == chat_photo.small_file_id
@@ -167,7 +158,6 @@ class TestChatPhoto:
         monkeypatch.setattr(chat_photo.get_bot(), 'get_file', make_assertion)
         assert await chat_photo.get_small_file()
 
-    @pytest.mark.asyncio
     async def test_get_big_file_instance_method(self, monkeypatch, chat_photo):
         async def make_assertion(*_, **kwargs):
             return kwargs['file_id'] == chat_photo.big_file_id

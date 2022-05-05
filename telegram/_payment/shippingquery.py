@@ -18,9 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional, List
+from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import ShippingAddress, TelegramObject, User, ShippingOption
+from telegram._payment.shippingaddress import ShippingAddress
+from telegram._payment.shippingoption import ShippingOption
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 

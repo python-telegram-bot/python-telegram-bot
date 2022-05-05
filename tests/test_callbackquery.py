@@ -19,8 +19,8 @@
 
 import pytest
 
-from telegram import CallbackQuery, User, Message, Chat, Audio, Bot
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from telegram import Audio, Bot, CallbackQuery, Chat, Message, User
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='function', params=['message', 'inline'])
@@ -113,7 +113,6 @@ class TestCallbackQuery:
         assert callback_query_dict['data'] == callback_query.data
         assert callback_query_dict['game_short_name'] == callback_query.game_short_name
 
-    @pytest.mark.asyncio
     async def test_answer(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             return kwargs['callback_query_id'] == callback_query.id
@@ -129,7 +128,6 @@ class TestCallbackQuery:
         monkeypatch.setattr(callback_query.get_bot(), 'answer_callback_query', make_assertion)
         assert await callback_query.answer()
 
-    @pytest.mark.asyncio
     async def test_edit_message_text(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             text = kwargs['text'] == 'test'
@@ -157,7 +155,6 @@ class TestCallbackQuery:
         assert await callback_query.edit_message_text(text='test')
         assert await callback_query.edit_message_text('test')
 
-    @pytest.mark.asyncio
     async def test_edit_message_caption(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             caption = kwargs['caption'] == 'new caption'
@@ -185,7 +182,6 @@ class TestCallbackQuery:
         assert await callback_query.edit_message_caption(caption='new caption')
         assert await callback_query.edit_message_caption('new caption')
 
-    @pytest.mark.asyncio
     async def test_edit_message_reply_markup(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             reply_markup = kwargs['reply_markup'] == [['1', '2']]
@@ -213,7 +209,6 @@ class TestCallbackQuery:
         assert await callback_query.edit_message_reply_markup(reply_markup=[['1', '2']])
         assert await callback_query.edit_message_reply_markup([['1', '2']])
 
-    @pytest.mark.asyncio
     async def test_edit_message_media(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             message_media = kwargs.get('media') == [['1', '2']]
@@ -241,7 +236,6 @@ class TestCallbackQuery:
         assert await callback_query.edit_message_media(media=[['1', '2']])
         assert await callback_query.edit_message_media([['1', '2']])
 
-    @pytest.mark.asyncio
     async def test_edit_message_live_location(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             latitude = kwargs.get('latitude') == 1
@@ -270,7 +264,6 @@ class TestCallbackQuery:
         assert await callback_query.edit_message_live_location(latitude=1, longitude=2)
         assert await callback_query.edit_message_live_location(1, 2)
 
-    @pytest.mark.asyncio
     async def test_stop_message_live_location(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             ids = self.check_passed_ids(callback_query, kwargs)
@@ -296,7 +289,6 @@ class TestCallbackQuery:
         monkeypatch.setattr(callback_query.get_bot(), 'stop_message_live_location', make_assertion)
         assert await callback_query.stop_message_live_location()
 
-    @pytest.mark.asyncio
     async def test_set_game_score(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             user_id = kwargs.get('user_id') == 1
@@ -325,7 +317,6 @@ class TestCallbackQuery:
         assert await callback_query.set_game_score(user_id=1, score=2)
         assert await callback_query.set_game_score(1, 2)
 
-    @pytest.mark.asyncio
     async def test_get_game_high_scores(self, monkeypatch, callback_query):
         async def make_assertion(*_, **kwargs):
             user_id = kwargs.get('user_id') == 1
@@ -353,7 +344,6 @@ class TestCallbackQuery:
         assert await callback_query.get_game_high_scores(user_id=1)
         assert await callback_query.get_game_high_scores(1)
 
-    @pytest.mark.asyncio
     async def test_delete_message(self, monkeypatch, callback_query):
         if callback_query.inline_message_id:
             pytest.skip("Can't delete inline messages")
@@ -379,7 +369,6 @@ class TestCallbackQuery:
         monkeypatch.setattr(callback_query.get_bot(), 'delete_message', make_assertion)
         assert await callback_query.delete_message()
 
-    @pytest.mark.asyncio
     async def test_pin_message(self, monkeypatch, callback_query):
         if callback_query.inline_message_id:
             pytest.skip("Can't pin inline messages")
@@ -401,7 +390,6 @@ class TestCallbackQuery:
         monkeypatch.setattr(callback_query.get_bot(), 'pin_chat_message', make_assertion)
         assert await callback_query.pin_message()
 
-    @pytest.mark.asyncio
     async def test_unpin_message(self, monkeypatch, callback_query):
         if callback_query.inline_message_id:
             pytest.skip("Can't unpin inline messages")
@@ -428,7 +416,6 @@ class TestCallbackQuery:
         monkeypatch.setattr(callback_query.get_bot(), 'unpin_chat_message', make_assertion)
         assert await callback_query.unpin_message()
 
-    @pytest.mark.asyncio
     async def test_copy_message(self, monkeypatch, callback_query):
         if callback_query.inline_message_id:
             pytest.skip("Can't copy inline messages")

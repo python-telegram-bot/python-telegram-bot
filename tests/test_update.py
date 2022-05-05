@@ -21,23 +21,22 @@ import time
 import pytest
 
 from telegram import (
-    Message,
-    User,
-    Update,
-    Chat,
     CallbackQuery,
-    InlineQuery,
+    Chat,
+    ChatJoinRequest,
+    ChatMemberOwner,
+    ChatMemberUpdated,
     ChosenInlineResult,
-    ShippingQuery,
-    PreCheckoutQuery,
+    InlineQuery,
+    Message,
     Poll,
     PollAnswer,
     PollOption,
-    ChatMemberUpdated,
-    ChatMemberOwner,
-    ChatJoinRequest,
+    PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-
 from telegram._utils.datetime import from_timestamp
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')

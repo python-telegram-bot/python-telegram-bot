@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import MessageEntity, Game, PhotoSize, Animation
+from telegram import Animation, Game, MessageEntity, PhotoSize
 
 
 @pytest.fixture(scope='function')

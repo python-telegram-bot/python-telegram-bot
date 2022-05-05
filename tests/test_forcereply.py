@@ -42,7 +42,6 @@ class TestForceReply:
         assert len(mro_slots(force_reply)) == len(set(mro_slots(force_reply))), "duplicate slot"
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
         message = await bot.send_message(chat_id, 'text', reply_markup=force_reply)
 

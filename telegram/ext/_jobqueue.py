@@ -24,8 +24,8 @@ from typing import TYPE_CHECKING, Optional, Tuple, Union, cast, overload
 
 import pytz
 from apscheduler.executors.asyncio import AsyncIOExecutor
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.job import Job as APSJob
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from telegram._utils.types import JSONDict
 from telegram.ext._extbot import ExtBot

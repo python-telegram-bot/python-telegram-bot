@@ -17,21 +17,16 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import gzip
 import os
 import pickle
-import gzip
 from pathlib import Path
 
 import pytest
 
+from telegram import Bot, Chat, Message, TelegramObject, Update, User
+from telegram.ext import ContextTypes, PersistenceInput, PicklePersistence
 from telegram.warnings import PTBUserWarning
-
-from telegram import Update, Message, User, Chat, Bot, TelegramObject
-from telegram.ext import (
-    PicklePersistence,
-    ContextTypes,
-    PersistenceInput,
-)
 
 
 @pytest.fixture(autouse=True)
@@ -256,14 +251,12 @@ class TestPicklePersistence:
         def __init__(self, my_var):
             self.my_var = my_var
 
-    @pytest.mark.asyncio
     async def test_slot_behaviour(self, mro_slots, pickle_persistence):
         inst = pickle_persistence
         for attr in inst.__slots__:
             assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('on_flush', (True, False))
     async def test_on_flush(self, pickle_persistence, on_flush):
         pickle_persistence.on_flush = on_flush
@@ -288,7 +281,6 @@ class TestPicklePersistence:
         await pickle_persistence.flush()
         assert file_path.is_file()
 
-    @pytest.mark.asyncio
     async def test_pickle_behaviour_with_slots(self, pickle_persistence):
         bot_data = await pickle_persistence.get_bot_data()
         bot_data['message'] = Message(3, datetime.datetime.now(), Chat(2, type='supergroup'))
@@ -296,7 +288,6 @@ class TestPicklePersistence:
         retrieved = await pickle_persistence.get_bot_data()
         assert retrieved == bot_data
 
-    @pytest.mark.asyncio
     async def test_no_files_present_multi_file(self, pickle_persistence):
         assert await pickle_persistence.get_user_data() == {}
         assert await pickle_persistence.get_chat_data() == {}
@@ -304,7 +295,6 @@ class TestPicklePersistence:
         assert await pickle_persistence.get_callback_data() is None
         assert await pickle_persistence.get_conversations('noname') == {}
 
-    @pytest.mark.asyncio
     async def test_no_files_present_single_file(self, pickle_persistence):
         pickle_persistence.single_file = True
         assert await pickle_persistence.get_user_data() == {}
@@ -313,7 +303,6 @@ class TestPicklePersistence:
         assert await pickle_persistence.get_callback_data() is None
         assert await pickle_persistence.get_conversations('noname') == {}
 
-    @pytest.mark.asyncio
     async def test_with_bad_multi_file(self, pickle_persistence, bad_pickle_files):
         with pytest.raises(TypeError, match='pickletest_user_data'):
             await pickle_persistence.get_user_data()
@@ -326,7 +315,6 @@ class TestPicklePersistence:
         with pytest.raises(TypeError, match='pickletest_conversations'):
             await pickle_persistence.get_conversations('name')
 
-    @pytest.mark.asyncio
     async def test_with_invalid_multi_file(self, pickle_persistence, invalid_pickle_files):
         with pytest.raises(TypeError, match='pickletest_user_data does not contain'):
             await pickle_persistence.get_user_data()
@@ -339,7 +327,6 @@ class TestPicklePersistence:
         with pytest.raises(TypeError, match='pickletest_conversations does not contain'):
             await pickle_persistence.get_conversations('name')
 
-    @pytest.mark.asyncio
     async def test_with_bad_single_file(self, pickle_persistence, bad_pickle_files):
         pickle_persistence.single_file = True
         with pytest.raises(TypeError, match='pickletest'):
@@ -353,7 +340,6 @@ class TestPicklePersistence:
         with pytest.raises(TypeError, match='pickletest'):
             await pickle_persistence.get_conversations('name')
 
-    @pytest.mark.asyncio
     async def test_with_invalid_single_file(self, pickle_persistence, invalid_pickle_files):
         pickle_persistence.single_file = True
         with pytest.raises(TypeError, match='pickletest does not contain'):
@@ -367,7 +353,6 @@ class TestPicklePersistence:
         with pytest.raises(TypeError, match='pickletest does not contain'):
             await pickle_persistence.get_conversations('name')
 
-    @pytest.mark.asyncio
     async def test_with_good_multi_file(self, pickle_persistence, good_pickle_files):
         user_data = await pickle_persistence.get_user_data()
         assert isinstance(user_data, dict)
@@ -403,7 +388,6 @@ class TestPicklePersistence:
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
-    @pytest.mark.asyncio
     async def test_with_good_single_file(self, pickle_persistence, good_pickle_files):
         pickle_persistence.single_file = True
         user_data = await pickle_persistence.get_user_data()
@@ -440,7 +424,6 @@ class TestPicklePersistence:
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
-    @pytest.mark.asyncio
     async def test_with_multi_file_wo_bot_data(self, pickle_persistence, pickle_files_wo_bot_data):
         user_data = await pickle_persistence.get_user_data()
         assert isinstance(user_data, dict)
@@ -474,7 +457,6 @@ class TestPicklePersistence:
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
-    @pytest.mark.asyncio
     async def test_with_multi_file_wo_callback_data(
         self, pickle_persistence, pickle_files_wo_callback_data
     ):
@@ -510,7 +492,6 @@ class TestPicklePersistence:
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
-    @pytest.mark.asyncio
     async def test_with_single_file_wo_bot_data(
         self, pickle_persistence, pickle_files_wo_bot_data
     ):
@@ -547,7 +528,6 @@ class TestPicklePersistence:
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
-    @pytest.mark.asyncio
     async def test_with_single_file_wo_callback_data(
         self, pickle_persistence, pickle_files_wo_callback_data
     ):
@@ -583,7 +563,6 @@ class TestPicklePersistence:
         with pytest.raises(KeyError):
             conversation2[(123, 123)]
 
-    @pytest.mark.asyncio
     async def test_updating_multi_file(self, pickle_persistence, good_pickle_files):
         user_data = await pickle_persistence.get_user_data()
         user_data[12345]['test3']['test4'] = 'test6'
@@ -640,7 +619,6 @@ class TestPicklePersistence:
         assert pickle_persistence.conversations['name1'] == {(123, 123): 5}
         assert await pickle_persistence.get_conversations('name1') == {(123, 123): 5}
 
-    @pytest.mark.asyncio
     async def test_updating_single_file(self, pickle_persistence, good_pickle_files):
         pickle_persistence.single_file = True
 
@@ -699,7 +677,6 @@ class TestPicklePersistence:
         assert pickle_persistence.conversations['name1'] == {(123, 123): 5}
         assert await pickle_persistence.get_conversations('name1') == {(123, 123): 5}
 
-    @pytest.mark.asyncio
     async def test_updating_single_file_no_data(self, pickle_persistence):
         pickle_persistence.single_file = True
         assert not any(
@@ -715,7 +692,6 @@ class TestPicklePersistence:
         with pytest.raises(FileNotFoundError, match='pickletest'):
             open('pickletest', 'rb')
 
-    @pytest.mark.asyncio
     async def test_save_on_flush_multi_files(self, pickle_persistence, good_pickle_files):
         # Should run without error
         await pickle_persistence.flush()
@@ -801,7 +777,6 @@ class TestPicklePersistence:
             conversations_test = dict(pickle.load(f))
         assert conversations_test['name1'] == conversation1
 
-    @pytest.mark.asyncio
     async def test_save_on_flush_single_files(self, pickle_persistence, good_pickle_files):
         # Should run without error
         await pickle_persistence.flush()
@@ -873,7 +848,6 @@ class TestPicklePersistence:
             conversations_test = dict(pickle.load(f))['conversations']
         assert conversations_test['name1'] == conversation1
 
-    @pytest.mark.asyncio
     async def test_custom_pickler_unpickler_simple(
         self, pickle_persistence, update, good_pickle_files, bot, recwarn
     ):
@@ -911,7 +885,6 @@ class TestPicklePersistence:
         pp.set_bot(bot)
         assert (await pp.get_chat_data())[12345]['unknown_bot_in_user']._bot is None
 
-    @pytest.mark.asyncio
     async def test_custom_pickler_unpickler_with_custom_objects(
         self, bot, pickle_persistence, good_pickle_files
     ):
@@ -942,7 +915,6 @@ class TestPicklePersistence:
         ['pickletest', Path('pickletest')],
         ids=['str filepath', 'pathlib.Path filepath'],
     )
-    @pytest.mark.asyncio
     async def test_filepath_argument_types(self, filepath):
         pick_persist = PicklePersistence(
             filepath=filepath,
@@ -957,7 +929,6 @@ class TestPicklePersistence:
     @pytest.mark.parametrize('ud', [int, float, complex])
     @pytest.mark.parametrize('cd', [int, float, complex])
     @pytest.mark.parametrize('bd', [int, float, complex])
-    @pytest.mark.asyncio
     async def test_with_context_types(self, ud, cd, bd, singlefile):
         cc = ContextTypes(user_data=ud, chat_data=cd, bot_data=bd)
         persistence = PicklePersistence('pickletest', single_file=singlefile, context_types=cc)
@@ -989,7 +960,6 @@ class TestPicklePersistence:
         assert isinstance(await persistence.get_bot_data(), bd)
         assert await persistence.get_bot_data() == 1
 
-    @pytest.mark.asyncio
     async def test_no_write_if_data_did_not_change(
         self, pickle_persistence, bot_data, user_data, chat_data, conversations, callback_data
     ):

@@ -21,19 +21,19 @@ import asyncio
 import pytest
 
 from telegram import (
-    Update,
-    CallbackQuery,
     Bot,
-    Message,
-    User,
+    CallbackQuery,
     Chat,
-    InlineQuery,
     ChosenInlineResult,
-    ShippingQuery,
-    PreCheckoutQuery,
+    InlineQuery,
     Location,
+    Message,
+    PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import InlineQueryHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, InlineQueryHandler, JobQueue
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
@@ -117,7 +117,6 @@ class TestInlineQueryHandler:
         handler = InlineQueryHandler(self.callback)
         assert not handler.check_update(false_update)
 
-    @pytest.mark.asyncio
     async def test_context(self, app, inline_query):
         handler = InlineQueryHandler(self.callback)
         app.add_handler(handler)
@@ -126,7 +125,6 @@ class TestInlineQueryHandler:
             await app.process_update(inline_query)
         assert self.test_flag
 
-    @pytest.mark.asyncio
     async def test_context_pattern(self, app, inline_query):
         handler = InlineQueryHandler(self.callback_pattern, pattern=r'(?P<begin>.*)est(?P<end>.*)')
         app.add_handler(handler)
@@ -153,7 +151,6 @@ class TestInlineQueryHandler:
     @pytest.mark.parametrize(
         'chat_type,result', [(Chat.SENDER, True), (Chat.CHANNEL, False), (None, False)]
     )
-    @pytest.mark.asyncio
     async def test_chat_types(self, app, inline_query, chat_types, chat_type, result):
         try:
             inline_query.inline_query.chat_type = chat_type

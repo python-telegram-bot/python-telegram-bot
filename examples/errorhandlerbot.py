@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """This is a very simple example on how one could implement a custom error handler."""
@@ -10,7 +10,7 @@ import traceback
 
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import CommandHandler, Application, CallbackContext
+from telegram.ext import Application, CallbackContext, CommandHandler
 
 # Enable logging
 logging.basicConfig(

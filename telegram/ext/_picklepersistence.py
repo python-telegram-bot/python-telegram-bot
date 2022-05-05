@@ -22,25 +22,14 @@ import pickle
 from copy import deepcopy
 from pathlib import Path
 from sys import version_info as py_ver
-from typing import (
-    Any,
-    Dict,
-    Optional,
-    Tuple,
-    overload,
-    cast,
-    Type,
-    Set,
-    Callable,
-    TypeVar,
-)
+from typing import Any, Callable, Dict, Optional, Set, Tuple, Type, TypeVar, cast, overload
 
 from telegram import Bot, TelegramObject
 from telegram._utils.types import FilePathInput
 from telegram._utils.warnings import warn
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._contexttypes import ContextTypes
-from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData, ConversationKey
+from telegram.ext._utils.types import BD, CD, UD, CDCData, ConversationDict, ConversationKey
 
 _REPLACED_KNOWN_BOT = "a known bot replaced by PTB's PicklePersistence"
 _REPLACED_UNKNOWN_BOT = "an unknown bot replaced by PTB's PicklePersistence"
@@ -86,9 +75,9 @@ class _BotPickler(pickle.Pickler):
             # Here we define a private dispatch_table, because we want to preserve the bot
             # attribute of objects so persistent_id works as intended. Otherwise, the bot attribute
             # is deleted in __getstate__, which is used during regular pickling (via pickle.dumps)
-            self.dispatch_table = copyreg.dispatch_table.copy()  # type: ignore[attr-defined]
+            self.dispatch_table = copyreg.dispatch_table.copy()
             for obj in _all_subclasses(TelegramObject):
-                self.dispatch_table[obj] = _custom_reduction  # type: ignore[index]
+                self.dispatch_table[obj] = _custom_reduction
         super().__init__(*args, **kwargs)
 
     def reducer_override(  # pylint: disable=no-self-use

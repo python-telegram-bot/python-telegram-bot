@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """Bot that explains Telegram's "Deep Linking Parameters" functionality.
@@ -20,14 +20,14 @@ bot.
 
 import logging
 
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update, helpers
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, helpers
 from telegram.constants import ParseMode
 from telegram.ext import (
-    CommandHandler,
-    CallbackQueryHandler,
-    filters,
     Application,
     CallbackContext,
+    CallbackQueryHandler,
+    CommandHandler,
+    filters,
 )
 
 # Enable logging

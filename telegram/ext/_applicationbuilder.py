@@ -19,33 +19,29 @@
 """This module contains the Builder classes for the telegram.ext module."""
 from asyncio import Queue
 from pathlib import Path
-from typing import (
-    TypeVar,
-    Generic,
-    TYPE_CHECKING,
-    Dict,
-    Union,
-    Type,
-    Optional,
-)
+from typing import TYPE_CHECKING, Dict, Generic, Optional, Type, TypeVar, Union
 
-from telegram import Bot
-from telegram._utils.types import ODVInput, DVInput, FilePathInput
-from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue, DEFAULT_FALSE
-from telegram.ext import Application, JobQueue, ExtBot, ContextTypes, CallbackContext, Updater
-from telegram.request._httpxrequest import HTTPXRequest
-from telegram.ext._utils.types import CCT, UD, CD, BD, BT, JQ
+from telegram._bot import Bot
+from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
+from telegram._utils.types import DVInput, FilePathInput, ODVInput
+from telegram.ext._application import Application
+from telegram.ext._callbackcontext import CallbackContext
+from telegram.ext._contexttypes import ContextTypes
+from telegram.ext._extbot import ExtBot
+from telegram.ext._jobqueue import JobQueue
+from telegram.ext._updater import Updater
+from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD
 from telegram.request import BaseRequest
+from telegram.request._httpxrequest import HTTPXRequest
 
 if TYPE_CHECKING:
-    from telegram.ext import (
-        Defaults,
-        BasePersistence,
-    )
+    from telegram.ext import BasePersistence, Defaults
 
 # Type hinting is a bit complicated here because we try to get to a sane level of
 # leveraging generics and therefore need a number of type variables.
-InBT = TypeVar('InBT', bound=Bot)  # 'In' stands for input - used in parameters of methods below
+# 'In' stands for input - used in parameters of methods below
+# pylint: disable=invalid-name
+InBT = TypeVar('InBT', bound=Bot)
 InJQ = TypeVar('InJQ', bound=Union[None, JobQueue])
 InCCT = TypeVar('InCCT', bound='CallbackContext')
 InUD = TypeVar('InUD')
@@ -252,7 +248,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         application: Application[
             BT, CCT, UD, CD, BD, JQ
-        ] = DefaultValue.get_value(  # type: ignore[call-arg]  # pylint: disable=not-callable
+        ] = DefaultValue.get_value(  # pylint: disable=not-callable
             self._application_class
         )(
             bot=bot,

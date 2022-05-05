@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Application."""
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, Generic
+from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput

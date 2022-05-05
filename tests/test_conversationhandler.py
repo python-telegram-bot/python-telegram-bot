@@ -25,39 +25,39 @@ import pytest
 from flaky import flaky
 
 from telegram import (
+    Bot,
+    CallbackQuery,
     Chat,
-    Update,
+    ChosenInlineResult,
+    InlineQuery,
     Message,
     MessageEntity,
-    User,
-    CallbackQuery,
-    InlineQuery,
-    ChosenInlineResult,
-    ShippingQuery,
     PreCheckoutQuery,
-    Bot,
+    ShippingQuery,
+    Update,
+    User,
 )
 from telegram.ext import (
-    ConversationHandler,
-    CommandHandler,
+    ApplicationBuilder,
     ApplicationHandlerStop,
-    TypeHandler,
     CallbackContext,
     CallbackQueryHandler,
-    MessageHandler,
-    filters,
+    ChosenInlineResultHandler,
+    CommandHandler,
+    ConversationHandler,
+    Defaults,
+    ExtBot,
+    InlineQueryHandler,
     JobQueue,
+    MessageHandler,
+    PollAnswerHandler,
+    PollHandler,
+    PreCheckoutQueryHandler,
+    ShippingQueryHandler,
     StringCommandHandler,
     StringRegexHandler,
-    PollHandler,
-    ShippingQueryHandler,
-    PreCheckoutQueryHandler,
-    InlineQueryHandler,
-    PollAnswerHandler,
-    ChosenInlineResultHandler,
-    Defaults,
-    ApplicationBuilder,
-    ExtBot,
+    TypeHandler,
+    filters,
 )
 from telegram.warnings import PTBUserWarning
 from tests.conftest import make_command_message
@@ -288,7 +288,6 @@ class TestConversationHandler:
                 self.entry_points, states=self.states, fallbacks=[], persistent=True
             )
 
-    @pytest.mark.asyncio
     async def test_check_update_returns_non(self, app, user1):
         """checks some cases where updates should not be handled"""
         conv_handler = ConversationHandler([], {}, [], per_message=True, per_chat=True)
@@ -298,7 +297,6 @@ class TestConversationHandler:
             Update(0, callback_query=CallbackQuery('1', from_user=user1, chat_instance='1'))
         )
 
-    @pytest.mark.asyncio
     async def test_handlers_generate_warning(self, recwarn):
         """this function tests all handler + per_* setting combinations."""
 
@@ -496,7 +494,6 @@ class TestConversationHandler:
                 per_message=False,
             )
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('raise_ahs', [True, False])
     async def test_basic_and_app_handler_stop(self, app, bot, user1, user2, raise_ahs):
         handler = ConversationHandler(
@@ -556,7 +553,6 @@ class TestConversationHandler:
             with pytest.raises(KeyError):
                 self.current_state[user2.id]
 
-    @pytest.mark.asyncio
     async def test_conversation_handler_end(self, caplog, app, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points, states=self.states, fallbacks=self.fallbacks
@@ -597,7 +593,6 @@ class TestConversationHandler:
             message.entities[0].length = len('/start')
             assert handler.check_update(Update(update_id=0, message=message))
 
-    @pytest.mark.asyncio
     async def test_conversation_handler_fallback(self, app, bot, user1, user2):
         handler = ConversationHandler(
             entry_points=self.entry_points, states=self.states, fallbacks=self.fallbacks
@@ -638,7 +633,6 @@ class TestConversationHandler:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
 
-    @pytest.mark.asyncio
     async def test_unknown_state_warning(self, app, bot, user1, recwarn):
         def build_callback(state):
             async def callback(_, __):
@@ -679,7 +673,6 @@ class TestConversationHandler:
                 "Handler returned state 69 which is unknown to the ConversationHandler xyz."
             )
 
-    @pytest.mark.asyncio
     async def test_conversation_handler_per_chat(self, app, bot, user1, user2):
         handler = ConversationHandler(
             entry_points=self.entry_points,
@@ -726,7 +719,6 @@ class TestConversationHandler:
             message.from_user = user2
             assert handler.check_update(Update(update_id=0, message=message))
 
-    @pytest.mark.asyncio
     async def test_conversation_handler_per_user(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points,
@@ -772,7 +764,6 @@ class TestConversationHandler:
             message.chat = self.second_group
             assert handler.check_update(Update(update_id=0, message=message))
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('inline', [True, False])
     @pytest.mark.filterwarnings("ignore: If 'per_message=True' is used, 'per_chat=True'")
     async def test_conversation_handler_per_message(self, app, bot, user1, user2, inline):
@@ -845,7 +836,6 @@ class TestConversationHandler:
             assert not handler.check_update(Update(0, callback_query=cbq_1))
             assert handler.check_update(Update(0, callback_query=cbq_2))
 
-    @pytest.mark.asyncio
     async def test_end_on_first_message(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[]
@@ -868,7 +858,6 @@ class TestConversationHandler:
             await app.process_update(Update(update_id=0, message=message))
             assert handler.check_update(Update(update_id=0, message=message))
 
-    @pytest.mark.asyncio
     async def test_end_on_first_message_non_blocking_handler(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', callback=self.start_end, block=False)],
@@ -901,7 +890,6 @@ class TestConversationHandler:
             # b) the conversation has ended
             assert handler.check_update(Update(0, message=message))
 
-    @pytest.mark.asyncio
     async def test_none_on_first_message(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=[MessageHandler(filters.ALL, self.start_none)], states={}, fallbacks=[]
@@ -916,7 +904,6 @@ class TestConversationHandler:
             # ended
             assert handler.check_update(Update(0, message=message))
 
-    @pytest.mark.asyncio
     async def test_none_on_first_message_non_blocking_handler(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start_none, block=False)],
@@ -948,7 +935,6 @@ class TestConversationHandler:
             # b) the conversation has ended
             assert handler.check_update(Update(0, message=message))
 
-    @pytest.mark.asyncio
     async def test_per_chat_message_without_chat(self, bot, user1):
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[]
@@ -957,7 +943,6 @@ class TestConversationHandler:
         update = Update(0, callback_query=cbq)
         assert not handler.check_update(update)
 
-    @pytest.mark.asyncio
     async def test_channel_message_without_chat(self, bot):
         handler = ConversationHandler(
             entry_points=[MessageHandler(filters.ALL, self.start_end)], states={}, fallbacks=[]
@@ -970,7 +955,6 @@ class TestConversationHandler:
         update = Update(0, edited_channel_post=message)
         assert not handler.check_update(update)
 
-    @pytest.mark.asyncio
     async def test_all_update_types(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start_end)], states={}, fallbacks=[]
@@ -988,7 +972,6 @@ class TestConversationHandler:
         assert not handler.check_update(Update(0, pre_checkout_query=pre_checkout_query))
         assert not handler.check_update(Update(0, shipping_query=shipping_query))
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('jq', [True, False])
     async def test_no_running_job_queue_warning(self, app, bot, user1, recwarn, jq):
         handler = ConversationHandler(
@@ -1025,7 +1008,6 @@ class TestConversationHandler:
             # now set app.job_queue back to it's original value
             app.job_queue = jqueue
 
-    @pytest.mark.asyncio
     async def test_schedule_job_exception(self, app, bot, user1, monkeypatch, caplog):
         def mocked_run_once(*a, **kw):
             raise Exception("job error")
@@ -1068,7 +1050,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_non_blocking_exception(self, app, bot, user1, caplog):
         """Here we make sure that when a non-blocking handler raises an
         exception, the state isn't changed.
@@ -1118,7 +1099,6 @@ class TestConversationHandler:
             )
             assert caplog.records[0].exc_info[1] is error
 
-    @pytest.mark.asyncio
     async def test_conversation_timeout(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points,
@@ -1185,7 +1165,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_timeout_not_triggered_on_conv_end_non_blocking(self, bot, app, user1):
         def timeout(*a, **kw):
             self.test_flag = True
@@ -1230,7 +1209,6 @@ class TestConversationHandler:
             # assert timeout handler didn't get called
             assert self.test_flag is False
 
-    @pytest.mark.asyncio
     async def test_conversation_timeout_application_handler_stop(self, app, bot, user1, recwarn):
         handler = ConversationHandler(
             entry_points=self.entry_points,
@@ -1285,7 +1263,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_conversation_handler_timeout_update_and_context(self, app, bot, user1):
         context = None
 
@@ -1338,7 +1315,6 @@ class TestConversationHandler:
             await app.stop()
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     async def test_conversation_timeout_keeps_extending(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points,
@@ -1396,7 +1372,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_conversation_timeout_two_users(self, app, bot, user1, user2):
         handler = ConversationHandler(
             entry_points=self.entry_points,
@@ -1448,7 +1423,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_conversation_handler_timeout_state(self, app, bot, user1):
         states = self.states
         states.update(
@@ -1522,7 +1496,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_conversation_handler_timeout_state_context(self, app, bot, user1):
         states = self.states
         states.update(
@@ -1595,7 +1568,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_conversation_timeout_cancel_conflict(self, app, bot, user1):
         # Start state machine, wait half the timeout,
         # then call a callback that takes more than the timeout
@@ -1659,7 +1631,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_nested_conversation_handler(self, app, bot, user1, user2):
         self.nested_states[self.DRINKING] = [
             ConversationHandler(
@@ -1782,7 +1753,6 @@ class TestConversationHandler:
             message.entities[0].length = len('/start')
             assert handler.check_update(Update(0, message=message))
 
-    @pytest.mark.asyncio
     async def test_nested_conversation_application_handler_stop(self, app, bot, user1, user2):
         self.nested_states[self.DRINKING] = [
             ConversationHandler(
@@ -1928,7 +1898,6 @@ class TestConversationHandler:
             assert handler.check_update(Update(0, message=message))
             assert not self.test_flag
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('callback_raises', [True, False])
     async def test_timeout_non_block(self, app, user1, callback_raises):
         event = asyncio.Event()
@@ -1967,7 +1936,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_no_timeout_on_end(self, app, user1):
 
         conv_handler = ConversationHandler(
@@ -1995,7 +1963,6 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @pytest.mark.asyncio
     async def test_conversation_handler_block_dont_override(self, app):
         """This just makes sure that we don't change any attributes of the handlers of the conv"""
         conv_handler = ConversationHandler(
@@ -2026,7 +1993,6 @@ class TestConversationHandler:
         for handler in all_handlers:
             assert handler.block is False
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('default_block', [True, False, None])
     @pytest.mark.parametrize('ch_block', [True, False, None])
     @pytest.mark.parametrize('handler_block', [True, False, None])
@@ -2114,7 +2080,6 @@ class TestConversationHandler:
                 assert self.test_flag
                 self.test_flag = False
 
-    @pytest.mark.asyncio
     async def test_waiting_state(self, app, user1):
         event = asyncio.Event()
 

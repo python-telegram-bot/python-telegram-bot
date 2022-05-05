@@ -19,9 +19,9 @@
 
 import pytest
 
-from telegram import Chat, ChatPermissions, ChatLocation, Location, Bot, User
+from telegram import Bot, Chat, ChatLocation, ChatPermissions, Location, User
 from telegram.constants import ChatAction, ChatType
-from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')
@@ -146,7 +146,6 @@ class TestChat:
         )
         assert chat.full_name is None
 
-    @pytest.mark.asyncio
     async def test_send_action(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             id_ = kwargs['chat_id'] == chat.id
@@ -161,7 +160,6 @@ class TestChat:
         assert await chat.send_action(action=ChatAction.TYPING)
         assert await chat.send_action(action=ChatAction.TYPING)
 
-    @pytest.mark.asyncio
     async def test_leave(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id
@@ -173,7 +171,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'leave_chat', make_assertion)
         assert await chat.leave()
 
-    @pytest.mark.asyncio
     async def test_get_administrators(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id
@@ -189,7 +186,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'get_chat_administrators', make_assertion)
         assert await chat.get_administrators()
 
-    @pytest.mark.asyncio
     async def test_get_members_count(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id
@@ -205,7 +201,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'get_chat_member_count', make_assertion)
         assert await chat.get_member_count()
 
-    @pytest.mark.asyncio
     async def test_get_member(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -219,7 +214,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'get_chat_member', make_assertion)
         assert await chat.get_member(user_id=42)
 
-    @pytest.mark.asyncio
     async def test_ban_member(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -234,7 +228,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'ban_chat_member', make_assertion)
         assert await chat.ban_member(user_id=42, until_date=43)
 
-    @pytest.mark.asyncio
     async def test_ban_sender_chat(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -252,7 +245,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'ban_chat_sender_chat', make_assertion)
         assert await chat.ban_sender_chat(42)
 
-    @pytest.mark.asyncio
     async def test_ban_chat(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == 42
@@ -269,7 +261,6 @@ class TestChat:
         assert await chat.ban_chat(42)
 
     @pytest.mark.parametrize('only_if_banned', [True, False, None])
-    @pytest.mark.asyncio
     async def test_unban_member(self, monkeypatch, chat, only_if_banned):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -284,7 +275,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'unban_chat_member', make_assertion)
         assert await chat.unban_member(user_id=42, only_if_banned=only_if_banned)
 
-    @pytest.mark.asyncio
     async def test_unban_sender_chat(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -302,7 +292,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'unban_chat_sender_chat', make_assertion)
         assert await chat.unban_sender_chat(42)
 
-    @pytest.mark.asyncio
     async def test_unban_chat(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == 42
@@ -319,7 +308,6 @@ class TestChat:
         assert await chat.unban_chat(42)
 
     @pytest.mark.parametrize('is_anonymous', [True, False, None])
-    @pytest.mark.asyncio
     async def test_promote_member(self, monkeypatch, chat, is_anonymous):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -338,7 +326,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'promote_chat_member', make_assertion)
         assert await chat.promote_member(user_id=42, is_anonymous=is_anonymous)
 
-    @pytest.mark.asyncio
     async def test_restrict_member(self, monkeypatch, chat):
         permissions = ChatPermissions(True, False, True, False, True, False, True, False)
 
@@ -359,7 +346,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'restrict_chat_member', make_assertion)
         assert await chat.restrict_member(user_id=42, permissions=permissions)
 
-    @pytest.mark.asyncio
     async def test_set_permissions(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -377,7 +363,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'set_chat_permissions', make_assertion)
         assert await chat.set_permissions(permissions=self.permissions)
 
-    @pytest.mark.asyncio
     async def test_set_administrator_custom_title(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == chat.id
@@ -388,7 +373,6 @@ class TestChat:
         monkeypatch.setattr('telegram.Bot.set_chat_administrator_custom_title', make_assertion)
         assert await chat.set_administrator_custom_title(user_id=42, custom_title='custom_title')
 
-    @pytest.mark.asyncio
     async def test_pin_message(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['message_id'] == 42
@@ -400,7 +384,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'pin_chat_message', make_assertion)
         assert await chat.pin_message(message_id=42)
 
-    @pytest.mark.asyncio
     async def test_unpin_message(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id
@@ -414,7 +397,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'unpin_chat_message', make_assertion)
         assert await chat.unpin_message()
 
-    @pytest.mark.asyncio
     async def test_unpin_all_messages(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id
@@ -430,7 +412,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'unpin_all_chat_messages', make_assertion)
         assert await chat.unpin_all_messages()
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_message(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['text'] == 'test'
@@ -442,7 +423,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_message', make_assertion)
         assert await chat.send_message(text='test')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_media_group(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['media'] == 'test_media_group'
@@ -456,7 +436,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_media_group', make_assertion)
         assert await chat.send_media_group(media='test_media_group')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_photo(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['photo'] == 'test_photo'
@@ -468,7 +447,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_photo', make_assertion)
         assert await chat.send_photo(photo='test_photo')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_contact(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['phone_number'] == 'test_contact'
@@ -480,7 +458,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_contact', make_assertion)
         assert await chat.send_contact(phone_number='test_contact')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_audio(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['audio'] == 'test_audio'
@@ -492,7 +469,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_audio', make_assertion)
         assert await chat.send_audio(audio='test_audio')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_document(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['document'] == 'test_document'
@@ -504,7 +480,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_document', make_assertion)
         assert await chat.send_document(document='test_document')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_dice(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['emoji'] == 'test_dice'
@@ -516,7 +491,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_dice', make_assertion)
         assert await chat.send_dice(emoji='test_dice')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_game(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['game_short_name'] == 'test_game'
@@ -528,7 +502,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_game', make_assertion)
         assert await chat.send_game(game_short_name='test_game')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_invoice(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             title = kwargs['title'] == 'title'
@@ -554,7 +527,6 @@ class TestChat:
             'prices',
         )
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_location(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['latitude'] == 'test_location'
@@ -566,7 +538,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_location', make_assertion)
         assert await chat.send_location(latitude='test_location')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_sticker(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['sticker'] == 'test_sticker'
@@ -578,7 +549,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_sticker', make_assertion)
         assert await chat.send_sticker(sticker='test_sticker')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_venue(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['title'] == 'test_venue'
@@ -590,7 +560,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_venue', make_assertion)
         assert await chat.send_venue(title='test_venue')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_video(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['video'] == 'test_video'
@@ -602,7 +571,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_video', make_assertion)
         assert await chat.send_video(video='test_video')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_video_note(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['video_note'] == 'test_video_note'
@@ -614,7 +582,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_video_note', make_assertion)
         assert await chat.send_video_note(video_note='test_video_note')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_voice(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['voice'] == 'test_voice'
@@ -626,7 +593,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_voice', make_assertion)
         assert await chat.send_voice(voice='test_voice')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_animation(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['animation'] == 'test_animation'
@@ -638,7 +604,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_animation', make_assertion)
         assert await chat.send_animation(animation='test_animation')
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_poll(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['question'] == 'test_poll'
@@ -650,7 +615,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'send_poll', make_assertion)
         assert await chat.send_poll(question='test_poll', options=[1, 2])
 
-    @pytest.mark.asyncio
     async def test_instance_method_send_copy(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             from_chat_id = kwargs['from_chat_id'] == 'test_copy'
@@ -665,7 +629,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'copy_message', make_assertion)
         assert await chat.send_copy(from_chat_id='test_copy', message_id=42)
 
-    @pytest.mark.asyncio
     async def test_instance_method_copy_message(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             from_chat_id = kwargs['from_chat_id'] == chat.id
@@ -680,7 +643,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'copy_message', make_assertion)
         assert await chat.copy_message(chat_id='test_copy', message_id=42)
 
-    @pytest.mark.asyncio
     async def test_export_invite_link(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id
@@ -696,7 +658,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'export_chat_invite_link', make_assertion)
         assert await chat.export_invite_link()
 
-    @pytest.mark.asyncio
     async def test_create_invite_link(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id
@@ -712,7 +673,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'create_chat_invite_link', make_assertion)
         assert await chat.create_invite_link()
 
-    @pytest.mark.asyncio
     async def test_edit_invite_link(self, monkeypatch, chat):
         link = "ThisIsALink"
 
@@ -730,7 +690,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'edit_chat_invite_link', make_assertion)
         assert await chat.edit_invite_link(invite_link=link)
 
-    @pytest.mark.asyncio
     async def test_revoke_invite_link(self, monkeypatch, chat):
         link = "ThisIsALink"
 
@@ -748,7 +707,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'revoke_chat_invite_link', make_assertion)
         assert await chat.revoke_invite_link(invite_link=link)
 
-    @pytest.mark.asyncio
     async def test_instance_method_get_menu_button(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id
@@ -767,7 +725,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'get_chat_menu_button', make_assertion)
         assert await chat.get_menu_button()
 
-    @pytest.mark.asyncio
     async def test_instance_method_set_menu_button(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['menu_button'] == 'menu_button'
@@ -786,7 +743,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'set_chat_menu_button', make_assertion)
         assert await chat.set_menu_button(menu_button='menu_button')
 
-    @pytest.mark.asyncio
     async def test_approve_join_request(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['user_id'] == 42
@@ -802,7 +758,6 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), 'approve_chat_join_request', make_assertion)
         assert await chat.approve_join_request(user_id=42)
 
-    @pytest.mark.asyncio
     async def test_decline_join_request(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['user_id'] == 42

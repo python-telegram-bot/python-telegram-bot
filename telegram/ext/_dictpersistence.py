@@ -18,13 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
 
+from copy import deepcopy
 from typing import Dict, Optional, cast
 
-from copy import deepcopy
-
-from telegram.ext import BasePersistence, PersistenceInput
 from telegram._utils.types import JSONDict
-from telegram.ext._utils.types import ConversationDict, CDCData, ConversationKey
+from telegram.ext import BasePersistence, PersistenceInput
+from telegram.ext._utils.types import CDCData, ConversationDict, ConversationKey
 
 try:
     import ujson as json

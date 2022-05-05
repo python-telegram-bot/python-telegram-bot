@@ -11,11 +11,11 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-import subprocess
-import re
-import sys
-import os
 import inspect
+import os
+import re
+import subprocess
+import sys
 from enum import Enum
 from pathlib import Path
 from typing import Tuple
@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '4.3.2'
+needs_sphinx = '4.5.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom

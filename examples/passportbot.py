@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -15,7 +15,7 @@ import logging
 from pathlib import Path
 
 from telegram import Update
-from telegram.ext import MessageHandler, filters, Application, CallbackContext
+from telegram.ext import Application, CallbackContext, MessageHandler, filters
 
 # Enable logging
 

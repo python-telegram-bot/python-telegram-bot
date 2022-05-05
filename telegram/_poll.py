@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=too-few-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -21,9 +20,12 @@
 
 import datetime
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Optional
 
-from telegram import MessageEntity, TelegramObject, User, constants
+from telegram import constants
+from telegram._messageentity import MessageEntity
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.types import JSONDict

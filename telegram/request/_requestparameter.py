@@ -19,9 +19,11 @@
 """This module contains a class that describes a single parameter of a request to the Bot API."""
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
 
-from telegram import InputFile, InputMedia, TelegramObject
+from telegram._files.inputfile import InputFile
+from telegram._files.inputmedia import InputMedia
+from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.enum import StringEnum
 from telegram._utils.types import UploadFileDict

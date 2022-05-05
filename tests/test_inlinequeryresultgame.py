@@ -20,9 +20,9 @@ import pytest
 
 from telegram import (
     InlineKeyboardButton,
+    InlineKeyboardMarkup,
     InlineQueryResultGame,
     InlineQueryResultVoice,
-    InlineKeyboardMarkup,
 )
 
 

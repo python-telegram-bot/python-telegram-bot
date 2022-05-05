@@ -19,7 +19,7 @@
 """Common base class for media objects"""
 from typing import TYPE_CHECKING
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 

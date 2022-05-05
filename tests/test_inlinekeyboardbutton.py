@@ -19,7 +19,7 @@
 
 import pytest
 
-from telegram import InlineKeyboardButton, LoginUrl, WebAppInfo, CallbackGame
+from telegram import CallbackGame, InlineKeyboardButton, LoginUrl, WebAppInfo
 
 
 @pytest.fixture(scope='class')

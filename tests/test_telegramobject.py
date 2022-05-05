@@ -19,16 +19,16 @@
 import datetime
 import json as json_lib
 import pickle
+from copy import deepcopy
 
 import pytest
-from copy import deepcopy
 
 try:
     import ujson
 except ImportError:
     ujson = None
 
-from telegram import TelegramObject, Message, Chat, User, PhotoSize
+from telegram import Chat, Message, PhotoSize, TelegramObject, User
 
 
 class TestTelegramObject:

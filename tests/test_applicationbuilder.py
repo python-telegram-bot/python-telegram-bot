@@ -22,20 +22,20 @@ from dataclasses import dataclass
 import httpx
 import pytest
 
-from telegram.request import HTTPXRequest
-from .conftest import data_file, PRIVATE_KEY
-
 from telegram.ext import (
-    ApplicationBuilder,
-    Defaults,
     Application,
+    ApplicationBuilder,
+    ContextTypes,
+    Defaults,
+    ExtBot,
     JobQueue,
     PicklePersistence,
-    ContextTypes,
     Updater,
-    ExtBot,
 )
 from telegram.ext._applicationbuilder import _BOT_CHECKS
+from telegram.request import HTTPXRequest
+
+from .conftest import PRIVATE_KEY, data_file
 
 
 @pytest.fixture(scope='function')

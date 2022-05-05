@@ -18,18 +18,18 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChosenInlineResultHandler class."""
 import re
-from typing import Optional, TypeVar, Union, TYPE_CHECKING, Pattern, Match, cast
+from typing import TYPE_CHECKING, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput
-from telegram.ext import Handler
+from telegram.ext._handler import Handler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar('RT')
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, Application
+    from telegram.ext import Application, CallbackContext
 
 
 class ChosenInlineResultHandler(Handler[Update, CCT]):

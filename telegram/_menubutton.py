@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=too-few-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -18,10 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
-from typing import Any, ClassVar, Optional, TYPE_CHECKING, Dict, Type
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Optional, Type
 
-from telegram import TelegramObject, constants, WebAppInfo
+from telegram import constants
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._webappinfo import WebAppInfo
 
 if TYPE_CHECKING:
     from telegram import Bot

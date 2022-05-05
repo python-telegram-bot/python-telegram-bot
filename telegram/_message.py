@@ -21,56 +21,56 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
-from telegram import (
-    Animation,
-    Audio,
-    Chat,
-    Contact,
-    Dice,
-    Document,
-    Game,
-    InlineKeyboardMarkup,
-    Invoice,
-    Location,
-    MessageEntity,
-    PassportData,
-    PhotoSize,
-    Poll,
-    Sticker,
-    SuccessfulPayment,
-    TelegramObject,
-    User,
-    Venue,
-    Video,
-    VideoNote,
-    Voice,
-    VideoChatStarted,
-    VideoChatEnded,
-    VideoChatParticipantsInvited,
-    ProximityAlertTriggered,
-    MessageAutoDeleteTimerChanged,
-    VideoChatScheduled,
-    WebAppData,
-)
-from telegram.constants import ParseMode, MessageAttachmentType
-from telegram.helpers import escape_markdown
+from telegram._chat import Chat
+from telegram._dice import Dice
+from telegram._files.animation import Animation
+from telegram._files.audio import Audio
+from telegram._files.contact import Contact
+from telegram._files.document import Document
+from telegram._files.location import Location
+from telegram._files.photosize import PhotoSize
+from telegram._files.sticker import Sticker
+from telegram._files.venue import Venue
+from telegram._files.video import Video
+from telegram._files.videonote import VideoNote
+from telegram._files.voice import Voice
+from telegram._games.game import Game
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
+from telegram._messageentity import MessageEntity
+from telegram._passport.passportdata import PassportData
+from telegram._payment.invoice import Invoice
+from telegram._payment.successfulpayment import SuccessfulPayment
+from telegram._poll import Poll
+from telegram._proximityalerttriggered import ProximityAlertTriggered
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
-from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput, ReplyMarkup
+from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram._videochat import (
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
+    VideoChatStarted,
+)
+from telegram._webappdata import WebAppData
+from telegram.constants import MessageAttachmentType, ParseMode
+from telegram.helpers import escape_markdown
 
 if TYPE_CHECKING:
     from telegram import (
         Bot,
         GameHighScore,
         InputMedia,
-        MessageId,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
         LabeledPrice,
+        MessageId,
     )
 
 
@@ -738,9 +738,7 @@ class Message(TelegramObject):
             # Unfortunately we need some ExtBot logic here because it's hard to move shortcut
             # logic into ExtBot
             if hasattr(self.get_bot(), 'defaults') and self.get_bot().defaults:  # type: ignore
-                default_quote = (
-                    self.get_bot().defaults.quote  # type: ignore[union-attr, attr-defined]
-                )
+                default_quote = self.get_bot().defaults.quote  # type: ignore[attr-defined]
             else:
                 default_quote = None
             if (default_quote is None and self.chat.type != Chat.PRIVATE) or default_quote:

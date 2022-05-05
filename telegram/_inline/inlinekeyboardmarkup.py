@@ -20,9 +20,10 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import InlineKeyboardButton, TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
+from telegram._telegramobject import TelegramObject
 from telegram._utils.markup import check_keyboard_type
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot

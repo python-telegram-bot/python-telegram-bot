@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import BotCommand, User, ProximityAlertTriggered
+from telegram import BotCommand, ProximityAlertTriggered, User
 
 
 @pytest.fixture(scope="class")

@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
-from typing import Any, Union, Tuple, List
+from typing import Any, List, Tuple, Union
 
-from telegram import InputMessageContent, MessageEntity
+from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 

@@ -172,79 +172,65 @@ __all__ = (  # Keep this alphabetically ordered
 )
 
 
-from ._telegramobject import TelegramObject
+from ._bot import Bot
 from ._botcommand import BotCommand
-from ._webappdata import WebAppData
-from ._webappinfo import WebAppInfo
-from ._sentwebappmessage import SentWebAppMessage
-from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
-from ._loginurl import LoginUrl
-from ._games.callbackgame import CallbackGame
-from ._user import User
-from ._files.chatphoto import ChatPhoto
+from ._botcommandscope import (
+    BotCommandScope,
+    BotCommandScopeAllChatAdministrators,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllPrivateChats,
+    BotCommandScopeChat,
+    BotCommandScopeChatAdministrators,
+    BotCommandScopeChatMember,
+    BotCommandScopeDefault,
+)
+from ._callbackquery import CallbackQuery
 from ._chat import Chat
 from ._chatadministratorrights import ChatAdministratorRights
-from ._chatlocation import ChatLocation
 from ._chatinvitelink import ChatInviteLink
 from ._chatjoinrequest import ChatJoinRequest
+from ._chatlocation import ChatLocation
 from ._chatmember import (
     ChatMember,
-    ChatMemberOwner,
     ChatMemberAdministrator,
-    ChatMemberMember,
-    ChatMemberRestricted,
-    ChatMemberLeft,
     ChatMemberBanned,
+    ChatMemberLeft,
+    ChatMemberMember,
+    ChatMemberOwner,
+    ChatMemberRestricted,
 )
 from ._chatmemberupdated import ChatMemberUpdated
 from ._chatpermissions import ChatPermissions
-from ._files.photosize import PhotoSize
-from ._files.audio import Audio
-from ._files.voice import Voice
-from ._files.document import Document
-from ._files.animation import Animation
-from ._files.sticker import Sticker, StickerSet, MaskPosition
-from ._files.video import Video
-from ._files.contact import Contact
-from ._files.location import Location
-from ._files.venue import Venue
-from ._files.videonote import VideoNote
+from ._choseninlineresult import ChosenInlineResult
 from ._dice import Dice
-from ._userprofilephotos import UserProfilePhotos
-from ._keyboardbuttonpolltype import KeyboardButtonPollType
-from ._keyboardbutton import KeyboardButton
-from ._replykeyboardmarkup import ReplyKeyboardMarkup
-from ._replykeyboardremove import ReplyKeyboardRemove
-from ._forcereply import ForceReply
-from ._files.inputfile import InputFile
+from ._files.animation import Animation
+from ._files.audio import Audio
+from ._files.chatphoto import ChatPhoto
+from ._files.contact import Contact
+from ._files.document import Document
 from ._files.file import File
-from ._messageentity import MessageEntity
-from ._messageid import MessageId
-from ._games.game import Game
-from ._poll import Poll, PollOption, PollAnswer
-from ._videochat import (
-    VideoChatStarted,
-    VideoChatEnded,
-    VideoChatParticipantsInvited,
-    VideoChatScheduled,
+from ._files.inputfile import InputFile
+from ._files.inputmedia import (
+    InputMedia,
+    InputMediaAnimation,
+    InputMediaAudio,
+    InputMediaDocument,
+    InputMediaPhoto,
+    InputMediaVideo,
 )
-from ._proximityalerttriggered import ProximityAlertTriggered
-from ._payment.shippingaddress import ShippingAddress
-from ._payment.orderinfo import OrderInfo
-from ._payment.successfulpayment import SuccessfulPayment
-from ._payment.invoice import Invoice
-from ._passport.credentials import EncryptedCredentials
-from ._passport.passportfile import PassportFile
-from ._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
-from ._passport.encryptedpassportelement import EncryptedPassportElement
-from ._passport.passportdata import PassportData
+from ._files.location import Location
+from ._files.photosize import PhotoSize
+from ._files.sticker import MaskPosition, Sticker, StickerSet
+from ._files.venue import Venue
+from ._files.video import Video
+from ._files.videonote import VideoNote
+from ._files.voice import Voice
+from ._forcereply import ForceReply
+from ._games.callbackgame import CallbackGame
+from ._games.game import Game
+from ._games.gamehighscore import GameHighScore
 from ._inline.inlinekeyboardbutton import InlineKeyboardButton
 from ._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
-from ._message import Message
-from ._callbackquery import CallbackQuery
-from ._choseninlineresult import ChosenInlineResult
-from ._inline.inputmessagecontent import InputMessageContent
 from ._inline.inlinequery import InlineQuery
 from ._inline.inlinequeryresult import InlineQueryResult
 from ._inline.inlinequeryresultarticle import InlineQueryResultArticle
@@ -259,6 +245,7 @@ from ._inline.inlinequeryresultcachedvideo import InlineQueryResultCachedVideo
 from ._inline.inlinequeryresultcachedvoice import InlineQueryResultCachedVoice
 from ._inline.inlinequeryresultcontact import InlineQueryResultContact
 from ._inline.inlinequeryresultdocument import InlineQueryResultDocument
+from ._inline.inlinequeryresultgame import InlineQueryResultGame
 from ._inline.inlinequeryresultgif import InlineQueryResultGif
 from ._inline.inlinequeryresultlocation import InlineQueryResultLocation
 from ._inline.inlinequeryresultmpeg4gif import InlineQueryResultMpeg4Gif
@@ -266,27 +253,31 @@ from ._inline.inlinequeryresultphoto import InlineQueryResultPhoto
 from ._inline.inlinequeryresultvenue import InlineQueryResultVenue
 from ._inline.inlinequeryresultvideo import InlineQueryResultVideo
 from ._inline.inlinequeryresultvoice import InlineQueryResultVoice
-from ._inline.inlinequeryresultgame import InlineQueryResultGame
-from ._inline.inputtextmessagecontent import InputTextMessageContent
-from ._inline.inputlocationmessagecontent import InputLocationMessageContent
-from ._inline.inputvenuemessagecontent import InputVenueMessageContent
-from ._payment.labeledprice import LabeledPrice
-from ._inline.inputinvoicemessagecontent import InputInvoiceMessageContent
 from ._inline.inputcontactmessagecontent import InputContactMessageContent
-from ._payment.shippingoption import ShippingOption
-from ._payment.precheckoutquery import PreCheckoutQuery
-from ._payment.shippingquery import ShippingQuery
-from ._webhookinfo import WebhookInfo
-from ._games.gamehighscore import GameHighScore
-from ._update import Update
-from ._files.inputmedia import (
-    InputMedia,
-    InputMediaVideo,
-    InputMediaPhoto,
-    InputMediaAnimation,
-    InputMediaAudio,
-    InputMediaDocument,
+from ._inline.inputinvoicemessagecontent import InputInvoiceMessageContent
+from ._inline.inputlocationmessagecontent import InputLocationMessageContent
+from ._inline.inputmessagecontent import InputMessageContent
+from ._inline.inputtextmessagecontent import InputTextMessageContent
+from ._inline.inputvenuemessagecontent import InputVenueMessageContent
+from ._keyboardbutton import KeyboardButton
+from ._keyboardbuttonpolltype import KeyboardButtonPollType
+from ._loginurl import LoginUrl
+from ._menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
+from ._message import Message
+from ._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
+from ._messageentity import MessageEntity
+from ._messageid import MessageId
+from ._passport.credentials import (
+    Credentials,
+    DataCredentials,
+    EncryptedCredentials,
+    FileCredentials,
+    SecureData,
+    SecureValue,
 )
+from ._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
+from ._passport.encryptedpassportelement import EncryptedPassportElement
+from ._passport.passportdata import PassportData
 from ._passport.passportelementerrors import (
     PassportElementError,
     PassportElementErrorDataField,
@@ -299,22 +290,31 @@ from ._passport.passportelementerrors import (
     PassportElementErrorTranslationFiles,
     PassportElementErrorUnspecified,
 )
-from ._passport.credentials import (
-    Credentials,
-    DataCredentials,
-    SecureData,
-    SecureValue,
-    FileCredentials,
-)
-from ._botcommandscope import (
-    BotCommandScope,
-    BotCommandScopeDefault,
-    BotCommandScopeAllPrivateChats,
-    BotCommandScopeAllGroupChats,
-    BotCommandScopeAllChatAdministrators,
-    BotCommandScopeChat,
-    BotCommandScopeChatAdministrators,
-    BotCommandScopeChatMember,
-)
-from ._bot import Bot
+from ._passport.passportfile import PassportFile
+from ._payment.invoice import Invoice
+from ._payment.labeledprice import LabeledPrice
+from ._payment.orderinfo import OrderInfo
+from ._payment.precheckoutquery import PreCheckoutQuery
+from ._payment.shippingaddress import ShippingAddress
+from ._payment.shippingoption import ShippingOption
+from ._payment.shippingquery import ShippingQuery
+from ._payment.successfulpayment import SuccessfulPayment
+from ._poll import Poll, PollAnswer, PollOption
+from ._proximityalerttriggered import ProximityAlertTriggered
+from ._replykeyboardmarkup import ReplyKeyboardMarkup
+from ._replykeyboardremove import ReplyKeyboardRemove
+from ._sentwebappmessage import SentWebAppMessage
+from ._telegramobject import TelegramObject
+from ._update import Update
+from ._user import User
+from ._userprofilephotos import UserProfilePhotos
 from ._version import __version__, bot_api_version  # noqa: F401
+from ._videochat import (
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
+    VideoChatStarted,
+)
+from ._webappdata import WebAppData
+from ._webappinfo import WebAppInfo
+from ._webhookinfo import WebhookInfo

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -17,16 +17,15 @@ bot.
 import logging
 from typing import Dict
 
-from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
-    CommandHandler,
-    MessageHandler,
-    filters,
-    ConversationHandler,
     Application,
     CallbackContext,
+    CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters,
 )
-
 
 # Enable logging
 logging.basicConfig(

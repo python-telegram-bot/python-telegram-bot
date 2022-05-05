@@ -20,8 +20,11 @@
 
 from typing import TYPE_CHECKING, Any, Optional
 
-from telegram import TelegramObject, LoginUrl, WebAppInfo, CallbackGame
+from telegram._games.callbackgame import CallbackGame
+from telegram._loginurl import LoginUrl
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._webappinfo import WebAppInfo
 
 if TYPE_CHECKING:
     from telegram import Bot

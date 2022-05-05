@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=too-few-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -20,9 +19,10 @@
 """This module contains objects related to Telegram video chats."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, List, Optional
 
-from telegram import TelegramObject, User
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.types import JSONDict
 

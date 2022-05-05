@@ -21,10 +21,10 @@
 import re
 from typing import TYPE_CHECKING, Match, Optional, Pattern, TypeVar, Union
 
-from telegram._utils.types import DVInput
-from telegram.ext import Handler
-from telegram.ext._utils.types import CCT, HandlerCallback
 from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.types import DVInput
+from telegram.ext._handler import Handler
+from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
     from telegram.ext import Application

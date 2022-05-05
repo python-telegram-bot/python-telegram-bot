@@ -23,14 +23,14 @@ import pytest
 import pytz
 
 from telegram import (
-    User,
+    Chat,
+    ChatInviteLink,
     ChatMember,
     ChatMemberAdministrator,
-    Chat,
-    ChatMemberUpdated,
-    ChatInviteLink,
-    ChatMemberOwner,
     ChatMemberBanned,
+    ChatMemberOwner,
+    ChatMemberUpdated,
+    User,
 )
 from telegram._utils.datetime import to_timestamp
 
@@ -105,7 +105,7 @@ class TestChatMemberUpdated:
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user
-        assert pytest.approx(chat_member_updated.date == time)
+        assert abs(chat_member_updated.date - time) < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_member_updated.date) == to_timestamp(time)
         assert chat_member_updated.old_chat_member == old_chat_member
         assert chat_member_updated.new_chat_member == new_chat_member
@@ -127,7 +127,7 @@ class TestChatMemberUpdated:
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user
-        assert pytest.approx(chat_member_updated.date == time)
+        assert abs(chat_member_updated.date - time) < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_member_updated.date) == to_timestamp(time)
         assert chat_member_updated.old_chat_member == old_chat_member
         assert chat_member_updated.new_chat_member == new_chat_member

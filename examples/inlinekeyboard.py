@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -9,13 +9,7 @@ Basic example for a bot that uses inline keyboards. For an in-depth explanation,
 import logging
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import (
-    CommandHandler,
-    CallbackQueryHandler,
-    Application,
-    CallbackContext,
-)
-
+from telegram.ext import Application, CallbackContext, CallbackQueryHandler, CommandHandler
 
 # Enable logging
 logging.basicConfig(

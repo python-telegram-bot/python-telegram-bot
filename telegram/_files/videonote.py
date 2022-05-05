@@ -20,8 +20,8 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import PhotoSize
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files.photosize import PhotoSize
 
 if TYPE_CHECKING:
     from telegram import Bot

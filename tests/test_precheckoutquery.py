@@ -19,8 +19,8 @@
 
 import pytest
 
-from telegram import Update, User, PreCheckoutQuery, OrderInfo, Bot
-from tests.conftest import check_shortcut_call, check_shortcut_signature, check_defaults_handling
+from telegram import Bot, OrderInfo, PreCheckoutQuery, Update, User
+from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope='class')
@@ -85,7 +85,6 @@ class TestPreCheckoutQuery:
         assert pre_checkout_query_dict['from'] == pre_checkout_query.from_user.to_dict()
         assert pre_checkout_query_dict['order_info'] == pre_checkout_query.order_info.to_dict()
 
-    @pytest.mark.asyncio
     async def test_answer(self, monkeypatch, pre_checkout_query):
         async def make_assertion(*_, **kwargs):
             return kwargs['pre_checkout_query_id'] == pre_checkout_query.id

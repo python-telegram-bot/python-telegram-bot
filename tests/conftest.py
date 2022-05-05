@@ -20,47 +20,41 @@ import asyncio
 import datetime
 import functools
 import inspect
-
 import os
 import re
+import sys
 from pathlib import Path
-from typing import Callable, List, Iterable, Any, Dict, Optional
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pytest
 import pytz
 from httpx import AsyncClient, Response
 
 from telegram import (
-    Message,
-    User,
-    Chat,
-    MessageEntity,
-    Update,
-    InlineQuery,
+    Bot,
     CallbackQuery,
-    ShippingQuery,
-    PreCheckoutQuery,
+    Chat,
+    ChatPermissions,
     ChosenInlineResult,
     File,
-    ChatPermissions,
-    Bot,
+    InlineQuery,
     InlineQueryResultArticle,
-    InputTextMessageContent,
     InlineQueryResultCachedPhoto,
     InputMediaPhoto,
+    InputTextMessageContent,
+    Message,
+    MessageEntity,
+    PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import ODVInput
 from telegram.constants import InputMediaType
-from telegram.ext import (
-    Application,
-    Defaults,
-    ExtBot,
-    ApplicationBuilder,
-    Updater,
-)
-from telegram.ext.filters import UpdateFilter, MessageFilter
-from telegram.error import BadRequest, TimedOut, RetryAfter
-from telegram._utils.defaultvalue import DefaultValue, DEFAULT_NONE
+from telegram.error import BadRequest, RetryAfter, TimedOut
+from telegram.ext import Application, ApplicationBuilder, Defaults, ExtBot, Updater
+from telegram.ext.filters import MessageFilter, UpdateFilter
 from telegram.request import RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from tests.bots import get_bot
@@ -95,6 +89,11 @@ def env_var_2_bool(env_var: object) -> bool:
 # session. See https://github.com/pytest-dev/pytest-asyncio/issues/68 for more details.
 @pytest.fixture(scope='session')
 def event_loop(request):
+    # ever since ProactorEventLoop became the default in Win 3.8+, the app crashes after the loop
+    # is closed. Hence, we use SelectorEventLoop on Windows to avoid this. See
+    # https://github.com/python/cpython/issues/83413, https://github.com/encode/httpx/issues/914
+    if sys.version_info[0] == 3 and sys.version_info[1] >= 8 and sys.platform.startswith('win'):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     # loop.close() # instead of closing here, do that at the every end of the test session
@@ -153,7 +152,6 @@ class DictApplication(Application):
 
 
 @pytest.fixture(scope='session')
-@pytest.mark.asyncio
 async def bot(bot_info):
     """Makes an ExtBot instance with the given bot_info"""
     async with make_bot(bot_info) as _bot:
@@ -161,7 +159,6 @@ async def bot(bot_info):
 
 
 @pytest.fixture(scope='session')
-@pytest.mark.asyncio
 async def raw_bot(bot_info):
     """Makes an regular Bot instance with the given bot_info"""
     async with DictBot(
@@ -210,7 +207,6 @@ def provider_token(bot_info):
 
 
 @pytest.fixture(scope='function')
-@pytest.mark.asyncio
 async def app(bot_info):
     # We build a new bot each time so that we use `app` in a context manager without problems
     application = (
@@ -223,7 +219,6 @@ async def app(bot_info):
 
 
 @pytest.fixture(scope='function')
-@pytest.mark.asyncio
 async def updater(bot_info):
     # We build a new bot each time so that we use `updater` in a context manager without problems
     up = Updater(bot=make_bot(bot_info), update_queue=asyncio.Queue())
@@ -434,7 +429,10 @@ def call_after(function: Callable, after: Callable):
 
         async def wrapped(*args, **kwargs):
             out = await function(*args, **kwargs)
-            after(out)
+            if asyncio.iscoroutinefunction(after):
+                await after(out)
+            else:
+                after(out)
             return out
 
     else:

@@ -23,8 +23,8 @@ import pytest
 from telegram import (
     Dice,
     MenuButton,
-    MenuButtonDefault,
     MenuButtonCommands,
+    MenuButtonDefault,
     MenuButtonWebApp,
     WebAppInfo,
 )

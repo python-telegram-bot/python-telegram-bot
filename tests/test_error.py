@@ -22,16 +22,16 @@ from collections import defaultdict
 import pytest
 
 from telegram.error import (
+    BadRequest,
+    ChatMigrated,
+    Conflict,
     Forbidden,
     InvalidToken,
     NetworkError,
-    BadRequest,
-    TimedOut,
-    ChatMigrated,
-    RetryAfter,
-    Conflict,
-    TelegramError,
     PassportDecryptionError,
+    RetryAfter,
+    TelegramError,
+    TimedOut,
 )
 from telegram.ext import InvalidCallbackData
 

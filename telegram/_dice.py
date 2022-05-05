@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=too-few-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -18,9 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Dice."""
-from typing import Any, List, ClassVar
+from typing import Any, ClassVar, List
 
-from telegram import TelegramObject, constants
+from telegram import constants
+from telegram._telegramobject import TelegramObject
 
 
 class Dice(TelegramObject):

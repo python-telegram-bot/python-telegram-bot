@@ -19,38 +19,40 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Optional, ClassVar, Union, Tuple, Any
+from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Tuple, Union
 
-from telegram import ChatPhoto, TelegramObject, constants, MenuButton
-from telegram._utils import enum
-from telegram._utils.types import JSONDict, FileInput, ODVInput, DVInput, ReplyMarkup
-from telegram._utils.defaultvalue import DEFAULT_NONE
-
-from telegram._chatpermissions import ChatPermissions
+from telegram import constants
 from telegram._chatlocation import ChatLocation
+from telegram._chatpermissions import ChatPermissions
+from telegram._files.chatphoto import ChatPhoto
+from telegram._menubutton import MenuButton
+from telegram._telegramobject import TelegramObject
+from telegram._utils import enum
+from telegram._utils.defaultvalue import DEFAULT_NONE
+from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 
 if TYPE_CHECKING:
     from telegram import (
+        Animation,
+        Audio,
         Bot,
-        ChatMember,
         ChatInviteLink,
-        Message,
-        MessageId,
+        ChatMember,
         Contact,
+        Document,
         InlineKeyboardMarkup,
-        Location,
-        Venue,
-        MessageEntity,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
         InputMediaVideo,
-        PhotoSize,
-        Audio,
-        Document,
-        Animation,
         LabeledPrice,
+        Location,
+        Message,
+        MessageEntity,
+        MessageId,
+        PhotoSize,
         Sticker,
+        Venue,
         Video,
         VideoNote,
         Voice,

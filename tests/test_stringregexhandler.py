@@ -17,23 +17,23 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import re
 
 import pytest
-import re
 
 from telegram import (
     Bot,
-    Update,
-    Message,
-    User,
-    Chat,
     CallbackQuery,
-    InlineQuery,
+    Chat,
     ChosenInlineResult,
-    ShippingQuery,
+    InlineQuery,
+    Message,
     PreCheckoutQuery,
+    ShippingQuery,
+    Update,
+    User,
 )
-from telegram.ext import StringRegexHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, JobQueue, StringRegexHandler
 
 message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
 
@@ -97,7 +97,6 @@ class TestStringRegexHandler:
         if context.matches[0].groupdict():
             self.test_flag = context.matches[0].groupdict() == {'begin': 't', 'end': ' message'}
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize('compile', (True, False))
     async def test_basic(self, app, compile):
         pattern = '(?P<begin>.*)est(?P<end>.*)'
@@ -117,7 +116,6 @@ class TestStringRegexHandler:
         handler = StringRegexHandler('test', self.callback)
         assert not handler.check_update(false_update)
 
-    @pytest.mark.asyncio
     async def test_context_pattern(self, app):
         handler = StringRegexHandler(r'(t)est(.*)', self.callback_pattern)
         app.add_handler(handler)

@@ -18,11 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
 
-from typing import Any, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import from_timestamp
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot

@@ -29,21 +29,21 @@ from typing import NamedTuple
 import pytest
 from flaky import flaky
 
-from telegram import User, Chat, InlineKeyboardMarkup, InlineKeyboardButton, Bot, Update
+from telegram import Bot, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Update, User
 from telegram.ext import (
-    ApplicationBuilder,
-    PersistenceInput,
-    BasePersistence,
     Application,
-    ConversationHandler,
-    MessageHandler,
-    filters,
-    Handler,
+    ApplicationBuilder,
     ApplicationHandlerStop,
+    BasePersistence,
     CallbackContext,
+    ConversationHandler,
+    Handler,
+    MessageHandler,
+    PersistenceInput,
+    filters,
 )
 from telegram.warnings import PTBUserWarning
-from tests.conftest import make_message_update, DictApplication
+from tests.conftest import DictApplication, make_message_update
 
 
 class HandlerStates(int, enum.Enum):
@@ -405,7 +405,6 @@ class TestBasePersistence:
         [PappInput(fill_data=True), PappInput(False, False, False, False, False, fill_data=True)],
         indirect=True,
     )
-    @pytest.mark.asyncio
     async def test_initialization_basic(self, papp: Application):
         # Check that no data is there before init
         assert not papp.chat_data
@@ -475,7 +474,6 @@ class TestBasePersistence:
         [PappInput(fill_data=True)],
         indirect=True,
     )
-    @pytest.mark.asyncio
     async def test_initialization_invalid_bot_data(self, papp: Application, monkeypatch):
         async def get_bot_data(*args, **kwargs):
             return 'invalid'
@@ -491,7 +489,6 @@ class TestBasePersistence:
         indirect=True,
     )
     @pytest.mark.parametrize('callback_data', ('invalid', (1, 2, 3)))
-    @pytest.mark.asyncio
     async def test_initialization_invalid_callback_data(
         self, papp: Application, callback_data, monkeypatch
     ):
@@ -504,7 +501,6 @@ class TestBasePersistence:
             await papp.initialize()
 
     @filled_papp
-    @pytest.mark.asyncio
     async def test_add_conversation_handler_after_init(self, papp: Application, recwarn):
         context = CallbackContext(application=papp)
 
@@ -569,13 +565,11 @@ class TestBasePersistence:
             app.add_handler(build_conversation_handler('name', persistent=True))
 
     @default_papp
-    @pytest.mark.asyncio
     async def test_add_conversation_handler_without_name(self, papp: Application):
         with pytest.raises(ValueError, match="when handler is unnamed"):
             papp.add_handler(build_conversation_handler(name=None, persistent=True))
 
     @flaky(3, 1)
-    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         'papp',
         [
@@ -604,7 +598,6 @@ class TestBasePersistence:
             )
 
     @papp_store_all_or_none
-    @pytest.mark.asyncio
     async def test_update_persistence_loop_call_count_update_handling(
         self, papp: Application, caplog
     ):
@@ -678,7 +671,6 @@ class TestBasePersistence:
             assert not papp.persistence.dropped_user_ids
 
     @papp_store_all_or_none
-    @pytest.mark.asyncio
     async def test_update_persistence_loop_call_count_job(self, papp: Application, caplog):
         async with papp:
             await papp.job_queue.start()
@@ -744,7 +736,6 @@ class TestBasePersistence:
             assert not papp.persistence.dropped_user_ids
 
     @default_papp
-    @pytest.mark.asyncio
     async def test_calls_on_shutdown(self, papp, chat_id):
         papp.add_handler(
             MessageHandler(filters.ALL, callback=self.handler_callback(chat_id=chat_id)), group=-1
@@ -776,7 +767,6 @@ class TestBasePersistence:
         assert papp.persistence.flushed
 
     @papp_store_all_or_none
-    @pytest.mark.asyncio
     async def test_update_persistence_loop_saved_data_update_handling(
         self, papp: Application, chat_id
     ):
@@ -834,7 +824,6 @@ class TestBasePersistence:
             assert not papp.persistence.conversations
 
     @papp_store_all_or_none
-    @pytest.mark.asyncio
     async def test_update_persistence_loop_saved_data_job(self, papp: Application, chat_id):
         papp.add_handler(
             MessageHandler(filters.ALL, callback=self.handler_callback(chat_id=chat_id)), group=-1
@@ -894,7 +883,6 @@ class TestBasePersistence:
 
     @default_papp
     @pytest.mark.parametrize('delay_type', ('job', 'handler', 'task'))
-    @pytest.mark.asyncio
     async def test_update_persistence_loop_async_logic(
         self, papp: Application, delay_type: str, chat_id
     ):
@@ -948,7 +936,6 @@ class TestBasePersistence:
             assert not papp.persistence.updated_conversations
 
     @filled_papp
-    @pytest.mark.asyncio
     async def test_drop_chat_data(self, papp: Application):
         async with papp:
             assert papp.persistence.chat_data == {1: {'key': 'value'}, 2: {'foo': 'bar'}}
@@ -968,7 +955,6 @@ class TestBasePersistence:
             assert not papp.persistence.updated_chat_ids
 
     @filled_papp
-    @pytest.mark.asyncio
     async def test_drop_user_data(self, papp: Application):
         async with papp:
             assert papp.persistence.user_data == {1: {'key': 'value'}, 2: {'foo': 'bar'}}
@@ -988,7 +974,6 @@ class TestBasePersistence:
             assert not papp.persistence.updated_user_ids
 
     @filled_papp
-    @pytest.mark.asyncio
     async def test_migrate_chat_data(self, papp: Application):
         async with papp:
             assert papp.persistence.chat_data == {1: {'key': 'value'}, 2: {'foo': 'bar'}}
@@ -1007,7 +992,6 @@ class TestBasePersistence:
             assert papp.persistence.dropped_chat_ids == {1: 1}
             assert papp.persistence.updated_chat_ids == {2: 1}
 
-    @pytest.mark.asyncio
     async def test_errors_while_persisting(self, bot, caplog):
         class ErrorPersistence(TrackingPersistence):
             def raise_error(self):
@@ -1067,7 +1051,6 @@ class TestBasePersistence:
     @pytest.mark.parametrize(
         'delay_type', ('job', 'blocking_handler', 'nonblocking_handler', 'task')
     )
-    @pytest.mark.asyncio
     async def test_update_persistence_after_exception(
         self, papp: Application, delay_type: str, chat_id
     ):
@@ -1132,7 +1115,6 @@ class TestBasePersistence:
                 assert not papp.persistence.updated_chat_ids
             assert not papp.persistence.updated_conversations
 
-    @pytest.mark.asyncio
     async def test_non_blocking_conversations(self, bot):
         papp = build_papp(token=bot.token)
         event = asyncio.Event()
@@ -1174,7 +1156,6 @@ class TestBasePersistence:
             assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
             assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
 
-    @pytest.mark.asyncio
     async def test_non_blocking_conversations_raises_Exception(self, bot):
         papp = build_papp(token=bot.token)
 
@@ -1228,7 +1209,6 @@ class TestBasePersistence:
             # since the second callback raised an exception, the state must be the previous one!
             assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
 
-    @pytest.mark.asyncio
     async def test_non_blocking_conversations_on_stop(self, bot):
         papp = build_papp(token=bot.token, update_interval=100)
         event = asyncio.Event()
@@ -1269,7 +1249,6 @@ class TestBasePersistence:
         assert papp.persistence.updated_conversations == {'conv': {(1, 1): 1}}
         assert papp.persistence.conversations == {'conv': {(1, 1): HandlerStates.STATE_1}}
 
-    @pytest.mark.asyncio
     async def test_non_blocking_conversations_on_improper_stop(self, bot, caplog):
         papp = build_papp(token=bot.token, update_interval=100)
         event = asyncio.Event()
@@ -1313,7 +1292,6 @@ class TestBasePersistence:
         assert found_record is not None
 
     @default_papp
-    @pytest.mark.asyncio
     async def test_conversation_ends(self, papp):
         async with papp:
             assert papp.persistence.updated_conversations == {}
@@ -1327,7 +1305,6 @@ class TestBasePersistence:
             # This is the important part: the persistence is updated with `None` when the conv ends
             assert papp.persistence.conversations == {'conv_1': {(1, 1): None}}
 
-    @pytest.mark.asyncio
     async def test_conversation_timeout(self, bot):
         # high update_interval so that we can instead manually call it
         papp = build_papp(token=bot.token, update_interval=150)
@@ -1372,7 +1349,6 @@ class TestBasePersistence:
 
             await papp.stop()
 
-    @pytest.mark.asyncio
     async def test_persistent_nested_conversations(self, bot):
         papp = build_papp(token=bot.token, update_interval=150)
 
