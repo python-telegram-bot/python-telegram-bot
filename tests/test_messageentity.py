@@ -27,10 +27,10 @@ def message_entity(request):
     type_ = request.param
     url = None
     if type_ == MessageEntity.TEXT_LINK:
-        url = 't.me'
+        url = "t.me"
     user = None
     if type_ == MessageEntity.TEXT_MENTION:
-        user = User(1, 'test_user', False)
+        user = User(1, "test_user", False)
     language = None
     if type_ == MessageEntity.PRE:
         language = "python"
@@ -38,19 +38,19 @@ def message_entity(request):
 
 
 class TestMessageEntity:
-    type_ = 'url'
+    type_ = "url"
     offset = 1
     length = 2
-    url = 'url'
+    url = "url"
 
     def test_slot_behaviour(self, message_entity, mro_slots):
         inst = message_entity
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, bot):
-        json_dict = {'type': self.type_, 'offset': self.offset, 'length': self.length}
+        json_dict = {"type": self.type_, "offset": self.offset, "length": self.length}
         entity = MessageEntity.de_json(json_dict, bot)
 
         assert entity.type == self.type_
@@ -61,20 +61,20 @@ class TestMessageEntity:
         entity_dict = message_entity.to_dict()
 
         assert isinstance(entity_dict, dict)
-        assert entity_dict['type'] == message_entity.type
-        assert entity_dict['offset'] == message_entity.offset
-        assert entity_dict['length'] == message_entity.length
+        assert entity_dict["type"] == message_entity.type
+        assert entity_dict["offset"] == message_entity.offset
+        assert entity_dict["length"] == message_entity.length
         if message_entity.url:
-            assert entity_dict['url'] == message_entity.url
+            assert entity_dict["url"] == message_entity.url
         if message_entity.user:
-            assert entity_dict['user'] == message_entity.user.to_dict()
+            assert entity_dict["user"] == message_entity.user.to_dict()
         if message_entity.language:
-            assert entity_dict['language'] == message_entity.language
+            assert entity_dict["language"] == message_entity.language
 
     def test_enum_init(self):
-        entity = MessageEntity(type='foo', offset=0, length=1)
-        assert entity.type == 'foo'
-        entity = MessageEntity(type='url', offset=0, length=1)
+        entity = MessageEntity(type="foo", offset=0, length=1)
+        assert entity.type == "foo"
+        entity = MessageEntity(type="url", offset=0, length=1)
         assert entity.type is MessageEntityType.URL
 
     def test_equality(self):

@@ -22,7 +22,7 @@ import pytest
 from telegram import SentWebAppMessage
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def sent_web_app_message():
     return SentWebAppMessage(
         inline_message_id=TestSentWebAppMessage.inline_message_id,
@@ -30,22 +30,22 @@ def sent_web_app_message():
 
 
 class TestSentWebAppMessage:
-    inline_message_id = '123'
+    inline_message_id = "123"
 
     def test_slot_behaviour(self, sent_web_app_message, mro_slots):
         inst = sent_web_app_message
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_to_dict(self, sent_web_app_message):
         sent_web_app_message_dict = sent_web_app_message.to_dict()
 
         assert isinstance(sent_web_app_message_dict, dict)
-        assert sent_web_app_message_dict['inline_message_id'] == self.inline_message_id
+        assert sent_web_app_message_dict["inline_message_id"] == self.inline_message_id
 
     def test_de_json(self, bot):
-        data = {'inline_message_id': self.inline_message_id}
+        data = {"inline_message_id": self.inline_message_id}
         m = SentWebAppMessage.de_json(data, None)
         assert m.inline_message_id == self.inline_message_id
 

@@ -121,9 +121,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     """
 
     __slots__ = (
-        'bot',
-        'store_data',
-        '_update_interval',
+        "bot",
+        "store_data",
+        "_update_interval",
     )
 
     def __init__(
@@ -162,7 +162,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 :paramref:`bot` is not an instance of :class:`telegram.ext.ExtBot`.
         """
         if self.store_data.callback_data and not isinstance(bot, ExtBot):
-            raise TypeError('callback_data can only be stored when using telegram.ext.ExtBot.')
+            raise TypeError("callback_data can only be stored when using telegram.ext.ExtBot.")
 
         self.bot = bot
 

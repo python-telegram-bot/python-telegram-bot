@@ -37,15 +37,15 @@ def _git_revision() -> Optional[str]:
 
 def print_ver_info() -> None:  # skipcq: PY-D0003
     git_revision = _git_revision()
-    print(f'python-telegram-bot {telegram_ver}' + (f' ({git_revision})' if git_revision else ''))
-    print(f'Bot API {BOT_API_VERSION}')
-    sys_version = sys.version.replace('\n', ' ')
-    print(f'Python {sys_version}')
+    print(f"python-telegram-bot {telegram_ver}" + (f" ({git_revision})" if git_revision else ""))
+    print(f"Bot API {BOT_API_VERSION}")
+    sys_version = sys.version.replace("\n", " ")
+    print(f"Python {sys_version}")
 
 
 def main() -> None:  # skipcq: PY-D0003
     print_ver_info()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

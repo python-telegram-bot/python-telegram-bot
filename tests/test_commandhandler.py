@@ -91,7 +91,7 @@ class BaseTest:
         )
 
     def callback_args(self, update, context):
-        self.test_flag = context.args == ['one', 'two']
+        self.test_flag = context.args == ["one", "two"]
 
     def callback_regex1(self, update, context):
         if context.matches:
@@ -109,7 +109,7 @@ class BaseTest:
         app.add_handler(handler)
         update = make_command_update(text, bot=app.bot)
         assert not await self.response(app, update)
-        update.message.text += ' one two'
+        update.message.text += " one two"
         assert await self.response(app, update)
 
     def _test_edited(self, message, handler_edited, handler_not_edited):
@@ -133,23 +133,23 @@ class BaseTest:
 
 
 class TestCommandHandler(BaseTest):
-    CMD = '/test'
+    CMD = "/test"
 
     def test_slot_behaviour(self, mro_slots):
         handler = self.make_default_handler()
         for attr in handler.__slots__:
-            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def command(self):
         return self.CMD
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def command_message(self, command, bot):
         return make_command_message(command, bot=bot)
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def command_update(self, command_message):
         return make_command_update(command_message)
 
@@ -165,26 +165,26 @@ class TestCommandHandler(BaseTest):
 
         assert await self.response(app, make_command_update(command, bot=app.bot))
         assert not is_match(handler, make_command_update(command[1:], bot=app.bot))
-        assert not is_match(handler, make_command_update(f'/not{command[1:]}', bot=app.bot))
-        assert not is_match(handler, make_command_update(f'not {command} at start', bot=app.bot))
+        assert not is_match(handler, make_command_update(f"/not{command[1:]}", bot=app.bot))
+        assert not is_match(handler, make_command_update(f"not {command} at start", bot=app.bot))
 
     @pytest.mark.parametrize(
-        'cmd',
-        ['way_too_longcommand1234567yes_way_toooooooLong', 'ïñválídletters', 'invalid #&* chars'],
-        ids=['too long', 'invalid letter', 'invalid characters'],
+        "cmd",
+        ["way_too_longcommand1234567yes_way_toooooooLong", "ïñválídletters", "invalid #&* chars"],
+        ids=["too long", "invalid letter", "invalid characters"],
     )
     def test_invalid_commands(self, cmd):
         with pytest.raises(
-            ValueError, match=f'`{re.escape(cmd.lower())}` is not a valid bot command'
+            ValueError, match=f"`{re.escape(cmd.lower())}` is not a valid bot command"
         ):
             CommandHandler(cmd, self.callback_basic)
 
     def test_command_list(self, bot):
         """A command handler with multiple commands registered should respond to all of them."""
-        handler = CommandHandler(['test', 'star'], self.callback_basic)
-        assert is_match(handler, make_command_update('/test', bot=bot))
-        assert is_match(handler, make_command_update('/star', bot=bot))
-        assert not is_match(handler, make_command_update('/stop', bot=bot))
+        handler = CommandHandler(["test", "star"], self.callback_basic)
+        assert is_match(handler, make_command_update("/test", bot=bot))
+        assert is_match(handler, make_command_update("/star", bot=bot))
+        assert not is_match(handler, make_command_update("/stop", bot=bot))
 
     def test_edited(self, command_message):
         """Test that a CH responds to an edited message if its filters allow it"""
@@ -195,8 +195,8 @@ class TestCommandHandler(BaseTest):
     def test_directed_commands(self, bot, command):
         """Test recognition of commands with a mention to the bot"""
         handler = self.make_default_handler()
-        assert is_match(handler, make_command_update(command + '@' + bot.username, bot=bot))
-        assert not is_match(handler, make_command_update(command + '@otherbot', bot=bot))
+        assert is_match(handler, make_command_update(command + "@" + bot.username, bot=bot))
+        assert not is_match(handler, make_command_update(command + "@otherbot", bot=bot))
 
     def test_with_filter(self, command, bot):
         """Test that a CH with a (generic) filter responds if its filters match"""
@@ -210,7 +210,7 @@ class TestCommandHandler(BaseTest):
         """Assert that newlines don't interfere with a command handler matching a message"""
         handler = self.make_default_handler()
         app.add_handler(handler)
-        update = make_command_update(command + '\nfoobar', bot=app.bot)
+        update = make_command_update(command + "\nfoobar", bot=app.bot)
         async with app:
             assert is_match(handler, update)
         assert await self.response(app, update)
@@ -223,7 +223,7 @@ class TestCommandHandler(BaseTest):
     def test_filters_for_wrong_command(self, mock_filter, bot):
         """Filters should not be executed if the command does not match the handler"""
         handler = self.make_default_handler(filters=mock_filter)
-        assert not is_match(handler, make_command_update('/star', bot=bot))
+        assert not is_match(handler, make_command_update("/star", bot=bot))
         assert not mock_filter.tested
 
     async def test_context(self, app, command_update):
@@ -239,13 +239,13 @@ class TestCommandHandler(BaseTest):
 
     async def test_context_regex(self, app, command):
         """Test CHs with context-based callbacks and a single filter"""
-        handler = self.make_default_handler(self.callback_regex1, filters=filters.Regex('one two'))
+        handler = self.make_default_handler(self.callback_regex1, filters=filters.Regex("one two"))
         await self._test_context_args_or_regex(app, handler, command)
 
     async def test_context_multiple_regex(self, app, command):
         """Test CHs with context-based callbacks and filters combined"""
         handler = self.make_default_handler(
-            self.callback_regex2, filters=filters.Regex('one') & filters.Regex('two')
+            self.callback_regex2, filters=filters.Regex("one") & filters.Regex("two")
         )
         await self._test_context_args_or_regex(app, handler, command)
 
@@ -259,41 +259,41 @@ def combinations(prefixes, commands):
 
 class TestPrefixHandler(BaseTest):
     # Prefixes and commands with which to test PrefixHandler:
-    PREFIXES = ['!', '#', 'mytrig-']
-    COMMANDS = ['help', 'test']
+    PREFIXES = ["!", "#", "mytrig-"]
+    COMMANDS = ["help", "test"]
     COMBINATIONS = list(combinations(PREFIXES, COMMANDS))
 
     def test_slot_behaviour(self, mro_slots):
         handler = self.make_default_handler()
         for attr in handler.__slots__:
-            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
-    @pytest.fixture(scope='class', params=PREFIXES)
+    @pytest.fixture(scope="class", params=PREFIXES)
     def prefix(self, request):
         return request.param
 
-    @pytest.fixture(scope='class', params=[1, 2], ids=['single prefix', 'multiple prefixes'])
+    @pytest.fixture(scope="class", params=[1, 2], ids=["single prefix", "multiple prefixes"])
     def prefixes(self, request):
         return TestPrefixHandler.PREFIXES[: request.param]
 
-    @pytest.fixture(scope='class', params=COMMANDS)
+    @pytest.fixture(scope="class", params=COMMANDS)
     def command(self, request):
         return request.param
 
-    @pytest.fixture(scope='class', params=[1, 2], ids=['single command', 'multiple commands'])
+    @pytest.fixture(scope="class", params=[1, 2], ids=["single command", "multiple commands"])
     def commands(self, request):
         return TestPrefixHandler.COMMANDS[: request.param]
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def prefix_message_text(self, prefix, command):
         return prefix + command
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def prefix_message(self, prefix_message_text):
         return make_message(prefix_message_text)
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def prefix_message_update(self, prefix_message):
         return make_message_update(prefix_message)
 
@@ -309,8 +309,8 @@ class TestPrefixHandler(BaseTest):
 
         assert await self.response(app, make_message_update(text))
         assert not is_match(handler, make_message_update(command))
-        assert not is_match(handler, make_message_update(prefix + 'notacommand'))
-        assert not is_match(handler, make_command_update(f'not {text} at start'))
+        assert not is_match(handler, make_message_update(prefix + "notacommand"))
+        assert not is_match(handler, make_command_update(f"not {text} at start"))
 
     def test_single_multi_prefixes_commands(self, prefixes, commands, prefix_message_update):
         """Test various combinations of prefixes and commands"""
@@ -337,20 +337,20 @@ class TestPrefixHandler(BaseTest):
     def test_filters_for_wrong_command(self, mock_filter):
         """Filters should not be executed if the command does not match the handler"""
         handler = self.make_default_handler(filters=mock_filter)
-        assert not is_match(handler, make_message_update('/test'))
+        assert not is_match(handler, make_message_update("/test"))
         assert not mock_filter.tested
 
     def test_edit_prefix(self):
         handler = self.make_default_handler()
-        handler.prefix = ['?', '§']
-        assert handler._commands == list(combinations(['?', '§'], self.COMMANDS))
-        handler.prefix = '+'
-        assert handler._commands == list(combinations(['+'], self.COMMANDS))
+        handler.prefix = ["?", "§"]
+        assert handler._commands == list(combinations(["?", "§"], self.COMMANDS))
+        handler.prefix = "+"
+        assert handler._commands == list(combinations(["+"], self.COMMANDS))
 
     def test_edit_command(self):
         handler = self.make_default_handler()
-        handler.command = 'foo'
-        assert handler._commands == list(combinations(self.PREFIXES, ['foo']))
+        handler.command = "foo"
+        assert handler._commands == list(combinations(self.PREFIXES, ["foo"]))
 
     async def test_basic_after_editing(self, app, prefix, command):
         """Test the basic expected response from a prefix handler"""
@@ -359,8 +359,8 @@ class TestPrefixHandler(BaseTest):
         text = prefix + command
 
         assert await self.response(app, make_message_update(text))
-        handler.command = 'foo'
-        text = prefix + 'foo'
+        handler.command = "foo"
+        text = prefix + "foo"
         assert await self.response(app, make_message_update(text))
 
     async def test_context(self, app, prefix_message_update):
@@ -373,11 +373,11 @@ class TestPrefixHandler(BaseTest):
         await self._test_context_args_or_regex(app, handler, prefix_message_text)
 
     async def test_context_regex(self, app, prefix_message_text):
-        handler = self.make_default_handler(self.callback_regex1, filters=filters.Regex('one two'))
+        handler = self.make_default_handler(self.callback_regex1, filters=filters.Regex("one two"))
         await self._test_context_args_or_regex(app, handler, prefix_message_text)
 
     async def test_context_multiple_regex(self, app, prefix_message_text):
         handler = self.make_default_handler(
-            self.callback_regex2, filters=filters.Regex('one') & filters.Regex('two')
+            self.callback_regex2, filters=filters.Regex("one") & filters.Regex("two")
         )
         await self._test_context_args_or_regex(app, handler, prefix_message_text)

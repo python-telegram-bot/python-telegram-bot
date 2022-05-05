@@ -72,7 +72,7 @@ class InputMedia(TelegramObject):
             entities that appear in the caption.
     """
 
-    __slots__ = ('caption', 'caption_entities', 'media', 'parse_mode', 'type')
+    __slots__ = ("caption", "caption_entities", "media", "parse_mode", "type")
 
     def __init__(
         self,
@@ -93,7 +93,7 @@ class InputMedia(TelegramObject):
         data = super().to_dict()
 
         if self.caption_entities:
-            data['caption_entities'] = [ce.to_dict() for ce in self.caption_entities]
+            data["caption_entities"] = [ce.to_dict() for ce in self.caption_entities]
 
         return data
 
@@ -160,7 +160,7 @@ class InputMediaAnimation(InputMedia):
 
     """
 
-    __slots__ = ('duration', 'height', 'thumb', 'width')
+    __slots__ = ("duration", "height", "thumb", "width")
 
     def __init__(
         self,
@@ -305,7 +305,7 @@ class InputMediaVideo(InputMedia):
 
     """
 
-    __slots__ = ('duration', 'height', 'thumb', 'supports_streaming', 'width')
+    __slots__ = ("duration", "height", "thumb", "supports_streaming", "width")
 
     def __init__(
         self,
@@ -398,7 +398,7 @@ class InputMediaAudio(InputMedia):
 
     """
 
-    __slots__ = ('duration', 'performer', 'thumb', 'title')
+    __slots__ = ("duration", "performer", "thumb", "title")
 
     def __init__(
         self,
@@ -480,7 +480,7 @@ class InputMediaDocument(InputMedia):
 
     """
 
-    __slots__ = ('disable_content_type_detection', 'thumb')
+    __slots__ = ("disable_content_type_detection", "thumb")
 
     def __init__(
         self,

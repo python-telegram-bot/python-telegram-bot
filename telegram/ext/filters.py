@@ -37,54 +37,54 @@ This module contains filters for use with :class:`telegram.ext.MessageHandler`,
 """
 
 __all__ = (
-    'ALL',
-    'ANIMATION',
-    'ATTACHMENT',
-    'AUDIO',
-    'BaseFilter',
-    'CAPTION',
-    'CHAT',
-    'COMMAND',
-    'CONTACT',
-    'Caption',
-    'CaptionEntity',
-    'CaptionRegex',
-    'Chat',
-    'ChatType',
-    'Command',
-    'Dice',
-    'Document',
-    'Entity',
-    'FORWARDED',
-    'ForwardedFrom',
-    'GAME',
-    'HAS_PROTECTED_CONTENT',
-    'INVOICE',
-    'IS_AUTOMATIC_FORWARD',
-    'LOCATION',
-    'Language',
-    'MessageFilter',
-    'PASSPORT_DATA',
-    'PHOTO',
-    'POLL',
-    'REPLY',
-    'Regex',
-    'Sticker',
-    'SUCCESSFUL_PAYMENT',
-    'SenderChat',
-    'StatusUpdate',
-    'TEXT',
-    'Text',
-    'USER',
-    'UpdateFilter',
-    'UpdateType',
-    'User',
-    'VENUE',
-    'VIA_BOT',
-    'VIDEO',
-    'VIDEO_NOTE',
-    'VOICE',
-    'ViaBot',
+    "ALL",
+    "ANIMATION",
+    "ATTACHMENT",
+    "AUDIO",
+    "BaseFilter",
+    "CAPTION",
+    "CHAT",
+    "COMMAND",
+    "CONTACT",
+    "Caption",
+    "CaptionEntity",
+    "CaptionRegex",
+    "Chat",
+    "ChatType",
+    "Command",
+    "Dice",
+    "Document",
+    "Entity",
+    "FORWARDED",
+    "ForwardedFrom",
+    "GAME",
+    "HAS_PROTECTED_CONTENT",
+    "INVOICE",
+    "IS_AUTOMATIC_FORWARD",
+    "LOCATION",
+    "Language",
+    "MessageFilter",
+    "PASSPORT_DATA",
+    "PHOTO",
+    "POLL",
+    "REPLY",
+    "Regex",
+    "Sticker",
+    "SUCCESSFUL_PAYMENT",
+    "SenderChat",
+    "StatusUpdate",
+    "TEXT",
+    "Text",
+    "USER",
+    "UpdateFilter",
+    "UpdateType",
+    "User",
+    "VENUE",
+    "VIA_BOT",
+    "VIDEO",
+    "VIDEO_NOTE",
+    "VOICE",
+    "ViaBot",
 )
 
 import mimetypes
@@ -174,7 +174,7 @@ class BaseFilter:
         data_filter (:obj:`bool`): Whether this filter is a data filter.
     """
 
-    __slots__ = ('_name', '_data_filter')
+    __slots__ = ("_name", "_data_filter")
 
     def __init__(self, name: str = None, data_filter: bool = False):
         self._name = self.__class__.__name__ if name is None else name
@@ -192,16 +192,16 @@ class BaseFilter:
             return True
         return False
 
-    def __and__(self, other: 'BaseFilter') -> 'BaseFilter':
+    def __and__(self, other: "BaseFilter") -> "BaseFilter":
         return _MergedFilter(self, and_filter=other)
 
-    def __or__(self, other: 'BaseFilter') -> 'BaseFilter':
+    def __or__(self, other: "BaseFilter") -> "BaseFilter":
         return _MergedFilter(self, or_filter=other)
 
-    def __xor__(self, other: 'BaseFilter') -> 'BaseFilter':
+    def __xor__(self, other: "BaseFilter") -> "BaseFilter":
         return _XORFilter(self, other)
 
-    def __invert__(self) -> 'BaseFilter':
+    def __invert__(self) -> "BaseFilter":
         return _InvertedFilter(self)
 
     @property
@@ -302,7 +302,7 @@ class _InvertedFilter(UpdateFilter):
 
     """
 
-    __slots__ = ('inv_filter',)
+    __slots__ = ("inv_filter",)
 
     def __init__(self, f: BaseFilter):
         super().__init__()
@@ -317,7 +317,7 @@ class _InvertedFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError('Cannot set name for combined filters.')
+        raise RuntimeError("Cannot set name for combined filters.")
 
 
 class _MergedFilter(UpdateFilter):
@@ -330,7 +330,7 @@ class _MergedFilter(UpdateFilter):
 
     """
 
-    __slots__ = ('base_filter', 'and_filter', 'or_filter')
+    __slots__ = ("base_filter", "and_filter", "or_filter")
 
     def __init__(
         self, base_filter: BaseFilter, and_filter: BaseFilter = None, or_filter: BaseFilter = None
@@ -405,7 +405,7 @@ class _MergedFilter(UpdateFilter):
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError('Cannot set name for combined filters.')
+        raise RuntimeError("Cannot set name for combined filters.")
 
 
 class _XORFilter(UpdateFilter):
@@ -418,7 +418,7 @@ class _XORFilter(UpdateFilter):
 
     """
 
-    __slots__ = ('base_filter', 'xor_filter', 'merged_filter')
+    __slots__ = ("base_filter", "xor_filter", "merged_filter")
 
     def __init__(self, base_filter: BaseFilter, xor_filter: BaseFilter):
         super().__init__()
@@ -431,11 +431,11 @@ class _XORFilter(UpdateFilter):
 
     @property
     def name(self) -> str:
-        return f'<{self.base_filter} xor {self.xor_filter}>'
+        return f"<{self.base_filter} xor {self.xor_filter}>"
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError('Cannot set name for combined filters.')
+        raise RuntimeError("Cannot set name for combined filters.")
 
 
 class _All(MessageFilter):
@@ -499,11 +499,11 @@ class Caption(MessageFilter):
             exact matches are allowed. If not specified, will allow any message with a caption.
     """
 
-    __slots__ = ('strings',)
+    __slots__ = ("strings",)
 
     def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
         self.strings = strings
-        super().__init__(name=f'filters.Caption({strings})' if strings else 'filters.CAPTION')
+        super().__init__(name=f"filters.Caption({strings})" if strings else "filters.CAPTION")
 
     def filter(self, message: Message) -> bool:
         if self.strings is None:
@@ -533,11 +533,11 @@ class CaptionEntity(MessageFilter):
 
     """
 
-    __slots__ = ('entity_type',)
+    __slots__ = ("entity_type",)
 
     def __init__(self, entity_type: str):
         self.entity_type = entity_type
-        super().__init__(name=f'filters.CaptionEntity({self.entity_type})')
+        super().__init__(name=f"filters.CaptionEntity({self.entity_type})")
 
     def filter(self, message: Message) -> bool:
         return any(entity.type == self.entity_type for entity in message.caption_entities)
@@ -561,29 +561,29 @@ class CaptionRegex(MessageFilter):
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
     """
 
-    __slots__ = ('pattern',)
+    __slots__ = ("pattern",)
 
     def __init__(self, pattern: Union[str, Pattern]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
         self.pattern: Pattern = pattern
-        super().__init__(name=f'filters.CaptionRegex({self.pattern})', data_filter=True)
+        super().__init__(name=f"filters.CaptionRegex({self.pattern})", data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
         if message.caption:
             match = self.pattern.search(message.caption)
             if match:
-                return {'matches': [match]}
+                return {"matches": [match]}
         return {}
 
 
 class _ChatUserBaseFilter(MessageFilter, ABC):
     __slots__ = (
-        '_chat_id_name',
-        '_username_name',
-        'allow_empty',
-        '_chat_ids',
-        '_usernames',
+        "_chat_id_name",
+        "_username_name",
+        "allow_empty",
+        "_chat_ids",
+        "_usernames",
     )
 
     def __init__(
@@ -593,8 +593,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         allow_empty: bool = False,
     ):
         super().__init__()
-        self._chat_id_name = 'chat_id'
-        self._username_name = 'username'
+        self._chat_id_name = "chat_id"
+        self._username_name = "username"
         self.allow_empty = allow_empty
 
         self._chat_ids: Set[int] = set()
@@ -620,8 +620,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         if username is None:
             return set()
         if isinstance(username, str):
-            return {username[1:] if username.startswith('@') else username}
-        return {chat[1:] if chat.startswith('@') else chat for chat in username}
+            return {username[1:] if username.startswith("@") else username}
+        return {chat[1:] if chat.startswith("@") else chat for chat in username}
 
     def _set_chat_ids(self, chat_id: Optional[SLT[int]]) -> None:
         if chat_id and self._usernames:
@@ -734,13 +734,13 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
     @property
     def name(self) -> str:
         return (
-            f'filters.{self.__class__.__name__}('
+            f"filters.{self.__class__.__name__}("
             f'{", ".join(str(s) for s in (self.usernames or self.chat_ids))})'
         )
 
     @name.setter
     def name(self, name: str) -> NoReturn:
-        raise RuntimeError(f'Cannot set name for filters.{self.__class__.__name__}')
+        raise RuntimeError(f"Cannot set name for filters.{self.__class__.__name__}")
 
 
 class Chat(_ChatUserBaseFilter):
@@ -890,11 +890,11 @@ class Command(MessageFilter):
             command. Defaults to :obj:`True`.
     """
 
-    __slots__ = ('only_start',)
+    __slots__ = ("only_start",)
 
     def __init__(self, only_start: bool = True):
         self.only_start = only_start
-        super().__init__(f'filters.Command({only_start})' if not only_start else 'filters.COMMAND')
+        super().__init__(f"filters.Command({only_start})" if not only_start else "filters.COMMAND")
 
     def filter(self, message: Message) -> bool:
         if not message.entities:
@@ -928,7 +928,7 @@ CONTACT = _Contact(name="filters.CONTACT")
 
 
 class _Dice(MessageFilter):
-    __slots__ = ('emoji', 'values')
+    __slots__ = ("emoji", "values")
 
     def __init__(self, values: SLT[int] = None, emoji: DiceEmojiEnum = None):
         super().__init__()
@@ -1123,7 +1123,7 @@ class Document:
             send media with wrong types that don't fit to this handler.
         """
 
-        __slots__ = ('_category',)
+        __slots__ = ("_category",)
 
         def __init__(self, category: str):
             self._category = category
@@ -1134,15 +1134,15 @@ class Document:
                 return message.document.mime_type.startswith(self._category)
             return False
 
-    APPLICATION = Category('application/')
+    APPLICATION = Category("application/")
     """Use as ``filters.Document.APPLICATION``."""
-    AUDIO = Category('audio/')
+    AUDIO = Category("audio/")
     """Use as ``filters.Document.AUDIO``."""
-    IMAGE = Category('image/')
+    IMAGE = Category("image/")
     """Use as ``filters.Document.IMAGE``."""
-    VIDEO = Category('video/')
+    VIDEO = Category("video/")
     """Use as ``filters.Document.VIDEO``."""
-    TEXT = Category('text/')
+    TEXT = Category("text/")
     """Use as ``filters.Document.TEXT``."""
 
     class FileExtension(MessageFilter):
@@ -1176,7 +1176,7 @@ class Document:
               i.e. without a dot in the filename.
         """
 
-        __slots__ = ('_file_extension', 'is_case_sensitive')
+        __slots__ = ("_file_extension", "is_case_sensitive")
 
         def __init__(self, file_extension: Optional[str], case_sensitive: bool = False):
             super().__init__()
@@ -1219,7 +1219,7 @@ class Document:
             send media with wrong types that don't fit to this handler.
         """
 
-        __slots__ = ('mimetype',)
+        __slots__ = ("mimetype",)
 
         def __init__(self, mimetype: str):
             self.mimetype = mimetype  # skipcq: PTC-W0052
@@ -1230,37 +1230,37 @@ class Document:
                 return message.document.mime_type == self.mimetype
             return False
 
-    APK = MimeType('application/vnd.android.package-archive')
+    APK = MimeType("application/vnd.android.package-archive")
     """Use as ``filters.Document.APK``."""
-    DOC = MimeType(mimetypes.types_map['.doc'])
+    DOC = MimeType(mimetypes.types_map[".doc"])
     """Use as ``filters.Document.DOC``."""
-    DOCX = MimeType('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    DOCX = MimeType("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
     """Use as ``filters.Document.DOCX``."""
-    EXE = MimeType(mimetypes.types_map['.exe'])
+    EXE = MimeType(mimetypes.types_map[".exe"])
     """Use as ``filters.Document.EXE``."""
-    MP4 = MimeType(mimetypes.types_map['.mp4'])
+    MP4 = MimeType(mimetypes.types_map[".mp4"])
     """Use as ``filters.Document.MP4``."""
-    GIF = MimeType(mimetypes.types_map['.gif'])
+    GIF = MimeType(mimetypes.types_map[".gif"])
     """Use as ``filters.Document.GIF``."""
-    JPG = MimeType(mimetypes.types_map['.jpg'])
+    JPG = MimeType(mimetypes.types_map[".jpg"])
     """Use as ``filters.Document.JPG``."""
-    MP3 = MimeType(mimetypes.types_map['.mp3'])
+    MP3 = MimeType(mimetypes.types_map[".mp3"])
     """Use as ``filters.Document.MP3``."""
-    PDF = MimeType(mimetypes.types_map['.pdf'])
+    PDF = MimeType(mimetypes.types_map[".pdf"])
     """Use as ``filters.Document.PDF``."""
-    PY = MimeType(mimetypes.types_map['.py'])
+    PY = MimeType(mimetypes.types_map[".py"])
     """Use as ``filters.Document.PY``."""
-    SVG = MimeType(mimetypes.types_map['.svg'])
+    SVG = MimeType(mimetypes.types_map[".svg"])
     """Use as ``filters.Document.SVG``."""
-    TXT = MimeType(mimetypes.types_map['.txt'])
+    TXT = MimeType(mimetypes.types_map[".txt"])
     """Use as ``filters.Document.TXT``."""
-    TARGZ = MimeType('application/x-compressed-tar')
+    TARGZ = MimeType("application/x-compressed-tar")
     """Use as ``filters.Document.TARGZ``."""
-    WAV = MimeType(mimetypes.types_map['.wav'])
+    WAV = MimeType(mimetypes.types_map[".wav"])
     """Use as ``filters.Document.WAV``."""
-    XML = MimeType(mimetypes.types_map['.xml'])
+    XML = MimeType(mimetypes.types_map[".xml"])
     """Use as ``filters.Document.XML``."""
-    ZIP = MimeType(mimetypes.types_map['.zip'])
+    ZIP = MimeType(mimetypes.types_map[".zip"])
     """Use as ``filters.Document.ZIP``."""
 
 
@@ -1278,11 +1278,11 @@ class Entity(MessageFilter):
 
     """
 
-    __slots__ = ('entity_type',)
+    __slots__ = ("entity_type",)
 
     def __init__(self, entity_type: str):
         self.entity_type = entity_type
-        super().__init__(name=f'filters.Entity({self.entity_type})')
+        super().__init__(name=f"filters.Entity({self.entity_type})")
 
     def filter(self, message: Message) -> bool:
         return any(entity.type == self.entity_type for entity in message.entities)
@@ -1385,7 +1385,7 @@ class _HasProtectedContent(MessageFilter):
         return bool(message.has_protected_content)
 
 
-HAS_PROTECTED_CONTENT = _HasProtectedContent(name='filters.HAS_PROTECTED_CONTENT')
+HAS_PROTECTED_CONTENT = _HasProtectedContent(name="filters.HAS_PROTECTED_CONTENT")
 """Messages that contain :attr:`telegram.Message.has_protected_content`.
 
     .. versionadded:: 13.9
@@ -1410,7 +1410,7 @@ class _IsAutomaticForward(MessageFilter):
         return bool(message.is_automatic_forward)
 
 
-IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name='filters.IS_AUTOMATIC_FORWARD')
+IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name="filters.IS_AUTOMATIC_FORWARD")
 """Messages that contain :attr:`telegram.Message.is_automatic_forward`.
 
     .. versionadded:: 13.9
@@ -1435,7 +1435,7 @@ class Language(MessageFilter):
 
     """
 
-    __slots__ = ('lang',)
+    __slots__ = ("lang",)
 
     def __init__(self, lang: SLT[str]):
         if isinstance(lang, str):
@@ -1528,19 +1528,19 @@ class Regex(MessageFilter):
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
     """
 
-    __slots__ = ('pattern',)
+    __slots__ = ("pattern",)
 
     def __init__(self, pattern: Union[str, Pattern]):
         if isinstance(pattern, str):
             pattern = re.compile(pattern)
         self.pattern: Pattern = pattern
-        super().__init__(name=f'filters.Regex({self.pattern})', data_filter=True)
+        super().__init__(name=f"filters.Regex({self.pattern})", data_filter=True)
 
     def filter(self, message: Message) -> Optional[Dict[str, List[Match]]]:
         if message.text:
             match = self.pattern.search(message.text)
             if match:
-                return {'matches': [match]}
+                return {"matches": [match]}
         return {}
 
 
@@ -1990,11 +1990,11 @@ class Text(MessageFilter):
             exact matches are allowed. If not specified, will allow any text message.
     """
 
-    __slots__ = ('strings',)
+    __slots__ = ("strings",)
 
     def __init__(self, strings: Union[List[str], Tuple[str, ...]] = None):
         self.strings = strings
-        super().__init__(name=f'filters.Text({strings})' if strings else 'filters.TEXT')
+        super().__init__(name=f"filters.Text({strings})" if strings else "filters.TEXT")
 
     def filter(self, message: Message) -> bool:
         if self.strings is None:
@@ -2127,7 +2127,7 @@ class User(_ChatUserBaseFilter):
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=user_id, username=username, allow_empty=allow_empty)
-        self._chat_id_name = 'user_id'
+        self._chat_id_name = "user_id"
 
     def get_chat_or_user(self, message: Message) -> Optional[TGUser]:
         return message.from_user
@@ -2228,7 +2228,7 @@ class ViaBot(_ChatUserBaseFilter):
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=bot_id, username=username, allow_empty=allow_empty)
-        self._chat_id_name = 'bot_id'
+        self._chat_id_name = "bot_id"
 
     def get_chat_or_user(self, message: Message) -> Optional[TGUser]:
         return message.via_bot

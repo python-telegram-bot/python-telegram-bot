@@ -47,16 +47,16 @@ class PersonalDetails(TelegramObject):
     """
 
     __slots__ = (
-        'middle_name',
-        'first_name_native',
-        'last_name_native',
-        'residence_country_code',
-        'first_name',
-        'last_name',
-        'country_code',
-        'gender',
-        'middle_name_native',
-        'birth_date',
+        "middle_name",
+        "first_name_native",
+        "last_name_native",
+        "residence_country_code",
+        "first_name",
+        "last_name",
+        "country_code",
+        "gender",
+        "middle_name_native",
+        "birth_date",
     )
 
     def __init__(
@@ -71,7 +71,7 @@ class PersonalDetails(TelegramObject):
         last_name_native: str = None,
         middle_name: str = None,
         middle_name_native: str = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         # Required
@@ -103,12 +103,12 @@ class ResidentialAddress(TelegramObject):
     """
 
     __slots__ = (
-        'post_code',
-        'city',
-        'country_code',
-        'street_line2',
-        'street_line1',
-        'state',
+        "post_code",
+        "city",
+        "country_code",
+        "street_line2",
+        "street_line1",
+        "state",
     )
 
     def __init__(
@@ -119,7 +119,7 @@ class ResidentialAddress(TelegramObject):
         state: str,
         country_code: str,
         post_code: str,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         # Required
@@ -142,9 +142,9 @@ class IdDocumentData(TelegramObject):
         expiry_date (:obj:`str`): Optional. Date of expiry, in DD.MM.YYYY format.
     """
 
-    __slots__ = ('document_no', 'expiry_date')
+    __slots__ = ("document_no", "expiry_date")
 
-    def __init__(self, document_no: str, expiry_date: str, bot: 'Bot' = None, **_kwargs: Any):
+    def __init__(self, document_no: str, expiry_date: str, bot: "Bot" = None, **_kwargs: Any):
         self.document_no = document_no
         self.expiry_date = expiry_date
 

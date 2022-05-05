@@ -55,7 +55,7 @@ class ReplyKeyboardRemove(TelegramObject):
 
     """
 
-    __slots__ = ('selective', 'remove_keyboard')
+    __slots__ = ("selective", "remove_keyboard")
 
     def __init__(self, selective: bool = False, **_kwargs: Any):
         # Required

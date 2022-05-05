@@ -29,7 +29,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 if TYPE_CHECKING:
     from telegram.ext import Application
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 class InlineQueryHandler(Handler[Update, CCT]):
@@ -77,7 +77,7 @@ class InlineQueryHandler(Handler[Update, CCT]):
 
     """
 
-    __slots__ = ('pattern', 'chat_types')
+    __slots__ = ("pattern", "chat_types")
 
     def __init__(
         self,
@@ -123,7 +123,7 @@ class InlineQueryHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        application: 'Application',
+        application: "Application",
         check_result: Optional[Union[bool, Match]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.inline_query.query)`` to

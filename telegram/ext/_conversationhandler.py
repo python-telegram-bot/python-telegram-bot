@@ -67,11 +67,11 @@ class _ConversationTimeoutContext(Generic[CCT]):
     :paramref:`JobQueue.run_once.context` parameter. See :meth:`_trigger_timeout`.
     """
 
-    __slots__ = ('conversation_key', 'update', 'application', 'callback_context')
+    __slots__ = ("conversation_key", "update", "application", "callback_context")
 
     conversation_key: ConversationKey
     update: Update
-    application: 'Application[Any, CCT, Any, Any, Any, JobQueue]'
+    application: "Application[Any, CCT, Any, Any, Any, JobQueue]"
     callback_context: CallbackContext
 
 
@@ -82,7 +82,7 @@ class PendingState:
     It's still hidden from users, since this module itself is private.
     """
 
-    __slots__ = ('task', 'old_state')
+    __slots__ = ("task", "old_state")
 
     task: asyncio.Task
     old_state: object
@@ -99,7 +99,7 @@ class PendingState:
             :exc:`RuntimeError`: If the current task has not yet finished.
         """
         if not self.task.done():
-            raise RuntimeError('New state is not yet available')
+            raise RuntimeError("New state is not yet available")
 
         exc = self.task.exception()
         if exc:
@@ -253,22 +253,22 @@ class ConversationHandler(Handler[Update, CCT]):
     """
 
     __slots__ = (
-        '_allow_reentry',
-        '_block',
-        '_child_conversations',
-        '_conversation_timeout',
-        '_conversations',
-        '_entry_points',
-        '_fallbacks',
-        '_map_to_parent',
-        '_name',
-        '_per_chat',
-        '_per_message',
-        '_per_user',
-        '_persistent',
-        '_states',
-        '_timeout_jobs_lock',
-        'timeout_jobs',
+        "_allow_reentry",
+        "_block",
+        "_child_conversations",
+        "_conversation_timeout",
+        "_conversations",
+        "_entry_points",
+        "_fallbacks",
+        "_map_to_parent",
+        "_name",
+        "_per_chat",
+        "_per_message",
+        "_per_user",
+        "_persistent",
+        "_states",
+        "_timeout_jobs_lock",
+        "timeout_jobs",
     )
 
     END: ClassVar[int] = -1
@@ -324,10 +324,10 @@ class ConversationHandler(Handler[Update, CCT]):
 
         # if conversation_timeout is used, this dict is used to schedule a job which runs when the
         # conv has timed out.
-        self.timeout_jobs: Dict[ConversationKey, 'Job'] = {}
+        self.timeout_jobs: Dict[ConversationKey, "Job"] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
-        self._child_conversations: Set['ConversationHandler'] = set()
+        self._child_conversations: Set["ConversationHandler"] = set()
 
         if persistent and not self.name:
             raise ValueError("Conversations can't be persistent when handler is unnamed.")
@@ -552,7 +552,7 @@ class ConversationHandler(Handler[Update, CCT]):
         )
 
     async def _initialize_persistence(
-        self, application: 'Application'
+        self, application: "Application"
     ) -> Dict[str, TrackingDict[ConversationKey, object]]:
         """Initializes the persistence for this handler and its child conversations.
         While this method is marked as protected, we expect it to be called by the
@@ -568,8 +568,8 @@ class ConversationHandler(Handler[Update, CCT]):
         """
         if not (self.persistent and self.name and application.persistence):
             raise RuntimeError(
-                'This handler is not persistent, has no name or the application has no '
-                'persistence!'
+                "This handler is not persistent, has no name or the application has no "
+                "persistence!"
             )
 
         current_conversations = self._conversations
@@ -626,7 +626,7 @@ class ConversationHandler(Handler[Update, CCT]):
     async def _schedule_job_delayed(
         self,
         new_state: asyncio.Task,
-        application: 'Application[Any, CCT, Any, Any, Any, JobQueue]',
+        application: "Application[Any, CCT, Any, Any, Any, JobQueue]",
         update: Update,
         context: CallbackContext,
         conversation_key: ConversationKey,
@@ -635,8 +635,8 @@ class ConversationHandler(Handler[Update, CCT]):
             effective_new_state = await new_state
         except Exception as exc:
             _logger.debug(
-                'Non-blocking handler callback raised exception. Not scheduling conversation '
-                'timeout.',
+                "Non-blocking handler callback raised exception. Not scheduling conversation "
+                "timeout.",
                 exc_info=exc,
             )
             return
@@ -651,7 +651,7 @@ class ConversationHandler(Handler[Update, CCT]):
     def _schedule_job(
         self,
         new_state: object,
-        application: 'Application[Any, CCT, Any, Any, Any, JobQueue]',
+        application: "Application[Any, CCT, Any, Any, Any, JobQueue]",
         update: Update,
         context: CallbackContext,
         conversation_key: ConversationKey,
@@ -704,7 +704,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
         # Resolve futures
         if isinstance(state, PendingState):
-            _logger.debug('Waiting for asyncio Task to finish ...')
+            _logger.debug("Waiting for asyncio Task to finish ...")
 
             # check if future is finished or not
             if state.done():
@@ -721,7 +721,7 @@ class ConversationHandler(Handler[Update, CCT]):
                         return self.WAITING, key, handler_, check
                 return None
 
-        _logger.debug('Selecting conversation %s with state %s', str(key), str(state))
+        _logger.debug("Selecting conversation %s with state %s", str(key), str(state))
 
         handler: Optional[Handler] = None
 
@@ -761,7 +761,7 @@ class ConversationHandler(Handler[Update, CCT]):
     async def handle_update(  # type: ignore[override]
         self,
         update: Update,
-        application: 'Application',
+        application: "Application",
         check_result: _CheckUpdateType,
         context: CallbackContext,
     ) -> Optional[object]:
@@ -883,11 +883,11 @@ class ConversationHandler(Handler[Update, CCT]):
         which are in the :attr:`TIMEOUT` state and whose :meth:`Handler.check_update` returns
         :obj:`True` is handled.
         """
-        job = cast('Job', context.job)
+        job = cast("Job", context.job)
         ctxt = cast(_ConversationTimeoutContext, job.context)
 
         _logger.debug(
-            'Conversation timeout was triggered for conversation %s!', ctxt.conversation_key
+            "Conversation timeout was triggered for conversation %s!", ctxt.conversation_key
         )
 
         callback_context = ctxt.callback_context
@@ -910,8 +910,8 @@ class ConversationHandler(Handler[Update, CCT]):
                     )
                 except ApplicationHandlerStop:
                     warn(
-                        'ApplicationHandlerStop in TIMEOUT state of '
-                        'ConversationHandler has no effect. Ignoring.',
+                        "ApplicationHandlerStop in TIMEOUT state of "
+                        "ConversationHandler has no effect. Ignoring.",
                     )
 
         self._update_state(self.END, ctxt.conversation_key)

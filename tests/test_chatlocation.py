@@ -22,25 +22,25 @@ import pytest
 from telegram import ChatLocation, Location, User
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def chat_location(bot):
     return ChatLocation(TestChatLocation.location, TestChatLocation.address)
 
 
 class TestChatLocation:
     location = Location(123, 456)
-    address = 'The Shire'
+    address = "The Shire"
 
     def test_slot_behaviour(self, chat_location, mro_slots):
         inst = chat_location
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, bot):
         json_dict = {
-            'location': self.location.to_dict(),
-            'address': self.address,
+            "location": self.location.to_dict(),
+            "address": self.address,
         }
         chat_location = ChatLocation.de_json(json_dict, bot)
 
@@ -51,15 +51,15 @@ class TestChatLocation:
         chat_location_dict = chat_location.to_dict()
 
         assert isinstance(chat_location_dict, dict)
-        assert chat_location_dict['location'] == chat_location.location.to_dict()
-        assert chat_location_dict['address'] == chat_location.address
+        assert chat_location_dict["location"] == chat_location.location.to_dict()
+        assert chat_location_dict["address"] == chat_location.address
 
     def test_equality(self, chat_location):
         a = chat_location
         b = ChatLocation(self.location, self.address)
-        c = ChatLocation(self.location, 'Mordor')
+        c = ChatLocation(self.location, "Mordor")
         d = ChatLocation(Location(456, 132), self.address)
-        e = User(456, '', False)
+        e = User(456, "", False)
 
         assert a == b
         assert hash(a) == hash(b)

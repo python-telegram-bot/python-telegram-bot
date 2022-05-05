@@ -55,11 +55,11 @@ def is_local_file(obj: Optional[FilePathInput]) -> bool:
 
 
 def parse_file_input(
-    file_input: Union[FileInput, 'TelegramObject'],
-    tg_type: Type['TelegramObject'] = None,
+    file_input: Union[FileInput, "TelegramObject"],
+    tg_type: Type["TelegramObject"] = None,
     filename: str = None,
     attach: bool = False,
-) -> Union[str, 'InputFile', Any]:
+) -> Union[str, "InputFile", Any]:
     """
     Parses input for sending files:
 
@@ -89,7 +89,7 @@ def parse_file_input(
     # Importing on file-level yields cyclic Import Errors
     from telegram import InputFile  # pylint: disable=import-outside-toplevel
 
-    if isinstance(file_input, str) and file_input.startswith('file://'):
+    if isinstance(file_input, str) and file_input.startswith("file://"):
         return file_input
     if isinstance(file_input, (str, Path)):
         if is_local_file(file_input):
@@ -99,7 +99,7 @@ def parse_file_input(
         return out
     if isinstance(file_input, bytes):
         return InputFile(file_input, filename=filename, attach=attach)
-    if hasattr(file_input, 'read'):
+    if hasattr(file_input, "read"):
         return InputFile(cast(IO, file_input), filename=filename, attach=attach)
     if tg_type and isinstance(file_input, tg_type):
         return file_input.file_id  # type: ignore[attr-defined]

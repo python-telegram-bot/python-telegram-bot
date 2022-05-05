@@ -23,16 +23,16 @@
 """
 
 __all__ = (
-    'BadRequest',
-    'ChatMigrated',
-    'Conflict',
-    'Forbidden',
-    'InvalidToken',
-    'NetworkError',
-    'PassportDecryptionError',
-    'RetryAfter',
-    'TelegramError',
-    'TimedOut',
+    "BadRequest",
+    "ChatMigrated",
+    "Conflict",
+    "Forbidden",
+    "InvalidToken",
+    "NetworkError",
+    "PassportDecryptionError",
+    "RetryAfter",
+    "TelegramError",
+    "TimedOut",
 )
 
 from typing import Optional, Tuple, Union
@@ -58,14 +58,14 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 class TelegramError(Exception):
     """Base class for Telegram errors."""
 
-    __slots__ = ('message',)
+    __slots__ = ("message",)
 
     def __init__(self, message: str):
         super().__init__()
 
-        msg = _lstrip_str(message, 'Error: ')
-        msg = _lstrip_str(msg, '[Error]: ')
-        msg = _lstrip_str(msg, 'Bad Request: ')
+        msg = _lstrip_str(message, "Error: ")
+        msg = _lstrip_str(msg, "[Error]: ")
+        msg = _lstrip_str(msg, "Bad Request: ")
         if msg != message:
             # api_error - capitalize the msg...
             msg = msg.capitalize()
@@ -100,11 +100,11 @@ class InvalidToken(TelegramError):
             .. versionadded:: 14.0
     """
 
-    __slots__ = ('_message',)
+    __slots__ = ("_message",)
 
     def __init__(self, message: str = None) -> None:
         self._message = message
-        super().__init__('Invalid token' if self._message is None else self._message)
+        super().__init__("Invalid token" if self._message is None else self._message)
 
     def __reduce__(self) -> Tuple[type, Tuple[Optional[str]]]:  # type: ignore[override]
         return self.__class__, (self._message,)
@@ -134,7 +134,7 @@ class TimedOut(NetworkError):
     __slots__ = ()
 
     def __init__(self, message: str = None) -> None:
-        super().__init__(message or 'Timed out')
+        super().__init__(message or "Timed out")
 
 
 class ChatMigrated(TelegramError):
@@ -146,10 +146,10 @@ class ChatMigrated(TelegramError):
 
     """
 
-    __slots__ = ('new_chat_id',)
+    __slots__ = ("new_chat_id",)
 
     def __init__(self, new_chat_id: int):
-        super().__init__(f'Group migrated to supergroup. New chat id: {new_chat_id}')
+        super().__init__(f"Group migrated to supergroup. New chat id: {new_chat_id}")
         self.new_chat_id = int(new_chat_id)
 
     def __reduce__(self) -> Tuple[type, Tuple[int]]:  # type: ignore[override]
@@ -165,10 +165,10 @@ class RetryAfter(TelegramError):
 
     """
 
-    __slots__ = ('retry_after',)
+    __slots__ = ("retry_after",)
 
     def __init__(self, retry_after: int):
-        super().__init__(f'Flood control exceeded. Retry in {float(retry_after)} seconds')
+        super().__init__(f"Flood control exceeded. Retry in {float(retry_after)} seconds")
         self.retry_after = float(retry_after)
 
     def __reduce__(self) -> Tuple[type, Tuple[float]]:  # type: ignore[override]
@@ -192,7 +192,7 @@ class PassportDecryptionError(TelegramError):
         ``telegram.TelegramDecryptionError``.
     """
 
-    __slots__ = ('_msg',)
+    __slots__ = ("_msg",)
 
     def __init__(self, message: Union[str, Exception]):
         super().__init__(f"PassportDecryptionError: {message}")

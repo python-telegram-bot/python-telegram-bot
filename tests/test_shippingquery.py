@@ -23,7 +23,7 @@ from telegram import Bot, ShippingAddress, ShippingQuery, Update, User
 from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def shipping_query(bot):
     return ShippingQuery(
         TestShippingQuery.id_,
@@ -36,22 +36,22 @@ def shipping_query(bot):
 
 class TestShippingQuery:
     id_ = 5
-    invoice_payload = 'invoice_payload'
-    from_user = User(0, '', False)
-    shipping_address = ShippingAddress('GB', '', 'London', '12 Grimmauld Place', '', 'WC1')
+    invoice_payload = "invoice_payload"
+    from_user = User(0, "", False)
+    shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
     def test_slot_behaviour(self, shipping_query, mro_slots):
         inst = shipping_query
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, bot):
         json_dict = {
-            'id': TestShippingQuery.id_,
-            'invoice_payload': TestShippingQuery.invoice_payload,
-            'from': TestShippingQuery.from_user.to_dict(),
-            'shipping_address': TestShippingQuery.shipping_address.to_dict(),
+            "id": TestShippingQuery.id_,
+            "invoice_payload": TestShippingQuery.invoice_payload,
+            "from": TestShippingQuery.from_user.to_dict(),
+            "shipping_address": TestShippingQuery.shipping_address.to_dict(),
         }
         shipping_query = ShippingQuery.de_json(json_dict, bot)
 
@@ -65,30 +65,30 @@ class TestShippingQuery:
         shipping_query_dict = shipping_query.to_dict()
 
         assert isinstance(shipping_query_dict, dict)
-        assert shipping_query_dict['id'] == shipping_query.id
-        assert shipping_query_dict['invoice_payload'] == shipping_query.invoice_payload
-        assert shipping_query_dict['from'] == shipping_query.from_user.to_dict()
-        assert shipping_query_dict['shipping_address'] == shipping_query.shipping_address.to_dict()
+        assert shipping_query_dict["id"] == shipping_query.id
+        assert shipping_query_dict["invoice_payload"] == shipping_query.invoice_payload
+        assert shipping_query_dict["from"] == shipping_query.from_user.to_dict()
+        assert shipping_query_dict["shipping_address"] == shipping_query.shipping_address.to_dict()
 
     async def test_answer(self, monkeypatch, shipping_query):
         async def make_assertion(*_, **kwargs):
-            return kwargs['shipping_query_id'] == shipping_query.id
+            return kwargs["shipping_query_id"] == shipping_query.id
 
         assert check_shortcut_signature(
-            ShippingQuery.answer, Bot.answer_shipping_query, ['shipping_query_id'], []
+            ShippingQuery.answer, Bot.answer_shipping_query, ["shipping_query_id"], []
         )
         assert await check_shortcut_call(
-            shipping_query.answer, shipping_query._bot, 'answer_shipping_query'
+            shipping_query.answer, shipping_query._bot, "answer_shipping_query"
         )
         assert await check_defaults_handling(shipping_query.answer, shipping_query._bot)
 
-        monkeypatch.setattr(shipping_query._bot, 'answer_shipping_query', make_assertion)
+        monkeypatch.setattr(shipping_query._bot, "answer_shipping_query", make_assertion)
         assert await shipping_query.answer(ok=True)
 
     def test_equality(self):
         a = ShippingQuery(self.id_, self.from_user, self.invoice_payload, self.shipping_address)
         b = ShippingQuery(self.id_, self.from_user, self.invoice_payload, self.shipping_address)
-        c = ShippingQuery(self.id_, None, '', None)
+        c = ShippingQuery(self.id_, None, "", None)
         d = ShippingQuery(0, self.from_user, self.invoice_payload, self.shipping_address)
         e = Update(self.id_)
 

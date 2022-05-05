@@ -98,8 +98,8 @@ class TestErrors:
             raise RetryAfter(12)
 
     def test_conflict(self):
-        with pytest.raises(Conflict, match='Something something.'):
-            raise Conflict('Something something.')
+        with pytest.raises(Conflict, match="Something something."):
+            raise Conflict("Something something.")
 
     @pytest.mark.parametrize(
         "exception, attributes",
@@ -114,7 +114,7 @@ class TestErrors:
             (RetryAfter(12), ["message", "retry_after"]),
             (Conflict("test message"), ["message"]),
             (PassportDecryptionError("test message"), ["message"]),
-            (InvalidCallbackData('test data'), ['callback_data']),
+            (InvalidCallbackData("test data"), ["callback_data"]),
         ],
     )
     def test_errors_pickling(self, exception, attributes):
@@ -139,12 +139,12 @@ class TestErrors:
             (RetryAfter(12)),
             (Conflict("test message")),
             (PassportDecryptionError("test message")),
-            (InvalidCallbackData('test data')),
+            (InvalidCallbackData("test data")),
         ],
     )
     def test_slot_behaviour(self, inst, mro_slots):
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_coverage(self):
@@ -181,14 +181,14 @@ class TestErrors:
 
     def test_string_representations(self):
         """We just randomly test a few of the subclasses - should suffice"""
-        e = TelegramError('This is a message')
+        e = TelegramError("This is a message")
         assert repr(e) == "TelegramError('This is a message')"
         assert str(e) == "This is a message"
 
         e = RetryAfter(42)
         assert repr(e) == "RetryAfter('Flood control exceeded. Retry in 42.0 seconds')"
-        assert str(e) == 'Flood control exceeded. Retry in 42.0 seconds'
+        assert str(e) == "Flood control exceeded. Retry in 42.0 seconds"
 
-        e = BadRequest('This is a message')
+        e = BadRequest("This is a message")
         assert repr(e) == "BadRequest('This is a message')"
         assert str(e) == "This is a message"

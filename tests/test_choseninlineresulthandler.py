@@ -34,43 +34,43 @@ from telegram import (
 )
 from telegram.ext import CallbackContext, ChosenInlineResultHandler, JobQueue
 
-message = Message(1, None, Chat(1, ''), from_user=User(1, '', False), text='Text')
+message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
 params = [
-    {'message': message},
-    {'edited_message': message},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat', message=message)},
-    {'channel_post': message},
-    {'edited_channel_post': message},
-    {'inline_query': InlineQuery(1, User(1, '', False), '', '')},
-    {'shipping_query': ShippingQuery('id', User(1, '', False), '', None)},
-    {'pre_checkout_query': PreCheckoutQuery('id', User(1, '', False), '', 0, '')},
-    {'callback_query': CallbackQuery(1, User(1, '', False), 'chat')},
+    {"message": message},
+    {"edited_message": message},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat", message=message)},
+    {"channel_post": message},
+    {"edited_channel_post": message},
+    {"inline_query": InlineQuery(1, User(1, "", False), "", "")},
+    {"shipping_query": ShippingQuery("id", User(1, "", False), "", None)},
+    {"pre_checkout_query": PreCheckoutQuery("id", User(1, "", False), "", 0, "")},
+    {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
 ]
 
 ids = (
-    'message',
-    'edited_message',
-    'callback_query',
-    'channel_post',
-    'edited_channel_post',
-    'inline_query',
-    'shipping_query',
-    'pre_checkout_query',
-    'callback_query_without_message',
+    "message",
+    "edited_message",
+    "callback_query",
+    "channel_post",
+    "edited_channel_post",
+    "inline_query",
+    "shipping_query",
+    "pre_checkout_query",
+    "callback_query_without_message",
 )
 
 
-@pytest.fixture(scope='class', params=params, ids=ids)
+@pytest.fixture(scope="class", params=params, ids=ids)
 def false_update(request):
     return Update(update_id=1, **request.param)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def chosen_inline_result():
     return Update(
         1,
-        chosen_inline_result=ChosenInlineResult('result_id', User(1, 'test_user', False), 'query'),
+        chosen_inline_result=ChosenInlineResult("result_id", User(1, "test_user", False), "query"),
     )
 
 
@@ -84,7 +84,7 @@ class TestChosenInlineResultHandler:
     def test_slot_behaviour(self, mro_slots):
         handler = ChosenInlineResultHandler(self.callback_basic)
         for attr in handler.__slots__:
-            assert getattr(handler, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(handler, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(handler)) == len(set(mro_slots(handler))), "duplicate slot"
 
     def callback_basic(self, update, context):
@@ -119,9 +119,9 @@ class TestChosenInlineResultHandler:
 
     def callback_pattern(self, update, context):
         if context.matches[0].groups():
-            self.test_flag = context.matches[0].groups() == ('res', '_id')
+            self.test_flag = context.matches[0].groups() == ("res", "_id")
         if context.matches[0].groupdict():
-            self.test_flag = context.matches[0].groupdict() == {'begin': 'res', 'end': '_id'}
+            self.test_flag = context.matches[0].groupdict() == {"begin": "res", "end": "_id"}
 
     def test_other_update_types(self, false_update):
         handler = ChosenInlineResultHandler(self.callback_basic)
@@ -136,17 +136,17 @@ class TestChosenInlineResultHandler:
         assert self.test_flag
 
     def test_with_pattern(self, chosen_inline_result):
-        handler = ChosenInlineResultHandler(self.callback_basic, pattern='.*ult.*')
+        handler = ChosenInlineResultHandler(self.callback_basic, pattern=".*ult.*")
 
         assert handler.check_update(chosen_inline_result)
 
-        chosen_inline_result.chosen_inline_result.result_id = 'nothing here'
+        chosen_inline_result.chosen_inline_result.result_id = "nothing here"
         assert not handler.check_update(chosen_inline_result)
-        chosen_inline_result.chosen_inline_result.result_id = 'result_id'
+        chosen_inline_result.chosen_inline_result.result_id = "result_id"
 
     async def test_context_pattern(self, app, chosen_inline_result):
         handler = ChosenInlineResultHandler(
-            self.callback_pattern, pattern=r'(?P<begin>.*)ult(?P<end>.*)'
+            self.callback_pattern, pattern=r"(?P<begin>.*)ult(?P<end>.*)"
         )
         app.add_handler(handler)
         async with app:
@@ -154,7 +154,7 @@ class TestChosenInlineResultHandler:
             assert self.test_flag
 
             app.remove_handler(handler)
-            handler = ChosenInlineResultHandler(self.callback_pattern, pattern=r'(res)ult(.*)')
+            handler = ChosenInlineResultHandler(self.callback_pattern, pattern=r"(res)ult(.*)")
             app.add_handler(handler)
 
             await app.process_update(chosen_inline_result)

@@ -81,14 +81,14 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'caption',
-        'title',
-        'description',
-        'parse_mode',
-        'input_message_content',
-        'video_file_id',
+        "reply_markup",
+        "caption_entities",
+        "caption",
+        "title",
+        "description",
+        "parse_mode",
+        "input_message_content",
+        "video_file_id",
     )
 
     def __init__(
@@ -99,7 +99,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
         description: str = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,

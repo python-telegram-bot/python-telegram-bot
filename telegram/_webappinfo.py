@@ -43,7 +43,7 @@ class WebAppInfo(TelegramObject):
             <https://core.telegram.org/bots/webapps#initializing-web-apps>`_.
     """
 
-    __slots__ = ('url',)
+    __slots__ = ("url",)
 
     def __init__(self, url: str, **_kwargs: Any):
         # Required

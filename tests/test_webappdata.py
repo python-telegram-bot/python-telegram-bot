@@ -22,7 +22,7 @@ import pytest
 from telegram import WebAppData
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def web_app_data():
     return WebAppData(
         data=TestWebAppData.data,
@@ -31,23 +31,23 @@ def web_app_data():
 
 
 class TestWebAppData:
-    data = 'data'
-    button_text = 'button_text'
+    data = "data"
+    button_text = "button_text"
 
     def test_slot_behaviour(self, web_app_data, mro_slots):
         for attr in web_app_data.__slots__:
-            assert getattr(web_app_data, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(web_app_data, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(web_app_data)) == len(set(mro_slots(web_app_data))), "duplicate slot"
 
     def test_to_dict(self, web_app_data):
         web_app_data_dict = web_app_data.to_dict()
 
         assert isinstance(web_app_data_dict, dict)
-        assert web_app_data_dict['data'] == self.data
-        assert web_app_data_dict['button_text'] == self.button_text
+        assert web_app_data_dict["data"] == self.data
+        assert web_app_data_dict["button_text"] == self.button_text
 
     def test_de_json(self, bot):
-        json_dict = {'data': self.data, 'button_text': self.button_text}
+        json_dict = {"data": self.data, "button_text": self.button_text}
         web_app_data = WebAppData.de_json(json_dict, bot)
 
         assert web_app_data.data == self.data

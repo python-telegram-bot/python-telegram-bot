@@ -35,7 +35,7 @@ class CustomContext(CallbackContext):
     pass
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 async def job_queue(bot, app):
     jq = JobQueue()
     jq.set_application(app)
@@ -45,7 +45,7 @@ async def job_queue(bot, app):
 
 
 @pytest.mark.skipif(
-    os.getenv('GITHUB_ACTIONS', False) and platform.system() in ['Windows', 'Darwin'],
+    os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Windows", "Darwin"],
     reason="On Windows & MacOS precise timings are not accurate.",
 )
 @flaky(10, 1)  # Timings aren't quite perfect
@@ -73,7 +73,7 @@ class TestJobQueue:
             self.result += 1
 
     async def job_with_exception(self, context):
-        raise Exception('Test Error')
+        raise Exception("Test Error")
 
     async def job_remove_self(self, context):
         self.result += 1
@@ -89,22 +89,22 @@ class TestJobQueue:
         self.received_error = (str(context.error), context.job)
 
     async def error_handler_raise_error(self, *args):
-        raise Exception('Failing bigly')
+        raise Exception("Failing bigly")
 
     def test_slot_behaviour(self, job_queue, mro_slots):
         for attr in job_queue.__slots__:
-            assert getattr(job_queue, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(job_queue, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(job_queue)) == len(set(mro_slots(job_queue))), "duplicate slot"
 
     def test_application_weakref(self, bot):
         jq = JobQueue()
         application = ApplicationBuilder().token(bot.token).job_queue(None).build()
-        with pytest.raises(RuntimeError, match='No application was set'):
+        with pytest.raises(RuntimeError, match="No application was set"):
             jq.application
         jq.set_application(application)
         assert jq.application is application
         del application
-        with pytest.raises(RuntimeError, match='no longer alive'):
+        with pytest.raises(RuntimeError, match="no longer alive"):
             jq.application
 
     async def test_run_once(self, job_queue):
@@ -175,7 +175,7 @@ class TestJobQueue:
         assert self.result == 2
 
     async def test_run_custom(self, job_queue):
-        job_queue.run_custom(self.job_run_once, {'trigger': 'interval', 'seconds': 0.2})
+        job_queue.run_custom(self.job_run_once, {"trigger": "interval", "seconds": 0.2})
         await asyncio.sleep(0.5)
         assert self.result == 2
 
@@ -379,13 +379,13 @@ class TestJobQueue:
     async def test_get_jobs(self, job_queue):
         callback = self.job_run_once
 
-        job1 = job_queue.run_once(callback, 10, name='name1')
-        job2 = job_queue.run_once(callback, 10, name='name1')
-        job3 = job_queue.run_once(callback, 10, name='name2')
+        job1 = job_queue.run_once(callback, 10, name="name1")
+        job2 = job_queue.run_once(callback, 10, name="name1")
+        job3 = job_queue.run_once(callback, 10, name="name2")
 
         assert job_queue.jobs() == (job1, job2, job3)
-        assert job_queue.get_jobs_by_name('name1') == (job1, job2)
-        assert job_queue.get_jobs_by_name('name2') == (job3,)
+        assert job_queue.get_jobs_by_name("name1") == (job1, job2)
+        assert job_queue.get_jobs_by_name("name2") == (job3,)
 
     async def test_job_run(self, app):
         job = app.job_queue.run_repeating(self.job_run_once, 0.02)
@@ -427,11 +427,11 @@ class TestJobQueue:
 
         job = job_queue.run_once(self.job_with_exception, 0.1)
         await asyncio.sleep(0.15)
-        assert self.received_error[0] == 'Test Error'
+        assert self.received_error[0] == "Test Error"
         assert self.received_error[1] is job
         self.received_error = None
         await job.run(app)
-        assert self.received_error[0] == 'Test Error'
+        assert self.received_error[0] == "Test Error"
         assert self.received_error[1] is job
 
         # Remove handler
@@ -452,14 +452,14 @@ class TestJobQueue:
         await asyncio.sleep(0.15)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'An error was raised and an uncaught' in rec.getMessage()
+        assert "An error was raised and an uncaught" in rec.getMessage()
         caplog.clear()
 
         with caplog.at_level(logging.ERROR):
             await job.run(app)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'uncaught error was raised while handling' in rec.getMessage()
+        assert "uncaught error was raised while handling" in rec.getMessage()
         caplog.clear()
 
         # Remove handler
@@ -471,14 +471,14 @@ class TestJobQueue:
         await asyncio.sleep(0.15)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'No error handlers are registered' in rec.getMessage()
+        assert "No error handlers are registered" in rec.getMessage()
         caplog.clear()
 
         with caplog.at_level(logging.ERROR):
             await job.run(app)
         assert len(caplog.records) == 1
         rec = caplog.records[-1]
-        assert 'No error handlers are registered' in rec.getMessage()
+        assert "No error handlers are registered" in rec.getMessage()
 
     async def test_custom_context(self, bot, job_queue):
         application = (
@@ -512,7 +512,7 @@ class TestJobQueue:
         ):
             job.error
 
-    @pytest.mark.parametrize('wait', (True, False))
+    @pytest.mark.parametrize("wait", (True, False))
     async def test_wait_on_shut_down(self, job_queue, wait):
         ready_event = asyncio.Event()
 

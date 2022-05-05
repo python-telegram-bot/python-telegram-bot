@@ -46,7 +46,7 @@ class Contact(TelegramObject):
 
     """
 
-    __slots__ = ('vcard', 'user_id', 'first_name', 'last_name', 'phone_number')
+    __slots__ = ("vcard", "user_id", "first_name", "last_name", "phone_number")
 
     def __init__(
         self,

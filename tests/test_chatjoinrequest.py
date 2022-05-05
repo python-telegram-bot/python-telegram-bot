@@ -26,12 +26,12 @@ from telegram._utils.datetime import to_timestamp
 from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def time():
     return datetime.datetime.now(tz=pytz.utc)
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def chat_join_request(bot, time):
     return ChatJoinRequest(
         chat=TestChatJoinRequest.chat,
@@ -45,13 +45,13 @@ def chat_join_request(bot, time):
 
 class TestChatJoinRequest:
     chat = Chat(1, Chat.SUPERGROUP)
-    from_user = User(2, 'first_name', False)
-    bio = 'bio'
+    from_user = User(2, "first_name", False)
+    bio = "bio"
     invite_link = ChatInviteLink(
-        'https://invite.link',
-        User(42, 'creator', False),
+        "https://invite.link",
+        User(42, "creator", False),
         creates_join_request=False,
-        name='InviteLink',
+        name="InviteLink",
         is_revoked=False,
         is_primary=False,
     )
@@ -59,14 +59,14 @@ class TestChatJoinRequest:
     def test_slot_behaviour(self, chat_join_request, mro_slots):
         inst = chat_join_request
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, bot, time):
         json_dict = {
-            'chat': self.chat.to_dict(),
-            'from': self.from_user.to_dict(),
-            'date': to_timestamp(time),
+            "chat": self.chat.to_dict(),
+            "from": self.from_user.to_dict(),
+            "date": to_timestamp(time),
         }
         chat_join_request = ChatJoinRequest.de_json(json_dict, bot)
 
@@ -75,7 +75,7 @@ class TestChatJoinRequest:
         assert abs(chat_join_request.date - time) < datetime.timedelta(seconds=1)
         assert to_timestamp(chat_join_request.date) == to_timestamp(time)
 
-        json_dict.update({'bio': self.bio, 'invite_link': self.invite_link.to_dict()})
+        json_dict.update({"bio": self.bio, "invite_link": self.invite_link.to_dict()})
         chat_join_request = ChatJoinRequest.de_json(json_dict, bot)
 
         assert chat_join_request.chat == self.chat
@@ -89,19 +89,19 @@ class TestChatJoinRequest:
         chat_join_request_dict = chat_join_request.to_dict()
 
         assert isinstance(chat_join_request_dict, dict)
-        assert chat_join_request_dict['chat'] == chat_join_request.chat.to_dict()
-        assert chat_join_request_dict['from'] == chat_join_request.from_user.to_dict()
-        assert chat_join_request_dict['date'] == to_timestamp(chat_join_request.date)
-        assert chat_join_request_dict['bio'] == chat_join_request.bio
-        assert chat_join_request_dict['invite_link'] == chat_join_request.invite_link.to_dict()
+        assert chat_join_request_dict["chat"] == chat_join_request.chat.to_dict()
+        assert chat_join_request_dict["from"] == chat_join_request.from_user.to_dict()
+        assert chat_join_request_dict["date"] == to_timestamp(chat_join_request.date)
+        assert chat_join_request_dict["bio"] == chat_join_request.bio
+        assert chat_join_request_dict["invite_link"] == chat_join_request.invite_link.to_dict()
 
     def test_equality(self, chat_join_request, time):
         a = chat_join_request
         b = ChatJoinRequest(self.chat, self.from_user, time)
-        c = ChatJoinRequest(self.chat, self.from_user, time, bio='bio')
+        c = ChatJoinRequest(self.chat, self.from_user, time, bio="bio")
         d = ChatJoinRequest(self.chat, self.from_user, time + datetime.timedelta(1))
-        e = ChatJoinRequest(self.chat, User(-1, 'last_name', True), time)
-        f = User(456, '', False)
+        e = ChatJoinRequest(self.chat, User(-1, "last_name", True), time)
+        f = User(456, "", False)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -121,44 +121,44 @@ class TestChatJoinRequest:
 
     async def test_approve(self, monkeypatch, chat_join_request):
         async def make_assertion(*_, **kwargs):
-            chat_id_test = kwargs['chat_id'] == chat_join_request.chat.id
-            user_id_test = kwargs['user_id'] == chat_join_request.from_user.id
+            chat_id_test = kwargs["chat_id"] == chat_join_request.chat.id
+            user_id_test = kwargs["user_id"] == chat_join_request.from_user.id
 
             return chat_id_test and user_id_test
 
         assert check_shortcut_signature(
-            ChatJoinRequest.approve, Bot.approve_chat_join_request, ['chat_id', 'user_id'], []
+            ChatJoinRequest.approve, Bot.approve_chat_join_request, ["chat_id", "user_id"], []
         )
         assert await check_shortcut_call(
-            chat_join_request.approve, chat_join_request.get_bot(), 'approve_chat_join_request'
+            chat_join_request.approve, chat_join_request.get_bot(), "approve_chat_join_request"
         )
         assert await check_defaults_handling(
             chat_join_request.approve, chat_join_request.get_bot()
         )
 
         monkeypatch.setattr(
-            chat_join_request.get_bot(), 'approve_chat_join_request', make_assertion
+            chat_join_request.get_bot(), "approve_chat_join_request", make_assertion
         )
         assert await chat_join_request.approve()
 
     async def test_decline(self, monkeypatch, chat_join_request):
         async def make_assertion(*_, **kwargs):
-            chat_id_test = kwargs['chat_id'] == chat_join_request.chat.id
-            user_id_test = kwargs['user_id'] == chat_join_request.from_user.id
+            chat_id_test = kwargs["chat_id"] == chat_join_request.chat.id
+            user_id_test = kwargs["user_id"] == chat_join_request.from_user.id
 
             return chat_id_test and user_id_test
 
         assert check_shortcut_signature(
-            ChatJoinRequest.decline, Bot.decline_chat_join_request, ['chat_id', 'user_id'], []
+            ChatJoinRequest.decline, Bot.decline_chat_join_request, ["chat_id", "user_id"], []
         )
         assert await check_shortcut_call(
-            chat_join_request.decline, chat_join_request.get_bot(), 'decline_chat_join_request'
+            chat_join_request.decline, chat_join_request.get_bot(), "decline_chat_join_request"
         )
         assert await check_defaults_handling(
             chat_join_request.decline, chat_join_request.get_bot()
         )
 
         monkeypatch.setattr(
-            chat_join_request.get_bot(), 'decline_chat_join_request', make_assertion
+            chat_join_request.get_bot(), "decline_chat_join_request", make_assertion
         )
         assert await chat_join_request.decline()

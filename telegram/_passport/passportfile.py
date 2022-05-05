@@ -59,11 +59,11 @@ class PassportFile(TelegramObject):
     """
 
     __slots__ = (
-        'file_date',
-        'file_id',
-        'file_size',
-        '_credentials',
-        'file_unique_id',
+        "file_date",
+        "file_id",
+        "file_size",
+        "_credentials",
+        "file_unique_id",
     )
 
     def __init__(
@@ -72,8 +72,8 @@ class PassportFile(TelegramObject):
         file_unique_id: str,
         file_date: int,
         file_size: int,
-        bot: 'Bot' = None,
-        credentials: 'FileCredentials' = None,
+        bot: "Bot" = None,
+        credentials: "FileCredentials" = None,
         **_kwargs: Any,
     ):
         # Required
@@ -89,8 +89,8 @@ class PassportFile(TelegramObject):
 
     @classmethod
     def de_json_decrypted(
-        cls, data: Optional[JSONDict], bot: 'Bot', credentials: 'FileCredentials'
-    ) -> Optional['PassportFile']:
+        cls, data: Optional[JSONDict], bot: "Bot", credentials: "FileCredentials"
+    ) -> Optional["PassportFile"]:
         """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
         passport credentials.
 
@@ -108,14 +108,14 @@ class PassportFile(TelegramObject):
         if not data:
             return None
 
-        data['credentials'] = credentials
+        data["credentials"] = credentials
 
         return cls(bot=bot, **data)
 
     @classmethod
     def de_list_decrypted(
-        cls, data: Optional[List[JSONDict]], bot: 'Bot', credentials: List['FileCredentials']
-    ) -> List[Optional['PassportFile']]:
+        cls, data: Optional[List[JSONDict]], bot: "Bot", credentials: List["FileCredentials"]
+    ) -> List[Optional["PassportFile"]]:
         """Variant of :meth:`telegram.TelegramObject.de_list` that also takes into account
         passport credentials.
 
@@ -143,7 +143,7 @@ class PassportFile(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> 'File':
+    ) -> "File":
         """
         Wrapper over :attr:`telegram.Bot.get_file`. Will automatically assign the correct
         credentials to the returned :class:`telegram.File` if originating from

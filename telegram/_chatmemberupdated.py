@@ -67,12 +67,12 @@ class ChatMemberUpdated(TelegramObject):
     """
 
     __slots__ = (
-        'chat',
-        'from_user',
-        'date',
-        'old_chat_member',
-        'new_chat_member',
-        'invite_link',
+        "chat",
+        "from_user",
+        "date",
+        "old_chat_member",
+        "new_chat_member",
+        "invite_link",
     )
 
     def __init__(
@@ -104,19 +104,19 @@ class ChatMemberUpdated(TelegramObject):
         )
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ChatMemberUpdated']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatMemberUpdated"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['chat'] = Chat.de_json(data.get('chat'), bot)
-        data['from_user'] = User.de_json(data.get('from'), bot)
-        data['date'] = from_timestamp(data.get('date'))
-        data['old_chat_member'] = ChatMember.de_json(data.get('old_chat_member'), bot)
-        data['new_chat_member'] = ChatMember.de_json(data.get('new_chat_member'), bot)
-        data['invite_link'] = ChatInviteLink.de_json(data.get('invite_link'), bot)
+        data["chat"] = Chat.de_json(data.get("chat"), bot)
+        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["date"] = from_timestamp(data.get("date"))
+        data["old_chat_member"] = ChatMember.de_json(data.get("old_chat_member"), bot)
+        data["new_chat_member"] = ChatMember.de_json(data.get("new_chat_member"), bot)
+        data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)
 
         return cls(**data)
 
@@ -125,7 +125,7 @@ class ChatMemberUpdated(TelegramObject):
         data = super().to_dict()
 
         # Required
-        data['date'] = to_timestamp(self.date)
+        data["date"] = to_timestamp(self.date)
 
         return data
 
@@ -171,9 +171,9 @@ class ChatMemberUpdated(TelegramObject):
         # we first get the names of the attributes that have changed
         # user.to_dict() is unhashable, so that needs some special casing further down
         old_dict = self.old_chat_member.to_dict()
-        old_user_dict = old_dict.pop('user')
+        old_user_dict = old_dict.pop("user")
         new_dict = self.new_chat_member.to_dict()
-        new_user_dict = new_dict.pop('user')
+        new_user_dict = new_dict.pop("user")
 
         # Generator for speed: we only need to iterate over it once
         # we can't directly use the values from old_dict ^ new_dict b/c that set is unordered
@@ -181,6 +181,6 @@ class ChatMemberUpdated(TelegramObject):
 
         result = {attribute: self._get_attribute_difference(attribute) for attribute in attributes}
         if old_user_dict != new_user_dict:
-            result['user'] = (self.old_chat_member.user, self.new_chat_member.user)
+            result["user"] = (self.old_chat_member.user, self.new_chat_member.user)
 
         return result  # type: ignore[return-value]

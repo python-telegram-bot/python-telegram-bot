@@ -27,25 +27,25 @@ from bs4 import BeautifulSoup
 import telegram
 from tests.conftest import env_var_2_bool
 
-IGNORED_OBJECTS = ('ResponseParameters', 'CallbackGame')
+IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
 IGNORED_PARAMETERS = {
-    'self',
-    'args',
-    '_kwargs',
-    'read_timeout',
-    'write_timeout',
-    'connect_timeout',
-    'pool_timeout',
-    'bot',
-    'api_kwargs',
-    'kwargs',
+    "self",
+    "args",
+    "_kwargs",
+    "read_timeout",
+    "write_timeout",
+    "connect_timeout",
+    "pool_timeout",
+    "bot",
+    "api_kwargs",
+    "kwargs",
 }
 
 ignored_param_requirements = {  # Ignore these since there's convenience params in them (eg. Venue)
-    'send_location': {'latitude', 'longitude'},
-    'edit_message_live_location': {'latitude', 'longitude'},
-    'send_venue': {'latitude', 'longitude', 'title', 'address'},
-    'send_contact': {'phone_number', 'first_name'},
+    "send_location": {"latitude", "longitude"},
+    "edit_message_live_location": {"latitude", "longitude"},
+    "send_venue": {"latitude", "longitude", "title", "address"},
+    "send_contact": {"phone_number", "first_name"},
 }
 
 
@@ -59,12 +59,12 @@ def find_next_sibling_until(tag, name, until):
 
 def parse_table(h4) -> List[List[str]]:
     """Parses the Telegram doc table and has an output of a 2D list."""
-    table = find_next_sibling_until(h4, 'table', h4.find_next_sibling('h4'))
+    table = find_next_sibling_until(h4, "table", h4.find_next_sibling("h4"))
     if not table:
         return []
     t = []
-    for tr in table.find_all('tr')[1:]:
-        t.append([td.text for td in tr.find_all('td')])
+    for tr in table.find_all("tr")[1:]:
+        t.append([td.text for td in tr.find_all("td")])
     return t
 
 
@@ -84,33 +84,33 @@ def check_method(h4):
         # TODO: Check type via docstring
         assert check_required_param(
             parameter, param.name, sig, method.__name__
-        ), f'Param {param.name!r} of method {method.__name__!r} requirement mismatch!'
+        ), f"Param {param.name!r} of method {method.__name__!r} requirement mismatch!"
         checked.append(parameter[0])
 
     ignored = IGNORED_PARAMETERS.copy()
-    if name == 'getUpdates':
-        ignored -= {'timeout'}  # Has it's own timeout parameter that we do wanna check for
+    if name == "getUpdates":
+        ignored -= {"timeout"}  # Has it's own timeout parameter that we do wanna check for
     elif name in (
-        f'send{media_type}'
+        f"send{media_type}"
         for media_type in [
-            'Animation',
-            'Audio',
-            'Document',
-            'Photo',
-            'Video',
-            'VideoNote',
-            'Voice',
+            "Animation",
+            "Audio",
+            "Document",
+            "Photo",
+            "Video",
+            "VideoNote",
+            "Voice",
         ]
     ):
-        ignored |= {'filename'}  # Convenience parameter
-    elif name == 'sendContact':
-        ignored |= {'contact'}  # Added for ease of use
-    elif name in ['sendLocation', 'editMessageLiveLocation']:
-        ignored |= {'location'}  # Added for ease of use
-    elif name == 'sendVenue':
-        ignored |= {'venue'}  # Added for ease of use
-    elif name == 'answerInlineQuery':
-        ignored |= {'current_offset'}  # Added for ease of use
+        ignored |= {"filename"}  # Convenience parameter
+    elif name == "sendContact":
+        ignored |= {"contact"}  # Added for ease of use
+    elif name in ["sendLocation", "editMessageLiveLocation"]:
+        ignored |= {"location"}  # Added for ease of use
+    elif name == "sendVenue":
+        ignored |= {"venue"}  # Added for ease of use
+    elif name == "answerInlineQuery":
+        ignored |= {"current_offset"}  # Added for ease of use
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
@@ -126,22 +126,22 @@ def check_object(h4):
     checked = set()
     for parameter in table:
         field = parameter[0]
-        if field == 'from':
-            field = 'from_user'
+        if field == "from":
+            field = "from_user"
         elif (
-            name.startswith('InlineQueryResult')
-            or name.startswith('InputMedia')
-            or name.startswith('BotCommandScope')
-            or name.startswith('MenuButton')
-        ) and field == 'type':
+            name.startswith("InlineQueryResult")
+            or name.startswith("InputMedia")
+            or name.startswith("BotCommandScope")
+            or name.startswith("MenuButton")
+        ) and field == "type":
             continue
-        elif (name.startswith('ChatMember')) and field == 'status':  # We autofill the status
+        elif (name.startswith("ChatMember")) and field == "status":  # We autofill the status
             continue
         elif (
-            name.startswith('PassportElementError') and field == 'source'
-        ) or field == 'remove_keyboard':
+            name.startswith("PassportElementError") and field == "source"
+        ) or field == "remove_keyboard":
             continue
-        elif name.startswith('ForceReply') and field == 'force_reply':  # this param is always True
+        elif name.startswith("ForceReply") and field == "force_reply":  # this param is always True
             continue
 
         param = sig.parameters.get(field)
@@ -153,24 +153,24 @@ def check_object(h4):
         checked.add(field)
 
     ignored = IGNORED_PARAMETERS.copy()
-    if name == 'InputFile':
+    if name == "InputFile":
         return
-    if name == 'InlineQueryResult':
-        ignored |= {'id', 'type'}  # attributes common to all subclasses
-    if name == 'ChatMember':
-        ignored |= {'user', 'status'}  # attributes common to all subclasses
-    if name == 'BotCommandScope':
-        ignored |= {'type'}  # attributes common to all subclasses
-    if name == 'MenuButton':
-        ignored |= {'type'}  # attributes common to all subclasses
-    elif name in ('PassportFile', 'EncryptedPassportElement'):
-        ignored |= {'credentials'}
-    elif name == 'PassportElementError':
-        ignored |= {'message', 'type', 'source'}
-    elif name == 'InputMedia':
-        ignored |= {'caption', 'caption_entities', 'media', 'media_type', 'parse_mode'}
-    elif name.startswith('InputMedia'):
-        ignored |= {'filename'}  # Convenience parameter
+    if name == "InlineQueryResult":
+        ignored |= {"id", "type"}  # attributes common to all subclasses
+    if name == "ChatMember":
+        ignored |= {"user", "status"}  # attributes common to all subclasses
+    if name == "BotCommandScope":
+        ignored |= {"type"}  # attributes common to all subclasses
+    if name == "MenuButton":
+        ignored |= {"type"}  # attributes common to all subclasses
+    elif name in ("PassportFile", "EncryptedPassportElement"):
+        ignored |= {"credentials"}
+    elif name == "PassportElementError":
+        ignored |= {"message", "type", "source"}
+    elif name == "InputMedia":
+        ignored |= {"caption", "caption_entities", "media", "media_type", "parse_mode"}
+    elif name.startswith("InputMedia"):
+        ignored |= {"filename"}  # Convenience parameter
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
@@ -183,27 +183,27 @@ def check_required_param(
         # Handle cases where we provide convenience intentionally-
         if param_name in ignored_param_requirements.get(method_or_obj_name, {}):
             return True
-        is_required = True if param_desc[2] in {'Required', 'Yes'} else False
+        is_required = True if param_desc[2] in {"Required", "Yes"} else False
         is_ours_required = sig.parameters[param_name].default is inspect.Signature.empty
         return is_required is is_ours_required
 
     if len(param_desc) == 3:  # The docs mention the requirement in the description for classes...
         if param_name in ignored_param_requirements.get(method_or_obj_name, {}):
             return True
-        is_required = False if param_desc[2].split('.', 1)[0] == 'Optional' else True
+        is_required = False if param_desc[2].split(".", 1)[0] == "Optional" else True
         is_ours_required = sig.parameters[param_name].default is inspect.Signature.empty
         return is_required is is_ours_required
 
 
 argvalues = []
 names = []
-request = httpx.get('https://core.telegram.org/bots/api')
-soup = BeautifulSoup(request.text, 'html.parser')
+request = httpx.get("https://core.telegram.org/bots/api")
+soup = BeautifulSoup(request.text, "html.parser")
 
-for thing in soup.select('h4 > a.anchor'):
+for thing in soup.select("h4 > a.anchor"):
     # Methods and types don't have spaces in them, luckily all other sections of the docs do
     # TODO: don't depend on that
-    if '-' not in thing['name']:
+    if "-" not in thing["name"]:
         h4 = thing.parent
 
         # Is it a method
@@ -215,9 +215,9 @@ for thing in soup.select('h4 > a.anchor'):
             names.append(h4.text)
 
 
-@pytest.mark.parametrize(('method', 'data'), argvalues=argvalues, ids=names)
+@pytest.mark.parametrize(("method", "data"), argvalues=argvalues, ids=names)
 @pytest.mark.skipif(
-    not env_var_2_bool(os.getenv('TEST_OFFICIAL')), reason='test_official is not enabled'
+    not env_var_2_bool(os.getenv("TEST_OFFICIAL")), reason="test_official is not enabled"
 )
 def test_official(method, data):
     method(data)

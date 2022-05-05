@@ -26,7 +26,7 @@ from telegram._utils.types import DVInput
 from telegram.ext._handler import Handler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 if TYPE_CHECKING:
     from telegram.ext import Application, CallbackContext
@@ -72,7 +72,7 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
 
     """
 
-    __slots__ = ('pattern',)
+    __slots__ = ("pattern",)
 
     def __init__(
         self,
@@ -108,9 +108,9 @@ class ChosenInlineResultHandler(Handler[Update, CCT]):
 
     def collect_additional_context(
         self,
-        context: 'CallbackContext',
+        context: "CallbackContext",
         update: Update,
-        application: 'Application',
+        application: "Application",
         check_result: Union[bool, Match],
     ) -> None:
         """This function adds the matched regex pattern result to

@@ -78,13 +78,13 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'caption',
-        'title',
-        'parse_mode',
-        'voice_file_id',
-        'input_message_content',
+        "reply_markup",
+        "caption_entities",
+        "caption",
+        "title",
+        "parse_mode",
+        "voice_file_id",
+        "input_message_content",
     )
 
     def __init__(
@@ -94,7 +94,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
         title: str,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,

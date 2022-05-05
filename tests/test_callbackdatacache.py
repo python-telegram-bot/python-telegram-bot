@@ -28,7 +28,7 @@ from telegram import CallbackQuery, Chat, InlineKeyboardButton, InlineKeyboardMa
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def callback_data_cache(bot):
     return CallbackDataCache(bot)
 
@@ -37,7 +37,7 @@ class TestInvalidCallbackData:
     def test_slot_behaviour(self, mro_slots):
         invalid_callback_data = InvalidCallbackData()
         for attr in invalid_callback_data.__slots__:
-            assert getattr(invalid_callback_data, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(invalid_callback_data, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invalid_callback_data)) == len(
             set(mro_slots(invalid_callback_data))
         ), "duplicate slot"
@@ -45,9 +45,9 @@ class TestInvalidCallbackData:
 
 class TestKeyboardData:
     def test_slot_behaviour(self, mro_slots):
-        keyboard_data = _KeyboardData('uuid')
+        keyboard_data = _KeyboardData("uuid")
         for attr in keyboard_data.__slots__:
-            assert getattr(keyboard_data, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(keyboard_data, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(keyboard_data)) == len(
             set(mro_slots(keyboard_data))
         ), "duplicate slot"
@@ -58,15 +58,15 @@ class TestCallbackDataCache:
         for attr in callback_data_cache.__slots__:
             attr = (
                 f"_CallbackDataCache{attr}"
-                if attr.startswith('__') and not attr.endswith('__')
+                if attr.startswith("__") and not attr.endswith("__")
                 else attr
             )
-            assert getattr(callback_data_cache, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(callback_data_cache, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(callback_data_cache)) == len(
             set(mro_slots(callback_data_cache))
         ), "duplicate slot"
 
-    @pytest.mark.parametrize('maxsize', [1, 5, 2048])
+    @pytest.mark.parametrize("maxsize", [1, 5, 2048])
     def test_init_maxsize(self, maxsize, bot):
         assert CallbackDataCache(bot).maxsize == 1024
         cdc = CallbackDataCache(bot, maxsize=maxsize)
@@ -74,23 +74,23 @@ class TestCallbackDataCache:
         assert cdc.bot is bot
 
     def test_init_and_access__persistent_data(self, bot):
-        keyboard_data = _KeyboardData('123', 456, {'button': 678})
-        persistent_data = ([keyboard_data.to_tuple()], {'id': '123'})
+        keyboard_data = _KeyboardData("123", 456, {"button": 678})
+        persistent_data = ([keyboard_data.to_tuple()], {"id": "123"})
         cdc = CallbackDataCache(bot, persistent_data=persistent_data)
 
         assert cdc.maxsize == 1024
-        assert dict(cdc._callback_queries) == {'id': '123'}
-        assert list(cdc._keyboard_data.keys()) == ['123']
-        assert cdc._keyboard_data['123'].keyboard_uuid == '123'
-        assert cdc._keyboard_data['123'].access_time == 456
-        assert cdc._keyboard_data['123'].button_data == {'button': 678}
+        assert dict(cdc._callback_queries) == {"id": "123"}
+        assert list(cdc._keyboard_data.keys()) == ["123"]
+        assert cdc._keyboard_data["123"].keyboard_uuid == "123"
+        assert cdc._keyboard_data["123"].access_time == 456
+        assert cdc._keyboard_data["123"].button_data == {"button": 678}
 
         assert cdc.persistence_data == persistent_data
 
     def test_process_keyboard(self, callback_data_cache):
-        changing_button_1 = InlineKeyboardButton('changing', callback_data='some data 1')
-        changing_button_2 = InlineKeyboardButton('changing', callback_data='some data 2')
-        non_changing_button = InlineKeyboardButton('non-changing', url='https://ptb.org')
+        changing_button_1 = InlineKeyboardButton("changing", callback_data="some data 1")
+        changing_button_2 = InlineKeyboardButton("changing", callback_data="some data 2")
+        non_changing_button = InlineKeyboardButton("non-changing", url="https://ptb.org")
         reply_markup = InlineKeyboardMarkup.from_row(
             [non_changing_button, changing_button_1, changing_button_2]
         )
@@ -108,23 +108,23 @@ class TestCallbackDataCache:
         )
         assert keyboard_1 == keyboard_2
         assert (
-            callback_data_cache._keyboard_data[keyboard_1].button_data[button_1] == 'some data 1'
+            callback_data_cache._keyboard_data[keyboard_1].button_data[button_1] == "some data 1"
         )
         assert (
-            callback_data_cache._keyboard_data[keyboard_2].button_data[button_2] == 'some data 2'
+            callback_data_cache._keyboard_data[keyboard_2].button_data[button_2] == "some data 2"
         )
 
     def test_process_keyboard_no_changing_button(self, callback_data_cache):
         reply_markup = InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton('non-changing', url='https://ptb.org')
+            InlineKeyboardButton("non-changing", url="https://ptb.org")
         )
         assert callback_data_cache.process_keyboard(reply_markup) is reply_markup
 
     def test_process_keyboard_full(self, bot):
         cdc = CallbackDataCache(bot, maxsize=1)
-        changing_button_1 = InlineKeyboardButton('changing', callback_data='some data 1')
-        changing_button_2 = InlineKeyboardButton('changing', callback_data='some data 2')
-        non_changing_button = InlineKeyboardButton('non-changing', url='https://ptb.org')
+        changing_button_1 = InlineKeyboardButton("changing", callback_data="some data 1")
+        changing_button_2 = InlineKeyboardButton("changing", callback_data="some data 2")
+        non_changing_button = InlineKeyboardButton("non-changing", url="https://ptb.org")
         reply_markup = InlineKeyboardMarkup.from_row(
             [non_changing_button, changing_button_1, changing_button_2]
         )
@@ -139,14 +139,14 @@ class TestCallbackDataCache:
         assert cdc.persistence_data[0][0][0] != keyboard_1
         assert cdc.persistence_data[0][0][0] == keyboard_2
 
-    @pytest.mark.parametrize('data', [True, False])
-    @pytest.mark.parametrize('message', [True, False])
-    @pytest.mark.parametrize('invalid', [True, False])
+    @pytest.mark.parametrize("data", [True, False])
+    @pytest.mark.parametrize("message", [True, False])
+    @pytest.mark.parametrize("invalid", [True, False])
     def test_process_callback_query(self, callback_data_cache, data, message, invalid):
         """This also tests large parts of process_message"""
-        changing_button_1 = InlineKeyboardButton('changing', callback_data='some data 1')
-        changing_button_2 = InlineKeyboardButton('changing', callback_data='some data 2')
-        non_changing_button = InlineKeyboardButton('non-changing', url='https://ptb.org')
+        changing_button_1 = InlineKeyboardButton("changing", callback_data="some data 1")
+        changing_button_2 = InlineKeyboardButton("changing", callback_data="some data 2")
+        non_changing_button = InlineKeyboardButton("non-changing", url="https://ptb.org")
         reply_markup = InlineKeyboardMarkup.from_row(
             [non_changing_button, changing_button_1, changing_button_2]
         )
@@ -155,7 +155,7 @@ class TestCallbackDataCache:
         if invalid:
             callback_data_cache.clear_callback_data()
 
-        chat = Chat(1, 'private')
+        chat = Chat(1, "private")
         effective_message = Message(message_id=1, date=datetime.now(), chat=chat, reply_markup=out)
         effective_message.reply_to_message = deepcopy(effective_message)
         effective_message.pinned_message = deepcopy(effective_message)
@@ -173,7 +173,7 @@ class TestCallbackDataCache:
 
         if not invalid:
             if data:
-                assert callback_query.data == 'some data 1'
+                assert callback_query.data == "some data 1"
                 # make sure that we stored the mapping CallbackQuery.id -> keyboard_uuid correctly
                 assert len(callback_data_cache._keyboard_data) == 1
                 assert (
@@ -209,13 +209,13 @@ class TestCallbackDataCache:
                         InvalidCallbackData,
                     )
 
-    @pytest.mark.parametrize('pass_from_user', [True, False])
-    @pytest.mark.parametrize('pass_via_bot', [True, False])
+    @pytest.mark.parametrize("pass_from_user", [True, False])
+    @pytest.mark.parametrize("pass_via_bot", [True, False])
     def test_process_message_wrong_sender(self, pass_from_user, pass_via_bot, callback_data_cache):
         reply_markup = InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton('test', callback_data='callback_data')
+            InlineKeyboardButton("test", callback_data="callback_data")
         )
-        user = User(1, 'first', False)
+        user = User(1, "first", False)
         message = Message(
             1,
             None,
@@ -227,21 +227,21 @@ class TestCallbackDataCache:
         callback_data_cache.process_message(message)
         if pass_from_user or pass_via_bot:
             # Here we can determine that the message is not from our bot, so no replacing
-            assert message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+            assert message.reply_markup.inline_keyboard[0][0].callback_data == "callback_data"
         else:
             # Here we have no chance to know, so InvalidCallbackData
             assert isinstance(
                 message.reply_markup.inline_keyboard[0][0].callback_data, InvalidCallbackData
             )
 
-    @pytest.mark.parametrize('pass_from_user', [True, False])
+    @pytest.mark.parametrize("pass_from_user", [True, False])
     def test_process_message_inline_mode(self, pass_from_user, callback_data_cache):
         """Check that via_bot tells us correctly that our bot sent the message, even if
         from_user is not our bot."""
         reply_markup = InlineKeyboardMarkup.from_button(
-            InlineKeyboardButton('test', callback_data='callback_data')
+            InlineKeyboardButton("test", callback_data="callback_data")
         )
-        user = User(1, 'first', False)
+        user = User(1, "first", False)
         message = Message(
             1,
             None,
@@ -252,7 +252,7 @@ class TestCallbackDataCache:
         )
         callback_data_cache.process_message(message)
         # Here we can determine that the message is not from our bot, so no replacing
-        assert message.reply_markup.inline_keyboard[0][0].callback_data == 'callback_data'
+        assert message.reply_markup.inline_keyboard[0][0].callback_data == "callback_data"
 
     def test_process_message_no_reply_markup(self, callback_data_cache):
         message = Message(1, None, None)
@@ -260,13 +260,13 @@ class TestCallbackDataCache:
         assert message.reply_markup is None
 
     def test_drop_data(self, callback_data_cache):
-        changing_button_1 = InlineKeyboardButton('changing', callback_data='some data 1')
-        changing_button_2 = InlineKeyboardButton('changing', callback_data='some data 2')
+        changing_button_1 = InlineKeyboardButton("changing", callback_data="some data 1")
+        changing_button_2 = InlineKeyboardButton("changing", callback_data="some data 2")
         reply_markup = InlineKeyboardMarkup.from_row([changing_button_1, changing_button_2])
 
         out = callback_data_cache.process_keyboard(reply_markup)
         callback_query = CallbackQuery(
-            '1',
+            "1",
             from_user=None,
             chat_instance=None,
             data=out.inline_keyboard[0][1].callback_data,
@@ -281,19 +281,19 @@ class TestCallbackDataCache:
         assert len(callback_data_cache.persistence_data[0]) == 0
 
     def test_drop_data_missing_data(self, callback_data_cache):
-        changing_button_1 = InlineKeyboardButton('changing', callback_data='some data 1')
-        changing_button_2 = InlineKeyboardButton('changing', callback_data='some data 2')
+        changing_button_1 = InlineKeyboardButton("changing", callback_data="some data 1")
+        changing_button_2 = InlineKeyboardButton("changing", callback_data="some data 2")
         reply_markup = InlineKeyboardMarkup.from_row([changing_button_1, changing_button_2])
 
         out = callback_data_cache.process_keyboard(reply_markup)
         callback_query = CallbackQuery(
-            '1',
+            "1",
             from_user=None,
             chat_instance=None,
             data=out.inline_keyboard[0][1].callback_data,
         )
 
-        with pytest.raises(KeyError, match='CallbackQuery was not found in cache.'):
+        with pytest.raises(KeyError, match="CallbackQuery was not found in cache."):
             callback_data_cache.drop_data(callback_query)
 
         callback_data_cache.process_callback_query(callback_query)
@@ -301,10 +301,10 @@ class TestCallbackDataCache:
         callback_data_cache.drop_data(callback_query)
         assert callback_data_cache.persistence_data == ([], {})
 
-    @pytest.mark.parametrize('method', ('callback_data', 'callback_queries'))
+    @pytest.mark.parametrize("method", ("callback_data", "callback_queries"))
     def test_clear_all(self, callback_data_cache, method):
-        changing_button_1 = InlineKeyboardButton('changing', callback_data='some data 1')
-        changing_button_2 = InlineKeyboardButton('changing', callback_data='some data 2')
+        changing_button_1 = InlineKeyboardButton("changing", callback_data="some data 1")
+        changing_button_2 = InlineKeyboardButton("changing", callback_data="some data 2")
         reply_markup = InlineKeyboardMarkup.from_row([changing_button_1, changing_button_2])
 
         for i in range(100):
@@ -317,7 +317,7 @@ class TestCallbackDataCache:
             )
             callback_data_cache.process_callback_query(callback_query)
 
-        if method == 'callback_data':
+        if method == "callback_data":
             callback_data_cache.clear_callback_data()
             # callback_data was cleared, callback_queries weren't
             assert len(callback_data_cache.persistence_data[0]) == 0
@@ -328,12 +328,12 @@ class TestCallbackDataCache:
             assert len(callback_data_cache.persistence_data[0]) == 100
             assert len(callback_data_cache.persistence_data[1]) == 0
 
-    @pytest.mark.parametrize('time_method', ['time', 'datetime', 'defaults'])
+    @pytest.mark.parametrize("time_method", ["time", "datetime", "defaults"])
     def test_clear_cutoff(self, callback_data_cache, time_method, tz_bot):
         # Fill the cache with some fake data
         for i in range(50):
             reply_markup = InlineKeyboardMarkup.from_button(
-                InlineKeyboardButton('changing', callback_data=str(i))
+                InlineKeyboardButton("changing", callback_data=str(i))
             )
             out = callback_data_cache.process_keyboard(reply_markup)
             callback_query = CallbackQuery(
@@ -346,9 +346,9 @@ class TestCallbackDataCache:
 
         # sleep a bit before saving the time cutoff, to make test more reliable
         time.sleep(0.1)
-        if time_method == 'time':
+        if time_method == "time":
             cutoff = time.time()
-        elif time_method == 'datetime':
+        elif time_method == "datetime":
             cutoff = datetime.now(pytz.utc)
         else:
             cutoff = datetime.now(tz_bot.defaults.tzinfo).replace(tzinfo=None)
@@ -358,7 +358,7 @@ class TestCallbackDataCache:
         # more fake data after the time cutoff
         for i in range(50, 100):
             reply_markup = InlineKeyboardMarkup.from_button(
-                InlineKeyboardButton('changing', callback_data=str(i))
+                InlineKeyboardButton("changing", callback_data=str(i))
             )
             out = callback_data_cache.process_keyboard(reply_markup)
             callback_query = CallbackQuery(

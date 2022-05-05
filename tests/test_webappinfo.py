@@ -22,7 +22,7 @@ import pytest
 from telegram import WebAppInfo
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def web_app_info():
     return WebAppInfo(url=TestWebAppInfo.url)
 
@@ -32,17 +32,17 @@ class TestWebAppInfo:
 
     def test_slot_behaviour(self, web_app_info, mro_slots):
         for attr in web_app_info.__slots__:
-            assert getattr(web_app_info, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(web_app_info, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(web_app_info)) == len(set(mro_slots(web_app_info))), "duplicate slot"
 
     def test_to_dict(self, web_app_info):
         web_app_info_dict = web_app_info.to_dict()
 
         assert isinstance(web_app_info_dict, dict)
-        assert web_app_info_dict['url'] == self.url
+        assert web_app_info_dict["url"] == self.url
 
     def test_de_json(self, bot):
-        json_dict = {'url': self.url}
+        json_dict = {"url": self.url}
         web_app_info = WebAppInfo.de_json(json_dict, bot)
 
         assert web_app_info.url == self.url

@@ -51,10 +51,10 @@ class _BaseMedium(TelegramObject):
 
     """
 
-    __slots__ = ('file_id', 'file_size', 'file_unique_id')
+    __slots__ = ("file_id", "file_size", "file_unique_id")
 
     def __init__(
-        self, file_id: str, file_unique_id: str, file_size: int = None, bot: 'Bot' = None
+        self, file_id: str, file_unique_id: str, file_size: int = None, bot: "Bot" = None
     ):
         # Required
         self.file_id: str = str(file_id)
@@ -72,7 +72,7 @@ class _BaseMedium(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> 'File':
+    ) -> "File":
         """Convenience wrapper over :attr:`telegram.Bot.get_file`
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.get_file`.

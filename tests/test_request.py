@@ -64,7 +64,7 @@ def mocker_factory(
     return make_assertion
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 async def httpx_request():
     async with HTTPXRequest() as rq:
         yield rq
@@ -80,45 +80,45 @@ class TestRequest:
     def test_slot_behaviour(self, mro_slots):
         inst = HTTPXRequest()
         for attr in inst.__slots__:
-            if attr.startswith('__'):
-                attr = f'_{inst.__class__.__name__}{attr}'
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            if attr.startswith("__"):
+                attr = f"_{inst.__class__.__name__}{attr}"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     async def test_context_manager(self, monkeypatch):
         async def initialize():
-            self.test_flag = ['initialize']
+            self.test_flag = ["initialize"]
 
         async def shutdown():
-            self.test_flag.append('stop')
+            self.test_flag.append("stop")
 
         httpx_request = HTTPXRequest()
 
-        monkeypatch.setattr(httpx_request, 'initialize', initialize)
-        monkeypatch.setattr(httpx_request, 'shutdown', shutdown)
+        monkeypatch.setattr(httpx_request, "initialize", initialize)
+        monkeypatch.setattr(httpx_request, "shutdown", shutdown)
 
         async with httpx_request:
             pass
 
-        assert self.test_flag == ['initialize', 'stop']
+        assert self.test_flag == ["initialize", "stop"]
 
     async def test_context_manager_exception_on_init(self, monkeypatch):
         async def initialize():
-            raise RuntimeError('initialize')
+            raise RuntimeError("initialize")
 
         async def shutdown():
-            self.test_flag = 'stop'
+            self.test_flag = "stop"
 
         httpx_request = HTTPXRequest()
 
-        monkeypatch.setattr(httpx_request, 'initialize', initialize)
-        monkeypatch.setattr(httpx_request, 'shutdown', shutdown)
+        monkeypatch.setattr(httpx_request, "initialize", initialize)
+        monkeypatch.setattr(httpx_request, "shutdown", shutdown)
 
-        with pytest.raises(RuntimeError, match='initialize'):
+        with pytest.raises(RuntimeError, match="initialize"):
             async with httpx_request:
                 pass
 
-        assert self.test_flag == 'stop'
+        assert self.test_flag == "stop"
 
     async def test_replaced_unprintable_char(self, monkeypatch, httpx_request):
         """Clients can send arbitrary bytes in callback data. Make sure that we just replace
@@ -126,17 +126,17 @@ class TestRequest:
         """
         server_response = b'{"result": "test_string\x80"}'
 
-        monkeypatch.setattr(httpx_request, 'do_request', mocker_factory(response=server_response))
+        monkeypatch.setattr(httpx_request, "do_request", mocker_factory(response=server_response))
 
-        assert await httpx_request.post(None, None, None) == 'test_string�'
+        assert await httpx_request.post(None, None, None) == "test_string�"
 
     async def test_illegal_json_response(self, monkeypatch, httpx_request: HTTPXRequest):
         # for proper JSON it should be `"result":` instead of `result:`
         server_response = b'{result: "test_string"}'
 
-        monkeypatch.setattr(httpx_request, 'do_request', mocker_factory(response=server_response))
+        monkeypatch.setattr(httpx_request, "do_request", mocker_factory(response=server_response))
 
-        with pytest.raises(TelegramError, match='Invalid server response'):
+        with pytest.raises(TelegramError, match="Invalid server response"):
             await httpx_request.post(None, None, None)
 
     async def test_chat_migrated(self, monkeypatch, httpx_request: HTTPXRequest):
@@ -144,11 +144,11 @@ class TestRequest:
 
         monkeypatch.setattr(
             httpx_request,
-            'do_request',
+            "do_request",
             mocker_factory(response=server_response, return_code=HTTPStatus.BAD_REQUEST),
         )
 
-        with pytest.raises(ChatMigrated, match='New chat id: 123') as exc_info:
+        with pytest.raises(ChatMigrated, match="New chat id: 123") as exc_info:
             await httpx_request.post(None, None, None)
 
         assert exc_info.value.new_chat_id == 123
@@ -158,11 +158,11 @@ class TestRequest:
 
         monkeypatch.setattr(
             httpx_request,
-            'do_request',
+            "do_request",
             mocker_factory(response=server_response, return_code=HTTPStatus.BAD_REQUEST),
         )
 
-        with pytest.raises(RetryAfter, match='Retry in 42.0') as exc_info:
+        with pytest.raises(RetryAfter, match="Retry in 42.0") as exc_info:
             await httpx_request.post(None, None, None)
 
         assert exc_info.value.retry_after == 42.0
@@ -172,7 +172,7 @@ class TestRequest:
 
         monkeypatch.setattr(
             httpx_request,
-            'do_request',
+            "do_request",
             mocker_factory(response=server_response, return_code=HTTPStatus.BAD_REQUEST),
         )
 
@@ -182,20 +182,20 @@ class TestRequest:
         ):
             await httpx_request.post(None, None, None)
 
-    @pytest.mark.parametrize('description', [True, False])
+    @pytest.mark.parametrize("description", [True, False])
     async def test_error_description(self, monkeypatch, httpx_request: HTTPXRequest, description):
         response_data = {"ok": "False"}
         if description:
-            match = 'ErrorDescription'
-            response_data['description'] = match
+            match = "ErrorDescription"
+            response_data["description"] = match
         else:
-            match = 'Unknown HTTPError'
+            match = "Unknown HTTPError"
 
-        server_response = json.dumps(response_data).encode('utf-8')
+        server_response = json.dumps(response_data).encode("utf-8")
 
         monkeypatch.setattr(
             httpx_request,
-            'do_request',
+            "do_request",
             mocker_factory(response=server_response, return_code=-1),
         )
 
@@ -206,15 +206,15 @@ class TestRequest:
         if not description:
             monkeypatch.setattr(
                 httpx_request,
-                'do_request',
+                "do_request",
                 mocker_factory(response=server_response, return_code=HTTPStatus.BAD_GATEWAY),
             )
 
-            with pytest.raises(NetworkError, match='Bad Gateway'):
+            with pytest.raises(NetworkError, match="Bad Gateway"):
                 await httpx_request.post(None, None, None)
 
     @pytest.mark.parametrize(
-        'code, exception_class',
+        "code, exception_class",
         [
             (HTTPStatus.FORBIDDEN, Forbidden),
             (HTTPStatus.NOT_FOUND, InvalidToken),
@@ -232,19 +232,19 @@ class TestRequest:
 
         monkeypatch.setattr(
             httpx_request,
-            'do_request',
+            "do_request",
             mocker_factory(response=server_response, return_code=code),
         )
 
-        with pytest.raises(exception_class, match='Test Message'):
+        with pytest.raises(exception_class, match="Test Message"):
             await httpx_request.post(None, None, None)
 
     @pytest.mark.parametrize(
-        ['exception', 'catch_class', 'match'],
+        ["exception", "catch_class", "match"],
         [
-            (TelegramError('TelegramError'), TelegramError, 'TelegramError'),
+            (TelegramError("TelegramError"), TelegramError, "TelegramError"),
             (
-                RuntimeError('CustomError'),
+                RuntimeError("CustomError"),
                 Exception,
                 r"HTTP implementation: RuntimeError\('CustomError'\)",
             ),
@@ -258,7 +258,7 @@ class TestRequest:
 
         monkeypatch.setattr(
             httpx_request,
-            'do_request',
+            "do_request",
             do_request,
         )
 
@@ -271,27 +271,27 @@ class TestRequest:
         """
         server_response = b'{"result": "test_string\x80"}'
 
-        monkeypatch.setattr(httpx_request, 'do_request', mocker_factory(response=server_response))
+        monkeypatch.setattr(httpx_request, "do_request", mocker_factory(response=server_response))
 
         assert await httpx_request.retrieve(None, None) == server_response
 
     async def test_timeout_propagation(self, monkeypatch, httpx_request):
         async def make_assertion(*args, **kwargs):
             self.test_flag = (
-                kwargs.get('read_timeout'),
-                kwargs.get('connect_timeout'),
-                kwargs.get('write_timeout'),
-                kwargs.get('pool_timeout'),
+                kwargs.get("read_timeout"),
+                kwargs.get("connect_timeout"),
+                kwargs.get("write_timeout"),
+                kwargs.get("pool_timeout"),
             )
             return HTTPStatus.OK, b'{"ok": "True", "result": {}}'
 
-        monkeypatch.setattr(httpx_request, 'do_request', make_assertion)
+        monkeypatch.setattr(httpx_request, "do_request", make_assertion)
 
-        await httpx_request.post('url', 'method')
+        await httpx_request.post("url", "method")
         assert self.test_flag == (DEFAULT_NONE, DEFAULT_NONE, DEFAULT_NONE, DEFAULT_NONE)
 
         await httpx_request.post(
-            'url', None, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
+            "url", None, read_timeout=1, connect_timeout=2, write_timeout=3, pool_timeout=4
         )
         assert self.test_flag == (1, 2, 3, 4)
 
@@ -310,7 +310,7 @@ class TestHTTPXRequest:
             proxies: object
             limits: object
 
-        monkeypatch.setattr(httpx, 'AsyncClient', Client)
+        monkeypatch.setattr(httpx, "AsyncClient", Client)
 
         request = HTTPXRequest()
         assert request._client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
@@ -321,13 +321,13 @@ class TestHTTPXRequest:
 
         request = HTTPXRequest(
             connection_pool_size=42,
-            proxy_url='proxy_url',
+            proxy_url="proxy_url",
             connect_timeout=43,
             read_timeout=44,
             write_timeout=45,
             pool_timeout=46,
         )
-        assert request._client.proxies == 'proxy_url'
+        assert request._client.proxies == "proxy_url"
         assert request._client.limits == httpx.Limits(
             max_connections=42, max_keepalive_connections=42
         )
@@ -342,13 +342,13 @@ class TestHTTPXRequest:
         class Client(httpx.AsyncClient):
             def __init__(*args, **kwargs):
                 orig_init(*args, **kwargs)
-                self.test_flag['init'] += 1
+                self.test_flag["init"] += 1
 
             async def aclose(*args, **kwargs):
                 await orig_aclose(*args, **kwargs)
-                self.test_flag['shutdown'] += 1
+                self.test_flag["shutdown"] += 1
 
-        monkeypatch.setattr(httpx, 'AsyncClient', Client)
+        monkeypatch.setattr(httpx, "AsyncClient", Client)
 
         # Create a new one instead of using the fixture so that the mocking can work
         httpx_request = HTTPXRequest()
@@ -360,62 +360,62 @@ class TestHTTPXRequest:
         await httpx_request.shutdown()
         await httpx_request.shutdown()
 
-        assert self.test_flag['init'] == 1
-        assert self.test_flag['shutdown'] == 1
+        assert self.test_flag["init"] == 1
+        assert self.test_flag["shutdown"] == 1
 
     async def test_multiple_init_cycles(self):
         # nothing really to assert - this should just not fail
         httpx_request = HTTPXRequest()
         async with httpx_request:
-            await httpx_request.do_request(url='https://python-telegram-bot.org', method='GET')
+            await httpx_request.do_request(url="https://python-telegram-bot.org", method="GET")
         async with httpx_request:
-            await httpx_request.do_request(url='https://python-telegram-bot.org', method='GET')
+            await httpx_request.do_request(url="https://python-telegram-bot.org", method="GET")
 
     async def test_do_request_after_shutdown(self, httpx_request):
         await httpx_request.shutdown()
-        with pytest.raises(RuntimeError, match='not initialized'):
-            await httpx_request.do_request(url='url', method='GET')
+        with pytest.raises(RuntimeError, match="not initialized"):
+            await httpx_request.do_request(url="url", method="GET")
 
     async def test_context_manager(self, monkeypatch):
         async def initialize():
-            self.test_flag = ['initialize']
+            self.test_flag = ["initialize"]
 
         async def aclose(*args):
-            self.test_flag.append('stop')
+            self.test_flag.append("stop")
 
         httpx_request = HTTPXRequest()
 
-        monkeypatch.setattr(httpx_request, 'initialize', initialize)
-        monkeypatch.setattr(httpx.AsyncClient, 'aclose', aclose)
+        monkeypatch.setattr(httpx_request, "initialize", initialize)
+        monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)
 
         async with httpx_request:
             pass
 
-        assert self.test_flag == ['initialize', 'stop']
+        assert self.test_flag == ["initialize", "stop"]
 
     async def test_context_manager_exception_on_init(self, monkeypatch):
         async def initialize():
-            raise RuntimeError('initialize')
+            raise RuntimeError("initialize")
 
         async def aclose(*args):
-            self.test_flag = 'stop'
+            self.test_flag = "stop"
 
         httpx_request = HTTPXRequest()
 
-        monkeypatch.setattr(httpx_request, 'initialize', initialize)
-        monkeypatch.setattr(httpx.AsyncClient, 'aclose', aclose)
+        monkeypatch.setattr(httpx_request, "initialize", initialize)
+        monkeypatch.setattr(httpx.AsyncClient, "aclose", aclose)
 
-        with pytest.raises(RuntimeError, match='initialize'):
+        with pytest.raises(RuntimeError, match="initialize"):
             async with httpx_request:
                 pass
 
-        assert self.test_flag == 'stop'
+        assert self.test_flag == "stop"
 
     async def test_do_request_default_timeouts(self, monkeypatch):
         default_timeouts = httpx.Timeout(connect=42, read=43, write=44, pool=45)
 
         async def make_assertion(_, **kwargs):
-            self.test_flag = kwargs.get('timeout') == default_timeouts
+            self.test_flag = kwargs.get("timeout") == default_timeouts
             return httpx.Response(HTTPStatus.OK)
 
         async with HTTPXRequest(
@@ -425,8 +425,8 @@ class TestHTTPXRequest:
             pool_timeout=default_timeouts.pool,
         ) as httpx_request:
 
-            monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
-            await httpx_request.do_request(method='GET', url='URL')
+            monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
+            await httpx_request.do_request(method="GET", url="URL")
 
         assert self.test_flag
 
@@ -435,7 +435,7 @@ class TestHTTPXRequest:
         manual_timeouts = httpx.Timeout(connect=52, read=53, write=54, pool=55)
 
         async def make_assertion(_, **kwargs):
-            self.test_flag = kwargs.get('timeout') == manual_timeouts
+            self.test_flag = kwargs.get("timeout") == manual_timeouts
             return httpx.Response(HTTPStatus.OK)
 
         async with HTTPXRequest(
@@ -445,10 +445,10 @@ class TestHTTPXRequest:
             pool_timeout=default_timeouts.pool,
         ) as httpx_request:
 
-            monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
+            monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
             await httpx_request.do_request(
-                method='GET',
-                url='URL',
+                method="GET",
+                url="URL",
                 connect_timeout=manual_timeouts.connect,
                 read_timeout=manual_timeouts.read,
                 write_timeout=manual_timeouts.write,
@@ -459,66 +459,66 @@ class TestHTTPXRequest:
 
     async def test_do_request_params_no_data(self, monkeypatch, httpx_request):
         async def make_assertion(self, **kwargs):
-            method_assertion = kwargs.get('method') == 'method'
-            url_assertion = kwargs.get('url') == 'url'
-            files_assertion = kwargs.get('files') is None
-            data_assertion = kwargs.get('data') is None
+            method_assertion = kwargs.get("method") == "method"
+            url_assertion = kwargs.get("url") == "url"
+            files_assertion = kwargs.get("files") is None
+            data_assertion = kwargs.get("data") is None
             if method_assertion and url_assertion and files_assertion and data_assertion:
                 return httpx.Response(HTTPStatus.OK)
             return httpx.Response(HTTPStatus.BAD_REQUEST)
 
-        monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
-        code, _ = await httpx_request.do_request(method='method', url='url')
+        monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
+        code, _ = await httpx_request.do_request(method="method", url="url")
         assert code == HTTPStatus.OK
 
     async def test_do_request_params_with_data(
         self, monkeypatch, httpx_request, mixed_rqs  # noqa: 9811
     ):
         async def make_assertion(self, **kwargs):
-            method_assertion = kwargs.get('method') == 'method'
-            url_assertion = kwargs.get('url') == 'url'
-            files_assertion = kwargs.get('files') == mixed_rqs.multipart_data
-            data_assertion = kwargs.get('data') == mixed_rqs.json_parameters
+            method_assertion = kwargs.get("method") == "method"
+            url_assertion = kwargs.get("url") == "url"
+            files_assertion = kwargs.get("files") == mixed_rqs.multipart_data
+            data_assertion = kwargs.get("data") == mixed_rqs.json_parameters
             if method_assertion and url_assertion and files_assertion and data_assertion:
                 return httpx.Response(HTTPStatus.OK)
             return httpx.Response(HTTPStatus.BAD_REQUEST)
 
-        monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
+        monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
         code, _ = await httpx_request.do_request(
-            method='method',
-            url='url',
+            method="method",
+            url="url",
             request_data=mixed_rqs,
         )
         assert code == HTTPStatus.OK
 
     async def test_do_request_return_value(self, monkeypatch, httpx_request):
         async def make_assertion(self, method, url, headers, timeout, files, data):
-            return httpx.Response(123, content=b'content')
+            return httpx.Response(123, content=b"content")
 
-        monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
+        monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
         code, content = await httpx_request.do_request(
-            'method',
-            'url',
+            "method",
+            "url",
         )
         assert code == 123
-        assert content == b'content'
+        assert content == b"content"
 
     @pytest.mark.parametrize(
-        ['raised_class', 'expected_class'],
+        ["raised_class", "expected_class"],
         [(httpx.TimeoutException, TimedOut), (httpx.HTTPError, NetworkError)],
     )
     async def test_do_request_exceptions(
         self, monkeypatch, httpx_request, raised_class, expected_class
     ):
         async def make_assertion(self, method, url, headers, timeout, files, data):
-            raise raised_class('message')
+            raise raised_class("message")
 
-        monkeypatch.setattr(httpx.AsyncClient, 'request', make_assertion)
+        monkeypatch.setattr(httpx.AsyncClient, "request", make_assertion)
 
         with pytest.raises(expected_class):
             await httpx_request.do_request(
-                'method',
-                'url',
+                "method",
+                "url",
             )
 
     async def test_do_request_pool_timeout(self, monkeypatch):
@@ -526,16 +526,16 @@ class TestHTTPXRequest:
             if self.test_flag is None:
                 self.test_flag = True
             else:
-                raise httpx.PoolTimeout('pool timeout')
+                raise httpx.PoolTimeout("pool timeout")
             return httpx.Response(HTTPStatus.OK)
 
-        monkeypatch.setattr(httpx.AsyncClient, 'request', request)
+        monkeypatch.setattr(httpx.AsyncClient, "request", request)
 
-        with pytest.raises(TimedOut, match='Pool timeout'):
+        with pytest.raises(TimedOut, match="Pool timeout"):
             async with HTTPXRequest(pool_timeout=0.02) as httpx_request:
                 await asyncio.gather(
-                    httpx_request.do_request(method='GET', url='URL'),
-                    httpx_request.do_request(method='GET', url='URL'),
+                    httpx_request.do_request(method="GET", url="URL"),
+                    httpx_request.do_request(method="GET", url="URL"),
                 )
 
     @flaky(3, 1)
@@ -544,12 +544,12 @@ class TestHTTPXRequest:
         instead of mocking"""
         task_1 = asyncio.create_task(
             httpx_request.do_request(
-                method='GET', url='https://python-telegram-bot.org/static/testfiles/telegram.mp4'
+                method="GET", url="https://python-telegram-bot.org/static/testfiles/telegram.mp4"
             )
         )
         task_2 = asyncio.create_task(
             httpx_request.do_request(
-                method='GET', url='https://python-telegram-bot.org/static/testfiles/telegram.mp4'
+                method="GET", url="https://python-telegram-bot.org/static/testfiles/telegram.mp4"
             )
         )
         done, pending = await asyncio.wait({task_1, task_2}, return_when=asyncio.FIRST_COMPLETED)

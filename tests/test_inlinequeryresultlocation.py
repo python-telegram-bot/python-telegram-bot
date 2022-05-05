@@ -27,7 +27,7 @@ from telegram import (
 )
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def inline_query_result_location():
     return InlineQueryResultLocation(
         TestInlineQueryResultLocation.id_,
@@ -47,25 +47,25 @@ def inline_query_result_location():
 
 
 class TestInlineQueryResultLocation:
-    id_ = 'id'
-    type_ = 'location'
+    id_ = "id"
+    type_ = "location"
     latitude = 0.0
     longitude = 1.0
-    title = 'title'
+    title = "title"
     horizontal_accuracy = 999
     live_period = 70
     heading = 90
     proximity_alert_radius = 1000
-    thumb_url = 'thumb url'
+    thumb_url = "thumb url"
     thumb_width = 10
     thumb_height = 15
-    input_message_content = InputTextMessageContent('input_message_content')
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton('reply_markup')]])
+    input_message_content = InputTextMessageContent("input_message_content")
+    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("reply_markup")]])
 
     def test_slot_behaviour(self, inline_query_result_location, mro_slots):
         inst = inline_query_result_location
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, inline_query_result_location):
@@ -91,47 +91,47 @@ class TestInlineQueryResultLocation:
         inline_query_result_location_dict = inline_query_result_location.to_dict()
 
         assert isinstance(inline_query_result_location_dict, dict)
-        assert inline_query_result_location_dict['id'] == inline_query_result_location.id
-        assert inline_query_result_location_dict['type'] == inline_query_result_location.type
+        assert inline_query_result_location_dict["id"] == inline_query_result_location.id
+        assert inline_query_result_location_dict["type"] == inline_query_result_location.type
         assert (
-            inline_query_result_location_dict['latitude'] == inline_query_result_location.latitude
+            inline_query_result_location_dict["latitude"] == inline_query_result_location.latitude
         )
         assert (
-            inline_query_result_location_dict['longitude']
+            inline_query_result_location_dict["longitude"]
             == inline_query_result_location.longitude
         )
-        assert inline_query_result_location_dict['title'] == inline_query_result_location.title
+        assert inline_query_result_location_dict["title"] == inline_query_result_location.title
         assert (
-            inline_query_result_location_dict['live_period']
+            inline_query_result_location_dict["live_period"]
             == inline_query_result_location.live_period
         )
         assert (
-            inline_query_result_location_dict['thumb_url']
+            inline_query_result_location_dict["thumb_url"]
             == inline_query_result_location.thumb_url
         )
         assert (
-            inline_query_result_location_dict['thumb_width']
+            inline_query_result_location_dict["thumb_width"]
             == inline_query_result_location.thumb_width
         )
         assert (
-            inline_query_result_location_dict['thumb_height']
+            inline_query_result_location_dict["thumb_height"]
             == inline_query_result_location.thumb_height
         )
         assert (
-            inline_query_result_location_dict['input_message_content']
+            inline_query_result_location_dict["input_message_content"]
             == inline_query_result_location.input_message_content.to_dict()
         )
         assert (
-            inline_query_result_location_dict['reply_markup']
+            inline_query_result_location_dict["reply_markup"]
             == inline_query_result_location.reply_markup.to_dict()
         )
         assert (
-            inline_query_result_location_dict['horizontal_accuracy']
+            inline_query_result_location_dict["horizontal_accuracy"]
             == inline_query_result_location.horizontal_accuracy
         )
-        assert inline_query_result_location_dict['heading'] == inline_query_result_location.heading
+        assert inline_query_result_location_dict["heading"] == inline_query_result_location.heading
         assert (
-            inline_query_result_location_dict['proximity_alert_radius']
+            inline_query_result_location_dict["proximity_alert_radius"]
             == inline_query_result_location.proximity_alert_radius
         )
 
@@ -139,8 +139,8 @@ class TestInlineQueryResultLocation:
         a = InlineQueryResultLocation(self.id_, self.longitude, self.latitude, self.title)
         b = InlineQueryResultLocation(self.id_, self.longitude, self.latitude, self.title)
         c = InlineQueryResultLocation(self.id_, 0, self.latitude, self.title)
-        d = InlineQueryResultLocation('', self.longitude, self.latitude, self.title)
-        e = InlineQueryResultVoice(self.id_, '', '')
+        d = InlineQueryResultLocation("", self.longitude, self.latitude, self.title)
+        e = InlineQueryResultVoice(self.id_, "", "")
 
         assert a == b
         assert hash(a) == hash(b)

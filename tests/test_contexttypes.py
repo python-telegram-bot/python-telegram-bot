@@ -29,7 +29,7 @@ class TestContextTypes:
     def test_slot_behaviour(self, mro_slots):
         instance = ContextTypes()
         for attr in instance.__slots__:
-            assert getattr(instance, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(instance, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(instance)) == len(set(mro_slots(instance))), "duplicate slot"
 
     def test_data_init(self):
@@ -39,7 +39,7 @@ class TestContextTypes:
         assert ct.chat_data is float
         assert ct.user_data is bool
 
-        with pytest.raises(ValueError, match='subclass of CallbackContext'):
+        with pytest.raises(ValueError, match="subclass of CallbackContext"):
             ContextTypes(context=bool)
 
     def test_data_assignment(self):

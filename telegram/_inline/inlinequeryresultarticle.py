@@ -66,22 +66,22 @@ class InlineQueryResultArticle(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'thumb_width',
-        'thumb_height',
-        'hide_url',
-        'url',
-        'title',
-        'description',
-        'input_message_content',
-        'thumb_url',
+        "reply_markup",
+        "thumb_width",
+        "thumb_height",
+        "hide_url",
+        "url",
+        "title",
+        "description",
+        "input_message_content",
+        "thumb_url",
     )
 
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin
         title: str,
-        input_message_content: 'InputMessageContent',
+        input_message_content: "InputMessageContent",
         reply_markup: InlineKeyboardMarkup = None,
         url: str = None,
         hide_url: bool = None,

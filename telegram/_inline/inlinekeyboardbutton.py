@@ -140,15 +140,15 @@ class InlineKeyboardButton(TelegramObject):
     """
 
     __slots__ = (
-        'callback_game',
-        'url',
-        'switch_inline_query_current_chat',
-        'callback_data',
-        'pay',
-        'switch_inline_query',
-        'text',
-        'login_url',
-        'web_app',
+        "callback_game",
+        "url",
+        "switch_inline_query_current_chat",
+        "callback_data",
+        "pay",
+        "switch_inline_query",
+        "text",
+        "login_url",
+        "web_app",
     )
 
     def __init__(
@@ -192,16 +192,16 @@ class InlineKeyboardButton(TelegramObject):
         )
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['InlineKeyboardButton']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineKeyboardButton"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['login_url'] = LoginUrl.de_json(data.get('login_url'), bot)
-        data['web_app'] = WebAppInfo.de_json(data.get('web_app'), bot)
-        data['callback_game'] = CallbackGame.de_json(data.get('callback_game'), bot)
+        data["login_url"] = LoginUrl.de_json(data.get("login_url"), bot)
+        data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
+        data["callback_game"] = CallbackGame.de_json(data.get("callback_game"), bot)
 
         return cls(**data)
 

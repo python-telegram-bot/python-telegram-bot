@@ -58,15 +58,15 @@ class Defaults:
     """
 
     __slots__ = (
-        '_tzinfo',
-        '_disable_web_page_preview',
-        '_block',
-        '_quote',
-        '_disable_notification',
-        '_allow_sending_without_reply',
-        '_parse_mode',
-        '_api_defaults',
-        '_protect_content',
+        "_tzinfo",
+        "_disable_web_page_preview",
+        "_block",
+        "_quote",
+        "_disable_notification",
+        "_allow_sending_without_reply",
+        "_parse_mode",
+        "_api_defaults",
+        "_protect_content",
     )
 
     def __init__(
@@ -92,12 +92,12 @@ class Defaults:
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
         for kwarg in (
-            'parse_mode',
-            'explanation_parse_mode',
-            'disable_notification',
-            'disable_web_page_preview',
-            'allow_sending_without_reply',
-            'protect_content',
+            "parse_mode",
+            "explanation_parse_mode",
+            "disable_notification",
+            "disable_web_page_preview",
+            "allow_sending_without_reply",
+            "protect_content",
         ):
             value = getattr(self, kwarg)
             if value is not None:

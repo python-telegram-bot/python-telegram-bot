@@ -68,7 +68,7 @@ class LoginUrl(TelegramObject):
 
     """
 
-    __slots__ = ('bot_username', 'request_write_access', 'url', 'forward_text')
+    __slots__ = ("bot_username", "request_write_access", "url", "forward_text")
 
     def __init__(
         self,

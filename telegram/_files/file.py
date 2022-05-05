@@ -70,18 +70,18 @@ class File(TelegramObject):
     """
 
     __slots__ = (
-        'file_id',
-        'file_size',
-        'file_unique_id',
-        'file_path',
-        '_credentials',
+        "file_id",
+        "file_size",
+        "file_unique_id",
+        "file_path",
+        "_credentials",
     )
 
     def __init__(
         self,
         file_id: str,
         file_unique_id: str,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         file_size: int = None,
         file_path: str = None,
         **_kwargs: Any,
@@ -93,7 +93,7 @@ class File(TelegramObject):
         self.file_size = file_size
         self.file_path = file_path
         self.set_bot(bot)
-        self._credentials: Optional['FileCredentials'] = None
+        self._credentials: Optional["FileCredentials"] = None
 
         self._id_attrs = (self.file_unique_id,)
 
@@ -152,7 +152,7 @@ class File(TelegramObject):
 
         """
         if custom_path is not None and out is not None:
-            raise ValueError('`custom_path` and `out` are mutually exclusive')
+            raise ValueError("`custom_path` and `out` are mutually exclusive")
 
         local_file = is_local_file(self.file_path)
         url = None if local_file else self._get_encoded_url()
@@ -225,7 +225,7 @@ class File(TelegramObject):
             buf.extend(await self.get_bot().request.retrieve(self._get_encoded_url()))
         return buf
 
-    def set_credentials(self, credentials: 'FileCredentials') -> None:
+    def set_credentials(self, credentials: "FileCredentials") -> None:
         """Sets the passport credentials for the file.
 
         Args:
