@@ -20,7 +20,7 @@
 
 from typing import Any
 
-from telegram import InputMessageContent
+from telegram._inline.inputmessagecontent import InputMessageContent
 
 
 class InputLocationMessageContent(InputMessageContent):

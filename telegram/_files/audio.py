@@ -20,8 +20,8 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import PhotoSize
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files.photosize import PhotoSize
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -68,7 +68,7 @@ class Audio(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ('duration', 'file_name', 'mime_type', 'performer', 'title')
+    __slots__ = ("duration", "file_name", "mime_type", "performer", "title")
 
     def __init__(
         self,
@@ -80,7 +80,7 @@ class Audio(_BaseThumbedMedium):
         mime_type: str = None,
         file_size: int = None,
         thumb: PhotoSize = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         file_name: str = None,
         **_kwargs: Any,
     ):

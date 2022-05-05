@@ -20,8 +20,8 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import PhotoSize
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files.photosize import PhotoSize
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -65,7 +65,7 @@ class Video(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ('duration', 'file_name', 'height', 'mime_type', 'width')
+    __slots__ = ("duration", "file_name", "height", "mime_type", "width")
 
     def __init__(
         self,
@@ -77,7 +77,7 @@ class Video(_BaseThumbedMedium):
         thumb: PhotoSize = None,
         mime_type: str = None,
         file_size: int = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         file_name: str = None,
         **_kwargs: Any,
     ):

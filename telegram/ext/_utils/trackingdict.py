@@ -25,23 +25,14 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-from typing import (
-    TypeVar,
-    Set,
-    ClassVar,
-    Union,
-    Tuple,
-    List,
-    Mapping,
-    Generic,
-)
 from collections import UserDict
+from typing import ClassVar, Generic, List, Mapping, Set, Tuple, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 
-_VT = TypeVar('_VT')
-_KT = TypeVar('_KT')
-_T = TypeVar('_T')
+_VT = TypeVar("_VT")
+_KT = TypeVar("_KT")
+_T = TypeVar("_T")
 
 
 class TrackingDict(UserDict, Generic[_KT, _VT]):
@@ -57,7 +48,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
     DELETED: ClassVar = object()
     """Special marker indicating that an entry was deleted."""
 
-    __slots__ = ('_write_access_keys',)
+    __slots__ = ("_write_access_keys",)
 
     def __init__(self) -> None:
         super().__init__()
@@ -122,7 +113,7 @@ class TrackingDict(UserDict, Generic[_KT, _VT]):
 
     # Mypy seems a bit inconsistent about what it wants as types for `default` and return value
     # so we just ignore a bit
-    def setdefault(self: 'TrackingDict[_KT, _T]', key: _KT, default: _T = None) -> _T:
+    def setdefault(self: "TrackingDict[_KT, _T]", key: _KT, default: _T = None) -> _T:
         if key in self:
             return self[key]
 

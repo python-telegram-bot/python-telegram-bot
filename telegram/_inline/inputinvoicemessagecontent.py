@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that represents a Telegram InputInvoiceMessageContent."""
 
-from typing import Any, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import InputMessageContent, LabeledPrice
+from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._payment.labeledprice import LabeledPrice
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -124,26 +125,26 @@ class InputInvoiceMessageContent(InputMessageContent):
     """
 
     __slots__ = (
-        'title',
-        'description',
-        'payload',
-        'provider_token',
-        'currency',
-        'prices',
-        'max_tip_amount',
-        'suggested_tip_amounts',
-        'provider_data',
-        'photo_url',
-        'photo_size',
-        'photo_width',
-        'photo_height',
-        'need_name',
-        'need_phone_number',
-        'need_email',
-        'need_shipping_address',
-        'send_phone_number_to_provider',
-        'send_email_to_provider',
-        'is_flexible',
+        "title",
+        "description",
+        "payload",
+        "provider_token",
+        "currency",
+        "prices",
+        "max_tip_amount",
+        "suggested_tip_amounts",
+        "provider_data",
+        "photo_url",
+        "photo_size",
+        "photo_width",
+        "photo_height",
+        "need_name",
+        "need_phone_number",
+        "need_email",
+        "need_shipping_address",
+        "send_phone_number_to_provider",
+        "send_email_to_provider",
+        "is_flexible",
     )
 
     def __init__(
@@ -222,20 +223,20 @@ class InputInvoiceMessageContent(InputMessageContent):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['prices'] = [price.to_dict() for price in self.prices]
+        data["prices"] = [price.to_dict() for price in self.prices]
 
         return data
 
     @classmethod
     def de_json(
-        cls, data: Optional[JSONDict], bot: 'Bot'
-    ) -> Optional['InputInvoiceMessageContent']:
+        cls, data: Optional[JSONDict], bot: "Bot"
+    ) -> Optional["InputInvoiceMessageContent"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['prices'] = LabeledPrice.de_list(data.get('prices'), bot)
+        data["prices"] = LabeledPrice.de_list(data.get("prices"), bot)
 
         return cls(**data, bot=bot)

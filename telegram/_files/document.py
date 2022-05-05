@@ -20,8 +20,8 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import PhotoSize
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files.photosize import PhotoSize
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -59,7 +59,7 @@ class Document(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ('file_name', 'mime_type')
+    __slots__ = ("file_name", "mime_type")
 
     def __init__(
         self,
@@ -69,7 +69,7 @@ class Document(_BaseThumbedMedium):
         file_name: str = None,
         mime_type: str = None,
         file_size: int = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         super().__init__(

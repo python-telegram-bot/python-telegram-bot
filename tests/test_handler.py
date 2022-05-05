@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-from telegram.ext import Handler
+from telegram.ext._handler import Handler
 
 
 class TestHandler:
@@ -33,5 +33,5 @@ class TestHandler:
 
         inst = SubclassHandler()
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"

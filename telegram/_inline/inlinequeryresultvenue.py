@@ -20,7 +20,8 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -81,19 +82,19 @@ class InlineQueryResultVenue(InlineQueryResult):
     """
 
     __slots__ = (
-        'longitude',
-        'reply_markup',
-        'google_place_type',
-        'thumb_width',
-        'thumb_height',
-        'title',
-        'address',
-        'foursquare_id',
-        'foursquare_type',
-        'google_place_id',
-        'input_message_content',
-        'latitude',
-        'thumb_url',
+        "longitude",
+        "reply_markup",
+        "google_place_type",
+        "thumb_width",
+        "thumb_height",
+        "title",
+        "address",
+        "foursquare_id",
+        "foursquare_type",
+        "google_place_id",
+        "input_message_content",
+        "latitude",
+        "thumb_url",
     )
 
     def __init__(
@@ -106,7 +107,7 @@ class InlineQueryResultVenue(InlineQueryResult):
         foursquare_id: str = None,
         foursquare_type: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,

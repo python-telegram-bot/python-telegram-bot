@@ -20,7 +20,9 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import EncryptedCredentials, EncryptedPassportElement, TelegramObject
+from telegram._passport.credentials import EncryptedCredentials
+from telegram._passport.encryptedpassportelement import EncryptedPassportElement
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -51,13 +53,13 @@ class PassportData(TelegramObject):
 
     """
 
-    __slots__ = ('credentials', 'data', '_decrypted_data')
+    __slots__ = ("credentials", "data", "_decrypted_data")
 
     def __init__(
         self,
         data: List[EncryptedPassportElement],
         credentials: EncryptedCredentials,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         self.data = data
@@ -68,15 +70,15 @@ class PassportData(TelegramObject):
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PassportData']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["PassportData"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['data'] = EncryptedPassportElement.de_list(data.get('data'), bot)
-        data['credentials'] = EncryptedCredentials.de_json(data.get('credentials'), bot)
+        data["data"] = EncryptedPassportElement.de_list(data.get("data"), bot)
+        data["credentials"] = EncryptedCredentials.de_json(data.get("credentials"), bot)
 
         return cls(bot=bot, **data)
 
@@ -84,7 +86,7 @@ class PassportData(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['data'] = [e.to_dict() for e in self.data]
+        data["data"] = [e.to_dict() for e in self.data]
 
         return data
 
@@ -108,7 +110,7 @@ class PassportData(TelegramObject):
         return self._decrypted_data
 
     @property
-    def decrypted_credentials(self) -> 'Credentials':
+    def decrypted_credentials(self) -> "Credentials":
         """
         :class:`telegram.Credentials`: Lazily decrypt and return credentials that were used
             to decrypt the data. This object also contains the user specified payload as

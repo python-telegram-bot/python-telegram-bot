@@ -16,13 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
 
 import pytest
 
 from telegram._utils.warnings import warn
-from telegram.warnings import PTBUserWarning, PTBRuntimeWarning, PTBDeprecationWarning
+from telegram.warnings import PTBDeprecationWarning, PTBRuntimeWarning, PTBUserWarning
 from tests.conftest import PROJECT_ROOT_PATH
 
 
@@ -37,7 +37,7 @@ class TestWarnings:
     )
     def test_slots_behavior(self, inst, mro_slots):
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_test_coverage(self):
@@ -65,23 +65,23 @@ class TestWarnings:
         make_assertion(PTBUserWarning)
 
     def test_warn(self, recwarn):
-        expected_file = PROJECT_ROOT_PATH / 'telegram' / '_utils' / 'warnings.py'
+        expected_file = PROJECT_ROOT_PATH / "telegram" / "_utils" / "warnings.py"
 
-        warn('test message')
+        warn("test message")
         assert len(recwarn) == 1
         assert recwarn[0].category is PTBUserWarning
-        assert str(recwarn[0].message) == 'test message'
+        assert str(recwarn[0].message) == "test message"
         assert Path(recwarn[0].filename) == expected_file, "incorrect stacklevel!"
 
-        warn('test message 2', category=PTBRuntimeWarning)
+        warn("test message 2", category=PTBRuntimeWarning)
         assert len(recwarn) == 2
         assert recwarn[1].category is PTBRuntimeWarning
-        assert str(recwarn[1].message) == 'test message 2'
+        assert str(recwarn[1].message) == "test message 2"
         assert Path(recwarn[1].filename) == expected_file, "incorrect stacklevel!"
 
-        warn('test message 3', stacklevel=1, category=PTBDeprecationWarning)
+        warn("test message 3", stacklevel=1, category=PTBDeprecationWarning)
         expected_file = Path(__file__)
         assert len(recwarn) == 3
         assert recwarn[2].category is PTBDeprecationWarning
-        assert str(recwarn[2].message) == 'test message 3'
+        assert str(recwarn[2].message) == "test message 3"
         assert Path(recwarn[2].filename) == expected_file, "incorrect stacklevel!"

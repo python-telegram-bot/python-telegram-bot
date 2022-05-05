@@ -18,9 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultMpeg4Gif."""
 
-from typing import TYPE_CHECKING, Any, Union, Tuple, List
+from typing import TYPE_CHECKING, Any, List, Tuple, Union
 
-from telegram import InlineQueryResult, MessageEntity, InlineKeyboardMarkup
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
@@ -89,18 +91,18 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'thumb_mime_type',
-        'caption_entities',
-        'mpeg4_duration',
-        'mpeg4_width',
-        'title',
-        'caption',
-        'parse_mode',
-        'input_message_content',
-        'mpeg4_url',
-        'mpeg4_height',
-        'thumb_url',
+        "reply_markup",
+        "thumb_mime_type",
+        "caption_entities",
+        "mpeg4_duration",
+        "mpeg4_width",
+        "title",
+        "caption",
+        "parse_mode",
+        "input_message_content",
+        "mpeg4_url",
+        "mpeg4_height",
+        "thumb_url",
     )
 
     def __init__(
@@ -113,7 +115,7 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         title: str = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         mpeg4_duration: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb_mime_type: str = None,

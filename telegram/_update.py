@@ -18,23 +18,19 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, Any, Optional, ClassVar, List
+from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
 
-from telegram import (
-    CallbackQuery,
-    ChosenInlineResult,
-    InlineQuery,
-    Message,
-    Poll,
-    PollAnswer,
-    PreCheckoutQuery,
-    ShippingQuery,
-    TelegramObject,
-    ChatMemberUpdated,
-    constants,
-    ChatJoinRequest,
-)
-
+from telegram import constants
+from telegram._callbackquery import CallbackQuery
+from telegram._chatjoinrequest import ChatJoinRequest
+from telegram._chatmemberupdated import ChatMemberUpdated
+from telegram._choseninlineresult import ChosenInlineResult
+from telegram._inline.inlinequery import InlineQuery
+from telegram._message import Message
+from telegram._payment.precheckoutquery import PreCheckoutQuery
+from telegram._payment.shippingquery import ShippingQuery
+from telegram._poll import Poll, PollAnswer
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -142,24 +138,24 @@ class Update(TelegramObject):
     """
 
     __slots__ = (
-        'callback_query',
-        'chosen_inline_result',
-        'pre_checkout_query',
-        'inline_query',
-        'update_id',
-        'message',
-        'shipping_query',
-        'poll',
-        'poll_answer',
-        'channel_post',
-        'edited_channel_post',
-        'edited_message',
-        '_effective_user',
-        '_effective_chat',
-        '_effective_message',
-        'my_chat_member',
-        'chat_member',
-        'chat_join_request',
+        "callback_query",
+        "chosen_inline_result",
+        "pre_checkout_query",
+        "inline_query",
+        "update_id",
+        "message",
+        "shipping_query",
+        "poll",
+        "poll_answer",
+        "channel_post",
+        "edited_channel_post",
+        "edited_message",
+        "_effective_user",
+        "_effective_chat",
+        "_effective_message",
+        "my_chat_member",
+        "chat_member",
+        "chat_join_request",
     )
 
     MESSAGE: ClassVar[str] = constants.UpdateType.MESSAGE
@@ -260,14 +256,14 @@ class Update(TelegramObject):
         self.chat_member = chat_member
         self.chat_join_request = chat_join_request
 
-        self._effective_user: Optional['User'] = None
-        self._effective_chat: Optional['Chat'] = None
+        self._effective_user: Optional["User"] = None
+        self._effective_chat: Optional["Chat"] = None
         self._effective_message: Optional[Message] = None
 
         self._id_attrs = (self.update_id,)
 
     @property
-    def effective_user(self) -> Optional['User']:
+    def effective_user(self) -> Optional["User"]:
         """
         :class:`telegram.User`: The user that sent this update, no matter what kind of update this
         is. If no user is associated with this update, this gives :obj:`None`. This is the case
@@ -321,7 +317,7 @@ class Update(TelegramObject):
         return user
 
     @property
-    def effective_chat(self) -> Optional['Chat']:
+    def effective_chat(self) -> Optional["Chat"]:
         """
         :class:`telegram.Chat`: The chat that this update was sent in, no matter what kind of
         update this is.
@@ -401,28 +397,28 @@ class Update(TelegramObject):
         return message
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Update']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Update"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['message'] = Message.de_json(data.get('message'), bot)
-        data['edited_message'] = Message.de_json(data.get('edited_message'), bot)
-        data['inline_query'] = InlineQuery.de_json(data.get('inline_query'), bot)
-        data['chosen_inline_result'] = ChosenInlineResult.de_json(
-            data.get('chosen_inline_result'), bot
+        data["message"] = Message.de_json(data.get("message"), bot)
+        data["edited_message"] = Message.de_json(data.get("edited_message"), bot)
+        data["inline_query"] = InlineQuery.de_json(data.get("inline_query"), bot)
+        data["chosen_inline_result"] = ChosenInlineResult.de_json(
+            data.get("chosen_inline_result"), bot
         )
-        data['callback_query'] = CallbackQuery.de_json(data.get('callback_query'), bot)
-        data['shipping_query'] = ShippingQuery.de_json(data.get('shipping_query'), bot)
-        data['pre_checkout_query'] = PreCheckoutQuery.de_json(data.get('pre_checkout_query'), bot)
-        data['channel_post'] = Message.de_json(data.get('channel_post'), bot)
-        data['edited_channel_post'] = Message.de_json(data.get('edited_channel_post'), bot)
-        data['poll'] = Poll.de_json(data.get('poll'), bot)
-        data['poll_answer'] = PollAnswer.de_json(data.get('poll_answer'), bot)
-        data['my_chat_member'] = ChatMemberUpdated.de_json(data.get('my_chat_member'), bot)
-        data['chat_member'] = ChatMemberUpdated.de_json(data.get('chat_member'), bot)
-        data['chat_join_request'] = ChatJoinRequest.de_json(data.get('chat_join_request'), bot)
+        data["callback_query"] = CallbackQuery.de_json(data.get("callback_query"), bot)
+        data["shipping_query"] = ShippingQuery.de_json(data.get("shipping_query"), bot)
+        data["pre_checkout_query"] = PreCheckoutQuery.de_json(data.get("pre_checkout_query"), bot)
+        data["channel_post"] = Message.de_json(data.get("channel_post"), bot)
+        data["edited_channel_post"] = Message.de_json(data.get("edited_channel_post"), bot)
+        data["poll"] = Poll.de_json(data.get("poll"), bot)
+        data["poll_answer"] = PollAnswer.de_json(data.get("poll_answer"), bot)
+        data["my_chat_member"] = ChatMemberUpdated.de_json(data.get("my_chat_member"), bot)
+        data["chat_member"] = ChatMemberUpdated.de_json(data.get("chat_member"), bot)
+        data["chat_join_request"] = ChatJoinRequest.de_json(data.get("chat_join_request"), bot)
 
         return cls(**data)

@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Proximity Alert."""
-from typing import Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
-from telegram import TelegramObject, User
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -46,7 +47,7 @@ class ProximityAlertTriggered(TelegramObject):
 
     """
 
-    __slots__ = ('traveler', 'distance', 'watcher')
+    __slots__ = ("traveler", "distance", "watcher")
 
     def __init__(self, traveler: User, watcher: User, distance: int, **_kwargs: Any):
         self.traveler = traveler
@@ -56,14 +57,14 @@ class ProximityAlertTriggered(TelegramObject):
         self._id_attrs = (self.traveler, self.watcher, self.distance)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ProximityAlertTriggered']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ProximityAlertTriggered"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['traveler'] = User.de_json(data.get('traveler'), bot)
-        data['watcher'] = User.de_json(data.get('watcher'), bot)
+        data["traveler"] = User.de_json(data.get("traveler"), bot)
+        data["watcher"] = User.de_json(data.get("watcher"), bot)
 
         return cls(bot=bot, **data)

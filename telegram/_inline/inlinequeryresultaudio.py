@@ -18,9 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultAudio."""
 
-from typing import TYPE_CHECKING, Any, Union, Tuple, List
+from typing import TYPE_CHECKING, Any, List, Tuple, Union
 
-from telegram import InlineQueryResult, MessageEntity, InlineKeyboardMarkup
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
@@ -80,15 +82,15 @@ class InlineQueryResultAudio(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'caption',
-        'title',
-        'parse_mode',
-        'audio_url',
-        'performer',
-        'input_message_content',
-        'audio_duration',
+        "reply_markup",
+        "caption_entities",
+        "caption",
+        "title",
+        "parse_mode",
+        "audio_url",
+        "performer",
+        "input_message_content",
+        "audio_duration",
     )
 
     def __init__(
@@ -100,7 +102,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         audio_duration: int = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,

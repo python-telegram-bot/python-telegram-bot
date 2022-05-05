@@ -20,7 +20,9 @@
 
 from typing import TYPE_CHECKING, Any, Optional
 
-from telegram import OrderInfo, TelegramObject, User
+from telegram._payment.orderinfo import OrderInfo
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -68,13 +70,13 @@ class PreCheckoutQuery(TelegramObject):
     """
 
     __slots__ = (
-        'invoice_payload',
-        'shipping_option_id',
-        'currency',
-        'order_info',
-        'total_amount',
-        'id',
-        'from_user',
+        "invoice_payload",
+        "shipping_option_id",
+        "currency",
+        "order_info",
+        "total_amount",
+        "id",
+        "from_user",
     )
 
     def __init__(
@@ -86,7 +88,7 @@ class PreCheckoutQuery(TelegramObject):
         invoice_payload: str,
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         self.id = id  # pylint: disable=invalid-name
@@ -102,15 +104,15 @@ class PreCheckoutQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['PreCheckoutQuery']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["PreCheckoutQuery"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.pop('from'), bot)
-        data['order_info'] = OrderInfo.de_json(data.get('order_info'), bot)
+        data["from_user"] = User.de_json(data.pop("from"), bot)
+        data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
 
         return cls(bot=bot, **data)
 

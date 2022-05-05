@@ -17,18 +17,19 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-import pytest
 import inspect
 
-from telegram.ext import Defaults
+import pytest
+
 from telegram import User
+from telegram.ext import Defaults
 
 
 class TestDefault:
     def test_slot_behaviour(self, mro_slots):
-        a = Defaults(parse_mode='HTML', quote=True)
+        a = Defaults(parse_mode="HTML", quote=True)
         for attr in a.__slots__:
-            assert getattr(a, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(a, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(a)) == len(set(mro_slots(a))), "duplicate slot"
 
     def test_data_assignment(self):
@@ -39,11 +40,11 @@ class TestDefault:
                 setattr(defaults, name, True)
 
     def test_equality(self):
-        a = Defaults(parse_mode='HTML', quote=True)
-        b = Defaults(parse_mode='HTML', quote=True)
-        c = Defaults(parse_mode='HTML', quote=True, protect_content=True)
-        d = Defaults(parse_mode='HTML', protect_content=True)
-        e = User(123, 'test_user', False)
+        a = Defaults(parse_mode="HTML", quote=True)
+        b = Defaults(parse_mode="HTML", quote=True)
+        c = Defaults(parse_mode="HTML", quote=True, protect_content=True)
+        d = Defaults(parse_mode="HTML", protect_content=True)
+        e = User(123, "test_user", False)
 
         assert a == b
         assert hash(a) == hash(b)

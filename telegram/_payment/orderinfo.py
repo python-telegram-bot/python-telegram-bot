@@ -20,7 +20,8 @@
 
 from typing import TYPE_CHECKING, Any, Optional
 
-from telegram import ShippingAddress, TelegramObject
+from telegram._payment.shippingaddress import ShippingAddress
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -49,7 +50,7 @@ class OrderInfo(TelegramObject):
 
     """
 
-    __slots__ = ('email', 'shipping_address', 'phone_number', 'name')
+    __slots__ = ("email", "shipping_address", "phone_number", "name")
 
     def __init__(
         self,
@@ -67,13 +68,13 @@ class OrderInfo(TelegramObject):
         self._id_attrs = (self.name, self.phone_number, self.email, self.shipping_address)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['OrderInfo']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["OrderInfo"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return cls()
 
-        data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
+        data["shipping_address"] = ShippingAddress.de_json(data.get("shipping_address"), bot)
 
         return cls(**data)

@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ReplyKeyboardRemove."""
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class ReplyKeyboardRemove(TelegramObject):
@@ -55,7 +55,7 @@ class ReplyKeyboardRemove(TelegramObject):
 
     """
 
-    __slots__ = ('selective', 'remove_keyboard')
+    __slots__ = ("selective", "remove_keyboard")
 
     def __init__(self, selective: bool = False, **_kwargs: Any):
         # Required

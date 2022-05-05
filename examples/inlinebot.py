@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -13,16 +13,16 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 import logging
-from uuid import uuid4
 from html import escape
+from uuid import uuid4
 
 from telegram import InlineQueryResultArticle, InputTextMessageContent, Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, InlineQueryHandler, CommandHandler, CallbackContext
+from telegram.ext import Application, CallbackContext, CommandHandler, InlineQueryHandler
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -31,12 +31,12 @@ logger = logging.getLogger(__name__)
 # context.
 async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
-    await update.message.reply_text('Hi!')
+    await update.message.reply_text("Hi!")
 
 
 async def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
-    await update.message.reply_text('Help!')
+    await update.message.reply_text("Help!")
 
 
 async def inline_query(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
@@ -87,5 +87,5 @@ def main() -> None:
     application.run_polling()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -10,28 +10,27 @@ one the user sends the bot
 import logging
 
 from telegram import (
-    Poll,
     KeyboardButton,
     KeyboardButtonPollType,
+    Poll,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
     Update,
 )
 from telegram.constants import ParseMode
 from telegram.ext import (
-    CommandHandler,
-    PollAnswerHandler,
-    PollHandler,
-    MessageHandler,
-    filters,
     Application,
     CallbackContext,
+    CommandHandler,
+    MessageHandler,
+    PollAnswerHandler,
+    PollHandler,
+    filters,
 )
-
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -39,8 +38,8 @@ logger = logging.getLogger(__name__)
 async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Inform user about what this bot can do"""
     await update.message.reply_text(
-        'Please select /poll to get a Poll, /quiz to get a Quiz or /preview'
-        ' to generate a preview for your poll'
+        "Please select /poll to get a Poll, /quiz to get a Quiz or /preview"
+        " to generate a preview for your poll"
     )
 
 
@@ -154,11 +153,11 @@ def main() -> None:
     """Run bot."""
     # Create the Application and pass it your bot's token.
     application = Application.builder().token("TOKEN").build()
-    application.add_handler(CommandHandler('start', start))
-    application.add_handler(CommandHandler('poll', poll))
-    application.add_handler(CommandHandler('quiz', quiz))
-    application.add_handler(CommandHandler('preview', preview))
-    application.add_handler(CommandHandler('help', help_handler))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("poll", poll))
+    application.add_handler(CommandHandler("quiz", quiz))
+    application.add_handler(CommandHandler("preview", preview))
+    application.add_handler(CommandHandler("help", help_handler))
     application.add_handler(MessageHandler(filters.POLL, receive_poll))
     application.add_handler(PollAnswerHandler(receive_poll_answer))
     application.add_handler(PollHandler(receive_quiz_answer))
@@ -167,5 +166,5 @@ def main() -> None:
     application.run_polling()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

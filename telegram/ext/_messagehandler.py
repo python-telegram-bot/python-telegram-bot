@@ -20,16 +20,16 @@
 from typing import TYPE_CHECKING, Dict, Optional, TypeVar, Union
 
 from telegram import Update
-from telegram._utils.types import DVInput
-from telegram.ext import filters as filters_module, Handler
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-
+from telegram._utils.types import DVInput
+from telegram.ext import filters as filters_module
+from telegram.ext._handler import Handler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
     from telegram.ext import Application
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 class MessageHandler(Handler[Update, CCT]):
@@ -70,7 +70,7 @@ class MessageHandler(Handler[Update, CCT]):
 
     """
 
-    __slots__ = ('filters',)
+    __slots__ = ("filters",)
 
     def __init__(
         self,
@@ -100,7 +100,7 @@ class MessageHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        application: 'Application',
+        application: "Application",
         check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
         """Adds possible output of data filters to the :class:`CallbackContext`."""

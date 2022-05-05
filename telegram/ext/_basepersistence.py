@@ -18,18 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the BasePersistence class."""
 from abc import ABC, abstractmethod
-from typing import (
-    Dict,
-    Optional,
-    Generic,
-    NamedTuple,
-    NoReturn,
-)
+from typing import Dict, Generic, NamedTuple, NoReturn, Optional
 
-from telegram import Bot
-from telegram.ext import ExtBot
-
-from telegram.ext._utils.types import UD, CD, BD, ConversationDict, CDCData, ConversationKey
+from telegram._bot import Bot
+from telegram.ext._extbot import ExtBot
+from telegram.ext._utils.types import BD, CD, UD, CDCData, ConversationDict, ConversationKey
 
 
 class PersistenceInput(NamedTuple):  # skipcq: PYL-E0239
@@ -128,9 +121,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     """
 
     __slots__ = (
-        'bot',
-        'store_data',
-        '_update_interval',
+        "bot",
+        "store_data",
+        "_update_interval",
     )
 
     def __init__(
@@ -169,7 +162,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
                 :paramref:`bot` is not an instance of :class:`telegram.ext.ExtBot`.
         """
         if self.store_data.callback_data and not isinstance(bot, ExtBot):
-            raise TypeError('callback_data can only be stored when using telegram.ext.ExtBot.')
+            raise TypeError("callback_data can only be stored when using telegram.ext.ExtBot.")
 
         self.bot = bot
 

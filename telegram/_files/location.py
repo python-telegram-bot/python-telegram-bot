@@ -20,7 +20,7 @@
 
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class Location(TelegramObject):
@@ -57,12 +57,12 @@ class Location(TelegramObject):
     """
 
     __slots__ = (
-        'longitude',
-        'horizontal_accuracy',
-        'proximity_alert_radius',
-        'live_period',
-        'latitude',
-        'heading',
+        "longitude",
+        "horizontal_accuracy",
+        "proximity_alert_radius",
+        "live_period",
+        "latitude",
+        "heading",
     )
 
     def __init__(

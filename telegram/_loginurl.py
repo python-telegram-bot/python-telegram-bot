@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=too-few-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -20,7 +19,7 @@
 """This module contains an object that represents a Telegram LoginUrl."""
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class LoginUrl(TelegramObject):
@@ -69,7 +68,7 @@ class LoginUrl(TelegramObject):
 
     """
 
-    __slots__ = ('bot_username', 'request_write_access', 'url', 'forward_text')
+    __slots__ = ("bot_username", "request_write_access", "url", "forward_text")
 
     def __init__(
         self,

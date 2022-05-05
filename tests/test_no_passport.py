@@ -41,17 +41,17 @@ from telegram import _bot as bot
 from telegram._passport import credentials as credentials
 from tests.conftest import env_var_2_bool
 
-TEST_NO_PASSPORT = env_var_2_bool(os.getenv('TEST_NO_PASSPORT', False))
+TEST_NO_PASSPORT = env_var_2_bool(os.getenv("TEST_NO_PASSPORT", False))
 
 if TEST_NO_PASSPORT:
     orig_import = __import__
 
     def import_mock(module_name, *args, **kwargs):
-        if module_name.startswith('cryptography'):
-            raise ModuleNotFoundError('We are testing without cryptography here')
+        if module_name.startswith("cryptography"):
+            raise ModuleNotFoundError("We are testing without cryptography here")
         return orig_import(module_name, *args, **kwargs)
 
-    with mock.patch('builtins.__import__', side_effect=import_mock):
+    with mock.patch("builtins.__import__", side_effect=import_mock):
         reload(bot)
         reload(credentials)
 
@@ -64,19 +64,19 @@ class TestNoPassport:
 
     def test_bot_init(self, bot_info, monkeypatch):
         if not TEST_NO_PASSPORT:
-            monkeypatch.setattr(bot, 'CRYPTO_INSTALLED', False)
-        with pytest.raises(RuntimeError, match='passport'):
-            bot.Bot(bot_info['token'], private_key=1, private_key_password=2)
+            monkeypatch.setattr(bot, "CRYPTO_INSTALLED", False)
+        with pytest.raises(RuntimeError, match="passport"):
+            bot.Bot(bot_info["token"], private_key=1, private_key_password=2)
 
     def test_credentials_decrypt(self, monkeypatch):
         if not TEST_NO_PASSPORT:
-            monkeypatch.setattr(credentials, 'CRYPTO_INSTALLED', False)
-        with pytest.raises(RuntimeError, match='passport'):
+            monkeypatch.setattr(credentials, "CRYPTO_INSTALLED", False)
+        with pytest.raises(RuntimeError, match="passport"):
             credentials.decrypt(1, 1, 1)
 
     def test_encrypted_credentials_decrypted_secret(self, monkeypatch):
         if not TEST_NO_PASSPORT:
-            monkeypatch.setattr(credentials, 'CRYPTO_INSTALLED', False)
-        ec = credentials.EncryptedCredentials('data', 'hash', 'secret')
-        with pytest.raises(RuntimeError, match='passport'):
+            monkeypatch.setattr(credentials, "CRYPTO_INSTALLED", False)
+        ec = credentials.EncryptedCredentials("data", "hash", "secret")
+        with pytest.raises(RuntimeError, match="passport"):
             ec.decrypted_secret

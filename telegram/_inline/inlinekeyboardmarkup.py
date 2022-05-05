@@ -20,9 +20,10 @@
 
 from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import InlineKeyboardButton, TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
+from telegram._telegramobject import TelegramObject
 from telegram._utils.markup import check_keyboard_type
+from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -46,7 +47,7 @@ class InlineKeyboardMarkup(TelegramObject):
 
     """
 
-    __slots__ = ('inline_keyboard',)
+    __slots__ = ("inline_keyboard",)
 
     def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]], **_kwargs: Any):
         if not check_keyboard_type(inline_keyboard):
@@ -63,14 +64,14 @@ class InlineKeyboardMarkup(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['inline_keyboard'] = []
+        data["inline_keyboard"] = []
         for inline_keyboard in self.inline_keyboard:
-            data['inline_keyboard'].append([x.to_dict() for x in inline_keyboard])
+            data["inline_keyboard"].append([x.to_dict() for x in inline_keyboard])
 
         return data
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['InlineKeyboardMarkup']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineKeyboardMarkup"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
@@ -78,7 +79,7 @@ class InlineKeyboardMarkup(TelegramObject):
             return None
 
         keyboard = []
-        for row in data['inline_keyboard']:
+        for row in data["inline_keyboard"]:
             tmp = []
             for col in row:
                 btn = InlineKeyboardButton.de_json(col, bot)
@@ -89,7 +90,7 @@ class InlineKeyboardMarkup(TelegramObject):
         return cls(keyboard)
 
     @classmethod
-    def from_button(cls, button: InlineKeyboardButton, **kwargs: object) -> 'InlineKeyboardMarkup':
+    def from_button(cls, button: InlineKeyboardButton, **kwargs: object) -> "InlineKeyboardMarkup":
         """Shortcut for::
 
             InlineKeyboardMarkup([[button]], **kwargs)
@@ -106,7 +107,7 @@ class InlineKeyboardMarkup(TelegramObject):
     @classmethod
     def from_row(
         cls, button_row: List[InlineKeyboardButton], **kwargs: object
-    ) -> 'InlineKeyboardMarkup':
+    ) -> "InlineKeyboardMarkup":
         """Shortcut for::
 
             InlineKeyboardMarkup([button_row], **kwargs)
@@ -124,7 +125,7 @@ class InlineKeyboardMarkup(TelegramObject):
     @classmethod
     def from_column(
         cls, button_column: List[InlineKeyboardButton], **kwargs: object
-    ) -> 'InlineKeyboardMarkup':
+    ) -> "InlineKeyboardMarkup":
         """Shortcut for::
 
             InlineKeyboardMarkup([[button] for button in button_column], **kwargs)

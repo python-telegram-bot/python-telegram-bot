@@ -18,9 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageEntity."""
 
-from typing import TYPE_CHECKING, Any, List, Optional, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
 
-from telegram import TelegramObject, User, constants
+from telegram import constants
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.types import JSONDict
 
@@ -62,7 +64,7 @@ class MessageEntity(TelegramObject):
 
     """
 
-    __slots__ = ('length', 'url', 'user', 'type', 'language', 'offset')
+    __slots__ = ("length", "url", "user", "type", "language", "offset")
 
     def __init__(
         self,
@@ -86,14 +88,14 @@ class MessageEntity(TelegramObject):
         self._id_attrs = (self.type, self.offset, self.length)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MessageEntity']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MessageEntity"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['user'] = User.de_json(data.get('user'), bot)
+        data["user"] = User.de_json(data.get("user"), bot)
 
         return cls(**data)
 

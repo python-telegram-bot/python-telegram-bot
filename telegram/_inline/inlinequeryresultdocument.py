@@ -18,9 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultDocument"""
 
-from typing import TYPE_CHECKING, Any, Union, Tuple, List
+from typing import TYPE_CHECKING, Any, List, Tuple, Union
 
-from telegram import InlineQueryResult, MessageEntity, InlineKeyboardMarkup
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
@@ -89,18 +91,18 @@ class InlineQueryResultDocument(InlineQueryResult):
     """
 
     __slots__ = (
-        'reply_markup',
-        'caption_entities',
-        'document_url',
-        'thumb_width',
-        'thumb_height',
-        'caption',
-        'title',
-        'description',
-        'parse_mode',
-        'mime_type',
-        'thumb_url',
-        'input_message_content',
+        "reply_markup",
+        "caption_entities",
+        "document_url",
+        "thumb_width",
+        "thumb_height",
+        "caption",
+        "title",
+        "description",
+        "parse_mode",
+        "mime_type",
+        "thumb_url",
+        "input_message_content",
     )
 
     def __init__(
@@ -112,7 +114,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         caption: str = None,
         description: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=too-many-instance-attributes, too-many-arguments
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -21,7 +20,7 @@
 
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class WebAppData(TelegramObject):
@@ -49,7 +48,7 @@ class WebAppData(TelegramObject):
             arbitrary data in this field.
     """
 
-    __slots__ = ('data', 'button_text')
+    __slots__ = ("data", "button_text")
 
     def __init__(self, data: str, button_text: str, **_kwargs: Any):
         # Required

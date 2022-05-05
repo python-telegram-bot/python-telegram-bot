@@ -18,27 +18,18 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the InlineQueryHandler class."""
 import re
-from typing import (
-    TYPE_CHECKING,
-    Match,
-    Optional,
-    Pattern,
-    TypeVar,
-    Union,
-    cast,
-    List,
-)
+from typing import TYPE_CHECKING, List, Match, Optional, Pattern, TypeVar, Union, cast
 
 from telegram import Update
-from telegram._utils.types import DVInput
-from telegram.ext import Handler
 from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.types import DVInput
+from telegram.ext._handler import Handler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
     from telegram.ext import Application
 
-RT = TypeVar('RT')
+RT = TypeVar("RT")
 
 
 class InlineQueryHandler(Handler[Update, CCT]):
@@ -87,7 +78,7 @@ class InlineQueryHandler(Handler[Update, CCT]):
 
     """
 
-    __slots__ = ('pattern', 'chat_types')
+    __slots__ = ("pattern", "chat_types")
 
     def __init__(
         self,
@@ -133,7 +124,7 @@ class InlineQueryHandler(Handler[Update, CCT]):
         self,
         context: CCT,
         update: Update,
-        application: 'Application',
+        application: "Application",
         check_result: Optional[Union[bool, Match]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.inline_query.query)`` to

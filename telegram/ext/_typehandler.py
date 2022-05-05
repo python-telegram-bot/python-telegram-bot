@@ -20,13 +20,13 @@
 
 from typing import Type, TypeVar
 
-from telegram._utils.types import DVInput
-from telegram.ext import Handler
-from telegram.ext._utils.types import CCT, HandlerCallback
 from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.types import DVInput
+from telegram.ext._handler import Handler
+from telegram.ext._utils.types import CCT, HandlerCallback
 
-RT = TypeVar('RT')
-UT = TypeVar('UT')
+RT = TypeVar("RT")
+UT = TypeVar("UT")
 
 
 class TypeHandler(Handler[UT, CCT]):
@@ -65,7 +65,7 @@ class TypeHandler(Handler[UT, CCT]):
 
     """
 
-    __slots__ = ('type', 'strict')
+    __slots__ = ("type", "strict")
 
     def __init__(
         self,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -17,19 +17,12 @@ bot.
 
 import logging
 
-from telegram import Update, ForceReply
-from telegram.ext import (
-    CommandHandler,
-    MessageHandler,
-    filters,
-    Application,
-    CallbackContext,
-)
-
+from telegram import ForceReply, Update
+from telegram.ext import Application, CallbackContext, CommandHandler, MessageHandler, filters
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -40,14 +33,14 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     await update.message.reply_html(
-        fr'Hi {user.mention_html()}!',
+        rf"Hi {user.mention_html()}!",
         reply_markup=ForceReply(selective=True),
     )
 
 
 async def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
-    await update.message.reply_text('Help!')
+    await update.message.reply_text("Help!")
 
 
 async def echo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
@@ -71,5 +64,5 @@ def main() -> None:
     application.run_polling()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

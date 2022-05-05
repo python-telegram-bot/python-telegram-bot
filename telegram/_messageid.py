@@ -19,7 +19,7 @@
 """This module contains an object that represents an instance of a Telegram MessageId."""
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class MessageId(TelegramObject):
@@ -32,7 +32,7 @@ class MessageId(TelegramObject):
         message_id (:obj:`int`): Unique message identifier
     """
 
-    __slots__ = ('message_id',)
+    __slots__ = ("message_id",)
 
     def __init__(self, message_id: int, **_kwargs: Any):
         self.message_id = int(message_id)

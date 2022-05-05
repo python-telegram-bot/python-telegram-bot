@@ -20,7 +20,7 @@
 
 from typing import TYPE_CHECKING, Any, List
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -46,13 +46,13 @@ class ShippingOption(TelegramObject):
 
     """
 
-    __slots__ = ('prices', 'title', 'id')
+    __slots__ = ("prices", "title", "id")
 
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin, invalid-name
         title: str,
-        prices: List['LabeledPrice'],
+        prices: List["LabeledPrice"],
         **_kwargs: Any,
     ):
         self.id = id  # pylint: disable=invalid-name
@@ -65,6 +65,6 @@ class ShippingOption(TelegramObject):
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
 
-        data['prices'] = [p.to_dict() for p in self.prices]
+        data["prices"] = [p.to_dict() for p in self.prices]
 
         return data

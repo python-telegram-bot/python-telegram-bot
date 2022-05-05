@@ -18,13 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
 
+from copy import deepcopy
 from typing import Dict, Optional, cast
 
-from copy import deepcopy
-
-from telegram.ext import BasePersistence, PersistenceInput
 from telegram._utils.types import JSONDict
-from telegram.ext._utils.types import ConversationDict, CDCData, ConversationKey
+from telegram.ext import BasePersistence, PersistenceInput
+from telegram.ext._utils.types import CDCData, ConversationDict, ConversationKey
 
 try:
     import ujson as json
@@ -81,26 +80,26 @@ class DictPersistence(BasePersistence):
     """
 
     __slots__ = (
-        '_user_data',
-        '_chat_data',
-        '_bot_data',
-        '_callback_data',
-        '_conversations',
-        '_user_data_json',
-        '_chat_data_json',
-        '_bot_data_json',
-        '_callback_data_json',
-        '_conversations_json',
+        "_user_data",
+        "_chat_data",
+        "_bot_data",
+        "_callback_data",
+        "_conversations",
+        "_user_data_json",
+        "_chat_data_json",
+        "_bot_data_json",
+        "_callback_data_json",
+        "_conversations_json",
     )
 
     def __init__(
         self,
         store_data: PersistenceInput = None,
-        user_data_json: str = '',
-        chat_data_json: str = '',
-        bot_data_json: str = '',
-        conversations_json: str = '',
-        callback_data_json: str = '',
+        user_data_json: str = "",
+        chat_data_json: str = "",
+        bot_data_json: str = "",
+        conversations_json: str = "",
+        callback_data_json: str = "",
         update_interval: float = 60,
     ):
         super().__init__(store_data=store_data, update_interval=update_interval)

@@ -20,7 +20,7 @@
 
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class LabeledPrice(TelegramObject):
@@ -45,7 +45,7 @@ class LabeledPrice(TelegramObject):
 
     """
 
-    __slots__ = ('label', 'amount')
+    __slots__ = ("label", "amount")
 
     def __init__(self, label: str, amount: int, **_kwargs: Any):
         self.label = label

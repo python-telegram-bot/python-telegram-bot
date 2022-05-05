@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=too-few-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -18,10 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
-from typing import Any, ClassVar, Optional, TYPE_CHECKING, Dict, Type
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, Optional, Type
 
-from telegram import TelegramObject, constants, WebAppInfo
+from telegram import constants
+from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._webappinfo import WebAppInfo
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -51,7 +52,7 @@ class MenuButton(TelegramObject):
         type (:obj:`str`): Type of menu button that the instance represents.
     """
 
-    __slots__ = ('type',)
+    __slots__ = ("type",)
 
     def __init__(self, type: str, **_kwargs: Any):  # pylint: disable=redefined-builtin
         self.type = type
@@ -59,7 +60,7 @@ class MenuButton(TelegramObject):
         self._id_attrs = (self.type,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MenuButton']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MenuButton"]:
         """Converts JSON data to the appropriate :class:`MenuButton` object, i.e. takes
         care of selecting the correct subclass.
 
@@ -76,14 +77,14 @@ class MenuButton(TelegramObject):
         if not data:
             return None
 
-        _class_mapping: Dict[str, Type['MenuButton']] = {
+        _class_mapping: Dict[str, Type["MenuButton"]] = {
             cls.COMMANDS: MenuButtonCommands,
             cls.WEB_APP: MenuButtonWebApp,
             cls.DEFAULT: MenuButtonDefault,
         }
 
-        if cls is MenuButton and data['type'] in _class_mapping:
-            return _class_mapping[data['type']].de_json(data, bot=bot)
+        if cls is MenuButton and data["type"] in _class_mapping:
+            return _class_mapping[data["type"]].de_json(data, bot=bot)
         return cls(**data, bot=bot)
 
     COMMANDS: ClassVar[str] = constants.MenuButtonType.COMMANDS
@@ -133,7 +134,7 @@ class MenuButtonWebApp(MenuButton):
             message on behalf of the user using the method :meth:`~telegram.Bot.answerWebAppQuery`.
     """
 
-    __slots__ = ('text', 'web_app')
+    __slots__ = ("text", "web_app")
 
     def __init__(self, text: str, web_app: WebAppInfo, **_kwargs: Any):
         super().__init__(type=constants.MenuButtonType.WEB_APP)
@@ -143,21 +144,21 @@ class MenuButtonWebApp(MenuButton):
         self._id_attrs = (self.type, self.text, self.web_app)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['MenuButtonWebApp']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MenuButtonWebApp"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['web_app'] = WebAppInfo.de_json(data.get('web_app'), bot)
+        data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
         return cls(bot=bot, **data)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
-        data['web_app'] = self.web_app.to_dict()
+        data["web_app"] = self.web_app.to_dict()
         return data
 
 

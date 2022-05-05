@@ -20,7 +20,8 @@
 
 from typing import TYPE_CHECKING, Any
 
-from telegram import InlineQueryResult, InlineKeyboardMarkup
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -53,14 +54,14 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
 
     """
 
-    __slots__ = ('reply_markup', 'input_message_content', 'sticker_file_id')
+    __slots__ = ("reply_markup", "input_message_content", "sticker_file_id")
 
     def __init__(
         self,
         id: str,  # pylint: disable=redefined-builtin
         sticker_file_id: str,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         **_kwargs: Any,
     ):
         # Required

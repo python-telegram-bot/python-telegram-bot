@@ -18,9 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
-from typing import Any, Union, Tuple, List
+from typing import Any, List, Tuple, Union
 
-from telegram import InputMessageContent, MessageEntity
+from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -61,7 +62,7 @@ class InputTextMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = ('disable_web_page_preview', 'parse_mode', 'entities', 'message_text')
+    __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")
 
     def __init__(
         self,
@@ -85,6 +86,6 @@ class InputTextMessageContent(InputMessageContent):
         data = super().to_dict()
 
         if self.entities:
-            data['entities'] = [ce.to_dict() for ce in self.entities]
+            data["entities"] = [ce.to_dict() for ce in self.entities]
 
         return data

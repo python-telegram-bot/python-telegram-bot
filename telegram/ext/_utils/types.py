@@ -26,30 +26,30 @@ Warning:
     the changelog.
 """
 from typing import (
-    TypeVar,
     TYPE_CHECKING,
-    Tuple,
-    List,
-    Dict,
     Any,
-    Union,
     Callable,
     Coroutine,
+    Dict,
+    List,
     MutableMapping,
+    Tuple,
+    TypeVar,
+    Union,
 )
 
 if TYPE_CHECKING:
-    from telegram.ext import CallbackContext, JobQueue, BasePersistence, Updater  # noqa: F401
     from telegram import Bot
+    from telegram.ext import BasePersistence, CallbackContext, JobQueue, Updater  # noqa: F401
 
-CCT = TypeVar('CCT', bound='CallbackContext')
+CCT = TypeVar("CCT", bound="CallbackContext")
 """An instance of :class:`telegram.ext.CallbackContext` or a custom subclass.
 
 .. versionadded:: 13.6
 """
 
-RT = TypeVar('RT')
-UT = TypeVar('UT')
+RT = TypeVar("RT")
+UT = TypeVar("UT")
 HandlerCallback = Callable[[UT, CCT], Coroutine[Any, Any, RT]]
 """Type of a handler callback
 
@@ -77,27 +77,27 @@ CDCData = Tuple[List[Tuple[str, float, Dict[str, Any]]], Dict[str, str]]
     .. versionadded:: 13.6
 """
 
-BT = TypeVar('BT', bound='Bot')
+BT = TypeVar("BT", bound="Bot")
 """Type of the bot.
 
 .. versionadded:: 20.0
 """
-UD = TypeVar('UD')
+UD = TypeVar("UD")
 """Type of the user data for a single user.
 
 .. versionadded:: 13.6
 """
-CD = TypeVar('CD')
+CD = TypeVar("CD")
 """Type of the chat data for a single user.
 
 .. versionadded:: 13.6
 """
-BD = TypeVar('BD')
+BD = TypeVar("BD")
 """Type of the bot data.
 
 .. versionadded:: 13.6
 """
-JQ = TypeVar('JQ', bound=Union[None, 'JobQueue'])
+JQ = TypeVar("JQ", bound=Union[None, "JobQueue"])
 """Type of the job queue.
 
 .. versionadded:: 20.0"""

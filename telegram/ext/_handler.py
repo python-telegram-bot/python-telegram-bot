@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the base class for handlers as used by the Application."""
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union, Generic
+from typing import TYPE_CHECKING, Any, Generic, Optional, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput
@@ -27,8 +27,8 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 if TYPE_CHECKING:
     from telegram.ext import Application
 
-RT = TypeVar('RT')
-UT = TypeVar('UT')
+RT = TypeVar("RT")
+UT = TypeVar("UT")
 
 
 class Handler(Generic[UT, CCT], ABC):
@@ -61,8 +61,8 @@ class Handler(Generic[UT, CCT], ABC):
     """
 
     __slots__ = (
-        'callback',
-        'block',
+        "callback",
+        "block",
     )
 
     def __init__(
@@ -96,7 +96,7 @@ class Handler(Generic[UT, CCT], ABC):
     async def handle_update(
         self,
         update: UT,
-        application: 'Application',
+        application: "Application",
         check_result: object,
         context: CCT,
     ) -> RT:
@@ -122,7 +122,7 @@ class Handler(Generic[UT, CCT], ABC):
         self,
         context: CCT,
         update: UT,
-        application: 'Application',
+        application: "Application",
         check_result: Any,
     ) -> None:
         """Prepares additional arguments for the context. Override if needed.

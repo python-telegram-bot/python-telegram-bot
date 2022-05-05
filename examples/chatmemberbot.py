@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=missing-function-docstring, unused-argument
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -12,16 +12,11 @@ bot.
 """
 
 import logging
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
-from telegram import Update, Chat, ChatMember, ChatMemberUpdated
+from telegram import Chat, ChatMember, ChatMemberUpdated, Update
 from telegram.constants import ParseMode
-from telegram.ext import (
-    CommandHandler,
-    ChatMemberHandler,
-    Application,
-    CallbackContext,
-)
+from telegram.ext import Application, CallbackContext, ChatMemberHandler, CommandHandler
 
 # Enable logging
 
@@ -46,24 +41,16 @@ def extract_status_change(
         return None
 
     old_status, new_status = status_change
-    was_member = (
-        old_status
-        in [
-            ChatMember.MEMBER,
-            ChatMember.OWNER,
-            ChatMember.ADMINISTRATOR,
-        ]
-        or (old_status == ChatMember.RESTRICTED and old_is_member is True)
-    )
-    is_member = (
-        new_status
-        in [
-            ChatMember.MEMBER,
-            ChatMember.OWNER,
-            ChatMember.ADMINISTRATOR,
-        ]
-        or (new_status == ChatMember.RESTRICTED and new_is_member is True)
-    )
+    was_member = old_status in [
+        ChatMember.MEMBER,
+        ChatMember.OWNER,
+        ChatMember.ADMINISTRATOR,
+    ] or (old_status == ChatMember.RESTRICTED and old_is_member is True)
+    is_member = new_status in [
+        ChatMember.MEMBER,
+        ChatMember.OWNER,
+        ChatMember.ADMINISTRATOR,
+    ] or (new_status == ChatMember.RESTRICTED and new_is_member is True)
 
     return was_member, is_member
 

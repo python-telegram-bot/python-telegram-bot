@@ -20,7 +20,7 @@
 
 from typing import Any
 
-from telegram import InputMessageContent
+from telegram._inline.inputmessagecontent import InputMessageContent
 
 
 class InputContactMessageContent(InputMessageContent):
@@ -46,7 +46,7 @@ class InputContactMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = ('vcard', 'first_name', 'last_name', 'phone_number')
+    __slots__ = ("vcard", "first_name", "last_name", "phone_number")
 
     def __init__(
         self,

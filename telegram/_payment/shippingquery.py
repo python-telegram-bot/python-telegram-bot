@@ -18,9 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional, List
+from typing import TYPE_CHECKING, Any, List, Optional
 
-from telegram import ShippingAddress, TelegramObject, User, ShippingOption
+from telegram._payment.shippingaddress import ShippingAddress
+from telegram._payment.shippingoption import ShippingOption
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -54,7 +57,7 @@ class ShippingQuery(TelegramObject):
 
     """
 
-    __slots__ = ('invoice_payload', 'shipping_address', 'id', 'from_user')
+    __slots__ = ("invoice_payload", "shipping_address", "id", "from_user")
 
     def __init__(
         self,
@@ -62,7 +65,7 @@ class ShippingQuery(TelegramObject):
         from_user: User,
         invoice_payload: str,
         shipping_address: ShippingAddress,
-        bot: 'Bot' = None,
+        bot: "Bot" = None,
         **_kwargs: Any,
     ):
         self.id = id  # pylint: disable=invalid-name
@@ -75,15 +78,15 @@ class ShippingQuery(TelegramObject):
         self._id_attrs = (self.id,)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['ShippingQuery']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ShippingQuery"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['from_user'] = User.de_json(data.pop('from'), bot)
-        data['shipping_address'] = ShippingAddress.de_json(data.get('shipping_address'), bot)
+        data["from_user"] = User.de_json(data.pop("from"), bot)
+        data["shipping_address"] = ShippingAddress.de_json(data.get("shipping_address"), bot)
 
         return cls(bot=bot, **data)
 

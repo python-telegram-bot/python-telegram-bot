@@ -16,13 +16,13 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-from collections import OrderedDict
 import asyncio
+from collections import OrderedDict
 
 import pytest
 
 from telegram import Bot
-from telegram.ext import TypeHandler, CallbackContext, JobQueue
+from telegram.ext import CallbackContext, JobQueue, TypeHandler
 
 
 class TestTypeHandler:
@@ -31,7 +31,7 @@ class TestTypeHandler:
     def test_slot_behaviour(self, mro_slots):
         inst = TypeHandler(dict, self.callback)
         for attr in inst.__slots__:
-            assert getattr(inst, attr, 'err') != 'err', f"got extra slot '{attr}'"
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     @pytest.fixture(autouse=True)
@@ -50,19 +50,18 @@ class TestTypeHandler:
             and isinstance(context.bot_data, dict)
         )
 
-    @pytest.mark.asyncio
     async def test_basic(self, app):
         handler = TypeHandler(dict, self.callback)
         app.add_handler(handler)
 
-        assert handler.check_update({'a': 1, 'b': 2})
-        assert not handler.check_update('not a dict')
+        assert handler.check_update({"a": 1, "b": 2})
+        assert not handler.check_update("not a dict")
         async with app:
-            await app.process_update({'a': 1, 'b': 2})
+            await app.process_update({"a": 1, "b": 2})
         assert self.test_flag
 
     def test_strict(self):
         handler = TypeHandler(dict, self.callback, strict=True)
-        o = OrderedDict({'a': 1, 'b': 2})
-        assert handler.check_update({'a': 1, 'b': 2})
+        o = OrderedDict({"a": 1, "b": 2})
+        assert handler.check_update({"a": 1, "b": 2})
         assert not handler.check_update(o)

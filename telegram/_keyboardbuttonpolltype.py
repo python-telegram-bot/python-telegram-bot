@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=too-few-public-methods
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2022
@@ -20,7 +19,7 @@
 """This module contains an object that represents a type of a Telegram Poll."""
 from typing import Any
 
-from telegram import TelegramObject
+from telegram._telegramobject import TelegramObject
 
 
 class KeyboardButtonPollType(TelegramObject):
@@ -37,7 +36,7 @@ class KeyboardButtonPollType(TelegramObject):
             create a poll of any type.
     """
 
-    __slots__ = ('type',)
+    __slots__ = ("type",)
 
     def __init__(self, type: str = None, **_kwargs: Any):  # pylint: disable=redefined-builtin
         self.type = type

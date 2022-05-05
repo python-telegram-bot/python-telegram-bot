@@ -20,7 +20,8 @@
 
 from typing import TYPE_CHECKING, Optional
 
-from telegram import TelegramObject, User
+from telegram._telegramobject import TelegramObject
+from telegram._user import User
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -45,7 +46,7 @@ class GameHighScore(TelegramObject):
 
     """
 
-    __slots__ = ('position', 'user', 'score')
+    __slots__ = ("position", "user", "score")
 
     def __init__(self, position: int, user: User, score: int):
         self.position = position
@@ -55,13 +56,13 @@ class GameHighScore(TelegramObject):
         self._id_attrs = (self.position, self.user, self.score)
 
     @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['GameHighScore']:
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["GameHighScore"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
         data = cls._parse_data(data)
 
         if not data:
             return None
 
-        data['user'] = User.de_json(data.get('user'), bot)
+        data["user"] = User.de_json(data.get("user"), bot)
 
         return cls(**data)

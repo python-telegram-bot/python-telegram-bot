@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=no-self-use
 """This module contains the class Defaults, which allows passing default values to Application."""
-from typing import NoReturn, Optional, Dict, Any
+from typing import Any, Dict, NoReturn, Optional
 
 import pytz
 
@@ -57,15 +57,15 @@ class Defaults:
     """
 
     __slots__ = (
-        '_tzinfo',
-        '_disable_web_page_preview',
-        '_block',
-        '_quote',
-        '_disable_notification',
-        '_allow_sending_without_reply',
-        '_parse_mode',
-        '_api_defaults',
-        '_protect_content',
+        "_tzinfo",
+        "_disable_web_page_preview",
+        "_block",
+        "_quote",
+        "_disable_notification",
+        "_allow_sending_without_reply",
+        "_parse_mode",
+        "_api_defaults",
+        "_protect_content",
     )
 
     def __init__(
@@ -91,12 +91,12 @@ class Defaults:
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
         for kwarg in (
-            'parse_mode',
-            'explanation_parse_mode',
-            'disable_notification',
-            'disable_web_page_preview',
-            'allow_sending_without_reply',
-            'protect_content',
+            "parse_mode",
+            "explanation_parse_mode",
+            "disable_notification",
+            "disable_web_page_preview",
+            "allow_sending_without_reply",
+            "protect_content",
         ):
             value = getattr(self, kwarg)
             if value is not None:

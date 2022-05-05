@@ -18,9 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultPhoto."""
 
-from typing import TYPE_CHECKING, Any, Union, Tuple, List
+from typing import TYPE_CHECKING, Any, List, Tuple, Union
 
-from telegram import InlineQueryResult, MessageEntity, InlineKeyboardMarkup
+from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
@@ -86,17 +88,17 @@ class InlineQueryResultPhoto(InlineQueryResult):
     """
 
     __slots__ = (
-        'photo_url',
-        'reply_markup',
-        'caption_entities',
-        'photo_width',
-        'caption',
-        'title',
-        'description',
-        'parse_mode',
-        'input_message_content',
-        'photo_height',
-        'thumb_url',
+        "photo_url",
+        "reply_markup",
+        "caption_entities",
+        "photo_width",
+        "caption",
+        "title",
+        "description",
+        "parse_mode",
+        "input_message_content",
+        "photo_height",
+        "thumb_url",
     )
 
     def __init__(
@@ -110,7 +112,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         description: str = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        input_message_content: 'InputMessageContent' = None,
+        input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
         **_kwargs: Any,

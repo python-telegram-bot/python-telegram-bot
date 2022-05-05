@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import datetime as dtm
 import os
 import time
-import datetime as dtm
 from importlib import reload
 from unittest import mock
 
@@ -26,7 +26,6 @@ import pytest
 
 from telegram._utils import datetime as tg_dtm
 from telegram.ext import Defaults
-
 
 # sample time specification values categorised into absolute / delta / time-of-day
 from tests.conftest import env_var_2_bool
@@ -56,17 +55,17 @@ import to raise the expected exception.
 Note that a fixture that just does this for every test that needs it is a nice idea, but for some
 reason makes test_updater.py hang indefinitely on GitHub Actions (at least when Hinrich tried that)
 """
-TEST_NO_PYTZ = env_var_2_bool(os.getenv('TEST_NO_PYTZ', False))
+TEST_NO_PYTZ = env_var_2_bool(os.getenv("TEST_NO_PYTZ", False))
 
 if TEST_NO_PYTZ:
     orig_import = __import__
 
     def import_mock(module_name, *args, **kwargs):
-        if module_name == 'pytz':
-            raise ModuleNotFoundError('We are testing without pytz here')
+        if module_name == "pytz":
+            raise ModuleNotFoundError("We are testing without pytz here")
         return orig_import(module_name, *args, **kwargs)
 
-    with mock.patch('builtins.__import__', side_effect=import_mock):
+    with mock.patch("builtins.__import__", side_effect=import_mock):
         reload(tg_dtm)
 
 
@@ -82,22 +81,22 @@ class TestDatetime:
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.
         """
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         assert tg_dtm.to_float_timestamp(datetime) == 1573431976.1
 
     def test_to_float_timestamp_absolute_naive_no_pytz(self, monkeypatch):
         """Conversion from timezone-naive datetime to timestamp.
         Naive datetimes should be assumed to be in UTC.
         """
-        monkeypatch.setattr(tg_dtm, 'UTC', tg_dtm.DTM_UTC)
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        monkeypatch.setattr(tg_dtm, "UTC", tg_dtm.DTM_UTC)
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         assert tg_dtm.to_float_timestamp(datetime) == 1573431976.1
 
     def test_to_float_timestamp_absolute_aware(self, timezone):
         """Conversion from timezone-aware datetime to timestamp"""
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
-        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         datetime = timezone.localize(test_datetime)
         assert (
             tg_dtm.to_float_timestamp(datetime)
@@ -109,11 +108,11 @@ class TestDatetime:
         with pytest.raises(ValueError):
             tg_dtm.to_float_timestamp(dtm.datetime(2019, 11, 11), reference_timestamp=123)
 
-    @pytest.mark.parametrize('time_spec', DELTA_TIME_SPECS, ids=str)
+    @pytest.mark.parametrize("time_spec", DELTA_TIME_SPECS, ids=str)
     def test_to_float_timestamp_delta(self, time_spec):
         """Conversion from a 'delta' time specification to timestamp"""
         reference_t = 0
-        delta = time_spec.total_seconds() if hasattr(time_spec, 'total_seconds') else time_spec
+        delta = time_spec.total_seconds() if hasattr(time_spec, "total_seconds") else time_spec
         assert tg_dtm.to_float_timestamp(time_spec, reference_t) == reference_t + delta
 
     def test_to_float_timestamp_time_of_day(self):
@@ -142,7 +141,7 @@ class TestDatetime:
             ref_t + (-utc_offset.total_seconds() % (24 * 60 * 60))
         )
 
-    @pytest.mark.parametrize('time_spec', RELATIVE_TIME_SPECS, ids=str)
+    @pytest.mark.parametrize("time_spec", RELATIVE_TIME_SPECS, ids=str)
     def test_to_float_timestamp_default_reference(self, time_spec):
         """The reference timestamp for relative time specifications should default to now"""
         now = time.time()
@@ -151,10 +150,10 @@ class TestDatetime:
         )
 
     def test_to_float_timestamp_error(self):
-        with pytest.raises(TypeError, match='Defaults'):
+        with pytest.raises(TypeError, match="Defaults"):
             tg_dtm.to_float_timestamp(Defaults())
 
-    @pytest.mark.parametrize('time_spec', TIME_SPECS, ids=str)
+    @pytest.mark.parametrize("time_spec", TIME_SPECS, ids=str)
     def test_to_timestamp(self, time_spec):
         # delegate tests to `to_float_timestamp`
         assert tg_dtm.to_timestamp(time_spec) == int(tg_dtm.to_float_timestamp(time_spec))
@@ -173,7 +172,7 @@ class TestDatetime:
     def test_from_timestamp_aware(self, timezone):
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
-        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10 ** 5)
+        test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
         datetime = timezone.localize(test_datetime)
         assert (
             tg_dtm.from_timestamp(1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
