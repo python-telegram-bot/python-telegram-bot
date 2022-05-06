@@ -225,7 +225,7 @@ class ConversationHandler(Handler[Update, CCT]):
             saved. :paramref:`name` is required and persistence has to be set in
             :attr:`Application <.Application.persistence>`.
 
-            .. versionchanged:: 14.0
+            .. versionchanged:: 20.0
                 Was previously named as ``persistence``.
         map_to_parent (Dict[:obj:`object`, :obj:`object`], optional): A :obj:`dict` that can be
             used to instruct a child conversation handler to transition into a mapped state on
@@ -239,7 +239,7 @@ class ConversationHandler(Handler[Update, CCT]):
             2. the value passed to this parameter (if any)
             3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
 
-            .. versionchanged:: 14.0
+            .. versionchanged:: 20.0
                 No longer overrides the handlers settings. Resolution order was changed.
 
     Raises:

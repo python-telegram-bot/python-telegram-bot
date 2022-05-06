@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains helper functions related to warnings issued by the library.
 
-.. versionadded:: 14.0
+.. versionadded:: 20.0
 
 Warning:
     Contents of this module are intended to be used internally by the library and *not* by the
@@ -35,7 +35,7 @@ def warn(message: str, category: Type[Warning] = PTBUserWarning, stacklevel: int
     """
     Helper function used as a shortcut for warning with default values.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
 
     Args:
         message (:obj:`str`): Specify the warnings message to pass to ``warnings.warn()``.

@@ -53,12 +53,12 @@ UT = TypeVar("UT")
 HandlerCallback = Callable[[UT, CCT], Coroutine[Any, Any, RT]]
 """Type of a handler callback
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
 """
 JobCallback = Callable[[CCT], Coroutine[Any, Any, Any]]
 """Type of a job callback
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
 """
 
 ConversationKey = Tuple[Union[int, str], ...]
@@ -80,7 +80,7 @@ CDCData = Tuple[List[Tuple[str, float, Dict[str, Any]]], Dict[str, str]]
 BT = TypeVar("BT", bound="Bot")
 """Type of the bot.
 
-.. versionadded:: 14.0
+.. versionadded:: 20.0
 """
 UD = TypeVar("UD")
 """Type of the user data for a single user.
@@ -100,4 +100,4 @@ BD = TypeVar("BD")
 JQ = TypeVar("JQ", bound=Union[None, "JobQueue"])
 """Type of the job queue.
 
-.. versionadded:: 14.0"""
+.. versionadded:: 20.0"""

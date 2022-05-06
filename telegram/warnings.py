@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains classes used for warnings issued by this library.
 
-.. versionadded:: 14.0
+.. versionadded:: 20.0
 """
 
 __all__ = ["PTBDeprecationWarning", "PTBRuntimeWarning", "PTBUserWarning"]
@@ -28,7 +28,7 @@ class PTBUserWarning(UserWarning):
     """
     Custom user warning class used for warnings in this library.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -38,7 +38,7 @@ class PTBRuntimeWarning(PTBUserWarning, RuntimeWarning):
     """
     Custom runtime warning class used for warnings in this library.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -50,7 +50,7 @@ class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
     """
     Custom warning class for deprecations in this library.
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
        Renamed TelegramDeprecationWarning to PTBDeprecationWarning.
     """
 

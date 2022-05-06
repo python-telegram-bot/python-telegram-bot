@@ -133,7 +133,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         finally:
             await application.shutdown()
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
 
         * Initialization is now done through the :class:`telegram.ext.ApplicationBuilder`.
         * Removed the attribute ``groups``.
@@ -148,7 +148,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the chat.
 
-            .. versionchanged:: 14.0
+            .. versionchanged:: 20.0
                 :attr:`chat_data` is now read-only
 
             .. tip::
@@ -157,7 +157,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         user_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the user.
 
-            .. versionchanged:: 14.0
+            .. versionchanged:: 20.0
                :attr:`user_data` is now read-only
 
             .. tip::
@@ -426,7 +426,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def builder() -> "InitApplicationBuilder":
         """Convenience method. Returns a new :class:`telegram.ext.ApplicationBuilder`.
 
-        .. versionadded:: 14.0
+        .. versionadded:: 20.0
         """
         # Unfortunately this needs to be here due to cyclical imports
         from telegram.ext import ApplicationBuilder  # pylint: disable=import-outside-toplevel
@@ -575,13 +575,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
             read_timeout (:obj:`float`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.read_timeout`. Defaults to ``2``.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.Bot.get_updates.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
@@ -906,7 +906,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         """Processes a single update and marks the update to be updated by the persistence later.
         Exceptions raised by handler callbacks will be processed by :meth:`process_update`.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             Persistence is now updated in an interval set by
             :attr:`telegram.ext.BasePersistence.update_interval`.
 
@@ -1033,7 +1033,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         """Registers multiple handlers at once. The order of the handlers in the passed
         sequence(s) matters. See :meth:`add_handler` for details.
 
-        .. versionadded:: 14.0
+        .. versionadded:: 20.0
 
         Args:
             handlers (List[:class:`telegram.ext.Handler`] | \
@@ -1090,12 +1090,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         the persistence on the next run of :meth:`update_persistence`, if applicable.
 
         Warning:
-            When using :paramref:`concurrent_updates` or the :attr:`job_queue`,
+            When using :attr:`concurrent_updates` or the :attr:`job_queue`,
             :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create this entry due to
             the asynchronous nature of these features. Please make sure that your program can
             avoid or handle such situations.
 
-        .. versionadded:: 14.0
+        .. versionadded:: 20.0
 
         Args:
             chat_id (:obj:`int`): The chat id to delete. The entry will be deleted even if it is
@@ -1109,12 +1109,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         the persistence on the next run of :meth:`update_persistence`, if applicable.
 
         Warning:
-            When using :paramref:`concurrent_updates` or the :attr:`job_queue`,
+            When using :attr:`concurrent_updates` or the :attr:`job_queue`,
             :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create this entry due to
             the asynchronous nature of these features. Please make sure that your program can
             avoid or handle such situations.
 
-        .. versionadded:: 14.0
+        .. versionadded:: 20.0
 
         Args:
             user_id (:obj:`int`): The user id to delete. The entry will be deleted even if it is
@@ -1400,7 +1400,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         (even in other groups) will handle the update. All other exceptions raised by an error
         handler will just be logged.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
 
             * ``dispatch_error`` was renamed to :meth:`process_error`.
             * Exceptions raised by error handlers are now properly logged.
@@ -1412,7 +1412,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             error (:obj:`Exception`): The error that was raised.
             job (:class:`telegram.ext.Job`, optional): The job that caused the error.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
             coroutine (:term:`coroutine function`, optional): The coroutine that caused the error.
 
         Returns:

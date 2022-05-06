@@ -66,9 +66,16 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     Warning:
          Do not combine custom attributes with :paramref:`telegram.ext.Handler.block` set to
-         :obj:`False` or :paramref:`telegram.ext.Application.concurrent_updates` set to
+         :obj:`False` or :attr:`telegram.ext.Application.concurrent_updates` set to
          :obj:`True`. Due to how those work, it will almost certainly execute the callbacks for an
          update out of order, and the attributes that you think you added will not be present.
+
+    This class is a :class:`~typing.Generic` class and accepts four type variables:
+
+    1. The type of :attr:`bot`. Must be :class:`telegram.Bot` or a subclass of that class.
+    2. The type of :attr:`user_data` (if :attr:`user_data` is not :obj:`None`).
+    3. The type of :attr:`chat_data` (if :attr:`chat_data` is not :obj:`None`).
+    4. The type of :attr:`bot_data` (if :attr:`bot_data` is not :obj:`None`).
 
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this
@@ -92,7 +99,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             Only present when passed to the callback of :class:`telegram.ext.Job` or in error
             handlers if the error is caused by a job.
 
-            .. versionchanged:: 14.0
+            .. versionchanged:: 20.0
                 :attr:`job` is now also present in error handlers if the error is caused by a job.
 
     """
@@ -114,7 +121,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 async def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
                     ...
 
-        .. versionadded: 14.0
+        .. versionadded: 20.0
         """
 
     __slots__ = (
@@ -263,7 +270,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
         .. seealso:: :meth:`telegram.ext.Application.add_error_handler`
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             Removed arguments ``async_args`` and ``async_kwargs``.
 
         Args:
@@ -274,7 +281,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 context.
             job (:class:`telegram.ext.Job`, optional): The job associated with the error.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
 
         Returns:
             :class:`telegram.ext.CallbackContext`

@@ -143,12 +143,14 @@ class InlineQuery(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.answer_inline_query`.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             Raises :class:`ValueError` instead of :class:`TypeError`.
 
         Args:
             auto_pagination (:obj:`bool`, optional): If set to :obj:`True`, :attr:`offset` will be
-                passed as :paramref:`current_offset` to :meth:`telegram.Bot.answer_inline_query`.
+                passed as
+                :paramref:`current_offset <telegram.Bot.answer_inline_query.current_offset>` to
+                :meth:`telegram.Bot.answer_inline_query`.
                 Defaults to :obj:`False`.
 
         Raises:
@@ -181,5 +183,5 @@ class InlineQuery(TelegramObject):
     MAX_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH
     """:const:`telegram.constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH`
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """

@@ -3,39 +3,29 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Python Telegram Bot's documentation!
-===============================================
+.. include:: ../../README.rst
 
-Guides and tutorials
-====================
-
-If you're just starting out with the library, we recommend following our `"Your first Bot" <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions-%E2%80%93-Your-first-Bot>`_ tutorial that you can find on our `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki>`_.
-While being there, you will also find guides to learn how to use handlers, webhooks, proxies, making your bot persistent, and much more.
-
-Examples
-========
-
-A great way to learn is by looking at examples. Ours can be found in our `examples folder on Github <https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples#examples>`_.
-
-
-Reference
-=========
-
-Below you can find a reference of all the classes and methods in python-telegram-bot.
-Apart from the `telegram.ext` package and the `Auxiliary` modules, the objects reflect the types defined in the `official Telegram Bot API documentation <https://core.telegram.org/bots/api>`_.
+.. The toctrees are hidden such that they don't reander on the start page but still include the contents into the documentation.
 
 .. toctree::
-   telegram.ext
+   :hidden:
+   :caption: Reference
 
-.. toctree::
    telegram
-
-Changelog
----------
+   telegram.ext
+   telegram_auxil
+   Telegrams Bot API Docs <https://core.telegram.org/bots/api>
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
+   :caption: Project
 
    changelog
+   Website <https://python-telegram-bot.org>
+   GitHub Repository <https://github.com/python-telegram-bot/python-telegram-bot/>
+   Telegram Channel <https://t.me/pythontelegrambotchannel/>
+   Telegram User Group <https://t.me/pythontelegrambotgroup/>
+   contributing
+   coc
 
 

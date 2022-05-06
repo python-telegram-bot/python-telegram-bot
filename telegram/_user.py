@@ -774,12 +774,14 @@ class User(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
         Warning:
-            As of API 5.2 :paramref:`start_parameter` is an optional argument and therefore the
+            As of API 5.2 :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>`
+            is an optional argument and therefore the
             order of the arguments had to be changed. Use keyword arguments to make sure that the
             arguments are passed correctly.
 
         .. versionchanged:: 13.5
-            As of Bot API 5.2, the parameter :paramref:`start_parameter` is optional.
+            As of Bot API 5.2, the parameter
+            :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>` is optional.
 
         Returns:
             :class:`telegram.Message`: On success, instance representing the message posted.

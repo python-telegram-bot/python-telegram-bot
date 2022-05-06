@@ -20,7 +20,7 @@
 This module contains filters for use with :class:`telegram.ext.MessageHandler`,
 :class:`telegram.ext.CommandHandler`, or :class:`telegram.ext.PrefixHandler`.
 
-.. versionchanged:: 14.0
+.. versionchanged:: 20.0
 
     #. Filters are no longer callable, if you're using a custom filter and are calling an existing
        filter, then switch to the new syntax: ``filters.{filter}.check_update(update)``.
@@ -159,7 +159,7 @@ class BaseFilter:
     will be the class name. If you want to overwrite this assign a better name to the :attr:`name`
     class variable.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
         Added the arguments :attr:`name` and :attr:`data_filter`.
 
     Args:
@@ -1917,7 +1917,7 @@ class Sticker:
     """Messages that contain :attr:`telegram.Message.sticker` and
     :attr:`is animated <telegram.Sticker.is_animated>`.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     class _Static(MessageFilter):
@@ -1933,7 +1933,7 @@ class Sticker:
     """Messages that contain :attr:`telegram.Message.sticker` and is a static sticker, i.e. does
     not contain :attr:`telegram.Sticker.is_animated` or :attr:`telegram.Sticker.is_video`.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     class _Video(MessageFilter):
@@ -1946,7 +1946,7 @@ class Sticker:
     """Messages that contain :attr:`telegram.Message.sticker` and is a
     :attr:`video sticker <telegram.Sticker.is_video>`.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
 
@@ -2054,7 +2054,7 @@ class UpdateType:
     """Updates with either :attr:`telegram.Update.edited_message` or
     :attr:`telegram.Update.edited_channel_post`.
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """
 
     class _EditedChannelPost(UpdateFilter):

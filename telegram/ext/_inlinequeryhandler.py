@@ -34,8 +34,9 @@ RT = TypeVar("RT")
 
 class InlineQueryHandler(Handler[Update, CCT]):
     """
-    Handler class to handle Telegram inline queries. Optionally based on a regex. Read the
-    documentation of the :mod:`re` module for more information.
+    Handler class to handle Telegram updates that contain a :attr:`telegram.Update.inline_query`.
+    Optionally based on a regex. Read the documentation of the :mod:`re` module for more
+    information.
 
     Warning:
         * When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom

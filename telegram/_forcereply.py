@@ -33,7 +33,7 @@ class ForceReply(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`selective` is equal.
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
         The (undocumented) argument ``force_reply`` was removed and instead :attr:`force_reply`
         is now always set to :obj:`True` as expected by the Bot API.
 

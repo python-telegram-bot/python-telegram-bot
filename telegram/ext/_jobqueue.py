@@ -42,7 +42,7 @@ class JobQueue:
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
 
-            .. versionchanged:: 14.0
+            .. versionchanged:: 20.0
                 Use :class:`~apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
                 :class:`~apscheduler.schedulers.background.BackgroundScheduler`
 
@@ -156,13 +156,13 @@ class JobQueue:
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
 
             user_id (:obj:`int`, optional): User id of the user associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.user_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
             context (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.context` in the callback. Defaults to
                 :obj:`None`.
@@ -263,13 +263,13 @@ class JobQueue:
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
 
             user_id (:obj:`int`, optional): User id of the user associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.user_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
@@ -320,7 +320,7 @@ class JobQueue:
     ) -> "Job":
         """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
             parameter to have the job run on the last day of the month.
 
@@ -345,13 +345,13 @@ class JobQueue:
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
 
             user_id (:obj:`int`, optional): User id of the user associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.user_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
@@ -420,13 +420,13 @@ class JobQueue:
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
 
             user_id (:obj:`int`, optional): User id of the user associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.user_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job()`.
 
@@ -485,13 +485,13 @@ class JobQueue:
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
 
             user_id (:obj:`int`, optional): User id of the user associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.user_data` will
                 be available in the callback.
 
-                .. versionadded:: 14.0
+                .. versionadded:: 20.0
 
         Returns:
             :class:`telegram.ext.Job`: The new :class:`Job` instance that has been added to the job
@@ -563,7 +563,7 @@ class Job:
         * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
           this :class:`telegram.ext.Job` to be useful.
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
         Removed argument and attribute ``job_queue``.
 
     Args:
@@ -579,10 +579,10 @@ class Job:
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
         chat_id (:obj:`int`, optional): Chat id of the chat that this job is associated with.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
         user_id (:obj:`int`, optional): User id of the user that this job is associated with.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
 
     Attributes:
         callback (:term:`coroutine function`): The callback function that should be executed by the
@@ -592,10 +592,10 @@ class Job:
         job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
         chat_id (:obj:`int`): Optional. Chat id of the chat that this job is associated with.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
         user_id (:obj:`int`): Optional. User id of the user that this job is associated with.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
     """
 
     __slots__ = (
@@ -634,7 +634,7 @@ class Job:
         """Executes the callback function independently of the jobs schedule. Also calls
         :meth:`telegram.ext.Application.update_persistence`.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             Calls :meth:`telegram.ext.Application.update_persistence`.
 
         Args:
