@@ -73,7 +73,7 @@ class ForceReply(TelegramObject):
         **_kwargs: Any,
     ):
         self.force_reply = True
-        self.selective = bool(selective)
+        self.selective = selective
         self.input_field_placeholder = input_field_placeholder
 
         self._id_attrs = (self.selective,)
