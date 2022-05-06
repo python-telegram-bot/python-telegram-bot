@@ -684,7 +684,7 @@ class Message(TelegramObject):
 
          Otherwise :obj:`None` is returned.
 
-        .. versionchanged:: 14.0
+        .. versionchanged:: 20.0
             :attr:`dice`, :attr:`passport_data` and :attr:`poll` are now also considered to be an
             attachment.
 
@@ -1905,14 +1905,16 @@ class Message(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_invoice`.
 
         Warning:
-            As of API 5.2 :paramref:`start_parameter` is an optional argument and therefore the
+            As of API 5.2 :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>`
+            is an optional argument and therefore the
             order of the arguments had to be changed. Use keyword arguments to make sure that the
             arguments are passed correctly.
 
         .. versionadded:: 13.2
 
         .. versionchanged:: 13.5
-            As of Bot API 5.2, the parameter :paramref:`start_parameter` is optional.
+            As of Bot API 5.2, the parameter
+            :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>` is optional.
 
         Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the invoice is sent as an actual

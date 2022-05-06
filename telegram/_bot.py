@@ -149,7 +149,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Objects of this class are comparable in terms of equality. Two objects of this class are
         considered equal, if their :attr:`bot` is equal.
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
 
         * Removed the deprecated methods ``kick_chat_member``, ``kickChatMember``,
           ``get_chat_members_count`` and ``getChatMembersCount``.
@@ -363,7 +363,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         cache :attr:`bot` and calls :meth:`telegram.request.BaseRequest.initialize` for
         the request objects used by this bot.
 
-        .. versionadded:: 14.0
+        .. seealso:: :meth:`shutdown`
+
+        .. versionadded:: 20.0
         """
         if self._initialized:
             self._logger.debug("This Bot is already initialized.")
@@ -377,7 +379,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """Stop & clear resources used by this class. Currently just calls
         :meth:`telegram.request.BaseRequest.shutdown` for the request objects used by this bot.
 
-        .. versionadded:: 14.0
+        .. seealso:: :meth:`initialize`
+
+        .. versionadded:: 20.0
         """
         if not self._initialized:
             self._logger.debug("This Bot is already shut down. Returning.")
@@ -518,13 +522,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -601,13 +605,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -678,13 +682,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -749,13 +753,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -858,12 +862,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -997,12 +1001,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1138,12 +1142,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1240,12 +1244,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1372,12 +1376,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1504,12 +1508,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1641,12 +1645,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1773,12 +1777,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1859,12 +1863,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to ``20``.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -1962,13 +1966,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2072,13 +2076,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2156,13 +2160,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2261,13 +2265,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2382,13 +2386,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2477,13 +2481,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2539,13 +2543,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2707,13 +2711,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2789,13 +2793,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2864,13 +2868,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -2937,13 +2941,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
@@ -3014,13 +3018,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3075,13 +3079,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3135,13 +3139,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3210,13 +3214,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3296,13 +3300,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3383,13 +3387,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3469,13 +3473,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3544,13 +3548,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3621,13 +3625,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 ``2``. :paramref:`timeout` will be added to this value.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             allowed_updates (List[:obj:`str`]), optional): A list the types of
@@ -3743,13 +3747,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3821,13 +3825,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3875,13 +3879,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3928,13 +3932,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -3980,13 +3984,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4034,13 +4038,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4085,13 +4089,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4140,13 +4144,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4188,13 +4192,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4232,13 +4236,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4294,13 +4298,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4371,13 +4375,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4535,13 +4539,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4645,13 +4649,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4736,13 +4740,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4873,13 +4877,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -4982,13 +4986,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5061,13 +5065,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5117,13 +5121,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5171,13 +5175,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5243,13 +5247,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5336,7 +5340,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to edit.
 
-                .. versionchanged:: 14.0
+                .. versionchanged:: 20.0
                     Now also accepts :obj:`telegram.ChatInviteLink` instances.
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire.
@@ -5348,13 +5352,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5431,18 +5435,18 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to revoke.
 
-                .. versionchanged:: 14.0
+                .. versionchanged:: 20.0
                     Now also accepts :obj:`telegram.ChatInviteLink` instances.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5495,13 +5499,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5552,13 +5556,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5610,13 +5614,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5662,13 +5666,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5716,13 +5720,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5770,13 +5774,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5832,13 +5836,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5893,13 +5897,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5950,13 +5954,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -5997,13 +6001,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6059,13 +6063,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6111,17 +6115,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to create new sticker set owned by a user.
         The bot will be able to edit the created sticker set.
-        You must use exactly one of the fields ``png_sticker``, ``tgs_sticker``, or
-        ``webm_sticker``.
+        You must use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`, or
+        :paramref:`webm_sticker`.
 
         Warning:
-            As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
-            arguments had to be changed. Use keyword arguments to make sure that the arguments are
-            passed correctly.
+            As of API 4.7 :paramref:`png_sticker` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
 
         Note:
-            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
-            disk ``open(filename, 'rb')``
+            The :paramref:`png_sticker` and :paramref:`tgs_sticker` argument can be either a
+            file_id, an URL or a file from disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -6163,13 +6167,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6225,19 +6229,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> bool:
         """
         Use this method to add a new sticker to a set created by the bot.
-        You **must** use exactly one of the fields ``png_sticker``, ``tgs_sticker`` or
-        ``webm_sticker``. Animated stickers can be added to animated sticker sets and only to them.
-        Animated sticker sets can have up to 50 stickers. Static sticker sets can have up to 120
-        stickers.
+        You **must** use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`
+        or :paramref:`webm_sticker`. Animated stickers can be added to animated sticker sets and
+        only to them. Animated sticker sets can have up to 50 stickers. Static sticker sets can
+        have up to 120 stickers.
 
         Warning:
-            As of API 4.7 ``png_sticker`` is an optional argument and therefore the order of the
-            arguments had to be changed. Use keyword arguments to make sure that the arguments are
-            passed correctly.
+            As of API 4.7 :paramref:`png_sticker` is an optional argument and therefore the order
+            of the arguments had to be changed. Use keyword arguments to make sure that the
+            arguments are passed correctly.
 
         Note:
-            The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
-            disk ``open(filename, 'rb')``
+            The :paramref:`png_sticker` and :paramref:`tgs_sticker` argument can be either a
+            file_id, an URL or a file from disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -6272,13 +6276,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6333,13 +6337,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6381,13 +6385,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6429,7 +6433,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         only.
 
         Note:
-            The thumb can be either a file_id, an URL or a file from disk ``open(filename, 'rb')``
+            The :paramref:`thumb` can be either a file_id, an URL or a file from disk
+            ``open(filename, 'rb')``
 
         Args:
             name (:obj:`str`): Sticker set name
@@ -6452,13 +6457,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6515,13 +6520,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6600,7 +6605,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 available modes.
             explanation_entities (List[:class:`telegram.MessageEntity`], optional): List of special
                 entities that appear in message text, which can be specified instead of
-                :paramref:`parse_mode`.
+                :paramref:`explanation_parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
                 after creation, 5-600. Can't be used together with :paramref:`close_date`.
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
@@ -6629,13 +6634,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6713,13 +6718,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6800,13 +6805,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -6982,13 +6987,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -7055,13 +7060,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -7135,13 +7140,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
@@ -7192,13 +7197,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
@@ -7235,13 +7240,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
@@ -7317,13 +7322,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional):  Value to pass to
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the

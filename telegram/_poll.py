@@ -298,5 +298,5 @@ class Poll(TelegramObject):
     MAX_OPTION_NUMBER: ClassVar[int] = constants.PollLimit.OPTION_NUMBER
     """:const:`telegram.constants.PollLimit.OPTION_NUMBER`
 
-    .. versionadded:: 14.0
+    .. versionadded:: 20.0
     """

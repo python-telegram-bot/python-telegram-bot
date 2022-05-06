@@ -6,12 +6,6 @@
    :target: https://python-telegram-bot.org
    :alt: python-telegram-bot-raw Logo
 
-We have made you a wrapper you can't refuse
-
-We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
-
-*Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
-
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot-raw.svg
    :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: PyPi Package Version
@@ -56,89 +50,71 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://deepsource.io/gh/python-telegram-bot/python-telegram-bot/?ref=repository-badge
    :alt: Code quality: DeepSource
 
+.. image:: https://results.pre-commit.ci/badge/github/python-telegram-bot/python-telegram-bot/master.svg
+   :target: https://results.pre-commit.ci/latest/github/python-telegram-bot/python-telegram-bot/master
+   :alt: pre-commit.ci status
+
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
+   :alt: Code Style: Black
+
+.. image:: https://img.shields.io/badge/Telegram-Channel-blue.svg?logo=telegram
+   :target: https://t.me/pythontelegrambotchannel
+   :alt: Telegram Channel
 
 .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram
    :target: https://telegram.me/pythontelegrambotgroup
    :alt: Telegram Group
 
-=================
-Table of contents
-=================
+We have made you a wrapper you can't refuse
 
-- `Introduction`_
+We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
 
-- `Telegram API support`_
+*Stay tuned for library updates and new releases on our* `Telegram Channel <https://telegram.me/pythontelegrambotchannel>`_.
 
-- `Installing`_
-
-- `Getting started`_
-
-  #. `Logging`_
-
-  #. `Documentation`_
-
-- `Getting help`_
-
-- `Contributing`_
-
-- `License`_
-
-============
 Introduction
 ============
 
-This library provides a pure Python, lightweight interface for the
+This library provides a pure Python, asynchronous interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions **3.7+**. PTB-Raw might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
+It's compatible with Python versions **3.7+**.
 
-``python-telegram-bot-raw`` is part of the `python-telegram-bot <https://python-telegram-bot.org>`_ ecosystem and provides the pure API functionality extracted from PTB. It therefore does *not* have independent release schedules, changelogs or documentation. Please consult the PTB resources.
+``python-telegram-bot-raw`` is part of the `python-telegram-bot <https://python-telegram-bot.org>`_ ecosystem and provides the pure API functionality extracted from PTB. It therefore does not have independent release schedules, changelogs or documentation.
 
-----
 Note
 ----
 
 Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conjunction will result in undesired side-effects, so only install *one* of both.
 
-====================
 Telegram API support
 ====================
 
 All types and methods of the Telegram Bot API **6.0** are supported.
 
-===========
-Concurrency
-===========
-
-Since v14.0, ``python-telegram-bot`` is built on top of Pythons ``asyncio`` module.
-Because ``asyncio`` is in general single-threaded, ``python-telegram-bot`` does currently not aim to be thread-safe.
-
-==========
 Installing
 ==========
 
-You can install or upgrade python-telegram-bot-raw with:
+You can install or upgrade ``python-telegram-bot`` via
 
 .. code:: shell
 
     $ pip install python-telegram-bot-raw --upgrade
 
-Or you can install from source with:
+To install a pre-release, use the ``--pre`` `flag <https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-pre>`_ in addition.
+
+You can also install ``python-telegram-bot-raw`` from source, though this is usually not necessary.
 
 .. code:: shell
 
-    $ git clone https://github.com/python-telegram-bot/python-telegram-bot --recursive
+    $ git clone https://github.com/python-telegram-bot/python-telegram-bot
     $ cd python-telegram-bot
     $ python setup-raw.py install
 
-----
 Note
 ----
 
-Installing the `.tar.gz` archive available on PyPi directly via `pip` will *not* work as expected, as `pip` does not recognize that it should use `setup-raw.py` instead of `setup.py`.
+Installing the ``.tar.gz`` archive available on PyPi directly via ``pip`` will *not* work as expected, as ``pip`` does not recognize that it should use ``setup-raw.py`` instead of ``setup.py``.
 
------------------------------
 Dependencies & Their Versions
 -----------------------------
 
@@ -153,88 +129,63 @@ To minimize dependency conflicts, we try to be liberal in terms of version requi
 On the other hand, we have to ensure stability of ``python-telegram-bot``, which is why we do apply version bounds.
 If you encounter dependency conflicts due to these bounds, feel free to reach out.
 
----------------------
 Optional Dependencies
 ---------------------
 
-PTB can be installed with optional dependencies:
+``python-telegram-bot-raw`` can be installed with optional dependencies:
 
-* ``pip install python-telegram-bot-raw[passport]`` installs the `cryptography>=3.0 <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
-* ``pip install python-telegram-bot-raw[json]`` installs the `ujson>=4.0.0 <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
+* ``pip install python-telegram-bot[passport]`` installs the `cryptography <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``pip install python-telegram-bot[json]`` installs the `ujson <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
+* ``pip install python-telegram-bot[socks]`` installs the `PySocks <https://pypi.org/project/PySocks/>`_ library. Use this, if you want to work behind a Socks5 server.
 
-===============
-Getting started
-===============
+Quick Start
+===========
 
-Our Wiki contains an `Introduction to the API <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Introduction-to-the-API>`_. Other references are:
+Our Wiki contains an `Introduction to the API <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Introduction-to-the-API>`_ explaining how the pure Bot API can be accessed via ``python-telegram-bot``.
 
-- the `Telegram API documentation <https://core.telegram.org/bots/api>`_
-- the `python-telegram-bot documentation <https://python-telegram-bot.readthedocs.io/>`_
+Resources
+=========
 
--------
-Logging
--------
+- The `package documentation <https://python-telegram-bot.readthedocs.io/>`_ is the technical reference for ``python-telegram-bot``.
+  It contains descriptions of all available classes, modules, methods and arguments.
+- The `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ is home to number of more elaborate introductions of the different features of ``python-telegram-bot`` and other useful resources that go beyond the technical documentation.
+- Our `examples directory <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/README.md>`_ contains several examples that showcase the different features of both the Bot API and ``python-telegram-bot``.
+  Even if it is not your approach for learning, please take a look at ``echobot.py``. It is the de facto base for most of the bots out there.
+  The code for these examples is released to the public domain, so you can start by grabbing the code and building on top of it.
+- The `official Telegram Bot API documentation <https://core.telegram.org/bots/api>`_ is of course always worth a read.
 
-This library uses the ``logging`` module. To set up logging to standard output, put:
-
-.. code:: python
-
-    import logging
-
-    logging.basicConfig(
-        level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-
-at the beginning of your script.
-
-You can also use logs in your application by calling ``logging.getLogger()`` and setting the log level you want:
-
-.. code:: python
-
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-
-If you want DEBUG logs instead:
-
-.. code:: python
-
-    logger.setLevel(logging.DEBUG)
-
-
-=============
-Documentation
-=============
-
-``python-telegram-bot``'s documentation lives at `readthedocs.io <https://python-telegram-bot.readthedocs.io/>`_, which
-includes the relevant documentation for ``python-telegram-bot-raw``.
-
-============
 Getting help
 ============
 
-You can get help in several ways:
+If the resources mentioned above don't answer your questions or simply overwhelm you, there are several ways of getting help.
 
-1. We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
+1. We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us! Asking a question here is often the quickest way to get a pointer in the right direction.
 
-2. Report bugs, request new features or ask questions by `creating an issue <https://github.com/python-telegram-bot/python-telegram-bot/issues/new/choose>`_ or `a discussion <https://github.com/python-telegram-bot/python-telegram-bot/discussions/new>`_.
+2. Ask questions by opening `a discussion <https://github.com/python-telegram-bot/python-telegram-bot/discussions/new>`_.
 
-3. Our `Wiki pages <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ offer a growing amount of resources.
+3. You can even ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
 
-4. You can even ask for help on Stack Overflow using the `python-telegram-bot tag <https://stackoverflow.com/questions/tagged/python-telegram-bot>`_.
+Concurrency
+===========
 
-============
+Since v20.0, ``python-telegram-bot`` is built on top of Pythons ``asyncio`` module.
+Because ``asyncio`` is in general single-threaded, ``python-telegram-bot`` does currently not aim to be thread-safe.
+
 Contributing
 ============
 
-Contributions of all sizes are welcome. Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/CONTRIBUTING.rst>`_ to get started. You can also help by `reporting bugs <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
+Contributions of all sizes are welcome.
+Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/CONTRIBUTING.rst>`_ to get started.
+You can also help by `reporting bugs or feature requests <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
 
-========
 Donating
 ========
-Occasionally we are asked if we accept donations to support the development. While we appreciate the thought, maintaining PTB is our hobby, and we have almost no running costs for it. We therefore have nothing set up to accept donations. If you still want to donate, we kindly ask you to donate to another open source project/initiative of your choice instead.
+Occasionally we are asked if we accept donations to support the development.
+While we appreciate the thought, maintaining PTB is our hobby, and we have almost no running costs for it. We therefore have nothing set up to accept donations.
+If you still want to donate, we kindly ask you to donate to another open source project/initiative of your choice instead.
 
-=======
 License
 =======
 
-You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_. Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.
+You may copy, distribute and modify the software provided that modifications are described and licensed for free under `LGPL-3 <https://www.gnu.org/licenses/lgpl-3.0.html>`_.
+Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under LGPL-3, but applications that use the library don't have to be.

@@ -48,7 +48,7 @@ class TelegramObject:
 
         assert telegram_object.get_bot() is copy.deepcopy(telegram_object).get_bot()
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
         ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
         special cases like :attr:`Message.from_user` that deviate from the official Bot API.
     """
@@ -231,7 +231,7 @@ class TelegramObject:
 
         .. seealso:: :meth:`set_bot`
 
-        .. versionadded: 14.0
+        .. versionadded: 20.0
 
         Raises:
             RuntimeError: If no :class:`telegram.Bot` instance was set for this object.
@@ -247,7 +247,7 @@ class TelegramObject:
 
         .. seealso:: :meth:`get_bot`
 
-        .. versionadded: 14.0
+        .. versionadded: 20.0
 
         Arguments:
             bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.

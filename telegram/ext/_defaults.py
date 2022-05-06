@@ -26,10 +26,9 @@ import pytz
 class Defaults:
     """Convenience Class to gather all parameters with a (user defined) default value
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
         Removed the argument and attribute ``timeout``. Specify default timeout behavior for the
         networking backend directly via :class:`telegram.ext.ApplicationBuilder` instead.
-
 
     Parameters:
         parse_mode (:obj:`str`, optional): Send :attr:`~telegram.constants.ParseMode.MARKDOWN` or
@@ -54,7 +53,7 @@ class Defaults:
         protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
             forwarding and saving.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
     """
 
     __slots__ = (
@@ -120,7 +119,7 @@ class Defaults:
 
     @property
     def explanation_parse_mode(self) -> Optional[str]:
-        """:obj:`str`: Optional. Alias for :paramref:`parse_mode`, used for
+        """:obj:`str`: Optional. Alias for :attr:`parse_mode`, used for
         the corresponding parameter of :meth:`telegram.Bot.send_poll`.
         """
         return self._parse_mode
@@ -210,7 +209,7 @@ class Defaults:
         """:obj:`bool`: Optional. Protects the contents of the sent message from forwarding and
         saving.
 
-        .. versionadded:: 14.0
+        .. versionadded:: 20.0
         """
         return self._protect_content
 

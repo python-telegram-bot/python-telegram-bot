@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains classes that represent Telegram errors.
 
-.. versionchanged:: 14.0
+.. versionchanged:: 20.0
     Replaced ``Unauthorized`` by :class:`Forbidden`.
 """
 
@@ -84,7 +84,7 @@ class TelegramError(Exception):
 class Forbidden(TelegramError):
     """Raised when the bot has not enough rights to perform the requested action.
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
         This class was previously named ``Unauthorized``.
     """
 
@@ -97,7 +97,7 @@ class InvalidToken(TelegramError):
     Args:
         message (:obj:`str`, optional): Any additional information about the exception.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
     """
 
     __slots__ = ("_message",)
@@ -128,7 +128,7 @@ class TimedOut(NetworkError):
     Args:
         message (:obj:`str`, optional): Any additional information about the exception.
 
-            .. versionadded:: 14.0
+            .. versionadded:: 20.0
     """
 
     __slots__ = ()
@@ -187,7 +187,7 @@ class Conflict(TelegramError):
 class PassportDecryptionError(TelegramError):
     """Something went wrong with decryption.
 
-    .. versionchanged:: 14.0
+    .. versionchanged:: 20.0
         This class was previously named ``TelegramDecryptionError`` and was available via
         ``telegram.TelegramDecryptionError``.
     """

@@ -759,7 +759,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             that your bot does not (explicitly or implicitly) rely on updates being processed
             sequentially.
 
-        .. seealso:: :paramref:`telegram.ext.Application.concurrent_updates`
+        .. seealso:: :attr:`telegram.ext.Application.concurrent_updates`
 
         Args:
             concurrent_updates (:obj:`bool` | :obj:`int`): Passing :obj:`True` will allow for
