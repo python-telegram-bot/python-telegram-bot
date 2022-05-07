@@ -2396,9 +2396,9 @@ class TestBot:
         my_rights = ChatAdministratorRights.all_rights()
         await bot.set_my_default_administrator_rights(my_rights, for_channels=True)
         my_admin_rights_ch = await bot.get_my_default_administrator_rights(for_channels=True)
-        # tg bug? is_anonymous, can_invite_users is False despite setting it True for channels:
+        assert my_admin_rights_ch.can_invite_users is my_rights.can_invite_users
+        # tg bug? is_anonymous is False despite setting it True for channels:
         assert my_admin_rights_ch.is_anonymous is not my_rights.is_anonymous
-        assert my_admin_rights_ch.can_invite_users is not my_rights.can_invite_users
 
         assert my_admin_rights_ch.can_manage_chat is my_rights.can_manage_chat
         assert my_admin_rights_ch.can_delete_messages is my_rights.can_delete_messages
