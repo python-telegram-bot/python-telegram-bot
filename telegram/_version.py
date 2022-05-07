@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
 
-__version__ = "13.11"
+__version__ = "20.0a0"
 
 from telegram import constants
 

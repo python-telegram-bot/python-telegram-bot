@@ -2,6 +2,201 @@
 Changelog
 =========
 
+Version 20.0a0
+==============
+*Released 2022-05-06*
+
+This is the technical changelog for version 20.0a0. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes:
+--------------
+
+-  Refactor Initialization of Persistence Classes
+   (`#2604 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2604>`__)
+-  Drop Non-``CallbackContext`` API
+   (`#2617 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2617>`__)
+-  Remove ``__dict__`` from ``__slots__`` and drop Python 3.6
+   (`#2619 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2619>`__,
+   `#2636 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2636>`__)
+-  Move and Rename ``TelegramDecryptionError`` to
+   ``telegram.error.PassportDecryptionError``
+   (`#2621 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2621>`__)
+-  Make ``BasePersistence`` Methods Abstract
+   (`#2624 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2624>`__)
+-  Remove ``day_is_strict`` argument of ``JobQueue.run_monthly``
+   (`#2634 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2634>`__
+   by `iota-008 <https://github.com/iota-008>`__)
+-  Move ``Defaults`` to ``telegram.ext``
+   (`#2648 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2648>`__)
+-  Remove Deprecated Functionality
+   (`#2644 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2644>`__,
+   `#2740 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2740>`__,
+   `#2745 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2745>`__)
+-  Overhaul of Filters
+   (`#2759 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2759>`__,
+   `#2922 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2922>`__)
+-  Switch to ``asyncio`` and Refactor PTBs Architecture
+   (`#2731 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2731>`__)
+-  Improve ``Job.__getattr__``
+   (`#2832 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2832>`__)
+-  Remove ``telegram.ReplyMarkup``
+   (`#2870 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2870>`__)
+-  Persistence of ``Bots``: Refactor Automatic Replacement and
+   Integration with ``TelegramObject``
+   (`#2893 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2893>`__)
+
+New Features:
+-------------
+
+-  Introduce Builder Pattern
+   (`#2646 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2646>`__)
+-  Add ``Filters.update.edited``
+   (`#2705 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2705>`__
+   by `PhilippFr <https://github.com/PhilippFr>`__)
+-  Introduce ``Enums`` for ``telegram.constants``
+   (`#2708 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2708>`__)
+-  Accept File Paths for ``private_key``
+   (`#2724 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2724>`__)
+-  Associate ``Jobs`` with ``chat/user_id``
+   (`#2731 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2731>`__)
+-  Convenience Functionality for ``ChatInviteLinks``
+   (`#2782 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2782>`__)
+-  Add ``Dispatcher.add_handlers``
+   (`#2823 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2823>`__)
+-  Improve Error Messages in ``CommandHandler.__init__``
+   (`#2837 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2837>`__)
+-  ``Defaults.protect_content``
+   (`#2840 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2840>`__)
+-  Add ``Dispatcher.migrate_chat_data``
+   (`#2848 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2848>`__
+   by `DonalDuck004 <https://github.com/DonalDuck004>`__)
+-  Add Method ``drop_chat/user_data`` to ``Dispatcher`` and Persistence
+   (`#2852 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2852>`__)
+-  Add methods ``ChatPermissions.{all, no}_permissions`` ([#2948]
+-  Full Support for API 6.0
+   (`#2956 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2956>`__)(https://github.com/python-telegram-bot/python-telegram-bot/pull/2948))
+-  Add Python 3.10 to Test Suite
+   (`#2968 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2968>`__)
+
+Bug Fixes & Minor Changes:
+--------------------------
+
+-  Improve Type Hinting for ``CallbackContext``
+   (`#2587 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2587>`__
+   by `revolter <https://github.com/revolter>`__)
+-  Fix Signatures and Improve ``test_official``
+   (`#2643 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2643>`__)
+-  Refine ``Dispatcher.dispatch_error``
+   (`#2660 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2660>`__)
+-  Make ``InlineQuery.answer`` Raise ``ValueError``
+   (`#2675 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2675>`__)
+-  Improve Signature Inspection for Bot Methods
+   (`#2686 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2686>`__)
+-  Introduce ``TelegramObject.set/get_bot``
+   (`#2712 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2712>`__
+   by `zpavloudis <https://github.com/zpavloudis>`__)
+-  Improve Subscription of ``TelegramObject``
+   (`#2719 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2719>`__
+   by `SimonDamberg <https://github.com/SimonDamberg>`__)
+-  Use Enums for Dynamic Types & Rename Two Attributes in ``ChatMember``
+   (`#2817 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2817>`__)
+-  Return Plain Dicts from ``BasePersistence.get_*_data``
+   (`#2873 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2873>`__)
+-  Fix a Bug in ``ChatMemberUpdated.difference``
+   (`#2947 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2947>`__)
+-  Update Dependency Policy
+   (`#2958 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2958>`__)
+
+Internal Restructurings & Improvements:
+---------------------------------------
+
+-  Add User Friendly Type Check For Init Of
+   ``{Inline, Reply}KeyboardMarkup``
+   (`#2657 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2657>`__)
+-  Warnings Overhaul
+   (`#2662 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2662>`__)
+-  Clear Up Import Policy
+   (`#2671 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2671>`__)
+-  Mark Internal Modules As Private
+   (`#2687 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2687>`__
+   by `kencx <https://github.com/kencx>`__)
+-  Handle Filepaths via the ``pathlib`` Module
+   (`#2688 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2688>`__
+   by `eldbud <https://github.com/eldbud>`__)
+-  Refactor MRO of ``InputMedia*`` and Some File-Like Classes
+   (`#2717 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2717>`__
+   by `eldbud <https://github.com/eldbud>`__)
+-  Update Exceptions for Immutable Attributes
+   (`#2749 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2749>`__)
+-  Refactor Warnings in ``ConversationHandler``
+   (`#2755 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2755>`__,
+   `#2784 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2784>`__)
+-  Use ``__all__`` Consistently
+   (`#2805 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2805>`__)
+
+CI, Code Quality & Test Suite Improvements:
+-------------------------------------------
+
+-  Add Custom ``pytest`` Marker to Ease Development
+   (`#2628 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2628>`__)
+-  Pass Failing Jobs to Error Handlers
+   (`#2692 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2692>`__)
+-  Update Notification Workflows
+   (`#2695 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2695>`__)
+-  Use Error Messages for ``pylint`` Instead of Codes
+   (`#2700 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2700>`__
+   by `Piraty <https://github.com/Piraty>`__)
+-  Make Tests Agnostic of the CWD
+   (`#2727 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2727>`__
+   by `eldbud <https://github.com/eldbud>`__)
+-  Update Code Quality Dependencies
+   (`#2748 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2748>`__)
+-  Improve Code Quality
+   (`#2783 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2783>`__)
+-  Update ``pre-commit`` Settings & Improve a Test
+   (`#2796 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2796>`__)
+-  Improve Code Quality & Test Suite
+   (`#2843 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2843>`__)
+-  Fix failing animation tests
+   (`#2865 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2865>`__)
+-  Update and Expand Tests & pre-commit Settings and Improve Code
+   Quality
+   (`#2925 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2925>`__)
+-  Extend Code Formatting With Black
+   (`#2972 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2972>`__)
+-  Update Workflow Permissions
+   (`#2984 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2984>`__)
+-  Adapt Tests to Changed ``Bot.get_file`` Behavior
+   (`#2995 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2995>`__)
+
+Documentation Improvements:
+---------------------------
+
+-  Doc Fixes
+   (`#2597 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2597>`__)
+-  Add Code Comment Guidelines to Contribution Guide
+   (`#2612 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2612>`__)
+-  Add Cross-References to External Libraries & Other Documentation
+   Improvements
+   (`#2693 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2693>`__,
+   `#2691 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2691>`__
+   by `joesinghh <https://github.com/joesinghh>`__,
+   `#2739 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2739>`__
+   by `eldbud <https://github.com/eldbud>`__)
+-  Use Furo Theme, Make Parameters Referenceable, Add Documentation
+   Building to CI, Improve Links to Source Code & Other Improvements
+   (`#2856 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2856>`__,
+   `#2798 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2798>`__,
+   `#2854 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2854>`__,
+   `#2841 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2841>`__)
+-  Documentation Fixes & Improvements
+   (`#2822 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2822>`__)
+-  Replace ``git.io`` Links
+   (`#2872 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2872>`__
+   by `murugu-21 <https://github.com/murugu-21>`__)
+-  Overhaul Readmes, Update RTD Startpage & Other Improvements
+   (`#2969 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2969>`__)
+
 Version 13.11
 =============
 *Released 2022-02-02*
