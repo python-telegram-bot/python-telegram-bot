@@ -3716,7 +3716,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         If you'd like to make sure that the Webhook request comes from Telegram, Telegram
         recommends using a secret path in the URL, e.g. https://www.example.com/<token>. Since
-        nobody else knows your bot's token, you can be pretty sure it's us.
+        nobody else knows your bot's token, you can be pretty sure it's them.
 
         Note:
             The certificate argument should be a file from disk ``open(filename, 'rb')``.
