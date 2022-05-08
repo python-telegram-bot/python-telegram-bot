@@ -1,13 +1,11 @@
 name: Test Documentation Build
 on:
-  pull_request:
-    branches:
-      - master
-      - doc-fixes
+  schedule:
+    # First day of month at 05:46 in every 2nd month
+    - cron: '46 5 1 */2 *'
   push:
-    branches: 
-      - master
-      - doc-fixes
+    branches:
+      - linkcheck
 
 jobs:
   test-sphinx-build:
