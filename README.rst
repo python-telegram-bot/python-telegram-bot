@@ -1,9 +1,9 @@
 ..
     Make sure to apply any changes to this file to README_RAW.rst as well!
 
-.. image:: https://github.com/python-telegram-bot/logos/blob/master/logo-text/png/ptb-logo-text_768.png?raw=true
+.. image:: https://raw.githubusercontent.com/python-telegram-bot/logos/master/logo-text/png/ptb-logo-text_768.png
    :align: center
-   :target: https://python-telegram-bot.org
+   :target: https://python-telegram-bot.io
    :alt: python-telegram-bot Logo
 
 .. image:: https://img.shields.io/pypi/v/python-telegram-bot.svg
@@ -34,16 +34,16 @@
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 
-.. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/python-telegram-bot/python-telegram-bot
+.. image:: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
+   :target: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot
    :alt: Code coverage
 
-.. image:: http://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
-   :target: http://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
+.. image:: https://isitmaintained.com/badge/resolution/python-telegram-bot/python-telegram-bot.svg
+   :target: https://isitmaintained.com/project/python-telegram-bot/python-telegram-bot
    :alt: Median time to resolve an issue
 
 .. image:: https://api.codacy.com/project/badge/Grade/99d901eaa09b44b4819aec05c330c968
-   :target: https://www.codacy.com/app/python-telegram-bot/python-telegram-bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=python-telegram-bot/python-telegram-bot&amp;utm_campaign=Badge_Grade
+   :target: https://app.codacy.com/gh/python-telegram-bot/python-telegram-bot/dashboard
    :alt: Code quality: Codacy
 
 .. image:: https://deepsource.io/gh/python-telegram-bot/python-telegram-bot.svg/?label=active+issues
@@ -136,7 +136,7 @@ Optional Dependencies
 
 PTB can be installed with optional dependencies:
 
-* ``pip install python-telegram-bot[passport]`` installs the `cryptography>=3.0 <https://cryptography.io>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``pip install python-telegram-bot[passport]`` installs the `cryptography>=3.0 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
 * ``pip install python-telegram-bot[json]`` installs the `ujson>=4.0.0 <https://pypi.org/project/ujson/>`_ library. It will then be used for JSON de- & encoding, which can bring speed up compared to the standard `json <https://docs.python.org/3/library/json.html>`_ library.
 * ``pip install python-telegram-bot[socks]`` installs ``httpx[socks]``. Use this, if you want to work behind a Socks5 server.
 
