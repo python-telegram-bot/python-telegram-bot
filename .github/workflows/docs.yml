@@ -17,8 +17,7 @@ jobs:
     - uses: ammaraskar/sphinx-action@0.4
       with:
         docs-folder: "docs/"
-        build-command: "sphinx-build docs/source docs/build/html -W --keep-going -j auto"
     - uses: ammaraskar/sphinx-action@0.4
       with:
         docs-folder: "docs/"
-        build-command: "sphinx-build docs/source docs/build/html -b linkcheck -W --keep-going -j auto"
+        build-command: "sphinx-build docs/source docs/build/html -b linkcheck"
