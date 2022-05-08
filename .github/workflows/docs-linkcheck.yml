@@ -1,4 +1,4 @@
-name: Test Documentation Build
+name: Check Links in Documentation
 on:
   schedule:
     # First day of month at 05:46 in every 2nd month
@@ -32,4 +32,4 @@ jobs:
           python -W ignore -m pip install -r requirements-dev.txt
           python -W ignore -m pip install -r docs/requirements-docs.txt
       - name: Build docs
-        run: sphinx-build docs/source docs/build/html -W --keep-going -j auto
+        run: sphinx-build docs/source docs/build/html -W --keep-going -j auto -b linkcheck
