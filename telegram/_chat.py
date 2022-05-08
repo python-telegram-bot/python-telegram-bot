@@ -109,7 +109,7 @@ class Chat(TelegramObject):
             be forwarded to other chats. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.9
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the

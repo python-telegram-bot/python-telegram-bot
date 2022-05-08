@@ -242,7 +242,7 @@ class Message(TelegramObject):
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -361,7 +361,7 @@ class Message(TelegramObject):
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`): Optional. The Bot to use for instance methods.
 
     """
 

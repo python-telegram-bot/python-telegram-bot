@@ -76,7 +76,7 @@ class User(TelegramObject):
             disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
         supports_inline_queries (:obj:`str`, optional): :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -91,7 +91,7 @@ class User(TelegramObject):
             disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
         supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`): Optional. The Bot to use for instance methods.
 
     """
 

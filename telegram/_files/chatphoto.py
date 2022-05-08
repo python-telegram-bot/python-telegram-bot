@@ -46,7 +46,7 @@ class ChatPhoto(TelegramObject):
         big_file_unique_id (:obj:`str`): Unique file identifier of big (640x640) chat photo,
             which is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:

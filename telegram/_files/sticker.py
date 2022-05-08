@@ -61,7 +61,7 @@ class Sticker(_BaseThumbedMedium):
         mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size in bytes.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
         _kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -82,7 +82,7 @@ class Sticker(_BaseThumbedMedium):
         mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
             where the mask should be placed.
         file_size (:obj:`int`): Optional. File size in bytes.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`): Optional. The Bot to use for instance methods.
 
     """
 

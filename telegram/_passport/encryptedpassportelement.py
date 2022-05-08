@@ -75,7 +75,7 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -110,7 +110,7 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`): Optional. The Bot to use for instance methods.
 
     """
 
@@ -194,7 +194,7 @@ class EncryptedPassportElement(TelegramObject):
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
+            bot (:class:`telegram.Bit`): The bot associated with this object.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
         Returns:

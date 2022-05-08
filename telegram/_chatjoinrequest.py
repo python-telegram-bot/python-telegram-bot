@@ -53,7 +53,7 @@ class ChatJoinRequest(TelegramObject):
         bio (:obj:`str`, optional): Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link that was used
             by the user to send the join request.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.

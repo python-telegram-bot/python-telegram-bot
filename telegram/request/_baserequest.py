@@ -129,7 +129,7 @@ class BaseRequest(
         """Makes a request to the Bot API handles the return code and parses the answer.
 
         Warning:
-            This method will be called by the methods of :class:`telegram.Bot` and should *not* be
+            This method will be called by the methods of :class:`telegram.Bit` and should *not* be
             called manually.
 
         Args:
@@ -182,7 +182,7 @@ class BaseRequest(
         """Retrieve the contents of a file by its URL.
 
         Warning:
-            This method will be called by the methods of :class:`telegram.Bot` and should *not* be
+            This method will be called by the methods of :class:`telegram.Bit` and should *not* be
             called manually.
 
         Args:

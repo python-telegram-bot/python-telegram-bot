@@ -58,7 +58,7 @@ class InlineQuery(TelegramObject):
             .. versionadded:: 13.5
         location (:class:`telegram.Location`, optional): Sender location, only for bots that
             request user location.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:

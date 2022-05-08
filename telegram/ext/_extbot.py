@@ -62,10 +62,10 @@ class ExtBot(Bot):
     """This object represents a Telegram Bot with convenience extensions.
 
     Warning:
-        Not to be confused with :class:`telegram.Bot`.
+        Not to be confused with :class:`telegram.Bit`.
 
     For the documentation of the arguments, methods and attributes, please see
-    :class:`telegram.Bot`.
+    :class:`telegram.Bit`.
 
     .. versionadded:: 13.6
 

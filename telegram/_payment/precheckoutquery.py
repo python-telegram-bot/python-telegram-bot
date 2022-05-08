@@ -53,7 +53,7 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -65,7 +65,7 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`): Optional. The Bot to use for instance methods.
 
     """
 

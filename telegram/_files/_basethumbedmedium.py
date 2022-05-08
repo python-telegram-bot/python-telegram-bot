@@ -45,7 +45,7 @@ class _BaseThumbedMedium(_BaseMedium):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): File size.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
 
     Attributes:
         file_id (:obj:`str`): File identifier.
@@ -54,7 +54,7 @@ class _BaseThumbedMedium(_BaseMedium):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): Optional. File size.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`): Optional. The Bot to use for instance methods.
 
     """
 

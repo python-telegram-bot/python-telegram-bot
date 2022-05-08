@@ -176,7 +176,7 @@ class TelegramObject:
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
+            bot (:class:`telegram.Bit`): The bot associated with this object.
 
         Returns:
             The Telegram object.
@@ -199,7 +199,7 @@ class TelegramObject:
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with these objects.
+            bot (:class:`telegram.Bit`): The bot associated with these objects.
 
         Returns:
             A list of Telegram objects.
@@ -227,14 +227,14 @@ class TelegramObject:
         return self._get_attrs(recursive=True)
 
     def get_bot(self) -> "Bot":
-        """Returns the :class:`telegram.Bot` instance associated with this object.
+        """Returns the :class:`telegram.Bit` instance associated with this object.
 
         .. seealso:: :meth:`set_bot`
 
         .. versionadded: 20.0
 
         Raises:
-            RuntimeError: If no :class:`telegram.Bot` instance was set for this object.
+            RuntimeError: If no :class:`telegram.Bit` instance was set for this object.
         """
         if self._bot is None:
             raise RuntimeError(
@@ -243,14 +243,14 @@ class TelegramObject:
         return self._bot
 
     def set_bot(self, bot: Optional["Bot"]) -> None:
-        """Sets the :class:`telegram.Bot` instance associated with this object.
+        """Sets the :class:`telegram.Bit` instance associated with this object.
 
         .. seealso:: :meth:`get_bot`
 
         .. versionadded: 20.0
 
         Arguments:
-            bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.
+            bot (:class:`telegram.Bit` | :obj:`None`): The bot instance.
         """
         self._bot = bot
 

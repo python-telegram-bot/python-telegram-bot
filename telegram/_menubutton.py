@@ -66,7 +66,7 @@ class MenuButton(TelegramObject):
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
+            bot (:class:`telegram.Bit`): The bot associated with this object.
 
         Returns:
             The Telegram object.

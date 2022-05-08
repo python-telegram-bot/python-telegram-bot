@@ -139,7 +139,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         * Removed the attribute ``groups``.
 
     Attributes:
-        bot (:class:`telegram.Bot`): The bot object that should be passed to the handlers.
+        bot (:class:`telegram.Bit`): The bot object that should be passed to the handlers.
         update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
             updates.
         updater (:class:`telegram.ext.Updater`): Optional. The updater used by this application.

@@ -85,7 +85,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     :meth:`update_bot_data` or :meth:`refresh_bot_data`.
 
     Note:
-       You should avoid saving :class:`telegram.Bot` instances. This is because if you change e.g.
+       You should avoid saving :class:`telegram.Bit` instances. This is because if you change e.g.
        the bots token, this won't propagate to the serialized instances and may lead to exceptions.
 
        To prevent this, the implementation may use :attr:`bot` to replace bot instances with a
@@ -130,7 +130,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.
-        bot (:class:`telegram.Bot`): The bot associated with the persistence.
+        bot (:class:`telegram.Bit`): The bot associated with the persistence.
     """
 
     __slots__ = (
@@ -168,7 +168,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         """Set the Bot to be used by this persistence instance.
 
         Args:
-            bot (:class:`telegram.Bot`): The bot.
+            bot (:class:`telegram.Bit`): The bot.
 
         Raises:
             :exc:`TypeError`: If :attr:`PersistenceInput.callback_data` is :obj:`True` and the

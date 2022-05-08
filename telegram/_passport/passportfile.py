@@ -44,7 +44,7 @@ class PassportFile(TelegramObject):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): File size in bytes.
         file_date (:obj:`int`): Unix time when the file was uploaded.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -54,7 +54,7 @@ class PassportFile(TelegramObject):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): File size in bytes.
         file_date (:obj:`int`): Unix time when the file was uploaded.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`): Optional. The Bot to use for instance methods.
 
     """
 
@@ -96,7 +96,7 @@ class PassportFile(TelegramObject):
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with this object.
+            bot (:class:`telegram.Bit`): The bot associated with this object.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
         Returns:
@@ -121,7 +121,7 @@ class PassportFile(TelegramObject):
 
         Args:
             data (Dict[:obj:`str`, ...]): The JSON data.
-            bot (:class:`telegram.Bot`): The bot associated with these objects.
+            bot (:class:`telegram.Bit`): The bot associated with these objects.
             credentials (:class:`telegram.FileCredentials`): The credentials
 
         Returns:

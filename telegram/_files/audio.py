@@ -47,7 +47,7 @@ class Audio(_BaseThumbedMedium):
         file_size (:obj:`int`, optional): File size in bytes.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -64,7 +64,7 @@ class Audio(_BaseThumbedMedium):
         file_size (:obj:`int`): Optional. File size in bytes.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
             which the music file belongs.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`): Optional. The Bot to use for instance methods.
 
     """
 

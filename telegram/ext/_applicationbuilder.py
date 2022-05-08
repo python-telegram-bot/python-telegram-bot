@@ -96,7 +96,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     Note:
         * Some arguments are mutually exclusive. E.g. after calling :meth:`token`, you can't set
           a custom bot with :meth:`bot` and vice versa.
-        * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
+        * Unless a custom :class:`telegram.Bit` instance is set via :meth:`bot`, :meth:`build` will
           use :class:`telegram.ext.ExtBot` for the bot.
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
@@ -713,12 +713,12 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]",
         bot: InBT,
     ) -> "ApplicationBuilder[InBT, CCT, UD, CD, BD, JQ]":
-        """Sets a :class:`telegram.Bot` instance for
+        """Sets a :class:`telegram.Bit` instance for
         :attr:`telegram.ext.Application.bot`. Instances of subclasses like
         :class:`telegram.ext.ExtBot` are also valid.
 
         Args:
-            bot (:class:`telegram.Bot`): The bot.
+            bot (:class:`telegram.Bit`): The bot.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.

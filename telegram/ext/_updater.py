@@ -67,11 +67,11 @@ class Updater(AbstractAsyncContextManager):
           is now :class:`telegram.ext.Application`.
 
     Args:
-        bot (:class:`telegram.Bot`): The bot used with this Updater.
+        bot (:class:`telegram.Bit`): The bot used with this Updater.
         update_queue (:class:`asyncio.Queue`): Queue for the updates.
 
     Attributes:
-        bot (:class:`telegram.Bot`): The bot used with this Updater.
+        bot (:class:`telegram.Bit`): The bot used with this Updater.
         update_queue (:class:`asyncio.Queue`): Queue for the updates.
 
     """

@@ -72,7 +72,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     This class is a :class:`~typing.Generic` class and accepts four type variables:
 
-    1. The type of :attr:`bot`. Must be :class:`telegram.Bot` or a subclass of that class.
+    1. The type of :attr:`bot`. Must be :class:`telegram.Bit` or a subclass of that class.
     2. The type of :attr:`user_data` (if :attr:`user_data` is not :obj:`None`).
     3. The type of :attr:`chat_data` (if :attr:`chat_data` is not :obj:`None`).
     4. The type of :attr:`bot_data` (if :attr:`bot_data` is not :obj:`None`).
@@ -376,7 +376,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @property
     def bot(self) -> BT:
-        """:class:`telegram.Bot`: The bot associated with this context."""
+        """:class:`telegram.Bit`: The bot associated with this context."""
         return self._application.bot
 
     @property

@@ -80,7 +80,7 @@ class CallbackQuery(TelegramObject):
             inline mode, that originated the query.
         game_short_name (:obj:`str`, optional): Short name of a Game to be returned, serves as
             the unique identifier for the game
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
@@ -93,7 +93,7 @@ class CallbackQuery(TelegramObject):
         inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
                 inline mode, that originated the query.
         game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        bot (:class:`telegram.Bit`, optional): The Bot to use for instance methods.
 
     """
 
