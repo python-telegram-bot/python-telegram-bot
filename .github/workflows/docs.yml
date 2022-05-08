@@ -3,37 +3,22 @@ on:
   pull_request:
     branches:
       - master
-      - v14
       - doc-fixes
   push:
     branches: 
       - master
-      - v14
       - doc-fixes
 
 jobs:
-  test-sphinx-build:
-    name: test-sphinx-build
-    runs-on: ${{matrix.os}}
-    strategy:
-      matrix:
-        python-version: [3.7]
-        os: [ubuntu-latest]
-      fail-fast: False
+  docs:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Initialize vendored libs
-        run:
-          git submodule update --init --recursive
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -r requirements.txt
-          python -W ignore -m pip install -r requirements-dev.txt
-          python -W ignore -m pip install -r docs/requirements-docs.txt
-      - name: Build docs
-        run: sphinx-build docs/source docs/build/html -W --keep-going -j auto
+    - uses: actions/checkout@v3
+    - uses: ammaraskar/sphinx-action@0.4
+      with:
+        docs-folder: "docs/"
+        build-command: "sphinx-build docs/source docs/build/html -W --keep-going -j auto"
+    - uses: ammaraskar/sphinx-action@0.4
+      with:
+        docs-folder: "docs/"
+        build-command: "sphinx-build docs/source docs/build/html -b linkcheck -W --keep-going -j auto"
