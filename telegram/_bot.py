@@ -1211,7 +1211,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to send static ``.WEBP``, animated ``.TGS``, or video ``.WEBM`` stickers.
 
         Note:
-            The sticker argument can be either a file_id, an URL or a file from disk
+            The :paramref:`sticker` argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
 
         Args:
@@ -1312,11 +1312,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         changed in the future.
 
         Note:
-            * The video argument can be either a file_id, an URL or a file from disk
+            * The :paramref:`video` argument can be either a file_id, an URL or a file from disk
               ``open(filename, 'rb')``
-            * ``thumb`` will be ignored for small video files, for which Telegram can easily
-              generate thumb nails. However, this behaviour is undocumented and might be changed
-              by Telegram.
+            * :paramref:`thumb` will be ignored for small video files, for which Telegram can
+              easily generate thumbnails. However, this behaviour is undocumented and might be
+              changed by Telegram.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1455,11 +1455,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to send video messages.
 
         Note:
-            * The video_note argument can be either a file_id or a file from disk
+            * The :paramref:`video_note` argument can be either a file_id or a file from disk
               ``open(filename, 'rb')``
-            * ``thumb`` will be ignored for small video files, for which Telegram can easily
-              generate thumb nails. However, this behaviour is undocumented and might be changed
-              by Telegram.
+            * :paramref:`thumb` will be ignored for small video files, for which Telegram can
+              easily generate thumbnails. However, this behaviour is undocumented and might be
+              changed by Telegram.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1726,11 +1726,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         in size, this limit may be changed in the future.
 
         Note:
-            * The voice argument can be either a file_id, an URL or a file from disk
+            * The :paramref:`voice` argument can be either a file_id, an URL or a file from disk
               ``open(filename, 'rb')``.
 
-            * To use this method, the file must have the type ``audio/ogg`` and be no more than 1MB
-              in size. 1-20MB voice notes will be sent as files.
+            * To use this method, the file must have the type :mimetype:`audio/ogg` and be no more
+              than ``1MB`` in size. ``1-20MB`` voice notes will be sent as files.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2224,10 +2224,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Note:
             * You can either supply :paramref:`venue`, or :paramref:`latitude`,
-              :paramref:`longitude`,
-              :paramref:title` and :paramref:address` and optionally :paramref:`foursquare_id` and
-              :paramref:`foursquare_type` or optionally :paramref:`google_place_id` and
-              :paramref:`google_place_type`.
+              :paramref:`longitude`, :paramref:`title` and :paramref:`address` and optionally
+              :paramref:`foursquare_id` and :paramref:`foursquare_type` or optionally
+              :paramref:`google_place_id` and :paramref:`google_place_type`.
             * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
 
@@ -6050,8 +6049,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         times).
 
         Note:
-            The png_sticker argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
+            The :paramref:`png_sticker` argument can be either a file_id, an URL or a file from
+            disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
