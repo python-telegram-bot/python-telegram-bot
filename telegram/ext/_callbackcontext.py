@@ -77,6 +77,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     3. The type of :attr:`chat_data` (if :attr:`chat_data` is not :obj:`None`).
     4. The type of :attr:`bot_data` (if :attr:`bot_data` is not :obj:`None`).
 
+    .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`
+
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this
             context.
