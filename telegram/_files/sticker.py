@@ -17,8 +17,11 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
-
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
+from typing import Any
+from typing import ClassVar
+from typing import List
+from typing import Optional
+from typing import TYPE_CHECKING
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
