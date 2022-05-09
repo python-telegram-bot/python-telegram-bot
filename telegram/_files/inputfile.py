@@ -17,12 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InputFile."""
-
 import imghdr
 import logging
 import mimetypes
 from pathlib import Path
-from typing import IO, Optional, Union
+from typing import IO
+from typing import Optional
+from typing import Union
 from uuid import uuid4
 
 from telegram._utils.types import FieldTuple
