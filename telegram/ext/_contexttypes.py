@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the auxiliary class ContextTypes."""
-from typing import TYPE_CHECKING, Dict, Generic, Type, overload  # pylint: disable=unused-import
+from typing import TYPE_CHECKING, Dict, Generic, Type, overload
 
 from telegram.ext._callbackcontext import CallbackContext
 from telegram.ext._utils.types import BD, CCT, CD, UD
@@ -53,7 +53,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     """
 
-    DEFAULT_TYPE = CallbackContext["ExtBot", Dict, Dict, Dict]
+    DEFAULT_TYPE = CallbackContext["ExtBot", Dict, Dict, Dict]  # type: ignore[misc]
     """Shortcut for the type annotation for the `context` argument that's correct for the
     default settings, i.e. if :class:`telegram.ext.ContextTypes` is not used.
 

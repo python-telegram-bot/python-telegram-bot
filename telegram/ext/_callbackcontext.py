@@ -34,7 +34,7 @@ from typing import (
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
 from telegram.ext._extbot import ExtBot
-from telegram.ext._utils.types import BD, BT, CD, UD  # pylint: disable=unused-import
+from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
     from asyncio import Queue
@@ -301,12 +301,12 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             if chat:
                 self._chat_id_and_data = (
                     chat.id,
-                    application.chat_data[chat.id],  # pylint: disable=protected-access
+                    application.chat_data[chat.id],
                 )
             if user:
                 self._user_id_and_data = (
                     user.id,
-                    application.user_data[user.id],  # pylint: disable=protected-access
+                    application.user_data[user.id],
                 )
         return self
 
@@ -336,12 +336,12 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         if job.chat_id:
             self._chat_id_and_data = (
                 job.chat_id,
-                application.chat_data[job.chat_id],  # pylint: disable=protected-access
+                application.chat_data[job.chat_id],
             )
         if job.user_id:
             self._user_id_and_data = (
                 job.user_id,
-                application.user_data[job.user_id],  # pylint: disable=protected-access
+                application.user_data[job.user_id],
             )
         return self
 
