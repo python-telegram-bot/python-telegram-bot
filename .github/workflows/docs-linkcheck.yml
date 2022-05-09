@@ -3,9 +3,6 @@ on:
   schedule:
     # First day of month at 05:46 in every 2nd month
     - cron: '46 5 1 */2 *'
-  push:
-    branches:
-      - linkcheck
 
 jobs:
   test-sphinx-build:
