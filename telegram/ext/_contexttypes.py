@@ -53,6 +53,19 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     """
 
+    DEFAULT_TYPE = CallbackContext["ExtBot", Dict, Dict, Dict]
+    """Shortcut for the type annotation for the `context` argument that's correct for the
+    default settings, i.e. if :class:`telegram.ext.ContextTypes` is not used.
+
+    Example:
+        .. code:: python
+
+            async def callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+                ...
+
+    .. versionadded: 20.0
+    """
+
     __slots__ = ("_context", "_bot_data", "_chat_data", "_user_data")
 
     # overload signatures generated with

@@ -19,9 +19,9 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     Application,
-    CallbackContext,
     CallbackQueryHandler,
     CommandHandler,
+    ContextTypes,
     ConversationHandler,
 )
 
@@ -37,7 +37,7 @@ START_ROUTES, END_ROUTES = range(2)
 ONE, TWO, THREE, FOUR = range(4)
 
 
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Send message on `/start`."""
     # Get user that sent /start and log his name
     user = update.message.from_user
@@ -59,7 +59,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return START_ROUTES
 
 
-async def start_over(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def start_over(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Prompt same text & keyboard as `start` does but not as new message"""
     # Get CallbackQuery from Update
     query = update.callback_query
@@ -80,7 +80,7 @@ async def start_over(update: Update, context: CallbackContext.DEFAULT_TYPE) -> i
     return START_ROUTES
 
 
-async def one(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def one(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     await query.answer()
@@ -97,7 +97,7 @@ async def one(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return START_ROUTES
 
 
-async def two(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def two(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     await query.answer()
@@ -114,7 +114,7 @@ async def two(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return START_ROUTES
 
 
-async def three(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def three(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Show new choice of buttons. This is the end point of the conversation."""
     query = update.callback_query
     await query.answer()
@@ -132,7 +132,7 @@ async def three(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return END_ROUTES
 
 
-async def four(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def four(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Show new choice of buttons"""
     query = update.callback_query
     await query.answer()
@@ -149,7 +149,7 @@ async def four(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return START_ROUTES
 
 
-async def end(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def end(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Returns `ConversationHandler.END`, which tells the
     ConversationHandler that the conversation is over.
     """

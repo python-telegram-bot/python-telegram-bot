@@ -890,7 +890,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 InitApplicationBuilder = (  # This is defined all the way down here so that its type is inferred
     ApplicationBuilder[  # by Pylance correctly.
         ExtBot,
-        CallbackContext.DEFAULT_TYPE,
+        ContextTypes.DEFAULT_TYPE,
         Dict,
         Dict,
         Dict,

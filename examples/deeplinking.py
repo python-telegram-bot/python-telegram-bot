@@ -22,13 +22,7 @@ import logging
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, helpers
 from telegram.constants import ParseMode
-from telegram.ext import (
-    Application,
-    CallbackContext,
-    CallbackQueryHandler,
-    CommandHandler,
-    filters,
-)
+from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, filters
 
 # Enable logging
 logging.basicConfig(
@@ -47,7 +41,7 @@ SO_COOL = "so-cool"
 KEYBOARD_CALLBACKDATA = "keyboard-callback-data"
 
 
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a deep-linked URL when the command /start is issued."""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, CHECK_THIS_OUT, group=True)
@@ -55,7 +49,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     await update.message.reply_text(text)
 
 
-async def deep_linked_level_1(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def deep_linked_level_1(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Reached through the CHECK_THIS_OUT payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, SO_COOL)
@@ -69,7 +63,7 @@ async def deep_linked_level_1(update: Update, context: CallbackContext.DEFAULT_T
     await update.message.reply_text(text, reply_markup=keyboard)
 
 
-async def deep_linked_level_2(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def deep_linked_level_2(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Reached through the SO_COOL payload"""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_ENTITIES)
@@ -77,7 +71,7 @@ async def deep_linked_level_2(update: Update, context: CallbackContext.DEFAULT_T
     await update.message.reply_text(text, parse_mode=ParseMode.HTML, disable_web_page_preview=True)
 
 
-async def deep_linked_level_3(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def deep_linked_level_3(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Reached through the USING_ENTITIES payload"""
     await update.message.reply_text(
         "It is also possible to make deep-linking using InlineKeyboardButtons.",
@@ -87,16 +81,14 @@ async def deep_linked_level_3(update: Update, context: CallbackContext.DEFAULT_T
     )
 
 
-async def deep_link_level_3_callback(
-    update: Update, context: CallbackContext.DEFAULT_TYPE
-) -> None:
+async def deep_link_level_3_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Answers CallbackQuery with deeplinking url."""
     bot = context.bot
     url = helpers.create_deep_linked_url(bot.username, USING_KEYBOARD)
     await update.callback_query.answer(url=url)
 
 
-async def deep_linked_level_4(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def deep_linked_level_4(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Reached through the USING_KEYBOARD payload"""
     payload = context.args
     await update.message.reply_text(
