@@ -275,6 +275,8 @@ html_static_path = ["_static"]
 
 html_css_files = ["style_external_link.css"]
 
+html_permalinks_icon = "¶"  # Furo's default permalink icon is `#`` which doesn't look great imo.
+
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
 # directly to the root of the documentation.
