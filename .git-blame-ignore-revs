@@ -1,0 +1,7 @@
+# .git-blame-ignore-revs
+# Use locally as `git blame file.py --ignore-revs-file .git-blame-ignore-revs`
+# or configure git to always use it: `git config blame.ignoreRevsFile .git-blame-ignore-revs`
+# First migration to code style Black (#2122)
+264b2c9c72691c5937b80e84e061c52dd2d8861a
+# Use Black more extensively (#2972)
+950d9a0751d79b92d78ea44344ce3e3c5b3948f9
