@@ -17,9 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Game."""
-
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import TYPE_CHECKING
 
 from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
