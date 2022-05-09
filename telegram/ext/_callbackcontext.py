@@ -39,7 +39,7 @@ from telegram.ext._utils.types import BD, BT, CD, UD  # pylint: disable=unused-i
 if TYPE_CHECKING:
     from asyncio import Queue
 
-    from telegram.ext import Application, Job, JobQueue
+    from telegram.ext import Application, Job, JobQueue  # noqa: F401
     from telegram.ext._utils.types import CCT, JQ
 
 _STORING_DATA_WIKI = (
@@ -48,7 +48,7 @@ _STORING_DATA_WIKI = (
 )
 
 
-class CallbackContext(Generic[BT, UD, CD, BD]):
+class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
     """
     This is a context object passed to the callback called by :class:`telegram.ext.Handler`
     or by the :class:`telegram.ext.Application` in an error handler added by
@@ -105,9 +105,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     """
 
     if TYPE_CHECKING:
-        DEFAULT_TYPE = CallbackContext[  # type: ignore[misc]  # noqa: F821
-            ExtBot, Dict, Dict, Dict
-        ]
+        DEFAULT_TYPE = CallbackContext[ExtBot, Dict, Dict, Dict, "JobQueue"]  # noqa: F821
     else:
         # Somewhat silly workaround so that accessing the attribute
         # doesn't only work while type checking
@@ -312,7 +310,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(application)  # type: ignore[arg-type]
+        self = cls(application)
 
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
@@ -350,7 +348,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(application)  # type: ignore[arg-type]
+        self = cls(application)
         self.job = job
 
         if job.chat_id:
@@ -380,7 +378,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.bot
 
     @property
-    def job_queue(self) -> Optional["JobQueue"]:
+    def job_queue(self) -> JQ:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
