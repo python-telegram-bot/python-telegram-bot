@@ -21,13 +21,18 @@ import shutil
 import urllib.parse as urllib_parse
 from base64 import b64decode
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Optional, Union
+from typing import Any
+from typing import IO
+from typing import Optional
+from typing import TYPE_CHECKING
+from typing import Union
 
 from telegram._passport.credentials import decrypt
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import is_local_file
-from telegram._utils.types import FilePathInput, ODVInput
+from telegram._utils.types import FilePathInput
+from telegram._utils.types import ODVInput
 
 if TYPE_CHECKING:
     from telegram import Bot, FileCredentials
