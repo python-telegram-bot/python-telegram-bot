@@ -2245,7 +2245,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
             google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
                 `supported types \
-                <https://developers.google.com/places/web-service/supported_types>`_.)
+                <https://developers.google.com/maps/documentation/places/web-service/supported_types>`_.)
             venue (:class:`telegram.Venue`, optional): The venue to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
@@ -3726,7 +3726,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 integration.
             certificate (:term:`file object`): Upload your public key certificate so that the root
                 certificate in use can be checked. See our self-signed guide for details.
-                (https://goo.gl/rw7w6Y)
+                (https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks#\
+                creating-a-self-signed-certificate-using-openssl)
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS

@@ -47,7 +47,8 @@ class Venue(TelegramObject):
             "arts_entertainment/default", "arts_entertainment/aquarium" or "food/icecream".)
         google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
         google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
-            `supported types <https://developers.google.com/places/web-service/supported_types>`_.)
+            `supported types <https://developers.google.com/maps/documentation/places/web-service\
+            /supported_types>`_.)
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:

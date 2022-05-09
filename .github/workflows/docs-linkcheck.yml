@@ -1,17 +1,12 @@
-name: Test Documentation Build
+name: Check Links in Documentation
 on:
-  pull_request:
-    branches:
-      - master
-      - doc-fixes
-  push:
-    branches: 
-      - master
-      - doc-fixes
+  schedule:
+    # First day of month at 05:46 in every 2nd month
+    - cron: '46 5 1 */2 *'
 
 jobs:
   test-sphinx-build:
-    name: test-sphinx-build
+    name: test-sphinx-linkcheck
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -30,5 +25,5 @@ jobs:
           python -W ignore -m pip install -r requirements.txt
           python -W ignore -m pip install -r requirements-dev.txt
           python -W ignore -m pip install -r docs/requirements-docs.txt
-      - name: Build docs
-        run: sphinx-build docs/source docs/build/html -W --keep-going -j auto
+      - name: Check Links
+        run: sphinx-build docs/source docs/build/html -W --keep-going -j auto -b linkcheck

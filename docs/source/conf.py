@@ -99,6 +99,27 @@ release = "20.0a0"  # telegram.__version__
 # Usually you set "language" from the command line for these cases.
 language = None
 
+# Linkcheck settings
+
+linkcheck_ignore = [
+    # Let's not check issue/PR links - that's wasted resources
+    r"http(s)://github\.com/python-telegram-bot/python-telegram-bot/(issues|pull)/\d+/?",
+    # For some reason linkcheck has a problem with these two:
+    re.escape("https://github.com/python-telegram-bot/python-telegram-bot/discussions/new"),
+    re.escape("https://github.com/python-telegram-bot/python-telegram-bot/issues/new"),
+    # Anchors are apparently inserted by GitHub dynamically, so let's skip checking them
+    "https://github.com/python-telegram-bot/python-telegram-bot/tree/master/examples#",
+    r"https://github\.com/python-telegram-bot/python-telegram-bot/wiki/[\w\-_,]+\#",
+]
+linkcheck_allowed_redirects = {
+    # Redirects to the default version are okay
+    r"https://python-telegram-bot\.readthedocs\.io/.*": r"https://python-telegram-bot\.readthedocs\.io/en/[\w\d\.]+/.*",
+    # pre-commit.ci always redirects to the latest run
+    re.escape(
+        "https://results.pre-commit.ci/latest/github/python-telegram-bot/python-telegram-bot/master"
+    ): r"https://results\.pre-commit\.ci/run/github/.*",
+}
+
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
 # today = ''
