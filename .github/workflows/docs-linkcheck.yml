@@ -9,7 +9,7 @@ on:
 
 jobs:
   test-sphinx-build:
-    name: test-sphinx-build
+    name: test-sphinx-linkcheck
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -18,9 +18,6 @@ jobs:
       fail-fast: False
     steps:
       - uses: actions/checkout@v3
-      - name: Initialize vendored libs
-        run:
-          git submodule update --init --recursive
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
