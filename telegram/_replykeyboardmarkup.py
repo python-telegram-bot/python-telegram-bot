@@ -88,9 +88,9 @@ class ReplyKeyboardMarkup(TelegramObject):
     def __init__(
         self,
         keyboard: Sequence[Sequence[Union[str, KeyboardButton]]],
-        resize_keyboard: bool = False,
-        one_time_keyboard: bool = False,
-        selective: bool = False,
+        resize_keyboard: bool = None,
+        one_time_keyboard: bool = None,
+        selective: bool = None,
         input_field_placeholder: str = None,
         **_kwargs: Any,
     ):
@@ -112,9 +112,9 @@ class ReplyKeyboardMarkup(TelegramObject):
             self.keyboard.append(button_row)
 
         # Optionals
-        self.resize_keyboard = bool(resize_keyboard)
-        self.one_time_keyboard = bool(one_time_keyboard)
-        self.selective = bool(selective)
+        self.resize_keyboard = resize_keyboard
+        self.one_time_keyboard = one_time_keyboard
+        self.selective = selective
         self.input_field_placeholder = input_field_placeholder
 
         self._id_attrs = (self.keyboard,)

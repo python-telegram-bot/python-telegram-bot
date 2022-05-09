@@ -271,8 +271,8 @@ class ExtBot(Bot):
     async def get_updates(
         self,
         offset: int = None,
-        limit: int = 100,
-        timeout: int = 0,
+        limit: int = None,
+        timeout: float = None,
         read_timeout: float = 2,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
