@@ -8,13 +8,13 @@ telegram package
     telegram.bot
     telegram.botcommand
     telegram.botcommandscope
-    telegram.botcommandscopedefault
-    telegram.botcommandscopeallprivatechats
-    telegram.botcommandscopeallgroupchats
     telegram.botcommandscopeallchatadministrators
+    telegram.botcommandscopeallgroupchats
+    telegram.botcommandscopeallprivatechats
     telegram.botcommandscopechat
     telegram.botcommandscopechatadministrators
     telegram.botcommandscopechatmember
+    telegram.botcommandscopedefault
     telegram.callbackquery
     telegram.chat
     telegram.chatadministratorrights
@@ -22,12 +22,12 @@ telegram package
     telegram.chatjoinrequest
     telegram.chatlocation
     telegram.chatmember
-    telegram.chatmemberowner
     telegram.chatmemberadministrator
-    telegram.chatmembermember
-    telegram.chatmemberrestricted
-    telegram.chatmemberleft
     telegram.chatmemberbanned
+    telegram.chatmemberleft
+    telegram.chatmembermember
+    telegram.chatmemberowner
+    telegram.chatmemberrestricted
     telegram.chatmemberupdated
     telegram.chatpermissions
     telegram.chatphoto
@@ -55,15 +55,15 @@ telegram package
     telegram.menubuttonwebapp
     telegram.message
     telegram.messageautodeletetimerchanged
-    telegram.messageid
     telegram.messageentity
+    telegram.messageid
     telegram.photosize
     telegram.poll
     telegram.pollanswer
     telegram.polloption
     telegram.proximityalerttriggered
-    telegram.replykeyboardremove
     telegram.replykeyboardmarkup
+    telegram.replykeyboardremove
     telegram.sentwebappmessage
     telegram.telegramobject
     telegram.update
@@ -86,15 +86,16 @@ Stickers
 
 .. toctree::
 
+    telegram.maskposition
     telegram.sticker
     telegram.stickerset
-    telegram.maskposition
 
 Inline Mode
 -----------
 
 .. toctree::
 
+    telegram.choseninlineresult
     telegram.inlinequery
     telegram.inlinequeryresult
     telegram.inlinequeryresultarticle
@@ -123,29 +124,28 @@ Inline Mode
     telegram.inputvenuemessagecontent
     telegram.inputcontactmessagecontent
     telegram.inputinvoicemessagecontent
-    telegram.choseninlineresult
 
 Payments
 --------
 
 .. toctree::
 
-    telegram.labeledprice
     telegram.invoice
-    telegram.shippingaddress
+    telegram.labeledprice
     telegram.orderinfo
-    telegram.shippingoption
-    telegram.successfulpayment
-    telegram.shippingquery
     telegram.precheckoutquery
+    telegram.shippingaddress
+    telegram.shippingoption
+    telegram.shippingquery
+    telegram.successfulpayment
 
 Games
 -----
 
 .. toctree::
 
-    telegram.game
     telegram.callbackgame
+    telegram.game
     telegram.gamehighscore
 
 Passport
@@ -153,25 +153,25 @@ Passport
 
 .. toctree::
 
+    telegram.credentials
+    telegram.datacredentials
+    telegram.encryptedcredentials
+    telegram.encryptedpassportelement
+    telegram.filecredentials
+    telegram.iddocumentdata
+    telegram.passportdata
     telegram.passportelementerror
+    telegram.passportelementerrordatafield
     telegram.passportelementerrorfile
     telegram.passportelementerrorfiles
-    telegram.passportelementerrorreverseside
     telegram.passportelementerrorfrontside
-    telegram.passportelementerrordatafield
+    telegram.passportelementerrorreverseside
     telegram.passportelementerrorselfie
     telegram.passportelementerrortranslationfile
     telegram.passportelementerrortranslationfiles
     telegram.passportelementerrorunspecified
-    telegram.credentials
-    telegram.datacredentials
-    telegram.securedata
-    telegram.securevalue
-    telegram.filecredentials
-    telegram.iddocumentdata
+    telegram.passportfile
     telegram.personaldetails
     telegram.residentialaddress
-    telegram.passportdata
-    telegram.passportfile
-    telegram.encryptedpassportelement
-    telegram.encryptedcredentials
+    telegram.securedata
+    telegram.securevalue

@@ -3,32 +3,32 @@ telegram.ext package
 
 .. toctree::
 
-    telegram.ext.extbot
-    telegram.ext.applicationbuilder
     telegram.ext.application
+    telegram.ext.applicationbuilder
     telegram.ext.applicationhandlerstop
-    telegram.ext.updater
     telegram.ext.callbackcontext
-    telegram.ext.job
-    telegram.ext.jobqueue
     telegram.ext.contexttypes
     telegram.ext.defaults
+    telegram.ext.extbot
+    telegram.ext.job
+    telegram.ext.jobqueue
+    telegram.ext.updater
 
 Handlers
 --------
 
 .. toctree::
 
-    telegram.ext.handler
     telegram.ext.callbackqueryhandler
     telegram.ext.chatjoinrequesthandler
     telegram.ext.chatmemberhandler
     telegram.ext.choseninlineresulthandler
     telegram.ext.commandhandler
     telegram.ext.conversationhandler
+    telegram.ext.filters
+    telegram.ext.handler
     telegram.ext.inlinequeryhandler
     telegram.ext.messagehandler
-    telegram.ext.filters
     telegram.ext.pollanswerhandler
     telegram.ext.pollhandler
     telegram.ext.precheckoutqueryhandler
@@ -44,9 +44,9 @@ Persistence
 .. toctree::
 
     telegram.ext.basepersistence
+    telegram.ext.dictpersistence
     telegram.ext.persistenceinput
     telegram.ext.picklepersistence
-    telegram.ext.dictpersistence
 
 Arbitrary Callback Data
 -----------------------
