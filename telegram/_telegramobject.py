@@ -20,7 +20,7 @@
 from copy import deepcopy
 
 try:
-    import ujson as json
+    import orjson as json
 except ImportError:
     import json  # type: ignore[no-redef]
 
@@ -216,6 +216,7 @@ class TelegramObject:
         Returns:
             :obj:`str`
         """
+        print(self.to_dict())
         return json.dumps(self.to_dict())
 
     def to_dict(self) -> JSONDict:

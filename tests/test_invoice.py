@@ -195,7 +195,7 @@ class TestInvoice:
 
     async def test_send_object_as_provider_data(self, monkeypatch, bot, chat_id, provider_token):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            # depends on whether we're using ujson
+            # depends on whether we're using orjson
             return request_data.json_parameters["provider_data"] in [
                 '{"test_data": 123456789}',
                 '{"test_data":123456789}',

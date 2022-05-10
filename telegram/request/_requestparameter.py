@@ -29,7 +29,7 @@ from telegram._utils.enum import StringEnum
 from telegram._utils.types import UploadFileDict
 
 try:
-    import ujson as json
+    import orjson as json
 except ImportError:
     import json  # type: ignore[no-redef]  # noqa: F723
 

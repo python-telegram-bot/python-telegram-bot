@@ -24,7 +24,7 @@ from types import TracebackType
 from typing import ClassVar, Optional, Tuple, Type, TypeVar, Union
 
 try:
-    import ujson as json
+    import orjson as json
 except ImportError:
     import json  # type: ignore[no-redef]
 

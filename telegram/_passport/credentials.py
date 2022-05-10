@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring,  redefined-builtin
 try:
-    import ujson as json
+    import orjson as json
 except ImportError:
     import json  # type: ignore[no-redef]
 

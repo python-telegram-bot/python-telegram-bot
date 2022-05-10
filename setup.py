@@ -72,9 +72,9 @@ def get_setup_kwargs(raw=False):
         install_requires=requirements,
         extras_require={
             "socks": "httpx[socks]",
-            # json and cryptography are very stable, so we use a reasonably new version as
+            # orjson and cryptography are very stable, so we use a reasonably new version as
             # lower bound and have no upper bound
-            "json": "ujson>=4.0.0",
+            "json": "orjson>=3.0.0",
             # 3.4-3.4.3 contained some cyclical import bugs
             "passport": "cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=3.0",
         },

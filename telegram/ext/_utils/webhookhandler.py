@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 try:
-    import ujson as json
+    import orjson as json
 except ImportError:
     import json  # type: ignore[no-redef]
 

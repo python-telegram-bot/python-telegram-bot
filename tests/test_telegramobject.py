@@ -24,9 +24,9 @@ from copy import deepcopy
 import pytest
 
 try:
-    import ujson
+    import orjson
 except ImportError:
-    ujson = None
+    orjson = None
 
 from telegram import Chat, Message, PhotoSize, TelegramObject, User
 
@@ -39,8 +39,8 @@ class TestTelegramObject:
             self._bot = b
 
     def test_to_json_native(self, monkeypatch):
-        if ujson:
-            monkeypatch.setattr("ujson.dumps", json_lib.dumps)
+        if orjson:
+            monkeypatch.setattr("orjson.dumps", json_lib.dumps)
         # to_json simply takes whatever comes from to_dict, therefore we only need to test it once
         telegram_object = TelegramObject()
 
@@ -61,27 +61,20 @@ class TestTelegramObject:
         with pytest.raises(TypeError):
             telegram_object.to_json()
 
-    @pytest.mark.skipif(not ujson, reason="ujson not installed")
-    def test_to_json_ujson(self, monkeypatch):
+    @pytest.mark.skipif(orjson is None, reason="orjson not installed")
+    def test_to_json_orjson(self, monkeypatch):
         # to_json simply takes whatever comes from to_dict, therefore we only need to test it once
         telegram_object = TelegramObject()
 
         # Test that it works with a dict with str keys as well as dicts as lists as values
         d = {"str": "str", "str2": ["str", "str"], "str3": {"str": "str"}}
         monkeypatch.setattr("telegram.TelegramObject.to_dict", lambda _: d)
-        json = telegram_object.to_json()
+        json = telegram_object.to_json().decode("utf-8")
+        print(json)
         # Order isn't guarantied and ujon discards whitespace
         assert '"str":"str"' in json
         assert '"str2":["str","str"]' in json
         assert '"str3":{"str":"str"}' in json
-
-        # Test that ujson allows tuples
-        # NOTE: This could be seen as a bug (since it's differnt from the normal "json",
-        # but we test it anyways
-        d = {("str", "str"): "str"}
-
-        monkeypatch.setattr("telegram.TelegramObject.to_dict", lambda _: d)
-        telegram_object.to_json()
 
     def test_to_dict_private_attribute(self):
         class TelegramObjectSubclass(TelegramObject):

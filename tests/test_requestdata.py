@@ -19,7 +19,7 @@
 from urllib.parse import quote
 
 try:
-    import ujson as json
+    import orjson as json
 except ImportError:
     import json
 

@@ -24,7 +24,7 @@ from telegram._utils.types import UploadFileDict
 from telegram.request._requestparameter import RequestParameter
 
 try:
-    import ujson as json
+    import orjson as json
 except ImportError:
     import json  # type: ignore[no-redef]  # noqa: F723
 
