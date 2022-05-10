@@ -20,12 +20,12 @@
 
 
 from telegram import Update
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT
 
 
-class ChatJoinRequestHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain
+class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
+    """BaseHandler class to handle Telegram updates that contain
     :attr:`telegram.Update.chat_join_request`.
 
     Warning:

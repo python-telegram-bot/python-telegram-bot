@@ -36,7 +36,7 @@ __all__ = (
     "DictPersistence",
     "ExtBot",
     "filters",
-    "Handler",
+    "BaseHandler",
     "InlineQueryHandler",
     "InvalidCallbackData",
     "Job",
@@ -71,7 +71,7 @@ from ._conversationhandler import ConversationHandler
 from ._defaults import Defaults
 from ._dictpersistence import DictPersistence
 from ._extbot import ExtBot
-from ._handler import Handler
+from ._handler import BaseHandler
 from ._inlinequeryhandler import InlineQueryHandler
 from ._jobqueue import Job, JobQueue
 from ._messagehandler import MessageHandler

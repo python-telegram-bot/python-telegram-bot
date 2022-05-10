@@ -98,7 +98,7 @@ class WebhookAppClass(tornado.web.Application):
 
 # pylint: disable=abstract-method
 class TelegramHandler(tornado.web.RequestHandler):
-    """Handler that processes incoming requests from Telegram"""
+    """BaseHandler that processes incoming requests from Telegram"""
 
     __slots__ = ("bot", "update_queue", "_logger")
 

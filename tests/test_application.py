@@ -44,7 +44,7 @@ from telegram.ext import (
     CommandHandler,
     ContextTypes,
     Defaults,
-    Handler,
+    BaseHandler,
     JobQueue,
     MessageHandler,
     PicklePersistence,
@@ -587,7 +587,7 @@ class TestApplication:
             await app.stop()
 
     async def test_check_update(self, app):
-        class TestHandler(Handler):
+        class TestHandler(BaseHandler):
             def check_update(_, update: object):
                 self.received = object()
 
@@ -862,7 +862,7 @@ class TestApplication:
         [(True, True), (None, False), (False, False), ({}, True), ("", True), ("check", True)],
     )
     async def test_check_update_handling(self, app, check, expected):
-        class MyHandler(Handler):
+        class MyHandler(BaseHandler):
             def check_update(self, update: object):
                 return check
 

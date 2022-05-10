@@ -22,16 +22,16 @@ from typing import TYPE_CHECKING, List, Optional
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, RT, HandlerCallback
 
 if TYPE_CHECKING:
     from telegram.ext import Application
 
 
-class StringCommandHandler(Handler[str, CCT]):
-    """Handler class to handle string commands. Commands are string updates that start with ``/``.
-    The handler will add a :obj:`list` to the
+class StringCommandHandler(BaseHandler[str, CCT]):
+    """BaseHandler class to handle string commands. Commands are string updates that start with
+    ``/``. The handler will add a :obj:`list` to the
     :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
     which is the text following the command split on single whitespace characters.
 
