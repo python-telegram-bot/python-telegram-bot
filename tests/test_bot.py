@@ -259,6 +259,12 @@ class TestBot:
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
             await bot.get_me()
+            # Only for stabilizing this test-
+            if len(caplog.records) == 4:
+                for idx, record in enumerate(caplog.records):
+                    print(record)
+                    if record.getMessage().startswith("Task was destroyed but it is pending"):
+                        caplog.records.pop(idx)
             assert len(caplog.records) == 3
             assert caplog.records[0].getMessage().startswith("Entering: get_me")
             assert caplog.records[-1].getMessage().startswith("Exiting: get_me")

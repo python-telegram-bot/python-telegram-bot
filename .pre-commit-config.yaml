@@ -63,7 +63,7 @@ repos:
         - cachetools~=5.0.0
         - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.32.0
+    rev: v2.32.1
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests)/.*\.py$

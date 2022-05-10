@@ -7,7 +7,7 @@ black==22.3.0
 flake8==4.0.1
 pylint==2.13.8
 mypy==0.950
-pyupgrade==2.32.0
+pyupgrade==2.32.1
 isort==5.10.1
 
 pytest==7.1.2

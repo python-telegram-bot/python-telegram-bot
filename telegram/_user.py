@@ -21,7 +21,6 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
 
-from telegram import constants
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
@@ -166,7 +165,7 @@ class User(TelegramObject):
     async def get_profile_photos(
         self,
         offset: int = None,
-        limit: int = 100,
+        limit: int = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1179,10 +1178,9 @@ class User(TelegramObject):
         self,
         question: str,
         options: List[str],
-        is_anonymous: bool = True,
-        # We use constant.PollType.REGULAR instead of Poll.REGULAR here to avoid circular imports
-        type: str = constants.PollType.REGULAR,  # pylint: disable=redefined-builtin
-        allows_multiple_answers: bool = False,
+        is_anonymous: bool = None,
+        type: str = None,
+        allows_multiple_answers: bool = None,
         correct_option_id: int = None,
         is_closed: bool = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,

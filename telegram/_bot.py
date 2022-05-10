@@ -2658,7 +2658,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
-        cache_time: int = 300,
+        cache_time: int = None,
         is_personal: bool = None,
         next_offset: str = None,
         switch_pm_text: str = None,
@@ -2775,7 +2775,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         user_id: Union[str, int],
         offset: int = None,
-        limit: int = 100,
+        limit: int = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3177,7 +3177,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         callback_query_id: str,
         text: str = None,
-        show_alert: bool = False,
+        show_alert: bool = None,
         url: str = None,
         cache_time: int = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3598,8 +3598,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def get_updates(
         self,
         offset: int = None,
-        limit: int = 100,
-        timeout: int = 0,
+        limit: int = None,
+        timeout: float = None,
         read_timeout: float = 2,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3678,7 +3678,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             await self._post(
                 "getUpdates",
                 data,
-                read_timeout=read_timeout + timeout,
+                read_timeout=read_timeout + timeout if timeout else read_timeout,
                 write_timeout=write_timeout,
                 connect_timeout=connect_timeout,
                 pool_timeout=pool_timeout,
@@ -3702,7 +3702,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        max_connections: int = 40,
+        max_connections: int = None,
         allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
         ip_address: str = None,
@@ -6557,9 +6557,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         chat_id: Union[int, str],
         question: str,
         options: List[str],
-        is_anonymous: bool = True,
-        type: str = Poll.REGULAR,  # pylint: disable=redefined-builtin
-        allows_multiple_answers: bool = False,
+        is_anonymous: bool = None,
+        type: str = None,  # pylint: disable=redefined-builtin
+        allows_multiple_answers: bool = None,
         correct_option_id: int = None,
         is_closed: bool = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,

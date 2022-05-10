@@ -149,7 +149,7 @@ class CallbackQuery(TelegramObject):
     async def answer(
         self,
         text: str = None,
-        show_alert: bool = False,
+        show_alert: bool = None,
         url: str = None,
         cache_time: int = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

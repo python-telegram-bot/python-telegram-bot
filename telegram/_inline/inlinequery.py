@@ -118,7 +118,7 @@ class InlineQuery(TelegramObject):
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
         ],
-        cache_time: int = 300,
+        cache_time: int = None,
         is_personal: bool = None,
         next_offset: str = None,
         switch_pm_text: str = None,
