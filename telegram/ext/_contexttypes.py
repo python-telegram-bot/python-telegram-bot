@@ -54,7 +54,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     """
 
     DEFAULT_TYPE = CallbackContext["ExtBot", Dict, Dict, Dict]  # type: ignore[misc]
-    """Shortcut for the type annotation for the `context` argument that's correct for the
+    """Shortcut for the type annotation for the ``context`` argument that's correct for the
     default settings, i.e. if :class:`telegram.ext.ContextTypes` is not used.
 
     Example:
