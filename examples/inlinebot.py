@@ -18,7 +18,7 @@ from uuid import uuid4
 
 from telegram import InlineQueryResultArticle, InputTextMessageContent, Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackContext, CommandHandler, InlineQueryHandler
+from telegram.ext import Application, CommandHandler, ContextTypes, InlineQueryHandler
 
 # Enable logging
 logging.basicConfig(
@@ -29,17 +29,17 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     await update.message.reply_text("Hi!")
 
 
-async def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
 
 
-async def inline_query(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def inline_query(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle the inline query. This is run when you type: @botusername <query>"""
     query = update.inline_query.query
 

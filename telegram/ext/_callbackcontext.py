@@ -34,7 +34,7 @@ from typing import (
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
 from telegram.ext._extbot import ExtBot
-from telegram.ext._utils.types import BD, BT, CD, UD  # pylint: disable=unused-import
+from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
     from asyncio import Queue
@@ -77,6 +77,8 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
     3. The type of :attr:`chat_data` (if :attr:`chat_data` is not :obj:`None`).
     4. The type of :attr:`bot_data` (if :attr:`bot_data` is not :obj:`None`).
 
+    .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`
+
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this
             context.
@@ -103,24 +105,6 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
                 :attr:`job` is now also present in error handlers if the error is caused by a job.
 
     """
-
-    if TYPE_CHECKING:
-        DEFAULT_TYPE = CallbackContext[ExtBot, Dict, Dict, Dict, "JobQueue"]  # noqa: F821
-    else:
-        # Somewhat silly workaround so that accessing the attribute
-        # doesn't only work while type checking
-        DEFAULT_TYPE = "CallbackContext[ExtBot, Dict, Dict, Dict]"  # pylint: disable-all
-        """Shortcut for the type annotation for the `context` argument that's correct for the
-        default settings, i.e. if :class:`telegram.ext.ContextTypes` is not used.
-
-        Example:
-            .. code:: python
-
-                async def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
-                    ...
-
-        .. versionadded: 20.0
-        """
 
     __slots__ = (
         "_application",
@@ -319,12 +303,12 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
             if chat:
                 self._chat_id_and_data = (
                     chat.id,
-                    application.chat_data[chat.id],  # pylint: disable=protected-access
+                    application.chat_data[chat.id],
                 )
             if user:
                 self._user_id_and_data = (
                     user.id,
-                    application.user_data[user.id],  # pylint: disable=protected-access
+                    application.user_data[user.id],
                 )
         return self
 
@@ -354,12 +338,12 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
         if job.chat_id:
             self._chat_id_and_data = (
                 job.chat_id,
-                application.chat_data[job.chat_id],  # pylint: disable=protected-access
+                application.chat_data[job.chat_id],
             )
         if job.user_id:
             self._user_id_and_data = (
                 job.user_id,
-                application.user_data[job.user_id],  # pylint: disable=protected-access
+                application.user_data[job.user_id],
             )
         return self
 

@@ -25,7 +25,6 @@ from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FilePathInput, ODVInput
 from telegram.ext._application import Application
-from telegram.ext._callbackcontext import CallbackContext
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._jobqueue import JobQueue
@@ -35,7 +34,7 @@ from telegram.request import BaseRequest
 from telegram.request._httpxrequest import HTTPXRequest
 
 if TYPE_CHECKING:
-    from telegram.ext import BasePersistence, Defaults
+    from telegram.ext import BasePersistence, Defaults, CallbackContext
 
 # Type hinting is a bit complicated here because we try to get to a sane level of
 # leveraging generics and therefore need a number of type variables.
@@ -890,7 +889,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 InitApplicationBuilder = (  # This is defined all the way down here so that its type is inferred
     ApplicationBuilder[  # by Pylance correctly.
         ExtBot,
-        CallbackContext.DEFAULT_TYPE,
+        ContextTypes.DEFAULT_TYPE,
         Dict,
         Dict,
         Dict,
