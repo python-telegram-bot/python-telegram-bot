@@ -96,7 +96,7 @@ from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram._webhookinfo import WebhookInfo
 from telegram.constants import InlineQueryLimit
-from telegram.error import InvalidToken, TelegramError
+from telegram.error import InvalidToken
 from telegram.request import BaseRequest, RequestData
 from telegram.request._httpxrequest import HTTPXRequest
 from telegram.request._requestparameter import RequestParameter
@@ -2092,6 +2092,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited message is returned, otherwise :obj:`True` is returned.
         """
+        # The location parameter is a convenience functionality added by us, so enforcing the
+        # mutual exclusivity here is nothing that Telegram would handle anyway
         if not (all([latitude, longitude]) or location):
             raise ValueError(
                 "Either location or latitude and longitude must be passed as argument."
@@ -2284,10 +2286,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
+        # The venue parameter is a convenience functionality added by us, so enforcing the
+        # mutual exclusivity here is nothing that Telegram would handle anyway
         if not (venue or all([latitude, longitude, address, title])):
             raise ValueError(
                 "Either venue or latitude, longitude, address and title must be "
                 "passed as arguments."
+            )
+        if not (
+            bool(venue) ^ any([latitude, longitude, address, title])
+        ):  # pylint: disable=superfluous-parens
+            raise ValueError(
+                "Either venue or latitude, longitude, address and title must be "
+                "passed as arguments. Not both."
             )
 
         if isinstance(venue, Venue):
@@ -2405,9 +2416,18 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
+        # The contact parameter is a convenience functionality added by us, so enforcing the
+        # mutual exclusivity here is nothing that Telegram would handle anyway
         if (not contact) and (not all([phone_number, first_name])):
             raise ValueError(
                 "Either contact or phone_number and first_name must be passed as arguments."
+            )
+        if not (
+            bool(contact) ^ any([phone_number, first_name])
+        ):  # pylint: disable=superfluous-parens
+            raise ValueError(
+                "Either contact or phone_number and first_name must be passed as arguments. "
+                "Not both."
             )
 
         if isinstance(contact, Contact):
@@ -3407,12 +3427,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        if inline_message_id is None and (chat_id is None or message_id is None):
-            raise ValueError(
-                "edit_message_caption: Both chat_id and message_id are required when "
-                "inline_message_id is not specified"
-            )
-
         data: JSONDict = {"parse_mode": parse_mode}
 
         if caption:
@@ -3492,12 +3506,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        if inline_message_id is None and (chat_id is None or message_id is None):
-            raise ValueError(
-                "edit_message_media: Both chat_id and message_id are required when "
-                "inline_message_id is not specified"
-            )
-
         data: JSONDict = {"media": media}
 
         if chat_id:
@@ -3568,12 +3576,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        if inline_message_id is None and (chat_id is None or message_id is None):
-            raise ValueError(
-                "edit_message_reply_markup: Both chat_id and message_id are required when "
-                "inline_message_id is not specified"
-            )
-
         data: JSONDict = {}
 
         if chat_id:
@@ -4668,27 +4670,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        ok = bool(ok)
-
-        if ok and (shipping_options is None or error_message is not None):
-            raise TelegramError(
-                "answerShippingQuery: If ok is True, shipping_options "
-                "should not be empty and there should not be error_message"
-            )
-
-        if not ok and (shipping_options is not None or error_message is None):
-            raise TelegramError(
-                "answerShippingQuery: If ok is False, error_message "
-                "should not be empty and there should not be shipping_options"
-            )
-
         data: JSONDict = {"shipping_query_id": shipping_query_id, "ok": ok}
 
-        if ok:
-            if not shipping_options:
-                # not using an assert statement directly here since they are removed in
-                # the optimized bytecode
-                raise AssertionError
+        if shipping_options is not None:
             data["shipping_options"] = [option.to_dict() for option in shipping_options]
         if error_message is not None:
             data["error_message"] = error_message
@@ -4759,15 +4743,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        ok = bool(ok)
-
-        if not (ok ^ (error_message is not None)):  # pylint: disable=superfluous-parens
-            raise TelegramError(
-                "answerPreCheckoutQuery: If ok is True, there should "
-                "not be error_message; if ok is False, error_message "
-                "should not be empty"
-            )
-
         data: JSONDict = {"pre_checkout_query_id": pre_checkout_query_id, "ok": ok}
 
         if error_message is not None:
@@ -5275,14 +5250,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        if creates_join_request and member_limit:
-            raise ValueError(
-                "If `creates_join_request` is `True`, `member_limit` can't be specified."
-            )
-
-        data: JSONDict = {
-            "chat_id": chat_id,
-        }
+        data: JSONDict = {"chat_id": chat_id}
 
         if expire_date is not None:
             data["expire_date"] = expire_date
@@ -5380,11 +5348,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        if creates_join_request and member_limit:
-            raise ValueError(
-                "If `creates_join_request` is `True`, `member_limit` can't be specified."
-            )
-
         link = invite_link.invite_link if isinstance(invite_link, ChatInviteLink) else invite_link
         data: JSONDict = {"chat_id": chat_id, "invite_link": link}
 
