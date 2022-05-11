@@ -107,7 +107,7 @@ from typing import (
 from telegram import Chat as TGChat
 from telegram import Message, MessageEntity, Update
 from telegram import User as TGUser
-from telegram._utils.types import SLT
+from telegram._utils.types import SCT
 from telegram.constants import DiceEmoji as DiceEmojiEnum
 
 DataDict = Dict[str, list]
@@ -588,8 +588,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
 
     def __init__(
         self,
-        chat_id: SLT[int] = None,
-        username: SLT[str] = None,
+        chat_id: SCT[int] = None,
+        username: SCT[str] = None,
         allow_empty: bool = False,
     ):
         super().__init__()
@@ -608,7 +608,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         ...
 
     @staticmethod
-    def _parse_chat_id(chat_id: Optional[SLT[int]]) -> Set[int]:
+    def _parse_chat_id(chat_id: Optional[SCT[int]]) -> Set[int]:
         if chat_id is None:
             return set()
         if isinstance(chat_id, int):
@@ -616,14 +616,14 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         return set(chat_id)
 
     @staticmethod
-    def _parse_username(username: Optional[SLT[str]]) -> Set[str]:
+    def _parse_username(username: Optional[SCT[str]]) -> Set[str]:
         if username is None:
             return set()
         if isinstance(username, str):
             return {username[1:] if username.startswith("@") else username}
         return {chat[1:] if chat.startswith("@") else chat for chat in username}
 
-    def _set_chat_ids(self, chat_id: Optional[SLT[int]]) -> None:
+    def _set_chat_ids(self, chat_id: Optional[SCT[int]]) -> None:
         if chat_id and self._usernames:
             raise RuntimeError(
                 f"Can't set {self._chat_id_name} in conjunction with (already set) "
@@ -631,7 +631,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
             )
         self._chat_ids = self._parse_chat_id(chat_id)
 
-    def _set_usernames(self, username: Optional[SLT[str]]) -> None:
+    def _set_usernames(self, username: Optional[SCT[str]]) -> None:
         if username and self._chat_ids:
             raise RuntimeError(
                 f"Can't set {self._username_name} in conjunction with (already set) "
@@ -644,7 +644,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         return frozenset(self._chat_ids)
 
     @chat_ids.setter
-    def chat_ids(self, chat_id: SLT[int]) -> None:
+    def chat_ids(self, chat_id: SCT[int]) -> None:
         self._set_chat_ids(chat_id)
 
     @property
@@ -664,10 +664,10 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         return frozenset(self._usernames)
 
     @usernames.setter
-    def usernames(self, username: SLT[str]) -> None:
+    def usernames(self, username: SCT[str]) -> None:
         self._set_usernames(username)
 
-    def add_usernames(self, username: SLT[str]) -> None:
+    def add_usernames(self, username: SCT[str]) -> None:
         """
         Add one or more chats to the allowed usernames.
 
@@ -684,7 +684,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         parsed_username = self._parse_username(username)
         self._usernames |= parsed_username
 
-    def _add_chat_ids(self, chat_id: SLT[int]) -> None:
+    def _add_chat_ids(self, chat_id: SCT[int]) -> None:
         if self._usernames:
             raise RuntimeError(
                 f"Can't set {self._chat_id_name} in conjunction with (already set) "
@@ -695,7 +695,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
 
         self._chat_ids |= parsed_chat_id
 
-    def remove_usernames(self, username: SLT[str]) -> None:
+    def remove_usernames(self, username: SCT[str]) -> None:
         """
         Remove one or more chats from allowed usernames.
 
@@ -712,7 +712,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         parsed_username = self._parse_username(username)
         self._usernames -= parsed_username
 
-    def _remove_chat_ids(self, chat_id: SLT[int]) -> None:
+    def _remove_chat_ids(self, chat_id: SCT[int]) -> None:
         if self._usernames:
             raise RuntimeError(
                 f"Can't set {self._chat_id_name} in conjunction with (already set) "
@@ -779,7 +779,7 @@ class Chat(_ChatUserBaseFilter):
     def get_chat_or_user(self, message: Message) -> Optional[TGChat]:
         return message.chat
 
-    def add_chat_ids(self, chat_id: SLT[int]) -> None:
+    def add_chat_ids(self, chat_id: SCT[int]) -> None:
         """
         Add one or more chats to the allowed chat ids.
 
@@ -789,7 +789,7 @@ class Chat(_ChatUserBaseFilter):
         """
         return super()._add_chat_ids(chat_id)
 
-    def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+    def remove_chat_ids(self, chat_id: SCT[int]) -> None:
         """
         Remove one or more chats from allowed chat ids.
 
@@ -930,7 +930,7 @@ CONTACT = _Contact(name="filters.CONTACT")
 class _Dice(MessageFilter):
     __slots__ = ("emoji", "values")
 
-    def __init__(self, values: SLT[int] = None, emoji: DiceEmojiEnum = None):
+    def __init__(self, values: SCT[int] = None, emoji: DiceEmojiEnum = None):
         super().__init__()
         self.emoji = emoji
         self.values = [values] if isinstance(values, int) else values
@@ -1001,7 +1001,7 @@ class Dice(_Dice):
 
         __slots__ = ()
 
-        def __init__(self, values: SLT[int]):
+        def __init__(self, values: SCT[int]):
             super().__init__(values, emoji=DiceEmojiEnum.BASKETBALL)
 
     BASKETBALL = _Dice(emoji=DiceEmojiEnum.BASKETBALL)
@@ -1016,7 +1016,7 @@ class Dice(_Dice):
 
         __slots__ = ()
 
-        def __init__(self, values: SLT[int]):
+        def __init__(self, values: SCT[int]):
             super().__init__(values, emoji=DiceEmojiEnum.BOWLING)
 
     BOWLING = _Dice(emoji=DiceEmojiEnum.BOWLING)
@@ -1031,7 +1031,7 @@ class Dice(_Dice):
 
         __slots__ = ()
 
-        def __init__(self, values: SLT[int]):
+        def __init__(self, values: SCT[int]):
             super().__init__(values, emoji=DiceEmojiEnum.DARTS)
 
     DARTS = _Dice(emoji=DiceEmojiEnum.DARTS)
@@ -1046,7 +1046,7 @@ class Dice(_Dice):
 
         __slots__ = ()
 
-        def __init__(self, values: SLT[int]):
+        def __init__(self, values: SCT[int]):
             super().__init__(values, emoji=DiceEmojiEnum.DICE)
 
     DICE = _Dice(emoji=DiceEmojiEnum.DICE)  # skipcq: PTC-W0052
@@ -1061,7 +1061,7 @@ class Dice(_Dice):
 
         __slots__ = ()
 
-        def __init__(self, values: SLT[int]):
+        def __init__(self, values: SCT[int]):
             super().__init__(values, emoji=DiceEmojiEnum.FOOTBALL)
 
     FOOTBALL = _Dice(emoji=DiceEmojiEnum.FOOTBALL)
@@ -1076,7 +1076,7 @@ class Dice(_Dice):
 
         __slots__ = ()
 
-        def __init__(self, values: SLT[int]):
+        def __init__(self, values: SCT[int]):
             super().__init__(values, emoji=DiceEmojiEnum.SLOT_MACHINE)
 
     SLOT_MACHINE = _Dice(emoji=DiceEmojiEnum.SLOT_MACHINE)
@@ -1346,7 +1346,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
     def get_chat_or_user(self, message: Message) -> Union[TGUser, TGChat, None]:
         return message.forward_from or message.forward_from_chat
 
-    def add_chat_ids(self, chat_id: SLT[int]) -> None:
+    def add_chat_ids(self, chat_id: SCT[int]) -> None:
         """
         Add one or more chats to the allowed chat ids.
 
@@ -1356,7 +1356,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
         """
         return super()._add_chat_ids(chat_id)
 
-    def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+    def remove_chat_ids(self, chat_id: SCT[int]) -> None:
         """
         Remove one or more chats from allowed chat ids.
 
@@ -1437,7 +1437,7 @@ class Language(MessageFilter):
 
     __slots__ = ("lang",)
 
-    def __init__(self, lang: SLT[str]):
+    def __init__(self, lang: SCT[str]):
         if isinstance(lang, str):
             lang = cast(str, lang)
             self.lang = [lang]
@@ -1638,7 +1638,7 @@ class SenderChat(_ChatUserBaseFilter):
     CHANNEL = _CHANNEL(name="filters.SenderChat.CHANNEL")
     """Messages whose sender chat is a channel."""
 
-    def add_chat_ids(self, chat_id: SLT[int]) -> None:
+    def add_chat_ids(self, chat_id: SCT[int]) -> None:
         """
         Add one or more sender chats to the allowed chat ids.
 
@@ -1651,7 +1651,7 @@ class SenderChat(_ChatUserBaseFilter):
     def get_chat_or_user(self, message: Message) -> Optional[TGChat]:
         return message.sender_chat
 
-    def remove_chat_ids(self, chat_id: SLT[int]) -> None:
+    def remove_chat_ids(self, chat_id: SCT[int]) -> None:
         """
         Remove one or more sender chats from allowed chat ids.
 
@@ -2122,8 +2122,8 @@ class User(_ChatUserBaseFilter):
 
     def __init__(
         self,
-        user_id: SLT[int] = None,
-        username: SLT[str] = None,
+        user_id: SCT[int] = None,
+        username: SCT[str] = None,
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=user_id, username=username, allow_empty=allow_empty)
@@ -2150,10 +2150,10 @@ class User(_ChatUserBaseFilter):
         return self.chat_ids
 
     @user_ids.setter
-    def user_ids(self, user_id: SLT[int]) -> None:
+    def user_ids(self, user_id: SCT[int]) -> None:
         self.chat_ids = user_id  # type: ignore[assignment]
 
-    def add_user_ids(self, user_id: SLT[int]) -> None:
+    def add_user_ids(self, user_id: SCT[int]) -> None:
         """
         Add one or more users to the allowed user ids.
 
@@ -2163,7 +2163,7 @@ class User(_ChatUserBaseFilter):
         """
         return super()._add_chat_ids(user_id)
 
-    def remove_user_ids(self, user_id: SLT[int]) -> None:
+    def remove_user_ids(self, user_id: SCT[int]) -> None:
         """
         Remove one or more users from allowed user ids.
 
@@ -2223,8 +2223,8 @@ class ViaBot(_ChatUserBaseFilter):
 
     def __init__(
         self,
-        bot_id: SLT[int] = None,
-        username: SLT[str] = None,
+        bot_id: SCT[int] = None,
+        username: SCT[str] = None,
         allow_empty: bool = False,
     ):
         super().__init__(chat_id=bot_id, username=username, allow_empty=allow_empty)
@@ -2251,10 +2251,10 @@ class ViaBot(_ChatUserBaseFilter):
         return self.chat_ids
 
     @bot_ids.setter
-    def bot_ids(self, bot_id: SLT[int]) -> None:
+    def bot_ids(self, bot_id: SCT[int]) -> None:
         self.chat_ids = bot_id  # type: ignore[assignment]
 
-    def add_bot_ids(self, bot_id: SLT[int]) -> None:
+    def add_bot_ids(self, bot_id: SCT[int]) -> None:
         """
         Add one or more bots to the allowed bot ids.
 
@@ -2264,7 +2264,7 @@ class ViaBot(_ChatUserBaseFilter):
         """
         return super()._add_chat_ids(bot_id)
 
-    def remove_bot_ids(self, bot_id: SLT[int]) -> None:
+    def remove_bot_ids(self, bot_id: SCT[int]) -> None:
         """
         Remove one or more bots from allowed bot ids.
 
