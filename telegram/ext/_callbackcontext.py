@@ -38,9 +38,10 @@ from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
     from asyncio import Queue
+    from typing import Any
 
     from telegram.ext import Application, Job, JobQueue  # noqa: F401
-    from telegram.ext._utils.types import CCT, JQ
+    from telegram.ext._utils.types import CCT
 
 _STORING_DATA_WIKI = (
     "https://github.com/python-telegram-bot/python-telegram-bot"
@@ -48,7 +49,7 @@ _STORING_DATA_WIKI = (
 )
 
 
-class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
+class CallbackContext(Generic[BT, UD, CD, BD]):
     """
     This is a context object passed to the callback called by :class:`telegram.ext.Handler`
     or by the :class:`telegram.ext.Application` in an error handler added by
@@ -118,7 +119,7 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
         "__dict__",
     )
 
-    def __init__(self: "CCT", application: "Application[BT, CCT, UD, CD, BD, JQ]"):
+    def __init__(self: "CCT", application: "Application[BT, CCT, UD, CD, BD, Any]"):
         self._application = application
         self._chat_id_and_data: Optional[Tuple[int, CD]] = None
         self._user_id_and_data: Optional[Tuple[int, UD]] = None
@@ -129,7 +130,7 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
         self.coroutine: Optional[Coroutine] = None
 
     @property
-    def application(self) -> "Application[BT, CCT, UD, CD, BD, JQ]":
+    def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
         """:class:`telegram.ext.Application`: The application associated with this context."""
         return self._application
 
@@ -242,7 +243,7 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
         cls: Type["CCT"],
         update: object,
         error: Exception,
-        application: "Application[BT, CCT, UD, CD, BD, JQ]",
+        application: "Application[BT, CCT, UD, CD, BD, Any]",
         job: "Job" = None,
         coroutine: Coroutine = None,
     ) -> "CCT":
@@ -278,7 +279,7 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
     def from_update(
         cls: Type["CCT"],
         update: object,
-        application: "Application[BT, CCT, UD, CD, BD, JQ]",
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
@@ -294,7 +295,7 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(application)
+        self = cls(application)  # type: ignore
 
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
@@ -316,7 +317,7 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
     def from_job(
         cls: Type["CCT"],
         job: "Job",
-        application: "Application[BT, CCT, UD, CD, BD, JQ]",
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
@@ -332,7 +333,7 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(application)
+        self = cls(application)  # type: ignore
         self.job = job
 
         if job.chat_id:
@@ -362,7 +363,7 @@ class CallbackContext(Generic[BT, UD, CD, BD, JQ]):
         return self._application.bot
 
     @property
-    def job_queue(self) -> JQ:
+    def job_queue(self) -> Optional["JobQueue"]:
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
