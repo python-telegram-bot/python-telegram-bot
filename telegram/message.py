@@ -762,6 +762,14 @@ class Message(TelegramObject):
             data.get('proximity_alert_triggered'), bot
         )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
+        data['voice_chat_scheduled'] = VideoChatScheduled.de_json(
+            data.get('voice_chat_scheduled'), bot
+        )
+        data['voice_chat_started'] = VideoChatStarted.de_json(data.get('vioice_chat_started'), bot)
+        data['voice_chat_ended'] = VideoChatEnded.de_json(data.get('voice_chat_ended'), bot)
+        data['voice_chat_participants_invited'] = VideoChatParticipantsInvited.de_json(
+            data.get('voice_chat_participants_invited'), bot
+        )
         data['video_chat_scheduled'] = VideoChatScheduled.de_json(
             data.get('video_chat_scheduled'), bot
         )
