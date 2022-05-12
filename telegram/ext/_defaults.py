@@ -47,7 +47,8 @@ class Defaults:
             appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
             somewhere, it will be assumed to be in :paramref:`tzinfo`. Must be a timezone provided
             by the ``pytz`` module. Defaults to UTC.
-        block (:obj:`bool`, optional): Default setting for the :paramref:`Handler.block` parameter
+        block (:obj:`bool`, optional): Default setting for the :paramref:`BaseHandler.block`
+            parameter
             of handlers and error handlers registered through :meth:`Application.add_handler` and
             :meth:`Application.add_error_handler`. Defaults to :obj:`True`.
         protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -194,8 +195,8 @@ class Defaults:
 
     @property
     def block(self) -> bool:
-        """:obj:`bool`: Optional. Default setting for the :paramref:`Handler.block` parameter of
-        handlers and error handlers registered through :meth:`Application.add_handler` and
+        """:obj:`bool`: Optional. Default setting for the :paramref:`BaseHandler.block` parameter
+        of handlers and error handlers registered through :meth:`Application.add_handler` and
         :meth:`Application.add_error_handler`.
         """
         return self._block

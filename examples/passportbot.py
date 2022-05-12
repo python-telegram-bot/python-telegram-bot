@@ -15,7 +15,7 @@ import logging
 from pathlib import Path
 
 from telegram import Update
-from telegram.ext import Application, CallbackContext, MessageHandler, filters
+from telegram.ext import Application, ContextTypes, MessageHandler, filters
 
 # Enable logging
 
@@ -26,7 +26,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def msg(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Downloads and prints the received passport data."""
     # Retrieve passport data
     passport_data = update.message.passport_data

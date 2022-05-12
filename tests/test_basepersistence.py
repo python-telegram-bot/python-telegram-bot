@@ -37,7 +37,7 @@ from telegram.ext import (
     BasePersistence,
     CallbackContext,
     ConversationHandler,
-    Handler,
+    BaseHandler,
     MessageHandler,
     PersistenceInput,
     filters,
@@ -247,7 +247,7 @@ def build_papp(
     )
 
 
-def build_conversation_handler(name: str, persistent: bool = True) -> Handler:
+def build_conversation_handler(name: str, persistent: bool = True) -> BaseHandler:
     return TrackingConversationHandler(name=name, persistent=persistent)
 
 

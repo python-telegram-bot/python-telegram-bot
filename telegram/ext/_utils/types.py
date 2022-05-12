@@ -40,7 +40,7 @@ from typing import (
 
 if TYPE_CHECKING:
     from telegram import Bot
-    from telegram.ext import BasePersistence, CallbackContext, JobQueue, Updater  # noqa: F401
+    from telegram.ext import CallbackContext, JobQueue
 
 CCT = TypeVar("CCT", bound="CallbackContext")
 """An instance of :class:`telegram.ext.CallbackContext` or a custom subclass.
