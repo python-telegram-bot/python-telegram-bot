@@ -672,7 +672,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         Add one or more chats to the allowed usernames.
 
         Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
+            username(:obj:`str` | Collection[:obj:`str`]): Which username(s) to
                 allow through. Leading ``'@'`` s in usernames will be discarded.
         """
         if self._chat_ids:
@@ -700,7 +700,7 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
         Remove one or more chats from allowed usernames.
 
         Args:
-            username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]): Which username(s) to
+            username(:obj:`str` | Collection[:obj:`str`]): Which username(s) to
                 disallow through. Leading ``'@'`` s in usernames will be discarded.
         """
         if self._chat_ids:
@@ -757,9 +757,9 @@ class Chat(_ChatUserBaseFilter):
         replace the current set of allowed chats.
 
     Args:
-        chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+        chat_id(:obj:`int` | Collection[:obj:`int`], optional):
             Which chat ID(s) to allow through.
-        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+        username(:obj:`str` | Collection[:obj:`str`], optional):
             Which username(s) to allow through.
             Leading ``'@'`` s in usernames will be discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
@@ -784,7 +784,7 @@ class Chat(_ChatUserBaseFilter):
         Add one or more chats to the allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat ID(s) to allow
+            chat_id(:obj:`int` | Collection[:obj:`int`]): Which chat ID(s) to allow
                 through.
         """
         return super()._add_chat_ids(chat_id)
@@ -794,7 +794,7 @@ class Chat(_ChatUserBaseFilter):
         Remove one or more chats from allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat ID(s) to
+            chat_id(:obj:`int` | Collection[:obj:`int`]): Which chat ID(s) to
                 disallow through.
         """
         return super()._remove_chat_ids(chat_id)
@@ -983,7 +983,7 @@ class Dice(_Dice):
         ``filters.TEXT | filters.Dice.ALL``.
 
     Args:
-        values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+        values (:obj:`int` | Collection[:obj:`int`], optional):
             Which values to allow. If not specified, will allow the specified dice message.
     """
 
@@ -996,7 +996,7 @@ class Dice(_Dice):
         """Dice messages with the emoji 🏀. Supports passing a list of integers.
 
         Args:
-            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+            values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
         """
 
         __slots__ = ()
@@ -1011,7 +1011,7 @@ class Dice(_Dice):
         """Dice messages with the emoji 🎳. Supports passing a list of integers.
 
         Args:
-            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+            values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
         """
 
         __slots__ = ()
@@ -1026,7 +1026,7 @@ class Dice(_Dice):
         """Dice messages with the emoji 🎯. Supports passing a list of integers.
 
         Args:
-            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+            values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
         """
 
         __slots__ = ()
@@ -1041,7 +1041,7 @@ class Dice(_Dice):
         """Dice messages with the emoji 🎲. Supports passing a list of integers.
 
         Args:
-            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+            values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
         """
 
         __slots__ = ()
@@ -1056,7 +1056,7 @@ class Dice(_Dice):
         """Dice messages with the emoji ⚽. Supports passing a list of integers.
 
         Args:
-            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+            values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
         """
 
         __slots__ = ()
@@ -1071,7 +1071,7 @@ class Dice(_Dice):
         """Dice messages with the emoji 🎰. Supports passing a list of integers.
 
         Args:
-            values (:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which values to allow.
+            values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
         """
 
         __slots__ = ()
@@ -1324,9 +1324,9 @@ class ForwardedFrom(_ChatUserBaseFilter):
         the current set of allowed chats.
 
     Args:
-        chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+        chat_id(:obj:`int` | Collection[:obj:`int`], optional):
             Which chat/user ID(s) to allow through.
-        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+        username(:obj:`str` | Collection[:obj:`str`], optional):
             Which username(s) to allow through. Leading ``'@'`` s in usernames will be
             discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no chat
@@ -1351,7 +1351,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
         Add one or more chats to the allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat/user ID(s) to
+            chat_id(:obj:`int` | Collection[:obj:`int`]): Which chat/user ID(s) to
                 allow through.
         """
         return super()._add_chat_ids(chat_id)
@@ -1361,7 +1361,7 @@ class ForwardedFrom(_ChatUserBaseFilter):
         Remove one or more chats from allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which chat/user ID(s) to
+            chat_id(:obj:`int` | Collection[:obj:`int`]): Which chat/user ID(s) to
                 disallow through.
         """
         return super()._remove_chat_ids(chat_id)
@@ -1428,7 +1428,7 @@ class Language(MessageFilter):
         ``MessageHandler(filters.Language("en"), callback_method)``
 
     Args:
-        lang (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
+        lang (:obj:`str` | Collection[:obj:`str`]):
             Which language code(s) to allow through.
             This will be matched using :obj:`str.startswith` meaning that
             'en' will match both 'en_US' and 'en_GB'.
@@ -1596,9 +1596,9 @@ class SenderChat(_ChatUserBaseFilter):
         the current set of allowed chats.
 
     Args:
-        chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional):
+        chat_id(:obj:`int` | Collection[:obj:`int`], optional):
             Which sender chat chat ID(s) to allow through.
-        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+        username(:obj:`str` | Collection[:obj:`str`], optional):
             Which sender chat username(s) to allow through.
             Leading ``'@'`` s in usernames will be discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no sender
@@ -1643,7 +1643,7 @@ class SenderChat(_ChatUserBaseFilter):
         Add one or more sender chats to the allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which sender chat ID(s) to
+            chat_id(:obj:`int` | Collection[:obj:`int`]): Which sender chat ID(s) to
                 allow through.
         """
         return super()._add_chat_ids(chat_id)
@@ -1656,7 +1656,7 @@ class SenderChat(_ChatUserBaseFilter):
         Remove one or more sender chats from allowed chat ids.
 
         Args:
-            chat_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which sender chat ID(s) to
+            chat_id(:obj:`int` | Collection[:obj:`int`]): Which sender chat ID(s) to
                 disallow through.
         """
         return super()._remove_chat_ids(chat_id)
@@ -2103,9 +2103,9 @@ class User(_ChatUserBaseFilter):
         ``MessageHandler(filters.User(1234), callback_method)``
 
     Args:
-        user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional): Which user ID(s) to
+        user_id(:obj:`int` | Collection[:obj:`int`], optional): Which user ID(s) to
             allow through.
-        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+        username(:obj:`str` | Collection[:obj:`str`], optional):
             Which username(s) to allow through. Leading ``'@'`` s in usernames will be discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user is
             specified in :attr:`user_ids` and :attr:`usernames`. Defaults to :obj:`False`.
@@ -2158,7 +2158,7 @@ class User(_ChatUserBaseFilter):
         Add one or more users to the allowed user ids.
 
         Args:
-            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which user ID(s) to allow
+            user_id(:obj:`int` | Collection[:obj:`int`]): Which user ID(s) to allow
                 through.
         """
         return super()._add_chat_ids(user_id)
@@ -2168,7 +2168,7 @@ class User(_ChatUserBaseFilter):
         Remove one or more users from allowed user ids.
 
         Args:
-            user_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which user ID(s) to
+            user_id(:obj:`int` | Collection[:obj:`int`]): Which user ID(s) to
                 disallow through.
         """
         return super()._remove_chat_ids(user_id)
@@ -2203,9 +2203,9 @@ class ViaBot(_ChatUserBaseFilter):
         ``MessageHandler(filters.ViaBot(1234), callback_method)``
 
     Args:
-        bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional): Which bot ID(s) to
+        bot_id(:obj:`int` | Collection[:obj:`int`], optional): Which bot ID(s) to
             allow through.
-        username(:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`], optional):
+        username(:obj:`str` | Collection[:obj:`str`], optional):
             Which username(s) to allow through. Leading ``'@'`` s in usernames will be
             discarded.
         allow_empty(:obj:`bool`, optional): Whether updates should be processed, if no user
@@ -2259,7 +2259,7 @@ class ViaBot(_ChatUserBaseFilter):
         Add one or more bots to the allowed bot ids.
 
         Args:
-            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`]): Which bot ID(s) to allow
+            bot_id(:obj:`int` | Collection[:obj:`int`]): Which bot ID(s) to allow
                 through.
         """
         return super()._add_chat_ids(bot_id)
@@ -2269,7 +2269,7 @@ class ViaBot(_ChatUserBaseFilter):
         Remove one or more bots from allowed bot ids.
 
         Args:
-            bot_id(:obj:`int` | Tuple[:obj:`int`] | List[:obj:`int`], optional): Which bot ID(s) to
+            bot_id(:obj:`int` | Collection[:obj:`int`], optional): Which bot ID(s) to
                 disallow through.
         """
         return super()._remove_chat_ids(bot_id)
