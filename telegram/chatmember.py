@@ -452,9 +452,8 @@ class ChatMemberAdministrator(ChatMember):
 
     .. versionadded:: 13.7
 
-    ..versionchanged:: 13.12
-        Since Bot API 6.0, voice chat was renamed to video chat. The old parameter is
-        supported but is supplied as video_chats.
+    .. versionchanged:: 13.12
+        Since Bot API 6.0, voice chat was renamed to video chat.
 
     Args:
         user (:class:`telegram.User`): Information about the user.

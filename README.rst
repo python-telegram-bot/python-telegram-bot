@@ -67,7 +67,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 Table of contents
 =================
 
-- `Depreciation warning`_
+- `Deprecation warning`_
 
 - `Introduction`_
 
@@ -90,12 +90,12 @@ Table of contents
 - `License`_
 
 ====================
-Depreciation warning
+Deprecation warning
 ====================
 
-> You are reading the documentation of V13.
-> This version is currently in "Bot API compatibility mode", so will only get updates to include new Bot API features.
-> If you can, you should switch your code to V20.
+    You are reading the documentation of V13. This version is currently in "Bot API compatibility mode", so will only get updates to include new Bot API features.
+    
+    If you can, you should switch your code to V20.
 
 ============
 Introduction
