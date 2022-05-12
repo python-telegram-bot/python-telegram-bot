@@ -83,7 +83,7 @@ class TestChatPhoto:
 
         new_file = await bot.get_file(chat_photo.small_file_id)
 
-        assert new_file.unique_file_id == chat_photo.small_file_unique_id
+        assert new_file.file_unique_id == chat_photo.small_file_unique_id
         assert new_file.file_path.startswith("https://")
 
         await new_file.download(jpg_file)
