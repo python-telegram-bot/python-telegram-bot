@@ -24,7 +24,7 @@ from telegram import MessageEntity, Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import SLT, DVInput
 from telegram.ext import filters as filters_module
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
@@ -33,8 +33,8 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class CommandHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram commands.
+class CommandHandler(BaseHandler[Update, CCT]):
+    """BaseHandler class to handle Telegram commands.
 
     Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
     bot's name and/or some additional text. The handler will add a :obj:`list` to the
@@ -164,7 +164,7 @@ class CommandHandler(Handler[Update, CCT]):
 
 
 class PrefixHandler(CommandHandler):
-    """Handler class to handle custom prefix commands.
+    """BaseHandler class to handle custom prefix commands.
 
     This is an intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
     It supports configurable commands with the same options as :class:`CommandHandler`. It will

@@ -46,7 +46,7 @@ from telegram.ext._callbackcontext import CallbackContext
 from telegram.ext._callbackqueryhandler import CallbackQueryHandler
 from telegram.ext._choseninlineresulthandler import ChosenInlineResultHandler
 from telegram.ext._extbot import ExtBot
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._inlinequeryhandler import InlineQueryHandler
 from telegram.ext._stringcommandhandler import StringCommandHandler
 from telegram.ext._stringregexhandler import StringRegexHandler
@@ -56,7 +56,7 @@ from telegram.ext._utils.types import CCT, ConversationDict, ConversationKey
 
 if TYPE_CHECKING:
     from telegram.ext import Application, Job, JobQueue
-_CheckUpdateType = Tuple[object, ConversationKey, Handler, object]
+_CheckUpdateType = Tuple[object, ConversationKey, BaseHandler, object]
 
 _logger = logging.getLogger(__name__)
 
@@ -117,7 +117,7 @@ class PendingState:
         return res
 
 
-class ConversationHandler(Handler[Update, CCT]):
+class ConversationHandler(BaseHandler[Update, CCT]):
     """
     A handler to hold a conversation with a single or multiple users through Telegram updates by
     managing three collections of other handlers.
@@ -186,16 +186,17 @@ class ConversationHandler(Handler[Update, CCT]):
         /examples#examples
 
     Args:
-        entry_points (List[:class:`telegram.ext.Handler`]): A list of :obj:`Handler` objects that
+        entry_points (List[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`
+            objects that
             can trigger the start of the conversation. The first handler whose :meth:`check_update`
             method returns :obj:`True` will be used. If all return :obj:`False`, the update is not
             handled.
-        states (Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]): A :obj:`dict` that
+        states (Dict[:obj:`object`, List[:class:`telegram.ext.BaseHandler`]]): A :obj:`dict` that
             defines the different states of conversation a user can be in and one or more
-            associated :obj:`Handler` objects that should be used in that state. The first handler
-            whose :meth:`check_update` method returns :obj:`True` will be used.
-        fallbacks (List[:class:`telegram.ext.Handler`]): A list of handlers that might be used if
-            the user is in a conversation, but every handler for their current state returned
+            associated :obj:`BaseHandler` objects that should be used in that state. The first
+            handler whose :meth:`check_update` method returns :obj:`True` will be used.
+        fallbacks (List[:class:`telegram.ext.BaseHandler`]): A list of handlers that might be used
+            if the user is in a conversation, but every handler for their current state returned
             :obj:`False` on :meth:`check_update`. The first handler which :meth:`check_update`
             method returns :obj:`True` will be used. If all return :obj:`False`, the update is not
             handled.
@@ -231,11 +232,11 @@ class ConversationHandler(Handler[Update, CCT]):
             used to instruct a child conversation handler to transition into a mapped state on
             its parent conversation handler in place of a specified nested state.
         block (:obj:`bool`, optional): Pass :obj:`False` or :obj:`True` to set a default value for
-            the :attr:`Handler.block` setting of all handlers (in :attr:`entry_points`,
+            the :attr:`BaseHandler.block` setting of all handlers (in :attr:`entry_points`,
             :attr:`states` and :attr:`fallbacks`). The resolution order for checking if a handler
             should be run non-blocking is:
 
-            1. :attr:`telegram.ext.Handler.block` (if set)
+            1. :attr:`telegram.ext.BaseHandler.block` (if set)
             2. the value passed to this parameter (if any)
             3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
 
@@ -283,9 +284,9 @@ class ConversationHandler(Handler[Update, CCT]):
     # pylint: disable=super-init-not-called
     def __init__(
         self,
-        entry_points: List[Handler[Update, CCT]],
-        states: Dict[object, List[Handler[Update, CCT]]],
-        fallbacks: List[Handler[Update, CCT]],
+        entry_points: List[BaseHandler[Update, CCT]],
+        states: Dict[object, List[BaseHandler[Update, CCT]]],
+        fallbacks: List[BaseHandler[Update, CCT]],
         allow_reentry: bool = False,
         per_chat: bool = True,
         per_user: bool = True,
@@ -343,7 +344,7 @@ class ConversationHandler(Handler[Update, CCT]):
                 stacklevel=2,
             )
 
-        all_handlers: List[Handler] = []
+        all_handlers: List[BaseHandler] = []
         all_handlers.extend(entry_points)
         all_handlers.extend(fallbacks)
 
@@ -426,9 +427,9 @@ class ConversationHandler(Handler[Update, CCT]):
                 )
 
     @property
-    def entry_points(self) -> List[Handler]:
-        """List[:class:`telegram.ext.Handler`]: A list of :obj:`Handler` objects that can trigger
-        the start of the conversation.
+    def entry_points(self) -> List[BaseHandler]:
+        """List[:class:`telegram.ext.BaseHandler`]: A list of :obj:`BaseHandler` objects that can
+        trigger the start of the conversation.
         """
         return self._entry_points
 
@@ -439,10 +440,10 @@ class ConversationHandler(Handler[Update, CCT]):
         )
 
     @property
-    def states(self) -> Dict[object, List[Handler]]:
-        """Dict[:obj:`object`, List[:class:`telegram.ext.Handler`]]: A :obj:`dict` that
+    def states(self) -> Dict[object, List[BaseHandler]]:
+        """Dict[:obj:`object`, List[:class:`telegram.ext.BaseHandler`]]: A :obj:`dict` that
         defines the different states of conversation a user can be in and one or more
-        associated :obj:`Handler` objects that should be used in that state.
+        associated :obj:`BaseHandler` objects that should be used in that state.
         """
         return self._states
 
@@ -451,8 +452,8 @@ class ConversationHandler(Handler[Update, CCT]):
         raise AttributeError("You can not assign a new value to states after initialization.")
 
     @property
-    def fallbacks(self) -> List[Handler]:
-        """List[:class:`telegram.ext.Handler`]: A list of handlers that might be used if
+    def fallbacks(self) -> List[BaseHandler]:
+        """List[:class:`telegram.ext.BaseHandler`]: A list of handlers that might be used if
         the user is in a conversation, but every handler for their current state returned
         :obj:`False` on :meth:`check_update`.
         """
@@ -723,7 +724,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
         _logger.debug("Selecting conversation %s with state %s", str(key), str(state))
 
-        handler: Optional[Handler] = None
+        handler: Optional[BaseHandler] = None
 
         # Search entry points for a match
         if state is None or self.allow_reentry:
@@ -765,7 +766,7 @@ class ConversationHandler(Handler[Update, CCT]):
         check_result: _CheckUpdateType,
         context: CallbackContext,
     ) -> Optional[object]:
-        """Send the update to the callback for the current state and Handler
+        """Send the update to the callback for the current state and BaseHandler
 
         Args:
             check_result: The result from :meth:`check_update`. For this handler it's a tuple of
@@ -872,7 +873,7 @@ class ConversationHandler(Handler[Update, CCT]):
         elif new_state is not None:
             if new_state not in self.states:
                 warn(
-                    f"Handler returned state {new_state} which is unknown to the "
+                    f"BaseHandler returned state {new_state} which is unknown to the "
                     f"ConversationHandler{' ' + self.name if self.name is not None else ''}.",
                     stacklevel=2,
                 )
@@ -880,7 +881,7 @@ class ConversationHandler(Handler[Update, CCT]):
 
     async def _trigger_timeout(self, context: CallbackContext) -> None:
         """This is run whenever a conversation has timed out. Also makes sure that all handlers
-        which are in the :attr:`TIMEOUT` state and whose :meth:`Handler.check_update` returns
+        which are in the :attr:`TIMEOUT` state and whose :meth:`BaseHandler.check_update` returns
         :obj:`True` is handled.
         """
         job = cast("Job", context.job)

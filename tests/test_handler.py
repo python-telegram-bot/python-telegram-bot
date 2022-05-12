@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 
 
 class TestHandler:
     def test_slot_behaviour(self, mro_slots):
-        class SubclassHandler(Handler):
+        class SubclassHandler(BaseHandler):
             __slots__ = ()
 
             def __init__(self):

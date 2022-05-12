@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, List, Match, Optional, Pattern, TypeVar, Union
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
@@ -32,9 +32,10 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class InlineQueryHandler(Handler[Update, CCT]):
+class InlineQueryHandler(BaseHandler[Update, CCT]):
     """
-    Handler class to handle Telegram updates that contain a :attr:`telegram.Update.inline_query`.
+    BaseHandler class to handle Telegram updates that contain a
+    :attr:`telegram.Update.inline_query`.
     Optionally based on a regex. Read the documentation of the :mod:`re` module for more
     information.
 

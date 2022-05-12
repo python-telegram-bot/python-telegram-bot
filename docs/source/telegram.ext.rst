@@ -19,7 +19,7 @@ Handlers
 
 .. toctree::
 
-    telegram.ext.handler
+    telegram.ext.basehandler
     telegram.ext.callbackqueryhandler
     telegram.ext.chatjoinrequesthandler
     telegram.ext.chatmemberhandler

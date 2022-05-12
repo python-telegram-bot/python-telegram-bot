@@ -50,7 +50,7 @@ _STORING_DATA_WIKI = (
 
 class CallbackContext(Generic[BT, UD, CD, BD]):
     """
-    This is a context object passed to the callback called by :class:`telegram.ext.Handler`
+    This is a context object passed to the callback called by :class:`telegram.ext.BaseHandler`
     or by the :class:`telegram.ext.Application` in an error handler added by
     :attr:`telegram.ext.Application.add_error_handler` or to the callback of a
     :class:`telegram.ext.Job`.
@@ -65,7 +65,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         so make sure to use a fairly unique name for the attributes.
 
     Warning:
-         Do not combine custom attributes with :paramref:`telegram.ext.Handler.block` set to
+         Do not combine custom attributes with :paramref:`telegram.ext.BaseHandler.block` set to
          :obj:`False` or :attr:`telegram.ext.Application.concurrent_updates` set to
          :obj:`True`. Due to how those work, it will almost certainly execute the callbacks for an
          update out of order, and the attributes that you think you added will not be present.
@@ -84,7 +84,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     Attributes:
         coroutine (:term:`coroutine function`): Optional. Only present in error handlers if the
             error was caused by a coroutine run with :meth:`Application.create_task` or a handler
-            callback with :attr:`block=False <Handler.block>`.
+            callback with :attr:`block=False <BaseHandler.block>`.
         matches (List[:meth:`re.Match <re.Match.expand>`]): Optional. If the associated update
             originated from a :class:`filters.Regex`, this will contain a list of match objects for
             every pattern where ``re.search(pattern, string)`` returned a match. Note that filters

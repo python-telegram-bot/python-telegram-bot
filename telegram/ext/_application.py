@@ -56,7 +56,7 @@ from telegram.ext._basepersistence import BasePersistence
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._updater import Updater
 from telegram.ext._utils.stack import was_called_by
 from telegram.ext._utils.trackingdict import TrackingDict
@@ -166,8 +166,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         bot_data (:obj:`dict`): A dictionary handlers can use to store data for the bot.
         persistence (:class:`telegram.ext.BasePersistence`): The persistence class to
             store data that should be persistent over restarts.
-        handlers (Dict[:obj:`int`, List[:class:`telegram.ext.Handler`]]): A dictionary mapping each
-            handler group to the list of handlers registered to that group.
+        handlers (Dict[:obj:`int`, List[:class:`telegram.ext.BaseHandler`]]): A dictionary mapping
+            each handler group to the list of handlers registered to that group.
 
             .. seealso::
                 :meth:`add_handler`, :meth:`add_handlers`.
@@ -237,7 +237,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         self.job_queue = job_queue
         self.context_types = context_types
         self.updater = updater
-        self.handlers: Dict[int, List[Handler]] = {}
+        self.handlers: Dict[int, List[BaseHandler]] = {}
         self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
 
         if isinstance(concurrent_updates, int) and concurrent_updates < 0:
@@ -962,13 +962,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             # (in __create_task_callback)
             self._mark_for_persistence_update(update=update)
 
-    def add_handler(self, handler: Handler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
+    def add_handler(self, handler: BaseHandler[Any, CCT], group: int = DEFAULT_GROUP) -> None:
         """Register a handler.
 
         TL;DR: Order and priority counts. 0 or 1 handlers per group will be used. End handling of
         update with :class:`telegram.ext.ApplicationHandlerStop`.
 
-        A handler must be an instance of a subclass of :class:`telegram.ext.Handler`. All handlers
+        A handler must be an instance of a subclass of :class:`telegram.ext.BaseHandler`. All
+        handlers
         are organized in groups with a numeric value. The default group is 0. All groups will be
         evaluated for handling an update, but only 0 or 1 handler per group will be used. If
         :class:`telegram.ext.ApplicationHandlerStop` is raised from one of the handlers, no further
@@ -978,7 +979,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
           * Priority of the group (lower group number == higher priority)
           * The first handler in a group which can handle an update (see
-            :attr:`telegram.ext.Handler.check_update`) will be used. Other handlers from the
+            :attr:`telegram.ext.BaseHandler.check_update`) will be used. Other handlers from the
             group will not be used. The order in which handlers were added to the group defines the
             priority.
 
@@ -990,7 +991,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             conversation states may be overridden by the loaded data.
 
         Args:
-            handler (:class:`telegram.ext.Handler`): A Handler instance.
+            handler (:class:`telegram.ext.BaseHandler`): A BaseHandler instance.
             group (:obj:`int`, optional): The group identifier. Default is ``0``.
 
         """
@@ -998,8 +999,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         # pylint: disable=import-outside-toplevel
         from telegram.ext._conversationhandler import ConversationHandler
 
-        if not isinstance(handler, Handler):
-            raise TypeError(f"handler is not an instance of {Handler.__name__}")
+        if not isinstance(handler, BaseHandler):
+            raise TypeError(f"handler is not an instance of {BaseHandler.__name__}")
         if not isinstance(group, int):
             raise TypeError("group is not int")
         if isinstance(handler, ConversationHandler) and handler.persistent and handler.name:
@@ -1026,7 +1027,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def add_handlers(
         self,
         handlers: Union[
-            Union[List[Handler], Tuple[Handler]], Dict[int, Union[List[Handler], Tuple[Handler]]]
+            Union[List[BaseHandler], Tuple[BaseHandler]],
+            Dict[int, Union[List[BaseHandler], Tuple[BaseHandler]]],
         ],
         group: DVInput[int] = DefaultValue(0),
     ) -> None:
@@ -1036,8 +1038,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         .. versionadded:: 20.0
 
         Args:
-            handlers (List[:class:`telegram.ext.Handler`] | \
-                Dict[int, List[:class:`telegram.ext.Handler`]]): \
+            handlers (List[:class:`telegram.ext.BaseHandler`] | \
+                Dict[int, List[:class:`telegram.ext.BaseHandler`]]): \
                 Specify a sequence of handlers *or* a dictionary where the keys are groups and
                 values are handlers.
             group (:obj:`int`, optional): Specify which group the sequence of :paramref:`handlers`
@@ -1072,11 +1074,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 "dictionary where the keys are groups and values are sequences of handlers."
             )
 
-    def remove_handler(self, handler: Handler, group: int = DEFAULT_GROUP) -> None:
+    def remove_handler(self, handler: BaseHandler, group: int = DEFAULT_GROUP) -> None:
         """Remove a handler from the specified group.
 
         Args:
-            handler (:class:`telegram.ext.Handler`): A :class:`telegram.ext.Handler` instance.
+            handler (:class:`telegram.ext.BaseHandler`): A :class:`telegram.ext.BaseHandler`
+                instance.
             group (:obj:`object`, optional): The group identifier. Default is ``0``.
 
         """
