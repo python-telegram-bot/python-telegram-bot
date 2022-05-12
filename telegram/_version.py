@@ -17,9 +17,42 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
-
-__version__ = "20.0a0"
-
+from typing import NamedTuple, Dict
 from telegram import constants
+
+_RELEASE_LEVEL_SHORTHANDS: Dict[str, str] = {
+    "alpha": "a",
+    "beta": "b",
+    "candidate": "rc",
+    "final": "final",
+}
+
+
+class Version(NamedTuple):
+    """Copies the behavior of sys.version_info.
+    serial is always 0 for stable releases.
+    """
+
+    major: int
+    minor: int
+    micro: int
+    releaselevel: str  # Literal['alpha', 'beta', 'candidate', 'final']
+    serial: int
+
+    def _rl_shorthand(self) -> str:
+        return _RELEASE_LEVEL_SHORTHANDS[self.releaselevel]
+
+    def __str__(self) -> str:
+        version = f"{self.major}.{self.minor}"
+        if self.micro != 0:
+            version = f"{version}.{self.micro}"
+        if self.releaselevel != "final":
+            version = f"{version}{self._rl_shorthand()}{self.serial}"
+
+        return version
+
+
+__version_info__ = Version(major=20, minor=0, micro=0, releaselevel="alpha", serial=0)
+__version__ = str(__version_info__)
 
 bot_api_version = constants.BOT_API_VERSION  # pylint: disable=invalid-name

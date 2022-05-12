@@ -308,7 +308,7 @@ from ._telegramobject import TelegramObject
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos
-from ._version import __version__, bot_api_version  # noqa: F401
+from ._version import __version__, __version_info__, bot_api_version  # noqa: F401
 from ._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
