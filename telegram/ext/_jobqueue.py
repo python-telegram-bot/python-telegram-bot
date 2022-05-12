@@ -166,6 +166,9 @@ class JobQueue:
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
+
+                .. versionchanged:: 20.0
+                    Renamed the parameter ``context`` to :paramref:`data`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
             job_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to pass to the
@@ -257,6 +260,9 @@ class JobQueue:
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
+
+                .. versionchanged:: 20.0
+                    Renamed the parameter ``context`` to :paramref:`data`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
@@ -339,6 +345,9 @@ class JobQueue:
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
+
+                .. versionchanged:: 20.0
+                    Renamed the parameter ``context`` to :paramref:`data`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
@@ -414,6 +423,9 @@ class JobQueue:
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
+
+                .. versionchanged:: 20.0
+                    Renamed the parameter ``context`` to :paramref:`data`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
@@ -479,6 +491,9 @@ class JobQueue:
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
+
+                .. versionchanged:: 20.0
+                    Renamed the parameter ``context`` to :paramref:`data`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
@@ -564,8 +579,8 @@ class Job:
           this :class:`telegram.ext.Job` to be useful.
 
     .. versionchanged:: 20.0
-        Removed argument and attribute ``job_queue``.
-        Renamed ``job.context`` to ``job.data``.
+       * Removed argument and attribute ``job_queue``.
+       * Renamed ``Job.context`` to :attr:`Job.data`.
 
     Args:
         callback (:term:`coroutine function`): The callback function that should be executed by the

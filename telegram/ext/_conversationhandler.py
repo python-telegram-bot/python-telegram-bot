@@ -882,7 +882,7 @@ class ConversationHandler(Handler[Update, CCT]):
         :obj:`True` is handled.
         """
         job = cast("Job", context.job)
-        ctxt = cast(_ConversationTimeoutContext, job.context)
+        ctxt = cast(_ConversationTimeoutContext, job.data)
 
         _logger.debug(
             "Conversation timeout was triggered for conversation %s!", ctxt.conversation_key
