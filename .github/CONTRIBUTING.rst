@@ -275,7 +275,7 @@ break the API classes. For example:
 .. _`here`: https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
 .. _`Black`: https://black.readthedocs.io/en/stable/index.html
 .. _`popular editors`: https://black.readthedocs.io/en/stable/integrations/editors.html
-.. _`RTD`: https://python-telegram-bot.readthedocs.io/
-.. _`RTD build`: https://python-telegram-bot.readthedocs.io/en/doc-fixes
+.. _`RTD`: https://docs.python-telegram-bot.org/
+.. _`RTD build`: https://docs.python-telegram-bot.org/en/doc-fixes
 .. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
 .. _`section`: #documenting

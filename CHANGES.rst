@@ -1520,7 +1520,7 @@ Changes
 - Lots of small improvements to our tests and documentation.
 
 
-.. _`see docs`: https://python-telegram-bot.readthedocs.io/en/stable/telegram.ext.dispatcher.html#telegram.ext.Dispatcher.add_handler
+.. _`see docs`: https://docs.python-telegram-bot.org/en/stable/telegram.ext.dispatcher.html#telegram.ext.Dispatcher.add_handler
 .. _`#777`: https://github.com/python-telegram-bot/python-telegram-bot/pull/777
 .. _`#806`: https://github.com/python-telegram-bot/python-telegram-bot/pull/806
 .. _`#766`: https://github.com/python-telegram-bot/python-telegram-bot/pull/766

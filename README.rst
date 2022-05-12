@@ -23,7 +23,7 @@
    :alt: PyPi Package Monthly Download
 
 .. image:: https://readthedocs.org/projects/python-telegram-bot/badge/?version=stable
-   :target: https://python-telegram-bot.readthedocs.io/en/stable/
+   :target: https://docs.python-telegram-bot.org/en/stable/
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/pypi/l/python-telegram-bot.svg
@@ -149,7 +149,7 @@ Moreover, the `Tutorial: Your first Bot <https://github.com/python-telegram-bot/
 Resources
 =========
 
-- The `package documentation <https://python-telegram-bot.readthedocs.io/>`_ is the technical reference for ``python-telegram-bot``.
+- The `package documentation <https://docs.python-telegram-bot.org/>`_ is the technical reference for ``python-telegram-bot``.
   It contains descriptions of all available classes, modules, methods and arguments.
 - The `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ is home to number of more elaborate introductions of the different features of ``python-telegram-bot`` and other useful resources that go beyond the technical documentation.
 - Our `examples directory <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/README.md>`_ contains several examples that showcase the different features of both the Bot API and ``python-telegram-bot``.

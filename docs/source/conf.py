@@ -96,7 +96,7 @@ linkcheck_ignore = [
 ]
 linkcheck_allowed_redirects = {
     # Redirects to the default version are okay
-    r"https://python-telegram-bot\.readthedocs\.io/.*": r"https://python-telegram-bot\.readthedocs\.io/en/[\w\d\.]+/.*",
+    r"https://docs\.python-telegram-bot\.org/.*": r"https://docs\.python-telegram-bot\.org/en/[\w\d\.]+/.*",
     # pre-commit.ci always redirects to the latest run
     re.escape(
         "https://results.pre-commit.ci/latest/github/python-telegram-bot/python-telegram-bot/master"
