@@ -21,7 +21,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, List, Optional, Union, Tuple
 
-from telegram import TelegramObject, constants
+from telegram import TelegramObject, constants, MenuButton
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.utils.helpers import (
     mention_html as util_mention_html,
@@ -1240,4 +1240,56 @@ class User(TelegramObject):
         """
         return self.bot.decline_chat_join_request(
             user_id=self.id, chat_id=chat_id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def set_menu_button(
+        self,
+        menu_button: MenuButton = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             bot.set_chat_menu_button(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_menu_button`.
+
+        ..seealso:: :meth:`get_menu_button`
+
+        .. versionadded:: 13.12
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.set_chat_menu_button(
+            chat_id=self.id,
+            menu_button=menu_button,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def get_menu_button(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> MenuButton:
+        """Shortcut for::
+
+             bot.get_chat_menu_button(chat_id=update.effective_user.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.get_chat_menu_button`.
+
+        ..seealso:: :meth:`set_menu_button`
+
+        .. versionadded:: 13.12
+
+        Returns:
+            :class:`telegram.MenuButton`: On success, the current menu button is returned.
+        """
+        return self.bot.get_chat_menu_button(
+            chat_id=self.id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
         )

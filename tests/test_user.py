@@ -430,6 +430,42 @@ class TestUser:
         monkeypatch.setattr(user.bot, 'copy_message', make_assertion)
         assert user.copy_message(chat_id='chat_id', message_id='message_id')
 
+    def test_instance_method_get_menu_button(self, monkeypatch, user):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == user.id
+
+        assert check_shortcut_signature(
+            User.get_menu_button, Bot.get_chat_menu_button, ['chat_id'], []
+        )
+        assert check_shortcut_call(
+            user.get_menu_button,
+            user.bot,
+            'get_chat_menu_button',
+            shortcut_kwargs=['chat_id'],
+        )
+        assert check_defaults_handling(user.get_menu_button, user.bot)
+
+        monkeypatch.setattr(user.bot, 'get_chat_menu_button', make_assertion)
+        assert user.get_menu_button()
+
+    def test_instance_method_set_menu_button(self, monkeypatch, user):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == user.id and kwargs['menu_button'] == 'menu_button'
+
+        assert check_shortcut_signature(
+            User.set_menu_button, Bot.set_chat_menu_button, ['chat_id'], []
+        )
+        assert check_shortcut_call(
+            user.set_menu_button,
+            user.bot,
+            'set_chat_menu_button',
+            shortcut_kwargs=['chat_id'],
+        )
+        assert check_defaults_handling(user.set_menu_button, user.bot)
+
+        monkeypatch.setattr(user.bot, 'set_chat_menu_button', make_assertion)
+        assert user.set_menu_button(menu_button='menu_button')
+
     def test_instance_method_approve_join_request(self, monkeypatch, user):
         def make_assertion(*_, **kwargs):
             chat_id = kwargs['chat_id'] == 'chat_id'

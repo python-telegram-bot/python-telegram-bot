@@ -1182,6 +1182,56 @@ officedocument.wordprocessingml.document")``.
         voice_chat_participants_invited = _VoiceChatParticipantsInvited()
         """Messages that contain :attr:`telegram.Message.voice_chat_participants_invited`."""
 
+        class _VideoChatScheduled(MessageFilter):
+            __slots__ = ()
+            name = 'Filters.status_update.video_chat_scheduled'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.video_chat_scheduled)
+
+        video_chat_scheduled = _VideoChatScheduled()
+        """Messages that contain :attr:`telegram.Message.video_chat_scheduled`."""
+
+        class _VideoChatStarted(MessageFilter):
+            __slots__ = ()
+            name = 'Filters.status_update.video_chat_started'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.video_chat_started)
+
+        video_chat_started = _VideoChatStarted()
+        """Messages that contain :attr:`telegram.Message.video_chat_started`."""
+
+        class _VideoChatEnded(MessageFilter):
+            __slots__ = ()
+            name = 'Filters.status_update.video_chat_ended'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.video_chat_ended)
+
+        video_chat_ended = _VideoChatEnded()
+        """Messages that contain :attr:`telegram.Message.voice_chat_ended`."""
+
+        class _VideoChatParticipantsInvited(MessageFilter):
+            __slots__ = ()
+            name = 'Filters.status_update.video_chat_participants_invited'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.video_chat_participants_invited)
+
+        video_chat_participants_invited = _VideoChatParticipantsInvited()
+        """Messages that contain :attr:`telegram.Message.video_chat_participants_invited`."""
+
+        class _WebAppData(MessageFilter):
+            __slots__ = ()
+            name = 'Filters.status_update.web_app_data'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.web_app_data)
+
+        web_app_data = _WebAppData()
+        """Messages that contain :attr:`telegram.Message.video_chat_participants_invited`."""
+
         name = 'Filters.status_update'
 
         def filter(self, message: Update) -> bool:
@@ -1201,6 +1251,11 @@ officedocument.wordprocessingml.document")``.
                 or self.voice_chat_started(message)
                 or self.voice_chat_ended(message)
                 or self.voice_chat_participants_invited(message)
+                or self.video_chat_scheduled(message)
+                or self.video_chat_started(message)
+                or self.video_chat_ended(message)
+                or self.video_chat_participants_invited(message)
+                or self.web_app_data(message)
             )
 
     status_update = _StatusUpdate()
@@ -1242,18 +1297,38 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.voice_chat_scheduled`.
 
             .. versionadded:: 13.5
+            .. deprecated:: 13.12
         voice_chat_started: Messages that contain
             :attr:`telegram.Message.voice_chat_started`.
 
             .. versionadded:: 13.4
+            .. deprecated:: 13.12
         voice_chat_ended: Messages that contain
             :attr:`telegram.Message.voice_chat_ended`.
 
             .. versionadded:: 13.4
+            .. deprecated:: 13.12
         voice_chat_participants_invited: Messages that contain
             :attr:`telegram.Message.voice_chat_participants_invited`.
 
             .. versionadded:: 13.4
+            .. deprecated:: 13.12
+        video_chat_scheduled: Messages that contain
+            :attr:`telegram.Message.video_chat_scheduled`.
+
+            .. versionadded:: 13.12
+        video_chat_started: Messages that contain
+            :attr:`telegram.Message.video_chat_started`.
+
+            .. versionadded:: 13.12
+        video_chat_ended: Messages that contain
+            :attr:`telegram.Message.video_chat_ended`.
+
+            .. versionadded:: 13.12
+        video_chat_participants_invited: Messages that contain
+            :attr:`telegram.Message.video_chat_participants_invited`.
+
+            .. versionadded:: 13.12
 
     """
 

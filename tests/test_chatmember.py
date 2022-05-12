@@ -183,6 +183,9 @@ class TestChatMember:
         if chat_member_type.can_manage_voice_chats is not None:
             assert chat_member_type.can_manage_voice_chats is True
             assert type(chat_member_type) == ChatMemberAdministrator
+        if chat_member_type.can_manage_video_chats is not None:
+            assert chat_member_type.can_manage_video_chats is True
+            assert type(chat_member_type) == ChatMemberAdministrator
 
     def test_de_json_invalid_status(self, bot, user):
         json_dict = {'status': 'invalid', 'user': user.to_dict()}
@@ -217,7 +220,7 @@ class TestChatMember:
             'can_send_other_messages': True,
             'can_add_web_page_previews': False,
             'can_manage_chat': True,
-            'can_manage_voice_chats': True,
+            'can_manage_video_chats': True,
         }
         assert type(cls.de_json(json_dict, bot)) is cls
 

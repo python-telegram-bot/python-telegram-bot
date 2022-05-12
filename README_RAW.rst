@@ -20,7 +20,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://pypi.org/project/python-telegram-bot-raw/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-5.7-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-6.0-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -67,6 +67,8 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 Table of contents
 =================
 
+- `Depreciation warning`_
+
 - `Introduction`_
 
 - `Telegram API support`_
@@ -84,6 +86,14 @@ Table of contents
 - `Contributing`_
 
 - `License`_
+
+====================
+Depreciation warning
+====================
+
+> You are reading the documentation of V13.
+> This version is currently in "Bot API compatibility mode", so will only get updates to include new Bot API features.
+> If you can, you should switch your code to V20.
 
 ============
 Introduction
@@ -105,7 +115,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **5.7** are supported.
+All types and methods of the Telegram Bot API **6.0** are supported.
 
 ==========
 Installing

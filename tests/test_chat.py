@@ -706,6 +706,42 @@ class TestChat:
         monkeypatch.setattr(chat.bot, 'revoke_chat_invite_link', make_assertion)
         assert chat.revoke_invite_link(invite_link=link)
 
+    def test_instance_method_get_menu_button(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id
+
+        assert check_shortcut_signature(
+            Chat.get_menu_button, Bot.get_chat_menu_button, ['chat_id'], []
+        )
+        assert check_shortcut_call(
+            chat.get_menu_button,
+            chat.bot,
+            'get_chat_menu_button',
+            shortcut_kwargs=['chat_id'],
+        )
+        assert check_defaults_handling(chat.get_menu_button, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'get_chat_menu_button', make_assertion)
+        assert chat.get_menu_button()
+
+    def test_instance_method_set_menu_button(self, monkeypatch, chat):
+        def make_assertion(*_, **kwargs):
+            return kwargs['chat_id'] == chat.id and kwargs['menu_button'] == 'menu_button'
+
+        assert check_shortcut_signature(
+            Chat.set_menu_button, Bot.set_chat_menu_button, ['chat_id'], []
+        )
+        assert check_shortcut_call(
+            chat.set_menu_button,
+            chat.bot,
+            'set_chat_menu_button',
+            shortcut_kwargs=['chat_id'],
+        )
+        assert check_defaults_handling(chat.set_menu_button, chat.bot)
+
+        monkeypatch.setattr(chat.bot, 'set_chat_menu_button', make_assertion)
+        assert chat.set_menu_button(menu_button='menu_button')
+
     def test_approve_join_request(self, monkeypatch, chat):
         def make_assertion(*_, **kwargs):
             return kwargs['chat_id'] == chat.id and kwargs['user_id'] == 42

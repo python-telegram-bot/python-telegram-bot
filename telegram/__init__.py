@@ -20,9 +20,16 @@
 
 from .base import TelegramObject
 from .botcommand import BotCommand
+from .webappdata import WebAppData
+from .webappinfo import WebAppInfo
+from .sentwebappmessage import SentWebAppMessage
+from .menubutton import MenuButton, MenuButtonCommands, MenuButtonDefault, MenuButtonWebApp
+from .loginurl import LoginUrl
+from .games.callbackgame import CallbackGame
 from .user import User
 from .files.chatphoto import ChatPhoto
 from .chat import Chat
+from .chatadministratorrights import ChatAdministratorRights
 from .chatlocation import ChatLocation
 from .chatinvitelink import ChatInviteLink
 from .chatjoinrequest import ChatJoinRequest
@@ -71,9 +78,13 @@ from .voicechat import (
     VoiceChatParticipantsInvited,
     VoiceChatScheduled,
 )
-from .loginurl import LoginUrl
+from .videochat import (
+    VideoChatStarted,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
+)
 from .proximityalerttriggered import ProximityAlertTriggered
-from .games.callbackgame import CallbackGame
 from .payment.shippingaddress import ShippingAddress
 from .payment.orderinfo import OrderInfo
 from .payment.successfulpayment import SuccessfulPayment
@@ -193,6 +204,7 @@ __all__ = (  # Keep this alphabetically ordered
     'CallbackGame',
     'CallbackQuery',
     'Chat',
+    'ChatAdministratorRights',
     'ChatAction',
     'ChatInviteLink',
     'ChatJoinRequest',
@@ -272,6 +284,10 @@ __all__ = (  # Keep this alphabetically ordered
     'MAX_MESSAGES_PER_SECOND_PER_CHAT',
     'MAX_MESSAGE_LENGTH',
     'MaskPosition',
+    'MenuButton',
+    'MenuButtonCommands',
+    'MenuButtonDefault',
+    'MenuButtonWebApp',
     'Message',
     'MessageAutoDeleteTimerChanged',
     'MessageEntity',
@@ -304,6 +320,7 @@ __all__ = (  # Keep this alphabetically ordered
     'SUPPORTED_WEBHOOK_PORTS',
     'SecureData',
     'SecureValue',
+    'SentWebAppMessage',
     'ShippingAddress',
     'ShippingOption',
     'ShippingQuery',
@@ -318,11 +335,17 @@ __all__ = (  # Keep this alphabetically ordered
     'UserProfilePhotos',
     'Venue',
     'Video',
+    'VideoChatEnded',
+    'VideoChatParticipantsInvited',
+    'VideoChatScheduled',
+    'VideoChatStarted',
     'VideoNote',
     'Voice',
     'VoiceChatStarted',
     'VoiceChatEnded',
     'VoiceChatScheduled',
     'VoiceChatParticipantsInvited',
+    'WebAppData',
+    'WebAppInfo',
     'WebhookInfo',
 )

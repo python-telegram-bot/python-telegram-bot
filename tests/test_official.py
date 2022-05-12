@@ -121,6 +121,7 @@ def check_object(h4):
             name.startswith('InlineQueryResult')
             or name.startswith('InputMedia')
             or name.startswith('BotCommandScope')
+            or name.startswith('MenuButton')
         ) and field == 'type':
             continue
         elif (name.startswith('ChatMember')) and field == 'status':
@@ -167,6 +168,8 @@ def check_object(h4):
             'until_date',
         }
     if name == 'BotCommandScope':
+        ignored |= {'type'}  # attributes common to all subclasses
+    if name == 'MenuButton':
         ignored |= {'type'}  # attributes common to all subclasses
     elif name == 'User':
         ignored |= {'type'}  # TODO: Deprecation

@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
-from telegram import MessageAutoDeleteTimerChanged, VoiceChatEnded
+from telegram import MessageAutoDeleteTimerChanged, VoiceChatEnded, VideoChatEnded
 
 
 class TestMessageAutoDeleteTimerChanged:
@@ -49,6 +49,7 @@ class TestMessageAutoDeleteTimerChanged:
         b = MessageAutoDeleteTimerChanged(100)
         c = MessageAutoDeleteTimerChanged(50)
         d = VoiceChatEnded(25)
+        e = VideoChatEnded(30)
 
         assert a == b
         assert hash(a) == hash(b)
@@ -58,3 +59,6 @@ class TestMessageAutoDeleteTimerChanged:
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
