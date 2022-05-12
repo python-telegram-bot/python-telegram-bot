@@ -119,7 +119,7 @@ class ConversationHandler(Handler[Update, CCT]):
         :attr:`END` to end the *parent* conversation from within the nested one. For an example on
         nested :class:`ConversationHandler` s, see our `examples`_.
 
-    .. _`examples`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples
+    .. _`examples`: https://github.com/python-telegram-bot/python-telegram-bot/blob/v13.x/examples
 
     Args:
         entry_points (List[:class:`telegram.ext.Handler`]): A list of ``Handler`` objects that can
