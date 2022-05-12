@@ -121,7 +121,7 @@ class JobQueue:
         self,
         callback: JobCallback,
         when: Union[float, datetime.timedelta, datetime.datetime, datetime.time],
-        context: object = None,
+        data: object = None,
         name: str = None,
         chat_id: int = None,
         user_id: int = None,
@@ -163,8 +163,8 @@ class JobQueue:
                 be available in the callback.
 
                 .. versionadded:: 20.0
-            context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+            data (:obj:`object`, optional): Additional data needed for the callback function.
+                Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
@@ -180,7 +180,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback=callback, context=context, name=name, chat_id=chat_id, user_id=user_id)
+        job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
         date_time = self._parse_time_input(when, shift_day=True)
 
         j = self.scheduler.add_job(
@@ -202,7 +202,7 @@ class JobQueue:
         interval: Union[float, datetime.timedelta],
         first: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
         last: Union[float, datetime.timedelta, datetime.datetime, datetime.time] = None,
-        context: object = None,
+        data: object = None,
         name: str = None,
         chat_id: int = None,
         user_id: int = None,
@@ -254,8 +254,8 @@ class JobQueue:
                 assumed.
 
                 Defaults to :obj:`None`.
-            context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+            data (:obj:`object`, optional): Additional data needed for the callback function.
+                Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
@@ -282,7 +282,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback=callback, context=context, name=name, chat_id=chat_id, user_id=user_id)
+        job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         dt_first = self._parse_time_input(first)
         dt_last = self._parse_time_input(last)
@@ -312,7 +312,7 @@ class JobQueue:
         callback: JobCallback,
         when: datetime.time,
         day: int,
-        context: object = None,
+        data: object = None,
         name: str = None,
         chat_id: int = None,
         user_id: int = None,
@@ -336,8 +336,8 @@ class JobQueue:
                 be within the range of 1 and 31, inclusive. If a month has fewer days than this
                 number, the job will not run in this month. Passing -1 leads to the job running on
                 the last day of the month.
-            context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+            data (:obj:`object`, optional): Additional data needed for the callback function.
+                Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
@@ -364,7 +364,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback=callback, context=context, name=name, chat_id=chat_id, user_id=user_id)
+        job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(
             job.run,
@@ -386,7 +386,7 @@ class JobQueue:
         callback: JobCallback,
         time: datetime.time,
         days: Tuple[int, ...] = tuple(range(7)),
-        context: object = None,
+        data: object = None,
         name: str = None,
         chat_id: int = None,
         user_id: int = None,
@@ -411,8 +411,8 @@ class JobQueue:
                 be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run (where ``0-6`` correspond to monday - sunday). Defaults to ``EVERY_DAY``
-            context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+            data (:obj:`object`, optional): Additional data needed for the callback function.
+                Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
@@ -439,7 +439,7 @@ class JobQueue:
             job_kwargs = {}
 
         name = name or callback.__name__
-        job = Job(callback=callback, context=context, name=name, chat_id=chat_id, user_id=user_id)
+        job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(
             job.run,
@@ -461,7 +461,7 @@ class JobQueue:
         self,
         callback: JobCallback,
         job_kwargs: JSONDict,
-        context: object = None,
+        data: object = None,
         name: str = None,
         chat_id: int = None,
         user_id: int = None,
@@ -476,8 +476,8 @@ class JobQueue:
 
             job_kwargs (:obj:`dict`): Arbitrary keyword arguments. Used as arguments for
                 :meth:`apscheduler.schedulers.base.BaseScheduler.add_job`.
-            context (:obj:`object`, optional): Additional data needed for the callback function.
-                Can be accessed through :attr:`Job.context` in the callback. Defaults to
+            data (:obj:`object`, optional): Additional data needed for the callback function.
+                Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
             name (:obj:`str`, optional): The name of the new job. Defaults to
                 :external:attr:`callback.__name__ <definition.__name__>`.
@@ -499,7 +499,7 @@ class JobQueue:
 
         """
         name = name or callback.__name__
-        job = Job(callback=callback, context=context, name=name, chat_id=chat_id, user_id=user_id)
+        job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
         j = self.scheduler.add_job(job.run, args=(self.application,), name=name, **job_kwargs)
 
@@ -565,6 +565,7 @@ class Job:
 
     .. versionchanged:: 20.0
         Removed argument and attribute ``job_queue``.
+        Renamed ``job.context`` to ``job.data``.
 
     Args:
         callback (:term:`coroutine function`): The callback function that should be executed by the
@@ -572,8 +573,8 @@ class Job:
 
                 async def callback(context: CallbackContext)
 
-        context (:obj:`object`, optional): Additional data needed for the callback function. Can be
-            accessed through :attr:`Job.context` in the callback. Defaults to :obj:`None`.
+        data (:obj:`object`, optional): Additional data needed for the callback function. Can be
+            accessed through :attr:`Job.data` in the callback. Defaults to :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to
             :external:obj:`callback.__name__ <definition.__name__>`.
         job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
@@ -587,7 +588,7 @@ class Job:
     Attributes:
         callback (:term:`coroutine function`): The callback function that should be executed by the
             new job.
-        context (:obj:`object`): Optional. Additional data needed for the callback function.
+        data (:obj:`object`): Optional. Additional data needed for the callback function.
         name (:obj:`str`): Optional. The name of the new job.
         job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
         chat_id (:obj:`int`): Optional. Chat id of the chat that this job is associated with.
@@ -600,7 +601,7 @@ class Job:
 
     __slots__ = (
         "callback",
-        "context",
+        "data",
         "name",
         "_removed",
         "_enabled",
@@ -612,7 +613,7 @@ class Job:
     def __init__(
         self,
         callback: JobCallback,
-        context: object = None,
+        data: object = None,
         name: str = None,
         job: APSJob = None,
         chat_id: int = None,
@@ -620,7 +621,7 @@ class Job:
     ):
 
         self.callback = callback
-        self.context = context
+        self.data = data
         self.name = name or callback.__name__
         self.chat_id = chat_id
         self.user_id = user_id

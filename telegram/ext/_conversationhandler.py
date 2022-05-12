@@ -64,7 +64,7 @@ _logger = logging.getLogger(__name__)
 @dataclass
 class _ConversationTimeoutContext(Generic[CCT]):
     """Used as a datastore for conversation timeouts. Passed in the
-    :paramref:`JobQueue.run_once.context` parameter. See :meth:`_trigger_timeout`.
+    :paramref:`JobQueue.run_once.data` parameter. See :meth:`_trigger_timeout`.
     """
 
     __slots__ = ("conversation_key", "update", "application", "callback_context")
@@ -666,9 +666,7 @@ class ConversationHandler(Handler[Update, CCT]):
             self.timeout_jobs[conversation_key] = j_queue.run_once(
                 self._trigger_timeout,
                 self.conversation_timeout,  # type: ignore[arg-type]
-                context=_ConversationTimeoutContext(
-                    conversation_key, update, application, context
-                ),
+                data=_ConversationTimeoutContext(conversation_key, update, application, context),
             )
         except Exception as exc:
             _logger.exception("Failed to schedule timeout.", exc_info=exc)
