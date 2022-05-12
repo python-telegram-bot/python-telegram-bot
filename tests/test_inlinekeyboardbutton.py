@@ -44,7 +44,7 @@ class TestInlineKeyboardButton:
     switch_inline_query = "switch_inline_query"
     switch_inline_query_current_chat = "switch_inline_query_current_chat"
     callback_game = CallbackGame()
-    pay = "pay"
+    pay = True
     login_url = LoginUrl("http://google.com")
     web_app = WebAppInfo(url="https://example.com")
 
