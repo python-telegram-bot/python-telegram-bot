@@ -21,7 +21,7 @@ bot.
 import logging
 
 from telegram import Update
-from telegram.ext import Application, CallbackContext, CommandHandler
+from telegram.ext import Application, CommandHandler, ContextTypes
 
 # Enable logging
 logging.basicConfig(
@@ -35,18 +35,18 @@ logging.basicConfig(
 # since context is an unused local variable.
 # This being an example and not having context present confusing beginners,
 # we decided to have it present as context.
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends explanation on how to use the bot."""
     await update.message.reply_text("Hi! Use /set <seconds> to set a timer")
 
 
-async def alarm(context: CallbackContext.DEFAULT_TYPE) -> None:
+async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
     job = context.job
     await context.bot.send_message(job.chat_id, text=f"Beep! {job.data} seconds are over!")
 
 
-def remove_job_if_exists(name: str, context: CallbackContext.DEFAULT_TYPE) -> bool:
+def remove_job_if_exists(name: str, context: ContextTypes.DEFAULT_TYPE) -> bool:
     """Remove job with given name. Returns whether job was removed."""
     current_jobs = context.job_queue.get_jobs_by_name(name)
     if not current_jobs:
@@ -56,14 +56,14 @@ def remove_job_if_exists(name: str, context: CallbackContext.DEFAULT_TYPE) -> bo
     return True
 
 
-async def set_timer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def set_timer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Add a job to the queue."""
     chat_id = update.effective_message.chat_id
     try:
         # args[0] should contain the time for the timer in seconds
-        due = int(context.args[0])
+        due = float(context.args[0])
         if due < 0:
-            await update.message.reply_text("Sorry we can not go back to future!")
+            await update.effective_message.reply_text("Sorry we can not go back to future!")
             return
 
         job_removed = remove_job_if_exists(str(chat_id), context)
@@ -72,13 +72,13 @@ async def set_timer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> No
         text = "Timer successfully set!"
         if job_removed:
             text += " Old one was removed."
-        await update.message.reply_text(text)
+        await update.effective_message.reply_text(text)
 
     except (IndexError, ValueError):
         await update.effective_message.reply_text("Usage: /set <seconds>")
 
 
-async def unset(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def unset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
     job_removed = remove_job_if_exists(str(chat_id), context)

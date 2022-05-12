@@ -34,13 +34,14 @@ from typing import (
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
 from telegram.ext._extbot import ExtBot
-from telegram.ext._utils.types import BD, BT, CD, UD  # pylint: disable=unused-import
+from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
     from asyncio import Queue
+    from typing import Any
 
-    from telegram.ext import Application, Job, JobQueue
-    from telegram.ext._utils.types import CCT, JQ
+    from telegram.ext import Application, Job, JobQueue  # noqa: F401
+    from telegram.ext._utils.types import CCT
 
 _STORING_DATA_WIKI = (
     "https://github.com/python-telegram-bot/python-telegram-bot"
@@ -77,6 +78,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     3. The type of :attr:`chat_data` (if :attr:`chat_data` is not :obj:`None`).
     4. The type of :attr:`bot_data` (if :attr:`bot_data` is not :obj:`None`).
 
+    .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`
+
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this
             context.
@@ -104,26 +107,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     """
 
-    if TYPE_CHECKING:
-        DEFAULT_TYPE = CallbackContext[  # type: ignore[misc]  # noqa: F821
-            ExtBot, Dict, Dict, Dict
-        ]
-    else:
-        # Somewhat silly workaround so that accessing the attribute
-        # doesn't only work while type checking
-        DEFAULT_TYPE = "CallbackContext[ExtBot, Dict, Dict, Dict]"  # pylint: disable-all
-        """Shortcut for the type annotation for the `context` argument that's correct for the
-        default settings, i.e. if :class:`telegram.ext.ContextTypes` is not used.
-
-        Example:
-            .. code:: python
-
-                async def callback(update: Update, context: CallbackContext.DEFAULT_TYPE):
-                    ...
-
-        .. versionadded: 20.0
-        """
-
     __slots__ = (
         "_application",
         "_chat_id_and_data",
@@ -136,7 +119,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         "__dict__",
     )
 
-    def __init__(self: "CCT", application: "Application[BT, CCT, UD, CD, BD, JQ]"):
+    def __init__(self: "CCT", application: "Application[BT, CCT, UD, CD, BD, Any]"):
         self._application = application
         self._chat_id_and_data: Optional[Tuple[int, CD]] = None
         self._user_id_and_data: Optional[Tuple[int, UD]] = None
@@ -147,7 +130,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.coroutine: Optional[Coroutine] = None
 
     @property
-    def application(self) -> "Application[BT, CCT, UD, CD, BD, JQ]":
+    def application(self) -> "Application[BT, CCT, UD, CD, BD, Any]":
         """:class:`telegram.ext.Application`: The application associated with this context."""
         return self._application
 
@@ -260,7 +243,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         cls: Type["CCT"],
         update: object,
         error: Exception,
-        application: "Application[BT, CCT, UD, CD, BD, JQ]",
+        application: "Application[BT, CCT, UD, CD, BD, Any]",
         job: "Job" = None,
         coroutine: Coroutine = None,
     ) -> "CCT":
@@ -296,7 +279,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     def from_update(
         cls: Type["CCT"],
         update: object,
-        application: "Application[BT, CCT, UD, CD, BD, JQ]",
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
@@ -312,7 +295,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(application)  # type: ignore[arg-type]
+        self = cls(application)  # type: ignore
 
         if update is not None and isinstance(update, Update):
             chat = update.effective_chat
@@ -321,12 +304,12 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             if chat:
                 self._chat_id_and_data = (
                     chat.id,
-                    application.chat_data[chat.id],  # pylint: disable=protected-access
+                    application.chat_data[chat.id],
                 )
             if user:
                 self._user_id_and_data = (
                     user.id,
-                    application.user_data[user.id],  # pylint: disable=protected-access
+                    application.user_data[user.id],
                 )
         return self
 
@@ -334,7 +317,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     def from_job(
         cls: Type["CCT"],
         job: "Job",
-        application: "Application[BT, CCT, UD, CD, BD, JQ]",
+        application: "Application[Any, CCT, Any, Any, Any, Any]",
     ) -> "CCT":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
@@ -350,18 +333,18 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(application)  # type: ignore[arg-type]
+        self = cls(application)  # type: ignore
         self.job = job
 
         if job.chat_id:
             self._chat_id_and_data = (
                 job.chat_id,
-                application.chat_data[job.chat_id],  # pylint: disable=protected-access
+                application.chat_data[job.chat_id],
             )
         if job.user_id:
             self._user_id_and_data = (
                 job.user_id,
-                application.user_data[job.user_id],  # pylint: disable=protected-access
+                application.user_data[job.user_id],
             )
         return self
 

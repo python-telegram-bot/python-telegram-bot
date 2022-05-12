@@ -112,7 +112,6 @@ if TYPE_CHECKING:
         MessageEntity,
     )
 
-RT = TypeVar("RT")
 BT = TypeVar("BT", bound="Bot")
 
 
