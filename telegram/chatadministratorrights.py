@@ -25,16 +25,16 @@ from telegram import TelegramObject
 
 class ChatAdministratorRights(TelegramObject):
     """Represents the rights of an administrator in a chat.
-        Objects of this class are comparable in terms of equality. Two objects of this class are
-        considered equal, if their :attr:`is_anonymous`, :attr:`can_manage_chat`,
-        :attr:`can_delete_messages`, :attr:`can_manage_video_chats`, :attr:`can_restrict_members`,
-        :attr:`can_promote_members`, :attr:`can_change_info`, :attr:`can_invite_users`,
-        :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages` are equal.
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`is_anonymous`, :attr:`can_manage_chat`,
+    :attr:`can_delete_messages`, :attr:`can_manage_video_chats`, :attr:`can_restrict_members`,
+    :attr:`can_promote_members`, :attr:`can_change_info`, :attr:`can_invite_users`,
+    :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages` are equal.
 
-        .. seealso: :meth:`Bot.set_my_default_administrator_rights`,
-            :meth:`Bot.get_my_default_administrator_rights`
+    .. seealso: :meth:`Bot.set_my_default_administrator_rights`,
+        :meth:`Bot.get_my_default_administrator_rights`
 
-        .. versionadded:: 13.12
+    .. versionadded:: 13.12
 
     Args:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -88,7 +88,8 @@ class ChatAdministratorRights(TelegramObject):
         can_edit_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
             messages of other users.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
-            messages; groups and supergroups only."""
+            messages; groups and supergroups only.
+    """
 
     __slots__ = (
         'is_anonymous',

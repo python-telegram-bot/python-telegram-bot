@@ -584,24 +584,32 @@ class Message(TelegramObject):
         web_app_data: WebAppData = None,
         **_kwargs: Any,
     ):
-        if voice_chat_scheduled is not None and video_chat_scheduled is not None:
-            if voice_chat_scheduled != video_chat_scheduled:
-                raise ValueError("Only supply `video_chat_scheduled`, not `voice_chat_scheduled`.")
-        if voice_chat_started is not None and video_chat_started is not None:
-            if voice_chat_started != video_chat_started:
-                raise ValueError("Only supply `video_chat_started`, not `voice_chat_started`.")
-        if voice_chat_ended is not None and video_chat_ended is not None:
-            if voice_chat_ended != video_chat_ended:
-                raise ValueError("Only supply `video_chat_ended`, not `voice_chat_ended`.")
+        if (
+            voice_chat_scheduled is not None
+            and video_chat_scheduled is not None
+            and voice_chat_scheduled != video_chat_scheduled
+        ):
+            raise ValueError("Only supply `video_chat_scheduled`, not `voice_chat_scheduled`.")
+        if (
+            voice_chat_started is not None
+            and video_chat_started is not None
+            and voice_chat_started != video_chat_started
+        ):
+            raise ValueError("Only supply `video_chat_started`, not `voice_chat_started`.")
+        if (
+            voice_chat_ended is not None
+            and video_chat_ended is not None
+            and voice_chat_ended != video_chat_ended
+        ):
+            raise ValueError("Only supply `video_chat_ended`, not `voice_chat_ended`.")
         if (
             voice_chat_participants_invited is not None
             and video_chat_participants_invited is not None
-        ):
-            if voice_chat_participants_invited != video_chat_participants_invited:
-                raise ValueError(
-                    "Only supply `video_chat_participants_invited`,"
-                    " not `voice_chat_participants_invited`."
-                )
+        ) and voice_chat_participants_invited != video_chat_participants_invited:
+            raise ValueError(
+                "Only supply `video_chat_participants_invited`,"
+                " not `voice_chat_participants_invited`."
+            )
 
         # Required
         self.message_id = int(message_id)
