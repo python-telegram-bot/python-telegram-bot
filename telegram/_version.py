@@ -19,6 +19,8 @@
 # pylint: disable=missing-module-docstring
 from typing import NamedTuple
 
+__all__ = ("__version__", "__version_info__", "__bot_api_version__", "__bot_api_version_info__")
+
 
 class Version(NamedTuple):
     """Copies the behavior of sys.version_info.
