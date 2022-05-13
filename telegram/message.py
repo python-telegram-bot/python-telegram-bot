@@ -94,8 +94,7 @@ class Message(TelegramObject):
         In Python ``from`` is a reserved word, use ``from_user`` instead.
 
     .. versionchanged:: 13.12
-        Since Bot API 6.0, voice chat was renamed to video chat. The old parameter is
-        supported but is supplied as video_chats.
+        Since Bot API 6.0, voice chat was renamed to video chat.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -597,14 +596,6 @@ class Message(TelegramObject):
                 "Only supply one of `video_chat_scheduled`/`voice_chat_scheduled`, not both."
             )
         if (
-            voice_chat_started is not None
-            and video_chat_started is not None
-            and voice_chat_started != video_chat_started
-        ):
-            raise ValueError(
-                "Only supply one of `video_chat_started`/`voice_chat_started`, not both."
-            )
-        if (
             voice_chat_ended is not None
             and video_chat_ended is not None
             and voice_chat_ended != video_chat_ended
@@ -680,6 +671,7 @@ class Message(TelegramObject):
         self.voice_chat_scheduled = temp0
         self.video_chat_scheduled = temp0
 
+        # those are empty classes, so they don't need a comparison like the others.
         temp1 = video_chat_started if video_chat_started is not None else voice_chat_started
         self.voice_chat_started = temp1
         self.video_chat_started = temp1

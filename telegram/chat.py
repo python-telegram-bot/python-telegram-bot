@@ -602,8 +602,7 @@ class Chat(TelegramObject):
         .. versionadded:: 13.2
 
         ..versionchanged:: 13.12
-            Since Bot API 6.0, voice chat was renamed to video chat. The old parameter is
-            supported but is supplied as video_chats.
+            Since Bot API 6.0, voice chat was renamed to video chat.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

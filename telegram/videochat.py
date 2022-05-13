@@ -38,7 +38,7 @@ class VideoChatStarted(TelegramObject):
     .. versionadded:: 13.12
     """
 
-    __slots__ = ('_id_attrs',)
+    __slots__ = ()
 
     def __init__(self, **_kwargs: Any):  # skipcq: PTC-W0049
         pass
