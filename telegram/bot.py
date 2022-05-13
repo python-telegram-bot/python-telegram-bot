@@ -5522,7 +5522,7 @@ class Bot(TelegramObject):
         data: JSONDict = {}
 
         if rights is not None:
-            data['rights'] = rights.to_json()
+            data['rights'] = rights.to_dict()
 
         if for_channels is not None:
             data['for_channels'] = for_channels
@@ -5866,7 +5866,7 @@ class Bot(TelegramObject):
         if chat_id is not None:
             data['chat_id'] = chat_id
         if menu_button is not None:
-            data['menu_button'] = menu_button.to_json()
+            data['menu_button'] = menu_button.to_dict()
 
         return self._post(  # type: ignore[return-value]
             'setChatMenuButton',

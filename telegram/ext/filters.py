@@ -1230,7 +1230,7 @@ officedocument.wordprocessingml.document")``.
                 return bool(message.web_app_data)
 
         web_app_data = _WebAppData()
-        """Messages that contain :attr:`telegram.Message.video_chat_participants_invited`."""
+        """Messages that contain :attr:`telegram.Message.web_app_data`."""
 
         name = 'Filters.status_update'
 

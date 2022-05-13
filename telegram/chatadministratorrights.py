@@ -53,7 +53,7 @@ class ChatAdministratorRights(TelegramObject):
             has promoted, directly or indirectly (promoted by administrators that were appointed by
             the user.)
         can_change_info (:obj:`bool`): :obj:`True`, if the user is allowed to change the chat title
-            ,photo and other settings.
+            , photo and other settings.
         can_invite_users (:obj:`bool`): :obj:`True`, if the user is allowed to invite new users to
             the chat.
         can_post_messages (:obj:`bool`, optional): :obj:`True`, if the administrator can post
@@ -155,7 +155,6 @@ class ChatAdministratorRights(TelegramObject):
         This method returns the :class:`ChatAdministratorRights` object with all attributes set to
         :obj:`True`. This is e.g. useful when changing the bot's default administrator rights with
         :meth:`telegram.Bot.set_my_default_administrator_rights`.
-        .. versionadded:: 20.0
         """
         return cls(True, True, True, True, True, True, True, True, True, True, True)
 
@@ -164,6 +163,5 @@ class ChatAdministratorRights(TelegramObject):
         """
         This method returns the :class:`ChatAdministratorRights` object with all attributes set to
         :obj:`False`.
-        .. versionadded:: 20.0
         """
         return cls(False, False, False, False, False, False, False, False, False, False, False)

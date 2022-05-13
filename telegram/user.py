@@ -1250,7 +1250,7 @@ class User(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             bot.set_chat_menu_button(chat_id=update.effective_chat.id, *args, **kwargs)
+             bot.set_chat_menu_button(chat_id=update.effective_user.id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_menu_button`.
