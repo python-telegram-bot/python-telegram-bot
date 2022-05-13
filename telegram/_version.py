@@ -17,15 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
-from typing import NamedTuple, Dict
-from telegram import constants
-
-_RELEASE_LEVEL_SHORTHANDS: Dict[str, str] = {
-    "alpha": "a",
-    "beta": "b",
-    "candidate": "rc",
-    "final": "final",
-}
+from typing import NamedTuple
 
 
 class Version(NamedTuple):
@@ -40,7 +32,12 @@ class Version(NamedTuple):
     serial: int
 
     def _rl_shorthand(self) -> str:
-        return _RELEASE_LEVEL_SHORTHANDS[self.releaselevel]
+        return {
+            "alpha": "a",
+            "beta": "b",
+            "candidate": "rc",
+            "final": "final",
+        }[self.releaselevel]
 
     def __str__(self) -> str:
         version = f"{self.major}.{self.minor}"
@@ -54,6 +51,12 @@ class Version(NamedTuple):
 
 __version_info__ = Version(major=20, minor=0, micro=0, releaselevel="alpha", serial=0)
 __version__ = str(__version_info__)
+
+# # SETUP.PY MARKER
+# Lines above this line will be `exec`-cuted in setup.py. Make sure that this only contains
+# std-lib imports!
+
+from telegram import constants  # noqa: E402  # pylint: disable=wrong-import-position
 
 __bot_api_version__ = constants.BOT_API_VERSION
 __bot_api_version_info__ = constants.BOT_API_VERSION_INFO
