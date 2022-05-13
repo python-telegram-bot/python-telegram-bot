@@ -24,7 +24,7 @@ Warning:
     the changelog.
 """
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import IO, TYPE_CHECKING, Any, Dict, Optional, Tuple, TypeVar, Union, Collection
 
 if TYPE_CHECKING:
     from telegram import InputFile
@@ -54,8 +54,8 @@ DVInput = Union["DefaultValue[DVType]", DVType]
 as ``Union[DefaultValue, type]``."""
 
 RT = TypeVar("RT")
-SLT = Union[RT, List[RT], Tuple[RT, ...]]
-"""Single instance or list/tuple of instances."""
+SCT = Union[RT, Collection[RT]]
+"""Single instance or collection of instances."""
 
 ReplyMarkup = Union[
     "InlineKeyboardMarkup", "ReplyKeyboardMarkup", "ReplyKeyboardRemove", "ForceReply"

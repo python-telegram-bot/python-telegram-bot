@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypeVar, Union
 
 from telegram import MessageEntity, Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
-from telegram._utils.types import SLT, DVInput
+from telegram._utils.types import SCT, DVInput
 from telegram.ext import filters as filters_module
 from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
@@ -53,7 +53,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
+        command (:obj:`str` | Collection[:obj:`str`]):
             The command or list of commands this handler should listen for.
             Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -76,8 +76,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         :exc:`ValueError`: When the command is too long or has illegal chars.
 
     Attributes:
-        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
-            The command or list of commands this handler should listen for.
+        command (List[:obj:`str`]): The list of commands this handler should listen for.
             Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
         callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
@@ -91,7 +90,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
 
     def __init__(
         self,
-        command: SLT[str],
+        command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
         filters: filters_module.BaseFilter = None,
         block: DVInput[bool] = DEFAULT_TRUE,
@@ -207,9 +206,9 @@ class PrefixHandler(CommandHandler):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Args:
-        prefix (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
+        prefix (:obj:`str` | Collection[:obj:`str`]):
             The prefix(es) that will precede :attr:`command`.
-        command (:obj:`str` | Tuple[:obj:`str`] | List[:obj:`str`]):
+        command (:obj:`str` | Collection[:obj:`str`]):
             The command or list of commands this handler should listen for.
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
@@ -242,8 +241,8 @@ class PrefixHandler(CommandHandler):
 
     def __init__(
         self,
-        prefix: SLT[str],
-        command: SLT[str],
+        prefix: SCT[str],
+        command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
         filters: filters_module.BaseFilter = None,
         block: DVInput[bool] = DEFAULT_TRUE,
