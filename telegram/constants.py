@@ -26,7 +26,7 @@ Unless noted otherwise, all constants in this module were extracted from the
 Attributes:
     BOT_API_VERSION (:obj:`str`): :tg-const:`telegram.constants.BOT_API_VERSION`. Telegram Bot API
         version supported by this version of `python-telegram-bot`. Also available as
-        ``telegram.bot_api_version``.
+        ``telegram.__bot_api_version__``.
 
         .. versionadded:: 13.4
     SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
@@ -37,6 +37,7 @@ they are related to a specific class, then they are also available as attributes
 
 __all__ = [
     "BOT_API_VERSION",
+    "BOT_API_VERSION_INFO",
     "BotCommandScopeType",
     "CallbackQueryLimit",
     "ChatAction",
@@ -66,11 +67,30 @@ __all__ = [
 ]
 
 from enum import IntEnum
-from typing import List
+from typing import List, NamedTuple
 
 from telegram._utils.enum import StringEnum
 
-BOT_API_VERSION = "6.0"
+
+class _BotAPIVersion(NamedTuple):
+    """Similar behavior to sys.version_info.
+    So far TG has only published X.Y releases. We can add X.Y.Z(a(S)) if needed.
+    """
+
+    major: int
+    minor: int
+
+    def __repr__(self) -> str:
+        """Unfortunately calling super().__repr__ doesn't work with typing.NamedTuple, so we
+        do this manually."""
+        return f"BotAPIVersion(major={self.major}, minor={self.minor})"
+
+    def __str__(self) -> str:
+        return f"{self.major}.{self.minor}"
+
+
+BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=0)
+BOT_API_VERSION = str(BOT_API_VERSION_INFO)
 
 # constants above this line are tested
 

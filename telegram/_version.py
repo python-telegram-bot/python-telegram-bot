@@ -55,4 +55,5 @@ class Version(NamedTuple):
 __version_info__ = Version(major=20, minor=0, micro=0, releaselevel="alpha", serial=0)
 __version__ = str(__version_info__)
 
-bot_api_version = constants.BOT_API_VERSION  # pylint: disable=invalid-name
+__bot_api_version__ = constants.BOT_API_VERSION
+__bot_api_version_info__ = constants.BOT_API_VERSION_INFO
