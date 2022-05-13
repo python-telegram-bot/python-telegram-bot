@@ -444,9 +444,17 @@ class TGConstXRefRole(PyXRefRole):
                 if isinstance(value, telegram.constants.FileSizeLimit):
                     return f"{int(value.value / 1e6)} MB", target
                 return repr(value.value), target
-            # Just for Bot API version number auto add in constants:
-            if isinstance(value, str) and target == "telegram.constants.BOT_API_VERSION":
+            # Just for (Bot API) versions number auto add in constants:
+            if isinstance(value, str) and target in (
+                "telegram.constants.BOT_API_VERSION",
+                "telegram.__version__",
+            ):
                 return value, target
+            if isinstance(value, tuple) and target in (
+                "telegram.constants.BOT_API_VERSION_INFO",
+                "telegram.__version_info__",
+            ):
+                return repr(value), target
             sphinx_logger.warning(
                 f"%s:%d: WARNING: Did not convert reference %s. :{CONSTANTS_ROLE}: is not supposed"
                 " to be used with this type of target.",

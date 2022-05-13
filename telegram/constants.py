@@ -24,12 +24,29 @@ Unless noted otherwise, all constants in this module were extracted from the
     Since v20.0, most of the constants in this module are grouped into enums.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): :tg-const:`telegram.constants.BOT_API_VERSION`. Telegram Bot API
+    BOT_API_VERSION (:obj:`str`): Telegram Bot API
         version supported by this version of `python-telegram-bot`. Also available as
-        ``telegram.__bot_api_version__``.
+        :data:`telegram.__bot_api_version__`.
 
         .. versionadded:: 13.4
-    SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): [443, 80, 88, 8443]
+
+        :value: :tg-const:`telegram.constants.BOT_API_VERSION`
+
+    BOT_API_VERSION_INFO (:class:`typing.NamedTuple`):
+       A tuple containing the two components of the version number: ``major`` and ``minor``.
+       Both values are integers.
+       The components can also be accessed by name, so ``BOT_API_VERSION_INFO[0]`` is equivalent
+       to ``BOT_API_VERSION_INFO.major`` and so on. Also available as
+       :data:`telegram.__bot_api_version_info__`.
+
+       .. versionadded:: 20.0
+
+       :value: :tg-const:`telegram.constants.BOT_API_VERSION_INFO`
+
+    SUPPORTED_WEBHOOK_PORTS (List[:obj:`int`]): Ports supported by
+        :paramref:`telegram.Bot.set_webhook.url`.
+
+        :value: ``[443, 80, 88, 8443]``
 
 The following constants are related to specific classes or topics and are grouped into enums. If
 they are related to a specific class, then they are also available as attributes of those classes.
