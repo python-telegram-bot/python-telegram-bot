@@ -28,15 +28,11 @@ import tornado.web
 from tornado.httpserver import HTTPServer
 
 from telegram import Update
+from telegram._utils.json import json_loads
 from telegram.ext._extbot import ExtBot
 
 if TYPE_CHECKING:
     from telegram import Bot
-
-try:
-    import orjson as json
-except ImportError:
-    import json  # type: ignore[no-redef]
 
 
 class WebhookServer:
@@ -121,7 +117,7 @@ class TelegramHandler(tornado.web.RequestHandler):
         self._validate_post()
 
         json_string = self.request.body.decode()
-        data = json.loads(json_string)
+        data = json_loads(json_string)
         self.set_status(HTTPStatus.OK)
         self._logger.debug("Webhook received data: %s", json_string)
 

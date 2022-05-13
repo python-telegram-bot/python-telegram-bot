@@ -20,13 +20,11 @@
 from typing import Any, Dict, List, Union
 from urllib.parse import urlencode
 
+from telegram._utils.json import json_dumps
 from telegram._utils.types import UploadFileDict
 from telegram.request._requestparameter import RequestParameter
 
-try:
-    import orjson as json
-except ImportError:
-    import json  # type: ignore[no-redef]  # noqa: F723
+# noqa: F723
 
 
 class RequestData:
@@ -101,7 +99,7 @@ class RequestData:
     @property
     def json_payload(self) -> bytes:
         """The parameters as UTF-8 encoded JSON payload."""
-        return json.dumps(self.json_parameters).encode("utf-8")
+        return json_dumps(self.json_parameters).encode("utf-8")
 
     @property
     def multipart_data(self) -> UploadFileDict:

@@ -19,13 +19,10 @@
 """Base class for Telegram Objects."""
 from copy import deepcopy
 
-try:
-    import orjson as json
-except ImportError:
-    import json  # type: ignore[no-redef]
 
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
+from telegram._utils.json import json_dumps
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 
@@ -216,8 +213,7 @@ class TelegramObject:
         Returns:
             :obj:`str`
         """
-        print(self.to_dict())
-        return json.dumps(self.to_dict())
+        return json_dumps(self.to_dict())
 
     def to_dict(self) -> JSONDict:
         """Gives representation of object as :obj:`dict`.

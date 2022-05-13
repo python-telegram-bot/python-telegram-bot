@@ -23,10 +23,8 @@ from http import HTTPStatus
 from types import TracebackType
 from typing import ClassVar, Optional, Tuple, Type, TypeVar, Union
 
-try:
-    import orjson as json
-except ImportError:
-    import json  # type: ignore[no-redef]
+from telegram._utils.json import json_loads
+
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
@@ -335,7 +333,7 @@ class BaseRequest(
         """
         decoded_s = json_payload.decode("utf-8", "replace")
         try:
-            return json.loads(decoded_s)
+            return json_loads(decoded_s)
         except ValueError as exc:
             raise TelegramError("Invalid server response") from exc
 

@@ -26,12 +26,10 @@ from telegram._files.inputmedia import InputMedia
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.enum import StringEnum
+from telegram._utils.json import json_dumps
 from telegram._utils.types import UploadFileDict
 
-try:
-    import orjson as json
-except ImportError:
-    import json  # type: ignore[no-redef]  # noqa: F723
+# noqa: F723
 
 
 @dataclass(repr=False, eq=False, order=False, frozen=True)
@@ -75,7 +73,7 @@ class RequestParameter:
             return self.value
         if self.value is None:
             return None
-        return json.dumps(self.value)
+        return json_dumps(self.value)
 
     @property
     def multipart_data(self) -> Optional[UploadFileDict]:

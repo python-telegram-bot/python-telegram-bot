@@ -57,7 +57,7 @@ class TestInputInvoiceMessageContent:
     prices = [LabeledPrice("label1", 42), LabeledPrice("label2", 314)]
     max_tip_amount = 420
     suggested_tip_amounts = ["314", "256"]
-    provider_data = "provider data"
+    provider_data = {"provider_data": 123456789}
     photo_url = "photo_url"
     photo_size = "314"
     photo_width = "420"

@@ -17,10 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring,  redefined-builtin
-try:
-    import orjson as json
-except ImportError:
-    import json  # type: ignore[no-redef]
+
 
 from base64 import b64decode
 from typing import TYPE_CHECKING, Any, List, Optional, no_type_check
@@ -43,6 +40,7 @@ except ImportError:
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+from telegram._utils.json import json_loads
 from telegram.error import PassportDecryptionError
 
 if TYPE_CHECKING:
@@ -101,7 +99,7 @@ def decrypt(secret, hash, data):
 @no_type_check
 def decrypt_json(secret, hash, data):
     """Decrypts data using secret and hash and then decodes utf-8 string and loads json"""
-    return json.loads(decrypt(secret, hash, data).decode("utf-8"))
+    return json_loads(decrypt(secret, hash, data).decode("utf-8"))
 
 
 class EncryptedCredentials(TelegramObject):
