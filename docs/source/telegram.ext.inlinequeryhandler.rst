@@ -1,4 +1,4 @@
-:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/v13.x/telegram/ext/inlinequeryhandler.py
+:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/ext/inlinequeryhandler.py
 
 telegram.ext.InlineQueryHandler
 ===============================

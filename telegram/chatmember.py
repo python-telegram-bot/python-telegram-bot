@@ -336,7 +336,8 @@ class ChatMember(TelegramObject):
             # if they are the same it's fine...
             if can_manage_voice_chats != can_manage_video_chats:
                 raise ValueError(
-                    "Only supply `can_manage_video_chats`, " "not `can_manage_voice_chats`."
+                    "Only supply one of `can_manage_video_chats`/`can_manage_voice_chats`,"
+                    " not both."
                 )
 
         # Required
@@ -518,7 +519,8 @@ class ChatMemberAdministrator(ChatMember):
         can_manage_voice_chats (:obj:`bool`): Optional. :obj:`True`, if the
             administrator can manage voice chats.
 
-            .. deprecated:: 13.12
+            .. deprecated:: 13.12 contains the same value as :attr:`can_manage_video_chats`
+                for backwards compatibility.
         can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
             administrator can manage video chats.
 

@@ -364,22 +364,26 @@ class Message(TelegramObject):
             voice chat scheduled.
 
             .. versionadded:: 13.5
-            .. deprecated:: 13.12
+            .. deprecated:: 13.12 contains the same value as :attr:`VideoChatScheduled`
+                for backwards compatibility.
         voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Service message: voice
             chat started.
 
             .. versionadded:: 13.4
-            .. deprecated:: 13.12
+            .. deprecated:: 13.12 contains the same value as :attr:`VideoChatStarted`
+                for backwards compatibility.
         voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Service message: voice chat
             ended.
 
             .. versionadded:: 13.4
-            .. deprecated:: 13.12
+            .. deprecated:: 13.12 contains the same value as :attr:`VideoChatEnded`
+                for backwards compatibility.
         voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited`): Optional.
             Service message: new participants invited to a voice chat.
 
             .. versionadded:: 13.4
-            .. deprecated:: 13.12
+            .. deprecated:: 13.12 contains the same value as :attr:`VideoChatParticipantsInvited`
+                for backwards compatibility.
         video_chat_scheduled (:class:`telegram.VideoChatScheduled`): Optional. Service message:
             video chat scheduled.
 
@@ -589,26 +593,30 @@ class Message(TelegramObject):
             and video_chat_scheduled is not None
             and voice_chat_scheduled != video_chat_scheduled
         ):
-            raise ValueError("Only supply `video_chat_scheduled`, not `voice_chat_scheduled`.")
+            raise ValueError(
+                "Only supply one of `video_chat_scheduled`/`voice_chat_scheduled`, not both."
+            )
         if (
             voice_chat_started is not None
             and video_chat_started is not None
             and voice_chat_started != video_chat_started
         ):
-            raise ValueError("Only supply `video_chat_started`, not `voice_chat_started`.")
+            raise ValueError(
+                "Only supply one of `video_chat_started`/`voice_chat_started`, not both."
+            )
         if (
             voice_chat_ended is not None
             and video_chat_ended is not None
             and voice_chat_ended != video_chat_ended
         ):
-            raise ValueError("Only supply `video_chat_ended`, not `voice_chat_ended`.")
+            raise ValueError("Only supply one of `video_chat_ended`/`voice_chat_ended`, not both.")
         if (
             voice_chat_participants_invited is not None
             and video_chat_participants_invited is not None
         ) and voice_chat_participants_invited != video_chat_participants_invited:
             raise ValueError(
-                "Only supply `video_chat_participants_invited`,"
-                " not `voice_chat_participants_invited`."
+                "Only supply one of `video_chat_participants_invited`/"
+                "`voice_chat_participants_invited`, not both."
             )
 
         # Required

@@ -4046,8 +4046,7 @@ class Bot(TelegramObject):
                 .. versionadded:: 13.4
 
                 .. deprecated:: 13.12
-                    Since Bot API 6.0, voice chat was renamed to video chat. This parameter is
-                    supplied as can_manage_video_chats to Telegram.
+                    Since Bot API 6.0, voice chat was renamed to video chat.
 
             can_manage_video_chats (:obj:`bool`, optional): Pass :obj:`True`, if the administrator
                 can manage video chats.
@@ -4086,7 +4085,9 @@ class Bot(TelegramObject):
 
         """
         if can_manage_voice_chats is not None and can_manage_video_chats is not None:
-            raise ValueError("Only supply `can_manage_video_chats`, not `can_manage_voice_chats`.")
+            raise ValueError(
+                "Only supply one of `can_manage_video_chats`/`can_manage_voice_chats`, not both."
+            )
 
         data: JSONDict = {'chat_id': chat_id, 'user_id': user_id}
 

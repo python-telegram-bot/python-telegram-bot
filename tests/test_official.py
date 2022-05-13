@@ -185,7 +185,7 @@ def check_object(h4):
         ignored |= {'message', 'type', 'source'}
     elif name.startswith('InputMedia'):
         ignored |= {'filename'}  # Convenience parameter
-    elif name == 'PromoteChatMember' or name == 'ChatMemberAdministrator':
+    elif name == 'ChatMemberAdministrator':
         ignored |= {'can_manage_voice_chats'}  # for backwards compatibility
     elif name == 'Message':
         # for backwards compatibility

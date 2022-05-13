@@ -1,4 +1,4 @@
-:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/v13.x/telegram/utils/request.py
+:github_url: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/utils/request.py
 
 telegram.utils.request.Request
 ==============================
