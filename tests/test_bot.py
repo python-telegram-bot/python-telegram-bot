@@ -1732,7 +1732,8 @@ class TestBot:
 
         with pytest.raises(
             ValueError,
-            match='Only supply `can_manage_video_chats`, ' 'not `can_manage_voice_chats`.',
+            match='Only supply one of `can_manage_video_chats`/`'
+            'can_manage_voice_chats`, not both.',
         ):
             assert bot.promote_chat_member(
                 channel_id,
