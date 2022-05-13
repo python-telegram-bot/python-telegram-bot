@@ -28,17 +28,6 @@ from .callbackcontext import CallbackContext
 from .contexttypes import ContextTypes
 from .dispatcher import Dispatcher, DispatcherHandlerStop, run_async
 
-# https://bugs.python.org/issue41451, fixed on 3.7+, doesn't actually remove slots
-# try-except is just  here in case the __init__ is called twice (like in the tests)
-# this block is also the reason for the pylint-ignore at the top of the file
-try:
-    del Dispatcher.__slots__
-except AttributeError as exc:
-    if str(exc) == '__slots__':
-        pass
-    else:
-        raise exc
-
 from .jobqueue import JobQueue, Job
 from .updater import Updater
 from .callbackqueryhandler import CallbackQueryHandler
