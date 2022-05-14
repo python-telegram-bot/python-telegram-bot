@@ -331,10 +331,9 @@ __version_info__ = _version.__version_info__
 #: .. versionchanged:: 20.0
 #:    This constant was previously named ``bot_api_version``.
 __bot_api_version__ = _version.__bot_api_version__
-#: :obj:`str`: Shortcut for :const:`telegram.constants.BOT_API_VERSION_INFO`.
+#: :class:`typing.NamedTuple`: Shortcut for :const:`telegram.constants.BOT_API_VERSION_INFO`.
 #:
-#: .. versionchanged:: 20.0
-#:    This constant was previously named ``bot_api_version``.
+#: .. versionadded:: 20.0
 __bot_api_version_info__ = _version.__bot_api_version_info__
 
 from ._videochat import (
