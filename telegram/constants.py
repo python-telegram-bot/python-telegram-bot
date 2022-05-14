@@ -48,6 +48,8 @@ Attributes:
 
         :value: ``[443, 80, 88, 8443]``
 
+----
+
 The following constants are related to specific classes or topics and are grouped into enums. If
 they are related to a specific class, then they are also available as attributes of those classes.
 """
