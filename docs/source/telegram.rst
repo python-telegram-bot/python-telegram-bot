@@ -5,7 +5,7 @@ Version Constants
 -----------------
 
 .. py:module:: telegram
-.. py:attribute:: __version__ (= sender)
+.. py:attribute:: __version__
 
    The version of the `python-telegram-bot` library as string.
    To get detailed information about the version number, please use :data:`__version_info__` instead.

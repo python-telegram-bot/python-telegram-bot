@@ -99,7 +99,8 @@ class _BotAPIVersion(NamedTuple):
 
     def __repr__(self) -> str:
         """Unfortunately calling super().__repr__ doesn't work with typing.NamedTuple, so we
-        do this manually."""
+        do this manually.
+        """
         return f"BotAPIVersion(major={self.major}, minor={self.minor})"
 
     def __str__(self) -> str:

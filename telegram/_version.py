@@ -38,7 +38,6 @@ class Version(NamedTuple):
             "alpha": "a",
             "beta": "b",
             "candidate": "rc",
-            "final": "final",
         }[self.releaselevel]
 
     def __str__(self) -> str:

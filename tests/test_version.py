@@ -69,7 +69,7 @@ class TestVersion:
                 return Version(*args)
 
         assert isinstance(TestClass(1, 2, 3, "beta", 4), tuple if use_tuple else Version)
-        assert version <= TestClass(1, 2, 3, "beta", 4)
+        assert version == TestClass(1, 2, 3, "beta", 4)
         assert not (version < TestClass(1, 2, 3, "beta", 4))
         assert version > TestClass(1, 2, 3, "alpha", 4)
         assert version < TestClass(1, 2, 3, "candidate", 0)

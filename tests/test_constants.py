@@ -124,7 +124,7 @@ class TestConstants:
         vi = constants.BOT_API_VERSION_INFO
         assert isinstance(vi, tuple)
         assert repr(vi) == f"BotAPIVersion(major={vi[0]}, minor={vi[1]})"
-        assert vi <= (vi[0], vi[1])
+        assert vi == (vi[0], vi[1])
         assert not (vi < (vi[0], vi[1]))
         assert vi < (vi[0], vi[1] + 1)
         assert vi < (vi[0] + 1, vi[1])
