@@ -85,7 +85,8 @@ class TestKeyboardButton:
         a = KeyboardButton("test", request_contact=True)
         b = KeyboardButton("test", request_contact=True)
         c = KeyboardButton("Test", request_location=True)
-        d = InlineKeyboardButton("test", callback_data="test")
+        d = KeyboardButton("Test", web_app=WebAppInfo(url="https://ptb.org"))
+        e = InlineKeyboardButton("test", callback_data="test")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -95,3 +96,6 @@ class TestKeyboardButton:
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
