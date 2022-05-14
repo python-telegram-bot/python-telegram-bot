@@ -101,7 +101,7 @@ BOT_API_VERSION = str(BOT_API_VERSION_INFO)
 # constants above this line are tested
 
 #: List[:obj:`int`]: Ports supported by
-#  :paramref:`telegram.Bot.set_webhook.url`.
+#:  :paramref:`telegram.Bot.set_webhook.url`.
 SUPPORTED_WEBHOOK_PORTS: List[int] = [443, 80, 88, 8443]
 
 
