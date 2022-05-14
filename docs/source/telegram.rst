@@ -1,6 +1,15 @@
 telegram package
 ================
 
+Version Constants
+-----------------
+
+.. automodule:: telegram
+   :members: __version__, __version_info__, __bot_api_version__, __bot_api_version_info__
+
+Available Types
+---------------
+
 .. toctree::
 
     telegram.animation
