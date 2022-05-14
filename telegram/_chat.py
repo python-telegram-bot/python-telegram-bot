@@ -66,7 +66,11 @@ class Chat(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     .. versionchanged:: 20.0
-        Removed the deprecated methods ``kick_member`` and ``get_members_count``.
+
+        * Removed the deprecated methods ``kick_member`` and ``get_members_count``.
+        * The following are now keyword-only arguments in Bot methods:
+          {read, write, connect, pool}_timeout, api_kwargs. Use a named argument for those,
+          and notice that some positional arguments changed position as a result.
 
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -1249,6 +1253,7 @@ class Chat(TelegramObject):
         reply_markup: "InlineKeyboardMarkup" = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,

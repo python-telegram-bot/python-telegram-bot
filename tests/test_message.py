@@ -344,7 +344,14 @@ class TestMessage:
             b"\\u200d\\U0001f467\\U0001f431http://google.com"
         ).decode("unicode-escape")
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
-        message = Message(1, from_user=self.from_user, date=self.date, chat=self.chat, text=text, entities=[entity])
+        message = Message(
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            text=text,
+            entities=[entity],
+        )
         assert message.parse_entity(entity) == "http://google.com"
 
         with pytest.raises(RuntimeError, match="Message has no"):
@@ -357,7 +364,12 @@ class TestMessage:
         ).decode("unicode-escape")
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         message = Message(
-            1, from_user=self.from_user, date=self.date, chat=self.chat, caption=caption, caption_entities=[entity]
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            caption=caption,
+            caption_entities=[entity],
         )
         assert message.parse_caption_entity(entity) == "http://google.com"
 
@@ -372,7 +384,12 @@ class TestMessage:
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
         message = Message(
-            1, from_user=self.from_user, date=self.date, chat=self.chat, text=text, entities=[entity_2, entity]
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            text=text,
+            entities=[entity_2, entity],
         )
         assert message.parse_entities(MessageEntity.URL) == {entity: "http://google.com"}
         assert message.parse_entities() == {entity: "http://google.com", entity_2: "h"}
@@ -507,7 +524,12 @@ class TestMessage:
         expected = b"\\U0001f469\\u200d\\U0001f469\\u200d <b>ABC</b>".decode("unicode-escape")
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
-            1, from_user=self.from_user, date=self.date, chat=self.chat, text=text, entities=[bold_entity]
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            text=text,
+            entities=[bold_entity],
         )
         assert expected == message.text_html
 

@@ -62,6 +62,12 @@ class User(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
+    .. versionchanged:: 20.0
+
+        The following are now keyword-only arguments in Bot methods:
+        {read, write, connect, pool}_timeout, api_kwargs. Use a named argument for those,
+        and notice that some positional arguments changed position as a result.
+
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
         is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
@@ -663,7 +669,6 @@ class User(TelegramObject):
         reply_markup: ReplyMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
-        api_kwargs: JSONDict = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
@@ -673,6 +678,7 @@ class User(TelegramObject):
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -996,7 +1002,6 @@ class User(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         supports_streaming: bool = None,
         thumb: FileInput = None,
-        api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
@@ -1006,6 +1011,7 @@ class User(TelegramObject):
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> "Message":
         """Shortcut for::
 

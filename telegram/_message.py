@@ -85,13 +85,17 @@ class Message(TelegramObject):
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
     .. versionchanged:: 20.0
-        The arguments and attributes ``voice_chat_scheduled``, ``voice_chat_started`` and
-        ``voice_chat_ended``, ``voice_chat_participants_invited`` were renamed to
-        :paramref:`video_chat_scheduled`/:attr:`video_chat_scheduled`,
-        :paramref:`video_chat_started`/:attr:`video_chat_started`,
-        :paramref:`video_chat_ended`/:attr:`video_chat_ended` and
-        :paramref:`video_chat_participants_invited`/:attr:`video_chat_participants_invited`,
-        respectively, in accordance to Bot API 6.0.
+
+        * The arguments and attributes ``voice_chat_scheduled``, ``voice_chat_started`` and
+          ``voice_chat_ended``, ``voice_chat_participants_invited`` were renamed to
+          :paramref:`video_chat_scheduled`/:attr:`video_chat_scheduled`,
+          :paramref:`video_chat_started`/:attr:`video_chat_started`,
+          :paramref:`video_chat_ended`/:attr:`video_chat_ended` and
+          :paramref:`video_chat_participants_invited`/:attr:`video_chat_participants_invited`,
+          respectively, in accordance to Bot API 6.0.
+        * The following are now keyword-only arguments in Bot methods:
+          {read, write, connect, pool}_timeout, api_kwargs. Use a named argument for those,
+          and notice that some positional arguments changed position as a result.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.

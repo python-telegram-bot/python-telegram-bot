@@ -157,6 +157,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
           :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
           instead.
         * Attempting to pickle a bot instance will now raise :exc:`pickle.PicklingError`.
+        * The following are now keyword-only arguments in Bot methods:
+          {read, write, connect, pool}_timeout, api_kwargs. Use a named argument for those,
+          and notice that some positional arguments changed position as a result.
 
     Args:
         token (:obj:`str`): Bot's unique authentication token.
@@ -3036,6 +3039,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 the chat for the user that is being removed. If :obj:`False`, the user will be able
                 to see messages in the group that were sent before the user was removed.
                 Always :obj:`True` for supergroups and channels.
+
                 .. versionadded:: 13.4
 
         Keyword Args:
@@ -7036,6 +7040,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def get_my_default_administrator_rights(
         self,
         for_channels: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
