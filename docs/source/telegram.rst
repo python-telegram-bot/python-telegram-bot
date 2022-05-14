@@ -4,43 +4,8 @@ telegram package
 Version Constants
 -----------------
 
-.. py:module:: telegram
-.. py:attribute:: __version__
-
-   The version of the `python-telegram-bot` library as string.
-   To get detailed information about the version number, please use :data:`__version_info__` instead.
-
-   :value: :tg-const:`telegram.__version__`
-   :type: str
-
-.. py:data:: __version_info__
-
-   A tuple containing the five components of the version number: `major`, `minor`, `micro`, `releaselevel`, and `serial`.
-   All values except `releaselevel` are integers.
-   The release level is ``'alpha'``, ``'beta'``, ``'candidate'``, or ``'final'``.
-   The components can also be accessed by name, so ``__version_info__[0]`` is equivalent to ``__version_info__.major`` and so on.
-
-   .. versionadded:: 20.0
-
-   :value: :tg-const:`telegram.__version_info__`
-   :type: :class:`typing.NamedTuple`
-
-.. py:data:: __bot_api_version__
-
-   Shortcut for :const:`telegram.constants.BOT_API_VERSION`.
-
-   .. versionchanged:: 20.0
-      This constant was previously named ``bot_api_version``.
-
-   :type: str
-
-.. py:data:: __bot_api_version_info__
-
-   Shortcut for :const:`telegram.constants.BOT_API_VERSION_INFO`.
-
-   .. versionadded:: 20.0
-
-   :type: :class:`typing.NamedTuple`
+.. automodule:: telegram
+   :members: __version__, __version_info__, __bot_api_version__, __bot_api_version_info__
 
 Available Types
 ---------------
