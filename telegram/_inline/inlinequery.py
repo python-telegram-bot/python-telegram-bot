@@ -46,8 +46,9 @@ class InlineQuery(TelegramObject):
     .. versionchanged:: 20.0
 
         * The following are now keyword-only arguments in Bot methods:
-          ``{read, write, connect, pool}_timeout``, ``api_kwargs``, ``auto_pagination``. Use a named argument
-          for those, and notice that some positional arguments changed position as a result.
+          ``{read, write, connect, pool}_timeout``, ``api_kwargs``, ``auto_pagination``.
+          Use a named argument for those,
+          and notice that some positional arguments changed position as a result.
 
     Args:
         id (:obj:`str`): Unique identifier for this query.

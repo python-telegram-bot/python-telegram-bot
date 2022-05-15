@@ -65,8 +65,8 @@ class User(TelegramObject):
     .. versionchanged:: 20.0
 
         The following are now keyword-only arguments in Bot methods:
-        ``location``, ``filename``, ``venue``, ``contact``, ``{read, write, connect, pool}_timeout``,
-        ``api_kwargs``. Use a named argument for those,
+        ``location``, ``filename``, ``venue``, ``contact``,
+        ``{read, write, connect, pool}_timeout`` ``api_kwargs``. Use a named argument for those,
         and notice that some positional arguments changed position as a result.
 
     Args:

@@ -134,9 +134,10 @@ def check_extra_params_are_keywordonly(method_name, api_params, name_in_api):
             kw_or_positional_args = [
                 p.name for p in sig.parameters.values() if p.kind != inspect.Parameter.KEYWORD_ONLY
             ]
-            assert (
-                set(kw_or_positional_args) - set(api_params) - {"self"} == set()
-            ), f"In {str(method).split()[1]}, extra args should be keyword only (compared to {name_in_api} in API)"
+            assert set(kw_or_positional_args) - set(api_params) - {"self"} == set(), (
+                f"In {str(method).split()[1]}, extra args should be keyword only "
+                f"(compared to {name_in_api} in API)"
+            )
         except (AttributeError, TypeError):
             pass
 
