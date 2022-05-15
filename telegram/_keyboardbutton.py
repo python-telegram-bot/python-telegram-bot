@@ -36,7 +36,7 @@ class KeyboardButton(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location`,
-    :attr:`request_poll` and :attr:``web_app` are equal.
+    :attr:`request_poll` and :attr:`web_app` are equal.
 
     Note:
         * Optional fields are mutually exclusive.

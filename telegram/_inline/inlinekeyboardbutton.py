@@ -36,7 +36,7 @@ class InlineKeyboardButton(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`url`, :attr:`login_url`, :attr:`callback_data`,
     :attr:`switch_inline_query`, :attr:`switch_inline_query_current_chat`, :attr:`callback_game`,
-    :attr:`web_app:` and :attr:`pay` are equal.
+    :attr:`web_app` and :attr:`pay` are equal.
 
     Note:
         * You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
