@@ -43,6 +43,12 @@ class InlineQuery(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
+    .. versionchanged:: 20.0
+
+        * The following are now keyword-only arguments in Bot methods:
+          ``{read, write, connect, pool}_timeout``, ``api_kwargs``, ``auto_pagination``. Use a named argument
+          for those, and notice that some positional arguments changed position as a result.
+
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
@@ -123,13 +129,14 @@ class InlineQuery(TelegramObject):
         next_offset: str = None,
         switch_pm_text: str = None,
         switch_pm_parameter: str = None,
+        current_offset: str = None,
+        *,
+        auto_pagination: bool = False,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        current_offset: str = None,
         api_kwargs: JSONDict = None,
-        auto_pagination: bool = False,
     ) -> bool:
         """Shortcut for::
 

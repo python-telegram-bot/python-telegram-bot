@@ -94,7 +94,8 @@ class Message(TelegramObject):
           :paramref:`video_chat_participants_invited`/:attr:`video_chat_participants_invited`,
           respectively, in accordance to Bot API 6.0.
         * The following are now keyword-only arguments in Bot methods:
-          {read, write, connect, pool}_timeout, api_kwargs. Use a named argument for those,
+          ``{read, write, connect, pool}_timeout``, ``api_kwargs``, ``contact``, ``quote``.
+          Use a named argument for those,
           and notice that some positional arguments changed position as a result.
 
     Args:
@@ -760,9 +761,9 @@ class Message(TelegramObject):
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -775,7 +776,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -813,9 +814,9 @@ class Message(TelegramObject):
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -839,7 +840,7 @@ class Message(TelegramObject):
             :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
             Telegram for backward compatibility. You should use :meth:`reply_markdown_v2` instead.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -876,9 +877,9 @@ class Message(TelegramObject):
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -898,7 +899,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -935,9 +936,9 @@ class Message(TelegramObject):
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -957,7 +958,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -993,9 +994,9 @@ class Message(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1008,7 +1009,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the media group is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1046,9 +1047,9 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1061,7 +1062,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the photo is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1106,9 +1107,9 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1121,7 +1122,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the audio is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1168,9 +1169,9 @@ class Message(TelegramObject):
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1183,7 +1184,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the document is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1230,9 +1231,9 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1245,7 +1246,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the animation is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1286,9 +1287,9 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1301,7 +1302,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the sticker is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1343,9 +1344,9 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1358,7 +1359,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the video is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1404,9 +1405,9 @@ class Message(TelegramObject):
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: str = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1419,7 +1420,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the video note is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1461,9 +1462,9 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         filename: str = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1476,7 +1477,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the voice note is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1520,9 +1521,9 @@ class Message(TelegramObject):
         heading: int = None,
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1535,7 +1536,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the location is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1582,9 +1583,9 @@ class Message(TelegramObject):
         google_place_id: str = None,
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1597,7 +1598,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the venue is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1639,12 +1640,12 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        contact: Contact = None,
         vcard: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        contact: Contact = None,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1657,7 +1658,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the contact is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1705,9 +1706,9 @@ class Message(TelegramObject):
         close_date: Union[int, datetime.datetime] = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1720,7 +1721,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the poll is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1764,9 +1765,9 @@ class Message(TelegramObject):
         reply_markup: ReplyMarkup = None,
         emoji: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1779,7 +1780,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the dice is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
@@ -1844,9 +1845,9 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         reply_markup: "InlineKeyboardMarkup" = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1859,7 +1860,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the game is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
@@ -1911,16 +1912,17 @@ class Message(TelegramObject):
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
-        max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1940,7 +1942,7 @@ class Message(TelegramObject):
             As of Bot API 5.2, the parameter
             :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>` is optional.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the invoice is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
@@ -2099,9 +2101,9 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2120,7 +2122,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the copy is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
