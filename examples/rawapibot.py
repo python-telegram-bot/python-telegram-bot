@@ -12,11 +12,16 @@ from typing import NoReturn
 
 import telegram
 
-if telegram.__version__.startswith("1"):
+try:
+    from telegram import __version_info__
+except ImportError:
+    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]  # type: ignore[assignment]
+
+if __version_info__ < (20, 0, 0, "alpha", 0):
+    tg_ver = telegram.__version__
     raise RuntimeError(
-        "This example requires PTB v20, either upgrade using "
-        "`pip install python-telegram-bot --pre` or view the v13 version of this from"
-        "https://github.com/python-telegram-bot/python-telegram-bot/tree/v13.x/examples"
+        f"You are currently on version {tg_ver}. To view the {tg_ver} version of this example, "
+        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{tg_ver}/examples"
     )
 from telegram import Bot
 from telegram.error import Forbidden, NetworkError
