@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# pylint: disable=wrong-import-position
 """Simple Bot to reply to Telegram messages.
 
 This is built on the API wrapper, see echobot.py to see the same example built
@@ -9,6 +10,14 @@ import asyncio
 import logging
 from typing import NoReturn
 
+import telegram
+
+if telegram.__version__.startswith("1"):
+    raise RuntimeError(
+        "This example requires PTB v20, either upgrade using "
+        "`pip install python-telegram-bot --pre` or view the v13 version of this from"
+        "https://github.com/python-telegram-bot/python-telegram-bot/tree/v13.x/examples"
+    )
 from telegram import Bot
 from telegram.error import Forbidden, NetworkError
 

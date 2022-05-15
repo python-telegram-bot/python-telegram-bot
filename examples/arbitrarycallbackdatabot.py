@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
 
 """This example showcases how PTBs "arbitrary callback data" feature can be used.
@@ -10,6 +10,14 @@ https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callba
 import logging
 from typing import List, Tuple, cast
 
+import telegram
+
+if telegram.__version__.startswith("1"):
+    raise RuntimeError(
+        "This example requires PTB v20, either upgrade using "
+        "`pip install python-telegram-bot --pre` or view the v13 version of this from"
+        "https://github.com/python-telegram-bot/python-telegram-bot/tree/v13.x/examples"
+    )
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     Application,
