@@ -17,9 +17,47 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
+from typing import NamedTuple
 
-__version__ = "20.0a0"
+__all__ = ("__version__", "__version_info__", "__bot_api_version__", "__bot_api_version_info__")
 
-from telegram import constants
 
-bot_api_version = constants.BOT_API_VERSION  # pylint: disable=invalid-name
+class Version(NamedTuple):
+    """Copies the behavior of sys.version_info.
+    serial is always 0 for stable releases.
+    """
+
+    major: int
+    minor: int
+    micro: int
+    releaselevel: str  # Literal['alpha', 'beta', 'candidate', 'final']
+    serial: int
+
+    def _rl_shorthand(self) -> str:
+        return {
+            "alpha": "a",
+            "beta": "b",
+            "candidate": "rc",
+        }[self.releaselevel]
+
+    def __str__(self) -> str:
+        version = f"{self.major}.{self.minor}"
+        if self.micro != 0:
+            version = f"{version}.{self.micro}"
+        if self.releaselevel != "final":
+            version = f"{version}{self._rl_shorthand()}{self.serial}"
+
+        return version
+
+
+__version_info__ = Version(major=20, minor=0, micro=0, releaselevel="alpha", serial=0)
+__version__ = str(__version_info__)
+
+# # SETUP.PY MARKER
+# Lines above this line will be `exec`-cuted in setup.py. Make sure that this only contains
+# std-lib imports!
+
+from telegram import constants  # noqa: E402  # pylint: disable=wrong-import-position
+
+__bot_api_version__ = constants.BOT_API_VERSION
+__bot_api_version_info__ = constants.BOT_API_VERSION_INFO

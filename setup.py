@@ -42,10 +42,9 @@ def get_setup_kwargs(raw=False):
     raw_ext = "-raw" if raw else ""
     readme = Path(f'README{"_RAW" if raw else ""}.rst')
 
-    with Path("telegram/_version.py").open() as fh:
-        for line in fh.readlines():
-            if line.startswith("__version__"):
-                exec(line)
+    version_file = Path("telegram/_version.py").read_text()
+    first_part = version_file.split("# SETUP.PY MARKER")[0]
+    exec(first_part)
 
     kwargs = dict(
         script_name=f"setup{raw_ext}.py",

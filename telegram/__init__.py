@@ -21,10 +21,13 @@
 __author__ = "devs@python-telegram-bot.org"
 
 __all__ = (  # Keep this alphabetically ordered
+    "__bot_api_version__",
+    "__bot_api_version_info__",
+    "__version__",
+    "__version_info__",
     "Animation",
     "Audio",
     "Bot",
-    "bot_api_version",
     "BotCommand",
     "BotCommandScope",
     "BotCommandScopeAllChatAdministrators",
@@ -308,7 +311,31 @@ from ._telegramobject import TelegramObject
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos
-from ._version import __version__, bot_api_version  # noqa: F401
+from . import _version
+
+#: :obj:`str`: The version of the `python-telegram-bot` library as string.
+#: To get detailed information about the version number, please use :data:`__version_info__`
+#: instead.
+__version__ = _version.__version__
+#:  :class:`typing.NamedTuple`: A tuple containing the five components of the version number:
+#:  `major`, `minor`, `micro`, `releaselevel`, and `serial`.
+#:  All values except `releaselevel` are integers.
+#:  The release level is ``'alpha'``, ``'beta'``, ``'candidate'``, or ``'final'``.
+#:  The components can also be accessed by name, so ``__version_info__[0]`` is equivalent to
+#:  ``__version_info__.major`` and so on.
+#:
+#:  .. versionadded:: 20.0
+__version_info__ = _version.__version_info__
+#: :obj:`str`: Shortcut for :const:`telegram.constants.BOT_API_VERSION`.
+#:
+#: .. versionchanged:: 20.0
+#:    This constant was previously named ``bot_api_version``.
+__bot_api_version__ = _version.__bot_api_version__
+#: :class:`typing.NamedTuple`: Shortcut for :const:`telegram.constants.BOT_API_VERSION_INFO`.
+#:
+#: .. versionadded:: 20.0
+__bot_api_version_info__ = _version.__bot_api_version_info__
+
 from ._videochat import (
     VideoChatEnded,
     VideoChatParticipantsInvited,
