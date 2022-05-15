@@ -2294,7 +2294,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             )
         if not (
             bool(venue) ^ any([latitude, longitude, address, title])
-        ):  # pylint: disable=superfluous-parens
+        ):
             raise ValueError(
                 "Either venue or latitude, longitude, address and title must be "
                 "passed as arguments. Not both."
@@ -2423,7 +2423,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             )
         if not (
             bool(contact) ^ any([phone_number, first_name])
-        ):  # pylint: disable=superfluous-parens
+        ):
             raise ValueError(
                 "Either contact or phone_number and first_name must be passed as arguments. "
                 "Not both."

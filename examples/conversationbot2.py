@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, wrong-import-position
+# pylint: disable=unused-argument
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -17,18 +17,18 @@ bot.
 import logging
 from typing import Dict
 
-import telegram
+from telegram import __version__ as TG_VER
 
 try:
     from telegram import __version_info__
 except ImportError:
     __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
 
-if __version_info__ < (20, 0, 0, "alpha", 0):
-    tg_ver = telegram.__version__
+if __version_info__ < (20, 0, 0, "alpha", 1):
     raise RuntimeError(
-        f"You are currently on version {tg_ver}. To view the {tg_ver} version of this example, "
-        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{tg_ver}/examples"
+        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
+        f"{TG_VER} version of this example, "
+        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{TG_VER}/examples"
     )
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (

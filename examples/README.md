@@ -1,5 +1,5 @@
 # Examples
-## The examples in the directory are subject to changes and may not work on the PTB version that you are using. You can find the examples compatible with a specific ptb version at https://github.com/python-telegram-bot/python-telegram-bot/tree/vX.Y/examples
+## ⚠️ The examples in this directory are subject to changes and may not work on the PTB version that you are using. You can find the examples compatible with a specific version at https://github.com/python-telegram-bot/python-telegram-bot/tree/v<X.Y>/examples.
 
 In this folder are small examples to show what a bot written with `python-telegram-bot` looks like. Some bots focus on one specific aspect of the Telegram Bot API while others focus on one of the mechanics of this library. Except for the [`rawapibot.py`](#pure-api) example, they all use the high-level framework this library provides with the [`telegram.ext`](https://python-telegram-bot.readthedocs.io/en/latest/telegram.ext.html) submodule.
 
