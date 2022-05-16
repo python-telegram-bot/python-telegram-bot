@@ -20,6 +20,7 @@ import asyncio
 import datetime
 import functools
 import inspect
+import itertools
 import os
 import re
 import sys
@@ -526,6 +527,20 @@ def check_shortcut_signature(
             raise Exception(
                 f"Default for argument {arg} does not match the default of the Bot method."
             )
+
+    bot_method_kw_only_args = [
+        p.name
+        for p in bot_method_sig.parameters.values()
+        if p.kind == inspect.Parameter.KEYWORD_ONLY
+    ]
+    should_be_kw_only = []
+    for arg in itertools.chain(additional_kwargs, bot_method_kw_only_args):
+        if shortcut_sig.parameters[arg].kind != inspect.Parameter.KEYWORD_ONLY:
+            should_be_kw_only.append(arg)
+
+    assert (
+        set(should_be_kw_only) == set()
+    ), f"In {shortcut.__qualname__}, args should be keyword only"
 
     return True
 

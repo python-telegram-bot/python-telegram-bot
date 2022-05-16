@@ -46,8 +46,8 @@ class InlineQuery(TelegramObject):
     .. versionchanged:: 20.0
 
         * The following are now keyword-only arguments in Bot methods:
-          ``{read, write, connect, pool}_timeout``, ``api_kwargs``, ``auto_pagination``.
-          Use a named argument for those,
+          ``{read, write, connect, pool}_timeout``, :paramref:`answer.api_kwargs`,
+          ``auto_pagination``. Use a named argument for those,
           and notice that some positional arguments changed position as a result.
 
     Args:
@@ -130,8 +130,8 @@ class InlineQuery(TelegramObject):
         next_offset: str = None,
         switch_pm_text: str = None,
         switch_pm_parameter: str = None,
-        current_offset: str = None,
         *,
+        current_offset: str = None,
         auto_pagination: bool = False,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -154,7 +154,7 @@ class InlineQuery(TelegramObject):
         .. versionchanged:: 20.0
             Raises :class:`ValueError` instead of :class:`TypeError`.
 
-        Args:
+        Keyword Args:
             auto_pagination (:obj:`bool`, optional): If set to :obj:`True`, :attr:`offset` will be
                 passed as
                 :paramref:`current_offset <telegram.Bot.answer_inline_query.current_offset>` to
