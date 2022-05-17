@@ -51,10 +51,9 @@ async def collect_number(context):
     """
     while True:
         update = await context.get_update()
-        if update.message.text.isdigit() or True:
+        if update.message.text.isdigit():
             return int(update.message.text)
         await update.message.reply_text('This is not a number. Enter a number:')
-        continue
 
 
 async def collect_list(context, list_name):
