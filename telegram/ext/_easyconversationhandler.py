@@ -78,10 +78,10 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
     __slots__ = ("main_callback", "error_callback", "first_message_filter", "_conversations")
 
     def __init__(
-            self,
-            main_callback: Callable[[CCT], Any],
-            first_message_filter: BaseFilter = None,
-            error_callback: Callable[[CCT, Exception], Any] = None
+        self,
+        main_callback: Callable[[CCT], Any],
+        first_message_filter: BaseFilter = None,
+        error_callback: Callable[[CCT, Exception], Any] = None
     ):
         super().__init__(callback=lambda u, c: "")
         self.main_callback = main_callback
@@ -97,8 +97,10 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
         self._conversations = {}
 
     def check_update(self, update: Update) -> bool:
-        if (update.effective_chat.id in self._conversations
-                and self._conversations[update.effective_chat.id].running()):
+        if (
+            update.effective_chat.id in self._conversations
+            and self._conversations[update.effective_chat.id].running()
+        ):
             return True
         if self.first_message_filter.check_update(update):
             return True
@@ -107,16 +109,14 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
     @staticmethod
     async def default_error_callback(exception: Exception, _):
         stderr.write("No error handler set for EasyConversationHandler, so printing to stderr")
-        stderr.write("".join(
-            traceback.format_exception(None, exception, exception.__traceback__)
-        ))
+        stderr.write("".join(traceback.format_exception(None, exception, exception.__traceback__)))
 
     async def handle_update(
-            self,
-            update: UT,
-            application: Application,
-            check_result: object,
-            context: CCT,
+        self,
+        update: UT,
+        application: Application,
+        check_result: object,
+        context: CCT,
     ):
         """
         This method is called if it was determined that an update should indeed
@@ -136,7 +136,8 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
         chat_id = update.effective_chat.id
         if chat_id not in self._conversations:
             # First time here?
-            self._conversations[chat_id] = _EasyBotConversation(self.main_callback,
-                                                                self.error_callback)
+            self._conversations[chat_id] = _EasyBotConversation(
+                self.main_callback, self.error_callback
+            )
 
         self._conversations[chat_id].got_update(update, context)
