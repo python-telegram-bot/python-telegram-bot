@@ -79,7 +79,7 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
             first_message_filter: BaseFilter = None,
             error_callback: Callable[[CCT, Exception], Any] = None
     ):
-        super(EasyConversationHandler, self).__init__(callback=lambda u, c: '')
+        super().__init__(callback=lambda u, c: '')
         self.main_callback = main_callback
 
         if first_message_filter is None:
