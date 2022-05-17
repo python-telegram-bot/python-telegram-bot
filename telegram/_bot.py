@@ -3460,7 +3460,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int] = None,
         message_id: int = None,
-        inline_message_id: int = None,
+        inline_message_id: str = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,

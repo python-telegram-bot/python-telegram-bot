@@ -20,7 +20,6 @@ import asyncio
 import datetime
 import functools
 import inspect
-import itertools
 import os
 import re
 import sys
@@ -505,6 +504,10 @@ def check_shortcut_signature(
     # shortcuts to return more specific types than the bot method, but it's only annotations after
     # all
     for kwarg in effective_shortcut_args:
+        expected_kind = shortcut_sig.parameters[kwarg].kind
+        if bot_sig.parameters[kwarg].kind != expected_kind:
+            raise Exception(f"Argument {kwarg} must be of kind {expected_kind}.")
+
         if bot_sig.parameters[kwarg].annotation != shortcut_sig.parameters[kwarg].annotation:
             if isinstance(bot_sig.parameters[kwarg].annotation, type):
                 if bot_sig.parameters[kwarg].annotation.__name__ != str(
@@ -528,19 +531,9 @@ def check_shortcut_signature(
                 f"Default for argument {arg} does not match the default of the Bot method."
             )
 
-    bot_method_kw_only_args = [
-        p.name
-        for p in bot_method_sig.parameters.values()
-        if p.kind == inspect.Parameter.KEYWORD_ONLY
-    ]
-    should_be_kw_only = []
-    for arg in itertools.chain(additional_kwargs, bot_method_kw_only_args):
-        if shortcut_sig.parameters[arg].kind != inspect.Parameter.KEYWORD_ONLY:
-            should_be_kw_only.append(arg)
-
-    assert (
-        set(should_be_kw_only) == set()
-    ), f"In {shortcut.__qualname__}, args should be keyword only"
+    for kwarg in additional_kwargs:
+        if not shortcut_sig.parameters[kwarg].kind == inspect.Parameter.KEYWORD_ONLY:
+            raise Exception(f"Argument {kwarg} must be a positional-only argument!")
 
     return True
 

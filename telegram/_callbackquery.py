@@ -248,13 +248,13 @@ class CallbackQuery(TelegramObject):
         caption: str = None,
         reply_markup: "InlineKeyboardMarkup" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
