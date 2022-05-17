@@ -98,7 +98,7 @@ async def print_help(update, context):
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token("5395331154:AAEEX6bcmL7Jm7pFYxxy3NL7QKlmDGpfXkk").build()
+    application = Application.builder().token("Token").build()
 
     application.add_handler(CommandHandler('print', print_data))
     application.add_handler(CommandHandler('help', print_help))
