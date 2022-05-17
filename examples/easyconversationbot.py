@@ -82,6 +82,7 @@ async def children_callback(context):
 
 # Simple command handlers callbacks
 
+
 async def print_data(update, context):
     """Callback for /print command"""
     siblings = context.user_data.get(SIBLINGS_KEY, "Not set yet")
