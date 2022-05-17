@@ -100,7 +100,7 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
         return False
 
     @staticmethod
-    async def default_error_callback(e: Exception, context):
+    async def default_error_callback(e: Exception, context_unused):
         import traceback
         stderr.write('No error handler set for EasyConversationHandler, so printing error')
         stderr.write(''.join(traceback.format_exception(None, e, e.__traceback__)))

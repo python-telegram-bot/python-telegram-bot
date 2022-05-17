@@ -25,9 +25,7 @@ SIBLINGS_KEY, CHILDREN_KEY = 1, 2
 
 
 async def collect_user_inputs(context, num_items: int):
-    """
-    Collects a list of strings from the user in maximum length of `num_items`
-    """
+    """Collects a list of strings from the user in maximum length of `num_items`"""
     inputs = []
     for _ in range(num_items):
         # await as in regular reply_text for network request
@@ -46,9 +44,7 @@ async def collect_user_inputs(context, num_items: int):
 
 
 async def collect_number(context):
-    """
-    Collects an int from the user
-    """
+    """Collects an int from the user"""
     while True:
         update = await context.get_update()
         if update.message.text.isdigit():
@@ -57,9 +53,7 @@ async def collect_number(context):
 
 
 async def collect_list(context, list_name):
-    """
-    Collects list from user. First prompts with `list_name`
-    """
+    """Collects list from user. First prompts with `list_name`"""
     await context.last_update.message.reply_text(f'How much {list_name}?')
     how_much = await collect_number(context)
     ret = await collect_user_inputs(context, how_much)
@@ -68,6 +62,7 @@ async def collect_list(context, list_name):
 
 
 async def siblings_callback(context):
+    """Entry point for /siblings command"""
     await context.get_update()  # Ignore first message (/siblings)
 
     # We can easily call this function multiple times in multiple logic paths
@@ -78,6 +73,7 @@ async def siblings_callback(context):
 
 
 async def children_callback(context):
+    """Entry point for /children command"""
     await context.get_update()  # Ignore first message
     context.user_data[CHILDREN_KEY] = await collect_list(context, 'children')
     await print_help(context.last_update, context)
@@ -86,12 +82,14 @@ async def children_callback(context):
 # Simple command handlers callbacks
 
 async def print_data(update, context):
+    """Callback for /print command"""
     await update.message.reply_text(f'Your siblings: {context.user_data.get(SIBLINGS_KEY, "Not set yet")}')
     await update.message.reply_text(f'Your children: {context.user_data.get(CHILDREN_KEY, "Not set yet")}')
 
 
-async def print_help(update, context):
-    await update.message.reply_text(f'Type /siblings, /children or /print')
+async def print_help(update, context_unused):
+    """Callback for /help command"""
+    await update.message.reply_text('Type /siblings, /children or /print')
 
 
 def main() -> None:
