@@ -56,7 +56,9 @@ class _EasyBotConversation:
 
         context.get_update = get_update  # context new function TODO: in new Context class or so
 
-        self._asyncio_task = asyncio.create_task(self._callback_wrapper(self.main_callback, context))
+        self._asyncio_task = asyncio.create_task(
+            self._callback_wrapper(self.main_callback, context)
+        )
 
     def running(self):
         return self._asyncio_task is not None and not self._asyncio_task.done()
@@ -93,7 +95,8 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
         self._conversations = {}
 
     def check_update(self, update: Update) -> bool:
-        if update.effective_chat.id in self._conversations and self._conversations[update.effective_chat.id].running():
+        if (update.effective_chat.id in self._conversations
+                and self._conversations[update.effective_chat.id].running()):
             return True
         if self.first_message_filter.check_update(update):
             return True
@@ -130,6 +133,7 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
         chat_id = update.effective_chat.id
         if chat_id not in self._conversations:
             # First time here?
-            self._conversations[chat_id] = _EasyBotConversation(self.main_callback, self.error_callback)
+            self._conversations[chat_id] = _EasyBotConversation(self.main_callback,
+                                                                self.error_callback)
 
         self._conversations[chat_id].got_update(update, context)

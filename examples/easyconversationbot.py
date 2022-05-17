@@ -4,7 +4,8 @@
 
 """
 Simple example of EasyConversationBot.
-The bot let user add family members and print them, in simple, functional way - without state machines.
+The bot let user add family members and print them, in simple, functional way
+ - without state machines.
 """
 
 import logging
@@ -83,8 +84,10 @@ async def children_callback(context):
 
 async def print_data(update, context):
     """Callback for /print command"""
-    await update.message.reply_text(f'Your siblings: {context.user_data.get(SIBLINGS_KEY, "Not set yet")}')
-    await update.message.reply_text(f'Your children: {context.user_data.get(CHILDREN_KEY, "Not set yet")}')
+    siblings = context.user_data.get(SIBLINGS_KEY, "Not set yet")
+    children = context.user_data.get(CHILDREN_KEY, "Not set yet")
+    await update.message.reply_text(f"Your siblings: {siblings}")
+    await update.message.reply_text(f"Your children: {children}")
 
 
 async def print_help(update, context_unused):
@@ -101,8 +104,12 @@ def main() -> None:
     application.add_handler(CommandHandler('help', print_help))
     application.add_handler(CommandHandler('start', print_help))
 
-    application.add_handler(EasyConversationHandler(siblings_callback, first_message_filter=Regex('/siblings')))
-    application.add_handler(EasyConversationHandler(children_callback, first_message_filter=Regex('/children')))
+    application.add_handler(
+        EasyConversationHandler(siblings_callback, first_message_filter=Regex('/siblings'))
+    )
+    application.add_handler(
+        EasyConversationHandler(children_callback, first_message_filter=Regex('/children'))
+    )
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
