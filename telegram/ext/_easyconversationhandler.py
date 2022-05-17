@@ -27,7 +27,7 @@ from types import GeneratorType
 from typing import Callable, Any
 
 from telegram import Update
-from telegram.ext import BaseHandler, Application
+from telegram.ext import BaseHandler, Application, CallbackContext
 from telegram.ext._utils.types import CCT, UT
 from telegram.ext.filters import BaseFilter
 
@@ -37,21 +37,21 @@ class _EasyBotConversation:
 
     __slots__ = ("main_callback", "error_callback", "_asyncio_task", "_semaphore", "_updates")
 
-    def __init__(self, main_callback, error_callback):
+    def __init__(self, main_callback: Callable, error_callback: Callable):
         self.main_callback = main_callback
         self.error_callback = error_callback
         self._asyncio_task: Union[GeneratorType, None] = None
         self._semaphore = asyncio.Semaphore(0)
         self._updates = []
 
-    async def _callback_wrapper(self, callback, context):
+    async def _callback_wrapper(self, callback: Callable, context: CallbackContext) -> None:
         try:
             await callback(context)
         except Exception as exception:
             await self.error_callback(exception, context)
 
-    def start_bot(self, context):
-        async def get_update():
+    def start_bot(self, context: CallbackContext) -> None:
+        async def get_update() -> Update:
             await self._semaphore.acquire()
             context.last_update = self._updates.pop()  # Eww
             return context.last_update
@@ -62,10 +62,10 @@ class _EasyBotConversation:
             self._callback_wrapper(self.main_callback, context)
         )
 
-    def running(self):
+    def running(self) -> bool:
         return self._asyncio_task is not None and not self._asyncio_task.done()
 
-    def got_update(self, update, context):
+    def got_update(self, update: Update, context: CallbackContext) -> None:
         self._updates.insert(0, update)
         self._semaphore.release()
         if not self.running():
@@ -107,7 +107,7 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
         return False
 
     @staticmethod
-    async def default_error_callback(exception: Exception, _):
+    async def default_error_callback(exception: Exception, _) -> None:
         stderr.write("No error handler set for EasyConversationHandler, so printing to stderr")
         stderr.write("".join(traceback.format_exception(None, exception, exception.__traceback__)))
 
