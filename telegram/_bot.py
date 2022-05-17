@@ -4030,7 +4030,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> int:
         """Use this method to get the number of members in a chat.
 
-         .. versionadded:: 13.7
+        .. versionadded:: 13.7
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
