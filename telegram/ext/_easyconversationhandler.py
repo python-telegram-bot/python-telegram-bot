@@ -17,15 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # This file is written by Yagel Ashkenazi <123yagel@gmail.com>
+"""This module contains the EasyConversationHandler class"""
 
 import asyncio
+import traceback
 from ctypes import Union
 from sys import stderr
 from types import GeneratorType
 from typing import Callable, Any
 
 from telegram import Update
-from telegram.ext import BaseHandler
+from telegram.ext import BaseHandler, Application
 from telegram.ext._utils.types import CCT, UT
 from telegram.ext.filters import BaseFilter
 
@@ -45,8 +47,8 @@ class _EasyBotConversation:
     async def _callback_wrapper(self, callback, context):
         try:
             await callback(context)
-        except Exception as e:
-            await self.error_callback(e, context)
+        except Exception as exception:
+            await self.error_callback(exception, context)
 
     def start_bot(self, context):
         async def get_update():
@@ -103,15 +105,16 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
         return False
 
     @staticmethod
-    async def default_error_callback(e: Exception, context_unused):
-        import traceback
-        stderr.write('No error handler set for EasyConversationHandler, so printing error')
-        stderr.write(''.join(traceback.format_exception(None, e, e.__traceback__)))
+    async def default_error_callback(exception: Exception, _):
+        stderr.write('No error handler set for EasyConversationHandler, so printing to stderr')
+        stderr.write(''.join(
+            traceback.format_exception(None, exception, exception.__traceback__)
+        ))
 
     async def handle_update(
             self,
             update: UT,
-            application: "Application",
+            application: Application,
             check_result: object,
             context: CCT,
     ):

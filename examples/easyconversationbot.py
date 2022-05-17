@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument, wrong-import-position
+# pylint: disable=wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -90,7 +90,7 @@ async def print_data(update, context):
     await update.message.reply_text(f"Your children: {children}")
 
 
-async def print_help(update, context_unused):
+async def print_help(update, _):
     """Callback for /help command"""
     await update.message.reply_text('Type /siblings, /children or /print')
 
