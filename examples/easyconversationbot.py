@@ -30,15 +30,15 @@ async def collect_user_inputs(context, num_items: int):
     inputs = []
     for _ in range(num_items):
         # await as in regular reply_text for network request
-        await context.last_update.message.reply_text('Enter input, or /done')
+        await context.last_update.message.reply_text("Enter input, or /done")
 
         # Here is the magic!
         # We can get new updates on the go
-        # Just remember to await it. This waits for the user's input, and can be for long time.
+        # Just remember to await it. This waits for the user"s input, and can be for long time.
         #  - But your functional logic stays simple and saves state!
         update = await context.get_update()
 
-        if update.message.text == '/done':
+        if update.message.text == "/done":
             break
         inputs.append(update.message.text)
     return inputs
@@ -50,15 +50,15 @@ async def collect_number(context):
         update = await context.get_update()
         if update.message.text.isdigit():
             return int(update.message.text)
-        await update.message.reply_text('This is not a number. Enter a number:')
+        await update.message.reply_text("This is not a number. Enter a number:")
 
 
 async def collect_list(context, list_name):
     """Collects list from user. First prompts with `list_name`"""
-    await context.last_update.message.reply_text(f'How much {list_name}?')
+    await context.last_update.message.reply_text(f"How much {list_name}?")
     how_much = await collect_number(context)
     ret = await collect_user_inputs(context, how_much)
-    await context.last_update.message.reply_text(f'{list_name}: {ret}')
+    await context.last_update.message.reply_text(f"{list_name}: {ret}")
     return ret
 
 
@@ -68,7 +68,7 @@ async def siblings_callback(context):
 
     # We can easily call this function multiple times in multiple logic paths
     # We need to await our functions too
-    context.user_data[SIBLINGS_KEY] = await collect_list(context, 'siblings')
+    context.user_data[SIBLINGS_KEY] = await collect_list(context, "siblings")
 
     await print_help(context.last_update, context)
 
@@ -76,7 +76,7 @@ async def siblings_callback(context):
 async def children_callback(context):
     """Entry point for /children command"""
     await context.get_update()  # Ignore first message
-    context.user_data[CHILDREN_KEY] = await collect_list(context, 'children')
+    context.user_data[CHILDREN_KEY] = await collect_list(context, "children")
     await print_help(context.last_update, context)
 
 
@@ -92,7 +92,7 @@ async def print_data(update, context):
 
 async def print_help(update, _):
     """Callback for /help command"""
-    await update.message.reply_text('Type /siblings, /children or /print')
+    await update.message.reply_text("Type /siblings, /children or /print")
 
 
 def main() -> None:
@@ -100,15 +100,15 @@ def main() -> None:
     # Create the Application and pass it your bot's token.
     application = Application.builder().token("Token").build()
 
-    application.add_handler(CommandHandler('print', print_data))
-    application.add_handler(CommandHandler('help', print_help))
-    application.add_handler(CommandHandler('start', print_help))
+    application.add_handler(CommandHandler("print", print_data))
+    application.add_handler(CommandHandler("help", print_help))
+    application.add_handler(CommandHandler("start", print_help))
 
     application.add_handler(
-        EasyConversationHandler(siblings_callback, first_message_filter=Regex('/siblings'))
+        EasyConversationHandler(siblings_callback, first_message_filter=Regex("/siblings"))
     )
     application.add_handler(
-        EasyConversationHandler(children_callback, first_message_filter=Regex('/children'))
+        EasyConversationHandler(children_callback, first_message_filter=Regex("/children"))
     )
 
     # Run the bot until the user presses Ctrl-C

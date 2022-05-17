@@ -35,7 +35,7 @@ from telegram.ext.filters import BaseFilter
 class _EasyBotConversation:
     """Save and manage state for EasyConversation for one chat"""
 
-    __slots__ = ('main_callback', 'error_callback', '_asyncio_task', '_semaphore', '_updates')
+    __slots__ = ("main_callback", "error_callback", "_asyncio_task", "_semaphore", "_updates")
 
     def __init__(self, main_callback, error_callback):
         self.main_callback = main_callback
@@ -75,7 +75,7 @@ class _EasyBotConversation:
 class EasyConversationHandler(BaseHandler[Update, CCT]):
     """Handler for functional-conversation bots"""
 
-    __slots__ = ('main_callback', 'error_callback', 'first_message_filter', '_conversations')
+    __slots__ = ("main_callback", "error_callback", "first_message_filter", "_conversations")
 
     def __init__(
             self,
@@ -83,7 +83,7 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
             first_message_filter: BaseFilter = None,
             error_callback: Callable[[CCT, Exception], Any] = None
     ):
-        super().__init__(callback=lambda u, c: '')
+        super().__init__(callback=lambda u, c: "")
         self.main_callback = main_callback
 
         if first_message_filter is None:
@@ -106,8 +106,8 @@ class EasyConversationHandler(BaseHandler[Update, CCT]):
 
     @staticmethod
     async def default_error_callback(exception: Exception, _):
-        stderr.write('No error handler set for EasyConversationHandler, so printing to stderr')
-        stderr.write(''.join(
+        stderr.write("No error handler set for EasyConversationHandler, so printing to stderr")
+        stderr.write("".join(
             traceback.format_exception(None, exception, exception.__traceback__)
         ))
 
