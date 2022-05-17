@@ -31,6 +31,10 @@ from telegram.ext.filters import BaseFilter
 
 
 class _EasyBotConversation:
+    """Save and manage state for EasyConversation for one chat"""
+
+    __slots__ = ('main_callback', 'error_callback', '_asyncio_task', '_semaphore', '_updates')
+
     def __init__(self, main_callback, error_callback):
         self.main_callback = main_callback
         self.error_callback = error_callback
@@ -65,6 +69,10 @@ class _EasyBotConversation:
 
 
 class EasyConversationHandler(BaseHandler[Update, CCT]):
+    """Handler for functional-conversation bots"""
+
+    __slots__ = ('main_callback', 'error_callback', 'first_message_filter', '_conversations')
+
     def __init__(
             self,
             main_callback: Callable[[CCT], Any],
