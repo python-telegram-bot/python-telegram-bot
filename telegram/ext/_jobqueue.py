@@ -28,6 +28,7 @@ from apscheduler.job import Job as APSJob
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import JobCallback
 
@@ -419,7 +420,10 @@ class JobQueue:
                 (:obj:`datetime.time.tzinfo`) is :obj:`None`, the default timezone of the bot will
                 be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
-                run (where ``0-6`` correspond to monday - sunday). Defaults to ``EVERY_DAY``
+                run (where ``0-6`` correspond to sunday - saturday). Defaults to ``EVERY_DAY``
+
+                .. versionchanged:: 20.0
+                    Changed day of the week mapping of 0-6 from monday-sunday to sunday-saturday.
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
@@ -447,18 +451,24 @@ class JobQueue:
             queue.
 
         """
+        warn(
+            "Prior to v20.0 the `days` parameter was aligned to that of cron's weekday scheme "
+            "we recommend double checking if the passed value is correct.",
+            stacklevel=2,
+        )
         if not job_kwargs:
             job_kwargs = {}
 
         name = name or callback.__name__
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
+        cron_mapping = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
         j = self.scheduler.add_job(
             job.run,
             name=name,
             args=(self.application,),
             trigger="cron",
-            day_of_week=",".join([str(d) for d in days]),
+            day_of_week=",".join([cron_mapping[d] for d in days]),
             hour=time.hour,
             minute=time.minute,
             second=time.second,
