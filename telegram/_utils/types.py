@@ -24,11 +24,16 @@ Warning:
     the changelog.
 """
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Dict, Optional, Tuple, TypeVar, Union, Collection
+from typing import IO, TYPE_CHECKING, Any, Collection, Dict, Optional, Tuple, TypeVar, Union
 
 if TYPE_CHECKING:
-    from telegram import InputFile
-    from telegram import ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove
+    from telegram import (
+        ForceReply,
+        InlineKeyboardMarkup,
+        InputFile,
+        ReplyKeyboardMarkup,
+        ReplyKeyboardRemove,
+    )
     from telegram._utils.defaultvalue import DefaultValue
 
 FileLike = Union[IO[bytes], "InputFile"]

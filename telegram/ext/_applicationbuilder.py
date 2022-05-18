@@ -34,7 +34,7 @@ from telegram.request import BaseRequest
 from telegram.request._httpxrequest import HTTPXRequest
 
 if TYPE_CHECKING:
-    from telegram.ext import BasePersistence, Defaults, CallbackContext
+    from telegram.ext import BasePersistence, CallbackContext, Defaults
 
 # Type hinting is a bit complicated here because we try to get to a sane level of
 # leveraging generics and therefore need a number of type variables.

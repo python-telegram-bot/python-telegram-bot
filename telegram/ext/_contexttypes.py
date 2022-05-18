@@ -24,6 +24,7 @@ from telegram.ext._utils.types import BD, CCT, CD, UD
 
 if TYPE_CHECKING:
     from typing import Dict
+
     from telegram.ext._extbot import ExtBot
 
 

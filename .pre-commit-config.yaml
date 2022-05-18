@@ -74,4 +74,6 @@ repos:
     hooks:
     -   id: isort
         name: isort
-        args: ["--diff"]  # -diff will not apply the changes, just show them
+        args:
+        - --diff
+        - --check
