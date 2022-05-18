@@ -157,6 +157,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
           :class:`telegram.ext.Defaults`, please use the subclass :class:`telegram.ext.ExtBot`
           instead.
         * Attempting to pickle a bot instance will now raise :exc:`pickle.PicklingError`.
+        * The following are now keyword-only arguments in Bot methods:
+          ``location``, ``filename``, ``venue``, ``contact``,
+          ``{read, write, connect, pool}_timeout``, ``api_kwargs``. Use a named argument for those,
+          and notice that some positional arguments changed position as a result.
 
     Args:
         token (:obj:`str`): Bot's unique authentication token.
@@ -276,6 +280,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         endpoint: str,
         data: JSONDict = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -323,12 +328,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Union[bool, Message]:
         if reply_to_message_id is not None:
             data["reply_to_message_id"] = reply_to_message_id
@@ -509,6 +515,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     @_log
     async def get_me(
         self,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -517,7 +524,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> User:
         """A simple method for testing your bot's auth token. Requires no parameters.
 
-        Args:
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -558,18 +565,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         chat_id: Union[int, str],
         text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """Use this method to send text messages.
 
@@ -601,6 +609,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -640,12 +650,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -653,6 +663,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         message_id: int,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -678,6 +689,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             message_id (:obj:`int`): Identifier of the message to delete.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -719,14 +732,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         from_chat_id: Union[str, int],
         message_id: int,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
-        """Use this method to forward messages of any kind. Service messages can't be forwarded.
+        """
+        Use this method to forward messages of any kind. Service messages can't be forwarded.
 
         Note:
             Since the release of Bot API 5.5 it can be impossible to forward messages from
@@ -749,6 +764,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionadded:: 13.10
 
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -769,7 +785,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Raises:
             :class:`telegram.error.TelegramError`
-
         """
         data: JSONDict = {}
 
@@ -783,12 +798,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "forwardMessage",
             data,
             disable_notification=disable_notification,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -800,16 +815,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        filename: str = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """Use this method to send photos.
 
@@ -829,11 +845,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            filename (:obj:`str`, optional): Custom file name for the photo, when uploading a
-                new file. Convenience parameter, useful e.g. when sending files generated by the
-                :obj:`tempfile` module.
-
-                .. versionadded:: 13.1
             caption (:obj:`str`, optional): Photo caption (may also be used when resending photos
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
@@ -858,6 +869,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            filename (:obj:`str`, optional): Custom file name for the photo, when uploading a
+                new file. Convenience parameter, useful e.g. when sending files generated by the
+                :obj:`tempfile` module.
+
+                .. versionadded:: 13.1
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -898,12 +916,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -918,17 +936,18 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        thumb: FileInput = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: FileInput = None,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        filename: str = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -956,11 +975,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            filename (:obj:`str`, optional): Custom file name for the audio, when uploading a
-                new file. Convenience parameter, useful e.g. when sending files generated by the
-                :obj:`tempfile` module.
-
-                .. versionadded:: 13.1
             caption (:obj:`str`, optional): Audio caption,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
@@ -997,6 +1011,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+        Keyword Args:
+            filename (:obj:`str`, optional): Custom file name for the audio, when uploading a
+                new file. Convenience parameter, useful e.g. when sending files generated by the
+                :obj:`tempfile` module.
+
+                .. versionadded:: 13.1
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -1045,12 +1066,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -1058,22 +1079,23 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[int, str],
         document: Union[FileInput, "Document"],
-        filename: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb: FileInput = None,
-        api_kwargs: JSONDict = None,
         disable_content_type_detection: bool = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> Message:
         """
         Use this method to send general files.
@@ -1100,9 +1122,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            filename (:obj:`str`, optional): Custom file name for the document, when uploading a
-                new file. Convenience parameter, useful e.g. when sending files generated by the
-                :obj:`tempfile` module.
             caption (:obj:`str`, optional): Document caption (may also be used when resending
                 documents by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
@@ -1138,6 +1157,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+        Keyword Args:
+            filename (:obj:`str`, optional): Custom file name for the document, when uploading a
+                new file. Convenience parameter, useful e.g. when sending files generated by the
+                :obj:`tempfile` module.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -1182,12 +1206,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -1198,13 +1222,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """
         Use this method to send static ``.WEBP``, animated ``.TGS``, or video ``.WEBM`` stickers.
@@ -1240,6 +1265,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -1269,12 +1296,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -1287,20 +1314,21 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         width: int = None,
         height: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         supports_streaming: bool = None,
         thumb: FileInput = None,
-        api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        filename: str = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> Message:
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -1329,11 +1357,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            filename (:obj:`str`, optional): Custom file name for the video, when uploading a
-                new file. Convenience parameter, useful e.g. when sending files generated by the
-                :obj:`tempfile` module.
-
-                .. versionadded:: 13.1
             duration (:obj:`int`, optional): Duration of sent video in seconds.
             width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
@@ -1372,6 +1395,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+        Keyword Args:
+            filename (:obj:`str`, optional): Custom file name for the video, when uploading a
+                new file. Convenience parameter, useful e.g. when sending files generated by the
+                :obj:`tempfile` module.
+
+                .. versionadded:: 13.1
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -1421,12 +1451,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -1439,15 +1469,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        thumb: FileInput = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        thumb: FileInput = None,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        filename: str = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
@@ -1472,11 +1503,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            filename (:obj:`str`, optional): Custom file name for the video note, when uploading a
-                new file. Convenience parameter, useful e.g. when sending files generated by the
-                :obj:`tempfile` module.
-
-                .. versionadded:: 13.1
             duration (:obj:`int`, optional): Duration of sent video in seconds.
             length (:obj:`int`, optional): Video width and height, i.e. diameter of the video
                 message.
@@ -1504,6 +1530,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+        Keyword Args:
+            filename (:obj:`str`, optional): Custom file name for the video note, when uploading a
+                new file. Convenience parameter, useful e.g. when sending files generated by the
+                :obj:`tempfile` module.
+
+                .. versionadded:: 13.1
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -1544,12 +1577,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -1566,15 +1599,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        filename: str = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -1599,11 +1633,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            filename (:obj:`str`, optional): Custom file name for the animation, when uploading a
-                new file. Convenience parameter, useful e.g. when sending files generated by the
-                :obj:`tempfile` module.
-
-                .. versionadded:: 13.1
             duration (:obj:`int`, optional): Duration of sent animation in seconds.
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
@@ -1641,6 +1670,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            filename (:obj:`str`, optional): Custom file name for the animation, when uploading a
+                new file. Convenience parameter, useful e.g. when sending files generated by the
+                :obj:`tempfile` module.
+
+                .. versionadded:: 13.1
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -1688,12 +1724,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -1706,16 +1742,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        filename: str = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -1743,11 +1780,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            filename (:obj:`str`, optional): Custom file name for the voice, when uploading a
-                new file. Convenience parameter, useful e.g. when sending files generated by the
-                :obj:`tempfile` module.
-
-                .. versionadded:: 13.1
             caption (:obj:`str`, optional): Voice message caption,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
@@ -1773,6 +1805,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            filename (:obj:`str`, optional): Custom file name for the voice, when uploading a
+                new file. Convenience parameter, useful e.g. when sending files generated by the
+                :obj:`tempfile` module.
+
+                .. versionadded:: 13.1
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -1815,12 +1854,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -1832,13 +1871,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
 
@@ -1859,6 +1899,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -1911,18 +1953,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        location: Location = None,
         live_period: int = None,
-        api_kwargs: JSONDict = None,
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        location: Location = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> Message:
         """Use this method to send point on the map.
 
@@ -1935,7 +1978,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
-            location (:class:`telegram.Location`, optional): The location to send.
             horizontal_accuracy (:obj:`int`, optional): The radius of uncertainty for the location,
                 measured in meters;
                 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
@@ -1962,6 +2004,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            location (:class:`telegram.Location`, optional): The location to send.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -2016,12 +2061,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -2032,16 +2077,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         inline_message_id: int = None,
         latitude: float = None,
         longitude: float = None,
-        location: Location = None,
         reply_markup: InlineKeyboardMarkup = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
+        *,
+        location: Location = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        horizontal_accuracy: float = None,
-        heading: int = None,
-        proximity_alert_radius: int = None,
     ) -> Union[Message, bool]:
         """Use this method to edit live location messages sent by the bot or via the bot
         (for inline bots). A location can be edited until its :attr:`telegram.Location.live_period`
@@ -2061,7 +2107,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 specified. Identifier of the inline message.
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
-            location (:class:`telegram.Location`, optional): The location to send.
             horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the
                 location, measured in meters;
                 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
@@ -2072,6 +2117,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard.
+
+        Keyword Args:
+            location (:class:`telegram.Location`, optional): The location to send.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -2139,6 +2187,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         message_id: int = None,
         inline_message_id: int = None,
         reply_markup: InlineKeyboardMarkup = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2158,6 +2207,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 specified. Identifier of the inline message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -2209,17 +2260,18 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        venue: Venue = None,
         foursquare_type: str = None,
-        api_kwargs: JSONDict = None,
         google_place_id: str = None,
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        venue: Venue = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> Message:
         """Use this method to send information about a venue.
 
@@ -2247,7 +2299,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
                 `supported types \
                 <https://developers.google.com/places/web-service/supported_types>`_.)
-            venue (:class:`telegram.Venue`, optional): The venue to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -2263,6 +2314,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            venue (:class:`telegram.Venue`, optional): The venue to send.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -2332,12 +2386,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -2350,15 +2404,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        vcard: str = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        contact: Contact = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        contact: Contact = None,
-        vcard: str = None,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """Use this method to send phone contacts.
 
@@ -2375,7 +2430,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             last_name (:obj:`str`, optional): Contact's last name.
             vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
                 0-2048 bytes.
-            contact (:class:`telegram.Contact`, optional): The contact to send.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -2391,6 +2445,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
+            contact (:class:`telegram.Contact`, optional): The contact to send.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -2449,12 +2506,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -2465,13 +2522,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: InlineKeyboardMarkup = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """Use this method to send a game.
 
@@ -2493,6 +2551,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard. If empty, one ‘Play game_title’ button will be
                 shown. If not empty, the first button must launch the game.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -2524,12 +2584,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -2537,6 +2597,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         action: str,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2555,6 +2616,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             action(:obj:`str`): Type of action to broadcast. Choose one, depending on what the user
                 is about to receive. For convenience look at the constants in
                 :class:`telegram.constants.ChatAction`.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -2678,11 +2741,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         next_offset: str = None,
         switch_pm_text: str = None,
         switch_pm_parameter: str = None,
+        *,
+        current_offset: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        current_offset: str = None,
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
@@ -2719,6 +2783,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :guilabel:`/start` message sent to the bot when user presses the switch button.
                 1-:tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
                 only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
+
+        Keyword Args:
             current_offset (:obj:`str`, optional): The :attr:`telegram.InlineQuery.offset` of
                 the inline query to answer. If passed, PTB will automatically take care of
                 the pagination for you, i.e. pass the correct :paramref:`next_offset` and truncate
@@ -2791,6 +2857,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         user_id: Union[str, int],
         offset: int = None,
         limit: int = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2805,6 +2872,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 By default, all photos are returned.
             limit (:obj:`int`, optional): Limits the number of photos to be retrieved. Values
                 between 1-100 are accepted. Defaults to ``100``.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -2852,6 +2921,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         file_id: Union[
             str, Animation, Audio, ChatPhoto, Document, PhotoSize, Sticker, Video, VideoNote, Voice
         ],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2880,6 +2950,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                      :class:`telegram.Voice`):
                 Either the file identifier or an object that has a file_id attribute
                 to get file information about.
+
+         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -2933,13 +3005,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
+        until_date: Union[int, datetime] = None,
+        revoke_messages: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        until_date: Union[int, datetime] = None,
         api_kwargs: JSONDict = None,
-        revoke_messages: bool = None,
     ) -> bool:
         """
         Use this method to ban a user from a group, supergroup or a channel. In the case of
@@ -2953,18 +3026,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
                 of the target supergroup or channel (in the format ``@channelusername``).
             user_id (:obj:`int`): Unique identifier of the target user.
-            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the user will
                 be unbanned, unix time. If user is banned for more than 366 days or less than 30
                 seconds from the current time they are considered to be banned forever. Applied
@@ -2977,6 +3038,20 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 Always :obj:`True` for supergroups and channels.
 
                 .. versionadded:: 13.4
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
@@ -3012,6 +3087,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         sender_chat_id: int,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3030,6 +3106,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target group or username
                 of the target supergroup or channel (in the format ``@channelusername``).
             sender_chat_id (:obj:`int`): Unique identifier of the target sender chat.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3071,12 +3149,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
+        only_if_banned: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        only_if_banned: bool = None,
     ) -> bool:
         """Use this method to unban a previously kicked user in a supergroup or channel.
 
@@ -3091,6 +3170,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target supergroup or channel (in the format ``@channelusername``).
             user_id (:obj:`int`): Unique identifier of the target user.
             only_if_banned (:obj:`bool`, optional): Do nothing if the user is not banned.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3135,6 +3216,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         sender_chat_id: int,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3151,6 +3233,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
             sender_chat_id (:obj:`int`): Unique identifier of the target sender chat.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3195,6 +3279,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         show_alert: bool = None,
         url: str = None,
         cache_time: int = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3226,6 +3311,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 your bot with a parameter.
             cache_time (:obj:`int`, optional): The maximum amount of time in seconds that the
                 result of the callback query may be cached client-side. Defaults to 0.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3281,12 +3368,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: InlineKeyboardMarkup = None,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit text and game messages.
@@ -3312,6 +3400,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 this message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3366,16 +3456,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int] = None,
         message_id: int = None,
-        inline_message_id: int = None,
+        inline_message_id: str = None,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Union[Message, bool]:
         """
         Use this method to edit captions of messages.
@@ -3399,6 +3490,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :paramref:`parse_mode`.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3454,6 +3547,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         message_id: int = None,
         inline_message_id: int = None,
         reply_markup: InlineKeyboardMarkup = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3479,6 +3573,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 specified. Identifier of the inline message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3528,6 +3624,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         message_id: int = None,
         inline_message_id: int = None,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3548,6 +3645,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 specified. Identifier of the inline message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3597,11 +3696,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         offset: int = None,
         limit: int = None,
         timeout: float = None,
+        allowed_updates: List[str] = None,
+        *,
         read_timeout: float = 2,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
     ) -> List[Update]:
         """Use this method to receive incoming updates using long polling.
@@ -3619,6 +3719,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to ``0``,
                 i.e. usual short polling. Should be positive, short polling should be used for
                 testing purposes only.
+            allowed_updates (List[:obj:`str`]), optional): A list the types of
+                updates you want your bot to receive. For example, specify ["message",
+                "edited_channel_post", "callback_query"] to only receive updates of these types.
+                See :class:`telegram.Update` for a complete list of available update types.
+                Specify an empty list to receive all updates except
+                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
+                setting will be used. Please note that this parameter doesn't affect updates
+                created before the call to the get_updates, so unwanted updates may be received for
+                a short period of time.
+
+        Keyword Args:
             read_timeout (:obj:`float`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 ``2``. :paramref:`timeout` will be added to this value.
@@ -3631,15 +3742,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            allowed_updates (List[:obj:`str`]), optional): A list the types of
-                updates you want your bot to receive. For example, specify ["message",
-                "edited_channel_post", "callback_query"] to only receive updates of these types.
-                See :class:`telegram.Update` for a complete list of available update types.
-                Specify an empty list to receive all updates except
-                :attr:`telegram.Update.chat_member` (default). If not specified, the previous
-                setting will be used. Please note that this parameter doesn't affect updates
-                created before the call to the get_updates, so unwanted updates may be received for
-                a short period of time.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
@@ -3695,15 +3797,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         url: str,
         certificate: FileInput = None,
+        max_connections: int = None,
+        allowed_updates: List[str] = None,
+        ip_address: str = None,
+        drop_pending_updates: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        max_connections: int = None,
-        allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
-        ip_address: str = None,
-        drop_pending_updates: bool = None,
     ) -> bool:
         """
         Use this method to specify a url and receive incoming updates via an outgoing webhook.
@@ -3741,6 +3844,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 a short period of time.
             drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
                 updates.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3805,12 +3910,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     @_log
     async def delete_webhook(
         self,
+        drop_pending_updates: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        drop_pending_updates: bool = None,
     ) -> bool:
         """
         Use this method to remove webhook integration if you decide to switch back to
@@ -3819,6 +3925,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
                 updates.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3862,6 +3970,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def leave_chat(
         self,
         chat_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3873,6 +3982,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3913,6 +4024,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def get_chat(
         self,
         chat_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3926,6 +4038,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -3966,6 +4080,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def get_chat_administrators(
         self,
         chat_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3978,6 +4093,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4019,6 +4136,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def get_chat_member_count(
         self,
         chat_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4032,6 +4150,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4071,6 +4191,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         user_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4083,6 +4204,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
             user_id (:obj:`int`): Unique identifier of the target user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4122,6 +4245,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         sticker_set_name: str,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4138,6 +4262,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target supergroup (in the format @supergroupusername).
             sticker_set_name (:obj:`str`): Name of the sticker set to be set as the group
                 sticker set.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4172,6 +4298,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def delete_chat_sticker_set(
         self,
         chat_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4186,6 +4313,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup (in the format @supergroupusername).
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4218,6 +4347,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
     async def get_webhook_info(
         self,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4229,7 +4359,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         If the bot is using :meth:`get_updates`, will return an object with the
         :attr:`telegram.WebhookInfo.url` field empty.
 
-        Args:
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4270,6 +4400,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         inline_message_id: int = None,
         force: bool = None,
         disable_edit_message: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4292,6 +4423,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4346,6 +4479,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         chat_id: Union[str, int] = None,
         message_id: int = None,
         inline_message_id: int = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4369,6 +4503,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 Identifier of the sent message.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
                 specified. Identifier of the inline message.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4438,15 +4574,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """Use this method to send invoices.
 
@@ -4533,6 +4670,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard. If empty, one 'Pay total price' button will be
                 shown. If not empty, the first button must be a Pay button.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4605,12 +4744,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -4620,6 +4759,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         ok: bool,
         shipping_options: List[ShippingOption] = None,
         error_message: str = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4643,6 +4783,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 human readable form that explains why it is impossible to complete the order (e.g.
                 "Sorry, delivery to your desired address is unavailable"). Telegram will display
                 this message to the user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4690,6 +4832,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         pre_checkout_query_id: str,
         ok: bool,
         error_message: str = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4716,6 +4859,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 the checkout (e.g. "Sorry, somebody just bought the last of our amazing black
                 T-shirts while you were busy filling out your payment details. Please choose a
                 different color or garment!"). Telegram will display this message to the user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4760,6 +4905,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         web_app_query_id: str,
         result: "InlineQueryResult",
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4775,6 +4921,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             web_app_query_id (:obj:`str`): Unique identifier for the query to be answered.
             result (:class:`telegram.InlineQueryResult`): An object describing the message to be
                 sent.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4819,6 +4967,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         user_id: Union[str, int],
         permissions: ChatPermissions,
         until_date: Union[int, datetime] = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4844,6 +4993,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 bot will be used.
             permissions (:class:`telegram.ChatPermissions`): An object for new user
                 permissions.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -4899,14 +5050,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         can_restrict_members: bool = None,
         can_pin_messages: bool = None,
         can_promote_members: bool = None,
+        is_anonymous: bool = None,
+        can_manage_chat: bool = None,
+        can_manage_video_chats: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        is_anonymous: bool = None,
-        can_manage_chat: bool = None,
-        can_manage_video_chats: bool = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
@@ -4953,6 +5105,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 add new administrators with a subset of his own privileges or demote administrators
                 that he has promoted, directly or indirectly (promoted by administrators that were
                 appointed by him).
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5017,6 +5171,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         permissions: ChatPermissions,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5032,6 +5187,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
                 the target supergroup (in the format `@supergroupusername`).
             permissions (:class:`telegram.ChatPermissions`): New default chat permissions.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5072,6 +5229,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         chat_id: Union[int, str],
         user_id: Union[int, str],
         custom_title: str,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5088,6 +5246,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             user_id (:obj:`int`): Unique identifier of the target administrator.
             custom_title (:obj:`str`): New custom title for the administrator; 0-16 characters,
                 emoji are not allowed.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5128,6 +5288,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def export_chat_invite_link(
         self,
         chat_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5142,6 +5303,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5189,13 +5352,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         chat_id: Union[str, int],
         expire_date: Union[int, datetime] = None,
         member_limit: int = None,
+        name: str = None,
+        creates_join_request: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        name: str = None,
-        creates_join_request: bool = None,
     ) -> ChatInviteLink:
         """
         Use this method to create an additional invite link for a chat. The bot must be an
@@ -5214,6 +5378,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
+            name (:obj:`str`, optional): Invite link name;
+                0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
+
+                .. versionadded:: 13.8
+            creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
+                via the link need to be approved by chat administrators.
+                If :obj:`True`, ``member_limit`` can't be specified.
+
+                .. versionadded:: 13.8
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5228,15 +5403,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-            name (:obj:`str`, optional): Invite link name;
-                0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
-
-                .. versionadded:: 13.8
-            creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
-                via the link need to be approved by chat administrators.
-                If :obj:`True`, ``member_limit`` can't be specified.
-
-                .. versionadded:: 13.8
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -5278,13 +5444,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         invite_link: Union[str, "ChatInviteLink"],
         expire_date: Union[int, datetime] = None,
         member_limit: int = None,
+        name: str = None,
+        creates_join_request: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        name: str = None,
-        creates_join_request: bool = None,
     ) -> ChatInviteLink:
         """
         Use this method to edit a non-primary invite link created by the bot. The bot must be an
@@ -5312,6 +5479,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
+            name (:obj:`str`, optional): Invite link name;
+                0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
+
+                .. versionadded:: 13.8
+            creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
+                via the link need to be approved by chat administrators.
+                If :obj:`True`, ``member_limit`` can't be specified.
+
+                .. versionadded:: 13.8
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5326,15 +5504,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-            name (:obj:`str`, optional): Invite link name;
-                0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
-
-                .. versionadded:: 13.8
-            creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
-                via the link need to be approved by chat administrators.
-                If :obj:`True`, ``member_limit`` can't be specified.
-
-                .. versionadded:: 13.8
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -5375,6 +5544,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         invite_link: Union[str, "ChatInviteLink"],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5395,6 +5565,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 20.0
                     Now also accepts :obj:`telegram.ChatInviteLink` instances.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5437,6 +5609,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         user_id: int,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5454,6 +5627,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             user_id (:obj:`int`): Unique identifier of the target user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5494,6 +5669,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         user_id: int,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5511,6 +5687,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             user_id (:obj:`int`): Unique identifier of the target user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5551,6 +5729,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         photo: FileInput,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5569,6 +5748,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5607,6 +5788,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def delete_chat_photo(
         self,
         chat_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5621,6 +5803,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5660,6 +5844,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         title: str,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5675,6 +5860,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             title (:obj:`str`): New chat title, 1-255 characters.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5714,6 +5901,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: Union[str, int],
         description: str = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5729,6 +5917,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             description (:obj:`str`, optional): New chat description, 0-255 characters.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5772,6 +5962,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         chat_id: Union[str, int],
         message_id: int,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5791,6 +5982,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification (:obj:`bool`, optional): Pass :obj:`True`, if it is not necessary
                 to send a notification to all chat members about the new pinned message.
                 Notifications are always disabled in channels and private chats.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5833,12 +6026,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def unpin_chat_message(
         self,
         chat_id: Union[str, int],
+        message_id: int = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        message_id: int = None,
     ) -> bool:
         """
         Use this method to remove a message from the list of pinned messages in a chat. If the
@@ -5852,6 +6046,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             message_id (:obj:`int`, optional): Identifier of a message to unpin. If not specified,
                 the most recent pinned message (by sending date) will be unpinned.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5893,6 +6089,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def unpin_all_chat_messages(
         self,
         chat_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5909,6 +6106,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5946,6 +6145,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def get_sticker_set(
         self,
         name: str,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5956,6 +6156,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             name (:obj:`str`): Name of the sticker set.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -5995,6 +6197,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         user_id: Union[str, int],
         png_sticker: FileInput,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6018,6 +6221,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6062,13 +6267,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         png_sticker: FileInput = None,
         contains_masks: bool = None,
         mask_position: MaskPosition = None,
+        tgs_sticker: FileInput = None,
+        webm_sticker: FileInput = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        tgs_sticker: FileInput = None,
         api_kwargs: JSONDict = None,
-        webm_sticker: FileInput = None,
     ) -> bool:
         """
         Use this method to create new sticker set owned by a user.
@@ -6122,6 +6328,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 should be created.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6177,13 +6385,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         emojis: str,
         png_sticker: FileInput = None,
         mask_position: MaskPosition = None,
+        tgs_sticker: FileInput = None,
+        webm_sticker: FileInput = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        tgs_sticker: FileInput = None,
         api_kwargs: JSONDict = None,
-        webm_sticker: FileInput = None,
     ) -> bool:
         """
         Use this method to add a new sticker to a set created by the bot.
@@ -6231,6 +6440,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6281,6 +6492,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         sticker: str,
         position: int,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6292,6 +6504,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             sticker (:obj:`str`): File identifier of the sticker.
             position (:obj:`int`): New sticker position in the set, zero-based.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6330,6 +6544,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def delete_sticker_from_set(
         self,
         sticker: str,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6340,6 +6555,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             sticker (:obj:`str`): File identifier of the sticker.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6380,6 +6597,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         name: str,
         user_id: Union[str, int],
         thumb: FileInput = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6412,6 +6630,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6455,6 +6675,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         user_id: Union[str, int],
         errors: List[PassportElementError],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6475,6 +6696,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             user_id (:obj:`int`): User identifier
             errors (List[:class:`PassportElementError`]): An array describing the
                 errors.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6523,18 +6746,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         explanation: str = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: int = None,
         close_date: Union[int, datetime] = None,
-        api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> Message:
         """
         Use this method to send a native poll.
@@ -6589,6 +6813,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6644,12 +6870,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
@@ -6658,6 +6884,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         chat_id: Union[int, str],
         message_id: int,
         reply_markup: InlineKeyboardMarkup = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6673,6 +6900,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             message_id (:obj:`int`): Identifier of the original message with the poll.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 message inline keyboard.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6718,14 +6947,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        emoji: str = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        emoji: str = None,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Message:
         """
         Use this method to send an animated emoji that will display a random value.
@@ -6760,6 +6990,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6793,18 +7025,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             disable_notification=disable_notification,
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     @_log
     async def get_my_default_administrator_rights(
         self,
         for_channels: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6821,6 +7054,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             for_channels (:obj:`bool`, optional): Pass :obj:`True` to get default administrator
                 rights of the bot in channels. Otherwise, default administrator rights of the bot
                 for groups and supergroups will be returned.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6864,6 +7099,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         rights: ChatAdministratorRights = None,
         for_channels: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6885,6 +7121,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             for_channels (:obj:`bool`, optional): Pass :obj:`True` to change the default
                 administrator rights of the bot in channels. Otherwise, the default administrator
                 rights of the bot for groups and supergroups will be changed.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6929,19 +7167,31 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     @_log
     async def get_my_commands(
         self,
+        scope: BotCommandScope = None,
+        language_code: str = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        scope: BotCommandScope = None,
-        language_code: str = None,
     ) -> List[BotCommand]:
         """
         Use this method to get the current list of the bot's commands for the given scope and user
         language.
 
         Args:
+            scope (:class:`telegram.BotCommandScope`, optional): An object,
+                describing scope of users. Defaults to :class:`telegram.BotCommandScopeDefault`.
+
+                .. versionadded:: 13.7
+
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code or an empty
+                string.
+
+                .. versionadded:: 13.7
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -6956,15 +7206,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-            scope (:class:`telegram.BotCommandScope`, optional): An object,
-                describing scope of users. Defaults to :class:`telegram.BotCommandScopeDefault`.
-
-                .. versionadded:: 13.7
-
-            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code or an empty
-                string.
-
-                .. versionadded:: 13.7
 
         Returns:
             List[:class:`telegram.BotCommand`]: On success, the commands set for the bot. An empty
@@ -6998,13 +7239,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def set_my_commands(
         self,
         commands: List[Union[BotCommand, Tuple[str, str]]],
+        scope: BotCommandScope = None,
+        language_code: str = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        scope: BotCommandScope = None,
-        language_code: str = None,
     ) -> bool:
         """
         Use this method to change the list of the bot's commands. See the
@@ -7015,6 +7257,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list
                 of bot commands to be set as the list of the bot's commands. At most 100 commands
                 can be specified.
+            scope (:class:`telegram.BotCommandScope`, optional): An object,
+                describing scope of users for which the commands are relevant. Defaults to
+                :class:`telegram.BotCommandScopeDefault`.
+
+                .. versionadded:: 13.7
+
+            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
+                commands will be applied to all users from the given scope, for whose language
+                there are no dedicated commands.
+
+                .. versionadded:: 13.7
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -7029,17 +7284,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-            scope (:class:`telegram.BotCommandScope`, optional): An object,
-                describing scope of users for which the commands are relevant. Defaults to
-                :class:`telegram.BotCommandScopeDefault`.
-
-                .. versionadded:: 13.7
-
-            language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
-                commands will be applied to all users from the given scope, for whose language
-                there are no dedicated commands.
-
-                .. versionadded:: 13.7
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -7074,11 +7318,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         scope: BotCommandScope = None,
         language_code: str = None,
-        api_kwargs: JSONDict = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> bool:
         """
         Use this method to delete the list of the bot's commands for the given scope and user
@@ -7095,6 +7340,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             language_code (:obj:`str`, optional): A two-letter ISO 639-1 language code. If empty,
                 commands will be applied to all users from the given scope, for whose language
                 there are no dedicated commands.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -7139,6 +7386,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     @_log
     async def log_out(
         self,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7151,7 +7399,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         local server, but will not be able to log in back to the cloud Bot API server for 10
         minutes.
 
-        Args:
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -7183,10 +7431,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     @_log
     async def close(
         self,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> bool:
         """
         Use this method to close the bot instance before moving it from one local server to
@@ -7194,7 +7444,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         isn't launched again after server restart. The method will return error 429 in the first
         10 minutes after the bot is launched.
 
-        Args:
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -7207,6 +7457,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
 
         Returns:
             :obj:`True`: On success
@@ -7221,6 +7473,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     @_log
@@ -7236,12 +7489,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> MessageId:
         """
         Use this method to copy messages of any kind. Service messages and invoice messages can't
@@ -7277,6 +7531,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -7332,6 +7588,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         self,
         chat_id: int = None,
         menu_button: MenuButton = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7351,6 +7608,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 specified, default bot's menu button will be changed
             menu_button (:class:`telegram.MenuButton`, optional): An object for the new bot's menu
                 button. Defaults to :class:`telegram.MenuButtonDefault`.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -7389,6 +7648,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def get_chat_menu_button(
         self,
         chat_id: int = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7406,6 +7666,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int`, optional): Unique identifier for the target private chat. If not
                 specified, default bot's menu button will be returned.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.

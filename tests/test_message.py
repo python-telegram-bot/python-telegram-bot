@@ -62,9 +62,9 @@ from tests.test_passport import RAW_PASSPORT_DATA
 @pytest.fixture(scope="class")
 def message(bot):
     return Message(
-        TestMessage.id_,
-        TestMessage.date,
-        TestMessage.chat,
+        message_id=TestMessage.id_,
+        date=TestMessage.date,
+        chat=TestMessage.chat,
         from_user=TestMessage.from_user,
         bot=bot,
     )
@@ -344,7 +344,14 @@ class TestMessage:
             b"\\u200d\\U0001f467\\U0001f431http://google.com"
         ).decode("unicode-escape")
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
-        message = Message(1, self.from_user, self.date, self.chat, text=text, entities=[entity])
+        message = Message(
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            text=text,
+            entities=[entity],
+        )
         assert message.parse_entity(entity) == "http://google.com"
 
         with pytest.raises(RuntimeError, match="Message has no"):
@@ -357,7 +364,12 @@ class TestMessage:
         ).decode("unicode-escape")
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         message = Message(
-            1, self.from_user, self.date, self.chat, caption=caption, caption_entities=[entity]
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            caption=caption,
+            caption_entities=[entity],
         )
         assert message.parse_caption_entity(entity) == "http://google.com"
 
@@ -372,7 +384,12 @@ class TestMessage:
         entity = MessageEntity(type=MessageEntity.URL, offset=13, length=17)
         entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
         message = Message(
-            1, self.from_user, self.date, self.chat, text=text, entities=[entity_2, entity]
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            text=text,
+            entities=[entity_2, entity],
         )
         assert message.parse_entities(MessageEntity.URL) == {entity: "http://google.com"}
         assert message.parse_entities() == {entity: "http://google.com", entity_2: "h"}
@@ -386,9 +403,9 @@ class TestMessage:
         entity_2 = MessageEntity(type=MessageEntity.BOLD, offset=13, length=1)
         message = Message(
             1,
-            self.from_user,
-            self.date,
-            self.chat,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
             caption=text,
             caption_entities=[entity_2, entity],
         )
@@ -507,7 +524,12 @@ class TestMessage:
         expected = b"\\U0001f469\\u200d\\U0001f469\\u200d <b>ABC</b>".decode("unicode-escape")
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
-            1, self.from_user, self.date, self.chat, text=text, entities=[bold_entity]
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            text=text,
+            entities=[bold_entity],
         )
         assert expected == message.text_html
 
@@ -607,9 +629,9 @@ class TestMessage:
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
             1,
-            self.from_user,
-            self.date,
-            self.chat,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
             caption=caption,
             caption_entities=[bold_entity],
         )
@@ -621,9 +643,9 @@ class TestMessage:
         bold_entity = MessageEntity(type=MessageEntity.BOLD, offset=7, length=3)
         message = Message(
             1,
-            self.from_user,
-            self.date,
-            self.chat,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
             caption=caption,
             caption_entities=[bold_entity],
         )

@@ -123,6 +123,14 @@ def check_method(h4):
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
+    kw_or_positional_args = [
+        p.name for p in sig.parameters.values() if p.kind != inspect.Parameter.KEYWORD_ONLY
+    ]
+    assert set(kw_or_positional_args).difference(checked).difference(["self"]) == set(), (
+        f"In {method.__qualname__}, extra args should be keyword only "
+        f"(compared to {name} in API)"
+    )
+
 
 def check_object(h4):
     name = h4.text
