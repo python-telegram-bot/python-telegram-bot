@@ -35,8 +35,8 @@ class KeyboardButton(TelegramObject):
     used instead of this object to specify text of the button.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location` and
-    :attr:`request_poll` are equal.
+    considered equal, if their :attr:`text`, :attr:`request_contact`, :attr:`request_location`,
+    :attr:`request_poll` and :attr:`web_app` are equal.
 
     Note:
         * Optional fields are mutually exclusive.
@@ -46,6 +46,10 @@ class KeyboardButton(TelegramObject):
           January, 2020. Older clients will display unsupported message.
         * :attr:`web_app` option will only work in Telegram versions released after 16 April, 2022.
           Older clients will display unsupported message.
+
+    .. versionchanged:: 20.0
+       :attr:`web_app` is considered as well when comparing objects of this type in terms of
+       equality.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -99,6 +103,7 @@ class KeyboardButton(TelegramObject):
             self.request_contact,
             self.request_location,
             self.request_poll,
+            self.web_app,
         )
 
     @classmethod

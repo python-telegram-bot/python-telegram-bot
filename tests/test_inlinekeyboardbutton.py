@@ -130,7 +130,8 @@ class TestInlineKeyboardButton:
         c = InlineKeyboardButton("texts", callback_data="data")
         d = InlineKeyboardButton("text", callback_data="info")
         e = InlineKeyboardButton("text", url="http://google.com")
-        f = LoginUrl("http://google.com")
+        f = InlineKeyboardButton("text", web_app=WebAppInfo(url="https://ptb.org"))
+        g = LoginUrl("http://google.com")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -146,6 +147,9 @@ class TestInlineKeyboardButton:
 
         assert a != f
         assert hash(a) != hash(f)
+
+        assert a != g
+        assert hash(a) != hash(g)
 
     @pytest.mark.parametrize("callback_data", ["foo", 1, ("da", "ta"), object()])
     def test_update_callback_data(self, callback_data):

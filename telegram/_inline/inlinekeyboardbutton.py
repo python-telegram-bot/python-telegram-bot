@@ -35,8 +35,8 @@ class InlineKeyboardButton(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text`, :attr:`url`, :attr:`login_url`, :attr:`callback_data`,
-    :attr:`switch_inline_query`, :attr:`switch_inline_query_current_chat`, :attr:`callback_game`
-    and :attr:`pay` are equal.
+    :attr:`switch_inline_query`, :attr:`switch_inline_query_current_chat`, :attr:`callback_game`,
+    :attr:`web_app` and :attr:`pay` are equal.
 
     Note:
         * You must use exactly one of the optional fields. Mind that :attr:`callback_game` is not
@@ -61,6 +61,10 @@ class InlineKeyboardButton(TelegramObject):
           .. versionchanged:: 13.6
 
         * After Bot API 6.1, only ``HTTPS`` links will be allowed in :paramref:`login_url`.
+
+    .. versionchanged:: 20.0
+       :attr:`web_app` is considered as well when comparing objects of this type in terms of
+       equality.
 
     Args:
         text (:obj:`str`): Label text on the button.
@@ -185,6 +189,7 @@ class InlineKeyboardButton(TelegramObject):
             self.url,
             self.login_url,
             self.callback_data,
+            self.web_app,
             self.switch_inline_query,
             self.switch_inline_query_current_chat,
             self.callback_game,
