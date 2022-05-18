@@ -106,7 +106,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
             commands = frozenset((command.lower(),))
         else:
             commands = frozenset(x.lower() for x in command)
-        for comm in command:
+        for comm in commands:
             if not re.match(r"^[\da-z_]{1,32}$", comm):
                 raise ValueError(f"Command `{comm}` is not a valid bot command")
         self.commands = commands
