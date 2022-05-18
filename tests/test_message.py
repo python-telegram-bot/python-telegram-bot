@@ -1615,6 +1615,8 @@ class TestMessage:
                 voice_chat_scheduled=True,
                 video_chat_scheduled=False
             )
+
+        with pytest.raises(ValueError):
             Message(
                 self.id_,
                 self.date,
@@ -1623,6 +1625,8 @@ class TestMessage:
                 voice_chat_ended=True,
                 video_chat_ended=False
             )
+
+        with pytest.raises(ValueError):
             Message(
                 self.id_,
                 self.date,
