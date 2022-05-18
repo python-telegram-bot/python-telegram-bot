@@ -19,10 +19,10 @@
 import pytest
 
 from telegram import (
-    __version_info__,
-    __version__,
-    __bot_api_version_info__,
     __bot_api_version__,
+    __bot_api_version_info__,
+    __version__,
+    __version_info__,
     constants,
 )
 from telegram._version import Version
