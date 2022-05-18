@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=C0413
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
 from .extbot import ExtBot

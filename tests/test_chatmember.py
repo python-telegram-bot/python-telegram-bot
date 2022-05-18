@@ -255,3 +255,7 @@ class TestChatMember:
 
         assert c != e
         assert hash(c) != hash(e)
+
+    def test_invalid_input(self, user):
+        with pytest.raises(ValueError):
+            ChatMember(user=user, status="status", can_manage_video_chats=True, can_manage_voice_chats=False)

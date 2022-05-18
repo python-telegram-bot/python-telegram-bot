@@ -1604,3 +1604,31 @@ class TestMessage:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    def test_invalid_input(self,):
+        with pytest.raises(ValueError):
+            Message(
+                self.id_,
+                self.date,
+                self.chat,
+                from_user=self.from_user,
+                voice_chat_scheduled=True,
+                video_chat_scheduled=False
+            )
+            Message(
+                self.id_,
+                self.date,
+                self.chat,
+                from_user=self.from_user,
+                voice_chat_ended=True,
+                video_chat_ended=False
+            )
+            Message(
+                self.id_,
+                self.date,
+                self.chat,
+                from_user=self.from_user,
+                voice_chat_participants_invited=True,
+                video_chat_participants_invited=False
+            )
+
