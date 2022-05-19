@@ -42,7 +42,6 @@ from typing import (
     no_type_check,
 )
 
-
 try:
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import serialization

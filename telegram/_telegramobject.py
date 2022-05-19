@@ -19,8 +19,6 @@
 """Base class for Telegram Objects."""
 import json
 from copy import deepcopy
-
-
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 from telegram._utils.types import JSONDict
