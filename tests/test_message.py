@@ -1605,7 +1605,9 @@ class TestMessage:
         assert a != e
         assert hash(a) != hash(e)
 
-    def test_invalid_input(self,):
+    def test_invalid_input(
+        self,
+    ):
         with pytest.raises(ValueError):
             Message(
                 self.id_,
@@ -1613,7 +1615,7 @@ class TestMessage:
                 self.chat,
                 from_user=self.from_user,
                 voice_chat_scheduled=True,
-                video_chat_scheduled=False
+                video_chat_scheduled=False,
             )
 
         with pytest.raises(ValueError):
@@ -1623,7 +1625,7 @@ class TestMessage:
                 self.chat,
                 from_user=self.from_user,
                 voice_chat_ended=True,
-                video_chat_ended=False
+                video_chat_ended=False,
             )
 
         with pytest.raises(ValueError):
@@ -1633,6 +1635,5 @@ class TestMessage:
                 self.chat,
                 from_user=self.from_user,
                 voice_chat_participants_invited=True,
-                video_chat_participants_invited=False
+                video_chat_participants_invited=False,
             )
-
