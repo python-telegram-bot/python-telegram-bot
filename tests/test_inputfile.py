@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import logging
 import subprocess
 import sys
 from io import BytesIO
@@ -46,8 +45,8 @@ class TestInputFile:
         in_file = InputFile(proc.stdout)
 
         assert in_file.input_file_content == png_file.read_bytes()
-        assert in_file.mimetype == "image/png"
-        assert in_file.filename == "image.png"
+        assert in_file.mimetype == "application/octet-stream"
+        assert in_file.filename == "application.octet-stream"
 
         try:
             proc.kill()
@@ -69,7 +68,9 @@ class TestInputFile:
     def test_mimetypes(self, caplog):
         # Only test a few to make sure logic works okay
         assert InputFile(data_file("telegram.jpg").open("rb")).mimetype == "image/jpeg"
-        assert InputFile(data_file("telegram.webp").open("rb")).mimetype == "image/webp"
+        assert (
+            InputFile(data_file("telegram.webp").open("rb")).mimetype == "application/octet-stream"
+        )
         assert InputFile(data_file("telegram.mp3").open("rb")).mimetype == "audio/mpeg"
 
         # Test guess from file
@@ -84,11 +85,7 @@ class TestInputFile:
         assert InputFile(BytesIO(b"blah")).mimetype == "application/octet-stream"
 
         # Test string file
-        with caplog.at_level(logging.DEBUG):
-            assert InputFile(data_file("text_file.txt").open()).mimetype == "text/plain"
-
-            assert len(caplog.records) == 1
-            assert caplog.records[0].getMessage().startswith("Could not parse file content")
+        assert InputFile(data_file("text_file.txt").open()).mimetype == "text/plain"
 
     def test_filenames(self):
         assert InputFile(data_file("telegram.jpg").open("rb")).filename == "telegram.jpg"
@@ -111,7 +108,10 @@ class TestInputFile:
             def read(self):
                 return self.f.read()
 
-        assert InputFile(MockedFileobject(data_file("telegram.jpg"))).filename == "image.jpeg"
+        assert (
+            InputFile(MockedFileobject(data_file("telegram.jpg"))).filename
+            == "application.octet-stream"
+        )
         assert (
             InputFile(MockedFileobject(data_file("telegram.jpg")), filename="blah").filename
             == "blah"
