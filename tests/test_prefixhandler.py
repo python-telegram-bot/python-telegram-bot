@@ -18,8 +18,8 @@
 import pytest
 
 from telegram import Chat
-from telegram.ext import PrefixHandler, filters
-from tests.conftest import make_message, make_message_update, make_command_update
+from telegram.ext import CallbackContext, PrefixHandler, filters
+from tests.conftest import make_command_update, make_message, make_message_update
 from tests.test_commandhandler import BaseTest, is_match
 
 
@@ -81,6 +81,9 @@ class TestPrefixHandler(BaseTest):
         assert not is_match(handler, make_message_update(command))
         assert not is_match(handler, make_message_update(prefix + "notacommand"))
         assert not is_match(handler, make_command_update(f"not {text} at start"))
+        assert not is_match(
+            handler, make_message_update(bot=app.bot, message={"text": None, "caption": "caption"})
+        )
 
         handler = PrefixHandler(prefix=["!", "#"], command="cmd", callback=self.callback)
         assert isinstance(handler.commands, frozenset)
@@ -136,3 +139,13 @@ class TestPrefixHandler(BaseTest):
             self.callback_regex2, filters=filters.Regex("one") & filters.Regex("two")
         )
         await self._test_context_args_or_regex(app, handler, prefix_message_text)
+
+    def test_collect_additional_context(self, app):
+        handler = self.make_default_handler(
+            self.callback_regex2, filters=filters.Regex("one") & filters.Regex("two")
+        )
+        context = CallbackContext(application=app)
+        handler.collect_additional_context(
+            context=context, update=None, application=app, check_result=None
+        )
+        assert context.args is None

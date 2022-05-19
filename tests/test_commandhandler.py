@@ -23,10 +23,7 @@ import pytest
 
 from telegram import Bot, Chat, Message, Update
 from telegram.ext import CallbackContext, CommandHandler, JobQueue, filters
-from tests.conftest import (
-    make_command_message,
-    make_command_update,
-)
+from tests.conftest import make_command_message, make_command_update, make_message_update
 
 
 def is_match(handler, update):
@@ -165,6 +162,9 @@ class TestCommandHandler(BaseTest):
         assert not is_match(handler, make_command_update(command[1:], bot=app.bot))
         assert not is_match(handler, make_command_update(f"/not{command[1:]}", bot=app.bot))
         assert not is_match(handler, make_command_update(f"not {command} at start", bot=app.bot))
+        assert not is_match(
+            handler, make_message_update(bot=app.bot, message={"text": None, "caption": "caption"})
+        )
 
         handler = CommandHandler(["FOO", "bAR"], callback=self.callback)
         assert isinstance(handler.commands, frozenset)
