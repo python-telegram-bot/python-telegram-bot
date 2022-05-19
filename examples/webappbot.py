@@ -3,8 +3,8 @@
 # This program is dedicated to the public domain under the CC0 license.
 
 """
-Simple example of Telegram WebApps. The static website for this website is hosted by the PTB team
-for your convenience.
+Simple example of a Telegram WebApp which displays a color picker.
+The static website for this website is hosted by the PTB team for your convenience.
 Currently only showcases starting the WebApp via a KeyboardButton, as all other methods would
 require a bot token.
 """
@@ -34,23 +34,25 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# Define a few command handlers. These usually take the two arguments update and
-# context.
+# Define a `/start` command handler.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message with a button that opens a the web app."""
     await update.message.reply_text(
-        "Please press the button below to open the WebApp.",
+        "Please press the button below to choose a color via the WebApp.",
         reply_markup=ReplyKeyboardMarkup.from_button(
             KeyboardButton(
-                text="Click Me!",
-                web_app=WebAppInfo(url="https://python-telgeram-bot.org/static/webappbot"),
+                text="Open the color picker!",
+                web_app=WebAppInfo(url="https://python-telegram-bot.org/static/webappbot"),
             )
         ),
     )
 
 
+# Handle incoming WebAppData
 async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Print the received data and remove the button."""
+    # Here we use `json.loads`, since the WebApp sends the data JSON serialized string
+    # (see webappbot.html)
     data = json.loads(update.effective_message.web_app_data.data)
     await update.message.reply_html(
         text=f"You selected the color with the HEX value <code>{data['hex']}</code>. The "
