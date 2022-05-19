@@ -19,15 +19,12 @@
 """This module contains an abstract class to make POST and GET requests."""
 import abc
 import asyncio
+import json
 from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from types import TracebackType
 from typing import ClassVar, Optional, Tuple, Type, TypeVar, Union
 
-try:
-    import ujson as json
-except ImportError:
-    import json  # type: ignore[no-redef]
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput

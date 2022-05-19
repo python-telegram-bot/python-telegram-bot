@@ -17,12 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
+import json
 from copy import deepcopy
 
-try:
-    import ujson as json
-except ImportError:
-    import json  # type: ignore[no-redef]
 
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type, TypeVar, Union
 

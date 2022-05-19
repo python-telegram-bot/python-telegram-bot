@@ -42,10 +42,6 @@ from typing import (
     no_type_check,
 )
 
-try:
-    import ujson as json
-except ImportError:
-    import json  # type: ignore[no-redef]  # noqa: F723
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -4710,10 +4706,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if start_parameter is not None:
             data["start_parameter"] = start_parameter
         if provider_data is not None:
-            if isinstance(provider_data, str):
-                data["provider_data"] = provider_data
-            else:
-                data["provider_data"] = json.dumps(provider_data)
+            data["provider_data"] = provider_data
         if photo_url is not None:
             data["photo_url"] = photo_url
         if photo_size is not None:
