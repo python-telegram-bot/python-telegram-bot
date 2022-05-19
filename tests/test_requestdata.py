@@ -16,12 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import json
 from urllib.parse import quote
 
-try:
-    import ujson as json
-except ImportError:
-    import json
 
 from typing import Any, Dict
 
