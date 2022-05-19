@@ -5,6 +5,9 @@
 ci:
     autofix_prs: false
     autoupdate_schedule: monthly
+    # We currently only need this behavior on the v13.x branch were we have the vendored urllib
+    # TODO: Remove once we discontinue v13
+    submodules: true
 
 repos:
 -   repo: https://github.com/psf/black

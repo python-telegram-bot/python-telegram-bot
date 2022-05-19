@@ -22,7 +22,6 @@ from copy import deepcopy
 
 import pytest
 
-
 from telegram import Chat, Message, PhotoSize, TelegramObject, User
 
 

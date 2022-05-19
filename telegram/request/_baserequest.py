@@ -25,7 +25,6 @@ from http import HTTPStatus
 from types import TracebackType
 from typing import ClassVar, Optional, Tuple, Type, TypeVar, Union
 
-
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 from telegram._version import __version__ as ptb_ver
