@@ -82,7 +82,7 @@ class TestPrefixHandler(BaseTest):
         assert not is_match(handler, make_message_update(prefix + "notacommand"))
         assert not is_match(handler, make_command_update(f"not {text} at start"))
         assert not is_match(
-            handler, make_message_update(bot=app.bot, message={"text": None, "caption": "caption"})
+            handler, make_message_update(bot=app.bot, message=None, caption="caption")
         )
 
         handler = PrefixHandler(prefix=["!", "#"], command="cmd", callback=self.callback)

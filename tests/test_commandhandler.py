@@ -163,7 +163,7 @@ class TestCommandHandler(BaseTest):
         assert not is_match(handler, make_command_update(f"/not{command[1:]}", bot=app.bot))
         assert not is_match(handler, make_command_update(f"not {command} at start", bot=app.bot))
         assert not is_match(
-            handler, make_message_update(bot=app.bot, message={"text": None, "caption": "caption"})
+            handler, make_message_update(bot=app.bot, message=None, caption="caption")
         )
 
         handler = CommandHandler(["FOO", "bAR"], callback=self.callback)
