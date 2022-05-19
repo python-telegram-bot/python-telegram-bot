@@ -2381,7 +2381,7 @@ class TestBot:
 
         # Test setting our chat menu button to Webapp.
         my_menu = MenuButtonWebApp("click me!", WebAppInfo("https://telegram.org/"))
-        await bot.set_chat_menu_button(chat_id, my_menu)
+        await bot.set_chat_menu_button(chat_id=chat_id, menu_button=my_menu)
         menu_button = await bot.get_chat_menu_button(chat_id)
         assert isinstance(menu_button, MenuButtonWebApp)
         assert menu_button.type == MenuButtonType.WEB_APP
