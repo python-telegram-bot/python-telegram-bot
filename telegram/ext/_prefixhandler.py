@@ -38,10 +38,10 @@ class PrefixHandler(BaseHandler[Update, CCT]):
 
     This is an intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
     It supports configurable commands with the same options as :class:`CommandHandler`. It will
-    respond to every combination of :attr:`prefix` and :attr:`command`. It will add a :obj:`list`
-    to the :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of
-    strings, which is the text following the command split on single or consecutive whitespace
-    characters.
+    respond to every combination of :paramref:`prefix` and :paramref:`command`.
+    It will add a :obj:`list` to the :class:`CallbackContext` named :attr:`CallbackContext.args`,
+    containing a list of strings, which is the text following the command split on single or
+    consecutive whitespace characters.
 
     Examples:
 
@@ -86,7 +86,7 @@ class PrefixHandler(BaseHandler[Update, CCT]):
 
     Args:
         prefix (:obj:`str` | Collection[:obj:`str`]):
-            The prefix(es) that will precede :attr:`command`.
+            The prefix(es) that will precede :paramref:`command`.
         command (:obj:`str` | Collection[:obj:`str`]):
             The command or list of commands this handler should listen for. Case-insensitive.
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -106,6 +106,8 @@ class PrefixHandler(BaseHandler[Update, CCT]):
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
+        commands (FrozenSet[:obj:`str`]): The commands that this handler will listen for, i.e. the
+            combinations of :paramref:`prefix` and :paramref:`command`.
         callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
@@ -127,10 +129,7 @@ class PrefixHandler(BaseHandler[Update, CCT]):
         block: DVInput[bool] = DEFAULT_TRUE,
     ):
 
-        super().__init__(
-            callback=callback,
-            block=block,
-        )
+        super().__init__(callback=callback, block=block)
 
         if isinstance(prefix, str):
             prefixes = {prefix.lower()}

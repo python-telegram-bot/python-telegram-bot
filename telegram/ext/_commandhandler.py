@@ -103,7 +103,7 @@ class CommandHandler(BaseHandler[Update, CCT]):
         super().__init__(callback, block=block)
 
         if isinstance(command, str):
-            commands = frozenset((command.lower(),))
+            commands = frozenset({command.lower()})
         else:
             commands = frozenset(x.lower() for x in command)
         for comm in commands:
