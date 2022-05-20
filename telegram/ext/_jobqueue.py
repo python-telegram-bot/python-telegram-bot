@@ -51,6 +51,7 @@ class JobQueue:
     """
 
     __slots__ = ("_application", "scheduler", "_executor")
+    CRON_MAPPING = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
 
     def __init__(self) -> None:
         self._application: "Optional[weakref.ReferenceType[Application]]" = None
@@ -420,7 +421,8 @@ class JobQueue:
                 (:obj:`datetime.time.tzinfo`) is :obj:`None`, the default timezone of the bot will
                 be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
-                run (where ``0-6`` correspond to sunday - saturday). Defaults to ``EVERY_DAY``
+                run (where ``0-6`` correspond to sunday - saturday). By default, the job will run
+                every day.
 
                 .. versionchanged:: 20.0
                     Changed day of the week mapping of 0-6 from monday-sunday to sunday-saturday.
@@ -452,8 +454,8 @@ class JobQueue:
 
         """
         warn(
-            "Prior to v20.0 the `days` parameter was aligned to that of cron's weekday scheme "
-            "we recommend double checking if the passed value is correct.",
+            "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
+            "We recommend double checking if the passed value is correct.",
             stacklevel=2,
         )
         if not job_kwargs:
@@ -462,13 +464,12 @@ class JobQueue:
         name = name or callback.__name__
         job = Job(callback=callback, data=data, name=name, chat_id=chat_id, user_id=user_id)
 
-        cron_mapping = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
         j = self.scheduler.add_job(
             job.run,
             name=name,
             args=(self.application,),
             trigger="cron",
-            day_of_week=",".join([cron_mapping[d] for d in days]),
+            day_of_week=",".join([self.CRON_MAPPING[d] for d in days]),
             hour=time.hour,
             minute=time.minute,
             second=time.second,
