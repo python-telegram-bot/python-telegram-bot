@@ -180,9 +180,7 @@ class InputInvoiceMessageContent(InputMessageContent):
         self.prices = prices
         # Optionals
         self.max_tip_amount = max_tip_amount
-        self.suggested_tip_amounts = (
-            [int(sta) for sta in suggested_tip_amounts] if suggested_tip_amounts else None
-        )
+        self.suggested_tip_amounts = suggested_tip_amounts
         self.provider_data = provider_data
         self.photo_url = photo_url
         self.photo_size = photo_size
