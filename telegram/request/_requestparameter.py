@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that describes a single parameter of a request to the Bot API."""
+import json
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, Tuple
@@ -27,11 +28,6 @@ from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.enum import StringEnum
 from telegram._utils.types import UploadFileDict
-
-try:
-    import ujson as json
-except ImportError:
-    import json  # type: ignore[no-redef]  # noqa: F723
 
 
 @dataclass(repr=False, eq=False, order=False, frozen=True)

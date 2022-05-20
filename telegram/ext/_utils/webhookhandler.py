@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
 import asyncio
+import json
 import logging
 from http import HTTPStatus
 from ssl import SSLContext
@@ -32,11 +33,6 @@ from telegram.ext._extbot import ExtBot
 
 if TYPE_CHECKING:
     from telegram import Bot
-
-try:
-    import ujson as json
-except ImportError:
-    import json  # type: ignore[no-redef]
 
 
 class WebhookServer:
@@ -98,7 +94,7 @@ class WebhookAppClass(tornado.web.Application):
 
 # pylint: disable=abstract-method
 class TelegramHandler(tornado.web.RequestHandler):
-    """Handler that processes incoming requests from Telegram"""
+    """BaseHandler that processes incoming requests from Telegram"""
 
     __slots__ = ("bot", "update_queue", "_logger")
 

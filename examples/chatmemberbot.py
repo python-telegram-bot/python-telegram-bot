@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -14,9 +14,22 @@ bot.
 import logging
 from typing import Optional, Tuple
 
+from telegram import __version__ as TG_VER
+
+try:
+    from telegram import __version_info__
+except ImportError:
+    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
+
+if __version_info__ < (20, 0, 0, "alpha", 1):
+    raise RuntimeError(
+        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
+        f"{TG_VER} version of this example, "
+        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{TG_VER}/examples"
+    )
 from telegram import Chat, ChatMember, ChatMemberUpdated, Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackContext, ChatMemberHandler, CommandHandler
+from telegram.ext import Application, ChatMemberHandler, CommandHandler, ContextTypes
 
 # Enable logging
 
@@ -27,9 +40,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def extract_status_change(
-    chat_member_update: ChatMemberUpdated,
-) -> Optional[Tuple[bool, bool]]:
+def extract_status_change(chat_member_update: ChatMemberUpdated) -> Optional[Tuple[bool, bool]]:
     """Takes a ChatMemberUpdated instance and extracts whether the 'old_chat_member' was a member
     of the chat and whether the 'new_chat_member' is a member of the chat. Returns None, if
     the status didn't change.
@@ -55,7 +66,7 @@ def extract_status_change(
     return was_member, is_member
 
 
-async def track_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def track_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Tracks the chats the bot is in."""
     result = extract_status_change(update.my_chat_member)
     if result is None:
@@ -90,7 +101,7 @@ async def track_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> 
             context.bot_data.setdefault("channel_ids", set()).discard(chat.id)
 
 
-async def show_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def show_chats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Shows which chats the bot is in"""
     user_ids = ", ".join(str(uid) for uid in context.bot_data.setdefault("user_ids", set()))
     group_ids = ", ".join(str(gid) for gid in context.bot_data.setdefault("group_ids", set()))
@@ -103,7 +114,7 @@ async def show_chats(update: Update, context: CallbackContext.DEFAULT_TYPE) -> N
     await update.effective_message.reply_text(text)
 
 
-async def greet_chat_members(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def greet_chat_members(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Greets new users in chats and announces when someone leaves"""
     result = extract_status_change(update.chat_member)
     if result is None:

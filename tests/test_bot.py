@@ -64,7 +64,7 @@ from telegram import (
 from telegram._utils.datetime import from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
 from telegram.constants import ChatAction, InlineQueryLimit, MenuButtonType, ParseMode
-from telegram.error import BadRequest, InvalidToken, NetworkError, TelegramError
+from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
 from telegram.request import BaseRequest, HTTPXRequest, RequestData
@@ -259,6 +259,12 @@ class TestBot:
         # Second argument makes sure that we ignore logs from e.g. httpx
         with caplog.at_level(logging.DEBUG, logger="telegram"):
             await bot.get_me()
+            # Only for stabilizing this test-
+            if len(caplog.records) == 4:
+                for idx, record in enumerate(caplog.records):
+                    print(record)
+                    if record.getMessage().startswith("Task was destroyed but it is pending"):
+                        caplog.records.pop(idx)
             assert len(caplog.records) == 3
             assert caplog.records[0].getMessage().startswith("Entering: get_me")
             assert caplog.records[-1].getMessage().startswith("Exiting: get_me")
@@ -1521,10 +1527,6 @@ class TestBot:
 
         assert message.caption == "new caption"
 
-    async def test_edit_message_caption_without_required(self, bot):
-        with pytest.raises(ValueError, match="Both chat_id and message_id are required when"):
-            await bot.edit_message_caption(caption="new_caption")
-
     @pytest.mark.skip(reason="need reference to an inline message")
     async def test_edit_message_caption_inline(self):
         pass
@@ -1537,11 +1539,6 @@ class TestBot:
         )
 
         assert message is not True
-
-    async def test_edit_message_reply_markup_without_required(self, bot):
-        new_markup = InlineKeyboardMarkup([[InlineKeyboardButton(text="test", callback_data="1")]])
-        with pytest.raises(ValueError, match="Both chat_id and message_id are required when"):
-            await bot.edit_message_reply_markup(reply_markup=new_markup)
 
     @pytest.mark.skip(reason="need reference to an inline message")
     async def test_edit_reply_markup_inline(self):
@@ -1865,24 +1862,6 @@ class TestBot:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.answer_shipping_query(1, False, error_message="Not enough fish")
 
-    async def test_answer_shipping_query_errors(self, monkeypatch, bot):
-        shipping_options = ShippingOption(1, "option1", [LabeledPrice("price", 100)])
-
-        with pytest.raises(TelegramError, match="should not be empty and there should not be"):
-            await bot.answer_shipping_query(1, True, error_message="Not enough fish")
-
-        with pytest.raises(TelegramError, match="should not be empty and there should not be"):
-            await bot.answer_shipping_query(1, False)
-
-        with pytest.raises(TelegramError, match="should not be empty and there should not be"):
-            await bot.answer_shipping_query(1, False, shipping_options=shipping_options)
-
-        with pytest.raises(TelegramError, match="should not be empty and there should not be"):
-            await bot.answer_shipping_query(1, True)
-
-        with pytest.raises(AssertionError):
-            await bot.answer_shipping_query(1, True, shipping_options=[])
-
     # TODO: Needs improvement. Need incoming pre checkout queries to test
     async def test_answer_pre_checkout_query_ok(self, monkeypatch, bot):
         # For now just test that our internals pass the correct data
@@ -1903,13 +1882,6 @@ class TestBot:
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.answer_pre_checkout_query(1, False, error_message="Not enough fish")
-
-    async def test_answer_pre_checkout_query_errors(self, monkeypatch, bot):
-        with pytest.raises(TelegramError, match="should not be"):
-            await bot.answer_pre_checkout_query(1, True, error_message="Not enough fish")
-
-        with pytest.raises(TelegramError, match="should not be empty"):
-            await bot.answer_pre_checkout_query(1, False)
 
     @flaky(3, 1)
     async def test_restrict_chat_member(self, bot, channel_id, chat_permissions):
@@ -2000,16 +1972,6 @@ class TestBot:
         invite_link = await bot.export_chat_invite_link(channel_id)
         assert isinstance(invite_link, str)
         assert invite_link != ""
-
-    async def test_create_edit_invite_link_mutually_exclusive_arguments(self, bot, channel_id):
-        data = {"chat_id": channel_id, "member_limit": 17, "creates_join_request": True}
-
-        with pytest.raises(ValueError, match="`member_limit` can't be specified"):
-            await bot.create_chat_invite_link(**data)
-
-        data.update({"invite_link": "https://invite.link"})
-        with pytest.raises(ValueError, match="`member_limit` can't be specified"):
-            await bot.edit_chat_invite_link(**data)
 
     @flaky(3, 1)
     async def test_edit_revoke_chat_invite_link_passing_link_objects(self, bot, channel_id):
@@ -2396,9 +2358,9 @@ class TestBot:
         my_rights = ChatAdministratorRights.all_rights()
         await bot.set_my_default_administrator_rights(my_rights, for_channels=True)
         my_admin_rights_ch = await bot.get_my_default_administrator_rights(for_channels=True)
-        # tg bug? is_anonymous, can_invite_users is False despite setting it True for channels:
+        assert my_admin_rights_ch.can_invite_users is my_rights.can_invite_users
+        # tg bug? is_anonymous is False despite setting it True for channels:
         assert my_admin_rights_ch.is_anonymous is not my_rights.is_anonymous
-        assert my_admin_rights_ch.can_invite_users is not my_rights.can_invite_users
 
         assert my_admin_rights_ch.can_manage_chat is my_rights.can_manage_chat
         assert my_admin_rights_ch.can_delete_messages is my_rights.can_delete_messages
@@ -2419,7 +2381,7 @@ class TestBot:
 
         # Test setting our chat menu button to Webapp.
         my_menu = MenuButtonWebApp("click me!", WebAppInfo("https://telegram.org/"))
-        await bot.set_chat_menu_button(chat_id, my_menu)
+        await bot.set_chat_menu_button(chat_id=chat_id, menu_button=my_menu)
         menu_button = await bot.get_chat_menu_button(chat_id)
         assert isinstance(menu_button, MenuButtonWebApp)
         assert menu_button.type == MenuButtonType.WEB_APP

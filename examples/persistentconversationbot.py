@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -17,11 +17,24 @@ bot.
 import logging
 from typing import Dict
 
+from telegram import __version__ as TG_VER
+
+try:
+    from telegram import __version_info__
+except ImportError:
+    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
+
+if __version_info__ < (20, 0, 0, "alpha", 1):
+    raise RuntimeError(
+        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
+        f"{TG_VER} version of this example, "
+        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{TG_VER}/examples"
+    )
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     Application,
-    CallbackContext,
     CommandHandler,
+    ContextTypes,
     ConversationHandler,
     MessageHandler,
     PicklePersistence,
@@ -50,7 +63,7 @@ def facts_to_str(user_data: Dict[str, str]) -> str:
     return "\n".join(facts).join(["\n", "\n"])
 
 
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Start the conversation, display any stored data and ask user for input."""
     reply_text = "Hi! My name is Doctor Botter."
     if context.user_data:
@@ -68,7 +81,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return CHOOSING
 
 
-async def regular_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def regular_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Ask the user for info about the selected predefined choice."""
     text = update.message.text.lower()
     context.user_data["choice"] = text
@@ -83,7 +96,7 @@ async def regular_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) 
     return TYPING_REPLY
 
 
-async def custom_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def custom_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Ask the user for a description of a custom category."""
     await update.message.reply_text(
         'Alright, please send me the category first, for example "Most impressive skill"'
@@ -92,7 +105,7 @@ async def custom_choice(update: Update, context: CallbackContext.DEFAULT_TYPE) -
     return TYPING_CHOICE
 
 
-async def received_information(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def received_information(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Store info provided by user and ask for the next category."""
     text = update.message.text
     category = context.user_data["choice"]
@@ -109,14 +122,14 @@ async def received_information(update: Update, context: CallbackContext.DEFAULT_
     return CHOOSING
 
 
-async def show_data(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def show_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Display the gathered info."""
     await update.message.reply_text(
         f"This is what you already told me: {facts_to_str(context.user_data)}"
     )
 
 
-async def done(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def done(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Display the gathered info and end the conversation."""
     if "choice" in context.user_data:
         del context.user_data["choice"]

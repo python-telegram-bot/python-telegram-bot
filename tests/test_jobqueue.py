@@ -65,7 +65,7 @@ class TestJobQueue:
             isinstance(context, CallbackContext)
             and isinstance(context.job, Job)
             and isinstance(context.update_queue, asyncio.Queue)
-            and context.job.context is None
+            and context.job.data is None
             and context.chat_data is None
             and context.user_data is None
             and isinstance(context.bot_data, dict)
@@ -79,8 +79,8 @@ class TestJobQueue:
         self.result += 1
         context.job.schedule_removal()
 
-    async def job_run_once_with_context(self, context):
-        self.result += context.job.context
+    async def job_run_once_with_data(self, context):
+        self.result += context.job.data
 
     async def job_datetime_tests(self, context):
         self.job_time = time.time()
@@ -121,8 +121,8 @@ class TestJobQueue:
         await asyncio.sleep(0.1)
         assert self.result == 1
 
-    async def test_job_with_context(self, job_queue):
-        job_queue.run_once(self.job_run_once_with_context, 0.1, context=5)
+    async def test_job_with_data(self, job_queue):
+        job_queue.run_once(self.job_run_once_with_data, 0.1, data=5)
         await asyncio.sleep(0.2)
         assert self.result == 5
 

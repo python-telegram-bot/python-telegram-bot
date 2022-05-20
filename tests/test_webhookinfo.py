@@ -105,7 +105,6 @@ class TestWebhookInfo:
             pending_update_count=self.pending_update_count,
             last_error_date=self.last_error_date,
             max_connections=self.max_connections,
-            last_synchronization_error_date=self.last_synchronization_error_date,
         )
         b = WebhookInfo(
             url=self.url,
@@ -121,7 +120,15 @@ class TestWebhookInfo:
             last_error_date=0,
             max_connections=1,
         )
-        d = LoginUrl("text.com")
+        d = WebhookInfo(
+            url="http://github.com",
+            has_custom_certificate=True,
+            pending_update_count=78,
+            last_error_date=0,
+            max_connections=1,
+            last_synchronization_error_date=123,
+        )
+        e = LoginUrl("text.com")
 
         assert a == b
         assert hash(a) == hash(b)
@@ -132,3 +139,6 @@ class TestWebhookInfo:
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)

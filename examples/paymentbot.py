@@ -1,16 +1,29 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
 
 """Basic example for a bot that can receive payment from user."""
 
 import logging
 
+from telegram import __version__ as TG_VER
+
+try:
+    from telegram import __version_info__
+except ImportError:
+    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
+
+if __version_info__ < (20, 0, 0, "alpha", 1):
+    raise RuntimeError(
+        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
+        f"{TG_VER} version of this example, "
+        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{TG_VER}/examples"
+    )
 from telegram import LabeledPrice, ShippingOption, Update
 from telegram.ext import (
     Application,
-    CallbackContext,
     CommandHandler,
+    ContextTypes,
     MessageHandler,
     PreCheckoutQueryHandler,
     ShippingQueryHandler,
@@ -26,7 +39,7 @@ logger = logging.getLogger(__name__)
 PAYMENT_PROVIDER_TOKEN = "PAYMENT_PROVIDER_TOKEN"
 
 
-async def start_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Displays info on how to use the bot."""
     msg = (
         "Use /shipping to get an invoice for shipping-payment, or /noshipping for an "
@@ -36,9 +49,7 @@ async def start_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) 
     await update.message.reply_text(msg)
 
 
-async def start_with_shipping_callback(
-    update: Update, context: CallbackContext.DEFAULT_TYPE
-) -> None:
+async def start_with_shipping_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends an invoice with shipping-payment."""
     chat_id = update.message.chat_id
     title = "Payment Example"
@@ -72,7 +83,7 @@ async def start_with_shipping_callback(
 
 
 async def start_without_shipping_callback(
-    update: Update, context: CallbackContext.DEFAULT_TYPE
+    update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
     """Sends an invoice without shipping-payment."""
     chat_id = update.message.chat_id
@@ -94,7 +105,7 @@ async def start_without_shipping_callback(
     )
 
 
-async def shipping_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def shipping_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Answers the ShippingQuery with ShippingOptions"""
     query = update.shipping_query
     # check the payload, is this from your bot?
@@ -112,7 +123,7 @@ async def shipping_callback(update: Update, context: CallbackContext.DEFAULT_TYP
 
 
 # after (optional) shipping, it's the pre-checkout
-async def precheckout_callback(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def precheckout_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Answers the PreQecheckoutQuery"""
     query = update.pre_checkout_query
     # check the payload, is this from your bot?
@@ -124,9 +135,7 @@ async def precheckout_callback(update: Update, context: CallbackContext.DEFAULT_
 
 
 # finally, after contacting the payment provider...
-async def successful_payment_callback(
-    update: Update, context: CallbackContext.DEFAULT_TYPE
-) -> None:
+async def successful_payment_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Confirms the successful payment."""
     # do something after successfully receiving payment?
     await update.message.reply_text("Thank you for your payment!")

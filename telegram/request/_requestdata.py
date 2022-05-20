@@ -17,16 +17,12 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that holds the parameters of a request to the Bot API."""
+import json
 from typing import Any, Dict, List, Union
 from urllib.parse import urlencode
 
 from telegram._utils.types import UploadFileDict
 from telegram.request._requestparameter import RequestParameter
-
-try:
-    import ujson as json
-except ImportError:
-    import json  # type: ignore[no-redef]  # noqa: F723
 
 
 class RequestData:

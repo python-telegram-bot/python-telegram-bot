@@ -19,6 +19,7 @@ Handlers
 
 .. toctree::
 
+    telegram.ext.basehandler
     telegram.ext.callbackqueryhandler
     telegram.ext.chatjoinrequesthandler
     telegram.ext.chatmemberhandler
@@ -26,7 +27,6 @@ Handlers
     telegram.ext.commandhandler
     telegram.ext.conversationhandler
     telegram.ext.filters
-    telegram.ext.handler
     telegram.ext.inlinequeryhandler
     telegram.ext.messagehandler
     telegram.ext.pollanswerhandler

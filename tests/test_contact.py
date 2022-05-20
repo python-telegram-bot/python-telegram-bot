@@ -127,6 +127,15 @@ class TestContact:
         with pytest.raises(ValueError, match="Either contact or phone_number and first_name"):
             await bot.send_contact(chat_id=chat_id)
 
+    async def test_send_mutually_exclusive(self, bot, chat_id, contact):
+        with pytest.raises(ValueError, match="Not both"):
+            await bot.send_contact(
+                chat_id=chat_id,
+                contact=contact,
+                phone_number=contact.phone_number,
+                first_name=contact.first_name,
+            )
+
     def test_to_dict(self, contact):
         contact_dict = contact.to_dict()
 

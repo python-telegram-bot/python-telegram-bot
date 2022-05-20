@@ -18,15 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an abstract class to make POST and GET requests."""
 import abc
+import asyncio
+import json
 from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from types import TracebackType
 from typing import ClassVar, Optional, Tuple, Type, TypeVar, Union
-
-try:
-    import ujson as json
-except ImportError:
-    import json  # type: ignore[no-redef]
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
@@ -275,6 +272,10 @@ class BaseRequest(
                 connect_timeout=connect_timeout,
                 pool_timeout=pool_timeout,
             )
+        except asyncio.CancelledError as exc:
+            # TODO: in py3.8+, CancelledError is a subclass of BaseException, so we can drop this
+            #  clause when we drop py3.7
+            raise exc
         except TelegramError as exc:
             raise exc
         except Exception as exc:

@@ -42,10 +42,9 @@ def get_setup_kwargs(raw=False):
     raw_ext = "-raw" if raw else ""
     readme = Path(f'README{"_RAW" if raw else ""}.rst')
 
-    with Path("telegram/_version.py").open() as fh:
-        for line in fh.readlines():
-            if line.startswith("__version__"):
-                exec(line)
+    version_file = Path("telegram/_version.py").read_text()
+    first_part = version_file.split("# SETUP.PY MARKER")[0]
+    exec(first_part)
 
     kwargs = dict(
         script_name=f"setup{raw_ext}.py",
@@ -72,9 +71,6 @@ def get_setup_kwargs(raw=False):
         install_requires=requirements,
         extras_require={
             "socks": "httpx[socks]",
-            # json and cryptography are very stable, so we use a reasonably new version as
-            # lower bound and have no upper bound
-            "json": "ujson>=4.0.0",
             # 3.4-3.4.3 contained some cyclical import bugs
             "passport": "cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=3.0",
         },

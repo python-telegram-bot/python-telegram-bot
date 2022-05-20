@@ -20,12 +20,13 @@
 
 
 from telegram import Update
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT
 
 
-class PollHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain a :attr:`poll <telegram.Update.poll>`.
+class PollHandler(BaseHandler[Update, CCT]):
+    """BaseHandler class to handle Telegram updates that contain a
+    :attr:`poll <telegram.Update.poll>`.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom

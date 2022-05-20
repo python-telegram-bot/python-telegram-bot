@@ -103,7 +103,6 @@ class TestConstants:
             )
 
     @flaky(3, 1)
-    @pytest.mark.xfail(reason="Telegram apparently changed the limit without documenting it yet.")
     async def test_max_caption_length(self, bot, chat_id):
         good_caption = "a" * constants.MessageLimit.CAPTION_LENGTH
         with data_file("telegram.png").open("rb") as f:
@@ -114,3 +113,21 @@ class TestConstants:
         match = "Media_caption_too_long"
         with pytest.raises(BadRequest, match=match), data_file("telegram.png").open("rb") as f:
             await bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
+
+    def test_bot_api_version_and_info(self):
+        assert constants.BOT_API_VERSION == str(constants.BOT_API_VERSION_INFO)
+        assert constants.BOT_API_VERSION_INFO == tuple(
+            int(x) for x in constants.BOT_API_VERSION.split(".")
+        )
+
+    def test_bot_api_version_info(self):
+        vi = constants.BOT_API_VERSION_INFO
+        assert isinstance(vi, tuple)
+        assert repr(vi) == f"BotAPIVersion(major={vi[0]}, minor={vi[1]})"
+        assert vi == (vi[0], vi[1])
+        assert not (vi < (vi[0], vi[1]))
+        assert vi < (vi[0], vi[1] + 1)
+        assert vi < (vi[0] + 1, vi[1])
+        assert vi < (vi[0] + 1, vi[1] + 1)
+        assert vi[0] == vi.major
+        assert vi[1] == vi.minor

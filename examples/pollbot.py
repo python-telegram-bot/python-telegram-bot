@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -9,6 +9,19 @@ one the user sends the bot
 """
 import logging
 
+from telegram import __version__ as TG_VER
+
+try:
+    from telegram import __version_info__
+except ImportError:
+    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
+
+if __version_info__ < (20, 0, 0, "alpha", 1):
+    raise RuntimeError(
+        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
+        f"{TG_VER} version of this example, "
+        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{TG_VER}/examples"
+    )
 from telegram import (
     KeyboardButton,
     KeyboardButtonPollType,
@@ -20,8 +33,8 @@ from telegram import (
 from telegram.constants import ParseMode
 from telegram.ext import (
     Application,
-    CallbackContext,
     CommandHandler,
+    ContextTypes,
     MessageHandler,
     PollAnswerHandler,
     PollHandler,
@@ -35,7 +48,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Inform user about what this bot can do"""
     await update.message.reply_text(
         "Please select /poll to get a Poll, /quiz to get a Quiz or /preview"
@@ -43,7 +56,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     )
 
 
-async def poll(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def poll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends a predefined poll"""
     questions = ["Good", "Really good", "Fantastic", "Great"]
     message = await context.bot.send_poll(
@@ -65,7 +78,7 @@ async def poll(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     context.bot_data.update(payload)
 
 
-async def receive_poll_answer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def receive_poll_answer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Summarize a users poll vote"""
     answer = update.poll_answer
     answered_poll = context.bot_data[answer.poll_id]
@@ -92,7 +105,7 @@ async def receive_poll_answer(update: Update, context: CallbackContext.DEFAULT_T
         await context.bot.stop_poll(answered_poll["chat_id"], answered_poll["message_id"])
 
 
-async def quiz(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a predefined poll"""
     questions = ["1", "2", "4", "20"]
     message = await update.effective_message.reply_poll(
@@ -105,7 +118,7 @@ async def quiz(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     context.bot_data.update(payload)
 
 
-async def receive_quiz_answer(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def receive_quiz_answer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Close quiz after three participants took it"""
     # the bot can receive closed poll updates we don't care about
     if update.poll.is_closed:
@@ -119,7 +132,7 @@ async def receive_quiz_answer(update: Update, context: CallbackContext.DEFAULT_T
         await context.bot.stop_poll(quiz_data["chat_id"], quiz_data["message_id"])
 
 
-async def preview(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def preview(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Ask user to create a poll and display a preview of it"""
     # using this without a type lets the user chooses what he wants (quiz or poll)
     button = [[KeyboardButton("Press me!", request_poll=KeyboardButtonPollType())]]
@@ -130,7 +143,7 @@ async def preview(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None
     )
 
 
-async def receive_poll(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def receive_poll(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """On receiving polls, reply to it by a closed poll copying the received poll"""
     actual_poll = update.effective_message.poll
     # Only need to set the question and options, since all other parameters don't matter for
@@ -144,7 +157,7 @@ async def receive_poll(update: Update, context: CallbackContext.DEFAULT_TYPE) ->
     )
 
 
-async def help_handler(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Display a help message"""
     await update.message.reply_text("Use /quiz, /poll or /preview to test this bot.")
 
