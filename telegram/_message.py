@@ -141,7 +141,7 @@ class Message(TelegramObject):
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. For Messages with a
+        caption_entities (List[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
             methods for how to use properly.
@@ -280,27 +280,29 @@ class Message(TelegramObject):
         media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`): Optional. The actual UTF-8 text of the message.
-        entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
+        entities (List[:class:`telegram.MessageEntity`]): Special entities like
             usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`Message.parse_entity` and :attr:`parse_entities` methods for how to use
-            properly.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities like
+            properly. This list is empty if the message does not contain entities.
+        caption_entities (List[:class:`telegram.MessageEntity`]): Special entities like
             usernames, URLs, bot commands, etc. that appear in the caption. See
             :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities` methods for how
-            to use properly.
+            to use properly. This list is empty if the message does not contain caption entities.
         audio (:class:`telegram.Audio`): Optional. Information about the file.
         document (:class:`telegram.Document`): Optional. Information about the file.
         animation (:class:`telegram.Animation`) Optional. Information about the file.
             For backward compatibility, when this field is set, the document field will also be
             set.
         game (:class:`telegram.Game`): Optional. Information about the game.
-        photo (List[:class:`telegram.PhotoSize`]): Optional. Available sizes of the photo.
+        photo (List[:class:`telegram.PhotoSize`]): Available sizes of the photo.
+            This list is empty if the message does not contain a photo.
         sticker (:class:`telegram.Sticker`): Optional. Information about the sticker.
         video (:class:`telegram.Video`): Optional. Information about the video.
         voice (:class:`telegram.Voice`): Optional. Information about the file.
         video_note (:class:`telegram.VideoNote`): Optional. Information about the video message.
-        new_chat_members (List[:class:`telegram.User`]): Optional. Information about new members to
-            the chat. (the bot itself may be one of these members).
+        new_chat_members (List[:class:`telegram.User`]): Information about new members to
+            the chat. The bot itself may be one of these members.
+            This list is empty if the message does not contain new chat members.
         caption (:obj:`str`): Optional. Caption for the document, photo or video,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
             characters.
@@ -310,8 +312,8 @@ class Message(TelegramObject):
         left_chat_member (:class:`telegram.User`): Optional. Information about the user that left
             the group. (this member may be the bot itself).
         new_chat_title (:obj:`str`): Optional. A chat title was changed to this value.
-        new_chat_photo (List[:class:`telegram.PhotoSize`]): Optional. A chat photo was changed to
-            this value.
+        new_chat_photo (List[:class:`telegram.PhotoSize`]): A chat photo was changed to
+            this value. This list is empty if the message does not contain a new chat photo.
         delete_chat_photo (:obj:`bool`): Optional. The chat photo was deleted.
         group_chat_created (:obj:`bool`): Optional. The group has been created.
         supergroup_chat_created (:obj:`bool`): Optional. The supergroup has been created.
@@ -2724,9 +2726,7 @@ class Message(TelegramObject):
             types = MessageEntity.ALL_TYPES
 
         return {
-            entity: self.parse_entity(entity)
-            for entity in (self.entities or [])
-            if entity.type in types
+            entity: self.parse_entity(entity) for entity in self.entities if entity.type in types
         }
 
     def parse_caption_entities(self, types: List[str] = None) -> Dict[MessageEntity, str]:
@@ -2757,7 +2757,7 @@ class Message(TelegramObject):
 
         return {
             entity: self.parse_caption_entity(entity)
-            for entity in (self.caption_entities or [])
+            for entity in self.caption_entities
             if entity.type in types
         }
 
