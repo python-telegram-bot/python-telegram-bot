@@ -86,7 +86,7 @@ class InputFile:
             filename = Path(obj.name).name  # type: ignore[union-attr]
 
         if filename:
-            self.mimetype = mimetypes.guess_type(filename)[0] or _DEFAULT_MIME_TYPE
+            self.mimetype = mimetypes.guess_type(filename, strict=False)[0] or _DEFAULT_MIME_TYPE
         else:
             self.mimetype = _DEFAULT_MIME_TYPE
 

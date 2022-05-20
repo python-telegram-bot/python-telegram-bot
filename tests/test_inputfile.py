@@ -68,10 +68,13 @@ class TestInputFile:
     def test_mimetypes(self, caplog):
         # Only test a few to make sure logic works okay
         assert InputFile(data_file("telegram.jpg").open("rb")).mimetype == "image/jpeg"
-        assert (
-            InputFile(data_file("telegram.webp").open("rb")).mimetype == "application/octet-stream"
-        )
+        # For some reason python can guess the type on macOS
+        assert InputFile(data_file("telegram.webp").open("rb")).mimetype in [
+            "application/octet-stream",
+            "image/webp",
+        ]
         assert InputFile(data_file("telegram.mp3").open("rb")).mimetype == "audio/mpeg"
+        assert InputFile(data_file("telegram.midi").open("rb")).mimetype == "audio/mid"
 
         # Test guess from file
         assert InputFile(BytesIO(b"blah"), filename="tg.jpg").mimetype == "image/jpeg"
