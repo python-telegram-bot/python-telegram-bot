@@ -72,5 +72,5 @@ class PhotoSize(_BaseMedium):
             file_id=file_id, file_unique_id=file_unique_id, file_size=file_size, bot=bot
         )
         # Required
-        self.width = int(width)
-        self.height = int(height)
+        self.width = width
+        self.height = height

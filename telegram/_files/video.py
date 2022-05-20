@@ -89,8 +89,8 @@ class Video(_BaseThumbedMedium):
             bot=bot,
         )
         # Required
-        self.width = int(width)
-        self.height = int(height)
+        self.width = width
+        self.height = height
         self.duration = duration
         # Optional
         self.mime_type = mime_type
