@@ -68,7 +68,8 @@ class WebhookUpdate:
 class CustomContext(CallbackContext[ExtBot, dict, dict, dict]):
     """
     Custom CallbackContext class that makes `user_data` available for updates of type
-    `WebhookUpdate`."""
+    `WebhookUpdate`.
+    """
 
     @classmethod
     def from_update(
@@ -109,14 +110,13 @@ async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
 
 async def main() -> None:
     """Set up the application and a custom webserver."""
-    token = "TOKEN"  # skipcq: W1006
     url = "https://domain.tld"
     admin_chat_id = 123456
     port = 8000
 
     context_types = ContextTypes(context=CustomContext)
     application = (
-        Application.builder().token(token).updater(None).context_types(context_types).build()
+        Application.builder().token("TOKEN").updater(None).context_types(context_types).build()
     )
     application.bot_data["url"] = url
     application.bot_data["admin_chat_id"] = admin_chat_id
@@ -139,7 +139,8 @@ async def main() -> None:
     async def custom_updates(request: Request) -> PlainTextResponse:
         """
         Handle incoming webhook updates by also putting them into the `update_queue` if
-        the required parameters where passed."""
+        the required parameters where passed.
+        """
         try:
             user_id = int(request.query_params["user_id"])
             payload = request.query_params["payload"]
