@@ -74,7 +74,7 @@ class TestInputFile:
             "image/webp",
         ]
         assert InputFile(data_file("telegram.mp3").open("rb")).mimetype == "audio/mpeg"
-        # For some reason windows drops the trailing i ...
+        # For some reason windows drops the trailing i
         assert InputFile(data_file("telegram.midi").open("rb")).mimetype in [
             "audio/mid",
             "audio/midi",
