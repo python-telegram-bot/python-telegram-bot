@@ -301,7 +301,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-
         if isinstance(update, Update):
             chat = update.effective_chat
             user = update.effective_user

@@ -9,7 +9,8 @@ Note that any other `asyncio` based web server framework can be used for a custo
 just as well.
 
 Usage:
-Set bot token, url, admin chat_id and port at the start of the `main` functino.
+Set bot token, url, admin chat_id and port at the start of the `main` function.
+You may also need to change the `listen` value in the uvicorn configuration to match your setup.
 Press Ctrl-C on the command line or send a signal to the process to stop the bot.
 """
 import asyncio
@@ -65,7 +66,8 @@ class WebhookUpdate:
 
 
 class CustomContext(CallbackContext[ExtBot, dict, dict, dict]):
-    """Custom CallbackContext class that makes `user_data` available for updates of type
+    """
+    Custom CallbackContext class that makes `user_data` available for updates of type
     `WebhookUpdate`."""
 
     @classmethod
@@ -107,7 +109,7 @@ async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
 
 async def main() -> None:
     """Set up the application and a custom webserver."""
-    token = "TOKEN"
+    token = "TOKEN"  # skipcq: W1006
     url = "https://domain.tld"
     admin_chat_id = 123456
     port = 8000
@@ -135,7 +137,8 @@ async def main() -> None:
         return Response()
 
     async def custom_updates(request: Request) -> PlainTextResponse:
-        """Handle incoming webhook updates by also putting them into the `update_queue` if
+        """
+        Handle incoming webhook updates by also putting them into the `update_queue` if
         the required parameters where passed."""
         try:
             user_id = int(request.query_params["user_id"])
@@ -170,7 +173,7 @@ async def main() -> None:
             app=starlette_app,
             port=port,
             use_colors=False,
-            host="0.0.0.0",
+            host="127.0.0.1",
         )
     )
 
