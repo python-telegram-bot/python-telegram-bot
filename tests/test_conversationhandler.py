@@ -670,7 +670,7 @@ class TestConversationHandler:
                 raise exc
             assert len(recwarn) == 1
             assert str(recwarn[0].message) == (
-                "Handler returned state 69 which is unknown to the ConversationHandler xyz."
+                "BaseHandler returned state 69 which is unknown to the ConversationHandler xyz."
             )
 
     async def test_conversation_handler_per_chat(self, app, bot, user1, user2):

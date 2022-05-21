@@ -17,18 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the DictPersistence class."""
-
+import json
 from copy import deepcopy
 from typing import Dict, Optional, cast
 
 from telegram._utils.types import JSONDict
 from telegram.ext import BasePersistence, PersistenceInput
 from telegram.ext._utils.types import CDCData, ConversationDict, ConversationKey
-
-try:
-    import ujson as json
-except ImportError:
-    import json  # type: ignore[no-redef]
 
 
 class DictPersistence(BasePersistence):

@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Match, Optional, Pattern, TypeVar, Union, cast
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")
@@ -32,8 +32,8 @@ if TYPE_CHECKING:
     from telegram.ext import Application, CallbackContext
 
 
-class ChosenInlineResultHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram updates that contain
+class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
+    """BaseHandler class to handle Telegram updates that contain
     :attr:`telegram.Update.chosen_inline_result`.
 
     Warning:

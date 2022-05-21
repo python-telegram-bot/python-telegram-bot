@@ -22,15 +22,15 @@ from typing import Type, TypeVar
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 RT = TypeVar("RT")
 UT = TypeVar("UT")
 
 
-class TypeHandler(Handler[UT, CCT]):
-    """Handler class to handle updates of custom types.
+class TypeHandler(BaseHandler[UT, CCT]):
+    """BaseHandler class to handle updates of custom types.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom

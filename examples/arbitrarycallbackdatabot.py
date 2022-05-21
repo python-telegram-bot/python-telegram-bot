@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
 
 """This example showcases how PTBs "arbitrary callback data" feature can be used.
@@ -10,12 +10,25 @@ https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callba
 import logging
 from typing import List, Tuple, cast
 
+from telegram import __version__ as TG_VER
+
+try:
+    from telegram import __version_info__
+except ImportError:
+    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
+
+if __version_info__ < (20, 0, 0, "alpha", 1):
+    raise RuntimeError(
+        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
+        f"{TG_VER} version of this example, "
+        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{TG_VER}/examples"
+    )
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
     Application,
-    CallbackContext,
     CallbackQueryHandler,
     CommandHandler,
+    ContextTypes,
     InvalidCallbackData,
     PicklePersistence,
 )
@@ -27,13 +40,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends a message with 5 inline buttons attached."""
     number_list: List[int] = []
     await update.message.reply_text("Please choose:", reply_markup=build_keyboard(number_list))
 
 
-async def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Displays info on how to use the bot."""
     await update.message.reply_text(
         "Use /start to test this bot. Use /clear to clear the stored data so that you can see "
@@ -41,7 +54,7 @@ async def help_command(update: Update, context: CallbackContext.DEFAULT_TYPE) ->
     )
 
 
-async def clear(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def clear(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Clears the callback data cache"""
     context.bot.callback_data_cache.clear_callback_data()
     context.bot.callback_data_cache.clear_callback_queries()
@@ -55,7 +68,7 @@ def build_keyboard(current_list: List[int]) -> InlineKeyboardMarkup:
     )
 
 
-async def list_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def list_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
     await query.answer()
@@ -75,7 +88,7 @@ async def list_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> 
     context.drop_callback_data(query)
 
 
-async def handle_invalid_button(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def handle_invalid_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Informs the user that the button is no longer available."""
     await update.callback_query.answer()
     await update.effective_message.edit_text(

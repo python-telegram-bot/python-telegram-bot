@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Match, Optional, Pattern, TypeVar, Union
 
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
@@ -32,8 +32,8 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class StringRegexHandler(Handler[str, CCT]):
-    """Handler class to handle string updates based on a regex which checks the update content.
+class StringRegexHandler(BaseHandler[str, CCT]):
+    """BaseHandler class to handle string updates based on a regex which checks the update content.
 
     Read the documentation of the :mod:`re` module for more information. The :func:`re.match`
     function is used to determine if an update should be handled by this handler.

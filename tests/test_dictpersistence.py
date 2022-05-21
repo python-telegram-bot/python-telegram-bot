@@ -16,12 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-import pytest
+import json
 
-try:
-    import ujson as json
-except ImportError:
-    import json
+import pytest
 
 from telegram.ext import DictPersistence
 

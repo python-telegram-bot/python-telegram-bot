@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
 
 """This is a very simple example on how one could implement a custom error handler."""
@@ -8,9 +8,22 @@ import json
 import logging
 import traceback
 
+from telegram import __version__ as TG_VER
+
+try:
+    from telegram import __version_info__
+except ImportError:
+    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
+
+if __version_info__ < (20, 0, 0, "alpha", 1):
+    raise RuntimeError(
+        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
+        f"{TG_VER} version of this example, "
+        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{TG_VER}/examples"
+    )
 from telegram import Update
 from telegram.constants import ParseMode
-from telegram.ext import Application, CallbackContext, CommandHandler
+from telegram.ext import Application, CommandHandler, ContextTypes
 
 # Enable logging
 logging.basicConfig(
@@ -23,7 +36,7 @@ logger = logging.getLogger(__name__)
 DEVELOPER_CHAT_ID = 123456789
 
 
-async def error_handler(update: object, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log the error and send a telegram message to notify the developer."""
     # Log the error before we do anything else, so we can see it even if something breaks.
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
@@ -51,12 +64,12 @@ async def error_handler(update: object, context: CallbackContext.DEFAULT_TYPE) -
     )
 
 
-async def bad_command(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def bad_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Raise an error to trigger the error handler."""
     await context.bot.wrong_method_name()  # type: ignore[attr-defined]
 
 
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Displays info on how to trigger an error."""
     await update.effective_message.reply_html(
         "Use /bad_command to cause an error.\n"

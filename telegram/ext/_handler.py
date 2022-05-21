@@ -31,7 +31,7 @@ RT = TypeVar("RT")
 UT = TypeVar("UT")
 
 
-class Handler(Generic[UT, CCT], ABC):
+class BaseHandler(Generic[UT, CCT], ABC):
     """The base class for all update handlers. Create custom handlers by inheriting from it.
 
     Warning:
@@ -55,7 +55,9 @@ class Handler(Generic[UT, CCT], ABC):
            this handler fits the definition of the :class:`~Application`.
 
     .. versionchanged:: 20.0
-        The attribute ``run_async`` is now :paramref:`block`.
+
+        * The attribute ``run_async`` is now :paramref:`block`.
+        * This class was previously named ``Handler``.
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

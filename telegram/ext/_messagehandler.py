@@ -23,7 +23,7 @@ from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import DVInput
 from telegram.ext import filters as filters_module
-from telegram.ext._handler import Handler
+from telegram.ext._handler import BaseHandler
 from telegram.ext._utils.types import CCT, HandlerCallback
 
 if TYPE_CHECKING:
@@ -32,8 +32,9 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class MessageHandler(Handler[Update, CCT]):
-    """Handler class to handle Telegram messages. They might contain text, media or status updates.
+class MessageHandler(BaseHandler[Update, CCT]):
+    """BaseHandler class to handle Telegram messages. They might contain text, media or status
+    updates.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom

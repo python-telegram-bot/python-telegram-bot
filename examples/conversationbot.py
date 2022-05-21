@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, wrong-import-position
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -16,11 +16,24 @@ bot.
 
 import logging
 
+from telegram import __version__ as TG_VER
+
+try:
+    from telegram import __version_info__
+except ImportError:
+    __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
+
+if __version_info__ < (20, 0, 0, "alpha", 1):
+    raise RuntimeError(
+        f"This example is not compatible with your current PTB version {TG_VER}. To view the "
+        f"{TG_VER} version of this example, "
+        f"visit https://github.com/python-telegram-bot/python-telegram-bot/tree/v{TG_VER}/examples"
+    )
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
     Application,
-    CallbackContext,
     CommandHandler,
+    ContextTypes,
     ConversationHandler,
     MessageHandler,
     filters,
@@ -35,7 +48,7 @@ logger = logging.getLogger(__name__)
 GENDER, PHOTO, LOCATION, BIO = range(4)
 
 
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Starts the conversation and asks the user about their gender."""
     reply_keyboard = [["Boy", "Girl", "Other"]]
 
@@ -51,7 +64,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return GENDER
 
 
-async def gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def gender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Stores the selected gender and asks for a photo."""
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
@@ -64,7 +77,7 @@ async def gender(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return PHOTO
 
 
-async def photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Stores the photo and asks for a location."""
     user = update.message.from_user
     photo_file = await update.message.photo[-1].get_file()
@@ -77,7 +90,7 @@ async def photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return LOCATION
 
 
-async def skip_photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def skip_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Skips the photo and asks for a location."""
     user = update.message.from_user
     logger.info("User %s did not send a photo.", user.first_name)
@@ -88,7 +101,7 @@ async def skip_photo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> i
     return LOCATION
 
 
-async def location(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Stores the location and asks for some info about the user."""
     user = update.message.from_user
     user_location = update.message.location
@@ -102,7 +115,7 @@ async def location(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int
     return BIO
 
 
-async def skip_location(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def skip_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Skips the location and asks for info about the user."""
     user = update.message.from_user
     logger.info("User %s did not send a location.", user.first_name)
@@ -113,7 +126,7 @@ async def skip_location(update: Update, context: CallbackContext.DEFAULT_TYPE) -
     return BIO
 
 
-async def bio(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def bio(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Stores the info about the user and ends the conversation."""
     user = update.message.from_user
     logger.info("Bio of %s: %s", user.first_name, update.message.text)
@@ -122,7 +135,7 @@ async def bio(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
     return ConversationHandler.END
 
 
-async def cancel(update: Update, context: CallbackContext.DEFAULT_TYPE) -> int:
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Cancels and ends the conversation."""
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)

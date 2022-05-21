@@ -135,6 +135,17 @@ class TestVenue:
         with pytest.raises(ValueError, match="Either venue or latitude, longitude, address and"):
             await bot.send_venue(chat_id=chat_id)
 
+    async def test_send_venue_mutually_exclusive(self, bot, chat_id, venue):
+        with pytest.raises(ValueError, match="Not both"):
+            await bot.send_venue(
+                chat_id=chat_id,
+                latitude=1,
+                longitude=1,
+                address="address",
+                title="title",
+                venue=venue,
+            )
+
     def test_to_dict(self, venue):
         venue_dict = venue.to_dict()
 
