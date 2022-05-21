@@ -335,7 +335,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        return cls(application, job=job, chat_id=job.chat_id, user_id=job.user_id)  # type: ignore
+        self = cls(application, chat_id=job.chat_id, user_id=job.user_id)  # type: ignore
+        self.job = job
+        return self
 
     def update(self, data: Dict[str, object]) -> None:
         """Updates ``self.__slots__`` with the passed data.
