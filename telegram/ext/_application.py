@@ -21,6 +21,7 @@ import asyncio
 import inspect
 import itertools
 import logging
+import platform
 import signal
 from collections import defaultdict
 from contextlib import AbstractAsyncContextManager
@@ -547,7 +548,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
         close_loop: bool = True,
-        stop_signals: Optional[Sequence[int]] = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT),
+        stop_signals: Optional[Sequence[int]] = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling` and
@@ -596,7 +597,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             stop_signals (Sequence[:obj:`int`] | :obj:`None`, optional): Signals that will shut
                 down the app. Pass :obj:`None` to not use stop signals.
                 Defaults to :data:`signal.SIGINT`, :data:`signal.SIGTERM` and
-                :data:`signal.SIGABRT`.
+                :data:`signal.SIGABRT` on non Windows platforms.
 
                 Caution:
                     Not every :class:`asyncio.AbstractEventLoop` implements
@@ -614,6 +615,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         def error_callback(exc: TelegramError) -> None:
             self.create_task(self.process_error(error=exc, update=None))
+
+        if stop_signals is None:
+            if platform.system() != "windows":
+                stop_signals = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
 
         return self.__run(
             updater_coroutine=self.updater.start_polling(
@@ -646,7 +651,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         ip_address: str = None,
         max_connections: int = 40,
         close_loop: bool = True,
-        stop_signals: Optional[Sequence[int]] = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT),
+        stop_signals: Optional[Sequence[int]] = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -710,6 +715,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             raise RuntimeError(
                 "Application.run_webhook is only available if the application has an Updater."
             )
+
+        if stop_signals is None:
+            if platform.system() != "windows":
+                stop_signals = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
 
         return self.__run(
             updater_coroutine=self.updater.start_webhook(
