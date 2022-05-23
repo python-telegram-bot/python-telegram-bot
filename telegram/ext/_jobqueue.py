@@ -51,7 +51,7 @@ class JobQueue:
     """
 
     __slots__ = ("_application", "scheduler", "_executor")
-    CRON_MAPPING = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+    _CRON_MAPPING = ("sun", "mon", "tue", "wed", "thu", "fri", "sat")
 
     def __init__(self) -> None:
         self._application: "Optional[weakref.ReferenceType[Application]]" = None
@@ -469,7 +469,7 @@ class JobQueue:
             name=name,
             args=(self.application,),
             trigger="cron",
-            day_of_week=",".join([self.CRON_MAPPING[d] for d in days]),
+            day_of_week=",".join([self._CRON_MAPPING[d] for d in days]),
             hour=time.hour,
             minute=time.minute,
             second=time.second,
