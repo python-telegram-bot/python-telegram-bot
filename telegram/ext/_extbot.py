@@ -241,12 +241,13 @@ class ExtBot(Bot):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> Union[bool, Message]:
         # We override this method to call self._replace_keyboard and self._insert_callback_data.
         # This covers most methods that have a reply_markup
@@ -257,12 +258,12 @@ class ExtBot(Bot):
             disable_notification=disable_notification,
             reply_markup=self._replace_keyboard(reply_markup),
             allow_sending_without_reply=allow_sending_without_reply,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
         if isinstance(result, Message):
             self._insert_callback_data(result)
@@ -273,22 +274,23 @@ class ExtBot(Bot):
         offset: int = None,
         limit: int = None,
         timeout: float = None,
+        allowed_updates: List[str] = None,
+        *,
         read_timeout: float = 2,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        allowed_updates: List[str] = None,
         api_kwargs: JSONDict = None,
     ) -> List[Update]:
         updates = await super().get_updates(
             offset=offset,
             limit=limit,
             timeout=timeout,
+            allowed_updates=allowed_updates,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            allowed_updates=allowed_updates,
             api_kwargs=api_kwargs,
         )
 
@@ -360,6 +362,7 @@ class ExtBot(Bot):
         chat_id: Union[int, str],
         message_id: int,
         reply_markup: InlineKeyboardMarkup = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -390,12 +393,13 @@ class ExtBot(Bot):
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> MessageId:
         # We override this method to call self._replace_keyboard
         return await super().copy_message(
@@ -409,17 +413,18 @@ class ExtBot(Bot):
             reply_to_message_id=reply_to_message_id,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=self._replace_keyboard(reply_markup),
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     async def get_chat(
         self,
         chat_id: Union[str, int],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,

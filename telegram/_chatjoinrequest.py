@@ -114,6 +114,7 @@ class ChatJoinRequest(TelegramObject):
 
     async def approve(
         self,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -145,6 +146,7 @@ class ChatJoinRequest(TelegramObject):
 
     async def decline(
         self,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,

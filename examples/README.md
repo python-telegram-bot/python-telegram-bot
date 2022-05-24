@@ -52,6 +52,12 @@ A basic example on how to set up a custom error handler.
 ### [`chatmemberbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py)
 A basic example on how `(my_)chat_member` updates can be used.
 
+### [`webappbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/webappbot.py)
+A basic example of how [Telegram WebApps](https://core.telegram.org/bots/webapps) can be used.
+Use in combination with [`webappbot.html`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/webappbot.html).
+For your convenience, this file is hosted by the PTB team such that you don't need to host it yourself.
+Uses the [`iro.js`](https://iro.js.org) JavaScript library to showcase a user interface that is hard to achieve with native Telegram functionality.
+
 ### [`contexttypesbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/contexttypesbot.py)
 This example showcases how `telegram.ext.ContextTypes` can be used to customize the `context` argument of handler and job callbacks.
 

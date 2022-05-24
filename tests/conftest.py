@@ -504,6 +504,10 @@ def check_shortcut_signature(
     # shortcuts to return more specific types than the bot method, but it's only annotations after
     # all
     for kwarg in effective_shortcut_args:
+        expected_kind = bot_sig.parameters[kwarg].kind
+        if shortcut_sig.parameters[kwarg].kind != expected_kind:
+            raise Exception(f"Argument {kwarg} must be of kind {expected_kind}.")
+
         if bot_sig.parameters[kwarg].annotation != shortcut_sig.parameters[kwarg].annotation:
             if isinstance(bot_sig.parameters[kwarg].annotation, type):
                 if bot_sig.parameters[kwarg].annotation.__name__ != str(
@@ -526,6 +530,10 @@ def check_shortcut_signature(
             raise Exception(
                 f"Default for argument {arg} does not match the default of the Bot method."
             )
+
+    for kwarg in additional_kwargs:
+        if not shortcut_sig.parameters[kwarg].kind == inspect.Parameter.KEYWORD_ONLY:
+            raise Exception(f"Argument {kwarg} must be a positional-only argument!")
 
     return True
 

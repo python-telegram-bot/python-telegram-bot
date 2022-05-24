@@ -28,8 +28,8 @@ from tests.conftest import check_defaults_handling, check_shortcut_call, check_s
 def chat(bot):
     return Chat(
         TestChat.id_,
-        TestChat.title,
-        TestChat.type_,
+        title=TestChat.title,
+        type=TestChat.type_,
         username=TestChat.username,
         all_members_are_administrators=TestChat.all_members_are_administrators,
         bot=bot,

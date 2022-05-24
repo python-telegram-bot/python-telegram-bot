@@ -95,6 +95,7 @@ class ShippingQuery(TelegramObject):
         ok: bool,
         shipping_options: List[ShippingOption] = None,
         error_message: str = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,

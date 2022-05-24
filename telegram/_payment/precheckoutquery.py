@@ -120,6 +120,7 @@ class PreCheckoutQuery(TelegramObject):
         self,
         ok: bool,
         error_message: str = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,

@@ -85,13 +85,18 @@ class Message(TelegramObject):
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
     .. versionchanged:: 20.0
-        The arguments and attributes ``voice_chat_scheduled``, ``voice_chat_started`` and
-        ``voice_chat_ended``, ``voice_chat_participants_invited`` were renamed to
-        :paramref:`video_chat_scheduled`/:attr:`video_chat_scheduled`,
-        :paramref:`video_chat_started`/:attr:`video_chat_started`,
-        :paramref:`video_chat_ended`/:attr:`video_chat_ended` and
-        :paramref:`video_chat_participants_invited`/:attr:`video_chat_participants_invited`,
-        respectively, in accordance to Bot API 6.0.
+
+        * The arguments and attributes ``voice_chat_scheduled``, ``voice_chat_started`` and
+          ``voice_chat_ended``, ``voice_chat_participants_invited`` were renamed to
+          :paramref:`video_chat_scheduled`/:attr:`video_chat_scheduled`,
+          :paramref:`video_chat_started`/:attr:`video_chat_started`,
+          :paramref:`video_chat_ended`/:attr:`video_chat_ended` and
+          :paramref:`video_chat_participants_invited`/:attr:`video_chat_participants_invited`,
+          respectively, in accordance to Bot API 6.0.
+        * The following are now keyword-only arguments in Bot methods:
+          ``{read, write, connect, pool}_timeout``, ``api_kwargs``, ``contact``, ``quote``,
+          ``filename``, ``loaction``, ``venue``. Use a named argument for those,
+          and notice that some positional arguments changed position as a result.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -754,15 +759,16 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -770,7 +776,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -789,14 +795,14 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
+            entities=entities,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
-            entities=entities,
-            protect_content=protect_content,
         )
 
     async def reply_markdown(
@@ -806,15 +812,16 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -833,7 +840,7 @@ class Message(TelegramObject):
             :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
             Telegram for backward compatibility. You should use :meth:`reply_markdown_v2` instead.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -851,14 +858,14 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
+            entities=entities,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
-            entities=entities,
-            protect_content=protect_content,
         )
 
     async def reply_markdown_v2(
@@ -868,15 +875,16 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -891,7 +899,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -909,14 +917,14 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
+            entities=entities,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
-            entities=entities,
-            protect_content=protect_content,
         )
 
     async def reply_html(
@@ -926,15 +934,16 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -949,7 +958,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -967,14 +976,14 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
+            allow_sending_without_reply=allow_sending_without_reply,
+            entities=entities,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            allow_sending_without_reply=allow_sending_without_reply,
-            entities=entities,
-            protect_content=protect_content,
         )
 
     async def reply_media_group(
@@ -984,14 +993,15 @@ class Message(TelegramObject):
         ],
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> List["Message"]:
         """Shortcut for::
 
@@ -999,7 +1009,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the media group is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1033,17 +1043,18 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        filename: str = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1051,7 +1062,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_photo`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the photo is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1069,16 +1080,16 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
-            api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def reply_audio(
@@ -1091,18 +1102,19 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        thumb: FileInput = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: FileInput = None,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        filename: str = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1110,7 +1122,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_audio`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the audio is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1131,39 +1143,40 @@ class Message(TelegramObject):
             disable_notification=disable_notification,
             reply_to_message_id=reply_to_message_id,
             reply_markup=reply_markup,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
             parse_mode=parse_mode,
             thumb=thumb,
-            api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
         )
 
     async def reply_document(
         self,
         document: Union[FileInput, "Document"],
-        filename: str = None,
         caption: str = None,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        thumb: FileInput = None,
+        disable_content_type_detection: bool = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        thumb: FileInput = None,
         api_kwargs: JSONDict = None,
-        disable_content_type_detection: bool = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1171,7 +1184,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_document`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the document is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1215,16 +1228,17 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        filename: str = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1232,7 +1246,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_animation`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the animation is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1272,14 +1286,15 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1287,7 +1302,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_sticker`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the sticker is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1321,21 +1336,22 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = 20,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         width: int = None,
         height: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         supports_streaming: bool = None,
         thumb: FileInput = None,
-        api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         filename: str = None,
         quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1343,7 +1359,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the video is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1386,16 +1402,17 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        thumb: FileInput = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        thumb: FileInput = None,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        filename: str = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1403,7 +1420,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_video_note`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the video note is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1441,17 +1458,18 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        filename: str = None,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        filename: str = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1459,7 +1477,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_voice`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the voice note is sent as an
                 actual reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1497,19 +1515,20 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        location: Location = None,
         live_period: int = None,
-        api_kwargs: JSONDict = None,
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        location: Location = None,
+        quote: bool = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1517,7 +1536,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_location`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the location is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1559,18 +1578,19 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        foursquare_type: str = None,
+        google_place_id: str = None,
+        google_place_type: str = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        venue: Venue = None,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        venue: Venue = None,
-        foursquare_type: str = None,
         api_kwargs: JSONDict = None,
-        google_place_id: str = None,
-        google_place_type: str = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1578,7 +1598,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_venue`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the venue is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1620,16 +1640,17 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        vcard: str = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        contact: Contact = None,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        contact: Contact = None,
-        vcard: str = None,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1637,7 +1658,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_contact`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the contact is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False` in
@@ -1679,19 +1700,20 @@ class Message(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
         explanation: str = None,
         explanation_parse_mode: ODVInput[str] = DEFAULT_NONE,
         open_period: int = None,
         close_date: Union[int, datetime.datetime] = None,
-        api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-        quote: bool = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ) -> "Message":
         """Shortcut for::
 
@@ -1699,7 +1721,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_poll`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the poll is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -1741,15 +1763,16 @@ class Message(TelegramObject):
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: ReplyMarkup = None,
+        emoji: str = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        emoji: str = None,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1757,7 +1780,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_dice`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the dice is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
@@ -1786,6 +1809,7 @@ class Message(TelegramObject):
     async def reply_chat_action(
         self,
         action: str,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1820,14 +1844,15 @@ class Message(TelegramObject):
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         reply_to_message_id: int = None,
         reply_markup: "InlineKeyboardMarkup" = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1835,7 +1860,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_game`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the game is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
@@ -1887,16 +1912,17 @@ class Message(TelegramObject):
         provider_data: Union[str, object] = None,
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
+        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: bool = None,
-        max_tip_amount: int = None,
-        suggested_tip_amounts: List[int] = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -1916,7 +1942,7 @@ class Message(TelegramObject):
             As of Bot API 5.2, the parameter
             :paramref:`start_parameter <telegram.Bot.send_invoice.start_parameter>` is optional.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the invoice is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``, this
                 parameter will be ignored. Default: :obj:`True` in group chats and :obj:`False`
@@ -1966,12 +1992,13 @@ class Message(TelegramObject):
         self,
         chat_id: Union[int, str],
         disable_notification: DVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "Message":
         """Shortcut for::
 
@@ -2002,12 +2029,12 @@ class Message(TelegramObject):
             from_chat_id=self.chat_id,
             message_id=self.message_id,
             disable_notification=disable_notification,
+            protect_content=protect_content,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
-            protect_content=protect_content,
         )
 
     async def copy(
@@ -2020,12 +2047,13 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "MessageId":
         """Shortcut for::
 
@@ -2073,13 +2101,14 @@ class Message(TelegramObject):
         reply_to_message_id: int = None,
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        quote: bool = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        quote: bool = None,
-        protect_content: ODVInput[bool] = DEFAULT_NONE,
     ) -> "MessageId":
         """Shortcut for::
 
@@ -2093,7 +2122,7 @@ class Message(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.copy_message`.
 
-        Args:
+        Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the copy is sent as an actual
                 reply to this message. If ``reply_to_message_id`` is passed in ``kwargs``,
                 this parameter will be ignored. Default: :obj:`True` in group chats and
@@ -2131,12 +2160,13 @@ class Message(TelegramObject):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: InlineKeyboardMarkup = None,
+        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Union["Message", bool]:
         """Shortcut for::
 
@@ -2176,13 +2206,14 @@ class Message(TelegramObject):
         self,
         caption: str = None,
         reply_markup: InlineKeyboardMarkup = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> Union["Message", bool]:
         """Shortcut for::
 
@@ -2222,6 +2253,7 @@ class Message(TelegramObject):
         self,
         media: "InputMedia",
         reply_markup: InlineKeyboardMarkup = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2263,6 +2295,7 @@ class Message(TelegramObject):
     async def edit_reply_markup(
         self,
         reply_markup: Optional["InlineKeyboardMarkup"] = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2303,16 +2336,17 @@ class Message(TelegramObject):
         self,
         latitude: float = None,
         longitude: float = None,
-        location: Location = None,
         reply_markup: InlineKeyboardMarkup = None,
+        horizontal_accuracy: float = None,
+        heading: int = None,
+        proximity_alert_radius: int = None,
+        *,
+        location: Location = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        horizontal_accuracy: float = None,
-        heading: int = None,
-        proximity_alert_radius: int = None,
     ) -> Union["Message", bool]:
         """Shortcut for::
 
@@ -2353,6 +2387,7 @@ class Message(TelegramObject):
     async def stop_live_location(
         self,
         reply_markup: InlineKeyboardMarkup = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2395,6 +2430,7 @@ class Message(TelegramObject):
         score: int,
         force: bool = None,
         disable_edit_message: bool = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2436,6 +2472,7 @@ class Message(TelegramObject):
     async def get_game_high_scores(
         self,
         user_id: Union[int, str],
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2473,6 +2510,7 @@ class Message(TelegramObject):
 
     async def delete(
         self,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2504,6 +2542,7 @@ class Message(TelegramObject):
     async def stop_poll(
         self,
         reply_markup: InlineKeyboardMarkup = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2537,6 +2576,7 @@ class Message(TelegramObject):
     async def pin(
         self,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2568,6 +2608,7 @@ class Message(TelegramObject):
 
     async def unpin(
         self,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,

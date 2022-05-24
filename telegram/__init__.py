@@ -175,6 +175,7 @@ __all__ = (  # Keep this alphabetically ordered
 )
 
 
+from . import _version
 from ._bot import Bot
 from ._botcommand import BotCommand
 from ._botcommandscope import (
@@ -311,7 +312,6 @@ from ._telegramobject import TelegramObject
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos
-from . import _version
 
 #: :obj:`str`: The version of the `python-telegram-bot` library as string.
 #: To get detailed information about the version number, please use :data:`__version_info__`
