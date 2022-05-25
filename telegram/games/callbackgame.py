@@ -17,11 +17,23 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram CallbackGame."""
+from typing import Optional, TYPE_CHECKING
 
 from telegram import TelegramObject
+from telegram.utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class CallbackGame(TelegramObject):
     """A placeholder, currently holds no information. Use BotFather to set up your game."""
 
     __slots__ = ()
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['CallbackGame']:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        if data is None:
+            return None
+        return cls()

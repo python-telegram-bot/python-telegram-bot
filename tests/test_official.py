@@ -100,6 +100,8 @@ def check_method(h4):
         ignored |= {'venue'}  # Added for ease of use
     elif name == 'answerInlineQuery':
         ignored |= {'current_offset'}  # Added for ease of use
+    elif name == 'promoteChatMember':
+        ignored |= {'can_manage_voice_chats'}  # for backwards compatibility
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
@@ -121,6 +123,7 @@ def check_object(h4):
             name.startswith('InlineQueryResult')
             or name.startswith('InputMedia')
             or name.startswith('BotCommandScope')
+            or name.startswith('MenuButton')
         ) and field == 'type':
             continue
         elif (name.startswith('ChatMember')) and field == 'status':
@@ -142,7 +145,11 @@ def check_object(h4):
     if name == 'InlineQueryResult':
         ignored |= {'id', 'type'}  # attributes common to all subclasses
     if name == 'ChatMember':
-        ignored |= {'user', 'status'}  # attributes common to all subclasses
+        ignored |= {
+            'user',
+            'status',
+            'can_manage_video_chats',
+        }  # attributes common to all subclasses
     if name == 'ChatMember':
         ignored |= {
             'can_add_web_page_previews',  # for backwards compatibility
@@ -168,6 +175,8 @@ def check_object(h4):
         }
     if name == 'BotCommandScope':
         ignored |= {'type'}  # attributes common to all subclasses
+    if name == 'MenuButton':
+        ignored |= {'type'}  # attributes common to all subclasses
     elif name == 'User':
         ignored |= {'type'}  # TODO: Deprecation
     elif name in ('PassportFile', 'EncryptedPassportElement'):
@@ -176,6 +185,16 @@ def check_object(h4):
         ignored |= {'message', 'type', 'source'}
     elif name.startswith('InputMedia'):
         ignored |= {'filename'}  # Convenience parameter
+    elif name == 'ChatMemberAdministrator':
+        ignored |= {'can_manage_voice_chats'}  # for backwards compatibility
+    elif name == 'Message':
+        # for backwards compatibility
+        ignored |= {
+            'voice_chat_ended',
+            'voice_chat_participants_invited',
+            'voice_chat_scheduled',
+            'voice_chat_started',
+        }
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
