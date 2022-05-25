@@ -20,7 +20,7 @@ We have a vibrant community of developers helping each other in our `Telegram gr
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-5.7-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-6.0-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -87,13 +87,14 @@ Table of contents
 
 - `License`_
 
+
 ============
 Introduction
 ============
 
 This library provides a pure Python interface for the
 `Telegram Bot API <https://core.telegram.org/bots/api>`_.
-It's compatible with Python versions 3.6.8+. PTB might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
+It's compatible with Python versions 3.7+. PTB might also work on `PyPy <http://pypy.org/>`_, though there have been a lot of issues before. Hence, PyPy is not officially supported.
 
 In addition to the pure API implementation, this library features a number of high-level classes to
 make the development of bots easy and straightforward. These classes are contained in the
@@ -111,7 +112,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **5.7** are supported.
+All types and methods of the Telegram Bot API **6.0** are supported.
 
 ==========
 Installing

@@ -222,4 +222,11 @@ class TestChatMemberUpdated:
         chat_member_updated = ChatMemberUpdated(
             chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
         )
-        assert chat_member_updated.difference() == {optional_attribute: (old_value, new_value)}
+        # for backwards compatibility, supplying video/voice chats right also leads
+        # to the other name being generated. So we need to add them to the compare to dict
+        compare_to_dict = {optional_attribute: (old_value, new_value)}
+        if optional_attribute == "can_manage_video_chats":
+            compare_to_dict["can_manage_voice_chats"] = (old_value, new_value)
+        elif optional_attribute == "can_manage_voice_chats":
+            compare_to_dict["can_manage_video_chats"] = (old_value, new_value)
+        assert chat_member_updated.difference() == compare_to_dict
