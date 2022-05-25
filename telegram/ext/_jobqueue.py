@@ -453,6 +453,7 @@ class JobQueue:
             queue.
 
         """
+        # TODO: After v20.0, we should remove the this warning.
         warn(
             "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
             "We recommend double checking if the passed value is correct.",
