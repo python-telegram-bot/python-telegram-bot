@@ -78,10 +78,10 @@ class PrefixHandler(BaseHandler[Update, CCT]):
 
     .. versionchanged:: 20.0
 
-        * :class:`PrefixHandler` is no longer as subclass of :class:`CommandHandler`.
+        * :class:`PrefixHandler` is no longer a subclass of :class:`CommandHandler`.
         * Removed the attributes ``command`` and ``prefix``. Instead, the new :attr:`commands`
-          contains all commands that this handler listens to as :class:`frozenset`, which includes
-          the prefixes.
+          contains all commands that this handler listens to as a :class:`frozenset`, which
+          includes the prefixes.
         * Updating the prefixes and commands this handler listens to is no longer possible.
 
     Args:
