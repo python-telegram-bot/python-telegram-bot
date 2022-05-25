@@ -89,6 +89,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Poolitzer <https://github.com/Poolitzer>`_
 - `Pranjalya Tiwari <https://github.com/Pranjalya>`_
 - `Rahiel Kasim <https://github.com/rahiel>`_
+- `rikkaneko <https://github.com/rikkaneko>`_
 - `Riko Naka <https://github.com/rikonaka>`_
 - `Rizlas <https://github.com/rizlas>`_
 - `Sahil Sharma <https://github.com/sahilsharma811>`_
