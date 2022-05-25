@@ -895,7 +895,7 @@ Expect minor releases soon (mainly complete Bot API 4.4 support)
 - Error Handler now handles all types of exceptions (`#1485`_)
 - Return UTC from from_timestamp() (`#1485`_)
 
-**See the wiki page at https://git.io/fxJuV for a detailed guide on how to migrate from version 11 to version 12.**
+**See the wiki page at https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for a detailed guide on how to migrate from version 11 to version 12.**
 
 Context based callbacks (`#1100`_)
 ----------------------------------
@@ -1100,7 +1100,7 @@ Non Bot API 4.0 changes:
 .. _`#1172`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1172
 .. _`#1179`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1179
 .. _`#1184`: https://github.com/python-telegram-bot/python-telegram-bot/pull/1184
-.. _`our telegram passport wiki page`: https://git.io/fAvYd
+.. _`our telegram passport wiki page`: https://github.com/python-telegram-bot/python-telegram-bot/wiki/Telegram-Passport
 
 Version 10.1.0
 ==============

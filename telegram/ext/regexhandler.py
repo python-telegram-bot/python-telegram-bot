@@ -128,7 +128,9 @@ class RegexHandler(MessageHandler):
         run_async: Union[bool, DefaultValue] = DEFAULT_FALSE,
     ):
         warnings.warn(
-            'RegexHandler is deprecated. See https://git.io/fxJuV for more info',
+            'RegexHandler is deprecated. See '
+            'https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to'
+            '-Version-12.0 for more info',
             TelegramDeprecationWarning,
             stacklevel=2,
         )

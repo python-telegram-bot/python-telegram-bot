@@ -204,7 +204,11 @@ class TestCommandHandler(BaseTest):
 
     def test_deprecation_warning(self):
         """``allow_edited`` deprecated in favor of filters"""
-        with pytest.warns(TelegramDeprecationWarning, match='See https://git.io/fxJuV'):
+        with pytest.warns(
+            TelegramDeprecationWarning,
+            match='See https://github.com/python-telegram-bot/python-telegram-bot/wiki'
+            '/Transition-guide-to-Version-12.0',
+        ):
             self.make_default_handler(allow_edited=True)
 
     def test_edited(self, command_message):
