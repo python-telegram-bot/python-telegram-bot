@@ -3,7 +3,7 @@
    :target: https://python-telegram-bot.org
    :alt: python-telegram-bot Logo
 
-We have made you a wrapper you can't refuse
+We have made you a wrapper you can't refusee
 
 We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
 
