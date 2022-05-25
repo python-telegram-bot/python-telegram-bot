@@ -45,7 +45,8 @@ class MessageHandler(Handler[Update, CCT]):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for more info.
+        https://github.com/python-telegram-bot/python-telegram-bot/wiki\
+        /Transition-guide-to-Version-12.0 for more info.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
@@ -155,7 +156,9 @@ class MessageHandler(Handler[Update, CCT]):
             self.filters = Filters.update
         if message_updates is not None:
             warnings.warn(
-                'message_updates is deprecated. See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for more info',
+                'message_updates is deprecated. See '
+                'https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition'
+                '-guide-to-Version-12.0 for more info',
                 TelegramDeprecationWarning,
                 stacklevel=2,
             )
@@ -164,7 +167,10 @@ class MessageHandler(Handler[Update, CCT]):
 
         if channel_post_updates is not None:
             warnings.warn(
-                'channel_post_updates is deprecated. See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 ' 'for more info',
+                'channel_post_updates is deprecated. See '
+                'https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition'
+                '-guide-to-Version-12.0 '
+                'for more info',
                 TelegramDeprecationWarning,
                 stacklevel=2,
             )
@@ -173,7 +179,9 @@ class MessageHandler(Handler[Update, CCT]):
 
         if edited_updates is not None:
             warnings.warn(
-                'edited_updates is deprecated. See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for more info',
+                'edited_updates is deprecated. See '
+                'https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition'
+                '-guide-to-Version-12.0 for more info',
                 TelegramDeprecationWarning,
                 stacklevel=2,
             )

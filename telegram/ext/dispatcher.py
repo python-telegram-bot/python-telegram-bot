@@ -241,7 +241,9 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
 
         if not use_context:
             warnings.warn(
-                'Old Handler API is deprecated - see https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for details',
+                'Old Handler API is deprecated - see '
+                'https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition'
+                '-guide-to-Version-12.0 for details',
                 TelegramDeprecationWarning,
                 stacklevel=3,
             )
@@ -763,7 +765,8 @@ class Dispatcher(Generic[CCT, UD, CD, BD]):
                 asynchronously using :meth:`run_async`. Defaults to :obj:`False`.
 
         Note:
-            See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for more info about switching to context based API.
+            See https://github.com/python-telegram-bot/python-telegram-bot/wiki\
+            /Transition-guide-to-Version-12.0 for more info about switching to context based API.
         """
         if callback in self.error_handlers:
             self.logger.debug('The callback is already registered as an error handler. Ignoring.')

@@ -55,7 +55,8 @@ class CallbackQueryHandler(Handler[Update, CCT]):
           user or in the same chat, it will be the same ``dict``.
 
           Note that this is DEPRECATED, and you should use context based callbacks. See
-          https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for more info.
+          https://github.com/python-telegram-bot/python-telegram-bot/wiki\
+          /Transition-guide-to-Version-12.0 for more info.
         * If your bot allows arbitrary objects as ``callback_data``, it may happen that the
           original ``callback_data`` for the incoming :class:`telegram.CallbackQuery`` can not be
           found. This is the case when either a malicious client tempered with the

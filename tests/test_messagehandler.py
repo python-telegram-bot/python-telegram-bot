@@ -149,11 +149,23 @@ class TestMessageHandler:
         assert self.test_flag
 
     def test_deprecation_warning(self):
-        with pytest.warns(TelegramDeprecationWarning, match='See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0'):
+        with pytest.warns(
+            TelegramDeprecationWarning,
+            match='See https://github.com/python-telegram-bot/python-telegram-bot/wiki'
+            '/Transition-guide-to-Version-12.0',
+        ):
             MessageHandler(None, self.callback_basic, edited_updates=True)
-        with pytest.warns(TelegramDeprecationWarning, match='See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0'):
+        with pytest.warns(
+            TelegramDeprecationWarning,
+            match='See https://github.com/python-telegram-bot/python-telegram-bot/wiki'
+            '/Transition-guide-to-Version-12.0',
+        ):
             MessageHandler(None, self.callback_basic, message_updates=False)
-        with pytest.warns(TelegramDeprecationWarning, match='See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0'):
+        with pytest.warns(
+            TelegramDeprecationWarning,
+            match='See https://github.com/python-telegram-bot/python-telegram-bot/wiki'
+            '/Transition-guide-to-Version-12.0',
+        ):
             MessageHandler(None, self.callback_basic, channel_post_updates=True)
 
     def test_edited_deprecated(self, message):

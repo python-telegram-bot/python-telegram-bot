@@ -45,7 +45,8 @@ class Handler(Generic[UT, CCT], ABC):
         or in the same chat, it will be the same ``dict``.
 
         Note that this is DEPRECATED, and you should use context based callbacks. See
-        https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for more info.
+        https://github.com/python-telegram-bot/python-telegram-bot/wiki\
+        /Transition-guide-to-Version-12.0 for more info.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
@@ -232,7 +233,8 @@ class Handler(Generic[UT, CCT], ABC):
         it should subclass this method, but remember to call this super method.
 
         DEPRECATED: This method is being replaced by new context based callbacks. Please see
-        https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-12.0 for more info.
+        https://github.com/python-telegram-bot/python-telegram-bot/wiki\
+        /Transition-guide-to-Version-12.0 for more info.
 
         Args:
             dispatcher (:class:`telegram.ext.Dispatcher`): The dispatcher.
