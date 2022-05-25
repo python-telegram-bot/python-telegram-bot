@@ -1,9 +1,14 @@
 # Make sure that
 #   * the revs specified here match requirements-dev.txt
 #   * the additional_dependencies here match requirements.txt
+
+ci:
+    # We currently only need this behavior on the v13.x branch were we have the vendored urllib
+    submodules: true
+
 repos:
 -   repo: https://github.com/psf/black
-    rev: 20.8b1
+    rev: 22.3.0
     hooks:
     -   id: black
         args:

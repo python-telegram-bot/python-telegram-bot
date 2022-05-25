@@ -7,3 +7,5 @@ telegram.VoiceChatScheduled
     :members:
     :show-inheritance:
 
+.. versionchanged:: v13.12
+    Since Bot API 6.0, voice chat was renamed to video chat.

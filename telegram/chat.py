@@ -22,7 +22,7 @@ import warnings
 from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional, ClassVar, Union, Tuple, Any
 
-from telegram import ChatPhoto, TelegramObject, constants
+from telegram import ChatPhoto, TelegramObject, constants, MenuButton
 from telegram.utils.types import JSONDict, FileInput, ODVInput, DVInput
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
@@ -590,6 +590,7 @@ class Chat(TelegramObject):
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
         can_manage_voice_chats: bool = None,
+        can_manage_video_chats: bool = None,
     ) -> bool:
         """Shortcut for::
 
@@ -599,6 +600,9 @@ class Chat(TelegramObject):
         :meth:`telegram.Bot.promote_chat_member`.
 
         .. versionadded:: 13.2
+
+        ..versionchanged:: 13.12
+            Since Bot API 6.0, voice chat was renamed to video chat.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -620,6 +624,7 @@ class Chat(TelegramObject):
             is_anonymous=is_anonymous,
             can_manage_chat=can_manage_chat,
             can_manage_voice_chats=can_manage_voice_chats,
+            can_manage_video_chats=can_manage_video_chats,
         )
 
     def restrict_member(
@@ -1812,4 +1817,62 @@ class Chat(TelegramObject):
         """
         return self.bot.decline_chat_join_request(
             chat_id=self.id, user_id=user_id, timeout=timeout, api_kwargs=api_kwargs
+        )
+
+    def set_menu_button(
+        self,
+        menu_button: MenuButton = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             bot.set_chat_menu_button(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_menu_button`.
+
+        Caution:
+            Can only work, if the chat is a private chat.
+
+        ..seealso:: :meth:`get_menu_button`
+
+        .. versionadded:: 13.12
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.set_chat_menu_button(
+            chat_id=self.id,
+            menu_button=menu_button,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def get_menu_button(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> MenuButton:
+        """Shortcut for::
+
+             bot.get_chat_menu_button(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_menu_button`.
+
+        Caution:
+            Can only work, if the chat is a private chat.
+
+        ..seealso:: :meth:`set_menu_button`
+
+        .. versionadded:: 13.12
+
+        Returns:
+            :class:`telegram.MenuButton`: On success, the current menu button is returned.
+        """
+        return self.bot.get_chat_menu_button(
+            chat_id=self.id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
         )

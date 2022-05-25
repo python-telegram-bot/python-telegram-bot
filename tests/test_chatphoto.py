@@ -70,7 +70,7 @@ class TestChatPhoto:
     def test_get_and_download(self, bot, chat_photo):
         new_file = bot.get_file(chat_photo.small_file_id)
 
-        assert new_file.file_id == chat_photo.small_file_id
+        assert new_file.file_unique_id == chat_photo.small_file_unique_id
         assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.jpg')
@@ -79,7 +79,7 @@ class TestChatPhoto:
 
         new_file = bot.get_file(chat_photo.big_file_id)
 
-        assert new_file.file_id == chat_photo.big_file_id
+        assert new_file.file_unique_id == chat_photo.big_file_unique_id
         assert new_file.file_path.startswith('https://')
 
         new_file.download('telegram.jpg')

@@ -48,11 +48,16 @@ from telegram import (
     Dice,
     Bot,
     ChatAction,
+    VoiceChatScheduled,
     VoiceChatStarted,
     VoiceChatEnded,
     VoiceChatParticipantsInvited,
+    VideoChatScheduled,
+    VideoChatStarted,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
     MessageAutoDeleteTimerChanged,
-    VoiceChatScheduled,
+    WebAppData,
 )
 from telegram.ext import Defaults
 from tests.conftest import check_shortcut_signature, check_shortcut_call, check_defaults_handling
@@ -182,6 +187,15 @@ def message(bot):
         {'sender_chat': Chat(-123, 'discussion_channel')},
         {'is_automatic_forward': True},
         {'has_protected_content': True},
+        {'video_chat_scheduled': VideoChatScheduled(datetime.utcnow())},
+        {'video_chat_started': VideoChatStarted()},
+        {'video_chat_ended': VideoChatEnded(100)},
+        {
+            'video_chat_participants_invited': VideoChatParticipantsInvited(
+                [User(1, 'Rem', False), User(2, 'Emilia', False)]
+            )
+        },
+        {'web_app_data': WebAppData('some_data', 'some_button_text')},
     ],
     ids=[
         'forwarded_user',
@@ -230,9 +244,14 @@ def message(bot):
         'voice_chat_started',
         'voice_chat_ended',
         'voice_chat_participants_invited',
+        'video_chat_scheduled',
+        'video_chat_started',
+        'video_chat_ended',
+        'video_chat_participants_invited',
         'sender_chat',
         'is_automatic_forward',
         'has_protected_content',
+        'web_app_data',
     ],
 )
 def message_params(bot, request):
@@ -1585,3 +1604,36 @@ class TestMessage:
 
         assert a != e
         assert hash(a) != hash(e)
+
+    def test_invalid_input(
+        self,
+    ):
+        with pytest.raises(ValueError):
+            Message(
+                self.id_,
+                self.date,
+                self.chat,
+                from_user=self.from_user,
+                voice_chat_scheduled=True,
+                video_chat_scheduled=False,
+            )
+
+        with pytest.raises(ValueError):
+            Message(
+                self.id_,
+                self.date,
+                self.chat,
+                from_user=self.from_user,
+                voice_chat_ended=True,
+                video_chat_ended=False,
+            )
+
+        with pytest.raises(ValueError):
+            Message(
+                self.id_,
+                self.date,
+                self.chat,
+                from_user=self.from_user,
+                voice_chat_participants_invited=True,
+                video_chat_participants_invited=False,
+            )

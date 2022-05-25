@@ -1,0 +1,58 @@
+#!/usr/bin/env python
+# pylint: disable=too-many-instance-attributes, too-many-arguments
+#
+# A library that provides a Python interface to the Telegram Bot API
+# Copyright (C) 2015-2022
+# Leandro Toledo de Souza <devs@python-telegram-bot.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser Public License for more details.
+#
+# You should have received a copy of the GNU Lesser Public License
+# along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""This module contains an object that represents a Telegram WebAppData."""
+
+from typing import Any
+
+from telegram import TelegramObject
+
+
+class WebAppData(TelegramObject):
+    """Contains data sent from a `Web App <https://core.telegram.org/bots/webapps>`_ to the bot.
+
+    Objects of this class are comparable in terms of equality. Two objects of this class are
+    considered equal, if their :attr:`data` and :attr:`button_text` are equal.
+
+    .. versionadded:: 13.12
+
+    Args:
+        data (:obj:`str`): The data. Be aware that a bad client can send arbitrary data in this
+            field.
+        button_text (:obj:`str`): Text of the :attr:`~telegram.KeyboardButton.web_app` keyboard
+            button, from which the Web App was opened.
+
+    Attributes:
+        data (:obj:`str`): The data. Be aware that a bad client can send arbitrary data in this
+            field.
+        button_text (:obj:`str`): Text of the :attr:`~telegram.KeyboardButton.web_app` keyboard
+            button, from which the Web App was opened.
+
+            Warning:
+                Be aware that a bad client can send arbitrary data in this field.
+    """
+
+    __slots__ = ('data', 'button_text', '_id_attrs')
+
+    def __init__(self, data: str, button_text: str, **_kwargs: Any):
+        # Required
+        self.data = data
+        self.button_text = button_text
+
+        self._id_attrs = (self.data, self.button_text)

@@ -286,6 +286,7 @@ class ChatMember(TelegramObject):
         'can_pin_messages',
         'can_manage_chat',
         'can_manage_voice_chats',
+        'can_manage_video_chats',
         'until_date',
         '_id_attrs',
     )
@@ -327,8 +328,18 @@ class ChatMember(TelegramObject):
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
         can_manage_voice_chats: bool = None,
+        can_manage_video_chats: bool = None,
         **_kwargs: Any,
     ):
+        # check before required to not waste resources if the error is raised
+        if can_manage_voice_chats is not None and can_manage_video_chats is not None:
+            # if they are the same it's fine...
+            if can_manage_voice_chats != can_manage_video_chats:
+                raise ValueError(
+                    "Only supply one of `can_manage_video_chats`/`can_manage_voice_chats`,"
+                    " not both."
+                )
+
         # Required
         self.user = user
         self.status = status
@@ -353,7 +364,13 @@ class ChatMember(TelegramObject):
         self.can_add_web_page_previews = can_add_web_page_previews
         self.is_member = is_member
         self.can_manage_chat = can_manage_chat
-        self.can_manage_voice_chats = can_manage_voice_chats
+        temp = (
+            can_manage_video_chats
+            if can_manage_video_chats is not None
+            else can_manage_voice_chats
+        )
+        self.can_manage_voice_chats = temp
+        self.can_manage_video_chats = temp
 
         self._id_attrs = (self.user, self.status)
 
@@ -436,6 +453,9 @@ class ChatMemberAdministrator(ChatMember):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 13.12
+        Since Bot API 6.0, voice chat was renamed to video chat.
+
     Args:
         user (:class:`telegram.User`): Information about the user.
         can_be_edited (:obj:`bool`, optional): :obj:`True`, if the bot
@@ -456,6 +476,12 @@ class ChatMemberAdministrator(ChatMember):
             administrator can delete messages of other users.
         can_manage_voice_chats (:obj:`bool`, optional): :obj:`True`, if the
             administrator can manage voice chats.
+
+            .. deprecated:: 13.12
+        can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
+            administrator can manage video chats.
+
+            .. versionadded:: 13.12
         can_restrict_members (:obj:`bool`, optional): :obj:`True`, if the
             administrator can restrict, ban or unban chat members.
         can_promote_members (:obj:`bool`, optional): :obj:`True`, if the administrator
@@ -491,6 +517,13 @@ class ChatMemberAdministrator(ChatMember):
             administrator can delete messages of other users.
         can_manage_voice_chats (:obj:`bool`): Optional. :obj:`True`, if the
             administrator can manage voice chats.
+
+            .. deprecated:: 13.12 contains the same value as :attr:`can_manage_video_chats`
+                for backwards compatibility.
+        can_manage_video_chats (:obj:`bool`): :obj:`True`, if the
+            administrator can manage video chats.
+
+            .. versionadded:: 13.12
         can_restrict_members (:obj:`bool`): Optional. :obj:`True`, if the
             administrator can restrict, ban or unban chat members.
         can_promote_members (:obj:`bool`): Optional. :obj:`True`, if the administrator
@@ -523,6 +556,7 @@ class ChatMemberAdministrator(ChatMember):
         can_change_info: bool = None,
         can_invite_users: bool = None,
         can_pin_messages: bool = None,
+        can_manage_video_chats: bool = None,
         **_kwargs: Any,
     ):
         super().__init__(
@@ -541,6 +575,7 @@ class ChatMemberAdministrator(ChatMember):
             can_change_info=can_change_info,
             can_invite_users=can_invite_users,
             can_pin_messages=can_pin_messages,
+            can_manage_video_chats=can_manage_video_chats,
         )
 
 

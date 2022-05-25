@@ -54,6 +54,11 @@ from telegram import (
     ReplyMarkup,
     MessageAutoDeleteTimerChanged,
     VoiceChatScheduled,
+    VideoChatStarted,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    WebAppData,
+    VideoChatScheduled,
 )
 from telegram.utils.helpers import (
     escape_markdown,
@@ -87,6 +92,9 @@ class Message(TelegramObject):
 
     Note:
         In Python ``from`` is a reserved word, use ``from_user`` instead.
+
+    .. versionchanged:: 13.12
+        Since Bot API 6.0, voice chat was renamed to video chat.
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -218,18 +226,41 @@ class Message(TelegramObject):
             voice chat scheduled.
 
             .. versionadded:: 13.5
+            .. deprecated:: 13.12
         voice_chat_started (:class:`telegram.VoiceChatStarted`, optional): Service message: voice
             chat started.
 
             .. versionadded:: 13.4
+            .. deprecated:: 13.12
         voice_chat_ended (:class:`telegram.VoiceChatEnded`, optional): Service message: voice chat
             ended.
 
             .. versionadded:: 13.4
+            .. deprecated:: 13.12
         voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited` optional):
             Service message: new participants invited to a voice chat.
 
             .. versionadded:: 13.4
+            .. deprecated:: 13.12
+        video_chat_scheduled (:class:`telegram.VideoChatScheduled`, optional): Service message:
+            video chat scheduled.
+
+            .. versionadded:: 13.12
+        video_chat_started (:class:`telegram.VideaChatStarted`, optional): Service message: video
+            chat started.
+
+            .. versionadded:: 13.12
+        video_chat_ended (:class:`telegram.VideaChatEnded`, optional): Service message: video chat
+            ended.
+
+            .. versionadded:: 13.12
+        video_chat_participants_invited (:class:`telegram.VideoChatParticipantsInvited` optional):
+            Service message: new participants invited to a video chat.
+
+            .. versionadded:: 13.12
+        web_app_data (:class:`telegram.WebAppData`, optional): Service message: data sent by a Web
+            App.
+            .. versionadded:: 13.12
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
@@ -332,18 +363,46 @@ class Message(TelegramObject):
             voice chat scheduled.
 
             .. versionadded:: 13.5
+            .. deprecated:: 13.12 contains the same value as :attr:`VideoChatScheduled`
+                for backwards compatibility.
         voice_chat_started (:class:`telegram.VoiceChatStarted`): Optional. Service message: voice
             chat started.
 
             .. versionadded:: 13.4
+            .. deprecated:: 13.12 contains the same value as :attr:`VideoChatStarted`
+                for backwards compatibility.
         voice_chat_ended (:class:`telegram.VoiceChatEnded`): Optional. Service message: voice chat
             ended.
 
             .. versionadded:: 13.4
+            .. deprecated:: 13.12 contains the same value as :attr:`VideoChatEnded`
+                for backwards compatibility.
         voice_chat_participants_invited (:class:`telegram.VoiceChatParticipantsInvited`): Optional.
             Service message: new participants invited to a voice chat.
 
             .. versionadded:: 13.4
+            .. deprecated:: 13.12 contains the same value as :attr:`VideoChatParticipantsInvited`
+                for backwards compatibility.
+        video_chat_scheduled (:class:`telegram.VideoChatScheduled`): Optional. Service message:
+            video chat scheduled.
+
+            .. versionadded:: 13.12
+        video_chat_started (:class:`telegram.VideoChatStarted`): Optional. Service message: video
+            chat started.
+
+            .. versionadded:: 13.12
+        video_chat_ended (:class:`telegram.VideoChatEnded`): Optional. Service message: video chat
+            ended.
+
+            .. versionadded:: 13.12
+        video_chat_participants_invited (:class:`telegram.VideoChatParticipantsInvited`): Optional.
+            Service message: new participants invited to a video chat.
+
+            .. versionadded:: 13.12
+        web_app_data (:class:`telegram.WebAppData`): Optional. Service message: data sent by a Web
+            App.
+
+            .. versionadded:: 13.12
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
@@ -410,8 +469,13 @@ class Message(TelegramObject):
         'voice_chat_participants_invited',
         'voice_chat_started',
         'voice_chat_scheduled',
+        'video_chat_ended',
+        'video_chat_participants_invited',
+        'video_chat_started',
+        'video_chat_scheduled',
         'is_automatic_forward',
         'has_protected_content',
+        'web_app_data',
         '_id_attrs',
     )
 
@@ -516,8 +580,36 @@ class Message(TelegramObject):
         voice_chat_scheduled: VoiceChatScheduled = None,
         is_automatic_forward: bool = None,
         has_protected_content: bool = None,
+        video_chat_scheduled: VideoChatScheduled = None,
+        video_chat_started: VideoChatStarted = None,
+        video_chat_ended: VideoChatEnded = None,
+        video_chat_participants_invited: VideoChatParticipantsInvited = None,
+        web_app_data: WebAppData = None,
         **_kwargs: Any,
     ):
+        if (
+            voice_chat_scheduled is not None
+            and video_chat_scheduled is not None
+            and voice_chat_scheduled != video_chat_scheduled
+        ):
+            raise ValueError(
+                "Only supply one of `video_chat_scheduled`/`voice_chat_scheduled`, not both."
+            )
+        if (
+            voice_chat_ended is not None
+            and video_chat_ended is not None
+            and voice_chat_ended != video_chat_ended
+        ):
+            raise ValueError("Only supply one of `video_chat_ended`/`voice_chat_ended`, not both.")
+        if (
+            voice_chat_participants_invited is not None
+            and video_chat_participants_invited is not None
+        ) and voice_chat_participants_invited != video_chat_participants_invited:
+            raise ValueError(
+                "Only supply one of `video_chat_participants_invited`/"
+                "`voice_chat_participants_invited`, not both."
+            )
+
         # Required
         self.message_id = int(message_id)
         # Optionals
@@ -573,11 +665,30 @@ class Message(TelegramObject):
         self.dice = dice
         self.via_bot = via_bot
         self.proximity_alert_triggered = proximity_alert_triggered
-        self.voice_chat_scheduled = voice_chat_scheduled
-        self.voice_chat_started = voice_chat_started
-        self.voice_chat_ended = voice_chat_ended
-        self.voice_chat_participants_invited = voice_chat_participants_invited
         self.reply_markup = reply_markup
+
+        temp0 = video_chat_scheduled if video_chat_scheduled is not None else voice_chat_scheduled
+        self.voice_chat_scheduled = temp0
+        self.video_chat_scheduled = temp0
+
+        # those are empty classes, so they don't need a comparison like the others.
+        temp1 = video_chat_started if video_chat_started is not None else voice_chat_started
+        self.voice_chat_started = temp1
+        self.video_chat_started = temp1
+
+        temp2 = video_chat_ended if video_chat_ended is not None else voice_chat_ended
+        self.voice_chat_ended = temp2
+        self.video_chat_ended = temp2
+
+        temp3 = (
+            video_chat_participants_invited
+            if video_chat_participants_invited is not None
+            else voice_chat_participants_invited
+        )
+        self.voice_chat_participants_invited = temp3
+        self.video_chat_participants_invited = temp3
+        self.web_app_data = web_app_data
+
         self.bot = bot
 
         self._effective_attachment = DEFAULT_NONE
@@ -651,14 +762,24 @@ class Message(TelegramObject):
             data.get('proximity_alert_triggered'), bot
         )
         data['reply_markup'] = InlineKeyboardMarkup.de_json(data.get('reply_markup'), bot)
-        data['voice_chat_scheduled'] = VoiceChatScheduled.de_json(
+        data['voice_chat_scheduled'] = VideoChatScheduled.de_json(
             data.get('voice_chat_scheduled'), bot
         )
-        data['voice_chat_started'] = VoiceChatStarted.de_json(data.get('voice_chat_started'), bot)
-        data['voice_chat_ended'] = VoiceChatEnded.de_json(data.get('voice_chat_ended'), bot)
-        data['voice_chat_participants_invited'] = VoiceChatParticipantsInvited.de_json(
+        data['voice_chat_started'] = VideoChatStarted.de_json(data.get('voice_chat_started'), bot)
+        data['voice_chat_ended'] = VideoChatEnded.de_json(data.get('voice_chat_ended'), bot)
+        data['voice_chat_participants_invited'] = VideoChatParticipantsInvited.de_json(
             data.get('voice_chat_participants_invited'), bot
         )
+        data['video_chat_scheduled'] = VideoChatScheduled.de_json(
+            data.get('video_chat_scheduled'), bot
+        )
+        data['video_chat_started'] = VideoChatStarted.de_json(data.get('video_chat_started'), bot)
+        data['video_chat_ended'] = VideoChatEnded.de_json(data.get('video_chat_ended'), bot)
+        data['video_chat_participants_invited'] = VideoChatParticipantsInvited.de_json(
+            data.get('video_chat_participants_invited'), bot
+        )
+        data['web_app_data'] = WebAppData.de_json(data.get('web_app_data'), bot)
+
         return cls(bot=bot, **data)
 
     @property
