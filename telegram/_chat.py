@@ -235,7 +235,7 @@ class Chat(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.id = int(id)  # pylint: disable=invalid-name
+        self.id = id  # pylint: disable=invalid-name
         self.type = enum.get_member(constants.ChatType, type, type)
         # Optionals
         self.title = title

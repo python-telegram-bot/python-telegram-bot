@@ -124,7 +124,7 @@ class ChatInviteLink(TelegramObject):
 
         # Optionals
         self.expire_date = expire_date
-        self.member_limit = int(member_limit) if member_limit is not None else None
+        self.member_limit = member_limit
         self.name = name
         self.pending_join_request_count = (
             int(pending_join_request_count) if pending_join_request_count is not None else None

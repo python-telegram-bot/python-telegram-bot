@@ -120,8 +120,8 @@ class Sticker(_BaseThumbedMedium):
             bot=bot,
         )
         # Required
-        self.width = int(width)
-        self.height = int(height)
+        self.width = width
+        self.height = height
         self.is_animated = is_animated
         self.is_video = is_video
         # Optional

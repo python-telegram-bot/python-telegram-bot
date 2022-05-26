@@ -303,7 +303,11 @@ class TestJobQueue:
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_time)
 
-    async def test_run_daily(self, job_queue):
+    async def test_run_daily(self, job_queue, recwarn):
+        expected_warning = (
+            "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
+            "We recommend double checking if the passed value is correct."
+        )
         delta, now = 1, dtm.datetime.now(pytz.utc)
         time_of_day = (now + dtm.timedelta(seconds=delta)).time()
         expected_reschedule_time = (now + dtm.timedelta(seconds=delta, days=1)).timestamp()
@@ -313,6 +317,30 @@ class TestJobQueue:
         assert self.result == 1
         scheduled_time = job_queue.jobs()[0].next_t.timestamp()
         assert scheduled_time == pytest.approx(expected_reschedule_time)
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
+
+    @pytest.mark.parametrize("weekday", (0, 1, 2, 3, 4, 5, 6))
+    async def test_run_daily_days_of_week(self, job_queue, recwarn, weekday):
+        expected_warning = (
+            "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
+            "We recommend double checking if the passed value is correct."
+        )
+        delta, now = 1, dtm.datetime.now(pytz.utc)
+        time_of_day = (now + dtm.timedelta(seconds=delta)).time()
+        # offset in days until next weekday
+        offset = (weekday + 6 - now.weekday()) % 7
+        offset = offset if offset > 0 else 7
+        expected_reschedule_time = (now + dtm.timedelta(seconds=delta, days=offset)).timestamp()
+
+        job_queue.run_daily(self.job_run_once, time_of_day, days=[weekday])
+        await asyncio.sleep(delta + 0.1)
+        scheduled_time = job_queue.jobs()[0].next_t.timestamp()
+        assert scheduled_time == pytest.approx(expected_reschedule_time)
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     async def test_run_monthly(self, job_queue, timezone):
         delta, now = 1, dtm.datetime.now(timezone)

@@ -144,13 +144,16 @@ class ChatMigrated(TelegramError):
     Args:
         new_chat_id (:obj:`int`): The new chat id of the group.
 
+    Attributes:
+        new_chat_id (:obj:`int`): The new chat id of the group.
+
     """
 
     __slots__ = ("new_chat_id",)
 
     def __init__(self, new_chat_id: int):
         super().__init__(f"Group migrated to supergroup. New chat id: {new_chat_id}")
-        self.new_chat_id = int(new_chat_id)
+        self.new_chat_id = new_chat_id
 
     def __reduce__(self) -> Tuple[type, Tuple[int]]:  # type: ignore[override]
         return self.__class__, (self.new_chat_id,)
@@ -160,7 +163,13 @@ class RetryAfter(TelegramError):
     """
     Raised when flood limits where exceeded.
 
+    .. versionchanged:: 20.0
+       :attr:`retry_after` is now an integer to comply with the Bot API.
+
     Args:
+        retry_after (:obj:`int`): Time in seconds, after which the bot can retry the request.
+
+    Attributes:
         retry_after (:obj:`int`): Time in seconds, after which the bot can retry the request.
 
     """
@@ -168,8 +177,8 @@ class RetryAfter(TelegramError):
     __slots__ = ("retry_after",)
 
     def __init__(self, retry_after: int):
-        super().__init__(f"Flood control exceeded. Retry in {float(retry_after)} seconds")
-        self.retry_after = float(retry_after)
+        super().__init__(f"Flood control exceeded. Retry in {retry_after} seconds")
+        self.retry_after = retry_after
 
     def __reduce__(self) -> Tuple[type, Tuple[float]]:  # type: ignore[override]
         return self.__class__, (self.retry_after,)

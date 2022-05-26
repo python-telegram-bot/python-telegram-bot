@@ -85,7 +85,7 @@ class TestChatInviteLink:
             "is_primary": self.primary,
             "is_revoked": self.revoked,
             "expire_date": to_timestamp(self.expire_date),
-            "member_limit": str(self.member_limit),
+            "member_limit": self.member_limit,
             "name": self.name,
             "pending_join_request_count": str(self.pending_join_request_count),
         }

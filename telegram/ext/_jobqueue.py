@@ -28,6 +28,7 @@ from apscheduler.job import Job as APSJob
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from telegram._utils.types import JSONDict
+from telegram._utils.warnings import warn
 from telegram.ext._extbot import ExtBot
 from telegram.ext._utils.types import JobCallback
 
@@ -50,6 +51,7 @@ class JobQueue:
     """
 
     __slots__ = ("_application", "scheduler", "_executor")
+    _CRON_MAPPING = ("sun", "mon", "tue", "wed", "thu", "fri", "sat")
 
     def __init__(self) -> None:
         self._application: "Optional[weakref.ReferenceType[Application]]" = None
@@ -419,7 +421,11 @@ class JobQueue:
                 (:obj:`datetime.time.tzinfo`) is :obj:`None`, the default timezone of the bot will
                 be used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
-                run (where ``0-6`` correspond to monday - sunday). Defaults to ``EVERY_DAY``
+                run (where ``0-6`` correspond to sunday - saturday). By default, the job will run
+                every day.
+
+                .. versionchanged:: 20.0
+                    Changed day of the week mapping of 0-6 from monday-sunday to sunday-saturday.
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
@@ -447,6 +453,12 @@ class JobQueue:
             queue.
 
         """
+        # TODO: After v20.0, we should remove the this warning.
+        warn(
+            "Prior to v20.0 the `days` parameter was not aligned to that of cron's weekday scheme."
+            "We recommend double checking if the passed value is correct.",
+            stacklevel=2,
+        )
         if not job_kwargs:
             job_kwargs = {}
 
@@ -458,7 +470,7 @@ class JobQueue:
             name=name,
             args=(self.application,),
             trigger="cron",
-            day_of_week=",".join([str(d) for d in days]),
+            day_of_week=",".join([self._CRON_MAPPING[d] for d in days]),
             hour=time.hour,
             minute=time.minute,
             second=time.second,

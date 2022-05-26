@@ -239,7 +239,7 @@ class Update(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.update_id = int(update_id)
+        self.update_id = update_id
         # Optionals
         self.message = message
         self.edited_message = edited_message

@@ -144,8 +144,12 @@ class Poll(TelegramObject):
         correct_option_id (:obj:`int`): Optional. Identifier of the correct answer option.
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll.
-        explanation_entities (List[:class:`telegram.MessageEntity`]): Optional. Special entities
+        explanation_entities (List[:class:`telegram.MessageEntity`]): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
+            This list is empty if the message does not contain explanation entities.
+
+            .. versionchanged:: 20.0
+               This attribute is now always a (possibly empty) list and never :obj:`None`.
         open_period (:obj:`int`): Optional. Amount of time in seconds the poll will be active
             after creation.
         close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
@@ -196,7 +200,7 @@ class Poll(TelegramObject):
         self.allows_multiple_answers = allows_multiple_answers
         self.correct_option_id = correct_option_id
         self.explanation = explanation
-        self.explanation_entities = explanation_entities
+        self.explanation_entities = explanation_entities or []
         self.open_period = open_period
         self.close_date = close_date
 
@@ -283,7 +287,7 @@ class Poll(TelegramObject):
 
         return {
             entity: self.parse_explanation_entity(entity)
-            for entity in (self.explanation_entities or [])
+            for entity in self.explanation_entities
             if entity.type in types
         }
 

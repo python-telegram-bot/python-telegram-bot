@@ -260,5 +260,5 @@ class BotCommandScopeChatMember(BotCommandScope):
         self.chat_id = (
             chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
         )
-        self.user_id = int(user_id)
+        self.user_id = user_id
         self._id_attrs = (self.type, self.chat_id, self.user_id)

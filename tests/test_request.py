@@ -140,7 +140,7 @@ class TestRequest:
             await httpx_request.post(None, None, None)
 
     async def test_chat_migrated(self, monkeypatch, httpx_request: HTTPXRequest):
-        server_response = b'{"ok": "False", "parameters": {"migrate_to_chat_id": "123"}}'
+        server_response = b'{"ok": "False", "parameters": {"migrate_to_chat_id": 123}}'
 
         monkeypatch.setattr(
             httpx_request,
@@ -154,7 +154,7 @@ class TestRequest:
         assert exc_info.value.new_chat_id == 123
 
     async def test_retry_after(self, monkeypatch, httpx_request: HTTPXRequest):
-        server_response = b'{"ok": "False", "parameters": {"retry_after": "42"}}'
+        server_response = b'{"ok": "False", "parameters": {"retry_after": 42}}'
 
         monkeypatch.setattr(
             httpx_request,
@@ -162,10 +162,10 @@ class TestRequest:
             mocker_factory(response=server_response, return_code=HTTPStatus.BAD_REQUEST),
         )
 
-        with pytest.raises(RetryAfter, match="Retry in 42.0") as exc_info:
+        with pytest.raises(RetryAfter, match="Retry in 42") as exc_info:
             await httpx_request.post(None, None, None)
 
-        assert exc_info.value.retry_after == 42.0
+        assert exc_info.value.retry_after == 42
 
     async def test_unknown_request_params(self, monkeypatch, httpx_request: HTTPXRequest):
         server_response = b'{"ok": "False", "parameters": {"unknown": "42"}}'
