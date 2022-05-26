@@ -6,7 +6,7 @@
 IMPORTANT - 
 To enable inline commands for your bot, you have to send `/setinline` command to `botfather`.
 Then select your bot and set placeholder for your bot.
-Read more [here](https://core.telegram.org/bots/inline)
+Read more here - https://core.telegram.org/bots/inline
 
 First, a few handler functions are defined. Then, those functions are passed to
 the Application and registered at their respective places.
