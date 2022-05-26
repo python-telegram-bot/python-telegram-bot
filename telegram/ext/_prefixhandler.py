@@ -16,11 +16,11 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the CommandHandler and PrefixHandler classes."""
-import re
+"""This module contains the PrefixHandler class."""
+import itertools
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypeVar, Union
 
-from telegram import MessageEntity, Update
+from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import SCT, DVInput
 from telegram.ext import filters as filters_module
@@ -33,20 +33,44 @@ if TYPE_CHECKING:
 RT = TypeVar("RT")
 
 
-class CommandHandler(BaseHandler[Update, CCT]):
-    """BaseHandler class to handle Telegram commands.
+class PrefixHandler(BaseHandler[Update, CCT]):
+    """BaseHandler class to handle custom prefix commands.
 
-    Commands are Telegram messages that start with ``/``, optionally followed by an ``@`` and the
-    bot's name and/or some additional text. The handler will add a :obj:`list` to the
-    :class:`CallbackContext` named :attr:`CallbackContext.args`. It will contain a list of strings,
-    which is the text following the command split on single or consecutive whitespace characters.
+    This is an intermediate handler between :class:`MessageHandler` and :class:`CommandHandler`.
+    It supports configurable commands with the same options as :class:`CommandHandler`. It will
+    respond to every combination of :paramref:`prefix` and :paramref:`command`.
+    It will add a :obj:`list` to the :class:`CallbackContext` named :attr:`CallbackContext.args`,
+    containing a list of strings, which is the text following the command split on single or
+    consecutive whitespace characters.
+
+    Examples:
+
+        Single prefix and command:
+
+        .. code:: python
+
+            PrefixHandler("!", "test", callback)  # will respond to '!test'.
+
+        Multiple prefixes, single command:
+
+        .. code:: python
+
+            PrefixHandler(["!", "#"], "test", callback)  # will respond to '!test' and '#test'.
+
+        Multiple prefixes and commands:
+
+        .. code:: python
+
+            PrefixHandler(
+                ["!", "#"], ["test", "help"], callback
+            )  # will respond to '!test', '#test', '!help' and '#help'.
+
 
     By default, the handler listens to messages as well as edited messages. To change this behavior
     use :attr:`~filters.UpdateType.EDITED_MESSAGE <telegram.ext.filters.UpdateType.EDITED_MESSAGE>`
-    in the filter argument.
 
     Note:
-        * :class:`CommandHandler` does *not* handle (edited) channel posts.
+        * :class:`PrefixHandler` does *not* handle (edited) channel posts.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
@@ -54,14 +78,17 @@ class CommandHandler(BaseHandler[Update, CCT]):
 
     .. versionchanged:: 20.0
 
-        * Renamed the attribute ``command`` to :attr:`commands`, which now is always a
-          :class:`frozenset`
-        * Updating the commands this handler listens to is no longer possible.
+        * :class:`PrefixHandler` is no longer a subclass of :class:`CommandHandler`.
+        * Removed the attributes ``command`` and ``prefix``. Instead, the new :attr:`commands`
+          contains all commands that this handler listens to as a :class:`frozenset`, which
+          includes the prefixes.
+        * Updating the prefixes and commands this handler listens to is no longer possible.
 
     Args:
+        prefix (:obj:`str` | Collection[:obj:`str`]):
+            The prefix(es) that will precede :paramref:`command`.
         command (:obj:`str` | Collection[:obj:`str`]):
             The command or list of commands this handler should listen for. Case-insensitive.
-            Limitations are the same as described `here <https://core.telegram.org/bots#commands>`_
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::
@@ -78,39 +105,43 @@ class CommandHandler(BaseHandler[Update, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
-    Raises:
-        :exc:`ValueError`: When the command is too long or has illegal chars.
-
     Attributes:
-        commands (FrozenSet[:obj:`str`]): The set of commands this handler should listen for.
+        commands (FrozenSet[:obj:`str`]): The commands that this handler will listen for, i.e. the
+            combinations of :paramref:`prefix` and :paramref:`command`.
         callback (:term:`coroutine function`): The callback function for this handler.
         filters (:class:`telegram.ext.filters.BaseFilter`): Optional. Only allow updates with these
             Filters.
         block (:obj:`bool`): Determines whether the return value of the callback should be
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
+
     """
 
+    # 'prefix' is a class property, & 'command' is included in the superclass, so they're left out.
     __slots__ = ("commands", "filters")
 
     def __init__(
         self,
+        prefix: SCT[str],
         command: SCT[str],
         callback: HandlerCallback[Update, CCT, RT],
         filters: filters_module.BaseFilter = None,
         block: DVInput[bool] = DEFAULT_TRUE,
     ):
-        super().__init__(callback, block=block)
+
+        super().__init__(callback=callback, block=block)
+
+        if isinstance(prefix, str):
+            prefixes = {prefix.lower()}
+        else:
+            prefixes = {x.lower() for x in prefix}
 
         if isinstance(command, str):
-            commands = frozenset({command.lower()})
+            commands = {command.lower()}
         else:
-            commands = frozenset(x.lower() for x in command)
-        for comm in commands:
-            if not re.match(r"^[\da-z_]{1,32}$", comm):
-                raise ValueError(f"Command `{comm}` is not a valid bot command")
-        self.commands = commands
+            commands = {x.lower() for x in command}
 
+        self.commands = frozenset(p + c for p, c in itertools.product(prefixes, commands))
         self.filters = filters if filters is not None else filters_module.UpdateType.MESSAGES
 
     def check_update(
@@ -128,27 +159,13 @@ class CommandHandler(BaseHandler[Update, CCT]):
         if isinstance(update, Update) and update.effective_message:
             message = update.effective_message
 
-            if (
-                message.entities
-                and message.entities[0].type == MessageEntity.BOT_COMMAND
-                and message.entities[0].offset == 0
-                and message.text
-                and message.get_bot()
-            ):
-                command = message.text[1 : message.entities[0].length]
-                args = message.text.split()[1:]
-                command_parts = command.split("@")
-                command_parts.append(message.get_bot().username)
-
-                if not (
-                    command_parts[0].lower() in self.commands
-                    and command_parts[1].lower() == message.get_bot().username.lower()
-                ):
+            if message.text:
+                text_list = message.text.split()
+                if text_list[0].lower() not in self.commands:
                     return None
-
                 filter_result = self.filters.check_update(update)
                 if filter_result:
-                    return args, filter_result
+                    return text_list[1:], filter_result
                 return False
         return None
 

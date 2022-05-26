@@ -65,7 +65,7 @@ from ._callbackqueryhandler import CallbackQueryHandler
 from ._chatjoinrequesthandler import ChatJoinRequestHandler
 from ._chatmemberhandler import ChatMemberHandler
 from ._choseninlineresulthandler import ChosenInlineResultHandler
-from ._commandhandler import CommandHandler, PrefixHandler
+from ._commandhandler import CommandHandler
 from ._contexttypes import ContextTypes
 from ._conversationhandler import ConversationHandler
 from ._defaults import Defaults
@@ -79,6 +79,7 @@ from ._picklepersistence import PicklePersistence
 from ._pollanswerhandler import PollAnswerHandler
 from ._pollhandler import PollHandler
 from ._precheckoutqueryhandler import PreCheckoutQueryHandler
+from ._prefixhandler import PrefixHandler
 from ._shippingqueryhandler import ShippingQueryHandler
 from ._stringcommandhandler import StringCommandHandler
 from ._stringregexhandler import StringRegexHandler
