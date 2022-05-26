@@ -708,8 +708,13 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             # check if future is finished or not
             if state.done():
                 res = state.resolve()
-                self._update_state(res, key)
-                state = self._conversations.get(key)
+                if res is None:
+                    # Special case if the error was raised in a non-blocking entry-point
+                    self._conversations.pop(key, None)
+                    state = None
+                else:
+                    self._update_state(res, key)
+                    state = self._conversations.get(key)
 
             # if not then handle WAITING state instead
             else:
