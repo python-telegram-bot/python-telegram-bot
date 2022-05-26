@@ -100,7 +100,7 @@ In addition to the pure API implementation, this library features a number of hi
 make the development of bots easy and straightforward. These classes are contained in the
 ``telegram.ext`` submodule.
 
-A pure API implementation *without* ``telegram.ext`` is available as the standalone package ``python-telegram-bot-raw``.  `See here for details. <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/README_RAW.rst>`_
+A pure API implementation *without* ``telegram.ext`` is available as the standalone package ``python-telegram-bot-raw``.  `See here for details. <https://github.com/python-telegram-bot/python-telegram-bot/blob/v13.x/README_RAW.rst>`_
 
 ----
 Note
@@ -172,7 +172,7 @@ look at ``echobot.py``, it is the de facto base for most of the bots out there. 
 the code for these examples are released to the public domain, so you can start by grabbing the
 code and building on top of it.
 
-Visit `this page <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/README.md>`_ to discover the official examples or look at the examples on the `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Examples>`_ to see other bots the community has built.
+Visit `this page <https://github.com/python-telegram-bot/python-telegram-bot/blob/v13.x/examples/README.md>`_ to discover the official examples or look at the examples on the `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Examples>`_ to see other bots the community has built.
 
 -------
 Logging
@@ -227,7 +227,7 @@ You can get help in several ways:
 Contributing
 ============
 
-Contributions of all sizes are welcome. Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.github/CONTRIBUTING.rst>`_ to get started. You can also help by `reporting bugs <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
+Contributions of all sizes are welcome. Please review our `contribution guidelines <https://github.com/python-telegram-bot/python-telegram-bot/blob/v13.x/.github/CONTRIBUTING.rst>`_ to get started. You can also help by `reporting bugs <https://github.com/python-telegram-bot/python-telegram-bot/issues/new>`_.
 
 ========
 Donating

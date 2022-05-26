@@ -55,7 +55,8 @@ class CommandHandler(Handler[Update, CCT]):
           user or in the same chat, it will be the same :obj:`dict`.
 
           Note that this is DEPRECATED, and you should use context based callbacks. See
-          https://git.io/fxJuV for more info.
+          https://github.com/python-telegram-bot/python-telegram-bot/wiki\
+          /Transition-guide-to-Version-12.0 for more info.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
@@ -169,7 +170,9 @@ class CommandHandler(Handler[Update, CCT]):
 
         if allow_edited is not None:
             warnings.warn(
-                'allow_edited is deprecated. See https://git.io/fxJuV for more info',
+                'allow_edited is deprecated. See '
+                'https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition'
+                '-guide-to-Version-12.0 for more info',
                 TelegramDeprecationWarning,
                 stacklevel=2,
             )
@@ -288,7 +291,8 @@ class PrefixHandler(CommandHandler):
           user or in the same chat, it will be the same :obj:`dict`.
 
           Note that this is DEPRECATED, and you should use context based callbacks. See
-          https://git.io/fxJuV for more info.
+          https://github.com/python-telegram-bot/python-telegram-bot/wiki\
+        /Transition-guide-to-Version-12.0 for more info.
 
     Warning:
         When setting ``run_async`` to :obj:`True`, you cannot rely on adding custom
