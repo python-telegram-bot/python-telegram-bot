@@ -75,6 +75,6 @@ class Voice(_BaseMedium):
             bot=bot,
         )
         # Required
-        self.duration = int(duration)
+        self.duration = duration
         # Optional
         self.mime_type = mime_type

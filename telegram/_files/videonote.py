@@ -81,5 +81,5 @@ class VideoNote(_BaseThumbedMedium):
             bot=bot,
         )
         # Required
-        self.length = int(length)
+        self.length = length
         self.duration = duration

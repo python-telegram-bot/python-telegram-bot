@@ -501,7 +501,7 @@ class Message(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.message_id = int(message_id)
+        self.message_id = message_id
         # Optionals
         self.from_user = from_user
         self.sender_chat = sender_chat
