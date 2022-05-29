@@ -3,8 +3,7 @@
 # This program is dedicated to the public domain under the CC0 license.
 
 """
-IMPORTANT - 
-Dont forget to enable inline mode with @Botfather
+Don't forget to enable inline mode with @BotFather
 
 First, a few handler functions are defined. Then, those functions are passed to
 the Application and registered at their respective places.
