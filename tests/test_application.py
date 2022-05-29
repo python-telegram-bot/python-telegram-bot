@@ -1702,6 +1702,7 @@ class TestApplication:
         app.job_queue.run_once(abort_app, 2)
         app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
 
-        if platform.system() == "windows":
-            with pytest.raises(PTBUserWarning):
+        if platform.system() == "Windows":
+            monkeypatch.undo()
+            with pytest.raises(PTBUserWarning, match="Could not add signal handlers for the stop"):
                 app.run_polling(close_loop=False, stop_signals=signal.SIGINT)

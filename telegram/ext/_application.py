@@ -548,7 +548,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
         close_loop: bool = True,
-        stop_signals: Optional[Sequence[int]] = None,
+        stop_signals: DVInput[Sequence[int]] = DEFAULT_NONE,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling` and
@@ -616,10 +616,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         def error_callback(exc: TelegramError) -> None:
             self.create_task(self.process_error(error=exc, update=None))
 
-        if stop_signals is None:
-            if platform.system() != "windows":
-                stop_signals = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
-
         return self.__run(
             updater_coroutine=self.updater.start_polling(
                 poll_interval=poll_interval,
@@ -651,7 +647,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         ip_address: str = None,
         max_connections: int = 40,
         close_loop: bool = True,
-        stop_signals: Optional[Sequence[int]] = None,
+        stop_signals: DVInput[Sequence[int]] = DEFAULT_NONE,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -716,10 +712,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 "Application.run_webhook is only available if the application has an Updater."
             )
 
-        if stop_signals is None:
-            if platform.system() != "windows":
-                stop_signals = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
-
         return self.__run(
             updater_coroutine=self.updater.start_webhook(
                 listen=listen,
@@ -745,7 +737,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def __run(
         self,
         updater_coroutine: Coroutine,
-        stop_signals: Optional[Sequence[int]],
+        stop_signals: DVInput[Sequence[int]],
         close_loop: bool = True,
     ) -> None:
         # Calling get_event_loop() should still be okay even in py3.10+ as long as there is a
@@ -753,9 +745,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         # See the docs of get_event_loop() and get_running_loop() for more info
         loop = asyncio.get_event_loop()
 
+        if stop_signals is DEFAULT_NONE and platform.system() != "Windows":
+            stop_signals = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
+
         try:
-            for sig in stop_signals or []:
-                loop.add_signal_handler(sig, self._raise_system_exit)
+            if not isinstance(stop_signals, DefaultValue):
+                for sig in stop_signals or []:
+                    loop.add_signal_handler(sig, self._raise_system_exit)
         except NotImplementedError as exc:
             warn(
                 f"Could not add signal handlers for the stop signals {stop_signals} due to "
