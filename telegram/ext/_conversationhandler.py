@@ -92,8 +92,9 @@ class PendingState:
 
     def resolve(self) -> object:
         """Returns the new state of the :class:`ConversationHandler` if available. If there was an
-        exception during the task execution, then return the old state. If the returned state was
-        :obj:`None`, then end the conversation.
+        exception during the task execution, then return the old state. If both the new and old
+        state are :obj:`None`, return `CH.END`. If only the new state is :obj:`None`, return the
+        old state.
 
         Raises:
             :exc:`RuntimeError`: If the current task has not yet finished.
@@ -113,6 +114,9 @@ class PendingState:
         res = self.task.result()
         if res is None and self.old_state is None:
             res = ConversationHandler.END
+        elif res is None:
+            # returning None from a callback means that we want to stay in the old state
+            return self.old_state
 
         return res
 
@@ -707,14 +711,8 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
             # check if future is finished or not
             if state.done():
-                res = state.resolve()
-                if res is None:
-                    # Special case if the error was raised in a non-blocking entry-point
-                    self._conversations.pop(key, None)
-                    state = None
-                else:
-                    self._update_state(res, key)
-                    state = self._conversations.get(key)
+                state = state.resolve()
+                self._update_state(state, key)
 
             # if not then handle WAITING state instead
             else:
