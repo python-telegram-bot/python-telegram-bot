@@ -548,7 +548,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
         close_loop: bool = True,
-        stop_signals: DVInput[Sequence[int]] = DEFAULT_NONE,
+        stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling` and
@@ -647,7 +647,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         ip_address: str = None,
         max_connections: int = 40,
         close_loop: bool = True,
-        stop_signals: DVInput[Sequence[int]] = DEFAULT_NONE,
+        stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -737,7 +737,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def __run(
         self,
         updater_coroutine: Coroutine,
-        stop_signals: DVInput[Sequence[int]],
+        stop_signals: ODVInput[Sequence[int]],
         close_loop: bool = True,
     ) -> None:
         # Calling get_event_loop() should still be okay even in py3.10+ as long as there is a

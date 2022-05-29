@@ -1681,7 +1681,6 @@ class TestApplication:
 
         assert len(recwarn) == 0
 
-    @pytest.mark.dev
     def test_signal_handlers(self, app, monkeypatch):
         # this test should make sure that signal handlers are set by default on Linux + Mac,
         # and not on Windows.
@@ -1705,4 +1704,4 @@ class TestApplication:
         if platform.system() == "Windows":
             monkeypatch.undo()
             with pytest.raises(PTBUserWarning, match="Could not add signal handlers for the stop"):
-                app.run_polling(close_loop=False, stop_signals=signal.SIGINT)
+                app.run_polling(close_loop=False, stop_signals=(signal.SIGINT,))
