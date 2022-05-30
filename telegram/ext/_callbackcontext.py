@@ -265,10 +265,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             job (:class:`telegram.ext.Job`, optional): The job associated with the error.
 
                 .. versionadded:: 20.0
-        coroutine (:term:`coroutine function`, optional): The coroutine function associated with
-            this error if the
-            error was caused by a coroutine run with :meth:`Application.create_task` or a handler
-            callback with :attr:`block=False <BaseHandler.block>`.
+            coroutine (:term:`coroutine function`, optional): The coroutine function associated
+                with this error if the error was caused by a coroutine run with
+                :meth:`Application.create_task` or a handler callback with
+                :attr:`block=False <BaseHandler.block>`.
 
                 .. versionadded:: 20.0
 
@@ -310,7 +310,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
             return cls(application, chat_id=chat_id, user_id=user_id)  # type: ignore
         return cls(application)  # type: ignore
-
 
     @classmethod
     def from_job(
