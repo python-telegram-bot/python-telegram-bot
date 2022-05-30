@@ -1681,13 +1681,16 @@ class TestApplication:
 
         assert len(recwarn) == 0
 
+    @pytest.mark.dev
     def test_signal_handlers(self, app, monkeypatch):
         # this test should make sure that signal handlers are set by default on Linux + Mac,
         # and not on Windows.
 
+        received_signals = []
+
         def signal_handler_test(*args, **kwargs):
             # args[0] is the signal, [1] the callback
-            assert args[0] in (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
+            received_signals.append(args[0])
 
         loop = asyncio.get_event_loop()
         monkeypatch.setattr(loop, "add_signal_handler", signal_handler_test)
@@ -1698,19 +1701,16 @@ class TestApplication:
         app.job_queue.run_once(abort_app, 2)
         app.run_polling(close_loop=False)
 
+        if platform.system() == "Windows":
+            assert received_signals == []
+        else:
+            assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
+
+        received_signals.clear()
         app.job_queue.run_once(abort_app, 2)
         app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
 
         if platform.system() == "Windows":
-
-            def signal_handler_test_windows(*args, **kwargs):
-                # this should be empty, but still called once.
-                assert args == []
-
-            monkeypatch.setattr(loop, "add_signal_handler", signal_handler_test_windows)
-            # this should run through, and we expect the signals to be empty
-            app.job_queue.run_once(abort_app, 2)
-            # pass false so it is not default
-            app.run_webhook(
-                port=49152, webhook_url="example.com", close_loop=False, stop_signals=False
-            )
+            assert received_signals == []
+        else:
+            assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
