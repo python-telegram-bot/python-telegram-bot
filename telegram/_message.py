@@ -2005,7 +2005,6 @@ class Message(TelegramObject):
         """Shortcut for::
 
              await bot.forward_message(
-                 chat_id=chat_id,
                  from_chat_id=update.effective_message.chat_id,
                  message_id=update.effective_message.message_id,
                  *args,
@@ -2116,7 +2115,6 @@ class Message(TelegramObject):
 
              await bot.copy_message(
                  chat_id=message.chat.id,
-                 from_chat_id=from_chat_id,
                  message_id=message_id,
                  *args,
                  **kwargs
