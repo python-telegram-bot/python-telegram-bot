@@ -308,11 +308,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             chat_id = chat.id if chat else None
             user_id = user.id if user else None
 
-            self = cls(application, chat_id=chat_id, user_id=user_id)  # type: ignore
-        else:
-            self = cls(application)  # type: ignore
+            return cls(application, chat_id=chat_id, user_id=user_id)  # type: ignore
+        return cls(application)  # type: ignore
 
-        return self
 
     @classmethod
     def from_job(

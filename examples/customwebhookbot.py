@@ -87,7 +87,7 @@ async def start(update: Update, context: CustomContext) -> None:
     url = context.bot_data["url"]
     payload_url = html.escape(f"{url}/submitpayload?user_id=<your user id>&payload=<payload>")
     text = (
-        f"To check if the bot is still running, call <code>{url}/healthcheck</code>. "
+        f"To check if the bot is still running, call <code>{url}/healthcheck</code>.\n\n"
         f"To post a custom update, call <code>{payload_url}</code>."
     )
     await update.message.reply_html(text=text)
@@ -100,8 +100,8 @@ async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
     payloads.append(update.payload)
     combined_payloads = "</code>\n• <code>".join(payloads)
     text = (
-        f"The user {chat_member.user.mention_html()} has send a new payload. "
-        f"So for they have send the following payloads: \n\n• <code>{combined_payloads}</code>"
+        f"The user {chat_member.user.mention_html()} has sent a new payload. "
+        f"So far they have sent the following payloads: \n\n• <code>{combined_payloads}</code>"
     )
     await context.bot.send_message(
         chat_id=context.bot_data["admin_chat_id"], text=text, parse_mode=ParseMode.HTML
@@ -115,6 +115,7 @@ async def main() -> None:
     port = 8000
 
     context_types = ContextTypes(context=CustomContext)
+    # Here we set updater to None because we want our custom webhook server to handle the updates
     application = (
         Application.builder().token("TOKEN").updater(None).context_types(context_types).build()
     )
