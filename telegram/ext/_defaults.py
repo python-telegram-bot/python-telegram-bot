@@ -41,7 +41,7 @@ class Defaults:
         allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
             should be sent even if the specified replied-to message is not found.
         quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
-            to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
+            to the message. If ``reply_to_message_id`` is passed, this parameter will
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
         tzinfo (:obj:`tzinfo`, optional): A timezone to be used for all date(time) inputs
             appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
@@ -173,7 +173,7 @@ class Defaults:
     @property
     def quote(self) -> Optional[bool]:
         """:obj:`bool`: Optional. If set to :obj:`True`, the reply is sent as an actual reply
-        to the message. If ``reply_to_message_id`` is passed in ``kwargs``, this parameter will
+        to the message. If ``reply_to_message_id`` is passed, this parameter will
         be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
         """
         return self._quote
