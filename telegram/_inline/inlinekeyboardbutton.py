@@ -82,6 +82,10 @@ class InlineKeyboardButton(TelegramObject):
         callback_data (:obj:`str` | :obj:`object`, optional): Data to be sent in a callback query
             to the bot when button is pressed, UTF-8 1-64 bytes. If the bot instance allows
             arbitrary callback data, anything can be passed.
+
+            Tip:
+                The value entered here will be available in :attr:`telegram.CallbackQuery.data`.
+
         web_app (:obj:`telegram.WebAppInfo`, optional): Description of the `Web App
             <https://core.telegram.org/bots/webapps>`_  that will be launched when the user presses
             the button. The Web App will be able to send an arbitrary message on behalf of the user
