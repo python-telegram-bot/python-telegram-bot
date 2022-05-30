@@ -106,7 +106,8 @@ class RequestData:
         Tip:
             By default, this property uses the standard libraries :func:`json.dumps`.
             To use a custom library for JSON encoding, you can directly encode the keys of
-            :attr:`parameters` - note that string valued keys should not be JSON encoded."""
+            :attr:`parameters` - note that string valued keys should not be JSON encoded.
+        """
         return json.dumps(self.json_parameters).encode("utf-8")
 
     @property
