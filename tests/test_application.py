@@ -1659,9 +1659,9 @@ class TestApplication:
 
         with pytest.raises(RuntimeError, match="Prevent Actually Running"):
             if "polling" in method:
-                app.run_polling(close_loop=False)
+                app.run_polling(close_loop=False, stop_signals=(signal.SIGINT,))
             else:
-                app.run_webhook(close_loop=False)
+                app.run_webhook(close_loop=False, stop_signals=(signal.SIGTERM,))
 
         assert len(recwarn) >= 1
         found = False
@@ -1702,6 +1702,15 @@ class TestApplication:
         app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
 
         if platform.system() == "Windows":
-            monkeypatch.undo()
-            with pytest.raises(PTBUserWarning, match="Could not add signal handlers for the stop"):
-                app.run_polling(close_loop=False, stop_signals=(signal.SIGINT,))
+
+            def signal_handler_test_windows(*args, **kwargs):
+                # this should be empty, but still called once.
+                assert args == []
+
+            monkeypatch.setattr(loop, "add_signal_handler", signal_handler_test_windows)
+            # this should run through, and we expect the signals to be empty
+            app.job_queue.run_once(abort_app, 2)
+            # pass false so it is not default
+            app.run_webhook(
+                port=49152, webhook_url="example.com", close_loop=False, stop_signals=False
+            )
