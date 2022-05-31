@@ -12,6 +12,7 @@ isort==5.10.1
 
 pytest==7.1.2
 pytest-asyncio==0.18.3
+pytest-timeout==2.1.0 # used to timeout tests
 
 flaky  # Used for flaky tests (flaky decorator)
 beautifulsoup4  # used in test_official for parsing tg docs

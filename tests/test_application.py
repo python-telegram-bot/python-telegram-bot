@@ -1681,7 +1681,7 @@ class TestApplication:
 
         assert len(recwarn) == 0
 
-    @pytest.mark.dev
+    @pytest.mark.timeout(6)
     def test_signal_handlers(self, app, monkeypatch):
         # this test should make sure that signal handlers are set by default on Linux + Mac,
         # and not on Windows.
@@ -1695,10 +1695,12 @@ class TestApplication:
         loop = asyncio.get_event_loop()
         monkeypatch.setattr(loop, "add_signal_handler", signal_handler_test)
 
-        async def abort_app(context):
-            raise KeyboardInterrupt
+        async def abort_app():
+            await asyncio.sleep(2)
+            raise SystemExit
 
-        app.job_queue.run_once(abort_app, 2)
+        loop.create_task(abort_app())
+
         app.run_polling(close_loop=False)
 
         if platform.system() == "Windows":
@@ -1707,7 +1709,7 @@ class TestApplication:
             assert received_signals == [signal.SIGINT, signal.SIGTERM, signal.SIGABRT]
 
         received_signals.clear()
-        app.job_queue.run_once(abort_app, 2)
+        loop.create_task(abort_app())
         app.run_webhook(port=49152, webhook_url="example.com", close_loop=False)
 
         if platform.system() == "Windows":
