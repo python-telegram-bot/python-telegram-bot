@@ -69,7 +69,7 @@ class BaseRequest(
             await request_object.shutdown()
 
     Tip:
-        JSON encoding and decoding is done with the standard libraries :mod:`json` by default.
+        JSON encoding and decoding is done with the standard library's :mod:`json` by default.
         To use a custom library for this, you can override :meth:`parse_json_payload` and implement
         custom logic to encode the keys of :attr:`telegram.request.RequestData.parameters`.
 
