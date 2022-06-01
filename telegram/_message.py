@@ -577,7 +577,8 @@ class Message(TelegramObject):
         """.. versionadded:: 20.0
         :obj: `int` : Convenience property. This is to reduce errors when users
         use Message.id instead of Message.message_id which is inconsistent with most
-        of the other properties which follow a similar pattern."""
+        of the other properties which follow a similar pattern.
+        """
         return self.message_id
 
     @property
