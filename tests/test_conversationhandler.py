@@ -1101,7 +1101,7 @@ class TestConversationHandler:
                     caplog.records[0].message
                     == "Task function raised exception. Falling back to old state 1"
                 )
-                assert caplog.records[0].exc_info[1] is error
+                assert caplog.records[0].exc_info[1] is None
             else:
                 assert len(caplog.records) == 0
 
@@ -1145,7 +1145,7 @@ class TestConversationHandler:
                 caplog.records[0].message
                 == "Task function raised exception. Falling back to old state None"
             )
-            assert caplog.records[0].exc_info[1] is error
+            assert caplog.records[0].exc_info[1] is None
 
     async def test_conversation_timeout(self, app, bot, user1):
         handler = ConversationHandler(
