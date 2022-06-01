@@ -664,6 +664,9 @@ class TestMessage:
     def test_chat_id(self, message):
         assert message.chat_id == message.chat.id
 
+    def test_id(self, message):
+        assert message.message_id == message.id
+
     @pytest.mark.parametrize("type_", argvalues=[Chat.SUPERGROUP, Chat.CHANNEL])
     def test_link_with_username(self, message, type_):
         message.chat.username = "username"
