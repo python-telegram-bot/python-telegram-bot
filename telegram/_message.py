@@ -575,11 +575,9 @@ class Message(TelegramObject):
     @property
     def id(self) -> int:  # pylint: disable=invalid-name
         """
-        .. versionchanged:: 20.0
-          :obj: `int` : Convenience property. This is to reduce errors when users
-          use Message.id instead of Message.message_id which is inconsistent with most
-          of the other properties which follow a similar pattern.
-
+        :obj:`int`: Shortcut for :attr:`message_id`.
+        
+            .. versionadded:: 20.0
         """
         return self.message_id
 
