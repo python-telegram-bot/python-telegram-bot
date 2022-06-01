@@ -334,7 +334,7 @@ class BaseRequest(
         """Parse the JSON returned from Telegram.
 
         Tip:
-            By default, this method uses the standard libraries :func:`json.loads` and
+            By default, this method uses the standard library's :func:`json.loads` and
             ``errors="replace"`` in :meth:`bytes.decode`.
             You can override it to customize either of these behaviors.
 
@@ -345,7 +345,7 @@ class BaseRequest(
             dict: A JSON parsed as Python dict with results.
 
         Raises:
-            TelegramError: If the data could not be json_loaded
+            TelegramError: If loading the JSON data failed
         """
         decoded_s = payload.decode("utf-8", "replace")
         try:

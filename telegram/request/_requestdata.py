@@ -66,7 +66,7 @@ class RequestData:
         value.
 
         Tip:
-            By default, this property uses the standard libraries :func:`json.dumps`.
+            By default, this property uses the standard library's :func:`json.dumps`.
             To use a custom library for JSON encoding, you can directly encode the keys of
             :attr:`parameters` - note that string valued keys should not be JSON encoded.
         """
@@ -101,10 +101,10 @@ class RequestData:
 
     @property
     def json_payload(self) -> bytes:
-        """The parameters as UTF-8 encoded JSON payload.
+        """The :attr:`parameters` as UTF-8 encoded JSON payload.
 
         Tip:
-            By default, this property uses the standard libraries :func:`json.dumps`.
+            By default, this property uses the standard library's :func:`json.dumps`.
             To use a custom library for JSON encoding, you can directly encode the keys of
             :attr:`parameters` - note that string valued keys should not be JSON encoded.
         """
