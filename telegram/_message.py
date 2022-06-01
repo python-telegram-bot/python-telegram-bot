@@ -573,6 +573,14 @@ class Message(TelegramObject):
         return self.chat.id
 
     @property
+    def id(self) -> int:  # pylint: disable=invalid-name
+        """.. versionadded:: 20.0
+        :obj: `int` : Convenience property. This is to reduce errors when users
+        use Message.id instead of Message.message_id which is inconsistent with most
+        of the other properties which follow a similar pattern."""
+        return self.message_id
+
+    @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat of the message is not
         a private chat or normal group, returns a t.me link of the message.
