@@ -107,7 +107,6 @@ class PendingState:
             _logger.exception(
                 "Task function raised exception. Falling back to old state %s",
                 self.old_state,
-                exc_info=exc,
             )
             return self.old_state
 
@@ -717,7 +716,6 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                     self._conversations.pop(key, None)
                     state = None
                 else:
-                    print("resolved stat", res)
                     self._update_state(res, key)
                     state = self._conversations.get(key)
 
