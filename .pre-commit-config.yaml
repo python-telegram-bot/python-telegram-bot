@@ -33,7 +33,7 @@ repos:
           - --jobs=0
 
         additional_dependencies:
-          - httpx~=0.22.0
+          - httpx~=0.23.0
           - tornado~=6.1
           - APScheduler~=3.9.1
           - cachetools~=5.1.0
@@ -49,7 +49,7 @@ repos:
           - types-pytz
           - types-cryptography
           - types-cachetools
-          - httpx~=0.22.0
+          - httpx~=0.23.0
           - tornado~=6.1
           - APScheduler~=3.9.1
           - cachetools~=5.1.0

@@ -6,7 +6,7 @@
 # versions and only increase the lower bound if necessary
 
 # httpx has no stable release yet, so let's be cautious for now
-httpx ~= 0.22.0
+httpx ~= 0.23.0
 # only telegram.ext: # Keep this line here; used in setup(-raw).py
 
 # tornado is rather stable, but let's not allow the next mayor release without prior testing

@@ -121,7 +121,7 @@ Dependencies & Their Versions
 However, for some features using a 3rd party library is more sane than implementing the functionality again.
 The dependencies are:
 
-* `httpx ~= 0.22.0 <https://www.python-httpx.org>`_ for ``telegram.request.HTTPXRequest``, the default networking backend
+* `httpx ~= 0.23.0 <https://www.python-httpx.org>`_ for ``telegram.request.HTTPXRequest``, the default networking backend
 * `tornado~=6.1 <https://www.tornadoweb.org/en/stable/>`_ for ``telegram.ext.Updater.start_webhook``
 * `cachetools~=5.1.0 <https://cachetools.readthedocs.io/en/latest/>`_ for ``telegram.ext.CallbackDataCache``
 * `APScheduler~=3.9.1 <https://apscheduler.readthedocs.io/en/3.x/>`_ for ``telegram.ext.JobQueue``
