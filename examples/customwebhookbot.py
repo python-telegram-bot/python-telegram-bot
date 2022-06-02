@@ -116,9 +116,11 @@ async def main() -> None:
 
     context_types = ContextTypes(context=CustomContext)
     # Here we set updater to None because we want our custom webhook server to handle the updates
+    # and hence we don't need an Updater instance
     application = (
         Application.builder().token("TOKEN").updater(None).context_types(context_types).build()
     )
+    # save the values in `bot_data` such that we may easily access them in the callbacks
     application.bot_data["url"] = url
     application.bot_data["admin_chat_id"] = admin_chat_id
 
@@ -140,7 +142,7 @@ async def main() -> None:
     async def custom_updates(request: Request) -> PlainTextResponse:
         """
         Handle incoming webhook updates by also putting them into the `update_queue` if
-        the required parameters where passed.
+        the required parameters were passed correctly.
         """
         try:
             user_id = int(request.query_params["user_id"])
