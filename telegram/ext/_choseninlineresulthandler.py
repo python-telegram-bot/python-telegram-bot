@@ -29,7 +29,7 @@ from telegram.ext._utils.types import CCT, HandlerCallback
 RT = TypeVar("RT")
 
 if TYPE_CHECKING:
-    from telegram.ext import Application, CallbackContext
+    from telegram.ext import Application
 
 
 class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
@@ -108,7 +108,7 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
 
     def collect_additional_context(
         self,
-        context: "CallbackContext",
+        context: CCT,
         update: Update,
         application: "Application",
         check_result: Union[bool, Match],
