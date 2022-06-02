@@ -573,6 +573,15 @@ class Message(TelegramObject):
         return self.chat.id
 
     @property
+    def id(self) -> int:  # pylint: disable=invalid-name
+        """
+        :obj:`int`: Shortcut for :attr:`message_id`.
+
+            .. versionadded:: 20.0
+        """
+        return self.message_id
+
+    @property
     def link(self) -> Optional[str]:
         """:obj:`str`: Convenience property. If the chat of the message is not
         a private chat or normal group, returns a t.me link of the message.

@@ -129,6 +129,9 @@ class TestRequest:
         monkeypatch.setattr(httpx_request, "do_request", mocker_factory(response=server_response))
 
         assert await httpx_request.post(None, None, None) == "test_string�"
+        # Explicitly call `parse_json_payload` here is well so that this public method is covered
+        # not only implicitly.
+        assert httpx_request.parse_json_payload(server_response) == {"result": "test_string�"}
 
     async def test_illegal_json_response(self, monkeypatch, httpx_request: HTTPXRequest):
         # for proper JSON it should be `"result":` instead of `result:`
