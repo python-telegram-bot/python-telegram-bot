@@ -129,6 +129,7 @@ class TestApplication:
             context_types=ContextTypes(),
             updater=updater,
             concurrent_updates=False,
+            post_init=None,
         )
         assert len(recwarn) == 1
         assert (
@@ -147,6 +148,10 @@ class TestApplication:
         persistence = PicklePersistence("file_path")
         context_types = ContextTypes()
         updater = Updater(bot=bot, update_queue=update_queue)
+
+        async def post_init(application: Application) -> None:
+            pass
+
         app = Application(
             bot=bot,
             update_queue=update_queue,
@@ -155,6 +160,7 @@ class TestApplication:
             context_types=context_types,
             updater=updater,
             concurrent_updates=concurrent_updates,
+            post_init=post_init,
         )
         assert app.bot is bot
         assert app.update_queue is update_queue
@@ -165,6 +171,7 @@ class TestApplication:
         assert app.update_queue is updater.update_queue
         assert app.bot is updater.bot
         assert app.concurrent_updates == expected
+        assert app.post_init is post_init
 
         # These should be done by the builder
         assert app.persistence.bot is None
@@ -184,6 +191,7 @@ class TestApplication:
                 context_types=context_types,
                 updater=updater,
                 concurrent_updates=-1,
+                post_init=None,
             )
 
     def test_custom_context_init(self, bot):
