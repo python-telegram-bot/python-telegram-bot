@@ -1553,10 +1553,10 @@ class TestApplication:
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
 
-    # @pytest.mark.skipif(
-    #     platform.system() == "Windows",
-    #     reason="Can't send signals without stopping whole process on windows",
-    # )
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Can't send signals without stopping whole process on windows",
+    )
     def test_run_webhook_post_init(self, bot, monkeypatch):
         events = []
 
