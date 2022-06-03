@@ -1387,6 +1387,48 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
+    def test_run_polling_post_init(self, bot, monkeypatch):
+        events = []
+
+        async def get_updates(*args, **kwargs):
+            # This makes sure that other coroutines have a chance of running as well
+            await asyncio.sleep(0)
+            return []
+
+        def thread_target():
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
+            os.kill(os.getpid(), signal.SIGINT)
+
+        async def post_init(app: Application) -> None:
+            events.append("post_init")
+
+        app = Application.builder().token(bot.token).post_init(post_init).build()
+        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(
+            app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
+        )
+        monkeypatch.setattr(
+            app.updater,
+            "start_polling",
+            call_after(app.updater.start_polling, lambda _: events.append("start_polling")),
+        )
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        app.run_polling(drop_pending_updates=True, close_loop=False)
+        thread.join()
+        assert events == ["init", "post_init", "start_polling"], "Wrong order of events detected!"
+
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Can't send signals without stopping whole process on windows",
+    )
     def test_run_polling_parameters_passing(self, app, monkeypatch):
         # First check that the default values match and that we have all arguments there
         updater_signature = inspect.signature(app.updater.start_polling)
@@ -1510,6 +1552,65 @@ class TestApplication:
         assert len(assertions) == 7
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
+
+    # @pytest.mark.skipif(
+    #     platform.system() == "Windows",
+    #     reason="Can't send signals without stopping whole process on windows",
+    # )
+    def test_run_webhook_post_init(self, bot, monkeypatch):
+        events = []
+
+        async def delete_webhook(*args, **kwargs):
+            return True
+
+        async def set_webhook(*args, **kwargs):
+            return True
+
+        async def get_updates(*args, **kwargs):
+            # This makes sure that other coroutines have a chance of running as well
+            await asyncio.sleep(0)
+            return []
+
+        def thread_target():
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
+            os.kill(os.getpid(), signal.SIGINT)
+
+        async def post_init(app: Application) -> None:
+            events.append("post_init")
+
+        app = Application.builder().token(bot.token).post_init(post_init).build()
+        monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+        monkeypatch.setattr(
+            app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
+        )
+        monkeypatch.setattr(
+            app.updater,
+            "start_webhook",
+            call_after(app.updater.start_webhook, lambda _: events.append("start_webhook")),
+        )
+
+        thread = Thread(target=thread_target)
+        thread.start()
+
+        ip = "127.0.0.1"
+        port = randrange(1024, 49152)
+
+        app.run_webhook(
+            ip_address=ip,
+            port=port,
+            url_path="TOKEN",
+            drop_pending_updates=True,
+            close_loop=False,
+        )
+        thread.join()
+        assert events == ["init", "post_init", "start_webhook"], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
