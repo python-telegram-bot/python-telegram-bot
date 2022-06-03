@@ -1,6 +1,6 @@
 sphinx==4.5.0
 sphinx-pypi-upload
-furo==2022.04.07
+furo==2022.6.4
 # Can be replaced with a sphinx-paramlinks==... dependency once a version is released that
 # includes the commit mentioned below and maybe even
 # https://github.com/sqlalchemyorg/sphinx-paramlinks/pull/14
