@@ -1832,7 +1832,7 @@ class TestBot:
         # We assume that the other game score tests ran within 20 sec
         assert high_scores[0].score == BASE_GAME_SCORE - 10
 
-    # send_invoice is tested in test_invoice
+    # send_invoice and create_invoice_link is tested in test_invoice
 
     # TODO: Needs improvement. Need incoming shipping queries to test
     async def test_answer_shipping_query_ok(self, monkeypatch, bot):
