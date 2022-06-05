@@ -83,6 +83,10 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`, optional): :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        added_to_attachment_menu (:obj:`bool`, optional): :obj:`True`, if this user added the bot
+            to attachment menu.
+
+            .. versionadded:: 20.0
 
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -98,7 +102,10 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        added_to_attachment_menu (:obj:`bool`, optional): :obj:`True`, if this user added the bot
+            to attachment menu.
 
+            .. versionadded:: 20.0
     """
 
     __slots__ = (
@@ -111,6 +118,7 @@ class User(TelegramObject):
         "supports_inline_queries",
         "id",
         "language_code",
+        "added_to_attachment_menu",
     )
 
     def __init__(
@@ -125,6 +133,7 @@ class User(TelegramObject):
         can_read_all_group_messages: bool = None,
         supports_inline_queries: bool = None,
         bot: "Bot" = None,
+        added_to_attachment_menu: bool = None,
         **_kwargs: Any,
     ):
         # Required
@@ -138,6 +147,7 @@ class User(TelegramObject):
         self.can_join_groups = can_join_groups
         self.can_read_all_group_messages = can_read_all_group_messages
         self.supports_inline_queries = supports_inline_queries
+        self.added_to_attachment_menu = added_to_attachment_menu
         self.set_bot(bot)
 
         self._id_attrs = (self.id,)
