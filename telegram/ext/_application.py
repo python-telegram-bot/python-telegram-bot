@@ -180,8 +180,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         context_types (:class:`telegram.ext.ContextTypes`): Specifies the types used by this
             dispatcher for the ``context`` argument of handler and job callbacks.
         post_init (:term:`coroutine function`): Optional. A callback that will be executed by
-            :meth:`Application.run_polling` and :meth:`Application.run_webhook` initializing the
-            application.
+            :meth:`Application.run_polling` and :meth:`Application.run_webhook` after initializing
+            the application via :meth:`initialize`.
 
     """
 
