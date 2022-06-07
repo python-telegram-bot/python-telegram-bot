@@ -918,7 +918,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                 async def post_init(application: Application) -> None:
                     await application.bot.set_my_commands([('start', 'Starts the bot')])
 
-                application = Application.builder().token("TOKEN").post_init(callback).build()
+                application = Application.builder().token("TOKEN").post_init(post_init).build()
 
         Args:
             post_init (:term:`coroutine function`): The custom callback. Must be a
