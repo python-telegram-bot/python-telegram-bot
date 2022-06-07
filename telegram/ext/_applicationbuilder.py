@@ -912,6 +912,14 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             This can be used for custom startup logic that requires to await coroutines, e.g.
             setting up the bots commands via :meth:`~telegram.Bot.set_my_commands`.
 
+        Example:
+            .. code::
+
+                async def post_init(application: Application) -> None:
+                    await application.bot.set_my_commands([('start', 'Starts the bot')])
+
+                application = Application.builder().token("TOKEN").post_init(callback).build()
+
         Args:
             post_init (:term:`coroutine function`): The custom callback. Must be a
                 :term:`coroutine function` and must accept exactly one positional argument, which
