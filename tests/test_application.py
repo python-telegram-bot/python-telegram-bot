@@ -129,6 +129,7 @@ class TestApplication:
             context_types=ContextTypes(),
             updater=updater,
             concurrent_updates=False,
+            post_init=None,
         )
         assert len(recwarn) == 1
         assert (
@@ -147,6 +148,10 @@ class TestApplication:
         persistence = PicklePersistence("file_path")
         context_types = ContextTypes()
         updater = Updater(bot=bot, update_queue=update_queue)
+
+        async def post_init(application: Application) -> None:
+            pass
+
         app = Application(
             bot=bot,
             update_queue=update_queue,
@@ -155,6 +160,7 @@ class TestApplication:
             context_types=context_types,
             updater=updater,
             concurrent_updates=concurrent_updates,
+            post_init=post_init,
         )
         assert app.bot is bot
         assert app.update_queue is update_queue
@@ -165,6 +171,7 @@ class TestApplication:
         assert app.update_queue is updater.update_queue
         assert app.bot is updater.bot
         assert app.concurrent_updates == expected
+        assert app.post_init is post_init
 
         # These should be done by the builder
         assert app.persistence.bot is None
@@ -184,6 +191,7 @@ class TestApplication:
                 context_types=context_types,
                 updater=updater,
                 concurrent_updates=-1,
+                post_init=None,
             )
 
     def test_custom_context_init(self, bot):
@@ -1387,6 +1395,48 @@ class TestApplication:
         platform.system() == "Windows",
         reason="Can't send signals without stopping whole process on windows",
     )
+    def test_run_polling_post_init(self, bot, monkeypatch):
+        events = []
+
+        async def get_updates(*args, **kwargs):
+            # This makes sure that other coroutines have a chance of running as well
+            await asyncio.sleep(0)
+            return []
+
+        def thread_target():
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
+            os.kill(os.getpid(), signal.SIGINT)
+
+        async def post_init(app: Application) -> None:
+            events.append("post_init")
+
+        app = Application.builder().token(bot.token).post_init(post_init).build()
+        monkeypatch.setattr(app.bot, "get_updates", get_updates)
+        monkeypatch.setattr(
+            app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
+        )
+        monkeypatch.setattr(
+            app.updater,
+            "start_polling",
+            call_after(app.updater.start_polling, lambda _: events.append("start_polling")),
+        )
+
+        thread = Thread(target=thread_target)
+        thread.start()
+        app.run_polling(drop_pending_updates=True, close_loop=False)
+        thread.join()
+        assert events == ["init", "post_init", "start_polling"], "Wrong order of events detected!"
+
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Can't send signals without stopping whole process on windows",
+    )
     def test_run_polling_parameters_passing(self, app, monkeypatch):
         # First check that the default values match and that we have all arguments there
         updater_signature = inspect.signature(app.updater.start_polling)
@@ -1510,6 +1560,65 @@ class TestApplication:
         assert len(assertions) == 7
         for key, value in assertions.items():
             assert value, f"assertion '{key}' failed!"
+
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Can't send signals without stopping whole process on windows",
+    )
+    def test_run_webhook_post_init(self, bot, monkeypatch):
+        events = []
+
+        async def delete_webhook(*args, **kwargs):
+            return True
+
+        async def set_webhook(*args, **kwargs):
+            return True
+
+        async def get_updates(*args, **kwargs):
+            # This makes sure that other coroutines have a chance of running as well
+            await asyncio.sleep(0)
+            return []
+
+        def thread_target():
+            waited = 0
+            while not app.running:
+                time.sleep(0.05)
+                waited += 0.05
+                if waited > 5:
+                    pytest.fail("App apparently won't start")
+
+            os.kill(os.getpid(), signal.SIGINT)
+
+        async def post_init(app: Application) -> None:
+            events.append("post_init")
+
+        app = Application.builder().token(bot.token).post_init(post_init).build()
+        monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
+        monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
+        monkeypatch.setattr(
+            app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
+        )
+        monkeypatch.setattr(
+            app.updater,
+            "start_webhook",
+            call_after(app.updater.start_webhook, lambda _: events.append("start_webhook")),
+        )
+
+        thread = Thread(target=thread_target)
+        thread.start()
+
+        ip = "127.0.0.1"
+        port = randrange(1024, 49152)
+
+        app.run_webhook(
+            ip_address=ip,
+            port=port,
+            url_path="TOKEN",
+            drop_pending_updates=True,
+            close_loop=False,
+        )
+        thread.join()
+        assert events == ["init", "post_init", "start_webhook"], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
         platform.system() == "Windows",
