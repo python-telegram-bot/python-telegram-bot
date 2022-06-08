@@ -179,6 +179,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 :meth:`add_error_handler`
         context_types (:class:`telegram.ext.ContextTypes`): Specifies the types used by this
             dispatcher for the ``context`` argument of handler and job callbacks.
+        post_init (:term:`coroutine function`): Optional. A callback that will be executed by
+            :meth:`Application.run_polling` and :meth:`Application.run_webhook` after initializing
+            the application via :meth:`initialize`.
 
     """
 
@@ -209,6 +212,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         "handlers",
         "job_queue",
         "persistence",
+        "post_init",
         "update_queue",
         "updater",
         "user_data",
@@ -224,6 +228,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         concurrent_updates: Union[bool, int],
         persistence: Optional[BasePersistence],
         context_types: ContextTypes[CCT, UD, CD, BD],
+        post_init: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ],
     ):
         if not was_called_by(
             inspect.currentframe(), Path(__file__).parent.resolve() / "_applicationbuilder.py"
@@ -240,6 +247,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         self.updater = updater
         self.handlers: Dict[int, List[BaseHandler]] = {}
         self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
+        self.post_init = post_init
 
         if isinstance(concurrent_updates, int) and concurrent_updates < 0:
             raise ValueError("`concurrent_updates` must be a non-negative integer!")
@@ -309,6 +317,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         * The :attr:`bot`, by calling :meth:`telegram.Bot.initialize`.
         * The :attr:`updater`, by calling :meth:`telegram.ext.Updater.initialize`.
         * The :attr:`persistence`, by loading persistent conversations and data.
+
+        Does *not* call :attr:`post_init` - that is only done by :meth:`run_polling` and
+        :meth:`run_webhook`.
 
         .. seealso::
             :meth:`shutdown`
@@ -558,6 +569,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         On unix, the app will also shut down on receiving the signals specified by
         :paramref:`stop_signals`.
 
+        If :attr:`post_init` is set, it will be called between :meth:`initialize` and
+        :meth:`telegram.ext.Updater.start_polling`.
+
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
             :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`
@@ -663,6 +677,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         application. Else, the webhook will be started on
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as required.
 
+        If :attr:`post_init` is set, it will be called between :meth:`initialize` and
+        :meth:`telegram.ext.Updater.start_webhook`.
+
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
             :meth:`telegram.ext.Updater.start_webhook`, :meth:`run_polling`
@@ -762,6 +779,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         try:
             loop.run_until_complete(self.initialize())
+            if self.post_init:
+                loop.run_until_complete(self.post_init(self))
             loop.run_until_complete(updater_coroutine)  # one of updater.start_webhook/polling
             loop.run_until_complete(self.start())
             loop.run_forever()
