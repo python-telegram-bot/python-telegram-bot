@@ -122,7 +122,7 @@ Dependencies & Their Versions
 However, for some features using a 3rd party library is more sane than implementing the functionality again.
 The dependencies are:
 
-* `httpx ~= 0.22.0 <https://www.python-httpx.org>`_ for ``telegram.request.HTTPXRequest``, the default networking backend
+* `httpx ~= 0.23.0 <https://www.python-httpx.org>`_ for ``telegram.request.HTTPXRequest``, the default networking backend
 
 ``python-telegram-bot`` is most useful when used along with additional libraries.
 To minimize dependency conflicts, we try to be liberal in terms of version requirements on the dependencies.

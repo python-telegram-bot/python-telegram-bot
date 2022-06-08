@@ -1050,9 +1050,10 @@ class TestConversationHandler:
 
             await app.stop()
 
-    async def test_non_blocking_exception(self, app, bot, user1, caplog):
+    @pytest.mark.parametrize(argnames="test_type", argvalues=["none", "exception"])
+    async def test_non_blocking_exception_or_none(self, app, bot, user1, caplog, test_type):
         """Here we make sure that when a non-blocking handler raises an
-        exception, the state isn't changed.
+        exception or returns None, the state isn't changed.
         """
         error = Exception("task exception")
 
@@ -1060,6 +1061,8 @@ class TestConversationHandler:
             return 1
 
         async def raise_error(*a, **kw):
+            if test_type == "none":
+                return None
             raise error
 
         handler = ConversationHandler(
@@ -1092,12 +1095,57 @@ class TestConversationHandler:
             with caplog.at_level(logging.ERROR):
                 # This also makes sure that we're still in the same state
                 assert handler.check_update(Update(0, message=message))
+            if test_type == "exception":
+                assert len(caplog.records) == 1
+                assert (
+                    caplog.records[0].message
+                    == "Task function raised exception. Falling back to old state 1"
+                )
+                assert caplog.records[0].exc_info[1] is None
+            else:
+                assert len(caplog.records) == 0
+
+    async def test_non_blocking_entry_point_exception(self, app, bot, user1, caplog):
+        """Here we make sure that when a non-blocking entry point raises an
+        exception, the state isn't changed.
+        """
+        error = Exception("task exception")
+
+        async def raise_error(*a, **kw):
+            raise error
+
+        handler = ConversationHandler(
+            entry_points=[CommandHandler("start", raise_error, block=False)],
+            states={},
+            fallbacks=self.fallbacks,
+        )
+        app.add_handler(handler)
+
+        message = Message(
+            0,
+            None,
+            self.group,
+            from_user=user1,
+            text="/start",
+            entities=[
+                MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
+            ],
+            bot=bot,
+        )
+        # start the conversation
+        async with app:
+            await app.process_update(Update(update_id=0, message=message))
+            await asyncio.sleep(0.1)
+            caplog.clear()
+            with caplog.at_level(logging.ERROR):
+                # This also makes sure that we're still in the same state
+                assert handler.check_update(Update(0, message=message))
             assert len(caplog.records) == 1
             assert (
                 caplog.records[0].message
-                == "Task function raised exception. Falling back to old state 1"
+                == "Task function raised exception. Falling back to old state None"
             )
-            assert caplog.records[0].exc_info[1] is error
+            assert caplog.records[0].exc_info[1] is None
 
     async def test_conversation_timeout(self, app, bot, user1):
         handler = ConversationHandler(
