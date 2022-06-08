@@ -68,6 +68,11 @@ class BaseRequest(
         finally:
             await request_object.shutdown()
 
+    Tip:
+        JSON encoding and decoding is done with the standard library's :mod:`json` by default.
+        To use a custom library for this, you can override :meth:`parse_json_payload` and implement
+        custom logic to encode the keys of :attr:`telegram.request.RequestData.parameters`.
+
     .. versionadded:: 20.0
     """
 
@@ -163,7 +168,7 @@ class BaseRequest(
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
         )
-        json_data = self._parse_json_response(result)
+        json_data = self.parse_json_payload(result)
         # For successful requests, the results are in the 'result' entry
         # see https://core.telegram.org/bots/api#making-requests
         return json_data["result"]
@@ -285,7 +290,7 @@ class BaseRequest(
             # 200-299 range are HTTP success statuses
             return payload
 
-        response_data = self._parse_json_response(payload)
+        response_data = self.parse_json_payload(payload)
 
         description = response_data.get("description")
         if description:
@@ -325,16 +330,24 @@ class BaseRequest(
         raise NetworkError(f"{message} ({code})")
 
     @staticmethod
-    def _parse_json_response(json_payload: bytes) -> JSONDict:
-        """Try and parse the JSON returned from Telegram.
+    def parse_json_payload(payload: bytes) -> JSONDict:
+        """Parse the JSON returned from Telegram.
+
+        Tip:
+            By default, this method uses the standard library's :func:`json.loads` and
+            ``errors="replace"`` in :meth:`bytes.decode`.
+            You can override it to customize either of these behaviors.
+
+        Args:
+            payload (:obj:`bytes`): The UTF-8 encoded JSON payload as returned by Telegram.
 
         Returns:
             dict: A JSON parsed as Python dict with results.
 
         Raises:
-            TelegramError: If the data could not be json_loaded
+            TelegramError: If loading the JSON data failed
         """
-        decoded_s = json_payload.decode("utf-8", "replace")
+        decoded_s = payload.decode("utf-8", "replace")
         try:
             return json.loads(decoded_s)
         except ValueError as exc:

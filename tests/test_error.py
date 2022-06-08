@@ -94,7 +94,7 @@ class TestErrors:
             assert e.new_chat_id == 1234
 
     def test_retry_after(self):
-        with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 12.0 seconds"):
+        with pytest.raises(RetryAfter, match="Flood control exceeded. Retry in 12 seconds"):
             raise RetryAfter(12)
 
     def test_conflict(self):
@@ -186,8 +186,8 @@ class TestErrors:
         assert str(e) == "This is a message"
 
         e = RetryAfter(42)
-        assert repr(e) == "RetryAfter('Flood control exceeded. Retry in 42.0 seconds')"
-        assert str(e) == "Flood control exceeded. Retry in 42.0 seconds"
+        assert repr(e) == "RetryAfter('Flood control exceeded. Retry in 42 seconds')"
+        assert str(e) == "Flood control exceeded. Retry in 42 seconds"
 
         e = BadRequest("This is a message")
         assert repr(e) == "BadRequest('This is a message')"

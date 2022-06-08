@@ -123,8 +123,8 @@ class InlineQueryResultPhoto(InlineQueryResult):
         self.thumb_url = thumb_url
 
         # Optionals
-        self.photo_width = int(photo_width) if photo_width is not None else None
-        self.photo_height = int(photo_height) if photo_height is not None else None
+        self.photo_width = photo_width
+        self.photo_height = photo_height
         self.title = title
         self.description = description
         self.caption = caption

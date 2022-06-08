@@ -71,7 +71,7 @@ class VideoChatEnded(TelegramObject):
     __slots__ = ("duration",)
 
     def __init__(self, duration: int, **_kwargs: object) -> None:
-        self.duration = int(duration) if duration is not None else None
+        self.duration = duration
         self._id_attrs = (self.duration,)
 
 

@@ -56,12 +56,12 @@ class TestInputInvoiceMessageContent:
     currency = "PTBCoin"
     prices = [LabeledPrice("label1", 42), LabeledPrice("label2", 314)]
     max_tip_amount = 420
-    suggested_tip_amounts = ["314", "256"]
+    suggested_tip_amounts = [314, 256]
     provider_data = "provider data"
     photo_url = "photo_url"
-    photo_size = "314"
-    photo_width = "420"
-    photo_height = "256"
+    photo_size = 314
+    photo_width = 420
+    photo_height = 256
     need_name = True
     need_phone_number = True
     need_email = True

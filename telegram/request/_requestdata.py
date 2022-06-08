@@ -64,6 +64,11 @@ class RequestData:
     def json_parameters(self) -> Dict[str, str]:
         """Gives the parameters as mapping of parameter name to the respective JSON encoded
         value.
+
+        Tip:
+            By default, this property uses the standard library's :func:`json.dumps`.
+            To use a custom library for JSON encoding, you can directly encode the keys of
+            :attr:`parameters` - note that string valued keys should not be JSON encoded.
         """
         return {
             param.name: param.json_value
@@ -96,7 +101,13 @@ class RequestData:
 
     @property
     def json_payload(self) -> bytes:
-        """The parameters as UTF-8 encoded JSON payload."""
+        """The :attr:`parameters` as UTF-8 encoded JSON payload.
+
+        Tip:
+            By default, this property uses the standard library's :func:`json.dumps`.
+            To use a custom library for JSON encoding, you can directly encode the keys of
+            :attr:`parameters` - note that string valued keys should not be JSON encoded.
+        """
         return json.dumps(self.json_parameters).encode("utf-8")
 
     @property

@@ -179,15 +179,13 @@ class InputInvoiceMessageContent(InputMessageContent):
         self.currency = currency
         self.prices = prices
         # Optionals
-        self.max_tip_amount = int(max_tip_amount) if max_tip_amount else None
-        self.suggested_tip_amounts = (
-            [int(sta) for sta in suggested_tip_amounts] if suggested_tip_amounts else None
-        )
+        self.max_tip_amount = max_tip_amount
+        self.suggested_tip_amounts = suggested_tip_amounts
         self.provider_data = provider_data
         self.photo_url = photo_url
-        self.photo_size = int(photo_size) if photo_size else None
-        self.photo_width = int(photo_width) if photo_width else None
-        self.photo_height = int(photo_height) if photo_height else None
+        self.photo_size = photo_size
+        self.photo_width = photo_width
+        self.photo_height = photo_height
         self.need_name = need_name
         self.need_phone_number = need_phone_number
         self.need_email = need_email

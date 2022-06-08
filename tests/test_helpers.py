@@ -32,8 +32,8 @@ class TestHelpers:
         assert expected_str == helpers.escape_markdown(test_str)
 
     def test_escape_markdown_v2(self):
-        test_str = "a_b*c[d]e (fg) h~I`>JK#L+MN -O=|p{qr}s.t! u"
-        expected_str = r"a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\! u"
+        test_str = r"a_b*c[d]e (fg) h~I`>JK#L+MN -O=|p{qr}s.t!\ \u"
+        expected_str = r"a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\!\\ \\u"
 
         assert expected_str == helpers.escape_markdown(test_str, version=2)
 

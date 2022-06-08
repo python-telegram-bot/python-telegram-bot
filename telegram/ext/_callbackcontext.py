@@ -18,18 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=no-self-use
 """This module contains the CallbackContext class."""
-from typing import (
-    TYPE_CHECKING,
-    Coroutine,
-    Dict,
-    Generic,
-    List,
-    Match,
-    NoReturn,
-    Optional,
-    Tuple,
-    Type,
-)
+from typing import TYPE_CHECKING, Coroutine, Dict, Generic, List, Match, NoReturn, Optional, Type
 
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
@@ -83,6 +72,14 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this
             context.
+        chat_id (:obj:`int`, optional): The ID of the chat associated with this object. Used
+            to provide :attr:`chat_data`.
+
+            .. versionadded:: 20.0
+        user_id (:obj:`int`, optional): The ID of the user associated with this object. Used
+            to provide :attr:`user_data`.
+
+            .. versionadded:: 20.0
 
     Attributes:
         coroutine (:term:`coroutine function`): Optional. Only present in error handlers if the
@@ -109,8 +106,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     __slots__ = (
         "_application",
-        "_chat_id_and_data",
-        "_user_id_and_data",
+        "_chat_id",
+        "_user_id",
         "args",
         "matches",
         "error",
@@ -119,10 +116,15 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         "__dict__",
     )
 
-    def __init__(self: "CCT", application: "Application[BT, CCT, UD, CD, BD, Any]"):
+    def __init__(
+        self: "CCT",
+        application: "Application[BT, CCT, UD, CD, BD, Any]",
+        chat_id: int = None,
+        user_id: int = None,
+    ):
         self._application = application
-        self._chat_id_and_data: Optional[Tuple[int, CD]] = None
-        self._user_id_and_data: Optional[Tuple[int, UD]] = None
+        self._chat_id = chat_id
+        self._user_id = user_id
         self.args: Optional[List[str]] = None
         self.matches: Optional[List[Match]] = None
         self.error: Optional[Exception] = None
@@ -159,8 +161,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
             Storing-bot,-user-and-chat-related-data#chat-migration>`_.
         """
-        if self._chat_id_and_data:
-            return self._chat_id_and_data[1]
+        if self._chat_id is not None:
+            return self._application.chat_data[self._chat_id]
         return None
 
     @chat_data.setter
@@ -175,8 +177,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         For each update from the same user it will be the same :obj:`ContextTypes.user_data`.
         Defaults to :obj:`dict`.
         """
-        if self._user_id_and_data:
-            return self._user_id_and_data[1]
+        if self._user_id is not None:
+            return self._application.user_data[self._user_id]
         return None
 
     @user_data.setter
@@ -200,16 +202,14 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         if self.application.persistence:
             if self.application.persistence.store_data.bot_data:
                 await self.application.persistence.refresh_bot_data(self.bot_data)
-            if (
-                self.application.persistence.store_data.chat_data
-                and self._chat_id_and_data is not None
-            ):
-                await self.application.persistence.refresh_chat_data(*self._chat_id_and_data)
-            if (
-                self.application.persistence.store_data.user_data
-                and self._user_id_and_data is not None
-            ):
-                await self.application.persistence.refresh_user_data(*self._user_id_and_data)
+            if self.application.persistence.store_data.chat_data and self._chat_id is not None:
+                await self.application.persistence.refresh_chat_data(
+                    chat_id=self._chat_id, chat_data=self.chat_data
+                )
+            if self.application.persistence.store_data.user_data and self._user_id is not None:
+                await self.application.persistence.refresh_user_data(
+                    user_id=self._user_id, user_data=self.user_data
+                )
 
     def drop_callback_data(self, callback_query: CallbackQuery) -> None:
         """
@@ -265,6 +265,12 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             job (:class:`telegram.ext.Job`, optional): The job associated with the error.
 
                 .. versionadded:: 20.0
+            coroutine (:term:`coroutine function`, optional): The coroutine function associated
+                with this error if the error was caused by a coroutine run with
+                :meth:`Application.create_task` or a handler callback with
+                :attr:`block=False <BaseHandler.block>`.
+
+                .. versionadded:: 20.0
 
         Returns:
             :class:`telegram.ext.CallbackContext`
@@ -295,23 +301,15 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(application)  # type: ignore
-
-        if update is not None and isinstance(update, Update):
+        if isinstance(update, Update):
             chat = update.effective_chat
             user = update.effective_user
 
-            if chat:
-                self._chat_id_and_data = (
-                    chat.id,
-                    application.chat_data[chat.id],
-                )
-            if user:
-                self._user_id_and_data = (
-                    user.id,
-                    application.user_data[user.id],
-                )
-        return self
+            chat_id = chat.id if chat else None
+            user_id = user.id if user else None
+
+            return cls(application, chat_id=chat_id, user_id=user_id)  # type: ignore
+        return cls(application)  # type: ignore
 
     @classmethod
     def from_job(
@@ -333,19 +331,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls(application)  # type: ignore
+        self = cls(application, chat_id=job.chat_id, user_id=job.user_id)  # type: ignore
         self.job = job
-
-        if job.chat_id:
-            self._chat_id_and_data = (
-                job.chat_id,
-                application.chat_data[job.chat_id],
-            )
-        if job.user_id:
-            self._user_id_and_data = (
-                job.user_id,
-                application.user_data[job.user_id],
-            )
         return self
 
     def update(self, data: Dict[str, object]) -> None:

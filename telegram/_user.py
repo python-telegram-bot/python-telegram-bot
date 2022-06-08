@@ -128,7 +128,7 @@ class User(TelegramObject):
         **_kwargs: Any,
     ):
         # Required
-        self.id = int(id)  # pylint: disable=invalid-name
+        self.id = id  # pylint: disable=invalid-name
         self.first_name = first_name
         self.is_bot = is_bot
         # Optionals

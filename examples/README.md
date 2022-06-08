@@ -61,6 +61,9 @@ Uses the [`iro.js`](https://iro.js.org) JavaScript library to showcase a user in
 ### [`contexttypesbot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/contexttypesbot.py)
 This example showcases how `telegram.ext.ContextTypes` can be used to customize the `context` argument of handler and job callbacks.
 
+### [`customwebhookbot.py`](customwebhookbot.py)
+This example showcases how a custom webhook setup can be used in combination with `telegram.ext.Application`.
+
 ### [`arbitrarycallbackdatabot.py`](https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/arbitrarycallbackdatabot.py)
 This example showcases how PTBs "arbitrary callback data" feature can be used.
 

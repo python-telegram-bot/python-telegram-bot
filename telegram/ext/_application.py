@@ -21,6 +21,7 @@ import asyncio
 import inspect
 import itertools
 import logging
+import platform
 import signal
 from collections import defaultdict
 from contextlib import AbstractAsyncContextManager
@@ -178,6 +179,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 :meth:`add_error_handler`
         context_types (:class:`telegram.ext.ContextTypes`): Specifies the types used by this
             dispatcher for the ``context`` argument of handler and job callbacks.
+        post_init (:term:`coroutine function`): Optional. A callback that will be executed by
+            :meth:`Application.run_polling` and :meth:`Application.run_webhook` after initializing
+            the application via :meth:`initialize`.
 
     """
 
@@ -208,6 +212,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         "handlers",
         "job_queue",
         "persistence",
+        "post_init",
         "update_queue",
         "updater",
         "user_data",
@@ -223,6 +228,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         concurrent_updates: Union[bool, int],
         persistence: Optional[BasePersistence],
         context_types: ContextTypes[CCT, UD, CD, BD],
+        post_init: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ],
     ):
         if not was_called_by(
             inspect.currentframe(), Path(__file__).parent.resolve() / "_applicationbuilder.py"
@@ -239,6 +247,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         self.updater = updater
         self.handlers: Dict[int, List[BaseHandler]] = {}
         self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
+        self.post_init = post_init
 
         if isinstance(concurrent_updates, int) and concurrent_updates < 0:
             raise ValueError("`concurrent_updates` must be a non-negative integer!")
@@ -308,6 +317,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         * The :attr:`bot`, by calling :meth:`telegram.Bot.initialize`.
         * The :attr:`updater`, by calling :meth:`telegram.ext.Updater.initialize`.
         * The :attr:`persistence`, by loading persistent conversations and data.
+
+        Does *not* call :attr:`post_init` - that is only done by :meth:`run_polling` and
+        :meth:`run_webhook`.
 
         .. seealso::
             :meth:`shutdown`
@@ -547,7 +559,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         allowed_updates: List[str] = None,
         drop_pending_updates: bool = None,
         close_loop: bool = True,
-        stop_signals: Optional[Sequence[int]] = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT),
+        stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_polling` and
@@ -556,6 +568,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         The app will shut down when :exc:`KeyboardInterrupt` or :exc:`SystemExit` is raised.
         On unix, the app will also shut down on receiving the signals specified by
         :paramref:`stop_signals`.
+
+        If :attr:`post_init` is set, it will be called between :meth:`initialize` and
+        :meth:`telegram.ext.Updater.start_polling`.
 
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
@@ -596,7 +611,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             stop_signals (Sequence[:obj:`int`] | :obj:`None`, optional): Signals that will shut
                 down the app. Pass :obj:`None` to not use stop signals.
                 Defaults to :data:`signal.SIGINT`, :data:`signal.SIGTERM` and
-                :data:`signal.SIGABRT`.
+                :data:`signal.SIGABRT` on non Windows platforms.
 
                 Caution:
                     Not every :class:`asyncio.AbstractEventLoop` implements
@@ -646,7 +661,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         ip_address: str = None,
         max_connections: int = 40,
         close_loop: bool = True,
-        stop_signals: Optional[Sequence[int]] = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT),
+        stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -661,6 +676,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         ``http://listen:port/url_path``, so SSL can be handled by another
         application. Else, the webhook will be started on
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as required.
+
+        If :attr:`post_init` is set, it will be called between :meth:`initialize` and
+        :meth:`telegram.ext.Updater.start_webhook`.
 
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
@@ -736,7 +754,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def __run(
         self,
         updater_coroutine: Coroutine,
-        stop_signals: Optional[Sequence[int]],
+        stop_signals: ODVInput[Sequence[int]],
         close_loop: bool = True,
     ) -> None:
         # Calling get_event_loop() should still be okay even in py3.10+ as long as there is a
@@ -744,9 +762,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         # See the docs of get_event_loop() and get_running_loop() for more info
         loop = asyncio.get_event_loop()
 
+        if stop_signals is DEFAULT_NONE and platform.system() != "Windows":
+            stop_signals = (signal.SIGINT, signal.SIGTERM, signal.SIGABRT)
+
         try:
-            for sig in stop_signals or []:
-                loop.add_signal_handler(sig, self._raise_system_exit)
+            if not isinstance(stop_signals, DefaultValue):
+                for sig in stop_signals or []:
+                    loop.add_signal_handler(sig, self._raise_system_exit)
         except NotImplementedError as exc:
             warn(
                 f"Could not add signal handlers for the stop signals {stop_signals} due to "
@@ -757,6 +779,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         try:
             loop.run_until_complete(self.initialize())
+            if self.post_init:
+                loop.run_until_complete(self.post_init(self))
             loop.run_until_complete(updater_coroutine)  # one of updater.start_webhook/polling
             loop.run_until_complete(self.start())
             loop.run_forever()

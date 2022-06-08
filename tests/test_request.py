@@ -129,6 +129,9 @@ class TestRequest:
         monkeypatch.setattr(httpx_request, "do_request", mocker_factory(response=server_response))
 
         assert await httpx_request.post(None, None, None) == "test_string�"
+        # Explicitly call `parse_json_payload` here is well so that this public method is covered
+        # not only implicitly.
+        assert httpx_request.parse_json_payload(server_response) == {"result": "test_string�"}
 
     async def test_illegal_json_response(self, monkeypatch, httpx_request: HTTPXRequest):
         # for proper JSON it should be `"result":` instead of `result:`
@@ -140,7 +143,7 @@ class TestRequest:
             await httpx_request.post(None, None, None)
 
     async def test_chat_migrated(self, monkeypatch, httpx_request: HTTPXRequest):
-        server_response = b'{"ok": "False", "parameters": {"migrate_to_chat_id": "123"}}'
+        server_response = b'{"ok": "False", "parameters": {"migrate_to_chat_id": 123}}'
 
         monkeypatch.setattr(
             httpx_request,
@@ -154,7 +157,7 @@ class TestRequest:
         assert exc_info.value.new_chat_id == 123
 
     async def test_retry_after(self, monkeypatch, httpx_request: HTTPXRequest):
-        server_response = b'{"ok": "False", "parameters": {"retry_after": "42"}}'
+        server_response = b'{"ok": "False", "parameters": {"retry_after": 42}}'
 
         monkeypatch.setattr(
             httpx_request,
@@ -162,10 +165,10 @@ class TestRequest:
             mocker_factory(response=server_response, return_code=HTTPStatus.BAD_REQUEST),
         )
 
-        with pytest.raises(RetryAfter, match="Retry in 42.0") as exc_info:
+        with pytest.raises(RetryAfter, match="Retry in 42") as exc_info:
             await httpx_request.post(None, None, None)
 
-        assert exc_info.value.retry_after == 42.0
+        assert exc_info.value.retry_after == 42
 
     async def test_unknown_request_params(self, monkeypatch, httpx_request: HTTPXRequest):
         server_response = b'{"ok": "False", "parameters": {"unknown": "42"}}'

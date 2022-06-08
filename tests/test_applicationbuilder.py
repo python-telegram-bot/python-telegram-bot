@@ -106,6 +106,7 @@ class TestApplicationBuilder:
         assert app.job_queue.application is app
 
         assert app.persistence is None
+        assert app.post_init is None
 
     @pytest.mark.parametrize(
         "method, description", _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
@@ -317,6 +318,10 @@ class TestApplicationBuilder:
         update_queue = asyncio.Queue()
         context_types = ContextTypes()
         concurrent_updates = 123
+
+        async def post_init(app: Application) -> None:
+            pass
+
         app = (
             builder.token(bot.token)
             .job_queue(job_queue)
@@ -324,6 +329,7 @@ class TestApplicationBuilder:
             .update_queue(update_queue)
             .context_types(context_types)
             .concurrent_updates(concurrent_updates)
+            .post_init(post_init)
         ).build()
         assert app.job_queue is job_queue
         assert app.job_queue.application is app
@@ -334,6 +340,7 @@ class TestApplicationBuilder:
         assert app.updater.bot is app.bot
         assert app.context_types is context_types
         assert app.concurrent_updates == concurrent_updates
+        assert app.post_init is post_init
 
         updater = Updater(bot=bot, update_queue=update_queue)
         app = ApplicationBuilder().updater(updater).build()

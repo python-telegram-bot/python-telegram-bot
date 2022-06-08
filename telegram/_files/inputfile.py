@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InputFile."""
 
-import imghdr
 import logging
 import mimetypes
 from pathlib import Path
@@ -35,7 +34,11 @@ class InputFile:
     """This object represents a Telegram InputFile.
 
     .. versionchanged:: 20.0
-        The former attribute ``attach`` was renamed to :attr:`attach_name`.
+
+        * The former attribute ``attach`` was renamed to :attr:`attach_name`.
+        * Method ``is_image`` was removed. If you pass :obj:`bytes` to :paramref:`obj` and would
+          like to have the mime type automatically guessed, please pass :paramref:`filename`
+          in addition.
 
     Args:
         obj (:term:`file object` | :obj:`bytes` | :obj:`str`): An open file descriptor or the files
@@ -82,38 +85,12 @@ class InputFile:
         ):
             filename = Path(obj.name).name  # type: ignore[union-attr]
 
-        image_mime_type = self.is_image(self.input_file_content)
-        if image_mime_type:
-            self.mimetype = image_mime_type
-        elif filename:
-            self.mimetype = mimetypes.guess_type(filename)[0] or _DEFAULT_MIME_TYPE
+        if filename:
+            self.mimetype = mimetypes.guess_type(filename, strict=False)[0] or _DEFAULT_MIME_TYPE
         else:
             self.mimetype = _DEFAULT_MIME_TYPE
 
         self.filename = filename or self.mimetype.replace("/", ".")
-
-    @staticmethod
-    def is_image(stream: bytes) -> Optional[str]:
-        """Check if the content file is an image by analyzing its headers.
-
-        Args:
-            stream (:obj:`bytes`): A byte stream representing the content of a file.
-
-        Returns:
-            :obj:`str` | :obj:`None`: The mime-type of an image, if the input is an image, or
-            :obj:`None` else.
-
-        """
-        try:
-            image = imghdr.what(None, stream)
-            if image:
-                return f"image/{image}"
-            return None
-        except Exception:
-            logger.debug(
-                "Could not parse file content. Assuming that file is not an image.", exc_info=True
-            )
-            return None
 
     @property
     def field_tuple(self) -> FieldTuple:
