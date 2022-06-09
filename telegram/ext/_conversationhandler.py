@@ -183,10 +183,8 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         attribute or else the latter will be ignored. You may map :attr:`END` to one of the parents
         states to continue the parent conversation after the child conversation has ended or even
         map a state to :attr:`END` to end the *parent* conversation from within the child
-        conversation. For an example on nested :class:`ConversationHandler` s, see our `examples`_.
-
-    .. _`examples`: https://github.com/python-telegram-bot/python-telegram-bot/tree/master\
-        /examples#examples
+        conversation. For an example on nested :class:`ConversationHandler` s, see
+        :any:`examples.conversationbot`.
 
     Args:
         entry_points (List[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`
