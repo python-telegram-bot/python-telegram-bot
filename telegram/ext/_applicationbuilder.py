@@ -644,8 +644,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the private key and corresponding password for decryption of telegram passport data
         for :attr:`telegram.ext.Application.bot`.
 
-        .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
-            /tree/master/examples#passportbotpy>`_, `Telegram Passports
+        .. seealso:: :any:`examples.passportbot`, `Telegram Passports
             <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Telegram-Passport>`_
 
         Args:
@@ -704,8 +703,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot\
             /python-telegram-bot/wiki/Arbitrary-callback_data>`_,
-            `arbitrarycallbackdatabot.py <https://github.com/python-telegram-bot\
-                /python-telegram-bot/tree/master/examples#arbitrarycallbackdatabotpy>`_
+            :any:`examples.arbitrarycallbackdatabot`
 
         Args:
             arbitrary_callback_data (:obj:`bool` | :obj:`int`): If :obj:`True` is passed, the
@@ -794,8 +792,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         instantiated.
 
         .. seealso:: `JobQueue <https://github.com/python-telegram-bot/python-telegram-bot/wiki\
-            /Extensions-%E2%80%93-JobQueue>`_, `timerbot.py <https://github.com\
-                /python-telegram-bot/python-telegram-bot/tree/master/examples#timerbotpy>`_
+            /Extensions-%E2%80%93-JobQueue>`_, :any:`examples.timerbot`
 
         Note:
             * :meth:`telegram.ext.JobQueue.set_application` will be called automatically by
@@ -832,8 +829,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: `Making your bot persistent <https://github.com/python-telegram-bot\
             /python-telegram-bot/wiki/Making-your-bot-persistent>`_,
-            `persistentconversationbot.py <https://github.com/python-telegram-bot\
-                /python-telegram-bot/tree/master/examples#persistentconversationbotpy>`_
+            :any:`examples.persistentconversationbot`
 
         Warning:
             If a :class:`telegram.ext.ContextTypes` instance is set via :meth:`context_types`,
@@ -855,8 +851,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets a :class:`telegram.ext.ContextTypes` instance for
         :attr:`telegram.ext.Application.context_types`.
 
-        .. seealso:: `contexttypesbot.py <https://github.com/python-telegram-bot\
-            /python-telegram-bot/tree/master/examples#contexttypesbotpy>`_
+        .. seealso:: :any:`examples.contexttypesbot`
 
         Args:
             context_types (:class:`telegram.ext.ContextTypes`): The context types.
