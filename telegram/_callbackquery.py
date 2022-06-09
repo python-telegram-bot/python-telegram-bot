@@ -65,7 +65,6 @@ class CallbackQuery(TelegramObject):
 
           .. versionadded:: 13.6
 
-
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
@@ -74,8 +73,8 @@ class CallbackQuery(TelegramObject):
         message (:class:`telegram.Message`, optional): Message with the callback button that
             originated the query. Note that message content and message date will not be available
             if the message is too old.
-        data (:obj:`str`, optional): Data associated with the callback button. Be aware that a bad
-            client can send arbitrary data in this field.
+        data (:obj:`str`, optional): Data associated with the callback button. Be aware that the
+            message, which originated the query, can contain no callback buttons with this data.
         inline_message_id (:obj:`str`, optional): Identifier of the message sent via the bot in
             inline mode, that originated the query.
         game_short_name (:obj:`str`, optional): Short name of a Game to be returned, serves as
@@ -90,6 +89,10 @@ class CallbackQuery(TelegramObject):
         message (:class:`telegram.Message`): Optional. Message with the callback button that
             originated the query.
         data (:obj:`str` | :obj:`object`): Optional. Data associated with the callback button.
+
+            Tip:
+                The value here is the same as the value passed in
+                :paramref:`telegram.InlineKeyboardButton.callback_data`.
         inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
                 inline mode, that originated the query.
         game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
@@ -199,12 +202,13 @@ class CallbackQuery(TelegramObject):
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
-            update.callback_query.message.edit_text(text, *args, **kwargs)
+            await update.callback_query.message.edit_text(*args, **kwargs)
 
         or::
 
-            bot.edit_message_text(text, inline_message_id=update.callback_query.inline_message_id,
-                                *args, **kwargs)
+            await bot.edit_message_text(
+                inline_message_id=update.callback_query.inline_message_id, *args, **kwargs,
+            )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_text` and :meth:`telegram.Message.edit_text`.
@@ -258,13 +262,13 @@ class CallbackQuery(TelegramObject):
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
-            update.callback_query.message.edit_caption(caption, *args, **kwargs)
+            await update.callback_query.message.edit_caption(*args, **kwargs)
 
         or::
 
-            bot.edit_message_caption(caption=caption
-                                    inline_message_id=update.callback_query.inline_message_id,
-                                   *args, **kwargs)
+            await bot.edit_message_caption(
+                inline_message_id=update.callback_query.inline_message_id, *args, **kwargs,
+            )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_caption` and :meth:`telegram.Message.edit_caption`.
@@ -313,19 +317,12 @@ class CallbackQuery(TelegramObject):
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
-            update.callback_query.message.edit_reply_markup(
-                reply_markup=reply_markup,
-                *args,
-                **kwargs
-            )
+            await update.callback_query.message.edit_reply_markup(*args, **kwargs)
 
         or::
 
-            bot.edit_message_reply_markup
-                inline_message_id=update.callback_query.inline_message_id,
-                reply_markup=reply_markup,
-                *args,
-                **kwargs
+            await bot.edit_message_reply_markup(
+                inline_message_id=update.callback_query.inline_message_id, *args, **kwargs
             )
 
         For the documentation of the arguments, please see
@@ -371,12 +368,13 @@ class CallbackQuery(TelegramObject):
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
-            update.callback_query.message.edit_media(*args, **kwargs)
+            await update.callback_query.message.edit_media(*args, **kwargs)
 
         or::
 
-            bot.edit_message_media(inline_message_id=update.callback_query.inline_message_id,
-                                   *args, **kwargs)
+            await bot.edit_message_media(
+                inline_message_id=update.callback_query.inline_message_id, *args, **kwargs
+            )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.edit_message_media` and :meth:`telegram.Message.edit_media`.
@@ -427,13 +425,12 @@ class CallbackQuery(TelegramObject):
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
-            update.callback_query.message.edit_live_location(*args, **kwargs)
+            await update.callback_query.message.edit_live_location(*args, **kwargs)
 
         or::
 
-            bot.edit_message_live_location(
-                inline_message_id=update.callback_query.inline_message_id,
-                *args, **kwargs
+            await bot.edit_message_live_location(
+                inline_message_id=update.callback_query.inline_message_id, *args, **kwargs
             )
 
         For the documentation of the arguments, please see
@@ -490,13 +487,12 @@ class CallbackQuery(TelegramObject):
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
-            update.callback_query.message.stop_live_location(*args, **kwargs)
+            await update.callback_query.message.stop_live_location(*args, **kwargs)
 
         or::
 
-            bot.stop_message_live_location(
-                inline_message_id=update.callback_query.inline_message_id,
-                *args, **kwargs
+            await bot.stop_message_live_location(
+                inline_message_id=update.callback_query.inline_message_id, *args, **kwargs
             )
 
         For the documentation of the arguments, please see
@@ -544,12 +540,13 @@ class CallbackQuery(TelegramObject):
     ) -> Union[Message, bool]:
         """Shortcut for either::
 
-           update.callback_query.message.set_game_score(*args, **kwargs)
+           await update.callback_query.message.set_game_score(*args, **kwargs)
 
         or::
 
-            bot.set_game_score(inline_message_id=update.callback_query.inline_message_id,
-                               *args, **kwargs)
+            await bot.set_game_score(
+                inline_message_id=update.callback_query.inline_message_id, *args, **kwargs
+            )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_game_score` and :meth:`telegram.Message.set_game_score`.
@@ -598,12 +595,13 @@ class CallbackQuery(TelegramObject):
     ) -> List["GameHighScore"]:
         """Shortcut for either::
 
-            update.callback_query.message.get_game_high_score(*args, **kwargs)
+            await update.callback_query.message.get_game_high_score(*args, **kwargs)
 
         or::
 
-            bot.get_game_high_scores(inline_message_id=update.callback_query.inline_message_id,
-                                     *args, **kwargs)
+            await bot.get_game_high_scores(
+                inline_message_id=update.callback_query.inline_message_id, *args, **kwargs
+            )
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_game_high_scores` and
@@ -645,10 +643,9 @@ class CallbackQuery(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            update.callback_query.message.delete(*args, **kwargs)
+            await update.callback_query.message.delete(*args, **kwargs)
 
-        For the documentation of the arguments, please see
-        :meth:`telegram.Message.delete`.
+        For the documentation of the arguments, please see :meth:`telegram.Message.delete`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -674,10 +671,9 @@ class CallbackQuery(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             update.callback_query.message.pin(*args, **kwargs)
+            await update.callback_query.message.pin(*args, **kwargs)
 
-        For the documentation of the arguments, please see
-        :meth:`telegram.Message.pin`.
+        For the documentation of the arguments, please see :meth:`telegram.Message.pin`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -703,10 +699,9 @@ class CallbackQuery(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             update.callback_query.message.unpin(*args, **kwargs)
+            await update.callback_query.message.unpin(*args, **kwargs)
 
-        For the documentation of the arguments, please see
-        :meth:`telegram.Message.unpin`.
+        For the documentation of the arguments, please see :meth:`telegram.Message.unpin`.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -740,16 +735,14 @@ class CallbackQuery(TelegramObject):
     ) -> "MessageId":
         """Shortcut for::
 
-            update.callback_query.message.copy(
-                chat_id,
+            await update.callback_query.message.copy(
                 from_chat_id=update.message.chat_id,
                 message_id=update.message.message_id,
                 *args,
                 **kwargs
             )
 
-        For the documentation of the arguments, please see
-        :meth:`telegram.Message.copy`.
+        For the documentation of the arguments, please see :meth:`telegram.Message.copy`.
 
         Returns:
             :class:`telegram.MessageId`: On success, returns the MessageId of the sent message.

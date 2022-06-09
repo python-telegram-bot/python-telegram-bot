@@ -72,11 +72,11 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             objects as :paramref:`~telegram.InlineKeyboardButton.callback_data`, non-strings will
             be accepted. To filter arbitrary objects you may pass:
 
-                * a callable, accepting exactly one argument, namely the
-                  :attr:`telegram.CallbackQuery.data`. It must return :obj:`True` or
-                  :obj:`False`/:obj:`None` to indicate, whether the update should be handled.
-                * a :obj:`type`. If :attr:`telegram.CallbackQuery.data` is an instance of that type
-                  (or a subclass), the update will be handled.
+            - a callable, accepting exactly one argument, namely the
+              :attr:`telegram.CallbackQuery.data`. It must return :obj:`True` or
+              :obj:`False`/:obj:`None` to indicate, whether the update should be handled.
+            - a :obj:`type`. If :attr:`telegram.CallbackQuery.data` is an instance of that type
+              (or a subclass), the update will be handled.
 
             If :attr:`telegram.CallbackQuery.data` is :obj:`None`, the
             :class:`telegram.CallbackQuery` update will not be handled.

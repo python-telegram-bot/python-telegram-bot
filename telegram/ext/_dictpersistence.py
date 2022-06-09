@@ -58,7 +58,7 @@ class DictPersistence(BasePersistence):
             bot_data on creating this persistence. Default is ``""``.
         conversations_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             conversation on creating this persistence. Default is ``""``.
-        callback_data_json (:obj:`str`, optional): Json string that will be used to reconstruct
+        callback_data_json (:obj:`str`, optional): JSON string that will be used to reconstruct
             callback_data on creating this persistence. Default is ``""``.
 
             .. versionadded:: 13.6

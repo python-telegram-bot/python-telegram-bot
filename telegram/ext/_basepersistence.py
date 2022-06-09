@@ -26,7 +26,8 @@ from telegram.ext._utils.types import BD, CD, UD, CDCData, ConversationDict, Con
 
 
 class PersistenceInput(NamedTuple):  # skipcq: PYL-E0239
-    """Convenience wrapper to group boolean input for :class:`BasePersistence`.
+    """Convenience wrapper to group boolean input for the :paramref:`~BasePersistence.store_data`
+    parameter for :class:`BasePersistence`.
 
     Args:
         bot_data (:obj:`bool`, optional): Whether the setting should be applied for ``bot_data``.
@@ -123,7 +124,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         update_interval (:obj:`int` | :obj:`float`, optional): The
             :class:`~telegram.ext.Application` will update
             the persistence in regular intervals. This parameter specifies the time (in seconds) to
-            wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
+            wait between two consecutive runs of updating the persistence. Defaults to ``60``
+            seconds.
 
             .. versionadded:: 20.0
 
@@ -186,9 +188,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :obj:`dict`. In the latter case, the dictionary should produce values
         corresponding to one of the following:
 
-          * :obj:`dict`
-          * The type from :attr:`telegram.ext.ContextTypes.user_data`
-            if :class:`telegram.ext.ContextTypes` is used.
+        - :obj:`dict`
+        - The type from :attr:`telegram.ext.ContextTypes.user_data`
+          if :class:`telegram.ext.ContextTypes` is used.
 
         .. versionchanged:: 20.0
             This method may now return a :obj:`dict` instead of a :obj:`collections.defaultdict`
@@ -205,9 +207,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :obj:`dict`. In the latter case, the dictionary should produce values
         corresponding to one of the following:
 
-          * :obj:`dict`
-          * The type from :attr:`telegram.ext.ContextTypes.chat_data`
-            if :class:`telegram.ext.ContextTypes` is used.
+        - :obj:`dict`
+        - The type from :attr:`telegram.ext.ContextTypes.chat_data`
+          if :class:`telegram.ext.ContextTypes` is used.
 
         .. versionchanged:: 20.0
             This method may now return a :obj:`dict` instead of a :obj:`collections.defaultdict`
@@ -224,9 +226,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         :obj:`dict`. In the latter case, the :obj:`dict` should produce values
         corresponding to one of the following:
 
-          * :obj:`dict`
-          * The type from :attr:`telegram.ext.ContextTypes.bot_data`
-            if :class:`telegram.ext.ContextTypes` are used.
+        - :obj:`dict`
+        - The type from :attr:`telegram.ext.ContextTypes.bot_data`
+          if :class:`telegram.ext.ContextTypes` are used.
 
         Returns:
             Dict[:obj:`int`, :obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`]:
@@ -244,9 +246,9 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Returns:
-            Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]]:
-                The restored metadata or :obj:`None`, if no data was stored.
+            Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :class:`object`]]],
+            Dict[:obj:`str`, :obj:`str`]] | :obj:`None`: The restored metadata or :obj:`None`,
+            if no data was stored.
         """
 
     @abstractmethod
@@ -320,8 +322,8 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
            Changed this method into an :external:func:`~abc.abstractmethod`.
 
         Args:
-            data (Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]]]):
+            data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
+                Dict[:obj:`str`, :obj:`Any`]]], Dict[:obj:`str`, :obj:`str`]] | :obj:`None`):
                 The relevant data to restore :class:`telegram.ext.CallbackDataCache`.
         """
 
