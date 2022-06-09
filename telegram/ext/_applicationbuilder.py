@@ -19,7 +19,18 @@
 """This module contains the Builder classes for the telegram.ext module."""
 from asyncio import Queue
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, Generic, Optional, Type, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Coroutine,
+    Dict,
+    Generic,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
@@ -102,36 +113,37 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     """
 
     __slots__ = (
-        "_token",
-        "_base_url",
-        "_base_file_url",
-        "_connection_pool_size",
-        "_proxy_url",
-        "_connect_timeout",
-        "_read_timeout",
-        "_write_timeout",
-        "_pool_timeout",
-        "_request",
-        "_get_updates_connection_pool_size",
-        "_get_updates_proxy_url",
-        "_get_updates_connect_timeout",
-        "_get_updates_read_timeout",
-        "_get_updates_write_timeout",
-        "_get_updates_pool_timeout",
-        "_get_updates_request",
-        "_private_key",
-        "_private_key_password",
-        "_defaults",
-        "_arbitrary_callback_data",
-        "_bot",
-        "_update_queue",
-        "_job_queue",
-        "_persistence",
-        "_context_types",
         "_application_class",
         "_application_kwargs",
+        "_arbitrary_callback_data",
+        "_base_file_url",
+        "_base_url",
+        "_bot",
         "_concurrent_updates",
+        "_connect_timeout",
+        "_connection_pool_size",
+        "_context_types",
+        "_defaults",
+        "_get_updates_connect_timeout",
+        "_get_updates_connection_pool_size",
+        "_get_updates_pool_timeout",
+        "_get_updates_proxy_url",
+        "_get_updates_read_timeout",
+        "_get_updates_request",
+        "_get_updates_write_timeout",
+        "_job_queue",
+        "_persistence",
+        "_pool_timeout",
+        "_post_init",
+        "_private_key",
+        "_private_key_password",
+        "_proxy_url",
+        "_read_timeout",
+        "_request",
+        "_token",
+        "_update_queue",
         "_updater",
+        "_write_timeout",
     )
 
     def __init__(self: "InitApplicationBuilder"):
@@ -165,6 +177,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._application_kwargs: Dict[str, object] = {}
         self._concurrent_updates: DVInput[Union[int, bool]] = DEFAULT_FALSE
         self._updater: ODVInput[Updater] = DEFAULT_NONE
+        self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
         prefix = "_get_updates_" if get_updates else "_"
@@ -257,6 +270,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             job_queue=job_queue,
             persistence=persistence,
             context_types=DefaultValue.get_value(self._context_types),
+            post_init=self._post_init,
             **self._application_kwargs,  # For custom Application subclasses
         )
 
@@ -630,8 +644,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the private key and corresponding password for decryption of telegram passport data
         for :attr:`telegram.ext.Application.bot`.
 
-        .. seealso:: `passportbot.py <https://github.com/python-telegram-bot/python-telegram-bot\
-            /tree/master/examples#passportbotpy>`_, `Telegram Passports
+        .. seealso:: :any:`examples.passportbot`, `Telegram Passports
             <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Telegram-Passport>`_
 
         Args:
@@ -690,8 +703,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot\
             /python-telegram-bot/wiki/Arbitrary-callback_data>`_,
-            `arbitrarycallbackdatabot.py <https://github.com/python-telegram-bot\
-                /python-telegram-bot/tree/master/examples#arbitrarycallbackdatabotpy>`_
+            :any:`examples.arbitrarycallbackdatabot`
 
         Args:
             arbitrary_callback_data (:obj:`bool` | :obj:`int`): If :obj:`True` is passed, the
@@ -736,7 +748,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         fetch updates from. Will also be used for the :attr:`telegram.ext.Application.updater`.
         If not called, a queue will be instantiated.
 
-         .. seealso:: :attr:`telegram.ext.Updater.update_queue`
+        .. seealso:: :attr:`telegram.ext.Updater.update_queue`
 
         Args:
             update_queue (:class:`asyncio.Queue`): The queue.
@@ -780,8 +792,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         instantiated.
 
         .. seealso:: `JobQueue <https://github.com/python-telegram-bot/python-telegram-bot/wiki\
-            /Extensions-%E2%80%93-JobQueue>`_, `timerbot.py <https://github.com\
-                /python-telegram-bot/python-telegram-bot/tree/master/examples#timerbotpy>`_
+            /Extensions-%E2%80%93-JobQueue>`_, :any:`examples.timerbot`
 
         Note:
             * :meth:`telegram.ext.JobQueue.set_application` will be called automatically by
@@ -818,8 +829,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
         .. seealso:: `Making your bot persistent <https://github.com/python-telegram-bot\
             /python-telegram-bot/wiki/Making-your-bot-persistent>`_,
-            `persistentconversationbot.py <https://github.com/python-telegram-bot\
-                /python-telegram-bot/tree/master/examples#persistentconversationbotpy>`_
+            :any:`examples.persistentconversationbot`
 
         Warning:
             If a :class:`telegram.ext.ContextTypes` instance is set via :meth:`context_types`,
@@ -841,8 +851,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets a :class:`telegram.ext.ContextTypes` instance for
         :attr:`telegram.ext.Application.context_types`.
 
-        .. seealso:: `contexttypesbot.py <https://github.com/python-telegram-bot\
-            /python-telegram-bot/tree/master/examples#contexttypesbotpy>`_
+        .. seealso:: :any:`examples.contexttypesbot`
 
         Args:
             context_types (:class:`telegram.ext.ContextTypes`): The context types.
@@ -883,6 +892,40 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
                 raise RuntimeError(_TWO_ARGS_REQ.format("updater", error))
 
         self._updater = updater
+        return self
+
+    def post_init(
+        self: BuilderType, post_init: Callable[[Application], Coroutine[Any, Any, None]]
+    ) -> BuilderType:
+        """
+        Sets a callback to be executed by :meth:`Application.run_polling` and
+        :meth:`Application.run_webhook` *after* executing :meth:`Application.initialize` but
+        *before* executing :meth:`Updater.start_polling` or :meth:`Updater.start_webhook`,
+        respectively.
+
+        Tip:
+            This can be used for custom startup logic that requires to await coroutines, e.g.
+            setting up the bots commands via :meth:`~telegram.Bot.set_my_commands`.
+
+        Example:
+            .. code::
+
+                async def post_init(application: Application) -> None:
+                    await application.bot.set_my_commands([('start', 'Starts the bot')])
+
+                application = Application.builder().token("TOKEN").post_init(post_init).build()
+
+        Args:
+            post_init (:term:`coroutine function`): The custom callback. Must be a
+                :term:`coroutine function` and must accept exactly one positional argument, which
+                is the :class:`~telegram.ext.Application`::
+
+                    async def post_init(application: Application) -> None:
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        self._post_init = post_init
         return self
 
 

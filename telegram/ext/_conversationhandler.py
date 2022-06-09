@@ -92,8 +92,9 @@ class PendingState:
 
     def resolve(self) -> object:
         """Returns the new state of the :class:`ConversationHandler` if available. If there was an
-        exception during the task execution, then return the old state. If the returned state was
-        :obj:`None`, then end the conversation.
+        exception during the task execution, then return the old state. If both the new and old
+        state are :obj:`None`, return `CH.END`. If only the new state is :obj:`None`, return the
+        old state.
 
         Raises:
             :exc:`RuntimeError`: If the current task has not yet finished.
@@ -106,13 +107,15 @@ class PendingState:
             _logger.exception(
                 "Task function raised exception. Falling back to old state %s",
                 self.old_state,
-                exc_info=exc,
             )
             return self.old_state
 
         res = self.task.result()
         if res is None and self.old_state is None:
             res = ConversationHandler.END
+        elif res is None:
+            # returning None from a callback means that we want to stay in the old state
+            return self.old_state
 
         return res
 
@@ -180,10 +183,8 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         attribute or else the latter will be ignored. You may map :attr:`END` to one of the parents
         states to continue the parent conversation after the child conversation has ended or even
         map a state to :attr:`END` to end the *parent* conversation from within the child
-        conversation. For an example on nested :class:`ConversationHandler` s, see our `examples`_.
-
-    .. _`examples`: https://github.com/python-telegram-bot/python-telegram-bot/tree/master\
-        /examples#examples
+        conversation. For an example on nested :class:`ConversationHandler` s, see
+        :any:`examples.conversationbot`.
 
     Args:
         entry_points (List[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`
@@ -708,8 +709,13 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             # check if future is finished or not
             if state.done():
                 res = state.resolve()
-                self._update_state(res, key)
-                state = self._conversations.get(key)
+                # Special case if an error was raised in a non-blocking entry-point
+                if state.old_state is None and state.task.exception():
+                    self._conversations.pop(key, None)
+                    state = None
+                else:
+                    self._update_state(res, key)
+                    state = self._conversations.get(key)
 
             # if not then handle WAITING state instead
             else:

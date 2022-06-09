@@ -14,7 +14,7 @@ tornado~=6.1
 
 # Cachetools and APS don't have a strict stability policy.
 # Let's be cautious for now.
-cachetools~=5.1.0
+cachetools~=5.2.0
 APScheduler~=3.9.1
 
 # pytz is required by APS and just needs the lower bound due to #2120

@@ -81,10 +81,10 @@ class Chat(TelegramObject):
         type (:obj:`str`): Type of chat, can be either :attr:`PRIVATE`, :attr:`GROUP`,
             :attr:`SUPERGROUP` or :attr:`CHANNEL`.
         title (:obj:`str`, optional): Title, for supergroups, channels and group chats.
-        username(:obj:`str`, optional): Username, for private chats, supergroups and channels if
+        username (:obj:`str`, optional): Username, for private chats, supergroups and channels if
             available.
-        first_name(:obj:`str`, optional): First name of the other party in a private chat.
-        last_name(:obj:`str`, optional): Last name of the other party in a private chat.
+        first_name (:obj:`str`, optional): First name of the other party in a private chat.
+        last_name (:obj:`str`, optional): Last name of the other party in a private chat.
         photo (:class:`telegram.ChatPhoto`, optional): Chat photo.
             Returned only in :meth:`telegram.Bot.get_chat`.
         bio (:obj:`str`, optional): Bio of the other party in a private chat. Returned only in

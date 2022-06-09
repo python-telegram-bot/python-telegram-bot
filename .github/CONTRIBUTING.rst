@@ -263,19 +263,19 @@ break the API classes. For example:
         self.last_name = last_name
 
 
-.. _`Code of Conduct`: https://www.python.org/psf/codeofconduct/
+.. _`Code of Conduct`: https://www.python.org/psf/conduct/
 .. _`issue tracker`: https://github.com/python-telegram-bot/python-telegram-bot/issues
 .. _`Telegram group`: https://telegram.me/pythontelegrambotgroup
-.. _`PEP 8 Style Guide`: https://www.python.org/dev/peps/pep-0008/
-.. _`sphinx`: http://sphinx-doc.org
-.. _`Google Python Style Guide`: http://google.github.io/styleguide/pyguide.html
+.. _`PEP 8 Style Guide`: https://peps.python.org/pep-0008/
+.. _`sphinx`: https://www.sphinx-doc.org/en/master
+.. _`Google Python Style Guide`: https://google.github.io/styleguide/pyguide.html
 .. _`Google Python Style Docstrings`: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
-.. _AUTHORS.rst: ../AUTHORS.rst
+.. _AUTHORS.rst: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/AUTHORS.rst
 .. _`MyPy`: https://mypy.readthedocs.io/en/stable/index.html
 .. _`here`: https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
 .. _`Black`: https://black.readthedocs.io/en/stable/index.html
-.. _`popular editors`: https://black.readthedocs.io/en/stable/editor_integration.html
-.. _`RTD`: https://python-telegram-bot.readthedocs.io/
-.. _`RTD build`: https://python-telegram-bot.readthedocs.io/en/doc-fixes
+.. _`popular editors`: https://black.readthedocs.io/en/stable/integrations/editors.html
+.. _`RTD`: https://docs.python-telegram-bot.org/
+.. _`RTD build`: https://docs.python-telegram-bot.org/en/doc-fixes
 .. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
 .. _`section`: #documenting

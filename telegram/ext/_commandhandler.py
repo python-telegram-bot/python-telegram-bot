@@ -46,7 +46,12 @@ class CommandHandler(BaseHandler[Update, CCT]):
     in the filter argument.
 
     Note:
-        * :class:`CommandHandler` does *not* handle (edited) channel posts.
+        :class:`CommandHandler` does *not* handle (edited) channel posts and does *not* handle
+        commands that are part of a caption. Please use :class:`~telegram.ext.MessageHandler`
+        with a suitable combination of filters (e.g.
+        :attr:`telegram.ext.filters.UpdateType.CHANNEL_POSTS`,
+        :attr:`telegram.ext.filters.CAPTION` and :class:`telegram.ext.filters.Regex`) to handle
+        those messages.
 
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom

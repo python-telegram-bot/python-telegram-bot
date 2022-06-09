@@ -15,8 +15,12 @@ formats:
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
-   version: 3
    install:
      - method: pip
        path: .
      - requirements: docs/requirements-docs.txt
+
+build:
+   os: ubuntu-20.04
+   tools:
+      python: "3"  # latest stable cpython version
