@@ -32,6 +32,8 @@ from typing import (
     Union,
 )
 
+from httpx._types import CertTypes, VerifyTypes
+
 from telegram._bot import Bot
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FilePathInput, ODVInput
@@ -144,6 +146,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_update_queue",
         "_updater",
         "_write_timeout",
+        "_cert",
+        "_verify",
     )
 
     def __init__(self: "InitApplicationBuilder"):
@@ -178,6 +182,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._concurrent_updates: DVInput[Union[int, bool]] = DEFAULT_FALSE
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
+        self._cert: Optional[CertTypes] = None
+        self._verify: VerifyTypes = True
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
         prefix = "_get_updates_" if get_updates else "_"
@@ -208,6 +214,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         return HTTPXRequest(
             connection_pool_size=connection_pool_size,
             proxy_url=proxy_url,
+            cert=self._cert,
+            verify=self._verify,
             **effective_timeouts,
         )
 
@@ -323,6 +331,38 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         if self._updater not in (DEFAULT_NONE, None):
             raise RuntimeError(_TWO_ARGS_REQ.format("token", "updater"))
         self._token = token
+        return self
+
+    def cert(self: BuilderType, cert: CertTypes) -> BuilderType:
+        """Sets the cert for :attr:`telegram.ext.Application.bot`.
+
+        Args:
+            cert (:obj:`CertTypes`): The Cert.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format("cert", "bot instance"))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format("cert", "updater"))
+        self._cert = cert
+        return self
+
+    def verify(self: BuilderType, verify: VerifyTypes) -> BuilderType:
+        """Sets the verify for :attr:`telegram.ext.Application.bot`.
+
+        Args:
+            verify (:obj:`VerifyTypes`): The verify.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format("cert", "bot instance"))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format("cert", "updater"))
+        self._verify = verify
         return self
 
     def base_url(self: BuilderType, base_url: str) -> BuilderType:

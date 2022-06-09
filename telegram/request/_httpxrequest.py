@@ -21,6 +21,7 @@ import logging
 from typing import Optional, Tuple
 
 import httpx
+from httpx._types import CertTypes, VerifyTypes
 
 from telegram._utils.defaultvalue import DefaultValue
 from telegram._utils.types import ODVInput
@@ -90,6 +91,8 @@ class HTTPXRequest(BaseRequest):
         self,
         connection_pool_size: int = 1,
         proxy_url: str = None,
+        verify: VerifyTypes = True,
+        cert: Optional[CertTypes] = None,
         read_timeout: Optional[float] = 5.0,
         write_timeout: Optional[float] = 5.0,
         connect_timeout: Optional[float] = 5.0,
@@ -105,10 +108,13 @@ class HTTPXRequest(BaseRequest):
             max_connections=connection_pool_size,
             max_keepalive_connections=connection_pool_size,
         )
+
         self._client_kwargs = dict(
             timeout=timeout,
             proxies=proxy_url,
             limits=limits,
+            cert=cert,
+            verify=verify
         )
 
         self._client = self._build_client()
