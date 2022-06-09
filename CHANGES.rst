@@ -72,9 +72,9 @@ New Features:
    by `DonalDuck004 <https://github.com/DonalDuck004>`__)
 -  Add Method ``drop_chat/user_data`` to ``Dispatcher`` and Persistence
    (`#2852 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2852>`__)
--  Add methods ``ChatPermissions.{all, no}_permissions`` ([#2948]
+-  Add methods ``ChatPermissions.{all, no}_permissions`` (`#2948 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2948>`__)
 -  Full Support for API 6.0
-   (`#2956 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2956>`__)(https://github.com/python-telegram-bot/python-telegram-bot/pull/2948))
+   (`#2956 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2956>`__)
 -  Add Python 3.10 to Test Suite
    (`#2968 <https://github.com/python-telegram-bot/python-telegram-bot/pull/2968>`__)
 
@@ -1520,7 +1520,7 @@ Changes
 - Lots of small improvements to our tests and documentation.
 
 
-.. _`see docs`: http://python-telegram-bot.readthedocs.io/en/stable/telegram.ext.dispatcher.html#telegram.ext.Dispatcher.add_handler
+.. _`see docs`: https://docs.python-telegram-bot.org/en/stable/telegram.ext.dispatcher.html#telegram.ext.Dispatcher.add_handler
 .. _`#777`: https://github.com/python-telegram-bot/python-telegram-bot/pull/777
 .. _`#806`: https://github.com/python-telegram-bot/python-telegram-bot/pull/806
 .. _`#766`: https://github.com/python-telegram-bot/python-telegram-bot/pull/766
@@ -1762,7 +1762,7 @@ Pre-version 7.0
 
 - Implement Bot API 2.0
 - Almost complete recode of ``Dispatcher``
-- Please read the `Transistion Guide to 4.0 <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transistion-guide-to-Version-4.0>`_
+- Please read the `Transistion Guide to 4.0 <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Transition-guide-to-Version-4.0>`_
 
 **2016-03-22**
 

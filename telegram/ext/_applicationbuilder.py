@@ -750,7 +750,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         fetch updates from. Will also be used for the :attr:`telegram.ext.Application.updater`.
         If not called, a queue will be instantiated.
 
-         .. seealso:: :attr:`telegram.ext.Updater.update_queue`
+        .. seealso:: :attr:`telegram.ext.Updater.update_queue`
 
         Args:
             update_queue (:class:`asyncio.Queue`): The queue.

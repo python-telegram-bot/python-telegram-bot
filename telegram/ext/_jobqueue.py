@@ -44,7 +44,7 @@ class JobQueue:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
 
             .. versionchanged:: 20.0
-                Use :class:`~apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
+                Uses :class:`~apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
                 :class:`~apscheduler.schedulers.background.BackgroundScheduler`
 
 
@@ -248,13 +248,13 @@ class JobQueue:
                   tomorrow. If the timezone (:attr:`datetime.time.tzinfo`) is :obj:`None`, the
                   default timezone of the bot will be used.
 
-                Defaults to ``interval``
+                Defaults to :paramref:`interval`
             last (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
                    :obj:`datetime.datetime` | :obj:`datetime.time`, optional):
                 Latest possible time for the job to run. This parameter will be interpreted
-                depending on its type. See ``first`` for details.
+                depending on its type. See :paramref:`first` for details.
 
-                If ``last`` is :obj:`datetime.datetime` or :obj:`datetime.time` type
+                If :paramref:`last` is :obj:`datetime.datetime` or :obj:`datetime.time` type
                 and ``last.tzinfo`` is :obj:`None`, the default timezone of the bot will be
                 assumed.
 
@@ -329,8 +329,8 @@ class JobQueue:
         """Creates a new :class:`Job` that runs on a monthly basis and adds it to the queue.
 
         .. versionchanged:: 20.0
-            The ``day_is_strict`` argument was removed. Instead one can now pass -1 to the ``day``
-            parameter to have the job run on the last day of the month.
+            The ``day_is_strict`` argument was removed. Instead one can now pass ``-1`` to the
+            :paramref:`day` parameter to have the job run on the last day of the month.
 
         Args:
             callback (:term:`coroutine function`): The callback function that should be executed by
@@ -341,9 +341,9 @@ class JobQueue:
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
-                be within the range of 1 and 31, inclusive. If a month has fewer days than this
-                number, the job will not run in this month. Passing -1 leads to the job running on
-                the last day of the month.
+                be within the range of ``1`` and ``31``, inclusive. If a month has fewer days than
+                this number, the job will not run in this month. Passing ``-1`` leads to the job
+                running on the last day of the month.
             data (:obj:`object`, optional): Additional data needed for the callback function.
                 Can be accessed through :attr:`Job.data` in the callback. Defaults to
                 :obj:`None`.
@@ -535,7 +535,7 @@ class JobQueue:
 
     async def start(self) -> None:
         # this method async just in case future versions need that
-        """Starts the job_queue."""
+        """Starts the :class:`~telegram.ext.JobQueue`."""
         if not self.scheduler.running:
             self.scheduler.start()
 

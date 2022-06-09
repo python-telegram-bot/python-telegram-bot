@@ -56,11 +56,11 @@ def get_setup_kwargs(raw=False):
         url="https://python-telegram-bot.org/",
         # Keywords supported by PyPI can be found at https://github.com/pypa/warehouse/blob/aafc5185e57e67d43487ce4faa95913dd4573e14/warehouse/templates/packaging/detail.html#L20-L58
         project_urls={
-            "Documentation": "https://python-telegram-bot.readthedocs.io",
+            "Documentation": "https://docs.python-telegram-bot.org",
             "Bug Tracker": "https://github.com/python-telegram-bot/python-telegram-bot/issues",
             "Source Code": "https://github.com/python-telegram-bot/python-telegram-bot",
             "News": "https://t.me/pythontelegrambotchannel",
-            "Changelog": "https://python-telegram-bot.readthedocs.io/en/stable/changelog.html",
+            "Changelog": "https://docs.python-telegram-bot.org/en/stable/changelog.html",
         },
         download_url=f"https://pypi.org/project/python-telegram-bot{raw_ext}/",
         keywords="python telegram bot api wrapper",

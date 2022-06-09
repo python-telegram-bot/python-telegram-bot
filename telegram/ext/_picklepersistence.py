@@ -343,9 +343,9 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         .. versionadded:: 13.6
 
         Returns:
-            Optional[Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
-                Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]]]:
-                The restored metadata or :obj:`None`, if no data was stored.
+            Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :class:`object`]]],
+            Dict[:obj:`str`, :obj:`str`]] | :obj:`None`: The restored metadata or :obj:`None`,
+            if no data was stored.
         """
         if self.callback_data:
             pass

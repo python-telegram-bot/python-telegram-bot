@@ -1230,7 +1230,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to send static ``.WEBP``, animated ``.TGS``, or video ``.WEBM`` stickers.
 
         Note:
-            The sticker argument can be either a file_id, an URL or a file from disk
+            The :paramref:`sticker` argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
 
         Args:
@@ -1334,11 +1334,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         changed in the future.
 
         Note:
-            * The video argument can be either a file_id, an URL or a file from disk
+            * The :paramref:`video` argument can be either a file_id, an URL or a file from disk
               ``open(filename, 'rb')``
-            * ``thumb`` will be ignored for small video files, for which Telegram can easily
-              generate thumb nails. However, this behaviour is undocumented and might be changed
-              by Telegram.
+            * :paramref:`thumb` will be ignored for small video files, for which Telegram can
+              easily generate thumbnails. However, this behaviour is undocumented and might be
+              changed by Telegram.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1480,11 +1480,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to send video messages.
 
         Note:
-            * The video_note argument can be either a file_id or a file from disk
+            * The :paramref:`video_note` argument can be either a file_id or a file from disk
               ``open(filename, 'rb')``
-            * ``thumb`` will be ignored for small video files, for which Telegram can easily
-              generate thumb nails. However, this behaviour is undocumented and might be changed
-              by Telegram.
+            * :paramref:`thumb` will be ignored for small video files, for which Telegram can
+              easily generate thumbnails. However, this behaviour is undocumented and might be
+              changed by Telegram.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1757,11 +1757,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         in size, this limit may be changed in the future.
 
         Note:
-            * The voice argument can be either a file_id, an URL or a file from disk
+            * The :paramref:`voice` argument can be either a file_id, an URL or a file from disk
               ``open(filename, 'rb')``.
 
-            * To use this method, the file must have the type ``audio/ogg`` and be no more than 1MB
-              in size. 1-20MB voice notes will be sent as files.
+            * To use this method, the file must have the type :mimetype:`audio/ogg` and be no more
+              than ``1MB`` in size. ``1-20MB`` voice notes will be sent as files.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -2272,10 +2272,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Note:
             * You can either supply :paramref:`venue`, or :paramref:`latitude`,
-              :paramref:`longitude`,
-              :paramref:title` and :paramref:address` and optionally :paramref:`foursquare_id` and
-              :paramref:`foursquare_type` or optionally :paramref:`google_place_id` and
-              :paramref:`google_place_type`.
+              :paramref:`longitude`, :paramref:`title` and :paramref:`address` and optionally
+              :paramref:`foursquare_id` and :paramref:`foursquare_type` or optionally
+              :paramref:`google_place_id` and :paramref:`google_place_type`.
             * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
 
@@ -2293,7 +2292,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
             google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
                 `supported types \
-                <https://developers.google.com/places/web-service/supported_types>`_.)
+                <https://developers.google.com/maps/documentation/places/web-service/supported_types>`_.)
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -3811,7 +3810,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         If you'd like to make sure that the Webhook request comes from Telegram, Telegram
         recommends using a secret path in the URL, e.g. https://www.example.com/<token>. Since
-        nobody else knows your bot's token, you can be pretty sure it's us.
+        nobody else knows your bot's token, you can be pretty sure it's them.
 
         Note:
             The certificate argument should be a file from disk ``open(filename, 'rb')``.
@@ -3821,7 +3820,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 integration.
             certificate (:term:`file object`): Upload your public key certificate so that the root
                 certificate in use can be checked. See our self-signed guide for details.
-                (https://goo.gl/rw7w6Y)
+                (https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks#\
+                creating-a-self-signed-certificate-using-openssl)
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
@@ -4140,7 +4140,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> int:
         """Use this method to get the number of members in a chat.
 
-         .. versionadded:: 13.7
+        .. versionadded:: 13.7
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -6202,8 +6202,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         times).
 
         Note:
-            The png_sticker argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
+            The :paramref:`png_sticker` argument can be either a file_id, an URL or a file from
+            disk ``open(filename, 'rb')``
 
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
