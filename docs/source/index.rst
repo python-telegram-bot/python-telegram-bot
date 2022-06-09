@@ -5,7 +5,7 @@
 
 .. include:: ../../README.rst
 
-.. The toctrees are hidden such that they don't reander on the start page but still include the contents into the documentation.
+.. The toctrees are hidden such that they don't render on the start page but still include the contents into the documentation.
 
 .. toctree::
    :hidden:
@@ -15,6 +15,13 @@
    telegram.ext
    telegram_auxil
    Telegrams Bot API Docs <https://core.telegram.org/bots/api>
+
+.. toctree::
+   :hidden:
+   :caption: Resources
+
+   examples
+   Wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki>
 
 .. toctree::
    :hidden:
