@@ -1,0 +1,24 @@
+```mermaid
+graph TD
+    %% Documentation: https://mermaid-js.github.io/mermaid/#/flowchart
+    firstState((" ")):::firstState --> A("/start"):::userInput
+    A -->|Hi! My name is Doctor Botter...| B((CHOOSING)):::state
+    B --> C("Something else..."):::userInput 
+    C --> |What category?| D((TYPING_CHOICE)):::state
+    D --> E("(text)"):::userInput
+    E --> |"[save choice] <br /> I'd love to hear about that!"| F((TYPING_REPLY)):::state
+    F --> G("(text)"):::userInput
+    G --> |"[save choice: text] <br /> Neat! <br /> (List of facts) <br /> More?"| B
+    B --> H("- Age <br /> - Fav. colour <br /> - Nr. of siblings"):::userInput
+    H --> |"[save choice] <br /> I'd love to hear about that!"| F
+
+    subgraph Legend
+    firstStateLegend(("First State")):::firstState
+    I(User Input):::userInput --> |"Bot reply"| J((State)):::state
+    end
+
+    classDef userInput  fill:#2a5279, color:#ffffff, stroke:#ffffff
+    classDef state fill:#222222, color:#ffffff, stroke:#ffffff
+    classDef firstState fill:#009c11, stroke:#42FF57, color:#ffffff
+    classDef termination fill:#bb0007, stroke:#E60109, color:#ffffff
+```

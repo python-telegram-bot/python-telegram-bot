@@ -1,0 +1,53 @@
+```mermaid
+graph TD
+    %% Documentation: https://mermaid-js.github.io/mermaid/#/flowchart
+    firstState((" ")):::firstState --> A("/start"):::userInput
+    A -->|Hi! I'm FamilyBot...| B((SELECTING_ACTION)):::state
+    B --> C("Show Data"):::userInput 
+    C --> |"(List of gathered data)"| D((SHOWING)):::state
+    D --> E("Back"):::userInput
+    E --> B
+    B --> F("Add Yourself"):::userInput
+    F --> G(("DESCRIBING_SELF")):::state
+    G --> H("Add info"):::userInput
+    H --> I((SELECT_FEATURE)):::state
+    I --> |"Please select a feature to update. <br /> - Name <br /> - Age <br /> - Done"|J("(choice)"):::userInput
+    J --> |"Okay, tell me."| K((TYPING)):::state
+    K --> L("(text)"):::userInput
+    L --> |"[saving]"|I
+    I --> M("Done"):::userInput
+    M --> B
+    B --> N("Add family member"):::userInput
+    subgraph Nested Conversation: Add Family Member
+    N --> O(("SELECT_LEVEL")):::state
+    O --> |"Add... <br /> - Add Parent <br /> - Add Child <br />"|P("(choice)"):::userInput
+    P -->  Q(("SELECT_GENDER")):::state
+    Q --> |"- Mother <br /> - Father <br /> / <br /> - Sister <br /> - Brother"| R("(choice)"):::userInput
+    Q --> V("Show Data"):::userInput
+    Q --> T(("SELECTING_ACTION")):::state
+    Q --> U("Back"):::userInput
+    U --> T
+    O --> U
+    O --> V
+    V --> S(("SHOWING")):::state
+    V --> T
+    end
+    R --> I
+    B --> W("Done"):::userInput
+    W --> |"See you around!"|X(("END")):::state
+    Y(("ANY STATE")):::state --> Z("/stop"):::userInput
+    Z --> X
+    X --> AA((" ")):::termination
+
+    subgraph Legend
+    firstStateLegend(("First State")):::firstState
+    terminationLegend(("Termination")):::termination
+    userInput(User Input):::userInput --> |"Bot reply"| state((State)):::state
+    end
+
+    classDef userInput  fill:#2a5279, color:#ffffff, stroke:#ffffff
+    classDef state fill:#222222, color:#ffffff, stroke:#ffffff
+    classDef firstState fill:#009c11, stroke:#42FF57, color:#ffffff
+    classDef termination fill:#bb0007, stroke:#E60109, color:#ffffff
+    
+```
