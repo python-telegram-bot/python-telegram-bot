@@ -29,6 +29,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Balduro <https://github.com/Balduro>`_
 - `Bibo-Joshi <https://github.com/Bibo-Joshi>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
+- `cyc8 <https://github.com/cyc8>`_ 
 - `d-qoi <https://github.com/d-qoi>`_
 - `daimajia <https://github.com/daimajia>`_
 - `Daniel Reed <https://github.com/nmlorg>`_
