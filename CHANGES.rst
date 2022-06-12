@@ -8,6 +8,10 @@ Version 13.12
 
 This is the technical changelog for version 13.12. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
 
+**Breaking changes:**
+
+- Drop support for python 3.6
+
 **Major Changes:**
 
 - Full Support for API 6.0 (`#3027`_)
