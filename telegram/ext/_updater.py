@@ -369,6 +369,7 @@ class Updater(AbstractAsyncContextManager):
         drop_pending_updates: bool = None,
         ip_address: str = None,
         max_connections: int = 40,
+        secret_token: str = None,
     ) -> asyncio.Queue:
         """
         Starts a small http server to listen for updates via webhook. If :paramref:`cert`
@@ -395,6 +396,7 @@ class Updater(AbstractAsyncContextManager):
             key (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL key file.
             drop_pending_updates (:obj:`bool`, optional): Whether to clean any pending updates on
                 Telegram servers before actually starting to poll. Default is :obj:`False`.
+
                 .. versionadded :: 13.4
             bootstrap_retries (:obj:`int`, optional): Whether the bootstrapping phase of the
                 :class:`telegram.ext.Updater` will retry on failures on the Telegram server.
@@ -407,12 +409,18 @@ class Updater(AbstractAsyncContextManager):
                 :paramref:`port`, :paramref:`url_path`, :paramref:`cert`, and :paramref:`key`.
             ip_address (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
                 Defaults to :obj:`None`.
+
                 .. versionadded :: 13.4
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.set_webhook`. Defaults to :obj:`None`.
             max_connections (:obj:`int`, optional): Passed to
                 :meth:`telegram.Bot.set_webhook`. Defaults to ``40``.
+
                 .. versionadded:: 13.6
+            secret_token (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
+                Defaults to :obj:`None`.
+
+                .. versionadded:: 20.0
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.
 
@@ -444,6 +452,7 @@ class Updater(AbstractAsyncContextManager):
                     ready=webhook_ready,
                     ip_address=ip_address,
                     max_connections=max_connections,
+                    secret_token=secret_token,
                 )
 
                 self._logger.debug("Waiting for webhook server to start")
@@ -470,6 +479,7 @@ class Updater(AbstractAsyncContextManager):
         ready: asyncio.Event = None,
         ip_address: str = None,
         max_connections: int = 40,
+        secret_token: str = None,
     ) -> None:
         self._logger.debug("Updater thread started (webhook)")
 
@@ -477,7 +487,7 @@ class Updater(AbstractAsyncContextManager):
             url_path = f"/{url_path}"
 
         # Create Tornado app instance
-        app = WebhookAppClass(url_path, self.bot, self.update_queue)
+        app = WebhookAppClass(url_path, self.bot, self.update_queue, secret_token)
 
         # Form SSL Context
         # An SSLError is raised if the private key does not match with the certificate
@@ -517,6 +527,7 @@ class Updater(AbstractAsyncContextManager):
             allowed_updates=allowed_updates,
             ip_address=ip_address,
             max_connections=max_connections,
+            secret_token=secret_token,
         )
 
         await self._httpd.serve_forever(ready=ready)
@@ -591,6 +602,7 @@ class Updater(AbstractAsyncContextManager):
         bootstrap_interval: float = 1,
         ip_address: str = None,
         max_connections: int = 40,
+        secret_token: str = None,
     ) -> None:
         """Prepares the setup for fetching updates: delete or set the webhook and drop pending
         updates if appropriate. If there are unsuccessful attempts, this will retry as specified by
@@ -616,6 +628,7 @@ class Updater(AbstractAsyncContextManager):
                 ip_address=ip_address,
                 drop_pending_updates=drop_pending_updates,
                 max_connections=max_connections,
+                secret_token=secret_token,
             )
             return False
 

@@ -83,8 +83,14 @@ class WebhookServer:
 class WebhookAppClass(tornado.web.Application):
     """Application used in the Webserver"""
 
-    def __init__(self, webhook_path: str, bot: "Bot", update_queue: asyncio.Queue):
-        self.shared_objects = {"bot": bot, "update_queue": update_queue}
+    def __init__(
+        self, webhook_path: str, bot: "Bot", update_queue: asyncio.Queue, secret_token: str = None
+    ):
+        self.shared_objects = {
+            "bot": bot,
+            "update_queue": update_queue,
+            "secret_token": secret_token,
+        }
         handlers = [(rf"{webhook_path}/?", TelegramHandler, self.shared_objects)]  # noqa
         tornado.web.Application.__init__(self, handlers)  # type: ignore
 
@@ -96,16 +102,17 @@ class WebhookAppClass(tornado.web.Application):
 class TelegramHandler(tornado.web.RequestHandler):
     """BaseHandler that processes incoming requests from Telegram"""
 
-    __slots__ = ("bot", "update_queue", "_logger")
+    __slots__ = ("bot", "update_queue", "_logger", "secret_token")
 
     SUPPORTED_METHODS = ("POST",)  # type: ignore[assignment]
 
-    def initialize(self, bot: "Bot", update_queue: asyncio.Queue) -> None:
+    def initialize(self, bot: "Bot", update_queue: asyncio.Queue, secret_token: str) -> None:
         """Initialize for each request - that's the interface provided by tornado"""
         # pylint: disable=attribute-defined-outside-init
         self.bot = bot
         self.update_queue = update_queue
         self._logger = logging.getLogger(__name__)
+        self.secret_token = secret_token
 
     def set_default_headers(self) -> None:
         """Sets default headers"""
@@ -115,6 +122,19 @@ class TelegramHandler(tornado.web.RequestHandler):
         """Handle incoming POST request"""
         self._logger.debug("Webhook triggered")
         self._validate_post()
+
+        # verifying that the secret token is the one the user set when the user set one
+        if self.secret_token is not None:
+            self._logger.debug("Webhook has a secret token, trying to get and validate it")
+            token = self.request.headers.get("X-Telegram-Bot-Api-Secret-Token")
+            if not token:
+                self._logger.debug("Request did not include the token")
+                raise tornado.web.HTTPError(HTTPStatus.FORBIDDEN)
+            if token != self.secret_token:
+                self._logger.debug("Request had the wrong token")
+                raise tornado.web.HTTPError(HTTPStatus.FORBIDDEN)
+
+            self._logger.debug("Webhook had the correct secret token, proceeding")
 
         json_string = self.request.body.decode()
         data = json.loads(json_string)

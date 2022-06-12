@@ -3795,6 +3795,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         allowed_updates: List[str] = None,
         ip_address: str = None,
         drop_pending_updates: bool = None,
+        secret_token: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3811,6 +3812,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         If you'd like to make sure that the Webhook request comes from Telegram, Telegram
         recommends using a secret path in the URL, e.g. https://www.example.com/<token>. Since
         nobody else knows your bot's token, you can be pretty sure it's them.
+
+        If you'd like to make sure that the Webhook was set by you, you can specify secret data in
+        the parameter “secret_token”. If specified, the request will contain a header
+        "X-Telegram-Bot-Api-Secret-Token” with the secret token as content.
 
         Note:
             The certificate argument should be a file from disk ``open(filename, 'rb')``.
@@ -3839,6 +3844,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 a short period of time.
             drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
                 updates.
+            secret_token (:obj:`str`, optional): A secret token to be sent in a header
+                “X-Telegram-Bot-Api-Secret-Token” in every webhook request, 1-256 characters.
+                Only characters ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
+                The header is useful to ensure that the request comes from a webhook set by you.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -3889,6 +3900,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data["ip_address"] = ip_address
         if drop_pending_updates:
             data["drop_pending_updates"] = drop_pending_updates
+        if secret_token is not None:
+            data["secret_token"] = secret_token
 
         result = await self._post(
             "setWebhook",

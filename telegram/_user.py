@@ -83,8 +83,11 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`, optional): :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        added_to_attachment_menu (:obj:`bool`, optional): :obj:`True`, if this user added the bot
-            to attachment menu.
+        is_premium (:obj:`bool`, optional): :obj:`True`,  if this user is a Telegram Premium user.
+
+            .. versionadded:: 20.0
+        added_to_attachment_menu (:obj:`bool`, optional): :obj:`True`, if this user is a Telegram
+            Premium user.
 
             .. versionadded:: 20.0
 
@@ -102,8 +105,12 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-        added_to_attachment_menu (:obj:`bool`, optional): :obj:`True`, if this user added the bot
-            to attachment menu.
+        is_premium (:obj:`bool`, optional): Optional. :obj:`True`, if this user is a Telegram
+            Premium user.
+
+            .. versionadded:: 20.0
+        added_to_attachment_menu (:obj:`bool`, optional): Optional. :obj:`True`, if this user added
+            the bot to attachment menu.
 
             .. versionadded:: 20.0
     """
@@ -118,6 +125,7 @@ class User(TelegramObject):
         "supports_inline_queries",
         "id",
         "language_code",
+        "is_premium",
         "added_to_attachment_menu",
     )
 
@@ -133,6 +141,7 @@ class User(TelegramObject):
         can_read_all_group_messages: bool = None,
         supports_inline_queries: bool = None,
         bot: "Bot" = None,
+        is_premium: bool = None,
         added_to_attachment_menu: bool = None,
         **_kwargs: Any,
     ):
@@ -147,6 +156,7 @@ class User(TelegramObject):
         self.can_join_groups = can_join_groups
         self.can_read_all_group_messages = can_read_all_group_messages
         self.supports_inline_queries = supports_inline_queries
+        self.is_premium = is_premium
         self.added_to_attachment_menu = added_to_attachment_menu
         self.set_bot(bot)
 
