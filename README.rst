@@ -61,9 +61,6 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 =================
 Table of contents
 =================
-.. image:: http://34.232.244.108:8080/view/Job-Sonar/job/ProjetoPython/badge/icon
-   :target: http://34.232.244.108:8080/view/Job-Sonar/job/ProjetoPython/
-   :alt: Jenkins CI/CD
    
 - `Introduction`_
 
