@@ -61,7 +61,8 @@ We have a vibrant community of developers helping each other in our `Telegram gr
 =================
 Table of contents
 =================
-[![Build Status](http://34.232.244.108:8080/view/Job-Sonar/job/ProjetoPython/badge/icon)](http://34.232.244.108:8080/view/Job-Sonar/job/ProjetoPython/)
+![Build Status](http://34.232.244.108:8080/view/Job-Sonar/job/ProjetoPython/badge/icon)
+![link sonar](http://34.232.244.108:8080/view/Job-Sonar/job/ProjetoPython/)
 - `Introduction`_
 
 - `Telegram API support`_
