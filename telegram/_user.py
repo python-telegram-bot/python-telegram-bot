@@ -69,6 +69,10 @@ class User(TelegramObject):
         ``{read, write, connect, pool}_timeout`` ``api_kwargs``. Use a named argument for those,
         and notice that some positional arguments changed position as a result.
 
+    .. versionadded:: 13.13
+
+        The ``is_premium`` attribute has been added to distinguish Telegram Premium users.
+
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
         is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
@@ -91,6 +95,8 @@ class User(TelegramObject):
         last_name (:obj:`str`): Optional. User's or bot's last name.
         username (:obj:`str`): Optional. User's or bot's username.
         language_code (:obj:`str`): Optional. IETF language tag of the user's language.
+        is_premium (:obj:`bool`): :obj:`True`, if this user has an active
+            Telegram Premium subscription.
         can_join_groups (:obj:`str`): Optional. :obj:`True`, if the bot can be invited to groups.
             Returned only in :attr:`telegram.Bot.get_me` requests.
         can_read_all_group_messages (:obj:`str`): Optional. :obj:`True`, if privacy mode is
@@ -107,6 +113,7 @@ class User(TelegramObject):
         "username",
         "first_name",
         "last_name",
+        "is_premium",
         "can_join_groups",
         "supports_inline_queries",
         "id",
@@ -121,6 +128,7 @@ class User(TelegramObject):
         last_name: str = None,
         username: str = None,
         language_code: str = None,
+        is_premium: bool = False,
         can_join_groups: bool = None,
         can_read_all_group_messages: bool = None,
         supports_inline_queries: bool = None,
@@ -135,6 +143,7 @@ class User(TelegramObject):
         self.last_name = last_name
         self.username = username
         self.language_code = language_code
+        self.is_premium = is_premium
         self.can_join_groups = can_join_groups
         self.can_read_all_group_messages = can_read_all_group_messages
         self.supports_inline_queries = supports_inline_queries
