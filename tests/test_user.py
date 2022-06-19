@@ -32,6 +32,7 @@ def json_dict():
         "last_name": TestUser.last_name,
         "username": TestUser.username,
         "language_code": TestUser.language_code,
+        "is_premium": TestUser.is_premium,
         "can_join_groups": TestUser.can_join_groups,
         "can_read_all_group_messages": TestUser.can_read_all_group_messages,
         "supports_inline_queries": TestUser.supports_inline_queries,
@@ -61,6 +62,7 @@ class TestUser:
     last_name = "last\u2022name"
     username = "username"
     language_code = "en_us"
+    is_premium = True
     can_join_groups = True
     can_read_all_group_messages = True
     supports_inline_queries = False
@@ -79,6 +81,7 @@ class TestUser:
         assert user.last_name == self.last_name
         assert user.username == self.username
         assert user.language_code == self.language_code
+        assert user.is_premium == self.is_premium
         assert user.can_join_groups == self.can_join_groups
         assert user.can_read_all_group_messages == self.can_read_all_group_messages
         assert user.supports_inline_queries == self.supports_inline_queries
@@ -94,6 +97,7 @@ class TestUser:
         assert user.last_name == self.last_name
         assert user.username is None
         assert user.language_code == self.language_code
+        assert user.is_premium == self.is_premium
         assert user.can_join_groups == self.can_join_groups
         assert user.can_read_all_group_messages == self.can_read_all_group_messages
         assert user.supports_inline_queries == self.supports_inline_queries
@@ -110,6 +114,7 @@ class TestUser:
         assert user.last_name is None
         assert user.username is None
         assert user.language_code == self.language_code
+        assert user.is_premium == self.is_premium
         assert user.can_join_groups == self.can_join_groups
         assert user.can_read_all_group_messages == self.can_read_all_group_messages
         assert user.supports_inline_queries == self.supports_inline_queries
