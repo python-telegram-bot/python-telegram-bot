@@ -177,6 +177,8 @@ def check_object(h4):
     ignored = IGNORED_PARAMETERS.copy()
     if name == "InputFile":
         return
+    if name == "User":
+        ignored |= {"is_premium"}
     if name == "InlineQueryResult":
         ignored |= {"id", "type"}  # attributes common to all subclasses
     if name == "ChatMember":
