@@ -90,3 +90,6 @@ telegram.jpg
 
 # virtual env
 venv*
+
+cfg/
+
