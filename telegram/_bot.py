@@ -3025,7 +3025,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 seconds from the current time they are considered to be banned forever. Applied
                 for supergroups and channels only.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             revoke_messages (:obj:`bool`, optional): Pass :obj:`True` to delete all messages from
                 the chat for the user that is being removed. If :obj:`False`, the user will be able
                 to see messages in the group that were sent before the user was removed.
@@ -4982,7 +4983,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 days or less than 30 seconds from the current time, they are considered to be
                 restricted forever.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             permissions (:class:`telegram.ChatPermissions`): An object for new user
                 permissions.
 
@@ -5366,7 +5368,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire. Integer input will be interpreted as Unix timestamp.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
@@ -5467,7 +5470,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
@@ -6787,7 +6791,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 more than 600 seconds in the future. Can't be used together with
                 :paramref:`open_period`.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be
                 immediately closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
