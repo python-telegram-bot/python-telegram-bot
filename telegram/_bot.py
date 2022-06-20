@@ -1612,7 +1612,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         changed in the future.
 
         Note:
-            :paramref:thumb` will be ignored for small files, for which Telegram can easily
+            :paramref:`thumb` will be ignored for small files, for which Telegram can easily
             generate thumb nails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
