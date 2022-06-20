@@ -106,7 +106,8 @@ class TestInvoice:
             currency=self.currency,
             prices=self.prices,
         )
-        assert link.startswith("https://t.me/invoice/")
+        assert isinstance(link, str)
+        assert link != ""
 
     @flaky(3, 1)
     async def test_send_all_args(self, bot, chat_id, provider_token, monkeypatch):
