@@ -1612,7 +1612,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         changed in the future.
 
         Note:
-            ``thumb`` will be ignored for small files, for which Telegram can easily
+            :paramref:thumb` will be ignored for small files, for which Telegram can easily
             generate thumb nails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
@@ -3554,7 +3554,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         is part of a message album, then it can be edited only to an audio for audio albums, only
         to a document for document albums and to a photo or a video otherwise. When an inline
         message is edited, a new file can't be uploaded; use a previously uploaded file via its
-        ``file_id`` or specify a URL.
+        :attr:`~telegram.File.file_id` or specify a URL.
 
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content
@@ -4616,7 +4616,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 suggested amounts of tips in the smallest units of the currency (integer, not
                 float/double). At most 4 suggested tip amounts can be specified. The suggested tip
                 amounts must be positive, passed in a strictly increased order and must not exceed
-                ``max_tip_amount``.
+                :paramref:`max_tip_amount`.
 
                 .. versionadded:: 13.5
             start_parameter (:obj:`str`, optional): Unique deep-linking parameter. If left empty,
@@ -4760,10 +4760,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
-        If you sent an invoice requesting a shipping address and the parameter ``is_flexible`` was
-        specified, the Bot API will send an :class:`telegram.Update` with a
-        :attr:`telegram.Update.shipping_query` field to the bot. Use this method to reply to
-        shipping queries.
+        If you sent an invoice requesting a shipping address and the parameter
+        :paramref:`send_invoice.is_flexible` was specified, the Bot API will send an
+        :class:`telegram.Update` with a :attr:`telegram.Update.shipping_query` field to the bot.
+        Use this method to reply to shipping queries.
 
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -5379,7 +5379,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 13.8
             creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
                 via the link need to be approved by chat administrators.
-                If :obj:`True`, ``member_limit`` can't be specified.
+                If :obj:`True`, :paramref:`member_limit` can't be specified.
 
                 .. versionadded:: 13.8
 
@@ -5481,7 +5481,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 13.8
             creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
                 via the link need to be approved by chat administrators.
-                If :obj:`True`, ``member_limit`` can't be specified.
+                If :obj:`True`, :paramref:`member_limit` can't be specified.
 
                 .. versionadded:: 13.8
 
@@ -5968,8 +5968,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to add a message to the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the ``can_pin_messages`` admin right in a supergroup
-        or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a channel.
+        and must have the :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` admin
+        right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
+        right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -6033,9 +6034,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to remove a message from the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the ``can_pin_messages`` admin right in a
-        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
-        channel.
+        and must have the :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` admin
+        right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
+        right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -6095,9 +6096,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to clear the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this
-        to work and must have the ``can_pin_messages`` admin right in a
-        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
-        channel.
+        to work and must have the :paramref:`~telegram.ChatAdministratorRights.can_pin_messages`
+        admin right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages`
+        admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
