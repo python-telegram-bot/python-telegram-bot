@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Invoice."""
 
-from typing import Any
+from typing import Any, ClassVar
 
+from telegram import constants
 from telegram._telegramobject import TelegramObject
 
 
@@ -83,3 +84,34 @@ class Invoice(TelegramObject):
             self.currency,
             self.total_amount,
         )
+
+    MIN_TITLE: ClassVar[int] = constants.InvoiceLimit.MIN_TITLE
+    """:const:`telegram.constants.InvoiceLimit.MIN_TITLE`
+
+    .. versionadded:: 20.0
+    """
+    MAX_TITLE: ClassVar[int] = constants.InvoiceLimit.MAX_TITLE
+    """:const:`telegram.constants.InvoiceLimit.MAX_TITLE`
+
+    .. versionadded:: 20.0
+    """
+    MIN_DESCRIPTION: ClassVar[int] = constants.InvoiceLimit.MIN_DESCRIPTION
+    """:const:`telegram.constants.InvoiceLimit.MIN_DESCRIPTION`
+
+    .. versionadded:: 20.0
+    """
+    MAX_DESCRIPTION: ClassVar[int] = constants.InvoiceLimit.MAX_DESCRIPTION
+    """:const:`telegram.constants.InvoiceLimit.MAX_DESCRIPTION`
+
+    .. versionadded:: 20.0
+    """
+    MIN_PAYLOAD: ClassVar[int] = constants.InvoiceLimit.MIN_PAYLOAD
+    """:const:`telegram.constants.InvoiceLimit.MIN_PAYLOAD`
+
+    .. versionadded:: 20.0
+    """
+    MAX_PAYLOAD: ClassVar[int] = constants.InvoiceLimit.MAX_PAYLOAD
+    """:const:`telegram.constants.InvoiceLimit.MAX_PAYLOAD`
+
+    .. versionadded:: 20.0
+    """

@@ -4606,12 +4606,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            title (:obj:`str`): Product name. Max
-                :tg-const:`telegram.constants.Invoice.TITLE` characters.
-            description (:obj:`str`): Product description. Max
-                :tg-const:`telegram.constants.Invoice.DESCRIPTION` characters.
-            payload (:obj:`str`): Bot-defined invoice payload. Max
-                :tg-const:`telegram.constants.Invoice.PAYLOAD` bytes. This will not be
+            title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE`-
+                :tg-const:`telegram.Invoice.MAX_TITLE` characters.
+            description (:obj:`str`): Product description.
+                :tg-const:`telegram.Invoice.MIN_DESCRIPTION`-
+                :tg-const:`telegram.Invoice.MAX_DESCRIPTION` characters.
+            payload (:obj:`str`): Bot-defined invoice payload.
+                :tg-const:`telegram.Invoice.MIN_PAYLOAD`-
+                :tg-const:`telegram.Invoice.MAX_PAYLOAD` bytes. This will not be
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
@@ -7745,12 +7747,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. versionadded:: 20.0
 
         Args:
-            title (:obj:`str`): Product name. Max
-                :tg-const:`telegram.constants.Invoice.TITLE` characters.
-            description (:obj:`str`): Product description. Max
-                :tg-const:`telegram.constants.Invoice.DESCRIPTION` characters.
-            payload (:obj:`str`): Bot-defined invoice payload. Max
-                :tg-const:`telegram.constants.Invoice.PAYLOAD` bytes. This will not be
+            title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE`-
+                :tg-const:`telegram.Invoice.MAX_TITLE` characters.
+            description (:obj:`str`): Product description.
+                :tg-const:`telegram.Invoice.MIN_DESCRIPTION`-
+                :tg-const:`telegram.Invoice.MAX_DESCRIPTION` characters.
+            payload (:obj:`str`): Bot-defined invoice payload.
+                :tg-const:`telegram.Invoice.MIN_PAYLOAD`-
+                :tg-const:`telegram.Invoice.MAX_PAYLOAD` bytes. This will not be
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.

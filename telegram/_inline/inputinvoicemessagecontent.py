@@ -39,9 +39,14 @@ class InputInvoiceMessageContent(InputMessageContent):
     .. versionadded:: 13.5
 
     Args:
-        title (:obj:`str`): Product name, 1-32 characters
-        description (:obj:`str`): Product description, 1-255 characters
-        payload (:obj:`str`):Bot-defined invoice payload, 1-128 bytes. This will not be displayed
+        title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE`-
+            :tg-const:`telegram.Invoice.MAX_TITLE` characters.
+        description (:obj:`str`): Product description.
+            :tg-const:`telegram.Invoice.MIN_DESCRIPTION`-
+            :tg-const:`telegram.Invoice.MAX_DESCRIPTION` characters.
+        payload (:obj:`str`): Bot-defined invoice payload.
+            :tg-const:`telegram.Invoice.MIN_PAYLOAD`-
+            :tg-const:`telegram.Invoice.MAX_PAYLOAD` bytes. This will not be displayed
             to the user, use for your internal processes.
         provider_token (:obj:`str`): Payment provider token, obtained via
             `@Botfather <https://t.me/Botfather>`_.
@@ -87,9 +92,14 @@ class InputInvoiceMessageContent(InputMessageContent):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        title (:obj:`str`): Product name, 1-32 characters
-        description (:obj:`str`): Product description, 1-255 characters
-        payload (:obj:`str`):Bot-defined invoice payload, 1-128 bytes. This will not be displayed
+        title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE`-
+            :tg-const:`telegram.Invoice.MAX_TITLE` characters.
+        description (:obj:`str`): Product description.
+            :tg-const:`telegram.Invoice.MIN_DESCRIPTION`-
+            :tg-const:`telegram.Invoice.MAX_DESCRIPTION` characters.
+        payload (:obj:`str`): Bot-defined invoice payload.
+            :tg-const:`telegram.Invoice.MIN_PAYLOAD`-
+            :tg-const:`telegram.Invoice.MAX_PAYLOAD` bytes. This will not be displayed
             to the user, use for your internal processes.
         provider_token (:obj:`str`): Payment provider token, obtained via
             `@Botfather <https://t.me/Botfather>`_.

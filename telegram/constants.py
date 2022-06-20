@@ -45,7 +45,7 @@ __all__ = [
     "InlineQueryLimit",
     "InlineQueryResultType",
     "InputMediaType",
-    "Invoice",
+    "InvoiceLimit",
     "LocationLimit",
     "MaskPosition",
     "MenuButtonType",
@@ -812,7 +812,7 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""
 
 
-class Invoice(IntEnum):
+class InvoiceLimit(IntEnum):
     """This enum contains limitations for :meth:`telegram.Bot.create_invoice_link`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
@@ -821,9 +821,15 @@ class Invoice(IntEnum):
 
     __slots__ = ()
 
-    TITLE = 32
-    """:obj:`str`: Maximum number of characters of the invoice title."""
-    DESCRIPTION = 255
-    """:obj:`str`: Maximum number of characters of the invoice description."""
-    PAYLOAD = 128
-    """:obj:`str`: Maximum amount of bytes for the internal payload."""
+    MIN_TITLE = 1
+    """:obj:`int`: Minimum number of characters of the invoice title."""
+    MAX_TITLE = 32
+    """:obj:`int`: Maximum number of characters of the invoice title."""
+    MIN_DESCRIPTION = 1
+    """:obj:`int`: Minimum number of characters of the invoice description."""
+    MAX_DESCRIPTION = 255
+    """:obj:`int`: Maximum number of characters of the invoice description."""
+    MIN_PAYLOAD = 1
+    """:obj:`int`: Minimum amount of bytes for the internal payload."""
+    MAX_PAYLOAD = 128
+    """:obj:`int`: Maximum amount of bytes for the internal payload."""
