@@ -819,6 +819,8 @@ class Invoice(IntEnum):
     .. versionadded:: 20.0
     """
 
+    __slots__ = ()
+
     TITLE = 32
     """:obj:`str`: Maximum number of characters of the invoice title."""
     DESCRIPTION = 255

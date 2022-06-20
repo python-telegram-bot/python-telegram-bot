@@ -501,7 +501,6 @@ class TestUpdater:
             await updater.stop()
             assert not updater.running
 
-    @pytest.mark.dev
     @pytest.mark.parametrize("ext_bot", [True, False])
     @pytest.mark.parametrize("drop_pending_updates", (True, False))
     async def test_webhook_basic(self, monkeypatch, updater, drop_pending_updates, ext_bot):
@@ -651,6 +650,7 @@ class TestUpdater:
                 max_connections=47,
                 allowed_updates=["message"],
                 ip_address="123.456.789",
+                secret_token=None,
                 **expected_delete_webhook,
             )
 
