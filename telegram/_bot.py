@@ -7754,13 +7754,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
-            currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on currencies
-            <https://core.telegram.org/bots/payments#supported-currencies>`_.
+            currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
+                <https://core.telegram.org/bots/payments#supported-currencies>`_.
             prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
-                smallest units of the currency (integer, not float/double). For example, for a
+                smallest units of the currency (integer, **not** float/double). For example, for a
                 maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
                 `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
                 shows the number of digits past the decimal point for each currency (2 for the
