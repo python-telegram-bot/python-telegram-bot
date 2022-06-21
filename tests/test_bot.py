@@ -1633,6 +1633,34 @@ class TestBot:
         assert await bot.set_webhook("", drop_pending_updates=drop_pending_updates)
         assert await bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
+    async def test_set_webhook_params(self, bot, monkeypatch):
+        # everything of this is tested in
+        # test_set_webhook_get_webhook_info_and_delete_webhook except secret_token
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs["url"] == "example.com"
+                and kwargs["certificate"].input_file_content
+                == data_file("sslcert.pem").read_bytes()
+                and kwargs["max_connections"] == 7
+                and kwargs["allowed_updates"] == ["messages"]
+                and kwargs["ip_address"] == "127.0.0.1"
+                and kwargs["drop_pending_updates"]
+                and kwargs["secret_token"] == "SoSecretToken"
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+
+        assert await bot.set_webhook(
+            "example.com",
+            data_file("sslcert.pem").read_bytes(),
+            7,
+            ["messages"],
+            "127.0.0.1",
+            True,
+            "SoSecretToken",
+        )
+
     @flaky(3, 1)
     async def test_leave_chat(self, bot):
         with pytest.raises(BadRequest, match="Chat not found"):

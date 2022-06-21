@@ -552,6 +552,10 @@ class TestUpdater:
             response = await send_webhook_message(ip, port, None, "TOKEN", get_method="HEAD")
             assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
+            # Returns Forbidden if no secret token is set
+            response = await send_webhook_message(ip, port, update.to_json(), "TOKEN")
+            assert response.status_code == HTTPStatus.FORBIDDEN
+
             # Returns Forbidden if the secret token is wrong
             response = await send_webhook_message(
                 ip, port, update.to_json(), "TOKEN", secret_token="NotTheSecretToken"
