@@ -9,7 +9,7 @@ graph TD
     E --> |"[save choice] <br /> I'd love to hear about that!"| F((TYPING_REPLY)):::state
     F --> G("(text)"):::userInput
     G --> |"[save choice: text] <br /> Neat! <br /> (List of facts) <br /> More?"| B
-    B --> H("- Age <br /> - Fav. colour <br /> - Nr. of siblings"):::userInput
+    B --> H("- Age <br /> - Fav. colour <br /> - No. of siblings"):::userInput
     H --> |"[save choice] <br /> I'd love to hear about that!"| F
 
     subgraph Legend
