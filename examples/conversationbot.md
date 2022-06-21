@@ -7,8 +7,8 @@ graph TD
     C --> |I see! Please send me a photo...| D((PHOTO)):::state
     D --> E("/skip"):::userInput
     D --> F("(photo)"):::userInput
-    E --> G[\" "/]
-    F --> G
+    E --> |I bet you look great!| G[\ /]
+    F --> |Gorgeous!| G[\ /]
     G --> |"Now, send me your location .."| H((LOCATION)):::state
     H --> I("/skip"):::userInput
     H --> J("(location)"):::userInput
