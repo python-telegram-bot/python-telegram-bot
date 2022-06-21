@@ -271,6 +271,8 @@
       - Used for getting basic info about a file
     * - :meth:`~telegram.Bot.get_me`
       - Used for getting basic information about the bot
+    * - :meth:`~telegram.Bot.create_invoice_link`
+      - Used to generate an HTTP link for an invoice
 
 .. raw:: html
 
