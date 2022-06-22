@@ -3842,8 +3842,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 updates.
             secret_token (:obj:`str`, optional): A secret token to be sent in a header
                 ``X-Telegram-Bot-Api-Secret-Token`` in every webhook request,
-                :tg-const:`telegram.constants.WebhookLimits.MIN_SECRET_LENGTH`-
-                :tg-const:`telegram.constants.WebhookLimits.MAX_SECRET_LENGTH` characters.
+                :tg-const:`telegram.constants.WebhookLimit.MIN_SECRET_LENGTH`-
+                :tg-const:`telegram.constants.WebhookLimit.MAX_SECRET_LENGTH` characters.
                 Only characters ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
                 The header is useful to ensure that the request comes from a webhook set by you.
 
@@ -4616,7 +4616,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
             currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
-            <https://core.telegram.org/bots/payments#supported-currencies>`_.
+                <https://core.telegram.org/bots/payments#supported-currencies>`_.
             prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
