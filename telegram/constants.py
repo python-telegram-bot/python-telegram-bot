@@ -841,6 +841,10 @@ class WebhookLimit(IntEnum):
 
     .. versionadded:: 20.0
     """
+    
+    __slots__ = ()
 
     MIN_SECRET_LENGTH = 1
+    """:obj:`int`: Minimum length of the secret token."""
     MAX_SECRET_LENGTH = 256
+    """:obj:`int`: Maximum length of the secret token."""

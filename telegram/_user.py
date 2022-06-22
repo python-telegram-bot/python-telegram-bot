@@ -86,8 +86,8 @@ class User(TelegramObject):
         is_premium (:obj:`bool`, optional): :obj:`True`,  if this user is a Telegram Premium user.
 
             .. versionadded:: 20.0
-        added_to_attachment_menu (:obj:`bool`, optional): :obj:`True`, if this user is a Telegram
-            Premium user.
+        added_to_attachment_menu (:obj:`bool`, optional): :obj:`True`, if this user added 
+            the bot to the attachment menu.
 
             .. versionadded:: 20.0
 
