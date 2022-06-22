@@ -1,0 +1,11 @@
+flowchart TB
+  subgraph Legend
+    direction TB
+      firstStateLegend(("First State")):::firstState
+      terminationLegend(("Termination")):::termination
+      userInput(User Input):::userInput --> |"Bot reply"| state((State)):::state
+  end
+  classDef userInput  fill:#2a5279, color:#ffffff, stroke:#ffffff
+  classDef state fill:#222222, color:#ffffff, stroke:#ffffff
+  classDef firstState fill:#009c11, stroke:#42FF57, color:#ffffff
+  classDef termination fill:#bb0007, stroke:#E60109, color:#ffffff
