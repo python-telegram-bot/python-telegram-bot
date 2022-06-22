@@ -503,7 +503,10 @@ class TestUpdater:
 
     @pytest.mark.parametrize("ext_bot", [True, False])
     @pytest.mark.parametrize("drop_pending_updates", (True, False))
-    async def test_webhook_basic(self, monkeypatch, updater, drop_pending_updates, ext_bot):
+    @pytest.mark.parametrize("secret_token", ["SecretToken", None])
+    async def test_webhook_basic(
+        self, monkeypatch, updater, drop_pending_updates, ext_bot, secret_token
+    ):
         # Testing with both ExtBot and Bot to make sure any logic in WebhookHandler
         # that depends on this distinction works
         if ext_bot and not isinstance(updater.bot, ExtBot):
@@ -532,7 +535,7 @@ class TestUpdater:
                 ip_address=ip,
                 port=port,
                 url_path="TOKEN",
-                secret_token="SecretToken",
+                secret_token=secret_token,
             )
             assert return_value is updater.update_queue
             assert updater.running
@@ -540,7 +543,7 @@ class TestUpdater:
             # Now, we send an update to the server
             update = make_message_update("Webhook")
             await send_webhook_message(
-                ip, port, update.to_json(), "TOKEN", secret_token="SecretToken"
+                ip, port, update.to_json(), "TOKEN", secret_token=secret_token
             )
             assert (await updater.update_queue.get()).to_dict() == update.to_dict()
 
@@ -552,15 +555,21 @@ class TestUpdater:
             response = await send_webhook_message(ip, port, None, "TOKEN", get_method="HEAD")
             assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
-            # Returns Forbidden if no secret token is set
-            response = await send_webhook_message(ip, port, update.to_json(), "TOKEN")
-            assert response.status_code == HTTPStatus.FORBIDDEN
+            if secret_token:
+                # Returns Forbidden if no secret token is set
+                response_text = "<html><title>403: {0}</title><body>403: {0}</body></html>"
+                response = await send_webhook_message(ip, port, update.to_json(), "TOKEN")
+                assert response.status_code == HTTPStatus.FORBIDDEN
+                assert response.text == response_text.format(
+                    "Request did not include the secret token"
+                )
 
-            # Returns Forbidden if the secret token is wrong
-            response = await send_webhook_message(
-                ip, port, update.to_json(), "TOKEN", secret_token="NotTheSecretToken"
-            )
-            assert response.status_code == HTTPStatus.FORBIDDEN
+                # Returns Forbidden if the secret token is wrong
+                response = await send_webhook_message(
+                    ip, port, update.to_json(), "TOKEN", secret_token="NotTheSecretToken"
+                )
+                assert response.status_code == HTTPStatus.FORBIDDEN
+                assert response.text == response_text.format("Request had the wrong secret token")
 
             await updater.stop()
             assert not updater.running

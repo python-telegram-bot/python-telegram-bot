@@ -420,6 +420,11 @@ class Updater(AbstractAsyncContextManager):
             secret_token (:obj:`str`, optional): Passed to :meth:`telegram.Bot.set_webhook`.
                 Defaults to :obj:`None`.
 
+                When added, the web server started by this call will expect the token to be set in
+                the ``X-Telegram-Bot-Api-Secret-Token`` header of an incoming request and will
+                raise a :class:`http.HTTPStatus.FORBIDDEN <http.HTTPStatus>` error if either the
+                header isn't set or it is set to a wrong token.
+
                 .. versionadded:: 20.0
         Returns:
             :class:`queue.Queue`: The update queue that can be filled from the main thread.

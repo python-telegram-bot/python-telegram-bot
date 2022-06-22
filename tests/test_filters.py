@@ -1182,16 +1182,16 @@ class TestFilters:
 
     def test_filters_user_attributes(self, update):
         assert not filters.USER_ATTACHMENT.check_update(update)
-        assert not filters.USER_PREMIUM.check_update(update)
+        assert not filters.PREMIUM_USER.check_update(update)
         update.message.from_user.added_to_attachment_menu = True
         assert filters.USER_ATTACHMENT.check_update(update)
-        assert not filters.USER_PREMIUM.check_update(update)
+        assert not filters.PREMIUM_USER.check_update(update)
         update.message.from_user.is_premium = True
         assert filters.USER_ATTACHMENT.check_update(update)
-        assert filters.USER_PREMIUM.check_update(update)
+        assert filters.PREMIUM_USER.check_update(update)
         update.message.from_user.added_to_attachment_menu = False
         assert not filters.USER_ATTACHMENT.check_update(update)
-        assert filters.USER_PREMIUM.check_update(update)
+        assert filters.PREMIUM_USER.check_update(update)
 
     def test_filters_chat_init(self):
         with pytest.raises(RuntimeError, match="in conjunction with"):

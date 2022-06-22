@@ -821,15 +821,26 @@ class InvoiceLimit(IntEnum):
 
     __slots__ = ()
 
-    MIN_TITLE = 1
+    MIN_TITLE_LENGTH = 1
     """:obj:`int`: Minimum number of characters of the invoice title."""
-    MAX_TITLE = 32
+    MAX_TITLE_LENGTH = 32
     """:obj:`int`: Maximum number of characters of the invoice title."""
-    MIN_DESCRIPTION = 1
+    MIN_DESCRIPTION_LENGTH = 1
     """:obj:`int`: Minimum number of characters of the invoice description."""
-    MAX_DESCRIPTION = 255
+    MAX_DESCRIPTION_LENGTH = 255
     """:obj:`int`: Maximum number of characters of the invoice description."""
-    MIN_PAYLOAD = 1
+    MIN_PAYLOAD_LENGTH = 1
     """:obj:`int`: Minimum amount of bytes for the internal payload."""
-    MAX_PAYLOAD = 128
+    MAX_PAYLOAD_LENGTH = 128
     """:obj:`int`: Maximum amount of bytes for the internal payload."""
+
+
+class WebhookLimit(IntEnum):
+    """This enum contains limitations for :paramref:`telegram.bot.set_webhook.secret_token`. The
+    enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    MIN_SECRET_LENGTH = 1
+    MAX_SECRET_LENGTH = 256

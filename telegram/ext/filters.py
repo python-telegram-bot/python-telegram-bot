@@ -77,7 +77,7 @@ __all__ = (
     "Text",
     "USER",
     "USER_ATTACHMENT",
-    "USER_PREMIUM",
+    "PREMIUM_USER",
     "UpdateFilter",
     "UpdateType",
     "User",
@@ -2227,9 +2227,9 @@ class _UserPremium(UpdateFilter):
         )
 
 
-USER_PREMIUM = _UserPremium(name="filters.USER_PREMIUM")
-"""This filter filters *any* message that have a :attr:`premium user <telegram.User.is_premium>`
-as :attr:`telegram.Update.effective_user`.
+PREMIUM_USER = _UserPremium(name="filters.PREMIUM_USER")
+"""This filter filters *any* message that has a
+:attr:`Telegram Premium user <telegram.User.is_premium>` as :attr:`telegram.Update.effective_user`.
 """
 
 

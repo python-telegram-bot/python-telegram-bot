@@ -120,6 +120,7 @@ class TestSticker:
         assert sticker.thumb.width == self.thumb_width
         assert sticker.thumb.height == self.thumb_height
         assert sticker.thumb.file_size == self.thumb_file_size
+        # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == self.premium_animation
 
     @flaky(3, 1)
@@ -138,6 +139,7 @@ class TestSticker:
         assert message.sticker.is_animated == sticker.is_animated
         assert message.sticker.is_video == sticker.is_video
         assert message.sticker.file_size == sticker.file_size
+        # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert message.sticker.premium_animation == sticker.premium_animation
 
         assert isinstance(message.sticker.thumb, PhotoSize)

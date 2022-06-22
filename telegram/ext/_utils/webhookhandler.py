@@ -113,6 +113,10 @@ class TelegramHandler(tornado.web.RequestHandler):
         self.update_queue = update_queue
         self._logger = logging.getLogger(__name__)
         self.secret_token = secret_token
+        if secret_token:
+            self._logger.debug(
+                "The webhook server has a secret token, " "expecting it in incoming requests now"
+            )
 
     def set_default_headers(self) -> None:
         """Sets default headers"""
@@ -122,19 +126,6 @@ class TelegramHandler(tornado.web.RequestHandler):
         """Handle incoming POST request"""
         self._logger.debug("Webhook triggered")
         self._validate_post()
-
-        # verifying that the secret token is the one the user set when the user set one
-        if self.secret_token is not None:
-            self._logger.debug("Webhook has a secret token, trying to get and validate it")
-            token = self.request.headers.get("X-Telegram-Bot-Api-Secret-Token")
-            if not token:
-                self._logger.debug("Request did not include the token")
-                raise tornado.web.HTTPError(HTTPStatus.FORBIDDEN)
-            if token != self.secret_token:
-                self._logger.debug("Request had the wrong token")
-                raise tornado.web.HTTPError(HTTPStatus.FORBIDDEN)
-
-            self._logger.debug("Webhook had the correct secret token, proceeding")
 
         json_string = self.request.body.decode()
         data = json.loads(json_string)
@@ -164,6 +155,19 @@ class TelegramHandler(tornado.web.RequestHandler):
         ct_header = self.request.headers.get("Content-Type", None)
         if ct_header != "application/json":
             raise tornado.web.HTTPError(HTTPStatus.FORBIDDEN)
+        # verifying that the secret token is the one the user set when the user set one
+        if self.secret_token is not None:
+            token = self.request.headers.get("X-Telegram-Bot-Api-Secret-Token")
+            if not token:
+                self._logger.debug("Request did not include the secret token")
+                raise tornado.web.HTTPError(
+                    HTTPStatus.FORBIDDEN, reason="Request did not include the secret token"
+                )
+            if token != self.secret_token:
+                self._logger.debug("Request had the wrong secret token: %s", token)
+                raise tornado.web.HTTPError(
+                    HTTPStatus.FORBIDDEN, reason="Request had the wrong secret token"
+                )
 
     def log_exception(
         self,

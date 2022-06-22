@@ -85,33 +85,33 @@ class Invoice(TelegramObject):
             self.total_amount,
         )
 
-    MIN_TITLE: ClassVar[int] = constants.InvoiceLimit.MIN_TITLE
-    """:const:`telegram.constants.InvoiceLimit.MIN_TITLE`
+    MIN_TITLE_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_TITLE_LENGTH
+    """:const:`telegram.constants.InvoiceLimit.MIN_TITLE_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_TITLE: ClassVar[int] = constants.InvoiceLimit.MAX_TITLE
-    """:const:`telegram.constants.InvoiceLimit.MAX_TITLE`
+    MAX_TITLE_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_TITLE_LENGTH
+    """:const:`telegram.constants.InvoiceLimit.MAX_TITLE_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_DESCRIPTION: ClassVar[int] = constants.InvoiceLimit.MIN_DESCRIPTION
-    """:const:`telegram.constants.InvoiceLimit.MIN_DESCRIPTION`
+    MIN_DESCRIPTION_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_DESCRIPTION_LENGTH
+    """:const:`telegram.constants.InvoiceLimit.MIN_DESCRIPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_DESCRIPTION: ClassVar[int] = constants.InvoiceLimit.MAX_DESCRIPTION
-    """:const:`telegram.constants.InvoiceLimit.MAX_DESCRIPTION`
+    MAX_DESCRIPTION_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_DESCRIPTION_LENGTH
+    """:const:`telegram.constants.InvoiceLimit.MAX_DESCRIPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_PAYLOAD: ClassVar[int] = constants.InvoiceLimit.MIN_PAYLOAD
-    """:const:`telegram.constants.InvoiceLimit.MIN_PAYLOAD`
+    MIN_PAYLOAD_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_PAYLOAD_LENGTH
+    """:const:`telegram.constants.InvoiceLimit.MIN_PAYLOAD_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_PAYLOAD: ClassVar[int] = constants.InvoiceLimit.MAX_PAYLOAD
-    """:const:`telegram.constants.InvoiceLimit.MAX_PAYLOAD`
+    MAX_PAYLOAD_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_PAYLOAD_LENGTH
+    """:const:`telegram.constants.InvoiceLimit.MAX_PAYLOAD_LENGTH`
 
     .. versionadded:: 20.0
     """

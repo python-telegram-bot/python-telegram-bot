@@ -22,12 +22,13 @@ from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
-    from telegram import Bot, File
+    from telegram import Bot
 
 
 class Sticker(_BaseThumbedMedium):
@@ -143,9 +144,6 @@ class Sticker(_BaseThumbedMedium):
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Sticker"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
-        # Unfortunately due to circular imports this has to be here
-        # pylint: disable=import-outside-toplevel
-        from telegram import File
 
         data = cls._parse_data(data)
 

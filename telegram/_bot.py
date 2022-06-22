@@ -3809,13 +3809,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         specified url, containing An Update. In case of an unsuccessful request,
         Telegram will give up after a reasonable amount of attempts.
 
-        If you'd like to make sure that the Webhook request comes from Telegram, Telegram
-        recommends using a secret path in the URL, e.g. https://www.example.com/<token>. Since
-        nobody else knows your bot's token, you can be pretty sure it's them.
-
         If you'd like to make sure that the Webhook was set by you, you can specify secret data in
-        the parameter “secret_token”. If specified, the request will contain a header
-        "X-Telegram-Bot-Api-Secret-Token” with the secret token as content.
+        the parameter :paramref:`secret_token`. If specified, the request will contain a header
+        ``X-Telegram-Bot-Api-Secret-Token`` with the secret token as content.
 
         Note:
             The certificate argument should be a file from disk ``open(filename, 'rb')``.
@@ -3845,7 +3841,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
                 updates.
             secret_token (:obj:`str`, optional): A secret token to be sent in a header
-                “X-Telegram-Bot-Api-Secret-Token” in every webhook request, 1-256 characters.
+                ``X-Telegram-Bot-Api-Secret-Token`` in every webhook request,
+                :tg-const:`telegram.constants.WebhookLimits.MIN_SECRET_LENGTH`-
+                :tg-const:`telegram.constants.WebhookLimits.MAX_SECRET_LENGTH` characters.
                 Only characters ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
                 The header is useful to ensure that the request comes from a webhook set by you.
 
@@ -4606,32 +4604,32 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE`-
-                :tg-const:`telegram.Invoice.MAX_TITLE` characters.
+            title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
             description (:obj:`str`): Product description.
-                :tg-const:`telegram.Invoice.MIN_DESCRIPTION`-
-                :tg-const:`telegram.Invoice.MAX_DESCRIPTION` characters.
+                :tg-const:`telegram.Invoice.MIN_DESCRIPTION_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_DESCRIPTION_LENGTH` characters.
             payload (:obj:`str`): Bot-defined invoice payload.
-                :tg-const:`telegram.Invoice.MIN_PAYLOAD`-
-                :tg-const:`telegram.Invoice.MAX_PAYLOAD` bytes. This will not be
+                :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
-            currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on currencies
+            currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
             <https://core.telegram.org/bots/payments#supported-currencies>`_.
             prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
-                smallest units of the currency (integer, not float/double). For example, for a
-                maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
+                *smallest* units of the currency (integer, **not** float/double). For example, for
+                a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
                 `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
                 shows the number of digits past the decimal point for each currency (2 for the
                 majority of currencies). Defaults to ``0``.
 
                 .. versionadded:: 13.5
             suggested_tip_amounts (List[:obj:`int`], optional): An array of
-                suggested amounts of tips in the smallest units of the currency (integer, not
+                suggested amounts of tips in the *smallest* units of the currency (integer, **not**
                 float/double). At most 4 suggested tip amounts can be specified. The suggested tip
                 amounts must be positive, passed in a strictly increased order and must not exceed
                 ``max_tip_amount``.
@@ -7747,14 +7745,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. versionadded:: 20.0
 
         Args:
-            title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE`-
-                :tg-const:`telegram.Invoice.MAX_TITLE` characters.
+            title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
             description (:obj:`str`): Product description.
-                :tg-const:`telegram.Invoice.MIN_DESCRIPTION`-
-                :tg-const:`telegram.Invoice.MAX_DESCRIPTION` characters.
+                :tg-const:`telegram.Invoice.MIN_DESCRIPTION_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_DESCRIPTION_LENGTH` characters.
             payload (:obj:`str`): Bot-defined invoice payload.
-                :tg-const:`telegram.Invoice.MIN_PAYLOAD`-
-                :tg-const:`telegram.Invoice.MAX_PAYLOAD` bytes. This will not be
+                :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
@@ -7764,24 +7762,23 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
-                smallest units of the currency (integer, **not** float/double). For example, for a
-                maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
+                *smallest* units of the currency (integer, **not** float/double). For example, for
+                a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
                 `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
                 shows the number of digits past the decimal point for each currency (2 for the
                 majority of currencies). Defaults to ``0``.
             suggested_tip_amounts (List[:obj:`int`], optional): An array of
-                suggested amounts of tips in the smallest units of the currency (integer, not
+                suggested amounts of tips in the *smallest* units of the currency (integer, **not**
                 float/double). At most 4 suggested tip amounts can be specified. The suggested tip
                 amounts must be positive, passed in a strictly increased order and must not exceed
-                ``max_tip_amount``.
+                :paramref:`max_tip_amount`.
             provider_data (:obj:`str` | :obj:`object`, optional): Data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is
                 passed, it will be encoded as JSON.
             photo_url (:obj:`str`, optional): URL of the product photo for the invoice. Can be a
-                photo of the goods or a marketing image for a service. People like it better when
-                they see what they are paying for.
-            photo_size (:obj:`str`, optional): Photo size.
+                photo of the goods or a marketing image for a service.
+            photo_size (:obj:`int`, optional): Photo size in bytes.
             photo_width (:obj:`int`, optional): Photo width.
             photo_height (:obj:`int`, optional): Photo height.
             need_name (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's full
@@ -7816,7 +7813,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 Telegram API.
 
         Returns:
-            :class:`str`: On success, the created link is returned.
+            :class:`str`: On success, the created invoice link is returned.
 
         """
         data: JSONDict = {

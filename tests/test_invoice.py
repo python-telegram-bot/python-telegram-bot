@@ -109,8 +109,7 @@ class TestInvoice:
         assert isinstance(link, str)
         assert link != ""
 
-    @flaky(3, 1)
-    async def test_send_all_args(self, bot, chat_id, provider_token, monkeypatch):
+    async def test_send_all_args_send_invoice(self, bot, chat_id, provider_token, monkeypatch):
         message = await bot.send_invoice(
             chat_id,
             self.title,
@@ -204,6 +203,9 @@ class TestInvoice:
             protect_content=True,
         )
 
+    async def test_send_all_args_create_invoice_link(
+        self, bot, chat_id, provider_token, monkeypatch
+    ):
         async def make_assertion(*args, **_):
             kwargs = args[1]
             return (

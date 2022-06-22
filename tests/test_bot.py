@@ -1634,8 +1634,9 @@ class TestBot:
         assert await bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
     async def test_set_webhook_params(self, bot, monkeypatch):
-        # everything of this is tested in
-        # test_set_webhook_get_webhook_info_and_delete_webhook except secret_token
+        # actually making calls to TG is done in
+        # test_set_webhook_get_webhook_info_and_delete_webhook. Sadly secret_token can't be tested
+        # there so we have this function \o/
         async def make_assertion(*args, **_):
             kwargs = args[1]
             return (

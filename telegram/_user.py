@@ -110,7 +110,7 @@ class User(TelegramObject):
 
             .. versionadded:: 20.0
         added_to_attachment_menu (:obj:`bool`, optional): Optional. :obj:`True`, if this user added
-            the bot to attachment menu.
+            the bot to the attachment menu.
 
             .. versionadded:: 20.0
     """
