@@ -359,7 +359,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         * :attr:`bot` by calling :meth:`telegram.Bot.shutdown`
         * :attr:`updater` by calling :meth:`telegram.ext.Updater.shutdown`
-        * :attr:`persistence` by calling :meth:`update_persistence` and :meth`persistence.flush`
+        * :attr:`persistence` by calling :meth:`update_persistence` and
+          :meth:`BasePersistence.flush`
 
         .. seealso::
             :meth:`initialize`
