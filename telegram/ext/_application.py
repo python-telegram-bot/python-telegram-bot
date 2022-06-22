@@ -729,6 +729,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 from Telegram. See :paramref:`telegram.Bot.set_webhook.secret_token` for more
                 details.
 
+                When added, the web server started by this call will expect the token to be set in
+                the ``X-Telegram-Bot-Api-Secret-Token`` header of an incoming request and will
+                raise a :class:`http.HTTPStatus.FORBIDDEN <http.HTTPStatus>` error if either the
+                header isn't set or it is set to a wrong token.
+
                 .. versionadded:: 20.0
         """
         if not self.updater:
