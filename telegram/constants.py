@@ -57,6 +57,7 @@ __all__ = [
     "PollLimit",
     "PollType",
     "SUPPORTED_WEBHOOK_PORTS",
+    "WebhookLimit",
     "UpdateType",
 ]
 
@@ -841,7 +842,7 @@ class WebhookLimit(IntEnum):
 
     .. versionadded:: 20.0
     """
-    
+
     __slots__ = ()
 
     MIN_SECRET_LENGTH = 1
