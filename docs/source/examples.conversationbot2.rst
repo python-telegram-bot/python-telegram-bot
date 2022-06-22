@@ -10,5 +10,6 @@
 State Diagram
 -------------
 
-.. image:: ../../examples/conversationbot2.png
-    
+.. mermaid:: ../../examples/diagram-legend.mmd
+   
+.. mermaid:: ../../examples/conversationbot2.mmd
