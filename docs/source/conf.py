@@ -45,6 +45,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
     "sphinx_paramlinks",
+    "sphinxcontrib.mermaid",
 ]
 
 # Use intersphinx to reference the python builtin library docs
