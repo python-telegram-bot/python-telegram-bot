@@ -846,8 +846,8 @@ class TestFilters:
         assert not filters.Sticker.PREMIUM.check_update(update)
         update.message.sticker.premium_animation = File("string", "uniqueString")
         assert not filters.Sticker.ANIMATED.check_update(update)
-        # premium stickers can probably be both, I have only see them as video thus far,
-        # doesn't really matter for the test
+        # premium stickers can be animated, video, or probably also static,
+        # it doesn't really matter for the test
         assert not filters.Sticker.STATIC.check_update(update)
         assert filters.Sticker.VIDEO.check_update(update)
         assert filters.Sticker.PREMIUM.check_update(update)
