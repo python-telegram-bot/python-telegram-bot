@@ -11,4 +11,3 @@ State Diagram
 -------------
 
 .. mermaid:: ../../examples/conversationbot.mmd
-    
