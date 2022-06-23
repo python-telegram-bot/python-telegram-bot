@@ -1,7 +1,6 @@
 flowchart TB
     %% Documentation: https://mermaid-js.github.io/mermaid/#/flowchart
-    firstState((" ")):::firstState --> A("/start"):::userInput
-    A -->|Hi! I'm FamilyBot...| B((SELECTING_ACTION)):::state
+    A(("/start")):::entryPoint -->|Hi! I'm FamilyBot...| B((SELECTING_ACTION)):::state
     B --> C("Show Data"):::userInput 
     C --> |"(List of gathered data)"| D((SHOWING)):::state
     D --> E("Back"):::userInput
@@ -18,12 +17,11 @@ flowchart TB
     M --> B
     B --> N("Add family member"):::userInput
     R --> I
-    W --> |"See you around!"|X(("END")):::state
+    W --> |"See you around!"|End(("END")):::termination
     Y(("ANY STATE")):::state --> Z("/stop"):::userInput
-    Z --> X
-    X --> AA((" ")):::termination
+    Z -->|"Okay, bye."| End
     B --> W("Done"):::userInput
-    subgraph Nested Conversation: Add Family Member
+    subgraph nestedConversation[Nested Conversation: Add Family Member]
         direction BT
         N --> O(("SELECT_LEVEL")):::state
         O --> |"Add... <br /> - Add Parent <br /> - Add Child <br />"|P("(choice)"):::userInput
@@ -40,6 +38,6 @@ flowchart TB
     end
     classDef userInput  fill:#2a5279, color:#ffffff, stroke:#ffffff
     classDef state fill:#222222, color:#ffffff, stroke:#ffffff
-    classDef firstState fill:#009c11, stroke:#42FF57, color:#ffffff
+    classDef entryPoint fill:#009c11, stroke:#42FF57, color:#ffffff
     classDef termination fill:#bb0007, stroke:#E60109, color:#ffffff
-    
+    style nestedConversation fill:#999999, stroke-width:2px, stroke:#333333
