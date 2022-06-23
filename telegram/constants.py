@@ -837,7 +837,7 @@ class InvoiceLimit(IntEnum):
 
 
 class WebhookLimit(IntEnum):
-    """This enum contains limitations for :paramref:`telegram.bot.set_webhook.secret_token`. The
+    """This enum contains limitations for :paramref:`telegram.Bot.set_webhook.secret_token`. The
     enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
@@ -845,7 +845,7 @@ class WebhookLimit(IntEnum):
 
     __slots__ = ()
 
-    MIN_SECRET_LENGTH = 1
+    MIN_SECRET_TOKEN_LENGTH = 1
     """:obj:`int`: Minimum length of the secret token."""
     MAX_SECRET_LENGTH = 256
     """:obj:`int`: Maximum length of the secret token."""
