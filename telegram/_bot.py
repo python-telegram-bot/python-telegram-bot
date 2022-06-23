@@ -3842,8 +3842,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 updates.
             secret_token (:obj:`str`, optional): A secret token to be sent in a header
                 ``X-Telegram-Bot-Api-Secret-Token`` in every webhook request,
-                :tg-const:`telegram.constants.WebhookLimit.MIN_SECRET_LENGTH`-
-                :tg-const:`telegram.constants.WebhookLimit.MAX_SECRET_LENGTH` characters.
+                :tg-const:`telegram.constants.WebhookLimit.MIN_SECRET_TOKEN_LENGTH`-
+                :tg-const:`telegram.constants.WebhookLimit.MAX_SECRET_TOKEN_LENGTH` characters.
                 Only characters ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
                 The header is useful to ensure that the request comes from a webhook set by you.
 
