@@ -2024,7 +2024,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    async def send_forward(
+    async def forward_from(
         self,
         from_chat_id: Union[str, int],
         message_id: int,
@@ -2060,7 +2060,7 @@ class Chat(TelegramObject):
             protect_content=protect_content,
         )
 
-    async def forward_message(
+    async def forward_to(
         self,
         chat_id: Union[int, str],
         message_id: int,
@@ -2083,7 +2083,7 @@ class Chat(TelegramObject):
             :class:`telegram.Message`: On success, instance representing the message posted.
 
         """
-        return await self.get_bot().copy_message(
+        return await self.get_bot().forward_message(
             from_chat_id=self.id,
             chat_id=chat_id,
             message_id=message_id,
