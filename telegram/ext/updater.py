@@ -463,6 +463,11 @@ class Updater(Generic[CCT, UD, CD, BD]):
         application. Else, the webhook will be started on
         https://listen:port/url_path. Also calls :meth:`telegram.Bot.set_webhook` as required.
 
+        Note:
+            :paramref:`telegram.Bot.set_webhook.secret_token` is not checked by this webhook
+            implementation. If you want to use this new security parameter, either build your own
+            webhook server or update your code to version 20.0a2+.
+
         .. versionchanged:: 13.4
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
             ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.

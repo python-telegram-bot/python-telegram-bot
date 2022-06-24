@@ -43,6 +43,8 @@ def chat(bot):
         location=TestChat.location,
         has_private_forwards=True,
         has_protected_content=True,
+        join_to_send_messages=True,
+        join_by_request=True,
     )
 
 
@@ -66,6 +68,8 @@ class TestChat:
     location = ChatLocation(Location(123, 456), 'Barbie World')
     has_protected_content = True
     has_private_forwards = True
+    join_to_send_messages = True
+    join_by_request = True
 
     def test_slot_behaviour(self, chat, recwarn, mro_slots):
         for attr in chat.__slots__:
@@ -92,6 +96,8 @@ class TestChat:
             'has_private_forwards': self.has_private_forwards,
             'linked_chat_id': self.linked_chat_id,
             'location': self.location.to_dict(),
+            'join_to_send_messages': self.join_to_send_messages,
+            'join_by_request': self.join_by_request,
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -111,6 +117,8 @@ class TestChat:
         assert chat.linked_chat_id == self.linked_chat_id
         assert chat.location.location == self.location.location
         assert chat.location.address == self.location.address
+        assert chat.join_to_send_messages == self.join_to_send_messages
+        assert chat.join_by_request == self.join_by_request
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -129,6 +137,8 @@ class TestChat:
         assert chat_dict['has_protected_content'] == chat.has_protected_content
         assert chat_dict['linked_chat_id'] == chat.linked_chat_id
         assert chat_dict['location'] == chat.location.to_dict()
+        assert chat_dict["join_to_send_messages"] == chat.join_to_send_messages
+        assert chat_dict["join_by_request"] == chat.join_by_request
 
     def test_link(self, chat):
         assert chat.link == f'https://t.me/{chat.username}'
