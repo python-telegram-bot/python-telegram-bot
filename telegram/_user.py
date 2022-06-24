@@ -83,7 +83,7 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`, optional): :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        is_premium (:obj:`bool`, optional): :obj:`True`,  if this user is a Telegram Premium user.
+        is_premium (:obj:`bool`, optional): :obj:`True`, if this user is a Telegram Premium user.
 
             .. versionadded:: 20.0
         added_to_attachment_menu (:obj:`bool`, optional): :obj:`True`, if this user added
@@ -105,11 +105,11 @@ class User(TelegramObject):
         supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-        is_premium (:obj:`bool`, optional): Optional. :obj:`True`, if this user is a Telegram
+        is_premium (:obj:`bool`): Optional. :obj:`True`, if this user is a Telegram
             Premium user.
 
             .. versionadded:: 20.0
-        added_to_attachment_menu (:obj:`bool`, optional): Optional. :obj:`True`, if this user added
+        added_to_attachment_menu (:obj:`bool`): Optional. :obj:`True`, if this user added
             the bot to the attachment menu.
 
             .. versionadded:: 20.0
