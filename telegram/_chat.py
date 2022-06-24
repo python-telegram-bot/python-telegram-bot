@@ -178,12 +178,12 @@ class Chat(TelegramObject):
             chats. Returned only in :meth:`telegram.Bot.get_chat`.
         location (:class:`telegram.ChatLocation`): Optional. For supergroups, the location to which
             the supergroup is connected. Returned only in :meth:`telegram.Bot.get_chat`.
-        join_to_send_messages (:obj:`bool`, optional): Optional. :obj:`True`, if users need to join
+        join_to_send_messages (:obj:`bool`): Optional. :obj:`True`, if users need to join
             the supergroup before they can send messages. Returned only in
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
-        join_by_request (:obj:`bool`, optional): Optional. :obj:`True`, if all users directly
+        join_by_request (:obj:`bool`): Optional. :obj:`True`, if all users directly
             joining the supergroup need to be approved by supergroup administrators. Returned only
             in :meth:`telegram.Bot.get_chat`.
 

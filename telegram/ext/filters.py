@@ -2215,6 +2215,8 @@ USER_ATTACHMENT = _UserAttachment(name="filters.USER_ATTACHMENT")
 """This filter filters *any* message that have a user who added the bot to their
 :attr:`attachment menu <telegram.User.added_to_attachment_menu>` as
 :attr:`telegram.Update.effective_user`.
+
+.. versionadded:: 20.0
 """
 
 
@@ -2230,6 +2232,8 @@ class _UserPremium(UpdateFilter):
 PREMIUM_USER = _UserPremium(name="filters.PREMIUM_USER")
 """This filter filters *any* message that has a
 :attr:`Telegram Premium user <telegram.User.is_premium>` as :attr:`telegram.Update.effective_user`.
+
+.. versionadded:: 20.0
 """
 
 

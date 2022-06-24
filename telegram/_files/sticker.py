@@ -88,7 +88,7 @@ class Sticker(_BaseThumbedMedium):
             where the mask should be placed.
         file_size (:obj:`int`): Optional. File size in bytes.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
-        premium_animation (:class:`telegram.File`, optional): Optional. Premium animation for the
+        premium_animation (:class:`telegram.File`): Optional. Premium animation for the
             sticker, if the sticker is premium.
 
             .. versionadded:: 20.0
