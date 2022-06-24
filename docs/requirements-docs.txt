@@ -2,3 +2,4 @@ sphinx==5.0.1
 sphinx-pypi-upload
 furo==2022.6.4.1
 sphinx-paramlinks==0.5.4
+sphinxcontrib-mermaid==0.7.1
