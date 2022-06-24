@@ -325,6 +325,24 @@ class TestSticker:
         with pytest.raises(TypeError):
             await bot.send_sticker(chat_id)
 
+    @flaky(3, 1)
+    async def test_premium_animation(self, bot):
+        # testing animation sucks a bit since we can't create a premium sticker. What we can do is
+        # get a sticker set which includes a premium sticker and check that specific one.
+        premium_sticker_chat = await bot.get_sticker_set("Flame")
+        # the first one to appear here is a sticker with unique file id of AQADOBwAAifPOElr
+        # this could change in the future ofc.
+        premium_sticker = premium_sticker_chat.stickers[20]
+        assert premium_sticker.premium_animation.file_unique_id == "AQADOBwAAifPOElr"
+        assert isinstance(premium_sticker.premium_animation.file_id, str)
+        assert premium_sticker.premium_animation.file_id != ""
+        premium_sticker_dict = {
+            "file_unique_id": "AQADOBwAAifPOElr",
+            "file_id": premium_sticker.premium_animation.file_id,
+            "file_size": premium_sticker.premium_animation.file_size,
+        }
+        assert premium_sticker.premium_animation.to_dict() == premium_sticker_dict
+
     def test_equality(self, sticker):
         a = Sticker(
             sticker.file_id,
