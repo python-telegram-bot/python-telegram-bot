@@ -206,6 +206,7 @@ class TestInvoice:
             protect_content=True,
         )
 
+    @pytest.mark.dev
     def test_send_all_args_create_invoice_link(self, bot, chat_id, provider_token, monkeypatch):
         def make_assertion(*args, **_):
             kwargs = args[1]
@@ -215,7 +216,7 @@ class TestInvoice:
                 and kwargs["payload"] == "payload"
                 and kwargs["provider_token"] == "provider_token"
                 and kwargs["currency"] == "currency"
-                and kwargs["prices"] == self.prices
+                and kwargs["prices"] == [p.to_dict() for p in self.prices]
                 and kwargs["max_tip_amount"] == "max_tip_amount"
                 and kwargs["suggested_tip_amounts"] == "suggested_tip_amounts"
                 and kwargs["provider_data"] == "provider_data"
