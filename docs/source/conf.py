@@ -45,6 +45,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
     "sphinx_paramlinks",
+    "sphinxcontrib.mermaid",
 ]
 
 # Use intersphinx to reference the python builtin library docs
@@ -211,7 +212,10 @@ html_favicon = "ptb-logo_1024.ico"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = ["style_external_link.css"]
+html_css_files = [
+    "style_external_link.css",
+    "style_mermaid_diagrams.css",
+]
 html_permalinks_icon = "¶"  # Furo's default permalink icon is `#`` which doesn't look great imo.
 
 # Output file base name for HTML help builder.

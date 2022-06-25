@@ -1,0 +1,17 @@
+flowchart TB
+    %% Documentation: https://mermaid-js.github.io/mermaid/#/flowchart
+    A(("/start")):::entryPoint -->|Hi! My name is Doctor Botter...| B((CHOOSING)):::state
+    B --> C("Something else..."):::userInput 
+    C --> |What category?| D((TYPING_CHOICE)):::state
+    D --> E("(text)"):::userInput
+    E --> |"[save choice] <br /> I'd love to hear about that!"| F((TYPING_REPLY)):::state
+    F --> G("(text)"):::userInput
+    G --> |"[save choice: text] <br /> Neat! <br /> (List of facts) <br /> More?"| B
+    B --> H("- Age <br /> - Favourite colour <br /> - Number of siblings"):::userInput
+    H --> |"[save choice] <br /> I'd love to hear about that!"| F
+    B --> I("Done"):::userInput
+    I --> |"I learned these facts about you: <br /> ..."| End(("END")):::termination
+    classDef userInput  fill:#2a5279, color:#ffffff, stroke:#ffffff
+    classDef state fill:#222222, color:#ffffff, stroke:#ffffff
+    classDef entryPoint fill:#009c11, stroke:#42FF57, color:#ffffff
+    classDef termination fill:#bb0007, stroke:#E60109, color:#ffffff

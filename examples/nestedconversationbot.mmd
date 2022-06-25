@@ -1,0 +1,43 @@
+flowchart TB
+    %% Documentation: https://mermaid-js.github.io/mermaid/#/flowchart
+    A(("/start")):::entryPoint -->|Hi! I'm FamilyBot...| B((SELECTING_ACTION)):::state
+    B --> C("Show Data"):::userInput 
+    C --> |"(List of gathered data)"| D((SHOWING)):::state
+    D --> E("Back"):::userInput
+    E --> B
+    B --> F("Add Yourself"):::userInput
+    F --> G(("DESCRIBING_SELF")):::state
+    G --> H("Add info"):::userInput
+    H --> I((SELECT_FEATURE)):::state
+    I --> |"Please select a feature to update. <br /> - Name <br /> - Age <br /> - Done"|J("(choice)"):::userInput
+    J --> |"Okay, tell me."| K((TYPING)):::state
+    K --> L("(text)"):::userInput
+    L --> |"[saving]"|I
+    I --> M("Done"):::userInput
+    M --> B
+    B --> N("Add family member"):::userInput
+    R --> I
+    W --> |"See you around!"|End(("END")):::termination
+    Y(("ANY STATE")):::state --> Z("/stop"):::userInput
+    Z -->|"Okay, bye."| End
+    B --> W("Done"):::userInput
+    subgraph nestedConversation[Nested Conversation: Add Family Member]
+        direction BT
+        N --> O(("SELECT_LEVEL")):::state
+        O --> |"Add... <br /> - Add Parent <br /> - Add Child <br />"|P("(choice)"):::userInput
+        P -->  Q(("SELECT_GENDER")):::state
+        Q --> |"- Mother <br /> - Father <br /> / <br /> - Sister <br /> - Brother"| R("(choice)"):::userInput
+        Q --> V("Show Data"):::userInput
+        Q --> T(("SELECTING_ACTION")):::state
+        Q --> U("Back"):::userInput
+        U --> T
+        O --> U
+        O --> V
+        V --> S(("SHOWING")):::state
+        V --> T
+    end
+    classDef userInput  fill:#2a5279, color:#ffffff, stroke:#ffffff
+    classDef state fill:#222222, color:#ffffff, stroke:#ffffff
+    classDef entryPoint fill:#009c11, stroke:#42FF57, color:#ffffff
+    classDef termination fill:#bb0007, stroke:#E60109, color:#ffffff
+    style nestedConversation fill:#999999, stroke-width:2px, stroke:#333333
