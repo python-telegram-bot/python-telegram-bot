@@ -1410,6 +1410,32 @@ class TestBot:
         assert bot.set_webhook(drop_pending_updates=drop_pending_updates)
         assert bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
+    def test_set_webhook_params(self, bot, monkeypatch):
+        # actually making calls to TG is done in
+        # test_set_webhook_get_webhook_info_and_delete_webhook. Sadly secret_token can't be tested
+        # there so we have this function \o/
+        def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs["url"] == "example.com"
+                and kwargs["max_connections"] == 7
+                and kwargs["allowed_updates"] == ["messages"]
+                and kwargs["ip_address"] == "127.0.0.1"
+                and kwargs["drop_pending_updates"]
+                and kwargs["secret_token"] == "SoSecretToken"
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+
+        assert bot.set_webhook(
+            "example.com",
+            max_connections=7,
+            allowed_updates=["messages"],
+            ip_address="127.0.0.1",
+            drop_pending_updates=True,
+            secret_token="SoSecretToken",
+        )
+
     @flaky(3, 1)
     def test_leave_chat(self, bot):
         with pytest.raises(BadRequest, match='Chat not found'):
