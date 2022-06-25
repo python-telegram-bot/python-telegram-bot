@@ -2230,7 +2230,7 @@ class _UserPremium(UpdateFilter):
 
 
 PREMIUM_USER = _UserPremium(name="filters.PREMIUM_USER")
-"""This filter filters *any* message that has a
+"""This filter filters *any* message from a
 :attr:`Telegram Premium user <telegram.User.is_premium>` as :attr:`telegram.Update.effective_user`.
 
 .. versionadded:: 20.0
