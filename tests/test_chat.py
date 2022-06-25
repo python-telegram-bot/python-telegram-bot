@@ -379,7 +379,11 @@ class TestChat:
             photo = kwargs["photo"] == "test_photo"
             return chat_id, photo
 
-        monkeypatch.setattr("telegram.Bot.set_chat_photo", make_assertion)
+        assert check_shortcut_signature(Chat.set_photo, Bot.set_chat_photo, ["chat_id"], [])
+        assert await check_shortcut_call(chat.set_photo, chat.get_bot(), "set_chat_photo")
+        assert await check_defaults_handling(chat.set_photo, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "set_chat_photo", make_assertion)
         assert await chat.set_photo(photo="test_photo")
 
     async def test_delete_photo(self, monkeypatch, chat):
@@ -387,7 +391,11 @@ class TestChat:
             chat_id = kwargs["chat_id"] == chat.id
             return chat_id
 
-        monkeypatch.setattr("telegram.Bot.delete_chat_photo", make_assertion)
+        assert check_shortcut_signature(Chat.delete_photo, Bot.delete_chat_photo, ["chat_id"], [])
+        assert await check_shortcut_call(chat.delete_photo, chat.get_bot(), "delete_chat_photo")
+        assert await check_defaults_handling(chat.delete_photo, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "delete_chat_photo", make_assertion)
         assert await chat.delete_photo()
 
     async def test_set_title(self, monkeypatch, chat):
@@ -396,7 +404,11 @@ class TestChat:
             title = kwargs["title"] == "test_title"
             return chat_id, title
 
-        monkeypatch.setattr("telegram.Bot.set_chat_title", make_assertion)
+        assert check_shortcut_signature(Chat.set_title, Bot.set_chat_title, ["chat_id"], [])
+        assert await check_shortcut_call(chat.set_title, chat.get_bot(), "set_chat_title")
+        assert await check_defaults_handling(chat.set_title, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "set_chat_title", make_assertion)
         assert await chat.set_title(title="test_title")
 
     async def test_set_description(self, monkeypatch, chat):
@@ -405,7 +417,15 @@ class TestChat:
             description = kwargs["description"] == "test_descripton"
             return chat_id, description
 
-        monkeypatch.setattr("telegram.Bot.set_chat_description", make_assertion)
+        assert check_shortcut_signature(
+            Chat.set_description, Bot.set_chat_description, ["chat_id"], []
+        )
+        assert await check_shortcut_call(
+            chat.set_description, chat.get_bot(), "set_chat_description"
+        )
+        assert await check_defaults_handling(chat.set_description, chat.get_bot())
+
+        monkeypatch.setattr(chat.get_bot(), "set_chat_description", make_assertion)
         assert await chat.set_description(description="test_description")
 
     async def test_pin_message(self, monkeypatch, chat):
