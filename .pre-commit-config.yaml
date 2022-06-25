@@ -1,6 +1,4 @@
-# Make sure that
-#   * the revs specified here match requirements-dev.txt
-#   * the additional_dependencies here match requirements.txt
+# Make sure that the additional_dependencies here match requirements.txt
 
 ci:
     autofix_prs: false
