@@ -3374,8 +3374,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to edit text and game messages.
 
-        Note: 
-            It is currently only possible to edit messages without 
+        Note:
+            It is currently only possible to edit messages without
             :paramref:`reply_markup` or with inline keyboards
 
         Args:
@@ -3470,8 +3470,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to edit captions of messages.
 
-        Note: 
-            It is currently only possible to edit messages without 
+        Note:
+            Please note, that it is currently only possible to edit messages without
             :paramref:`reply_markup` or with inline keyboards
 
         Args:
@@ -3564,8 +3564,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         message is edited, a new file can't be uploaded; use a previously uploaded file via its
         :attr:`~telegram.File.file_id` or specify a URL.
 
-        Note: 
-            It is currently only possible to edit messages without 
+        Note:
+            It is currently only possible to edit messages without
             :paramref:`reply_markup` or with inline keyboards
 
         Args:
