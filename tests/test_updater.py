@@ -92,7 +92,6 @@ class TestUpdater:
 
         assert self.test_flag
 
-    @pytest.mark.dev
     async def test_shutdown(self, bot, monkeypatch):
         async def shutdown_bot(*args, **kwargs):
             self.test_flag = True
