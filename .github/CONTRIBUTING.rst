@@ -273,7 +273,7 @@ break the API classes. For example:
 .. _AUTHORS.rst: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/AUTHORS.rst
 .. _`MyPy`: https://mypy.readthedocs.io/en/stable/index.html
 .. _`here`: https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
-.. _`pre-commit config file`_: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.pre-commit-config.yaml
+.. _`pre-commit config file`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/.pre-commit-config.yaml
 .. _`Black`: https://black.readthedocs.io/en/stable/index.html
 .. _`popular editors`: https://black.readthedocs.io/en/stable/integrations/editors.html
 .. _`RTD`: https://docs.python-telegram-bot.org/
