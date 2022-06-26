@@ -3642,6 +3642,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to edit only the reply markup of messages sent by the bot or via the bot
         (for inline bots).
 
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
