@@ -595,6 +595,7 @@ class Job:
           this :class:`telegram.ext.Job` to be useful.
 
     .. versionchanged:: 20.0
+
        * Removed argument and attribute ``job_queue``.
        * Renamed ``Job.context`` to :attr:`Job.data`.
 
