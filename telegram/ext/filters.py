@@ -1006,13 +1006,14 @@ officedocument.wordprocessingml.document")``.
 
     class _UserAttachment(UpdateFilter):
         __slots__ = ()
+        name = "Filters.user_attachment"
 
         def filter(self, update: Update) -> bool:
             return bool(update.effective_user) and bool(
                 update.effective_user.added_to_attachment_menu
             )
 
-    user_attachment = _UserAttachment(name="filters.USER_ATTACHMENT")
+    user_attachment = _UserAttachment()
     """This filter filters *any* message that have a user who added the bot to their
     :attr:`attachment menu <telegram.User.added_to_attachment_menu>` as
     :attr:`telegram.Update.effective_user`.
@@ -1022,12 +1023,13 @@ officedocument.wordprocessingml.document")``.
 
     class _UserPremium(UpdateFilter):
         __slots__ = ()
+        name = "Filters.premium_user"
 
         def filter(self, update: Update) -> bool:
             return bool(update.effective_user) and bool(update.effective_user.is_premium)
 
-    premium_user = _UserPremium(name="filters.PREMIUM_USER")
-    """This filter filters *any* message that has a
+    premium_user = _UserPremium()
+    """This filter filters *any* message from a
     :attr:`Telegram Premium user <telegram.User.is_premium>` as
     :attr:`telegram.Update.effective_user`.
 

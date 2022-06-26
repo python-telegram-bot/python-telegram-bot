@@ -3089,7 +3089,7 @@ class Bot(TelegramObject):
         Telegram will give up after a reasonable amount of attempts.
 
         If you'd like to make sure that the Webhook was set by you, you can specify secret data in
-        the parameter :paramref:`secret_token`. If specified, the request will contain a header
+        the parameter ``secret_token``. If specified, the request will contain a header
         ``X-Telegram-Bot-Api-Secret-Token`` with the secret token as content.
 
         Note:
@@ -5954,7 +5954,7 @@ class Bot(TelegramObject):
         .. versionadded:: 13.13
 
         Args:
-            title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
+            title (:obj:`str`): Product name. :attr:`telegram.Invoice.MIN_TITLE_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
             description (:obj:`str`): Product description.
                 :tg-const:`telegram.Invoice.MIN_DESCRIPTION_LENGTH`-
