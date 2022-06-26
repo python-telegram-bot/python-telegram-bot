@@ -3376,7 +3376,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Note:
             It is currently only possible to edit messages without
-            :paramref:`reply_markup` or with inline keyboards
+            :attr:`telegram.Message.reply_markup` or with inline keyboards.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
