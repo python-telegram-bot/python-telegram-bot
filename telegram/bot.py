@@ -5954,14 +5954,9 @@ class Bot(TelegramObject):
         .. versionadded:: 13.13
 
         Args:
-            title (:obj:`str`): Product name. :attr:`telegram.Invoice.MIN_TITLE_LENGTH`-
-                :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
-            description (:obj:`str`): Product description.
-                :tg-const:`telegram.Invoice.MIN_DESCRIPTION_LENGTH`-
-                :tg-const:`telegram.Invoice.MAX_DESCRIPTION_LENGTH` characters.
-            payload (:obj:`str`): Bot-defined invoice payload.
-                :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
-                :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
+            title (:obj:`str`): Product name. 1-32 characters.
+            description (:obj:`str`): Product description. 1-255 characters.
+            payload (:obj:`str`): Bot-defined invoice payload. 1-128 bytes. This will not be
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
@@ -5980,7 +5975,7 @@ class Bot(TelegramObject):
                 suggested amounts of tips in the *smallest* units of the currency (integer, **not**
                 float/double). At most 4 suggested tip amounts can be specified. The suggested tip
                 amounts must be positive, passed in a strictly increased order and must not exceed
-                :paramref:`max_tip_amount`.
+                ``max_tip_amount``.
             provider_data (:obj:`str` | :obj:`object`, optional): Data about the
                 invoice, which will be shared with the payment provider. A detailed description of
                 required fields should be provided by the payment provider. When an object is

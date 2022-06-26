@@ -464,7 +464,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         https://listen:port/url_path. Also calls :meth:`telegram.Bot.set_webhook` as required.
 
         Note:
-            :paramref:`telegram.Bot.set_webhook.secret_token` is not checked by this webhook
+            ``telegram.Bot.set_webhook.secret_token`` is not checked by this webhook
             implementation. If you want to use this new security parameter, either build your own
             webhook server or update your code to version 20.0a2+.
 
