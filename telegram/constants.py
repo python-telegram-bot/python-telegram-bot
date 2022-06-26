@@ -247,7 +247,7 @@ Attributes:
 """
 from typing import List
 
-BOT_API_VERSION: str = '6.2'
+BOT_API_VERSION: str = '6.1'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
