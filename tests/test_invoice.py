@@ -206,7 +206,6 @@ class TestInvoice:
             protect_content=True,
         )
 
-    @pytest.mark.dev
     def test_send_all_args_create_invoice_link(self, bot, chat_id, provider_token, monkeypatch):
         def make_assertion(*args, **_):
             kwargs = args[1]
