@@ -3471,7 +3471,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to edit captions of messages.
 
         Note:
-            Please note, that it is currently only possible to edit messages without
+            It is currently only possible to edit messages without
             :paramref:`reply_markup` or with inline keyboards
 
         Args:
