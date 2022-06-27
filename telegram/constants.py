@@ -45,6 +45,7 @@ __all__ = [
     "InlineQueryLimit",
     "InlineQueryResultType",
     "InputMediaType",
+    "InvoiceLimit",
     "LocationLimit",
     "MaskPosition",
     "MenuButtonType",
@@ -56,6 +57,7 @@ __all__ = [
     "PollLimit",
     "PollType",
     "SUPPORTED_WEBHOOK_PORTS",
+    "WebhookLimit",
     "UpdateType",
 ]
 
@@ -90,7 +92,7 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=0)
+BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=1)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -809,3 +811,41 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_member`."""
     CHAT_JOIN_REQUEST = "chat_join_request"
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""
+
+
+class InvoiceLimit(IntEnum):
+    """This enum contains limitations for :meth:`telegram.Bot.create_invoice_link`. The enum
+    members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_TITLE_LENGTH = 1
+    """:obj:`int`: Minimum number of characters of the invoice title."""
+    MAX_TITLE_LENGTH = 32
+    """:obj:`int`: Maximum number of characters of the invoice title."""
+    MIN_DESCRIPTION_LENGTH = 1
+    """:obj:`int`: Minimum number of characters of the invoice description."""
+    MAX_DESCRIPTION_LENGTH = 255
+    """:obj:`int`: Maximum number of characters of the invoice description."""
+    MIN_PAYLOAD_LENGTH = 1
+    """:obj:`int`: Minimum amount of bytes for the internal payload."""
+    MAX_PAYLOAD_LENGTH = 128
+    """:obj:`int`: Maximum amount of bytes for the internal payload."""
+
+
+class WebhookLimit(IntEnum):
+    """This enum contains limitations for :paramref:`telegram.Bot.set_webhook.secret_token`. The
+    enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_SECRET_TOKEN_LENGTH = 1
+    """:obj:`int`: Minimum length of the secret token."""
+    MAX_SECRET_TOKEN_LENGTH = 256
+    """:obj:`int`: Maximum length of the secret token."""

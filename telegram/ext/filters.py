@@ -76,6 +76,8 @@ __all__ = (
     "TEXT",
     "Text",
     "USER",
+    "USER_ATTACHMENT",
+    "PREMIUM_USER",
     "UpdateFilter",
     "UpdateType",
     "User",
@@ -1949,6 +1951,21 @@ class Sticker:
     .. versionadded:: 20.0
     """
 
+    class _Premium(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.sticker) and bool(
+                message.sticker.premium_animation  # type: ignore
+            )
+
+    PREMIUM = _Premium(name="filters.Sticker.PREMIUM")
+    """Messages that contain :attr:`telegram.Message.sticker` and have a
+    :attr:`premium animation <telegram.Sticker.premium_animation>`.
+
+    .. versionadded:: 20.0
+    """
+
 
 class _SuccessfulPayment(MessageFilter):
     __slots__ = ()
@@ -2183,6 +2200,41 @@ class _User(MessageFilter):
 
 USER = _User(name="filters.USER")
 """This filter filters *any* message that has a :attr:`telegram.Message.from_user`."""
+
+
+class _UserAttachment(UpdateFilter):
+    __slots__ = ()
+
+    def filter(self, update: Update) -> bool:
+        return bool(update.effective_user) and bool(
+            update.effective_user.added_to_attachment_menu  # type: ignore
+        )
+
+
+USER_ATTACHMENT = _UserAttachment(name="filters.USER_ATTACHMENT")
+"""This filter filters *any* message that have a user who added the bot to their
+:attr:`attachment menu <telegram.User.added_to_attachment_menu>` as
+:attr:`telegram.Update.effective_user`.
+
+.. versionadded:: 20.0
+"""
+
+
+class _UserPremium(UpdateFilter):
+    __slots__ = ()
+
+    def filter(self, update: Update) -> bool:
+        return bool(update.effective_user) and bool(
+            update.effective_user.is_premium  # type: ignore
+        )
+
+
+PREMIUM_USER = _UserPremium(name="filters.PREMIUM_USER")
+"""This filter filters *any* message from a
+:attr:`Telegram Premium user <telegram.User.is_premium>` as :attr:`telegram.Update.effective_user`.
+
+.. versionadded:: 20.0
+"""
 
 
 class _Venue(MessageFilter):

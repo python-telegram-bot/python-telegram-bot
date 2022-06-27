@@ -24,9 +24,10 @@ from pathlib import Path
 
 import pytest
 
-from telegram import Bot, Chat, Message, TelegramObject, Update, User
+from telegram import Chat, Message, TelegramObject, Update, User
 from telegram.ext import ContextTypes, PersistenceInput, PicklePersistence
 from telegram.warnings import PTBUserWarning
+from tests.conftest import make_bot
 
 
 @pytest.fixture(autouse=True)
@@ -875,7 +876,7 @@ class TestPicklePersistence:
         # Now test that pickling of unknown bots in TelegramObjects will be replaced by None-
         assert not len(recwarn)
         data_with_bot = {}
-        async with Bot(bot.token) as other_bot:
+        async with make_bot(token=bot.token) as other_bot:
             data_with_bot["unknown_bot_in_user"] = User(1, "Dev", False, bot=other_bot)
         await pickle_persistence.update_chat_data(12345, data_with_bot)
         assert len(recwarn) == 1

@@ -35,6 +35,7 @@ from telegram.error import PassportDecryptionError
 # here, although they are implicitly tested. Testing for those classes was too much work and not
 # worth it.
 from telegram.request import RequestData
+from tests.conftest import make_bot
 
 RAW_PASSPORT_DATA = {
     "credentials": {
@@ -427,7 +428,7 @@ class TestPassport:
             Bot(bot.token, private_key=b"Invalid key!")
 
     async def test_passport_data_okay_with_non_crypto_bot(self, bot):
-        async with Bot(bot.token) as b:
+        async with make_bot(token=bot.token) as b:
             assert PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
 
     def test_wrong_hash(self, bot):
@@ -439,13 +440,13 @@ class TestPassport:
 
     async def test_wrong_key(self, bot):
         short_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIBOQIBAAJBAKU+OZ2jJm7sCA/ec4gngNZhXYPu+DZ/TAwSMl0W7vAPXAsLplBk\r\nO8l6IBHx8N0ZC4Bc65mO3b2G8YAzqndyqH8CAwEAAQJAWOx3jQFzeVXDsOaBPdAk\r\nYTncXVeIc6tlfUl9mOLyinSbRNCy1XicOiOZFgH1rRKOGIC1235QmqxFvdecySoY\r\nwQIhAOFeGgeX9CrEPuSsd9+kqUcA2avCwqdQgSdy2qggRFyJAiEAu7QHT8JQSkHU\r\nDELfzrzc24AhjyG0z1DpGZArM8COascCIDK42SboXj3Z2UXiQ0CEcMzYNiVgOisq\r\nBUd5pBi+2mPxAiAM5Z7G/Sv1HjbKrOGh29o0/sXPhtpckEuj5QMC6E0gywIgFY6S\r\nNjwrAA+cMmsgY0O2fAzEKkDc5YiFsiXaGaSS4eA=\r\n-----END RSA PRIVATE KEY-----"
-        async with Bot(bot.token, private_key=short_key) as b:
+        async with make_bot(token=bot.token, private_key=short_key) as b:
             passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
             with pytest.raises(PassportDecryptionError):
                 assert passport_data.decrypted_data
 
         wrong_key = b"-----BEGIN RSA PRIVATE KEY-----\r\nMIIEogIBAAKCAQB4qCFltuvHakZze86TUweU7E/SB3VLGEHAe7GJlBmrou9SSWsL\r\nH7E++157X6UqWFl54LOE9MeHZnoW7rZ+DxLKhk6NwAHTxXPnvw4CZlvUPC3OFxg3\r\nhEmNen6ojSM4sl4kYUIa7F+Q5uMEYaboxoBen9mbj4zzMGsG4aY/xBOb2ewrXQyL\r\nRh//tk1Px4ago+lUPisAvQVecz7/6KU4Xj4Lpv2z20f3cHlZX6bb7HlE1vixCMOf\r\nxvfC5SkWEGZMR/ZoWQUsoDkrDSITF/S3GtLfg083TgtCKaOF3mCT27sJ1og77npP\r\n0cH/qdlbdoFtdrRj3PvBpaj/TtXRhmdGcJBxAgMBAAECggEAYSq1Sp6XHo8dkV8B\r\nK2/QSURNu8y5zvIH8aUrgqo8Shb7OH9bryekrB3vJtgNwR5JYHdu2wHttcL3S4SO\r\nftJQxbyHgmxAjHUVNGqOM6yPA0o7cR70J7FnMoKVgdO3q68pVY7ll50IET9/T0X9\r\nDrTdKFb+/eILFsXFS1NpeSzExdsKq3zM0sP/vlJHHYVTmZDGaGEvny/eLAS+KAfG\r\nrKP96DeO4C/peXEJzALZ/mG1ReBB05Qp9Dx1xEC20yreRk5MnnBA5oiHVG5ZLOl9\r\nEEHINidqN+TMNSkxv67xMfQ6utNu5IpbklKv/4wqQOJOO50HZ+qBtSurTN573dky\r\nzslbCQKBgQDHDUBYyKN/v69VLmvNVcxTgrOcrdbqAfefJXb9C3dVXhS8/oRkCRU/\r\ndzxYWNT7hmQyWUKor/izh68rZ/M+bsTnlaa7IdAgyChzTfcZL/2pxG9pq05GF1Q4\r\nBSJ896ZEe3jEhbpJXRlWYvz7455svlxR0H8FooCTddTmkU3nsQSx0wKBgQCbLSa4\r\nyZs2QVstQQerNjxAtLi0IvV8cJkuvFoNC2Q21oqQc7BYU7NJL7uwriprZr5nwkCQ\r\nOFQXi4N3uqimNxuSng31ETfjFZPp+pjb8jf7Sce7cqU66xxR+anUzVZqBG1CJShx\r\nVxN7cWN33UZvIH34gA2Ax6AXNnJG42B5Gn1GKwKBgQCZ/oh/p4nGNXfiAK3qB6yy\r\nFvX6CwuvsqHt/8AUeKBz7PtCU+38roI/vXF0MBVmGky+HwxREQLpcdl1TVCERpIT\r\nUFXThI9OLUwOGI1IcTZf9tby+1LtKvM++8n4wGdjp9qAv6ylQV9u09pAzZItMwCd\r\nUx5SL6wlaQ2y60tIKk0lfQKBgBJS+56YmA6JGzY11qz+I5FUhfcnpauDNGOTdGLT\r\n9IqRPR2fu7RCdgpva4+KkZHLOTLReoRNUojRPb4WubGfEk93AJju5pWXR7c6k3Bt\r\novS2mrJk8GQLvXVksQxjDxBH44sLDkKMEM3j7uYJqDaZNKbyoCWT7TCwikAau5qx\r\naRevAoGAAKZV705dvrpJuyoHFZ66luANlrAwG/vNf6Q4mBEXB7guqMkokCsSkjqR\r\nhsD79E6q06zA0QzkLCavbCn5kMmDS/AbA80+B7El92iIN6d3jRdiNZiewkhlWhEG\r\nm4N0gQRfIu+rUjsS/4xk8UuQUT/Ossjn/hExi7ejpKdCc7N++bc=\r\n-----END RSA PRIVATE KEY-----"
-        async with Bot(bot.token, private_key=wrong_key) as b:
+        async with make_bot(token=bot.token, private_key=short_key) as b:
             passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot=b)
             with pytest.raises(PassportDecryptionError):
                 assert passport_data.decrypted_data

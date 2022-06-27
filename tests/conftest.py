@@ -250,13 +250,16 @@ def class_thumb_file():
     f.close()
 
 
-def make_bot(bot_info, **kwargs):
+def make_bot(bot_info=None, **kwargs):
     """
     Tests are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
     """
+    token = kwargs.pop("token", (bot_info or {}).get("token"))
+    private_key = kwargs.pop("private_key", PRIVATE_KEY)
+    kwargs.pop("token", None)
     _bot = DictExtBot(
-        bot_info["token"],
-        private_key=PRIVATE_KEY,
+        token=token,
+        private_key=private_key,
         request=TestHttpxRequest(8),
         get_updates_request=TestHttpxRequest(1),
         **kwargs,
@@ -827,10 +830,13 @@ async def send_webhook_message(
     content_len: int = -1,
     content_type: str = "application/json",
     get_method: str = None,
+    secret_token: str = None,
 ) -> Response:
     headers = {
         "content-type": content_type,
     }
+    if secret_token:
+        headers["X-Telegram-Bot-Api-Secret-Token"] = secret_token
 
     if not payload_str:
         content_len = None
