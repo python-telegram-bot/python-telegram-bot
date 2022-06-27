@@ -790,6 +790,144 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    async def set_photo(
+        self,
+        photo: FileInput,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = 20,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.set_chat_photo(
+                 chat_id=update.effective_chat.id, *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_photo`.
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().set_chat_photo(
+            chat_id=self.id,
+            photo=photo,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def delete_photo(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.delete_chat_photo(
+                 chat_id=update.effective_chat.id, *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_chat_photo`.
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().delete_chat_photo(
+            chat_id=self.id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_title(
+        self,
+        title: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.set_chat_title(
+                 chat_id=update.effective_chat.id, *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_title`.
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().set_chat_title(
+            chat_id=self.id,
+            title=title,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    async def set_description(
+        self,
+        description: str = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.set_chat_description(
+                 chat_id=update.effective_chat.id, *args, **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.set_chat_description`.
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        """
+        return await self.get_bot().set_chat_description(
+            chat_id=self.id,
+            description=description,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def pin_message(
         self,
         message_id: int,
@@ -1886,6 +2024,86 @@ class Chat(TelegramObject):
             reply_to_message_id=reply_to_message_id,
             allow_sending_without_reply=allow_sending_without_reply,
             reply_markup=reply_markup,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            protect_content=protect_content,
+        )
+
+    async def forward_from(
+        self,
+        from_chat_id: Union[str, int],
+        message_id: int,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.forward_message(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
+
+        .. seealso:: :meth:`forward_to`
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return await self.get_bot().forward_message(
+            chat_id=self.id,
+            from_chat_id=from_chat_id,
+            message_id=message_id,
+            disable_notification=disable_notification,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+            protect_content=protect_content,
+        )
+
+    async def forward_to(
+        self,
+        chat_id: Union[int, str],
+        message_id: int,
+        disable_notification: DVInput[bool] = DEFAULT_NONE,
+        protect_content: ODVInput[bool] = DEFAULT_NONE,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> "Message":
+        """Shortcut for::
+
+             await bot.forward_message(from_chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
+
+        .. seealso:: :meth:`forward_from`
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
+        """
+        return await self.get_bot().forward_message(
+            from_chat_id=self.id,
+            chat_id=chat_id,
+            message_id=message_id,
+            disable_notification=disable_notification,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
