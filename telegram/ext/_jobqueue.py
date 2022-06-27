@@ -148,11 +148,13 @@ class JobQueue:
                   job should run.
                 * :obj:`datetime.datetime` will be interpreted as a specific date and time at
                   which the job should run. If the timezone (:attr:`datetime.datetime.tzinfo`) is
-                  :obj:`None`, the default timezone of the bot will be used.
+                  :obj:`None`, the default timezone of the bot will be used, which is UTC unless
+                  :attr:`telegram.ext.Defaults.tzinfo` is used.
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
                   tomorrow. If the timezone (:attr:`datetime.time.tzinfo`) is :obj:`None`, the
-                  default timezone of the bot will be used.
+                  default timezone of the bot will be used, which is UTC unless
+                  :attr:`telegram.ext.Defaults.tzinfo` is used.
 
             chat_id (:obj:`int`, optional): Chat id of the chat associated with this job. If
                 passed, the corresponding :attr:`~telegram.ext.CallbackContext.chat_data` will
@@ -246,7 +248,8 @@ class JobQueue:
                 * :obj:`datetime.time` will be interpreted as a specific time of day at which the
                   job should run. This could be either today or, if the time has already passed,
                   tomorrow. If the timezone (:attr:`datetime.time.tzinfo`) is :obj:`None`, the
-                  default timezone of the bot will be used.
+                  default timezone of the bot will be used, which is UTC unless
+                  :attr:`telegram.ext.Defaults.tzinfo` is used.
 
                 Defaults to :paramref:`interval`
             last (:obj:`int` | :obj:`float` | :obj:`datetime.timedelta` |                        \
@@ -256,7 +259,7 @@ class JobQueue:
 
                 If :paramref:`last` is :obj:`datetime.datetime` or :obj:`datetime.time` type
                 and ``last.tzinfo`` is :obj:`None`, the default timezone of the bot will be
-                assumed.
+                assumed, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
 
                 Defaults to :obj:`None`.
             data (:obj:`object`, optional): Additional data needed for the callback function.
@@ -339,7 +342,8 @@ class JobQueue:
                     async def callback(context: CallbackContext)
 
             when (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
-                (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used.
+                (``when.tzinfo``) is :obj:`None`, the default timezone of the bot will be used,
+                which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
             day (:obj:`int`): Defines the day of the month whereby the job would run. It should
                 be within the range of ``1`` and ``31``, inclusive. If a month has fewer days than
                 this number, the job will not run in this month. Passing ``-1`` leads to the job
@@ -419,7 +423,7 @@ class JobQueue:
 
             time (:obj:`datetime.time`): Time of day at which the job should run. If the timezone
                 (:obj:`datetime.time.tzinfo`) is :obj:`None`, the default timezone of the bot will
-                be used.
+                be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is used.
             days (Tuple[:obj:`int`], optional): Defines on which days of the week the job should
                 run (where ``0-6`` correspond to sunday - saturday). By default, the job will run
                 every day.
@@ -591,6 +595,7 @@ class Job:
           this :class:`telegram.ext.Job` to be useful.
 
     .. versionchanged:: 20.0
+
        * Removed argument and attribute ``job_queue``.
        * Renamed ``Job.context`` to :attr:`Job.data`.
 

@@ -34,7 +34,7 @@
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 
-.. image:: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
    :target: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot
    :alt: Code coverage
 
@@ -149,7 +149,7 @@ Resources
 =========
 
 - The `package documentation <https://docs.python-telegram-bot.org/>`_ is the technical reference for ``python-telegram-bot``.
-  It contains descriptions of all available classes, modules, methods and arguments.
+  It contains descriptions of all available classes, modules, methods and arguments as well as the `changelog <https://docs.python-telegram-bot.org/changelog.html>`_.
 - The `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ is home to number of more elaborate introductions of the different features of ``python-telegram-bot`` and other useful resources that go beyond the technical documentation.
 - Our `examples section <https://docs.python-telegram-bot.org/examples.html>`_ contains several examples that showcase the different features of both the Bot API and ``python-telegram-bot``.
   Even if it is not your approach for learning, please take a look at ``echobot.py``. It is the de facto base for most of the bots out there.

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 from telegram._games.callbackgame import CallbackGame
 from telegram._loginurl import LoginUrl
@@ -163,7 +163,7 @@ class InlineKeyboardButton(TelegramObject):
         self,
         text: str,
         url: str = None,
-        callback_data: object = None,
+        callback_data: Union[str, object] = None,
         switch_inline_query: str = None,
         switch_inline_query_current_chat: str = None,
         callback_game: CallbackGame = None,
@@ -214,7 +214,7 @@ class InlineKeyboardButton(TelegramObject):
 
         return cls(**data)
 
-    def update_callback_data(self, callback_data: object) -> None:
+    def update_callback_data(self, callback_data: Union[str, object]) -> None:
         """
         Sets :attr:`callback_data` to the passed object. Intended to be used by
         :class:`telegram.ext.CallbackDataCache`.

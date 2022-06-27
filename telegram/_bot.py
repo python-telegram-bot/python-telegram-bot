@@ -1612,7 +1612,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         changed in the future.
 
         Note:
-            ``thumb`` will be ignored for small files, for which Telegram can easily
+            :paramref:`thumb` will be ignored for small files, for which Telegram can easily
             generate thumb nails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
@@ -3025,7 +3025,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 seconds from the current time they are considered to be banned forever. Applied
                 for supergroups and channels only.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             revoke_messages (:obj:`bool`, optional): Pass :obj:`True` to delete all messages from
                 the chat for the user that is being removed. If :obj:`False`, the user will be able
                 to see messages in the group that were sent before the user was removed.
@@ -3373,6 +3374,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to edit text and game messages.
 
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards.
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
@@ -3465,6 +3470,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to edit captions of messages.
 
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
@@ -3553,7 +3562,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         is part of a message album, then it can be edited only to an audio for audio albums, only
         to a document for document albums and to a photo or a video otherwise. When an inline
         message is edited, a new file can't be uploaded; use a previously uploaded file via its
-        ``file_id`` or specify a URL.
+        :attr:`~telegram.File.file_id` or specify a URL.
+
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards
 
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content
@@ -3628,6 +3641,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to edit only the reply markup of messages sent by the bot or via the bot
         (for inline bots).
+
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -4632,7 +4649,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 suggested amounts of tips in the *smallest* units of the currency (integer, **not**
                 float/double). At most 4 suggested tip amounts can be specified. The suggested tip
                 amounts must be positive, passed in a strictly increased order and must not exceed
-                ``max_tip_amount``.
+                :paramref:`max_tip_amount`.
 
                 .. versionadded:: 13.5
             start_parameter (:obj:`str`, optional): Unique deep-linking parameter. If left empty,
@@ -4776,10 +4793,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         api_kwargs: JSONDict = None,
     ) -> bool:
         """
-        If you sent an invoice requesting a shipping address and the parameter ``is_flexible`` was
-        specified, the Bot API will send an :class:`telegram.Update` with a
-        :attr:`telegram.Update.shipping_query` field to the bot. Use this method to reply to
-        shipping queries.
+        If you sent an invoice requesting a shipping address and the parameter
+        :paramref:`send_invoice.is_flexible` was specified, the Bot API will send an
+        :class:`telegram.Update` with a :attr:`telegram.Update.shipping_query` field to the bot.
+        Use this method to reply to shipping queries.
 
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -4999,7 +5016,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 days or less than 30 seconds from the current time, they are considered to be
                 restricted forever.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             permissions (:class:`telegram.ChatPermissions`): An object for new user
                 permissions.
 
@@ -5383,7 +5401,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire. Integer input will be interpreted as Unix timestamp.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
@@ -5393,7 +5412,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 13.8
             creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
                 via the link need to be approved by chat administrators.
-                If :obj:`True`, ``member_limit`` can't be specified.
+                If :obj:`True`, :paramref:`member_limit` can't be specified.
 
                 .. versionadded:: 13.8
 
@@ -5484,7 +5503,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
@@ -5494,7 +5514,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 13.8
             creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
                 via the link need to be approved by chat administrators.
-                If :obj:`True`, ``member_limit`` can't be specified.
+                If :obj:`True`, :paramref:`member_limit` can't be specified.
 
                 .. versionadded:: 13.8
 
@@ -5981,8 +6001,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to add a message to the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the ``can_pin_messages`` admin right in a supergroup
-        or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a channel.
+        and must have the :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` admin
+        right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
+        right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -6046,9 +6067,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to remove a message from the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the ``can_pin_messages`` admin right in a
-        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
-        channel.
+        and must have the :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` admin
+        right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
+        right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -6108,9 +6129,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to clear the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this
-        to work and must have the ``can_pin_messages`` admin right in a
-        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
-        channel.
+        to work and must have the :paramref:`~telegram.ChatAdministratorRights.can_pin_messages`
+        admin right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages`
+        admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -6804,7 +6825,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 more than 600 seconds in the future. Can't be used together with
                 :paramref:`open_period`.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be
                 immediately closed. This can be useful for poll preview.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
