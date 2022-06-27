@@ -3374,6 +3374,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to edit text and game messages.
 
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards.
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
@@ -3466,6 +3470,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to edit captions of messages.
 
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
@@ -3556,6 +3564,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         message is edited, a new file can't be uploaded; use a previously uploaded file via its
         :attr:`~telegram.File.file_id` or specify a URL.
 
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards
+
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content
                 of the message.
@@ -3629,6 +3641,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to edit only the reply markup of messages sent by the bot or via the bot
         (for inline bots).
+
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
