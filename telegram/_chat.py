@@ -809,10 +809,11 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_photo`.
 
+        .. versionadded:: 20.0
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
-        .. versionadded:: 20.0
         """
         return await self.get_bot().set_chat_photo(
             chat_id=self.id,
@@ -842,10 +843,11 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.delete_chat_photo`.
 
+        .. versionadded:: 20.0
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
-        .. versionadded:: 20.0
         """
         return await self.get_bot().delete_chat_photo(
             chat_id=self.id,
@@ -875,10 +877,11 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_title`.
 
+        .. versionadded:: 20.0
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
-        .. versionadded:: 20.0
         """
         return await self.get_bot().set_chat_title(
             chat_id=self.id,
@@ -909,10 +912,11 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_description`.
 
+        .. versionadded:: 20.0
+
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
-        .. versionadded:: 20.0
         """
         return await self.get_bot().set_chat_description(
             chat_id=self.id,
@@ -2047,12 +2051,13 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
-        Returns:
-            :class:`telegram.Message`: On success, instance representing the message posted.
-
         .. seealso:: :meth:`forward_to`
 
         .. versionadded:: 20.0
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
         """
         return await self.get_bot().forward_message(
             chat_id=self.id,
@@ -2086,12 +2091,13 @@ class Chat(TelegramObject):
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.forward_message`.
 
-        Returns:
-            :class:`telegram.Message`: On success, instance representing the message posted.
-
         .. seealso:: :meth:`forward_from`
 
         .. versionadded:: 20.0
+
+        Returns:
+            :class:`telegram.Message`: On success, instance representing the message posted.
+
         """
         return await self.get_bot().forward_message(
             from_chat_id=self.id,
