@@ -3795,6 +3795,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         allowed_updates: List[str] = None,
         ip_address: str = None,
         drop_pending_updates: bool = None,
+        secret_token: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -3808,9 +3809,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         specified url, containing An Update. In case of an unsuccessful request,
         Telegram will give up after a reasonable amount of attempts.
 
-        If you'd like to make sure that the Webhook request comes from Telegram, Telegram
-        recommends using a secret path in the URL, e.g. https://www.example.com/<token>. Since
-        nobody else knows your bot's token, you can be pretty sure it's them.
+        If you'd like to make sure that the Webhook was set by you, you can specify secret data in
+        the parameter :paramref:`secret_token`. If specified, the request will contain a header
+        ``X-Telegram-Bot-Api-Secret-Token`` with the secret token as content.
 
         Note:
             The certificate argument should be a file from disk ``open(filename, 'rb')``.
@@ -3839,6 +3840,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 a short period of time.
             drop_pending_updates (:obj:`bool`, optional): Pass :obj:`True` to drop all pending
                 updates.
+            secret_token (:obj:`str`, optional): A secret token to be sent in a header
+                ``X-Telegram-Bot-Api-Secret-Token`` in every webhook request,
+                :tg-const:`telegram.constants.WebhookLimit.MIN_SECRET_TOKEN_LENGTH`-
+                :tg-const:`telegram.constants.WebhookLimit.MAX_SECRET_TOKEN_LENGTH` characters.
+                Only characters ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
+                The header is useful to ensure that the request comes from a webhook set by you.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -3889,6 +3898,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data["ip_address"] = ip_address
         if drop_pending_updates:
             data["drop_pending_updates"] = drop_pending_updates
+        if secret_token is not None:
+            data["secret_token"] = secret_token
 
         result = await self._post(
             "setWebhook",
@@ -4593,26 +4604,32 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            title (:obj:`str`): Product name, 1-32 characters.
-            description (:obj:`str`): Product description, 1-255 characters.
-            payload (:obj:`str`): Bot-defined invoice payload, 1-128 bytes. This will not be
+            title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
+            description (:obj:`str`): Product description.
+                :tg-const:`telegram.Invoice.MIN_DESCRIPTION_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_DESCRIPTION_LENGTH` characters.
+            payload (:obj:`str`): Bot-defined invoice payload.
+                :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
                 displayed to the user, use for your internal processes.
             provider_token (:obj:`str`): Payments provider token, obtained via
                 `@BotFather <https://t.me/BotFather>`_.
-            currency (:obj:`str`): Three-letter ISO 4217 currency code.
+            currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
+                <https://core.telegram.org/bots/payments#supported-currencies>`_.
             prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
                 of components (e.g. product price, tax, discount, delivery cost, delivery tax,
                 bonus, etc.).
             max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
-                smallest units of the currency (integer, not float/double). For example, for a
-                maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
+                *smallest* units of the currency (integer, **not** float/double). For example, for
+                a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
                 `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
                 shows the number of digits past the decimal point for each currency (2 for the
                 majority of currencies). Defaults to ``0``.
 
                 .. versionadded:: 13.5
             suggested_tip_amounts (List[:obj:`int`], optional): An array of
-                suggested amounts of tips in the smallest units of the currency (integer, not
+                suggested amounts of tips in the *smallest* units of the currency (integer, **not**
                 float/double). At most 4 suggested tip amounts can be specified. The suggested tip
                 amounts must be positive, passed in a strictly increased order and must not exceed
                 ``max_tip_amount``.
@@ -7693,6 +7710,159 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
         return MenuButton.de_json(result, bot=self)  # type: ignore[return-value, arg-type]
 
+    @_log
+    async def create_invoice_link(
+        self,
+        title: str,
+        description: str,
+        payload: str,
+        provider_token: str,
+        currency: str,
+        prices: List["LabeledPrice"],
+        max_tip_amount: int = None,
+        suggested_tip_amounts: List[int] = None,
+        provider_data: Union[str, object] = None,
+        photo_url: str = None,
+        photo_size: int = None,
+        photo_width: int = None,
+        photo_height: int = None,
+        need_name: bool = None,
+        need_phone_number: bool = None,
+        need_email: bool = None,
+        need_shipping_address: bool = None,
+        send_phone_number_to_provider: bool = None,
+        send_email_to_provider: bool = None,
+        is_flexible: bool = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> str:
+        """Use this method to create a link for an invoice.
+
+        .. versionadded:: 20.0
+
+        Args:
+            title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
+            description (:obj:`str`): Product description.
+                :tg-const:`telegram.Invoice.MIN_DESCRIPTION_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_DESCRIPTION_LENGTH` characters.
+            payload (:obj:`str`): Bot-defined invoice payload.
+                :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
+                :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be
+                displayed to the user, use for your internal processes.
+            provider_token (:obj:`str`): Payments provider token, obtained via
+                `@BotFather <https://t.me/BotFather>`_.
+            currency (:obj:`str`): Three-letter ISO 4217 currency code, see `more on currencies
+                <https://core.telegram.org/bots/payments#supported-currencies>`_.
+            prices (List[:class:`telegram.LabeledPrice`)]: Price breakdown, a list
+                of components (e.g. product price, tax, discount, delivery cost, delivery tax,
+                bonus, etc.).
+            max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
+                *smallest* units of the currency (integer, **not** float/double). For example, for
+                a maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the exp parameter in
+                `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
+                shows the number of digits past the decimal point for each currency (2 for the
+                majority of currencies). Defaults to ``0``.
+            suggested_tip_amounts (List[:obj:`int`], optional): An array of
+                suggested amounts of tips in the *smallest* units of the currency (integer, **not**
+                float/double). At most 4 suggested tip amounts can be specified. The suggested tip
+                amounts must be positive, passed in a strictly increased order and must not exceed
+                :paramref:`max_tip_amount`.
+            provider_data (:obj:`str` | :obj:`object`, optional): Data about the
+                invoice, which will be shared with the payment provider. A detailed description of
+                required fields should be provided by the payment provider. When an object is
+                passed, it will be encoded as JSON.
+            photo_url (:obj:`str`, optional): URL of the product photo for the invoice. Can be a
+                photo of the goods or a marketing image for a service.
+            photo_size (:obj:`int`, optional): Photo size in bytes.
+            photo_width (:obj:`int`, optional): Photo width.
+            photo_height (:obj:`int`, optional): Photo height.
+            need_name (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's full
+                name to complete the order.
+            need_phone_number (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's
+                phone number to complete the order.
+            need_email (:obj:`bool`, optional): Pass :obj:`True`, if you require the user's email
+                address to complete the order.
+            need_shipping_address (:obj:`bool`, optional): Pass :obj:`True`, if you require the
+                user's shipping address to complete the order.
+            send_phone_number_to_provider (:obj:`bool`, optional): Pass :obj:`True`, if user's
+                phone number should be sent to provider.
+            send_email_to_provider (:obj:`bool`, optional): Pass :obj:`True`, if user's email
+                address should be sent to provider.
+            is_flexible (:obj:`bool`, optional): Pass :obj:`True`, if the final price depends on
+                the shipping method.
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`str`: On success, the created invoice link is returned.
+
+        """
+        data: JSONDict = {
+            "title": title,
+            "description": description,
+            "payload": payload,
+            "provider_token": provider_token,
+            "currency": currency,
+            "prices": prices,
+        }
+        if max_tip_amount is not None:
+            data["max_tip_amount"] = max_tip_amount
+        if suggested_tip_amounts is not None:
+            data["suggested_tip_amounts"] = suggested_tip_amounts
+        if provider_data is not None:
+            data["provider_data"] = provider_data
+        if photo_url is not None:
+            data["photo_url"] = photo_url
+        if photo_size is not None:
+            data["photo_size"] = photo_size
+        if photo_width is not None:
+            data["photo_width"] = photo_width
+        if photo_height is not None:
+            data["photo_height"] = photo_height
+        if need_name is not None:
+            data["need_name"] = need_name
+        if need_phone_number is not None:
+            data["need_phone_number"] = need_phone_number
+        if need_email is not None:
+            data["need_email"] = need_email
+        if need_shipping_address is not None:
+            data["need_shipping_address"] = need_shipping_address
+        if is_flexible is not None:
+            data["is_flexible"] = is_flexible
+        if send_phone_number_to_provider is not None:
+            data["send_phone_number_to_provider"] = send_phone_number_to_provider
+        if send_email_to_provider is not None:
+            data["send_email_to_provider"] = send_email_to_provider
+
+        return await self._post(  # type: ignore[return-value]
+            "createInvoiceLink",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -7881,3 +8051,5 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     """Alias for :meth:`get_my_default_administrator_rights`"""
     setMyDefaultAdministratorRights = set_my_default_administrator_rights
     """Alias for :meth:`set_my_default_administrator_rights`"""
+    createInvoiceLink = create_invoice_link
+    """Alias for :meth:`create_invoice_link`"""

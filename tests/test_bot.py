@@ -1634,6 +1634,35 @@ class TestBot:
         assert await bot.set_webhook("", drop_pending_updates=drop_pending_updates)
         assert await bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
+    async def test_set_webhook_params(self, bot, monkeypatch):
+        # actually making calls to TG is done in
+        # test_set_webhook_get_webhook_info_and_delete_webhook. Sadly secret_token can't be tested
+        # there so we have this function \o/
+        async def make_assertion(*args, **_):
+            kwargs = args[1]
+            return (
+                kwargs["url"] == "example.com"
+                and kwargs["certificate"].input_file_content
+                == data_file("sslcert.pem").read_bytes()
+                and kwargs["max_connections"] == 7
+                and kwargs["allowed_updates"] == ["messages"]
+                and kwargs["ip_address"] == "127.0.0.1"
+                and kwargs["drop_pending_updates"]
+                and kwargs["secret_token"] == "SoSecretToken"
+            )
+
+        monkeypatch.setattr(bot, "_post", make_assertion)
+
+        assert await bot.set_webhook(
+            "example.com",
+            data_file("sslcert.pem").read_bytes(),
+            7,
+            ["messages"],
+            "127.0.0.1",
+            True,
+            "SoSecretToken",
+        )
+
     @flaky(3, 1)
     async def test_leave_chat(self, bot):
         with pytest.raises(BadRequest, match="Chat not found"):
@@ -1833,7 +1862,7 @@ class TestBot:
         # We assume that the other game score tests ran within 20 sec
         assert high_scores[0].score == BASE_GAME_SCORE - 10
 
-    # send_invoice is tested in test_invoice
+    # send_invoice and create_invoice_link is tested in test_invoice
 
     # TODO: Needs improvement. Need incoming shipping queries to test
     async def test_answer_shipping_query_ok(self, monkeypatch, bot):

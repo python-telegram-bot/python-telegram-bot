@@ -27,6 +27,7 @@ from telegram import (
     Chat,
     Dice,
     Document,
+    File,
     Message,
     MessageEntity,
     Sticker,
@@ -830,15 +831,26 @@ class TestFilters:
         update.message.sticker = Sticker("1", "uniq", 1, 2, False, False)
         assert filters.Sticker.ALL.check_update(update)
         assert filters.Sticker.STATIC.check_update(update)
+        assert not filters.Sticker.VIDEO.check_update(update)
+        assert not filters.Sticker.PREMIUM.check_update(update)
         update.message.sticker.is_animated = True
         assert filters.Sticker.ANIMATED.check_update(update)
         assert not filters.Sticker.VIDEO.check_update(update)
         assert not filters.Sticker.STATIC.check_update(update)
+        assert not filters.Sticker.PREMIUM.check_update(update)
         update.message.sticker.is_animated = False
         update.message.sticker.is_video = True
         assert not filters.Sticker.ANIMATED.check_update(update)
         assert not filters.Sticker.STATIC.check_update(update)
         assert filters.Sticker.VIDEO.check_update(update)
+        assert not filters.Sticker.PREMIUM.check_update(update)
+        update.message.sticker.premium_animation = File("string", "uniqueString")
+        assert not filters.Sticker.ANIMATED.check_update(update)
+        # premium stickers can be animated, video, or probably also static,
+        # it doesn't really matter for the test
+        assert not filters.Sticker.STATIC.check_update(update)
+        assert filters.Sticker.VIDEO.check_update(update)
+        assert filters.Sticker.PREMIUM.check_update(update)
 
     def test_filters_video(self, update):
         assert not filters.VIDEO.check_update(update)
@@ -1167,6 +1179,19 @@ class TestFilters:
 
         with pytest.raises(RuntimeError, match="Cannot set name"):
             f.name = "foo"
+
+    def test_filters_user_attributes(self, update):
+        assert not filters.USER_ATTACHMENT.check_update(update)
+        assert not filters.PREMIUM_USER.check_update(update)
+        update.message.from_user.added_to_attachment_menu = True
+        assert filters.USER_ATTACHMENT.check_update(update)
+        assert not filters.PREMIUM_USER.check_update(update)
+        update.message.from_user.is_premium = True
+        assert filters.USER_ATTACHMENT.check_update(update)
+        assert filters.PREMIUM_USER.check_update(update)
+        update.message.from_user.added_to_attachment_menu = False
+        assert not filters.USER_ATTACHMENT.check_update(update)
+        assert filters.PREMIUM_USER.check_update(update)
 
     def test_filters_chat_init(self):
         with pytest.raises(RuntimeError, match="in conjunction with"):

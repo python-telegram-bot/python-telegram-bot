@@ -23,7 +23,7 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Audio, Bot, MaskPosition, PhotoSize, Sticker, StickerSet
+from telegram import Audio, Bot, File, MaskPosition, PhotoSize, Sticker, StickerSet
 from telegram.error import BadRequest, TelegramError
 from telegram.request import RequestData
 from tests.conftest import (
@@ -91,6 +91,8 @@ class TestSticker:
     sticker_file_id = "5a3128a4d2a04750b5b58397f3b5e812"
     sticker_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
+    premium_animation = File("this_is_an_id", "this_is_an_unique_id")
+
     def test_slot_behaviour(self, sticker, mro_slots, recwarn):
         for attr in sticker.__slots__:
             assert getattr(sticker, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -118,6 +120,8 @@ class TestSticker:
         assert sticker.thumb.width == self.thumb_width
         assert sticker.thumb.height == self.thumb_height
         assert sticker.thumb.file_size == self.thumb_file_size
+        # we need to be a premium TG user to send a premium sticker, so the below is not tested
+        # assert sticker.premium_animation == self.premium_animation
 
     @flaky(3, 1)
     async def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
@@ -135,6 +139,8 @@ class TestSticker:
         assert message.sticker.is_animated == sticker.is_animated
         assert message.sticker.is_video == sticker.is_video
         assert message.sticker.file_size == sticker.file_size
+        # we need to be a premium TG user to send a premium sticker, so the below is not tested
+        # assert message.sticker.premium_animation == sticker.premium_animation
 
         assert isinstance(message.sticker.thumb, PhotoSize)
         assert isinstance(message.sticker.thumb.file_id, str)
@@ -212,6 +218,7 @@ class TestSticker:
             "thumb": sticker.thumb.to_dict(),
             "emoji": self.emoji,
             "file_size": self.file_size,
+            "premium_animation": self.premium_animation.to_dict(),
         }
         json_sticker = Sticker.de_json(json_dict, bot)
 
@@ -224,6 +231,7 @@ class TestSticker:
         assert json_sticker.emoji == self.emoji
         assert json_sticker.file_size == self.file_size
         assert json_sticker.thumb == sticker.thumb
+        assert json_sticker.premium_animation == self.premium_animation
 
     async def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -316,6 +324,24 @@ class TestSticker:
     async def test_error_without_required_args(self, bot, chat_id):
         with pytest.raises(TypeError):
             await bot.send_sticker(chat_id)
+
+    @flaky(3, 1)
+    async def test_premium_animation(self, bot):
+        # testing animation sucks a bit since we can't create a premium sticker. What we can do is
+        # get a sticker set which includes a premium sticker and check that specific one.
+        premium_sticker_set = await bot.get_sticker_set("Flame")
+        # the first one to appear here is a sticker with unique file id of AQADOBwAAifPOElr
+        # this could change in the future ofc.
+        premium_sticker = premium_sticker_set.stickers[20]
+        assert premium_sticker.premium_animation.file_unique_id == "AQADOBwAAifPOElr"
+        assert isinstance(premium_sticker.premium_animation.file_id, str)
+        assert premium_sticker.premium_animation.file_id != ""
+        premium_sticker_dict = {
+            "file_unique_id": "AQADOBwAAifPOElr",
+            "file_id": premium_sticker.premium_animation.file_id,
+            "file_size": premium_sticker.premium_animation.file_size,
+        }
+        assert premium_sticker.premium_animation.to_dict() == premium_sticker_dict
 
     def test_equality(self, sticker):
         a = Sticker(

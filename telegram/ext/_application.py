@@ -662,6 +662,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         max_connections: int = 40,
         close_loop: bool = True,
         stop_signals: ODVInput[Sequence[int]] = DEFAULT_NONE,
+        secret_token: str = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
         polling updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
@@ -724,6 +725,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                     :meth:`asyncio.loop.add_signal_handler`. Most notably, the standard event loop
                     on Windows, :class:`asyncio.ProactorEventLoop`, does not implement this method.
                     If this method is not available, stop signals can not be set.
+            secret_token (:obj:`str`, optional): Secret token to ensure webhook requests originate
+                from Telegram. See :paramref:`telegram.Bot.set_webhook.secret_token` for more
+                details.
+
+                When added, the web server started by this call will expect the token to be set in
+                the ``X-Telegram-Bot-Api-Secret-Token`` header of an incoming request and will
+                raise a :class:`http.HTTPStatus.FORBIDDEN <http.HTTPStatus>` error if either the
+                header isn't set or it is set to a wrong token.
+
+                .. versionadded:: 20.0
         """
         if not self.updater:
             raise RuntimeError(
@@ -743,6 +754,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 allowed_updates=allowed_updates,
                 ip_address=ip_address,
                 max_connections=max_connections,
+                secret_token=secret_token,
             ),
             close_loop=close_loop,
             stop_signals=stop_signals,

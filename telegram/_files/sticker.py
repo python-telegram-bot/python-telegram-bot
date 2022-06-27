@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -62,6 +63,10 @@ class Sticker(_BaseThumbedMedium):
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size in bytes.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        premium_animation (:class:`telegram.File`, optional): Premium animation for the sticker,
+            if the sticker is premium.
+
+            .. versionadded:: 20.0
         _kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -83,6 +88,10 @@ class Sticker(_BaseThumbedMedium):
             where the mask should be placed.
         file_size (:obj:`int`): Optional. File size in bytes.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        premium_animation (:class:`telegram.File`): Optional. Premium animation for the
+            sticker, if the sticker is premium.
+
+            .. versionadded:: 20.0
 
     """
 
@@ -94,6 +103,7 @@ class Sticker(_BaseThumbedMedium):
         "mask_position",
         "set_name",
         "width",
+        "premium_animation",
     )
 
     def __init__(
@@ -110,6 +120,7 @@ class Sticker(_BaseThumbedMedium):
         set_name: str = None,
         mask_position: "MaskPosition" = None,
         bot: "Bot" = None,
+        premium_animation: "File" = None,
         **_kwargs: Any,
     ):
         super().__init__(
@@ -128,6 +139,7 @@ class Sticker(_BaseThumbedMedium):
         self.emoji = emoji
         self.set_name = set_name
         self.mask_position = mask_position
+        self.premium_animation = premium_animation
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Sticker"]:
@@ -139,6 +151,7 @@ class Sticker(_BaseThumbedMedium):
 
         data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
         data["mask_position"] = MaskPosition.de_json(data.get("mask_position"), bot)
+        data["premium_animation"] = File.de_json(data.get("premium_animation"), bot)
 
         return cls(bot=bot, **data)
 

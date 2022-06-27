@@ -830,10 +830,13 @@ async def send_webhook_message(
     content_len: int = -1,
     content_type: str = "application/json",
     get_method: str = None,
+    secret_token: str = None,
 ) -> Response:
     headers = {
         "content-type": content_type,
     }
+    if secret_token:
+        headers["X-Telegram-Bot-Api-Secret-Token"] = secret_token
 
     if not payload_str:
         content_len = None
