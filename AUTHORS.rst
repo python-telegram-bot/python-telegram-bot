@@ -46,6 +46,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Evan Haberecht <https://github.com/habereet>`_
 - `Evgeny Denisov <https://github.com/eIGato>`_
 - `evgfilim1 <https://github.com/evgfilim1>`_
+- `ExalFabu <https://github.com/ExalFabu>`_
 - `franciscod <https://github.com/franciscod>`_
 - `gamgi <https://github.com/gamgi>`_
 - `Gauthamram Ravichandran <https://github.com/GauthamramRavichandran>`_
