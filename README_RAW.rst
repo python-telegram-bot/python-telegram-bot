@@ -34,7 +34,7 @@
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 
-.. image:: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
+.. image:: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot
    :target: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot
    :alt: Code coverage
 
