@@ -34,6 +34,7 @@ from telegram.request import HTTPXRequest
 from tests.conftest import (
     DictBot,
     data_file,
+    make_bot,
     make_message,
     make_message_update,
     send_webhook_message,
@@ -83,7 +84,7 @@ class TestUpdater:
         async def initialize_bot(*args, **kwargs):
             self.test_flag = True
 
-        async with Bot(bot.token) as test_bot:
+        async with make_bot(token=bot.token) as test_bot:
             monkeypatch.setattr(test_bot, "initialize", initialize_bot)
 
             updater = Updater(bot=test_bot, update_queue=asyncio.Queue())
@@ -95,7 +96,7 @@ class TestUpdater:
         async def shutdown_bot(*args, **kwargs):
             self.test_flag = True
 
-        async with Bot(bot.token) as test_bot:
+        async with make_bot(token=bot.token) as test_bot:
             monkeypatch.setattr(test_bot, "shutdown", shutdown_bot)
 
             updater = Updater(bot=test_bot, update_queue=asyncio.Queue())

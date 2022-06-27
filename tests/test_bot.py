@@ -75,6 +75,7 @@ from tests.conftest import (
     check_defaults_handling,
     data_file,
     expect_bad_request,
+    make_bot,
 )
 
 
@@ -282,7 +283,7 @@ class TestBot:
     async def test_invalid_token_server_response(self, monkeypatch):
         monkeypatch.setattr("telegram.Bot._validate_token", lambda x, y: "")
         with pytest.raises(InvalidToken):
-            async with Bot("12") as bot:
+            async with make_bot(token="12") as bot:
                 await bot.get_me()
 
     async def test_unknown_kwargs(self, bot, monkeypatch):
@@ -335,9 +336,9 @@ class TestBot:
             await bot.shutdown()
 
     async def test_equality(self):
-        async with Bot(FALLBACKS[0]["token"]) as a, Bot(FALLBACKS[0]["token"]) as b, Bot(
-            FALLBACKS[1]["token"]
-        ) as c:
+        async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
+            token=FALLBACKS[0]["token"]
+        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c:
             d = Update(123456789)
 
             assert a == b
