@@ -60,6 +60,10 @@ class Sticker(TelegramObject):
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+        premium_animation (:class:`telegram.File`, optional): Premium animation for the sticker,
+            if the sticker is premium.
+
+            .. versionadded:: 13.13
         **kwargs (obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -80,6 +84,10 @@ class Sticker(TelegramObject):
         mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
             where the mask should be placed.
         file_size (:obj:`int`): Optional. File size.
+        premium_animation (:class:`telegram.File`): Optional. Premium animation for the sticker,
+            if the sticker is premium.
+
+            .. versionadded:: 13.13
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
@@ -97,6 +105,7 @@ class Sticker(TelegramObject):
         'height',
         'file_unique_id',
         'emoji',
+        'premium_animation',
         '_id_attrs',
     )
 
@@ -114,6 +123,7 @@ class Sticker(TelegramObject):
         set_name: str = None,
         mask_position: 'MaskPosition' = None,
         bot: 'Bot' = None,
+        premium_animation: 'File' = None,
         **_kwargs: Any,
     ):
         # Required
@@ -130,12 +140,17 @@ class Sticker(TelegramObject):
         self.set_name = set_name
         self.mask_position = mask_position
         self.bot = bot
+        self.premium_animation = premium_animation
 
         self._id_attrs = (self.file_unique_id,)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: 'Bot') -> Optional['Sticker']:
         """See :meth:`telegram.TelegramObject.de_json`."""
+        # needs to be here to avoid circular imports
+        # pylint: disable=import-outside-toplevel
+        from telegram import File
+
         data = cls._parse_data(data)
 
         if not data:
@@ -143,6 +158,7 @@ class Sticker(TelegramObject):
 
         data['thumb'] = PhotoSize.de_json(data.get('thumb'), bot)
         data['mask_position'] = MaskPosition.de_json(data.get('mask_position'), bot)
+        data["premium_animation"] = File.de_json(data.get("premium_animation"), bot)
 
         return cls(bot=bot, **data)
 

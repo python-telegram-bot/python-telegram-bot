@@ -1189,6 +1189,19 @@ class TestFilters:
         with pytest.raises(RuntimeError, match='Cannot set name'):
             f.name = 'foo'
 
+    def test_filters_user_attributes(self, update):
+        assert not Filters.user_attachment(update)
+        assert not Filters.premium_user(update)
+        update.message.from_user.added_to_attachment_menu = True
+        assert Filters.user_attachment(update)
+        assert not Filters.premium_user(update)
+        update.message.from_user.is_premium = True
+        assert Filters.user_attachment(update)
+        assert Filters.premium_user(update)
+        update.message.from_user.added_to_attachment_menu = False
+        assert not Filters.user_attachment(update)
+        assert Filters.premium_user(update)
+
     def test_filters_chat_init(self):
         with pytest.raises(RuntimeError, match='in conjunction with'):
             Filters.chat(chat_id=1, username='chat')
