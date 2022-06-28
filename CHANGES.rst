@@ -2,6 +2,18 @@
 Changelog
 =========
 
+Version 13.13
+=============
+*Released 2022-06-28*
+
+This is the technical changelog for version 13.13. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+**Major Changes:**
+
+- Full Support for API 6.1 (`#3117`_)
+
+.. _`#3117`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3117
+
 Version 13.12
 =============
 *Released 2022-05-26*
