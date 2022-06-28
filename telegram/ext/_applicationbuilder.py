@@ -191,7 +191,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             )
         else:
             connection_pool_size = (
-                DefaultValue.get_value(getattr(self, f"{prefix}connection_pool_size")) or 128
+                DefaultValue.get_value(getattr(self, f"{prefix}connection_pool_size")) or 256
             )
 
         timeouts = dict(
@@ -424,7 +424,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     def connection_pool_size(self: BuilderType, connection_pool_size: int) -> BuilderType:
         """Sets the size of the connection pool for the
         :paramref:`~telegram.request.HTTPXRequest.connection_pool_size` parameter of
-        :attr:`telegram.Bot.request`. Defaults to ``128``.
+        :attr:`telegram.Bot.request`. Defaults to ``256``.
+
+        .. include:: inclusions/pool_size_tip.rst
 
         Args:
             connection_pool_size (:obj:`int`): The size of the connection pool.
@@ -503,6 +505,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         """Sets the connection pool's connection freeing timeout for the
         :paramref:`~telegram.request.HTTPXRequest.pool_timeout` parameter of
         :attr:`telegram.Bot.request`. Defaults to :obj:`None`.
+
+        .. include:: inclusions/pool_size_tip.rst
 
         Args:
             pool_timeout (:obj:`float`): See
@@ -770,11 +774,13 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             that your bot does not (explicitly or implicitly) rely on updates being processed
             sequentially.
 
+        .. include:: inclusions/pool_size_tip.rst
+
         .. seealso:: :attr:`telegram.ext.Application.concurrent_updates`
 
         Args:
             concurrent_updates (:obj:`bool` | :obj:`int`): Passing :obj:`True` will allow for
-                ``4096`` updates to be processed concurrently. Pass an integer to specify a
+                ``256`` updates to be processed concurrently. Pass an integer to specify a
                 different number of updates that may be processed concurrently.
 
         Returns:

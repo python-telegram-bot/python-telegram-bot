@@ -252,7 +252,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         if isinstance(concurrent_updates, int) and concurrent_updates < 0:
             raise ValueError("`concurrent_updates` must be a non-negative integer!")
         if concurrent_updates is True:
-            concurrent_updates = 4096
+            concurrent_updates = 256
         self._concurrent_updates_sem = asyncio.BoundedSemaphore(concurrent_updates or 1)
         self._concurrent_updates: int = concurrent_updates or 0
 

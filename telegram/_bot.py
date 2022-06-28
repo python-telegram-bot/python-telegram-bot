@@ -172,7 +172,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
 
-    .. include:: bot_methods.rst
+    .. include:: inclusions/bot_methods.rst
 
     """
 
