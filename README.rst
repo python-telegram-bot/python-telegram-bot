@@ -14,7 +14,7 @@
    :target: https://pypi.org/project/python-telegram-bot/
    :alt: Supported Python versions
 
-.. image:: https://img.shields.io/badge/Bot%20API-6.0-blue?logo=telegram
+.. image:: https://img.shields.io/badge/Bot%20API-6.1-blue?logo=telegram
    :target: https://core.telegram.org/bots/api-changelog
    :alt: Supported Bot API versions
 
@@ -34,7 +34,7 @@
    :target: https://github.com/python-telegram-bot/python-telegram-bot/
    :alt: Github Actions workflow
 
-.. image:: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/python-telegram-bot/python-telegram-bot/branch/master/graph/badge.svg
    :target: https://app.codecov.io/gh/python-telegram-bot/python-telegram-bot
    :alt: Code coverage
 
@@ -93,7 +93,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **6.0** are supported.
+All types and methods of the Telegram Bot API **6.1** are supported.
 
 Installing
 ==========
@@ -149,7 +149,7 @@ Resources
 =========
 
 - The `package documentation <https://docs.python-telegram-bot.org/>`_ is the technical reference for ``python-telegram-bot``.
-  It contains descriptions of all available classes, modules, methods and arguments.
+  It contains descriptions of all available classes, modules, methods and arguments as well as the `changelog <https://docs.python-telegram-bot.org/changelog.html>`_.
 - The `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki/>`_ is home to number of more elaborate introductions of the different features of ``python-telegram-bot`` and other useful resources that go beyond the technical documentation.
 - Our `examples section <https://docs.python-telegram-bot.org/examples.html>`_ contains several examples that showcase the different features of both the Bot API and ``python-telegram-bot``.
   Even if it is not your approach for learning, please take a look at ``echobot.py``. It is the de facto base for most of the bots out there.

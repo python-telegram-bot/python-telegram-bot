@@ -35,6 +35,8 @@ def json_dict():
         "can_join_groups": TestUser.can_join_groups,
         "can_read_all_group_messages": TestUser.can_read_all_group_messages,
         "supports_inline_queries": TestUser.supports_inline_queries,
+        "is_premium": TestUser.is_premium,
+        "added_to_attachment_menu": TestUser.added_to_attachment_menu,
     }
 
 
@@ -51,6 +53,8 @@ def user(bot):
         can_read_all_group_messages=TestUser.can_read_all_group_messages,
         supports_inline_queries=TestUser.supports_inline_queries,
         bot=bot,
+        is_premium=TestUser.is_premium,
+        added_to_attachment_menu=TestUser.added_to_attachment_menu,
     )
 
 
@@ -64,6 +68,8 @@ class TestUser:
     can_join_groups = True
     can_read_all_group_messages = True
     supports_inline_queries = False
+    is_premium = True
+    added_to_attachment_menu = False
 
     def test_slot_behaviour(self, user, mro_slots):
         for attr in user.__slots__:
@@ -82,6 +88,8 @@ class TestUser:
         assert user.can_join_groups == self.can_join_groups
         assert user.can_read_all_group_messages == self.can_read_all_group_messages
         assert user.supports_inline_queries == self.supports_inline_queries
+        assert user.is_premium == self.is_premium
+        assert user.added_to_attachment_menu == self.added_to_attachment_menu
 
     def test_de_json_without_username(self, json_dict, bot):
         del json_dict["username"]
@@ -97,6 +105,8 @@ class TestUser:
         assert user.can_join_groups == self.can_join_groups
         assert user.can_read_all_group_messages == self.can_read_all_group_messages
         assert user.supports_inline_queries == self.supports_inline_queries
+        assert user.is_premium == self.is_premium
+        assert user.added_to_attachment_menu == self.added_to_attachment_menu
 
     def test_de_json_without_username_and_last_name(self, json_dict, bot):
         del json_dict["username"]
@@ -113,6 +123,8 @@ class TestUser:
         assert user.can_join_groups == self.can_join_groups
         assert user.can_read_all_group_messages == self.can_read_all_group_messages
         assert user.supports_inline_queries == self.supports_inline_queries
+        assert user.is_premium == self.is_premium
+        assert user.added_to_attachment_menu == self.added_to_attachment_menu
 
     def test_name(self, user):
         assert user.name == "@username"

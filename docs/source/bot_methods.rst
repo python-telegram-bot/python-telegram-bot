@@ -263,6 +263,8 @@
     :align: left
     :widths: 1 4
 
+    * - :meth:`~telegram.Bot.create_invoice_link`
+      - Used to generate an HTTP link for an invoice
     * - :meth:`~telegram.Bot.close`
       - Used for closing server instance when switching to another local server
     * - :meth:`~telegram.Bot.log_out`

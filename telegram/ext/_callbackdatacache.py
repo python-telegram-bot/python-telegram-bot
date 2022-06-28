@@ -369,7 +369,8 @@ class CallbackDataCache:
             time_cutoff (:obj:`float` | :obj:`datetime.datetime`, optional): Pass a UNIX timestamp
                 or a :obj:`datetime.datetime` to clear only entries which are older.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
 
         """
         self.__clear(self._keyboard_data, time_cutoff=time_cutoff)

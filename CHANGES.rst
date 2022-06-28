@@ -2,6 +2,43 @@
 Changelog
 =========
 
+Version 20.0a2
+==============
+*Released 2022-06-27*
+
+This is the technical changelog for version 20.0a2. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for API 6.1 (`#3112`_)
+
+New Features
+------------
+
+- Add Additional Shortcut Methods to ``Chat`` (`#3115`_)
+- Mermaid-based Example State Diagrams (`#3090`_)
+
+Minor Changes, Documentation Improvements and CI
+------------------------------------------------
+
+- Documentation Improvements (`#3103`_, `#3121`_, `#3098`_)
+- Stabilize CI (`#3119`_)
+- Bump ``pyupgrade`` from 2.32.1 to 2.34.0 (`#3096`_)
+- Bump ``furo`` from 2022.6.4 to 2022.6.4.1 (`#3095`_)
+- Bump ``mypy`` from 0.960 to 0.961 (`#3093`_)
+
+.. _`#3112`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3112
+.. _`#3115`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3115
+.. _`#3090`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3090
+.. _`#3103`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3103
+.. _`#3121`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3121
+.. _`#3098`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3098
+.. _`#3119`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3119
+.. _`#3096`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3096
+.. _`#3095`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3095
+.. _`#3093`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3093
+
 Version 20.0a1
 ==============
 *Released 2022-06-09*

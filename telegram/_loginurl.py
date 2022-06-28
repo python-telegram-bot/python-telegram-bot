@@ -39,7 +39,7 @@ class LoginUrl(TelegramObject):
         `Checking authorization <https://core.telegram.org/widgets/login#checking-authorization>`_
 
     Args:
-        url (:obj:`str`): An HTTP URL to be opened with user authorization data added to the query
+        url (:obj:`str`): An HTTPS URL to be opened with user authorization data added to the query
             string when the button is pressed. If the user refuses to provide authorization data,
             the original URL without information about the user will be opened. The data added is
             the same as described in
@@ -59,7 +59,7 @@ class LoginUrl(TelegramObject):
             for your bot to send messages to the user.
 
     Attributes:
-        url (:obj:`str`): An HTTP URL to be opened with user authorization data.
+        url (:obj:`str`): An HTTPS URL to be opened with user authorization data.
         forward_text (:obj:`str`): Optional. New text of the button in forwarded messages.
         bot_username (:obj:`str`): Optional. Username of a bot, which will be used for user
             authorization.

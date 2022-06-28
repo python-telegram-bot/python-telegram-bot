@@ -39,9 +39,14 @@ class InputInvoiceMessageContent(InputMessageContent):
     .. versionadded:: 13.5
 
     Args:
-        title (:obj:`str`): Product name, 1-32 characters
-        description (:obj:`str`): Product description, 1-255 characters
-        payload (:obj:`str`):Bot-defined invoice payload, 1-128 bytes. This will not be displayed
+        title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
+            :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
+        description (:obj:`str`): Product description.
+            :tg-const:`telegram.Invoice.MIN_DESCRIPTION_LENGTH`-
+            :tg-const:`telegram.Invoice.MAX_DESCRIPTION_LENGTH` characters.
+        payload (:obj:`str`): Bot-defined invoice payload.
+            :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
+            :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be displayed
             to the user, use for your internal processes.
         provider_token (:obj:`str`): Payment provider token, obtained via
             `@Botfather <https://t.me/Botfather>`_.
@@ -50,15 +55,15 @@ class InputInvoiceMessageContent(InputMessageContent):
         prices (List[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
             components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus,
             etc.)
-        max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the smallest
-            units of the currency (integer, not float/double). For example, for a maximum tip of
-            US$ 1.45 pass ``max_tip_amount = 145``. See the ``exp`` parameter in
+        max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
+            *smallest* units of the currency (integer, **not** float/double). For example, for a
+            maximum tip of US$ 1.45 pass ``max_tip_amount = 145``. See the ``exp`` parameter in
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_, it
             shows the number of digits past the decimal point for each currency (2 for the majority
             of currencies). Defaults to ``0``.
         suggested_tip_amounts (List[:obj:`int`], optional): An array of suggested
-            amounts of tip in the smallest units of the currency (integer, not float/double). At
-            most 4 suggested tip amounts can be specified. The suggested tip amounts must be
+            amounts of tip in the *smallest* units of the currency (integer, **not** float/double).
+            At most 4 suggested tip amounts can be specified. The suggested tip amounts must be
             positive, passed in a strictly increased order and must not exceed
             :attr:`max_tip_amount`.
         provider_data (:obj:`str`, optional): An object for data about the invoice,
@@ -87,9 +92,14 @@ class InputInvoiceMessageContent(InputMessageContent):
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
-        title (:obj:`str`): Product name, 1-32 characters
-        description (:obj:`str`): Product description, 1-255 characters
-        payload (:obj:`str`):Bot-defined invoice payload, 1-128 bytes. This will not be displayed
+        title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
+            :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
+        description (:obj:`str`): Product description.
+            :tg-const:`telegram.Invoice.MIN_DESCRIPTION_LENGTH`-
+            :tg-const:`telegram.Invoice.MAX_DESCRIPTION_LENGTH` characters.
+        payload (:obj:`str`): Bot-defined invoice payload.
+            :tg-const:`telegram.Invoice.MIN_PAYLOAD_LENGTH`-
+            :tg-const:`telegram.Invoice.MAX_PAYLOAD_LENGTH` bytes. This will not be displayed
             to the user, use for your internal processes.
         provider_token (:obj:`str`): Payment provider token, obtained via
             `@Botfather <https://t.me/Botfather>`_.
