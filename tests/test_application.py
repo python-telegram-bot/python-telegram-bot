@@ -1834,7 +1834,12 @@ class TestApplication:
 
         assert not app.running
         assert not app.updater.running
-        assert set(shutdowns) == {"application", "updater"}
+        if method == "initialize":
+            # If App.initialize fails, then App.shutdown pretty much does nothing, especially
+            # doesn't call Updater.shutdown.
+            assert set(shutdowns) == {"application"}
+        else:
+            assert set(shutdowns) == {"application", "updater"}
 
     @pytest.mark.parametrize("method", ["start_polling", "start_webhook"])
     @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
