@@ -947,7 +947,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             .. code::
 
                 async def post_shutdown(application: Application) -> None:
-                    await db_connection.close()
+                    await application.bot_data['database'].close()
 
                 application = Application.builder()
                                         .token("TOKEN")
