@@ -584,8 +584,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         If :attr:`post_init` is set, it will be called between :meth:`initialize` and
         :meth:`telegram.ext.Updater.start_polling`.
 
-        If :attr:`post_shutdown` is set, it will be called between :meth:`shutdown` and
-        :meth:`telegram.ext.Updater.shutdown`.
+        If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
+        and :meth:`telegram.ext.Updater.shutdown`.
 
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
@@ -697,8 +697,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         If :attr:`post_init` is set, it will be called between :meth:`initialize` and
         :meth:`telegram.ext.Updater.start_webhook`.
 
-        If :attr:`post_shutdown` is set, it will be called between :meth:`shutdown` and
-        :meth:`telegram.ext.Updater.shutdown`.
+        If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
+        and :meth:`telegram.ext.Updater.shutdown`.
 
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
@@ -832,7 +832,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 loop.run_until_complete(self.shutdown())
                 if self.post_shutdown:
                     loop.run_until_complete(self.post_shutdown(self))
-                loop.run_until_complete(self.updater.shutdown())  # type: ignore[union-attr]
             finally:
                 if close_loop:
                     loop.close()

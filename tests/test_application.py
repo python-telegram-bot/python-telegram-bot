@@ -1481,9 +1481,9 @@ class TestApplication:
         app.run_polling(drop_pending_updates=True, close_loop=False)
         thread.join()
         assert events == [
+            "updater.shutdown",
             "shutdown",
             "post_shutdown",
-            "updater.shutdown",
         ], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
@@ -1731,9 +1731,9 @@ class TestApplication:
         )
         thread.join()
         assert events == [
+            "updater.shutdown",
             "shutdown",
             "post_shutdown",
-            "updater.shutdown",
         ], "Wrong order of events detected!"
 
     @pytest.mark.skipif(
