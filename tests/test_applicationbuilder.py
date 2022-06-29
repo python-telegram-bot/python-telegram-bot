@@ -93,7 +93,7 @@ class TestApplicationBuilder:
         )
 
         client = app.bot.request._client
-        assert client.limits == httpx.Limits(max_connections=128, max_keepalive_connections=128)
+        assert client.limits == httpx.Limits(max_connections=256, max_keepalive_connections=256)
         assert client.proxies is None
         assert client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
 

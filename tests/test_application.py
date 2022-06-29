@@ -139,7 +139,7 @@ class TestApplication:
         assert recwarn[0].filename == __file__, "stacklevel is incorrect!"
 
     @pytest.mark.parametrize(
-        "concurrent_updates, expected", [(0, 0), (4, 4), (False, 0), (True, 4096)]
+        "concurrent_updates, expected", [(0, 0), (4, 4), (False, 0), (True, 256)]
     )
     @pytest.mark.filterwarnings("ignore: `Application` instances should")
     def test_init(self, bot, concurrent_updates, expected):
