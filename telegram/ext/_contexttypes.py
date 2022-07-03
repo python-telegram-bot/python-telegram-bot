@@ -53,7 +53,8 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
             and job callbacks. Defaults to :obj:`dict`. Must support instantiating without
             arguments.
 
-    .. seealso:: `contexttypesbot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/contexttypesbot.py>`_
+    .. seealso:: `contexttypesbot.py <https://github.com/python-telegram-bot/
+        python-telegram-bot/blob/master/examples/contexttypesbot.py>`_
     """
 
     DEFAULT_TYPE = CallbackContext["ExtBot", dict, dict, dict]

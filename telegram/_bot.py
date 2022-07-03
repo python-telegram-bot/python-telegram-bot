@@ -172,7 +172,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
 
-    .. seealso:: :attr:`telegram.ext.Application.bot`, :attr:`telegram.ext.CallbackContext.bot`, :attr:`telegram.ext.Updater.bot`
+    .. seealso:: :attr:`telegram.ext.Application.bot`,
+        :attr:`telegram.ext.CallbackContext.bot`,
+        :attr:`telegram.ext.Updater.bot`
     .. include:: inclusions/bot_methods.rst
 
     """
@@ -780,7 +782,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Message.forward`, :attr:`telegram.Chat.forward_to`, :attr:`telegram.Chat.forward_from`
+        .. seealso:: :attr:`telegram.Message.forward`,
+            :attr:`telegram.Chat.forward_to`,
+            :attr:`telegram.Chat.forward_from`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1563,7 +1567,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Message.reply_video_note`, :attr:`telegram.Chat.send_video_note`
+        .. seealso:: :attr:`telegram.Message.reply_video_note`,
+            :attr:`telegram.Chat.send_video_note`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -5760,7 +5765,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Chat.approve_join_request`, :attr:`telegram.ChatJoinRequest.approve`
+        .. seealso:: :attr:`telegram.Chat.approve_join_request`,
+            :attr:`telegram.ChatJoinRequest.approve`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5822,7 +5828,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Chat.decline_join_request`, :attr:`telegram.ChatJoinRequest.decline`
+        .. seealso:: :attr:`telegram.Chat.decline_join_request`,
+            :attr:`telegram.ChatJoinRequest.decline`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -7686,7 +7693,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Message.copy`, :attr:`telegram.Chat.send_copy`, :attr:`telegram.Chat.copy_message`
+        .. seealso:: :attr:`telegram.Message.copy`,
+            :attr:`telegram.Chat.send_copy`,
+            :attr:`telegram.Chat.copy_message`
 
         Returns:
             :class:`telegram.MessageId`: On success

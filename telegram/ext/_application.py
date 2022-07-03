@@ -1411,7 +1411,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 should be awaited before processing the next error handler in
                 :meth:`process_error`. Defaults to :obj:`True`.
 
-        .. seealso:: `errorhandlerbot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/errorhandlerbot.py>`_
+        .. seealso:: `errorhandlerbot.py <https://github.com/python-telegram-bot/
+            python-telegram-bot/blob/master/examples/errorhandlerbot.py>`_
         """
         if callback in self.error_handlers:
             _logger.warning("The callback is already registered as an error handler. Ignoring.")

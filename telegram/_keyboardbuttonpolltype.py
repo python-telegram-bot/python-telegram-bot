@@ -34,7 +34,9 @@ class KeyboardButtonPollType(TelegramObject):
             allowed to create only polls in the quiz mode. If :tg-const:`telegram.Poll.REGULAR` is
             passed, only regular polls will be allowed. Otherwise, the user will be allowed to
             create a poll of any type.
-    .. seelaso:: `pollbot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/pollbot.py>`_
+
+    .. seealso:: `pollbot.py <https://github.com/python-telegram-bot/
+        python-telegram-bot/blob/master/examples/pollbot.py>`_
     """
 
     __slots__ = ("type",)

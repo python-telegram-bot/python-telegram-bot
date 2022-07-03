@@ -60,7 +60,8 @@ class InputTextMessageContent(InputMessageContent):
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
-    .. seealso:: `inlinebot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py>`_
+    .. seealso:: `inlinebot.py <https://github.com/python-telegram-bot/
+        python-telegram-bot/blob/master/examples/inlinebot.py>`_
     """
 
     __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")

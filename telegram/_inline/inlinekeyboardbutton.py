@@ -145,7 +145,8 @@ class InlineKeyboardButton(TelegramObject):
             be launched when the user presses the button.
         pay (:obj:`bool`): Optional. Specify :obj:`True`, to send a Pay button.
 
-    .. seealso:: `inlinekeyboardbutton.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/telegram/_inline/inlinekeyboardbutton.py>`_, `inlinekeyboard2.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard2.py>`_, `InlineKeyboard Example <https://github.com/python-telegram-bot/python-telegram-bot/wiki/InlineKeyboard-Example>`_
+    .. seealso:: `inlinekeyboardbutton.py <https://github.com/python-telegram-bot/
+        python-telegram-bot/blob/master/telegram/_inline/inlinekeyboardbutton.py>`_, `inlinekeyboard2.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinekeyboard2.py>`_, `InlineKeyboard Example <https://github.com/python-telegram-bot/python-telegram-bot/wiki/InlineKeyboard-Example>`_
     """
 
     __slots__ = (
