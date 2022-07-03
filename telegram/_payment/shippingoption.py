@@ -44,6 +44,7 @@ class ShippingOption(TelegramObject):
         title (:obj:`str`): Option title.
         prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
 
+    .. seealso:: `paymentbot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/paymentbot.py>`_
     """
 
     __slots__ = ("prices", "title", "id")

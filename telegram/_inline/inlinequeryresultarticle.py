@@ -63,6 +63,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         thumb_width (:obj:`int`): Optional. Thumbnail width.
         thumb_height (:obj:`int`): Optional. Thumbnail height.
 
+    .. seealso:: `inlinebot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py>`_
     """
 
     __slots__ = (

@@ -110,6 +110,7 @@ class CallbackDataCache:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
         maxsize (:obj:`int`): maximum size of the cache.
 
+    .. seealso:: :attr:`telegram.ext.ExtBot.callback_data_cache`
     """
 
     __slots__ = ("bot", "maxsize", "_keyboard_data", "_callback_queries", "logger")

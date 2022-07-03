@@ -150,6 +150,8 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
             add the bot to. If :obj:`False`, opens a one-on-one conversation with the bot.
             Defaults to :obj:`False`.
 
+    .. seealso:: `deeplinking.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/deeplinking.py>`_
+
     Returns:
         :obj:`str`: An URL to start the bot with specific parameters
     """

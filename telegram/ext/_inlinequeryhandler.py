@@ -77,6 +77,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
 
+    .. seealso:: `inlinebot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/inlinebot.py>`_
     """
 
     __slots__ = ("pattern", "chat_types")

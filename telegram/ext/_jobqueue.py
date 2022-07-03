@@ -47,6 +47,7 @@ class JobQueue:
                 Uses :class:`~apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
                 :class:`~apscheduler.schedulers.background.BackgroundScheduler`
 
+    .. seealso:: :attr:`telegram.ext.Application.job_queue`, :attr:`telegram.ext.CallbackContext.job_queue`, `timerbot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/timerbot.py>`_, `Job Queue <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
 
     """
 

@@ -63,6 +63,7 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
 
+    .. seealso:: `chatmemberbot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/chatmemberbot.py>`_
     """
 
     __slots__ = ("chat_member_types",)

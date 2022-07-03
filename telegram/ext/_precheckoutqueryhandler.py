@@ -48,6 +48,7 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
         callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the callback will run in a blocking way..
 
+    .. seealso:: `paymentbot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/paymentbot.py>`_
     """
 
     __slots__ = ()

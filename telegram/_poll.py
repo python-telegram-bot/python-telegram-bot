@@ -155,6 +155,7 @@ class Poll(TelegramObject):
         close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
             automatically closed.
 
+    .. seelaso:: `pollbot.py <https://github.com/python-telegram-bot/python-telegram-bot/blob/master/examples/pollbot.py>`_
     """
 
     __slots__ = (

@@ -85,6 +85,7 @@ class ExtBot(Bot):
         callback_data_cache (:class:`telegram.ext.CallbackDataCache`): The cache for objects passed
             as callback data for :class:`telegram.InlineKeyboardButton`.
 
+    .. seealso:: `arbitrarycallbackbot.py <https://docs.python-telegram-bot.org/examples.html#examples-arbitrarycallbackdatabot>`_, `Arbitrary callback_data <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
     """
 
     __slots__ = ("arbitrary_callback_data", "callback_data_cache", "_defaults")
