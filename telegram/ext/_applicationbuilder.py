@@ -936,8 +936,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
     ) -> BuilderType:
         """
         Sets a callback to be executed by :meth:`Application.run_polling` and
-        :meth:`Application.run_webhook` *after* executing :meth:`Application.shutdown` but
-        *before* executing :meth:`Updater.shutdown` respectively.
+        :meth:`Application.run_webhook` *after* executing :meth:`Updater.shutdown`
+        and :meth:`Application.shutdown`.
 
         Tip:
             This can be used for custom shutdown logic that requires to await coroutines, e.g.
