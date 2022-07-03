@@ -3617,7 +3617,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         is part of a message album, then it can be edited only to an audio for audio albums, only
         to a document for document albums and to a photo or a video otherwise. When an inline
         message is edited, a new file can't be uploaded; use a previously uploaded file via its
-        ``file_id`` or specify a URL.
+        :attr:`~telegram.File.file_id` or specify a URL.
+
+        Note:
+            It is currently only possible to edit messages without
+            :attr:`telegram.Message.reply_markup` or with inline keyboards
 
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content
@@ -5480,7 +5484,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire. Integer input will be interpreted as Unix timestamp.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-                bot will be used.
+                bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+                used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
                 1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
@@ -5490,7 +5495,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 13.8
             creates_join_request (:obj:`bool`, optional): :obj:`True`, if users joining the chat
                 via the link need to be approved by chat administrators.
-                If :obj:`True`, ``member_limit`` can't be specified.
+                If :obj:`True`, :paramref:`member_limit` can't be specified.
 
                 .. versionadded:: 13.8
 
@@ -6091,8 +6096,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to add a message to the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the ``can_pin_messages`` admin right in a supergroup
-        or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a channel.
+        and must have the :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` admin
+        right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
+        right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -6158,9 +6164,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to remove a message from the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this to work
-        and must have the ``can_pin_messages`` admin right in a
-        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
-        channel.
+        and must have the :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` admin
+        right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
+        right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -6222,9 +6228,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to clear the list of pinned messages in a chat. If the
         chat is not a private chat, the bot must be an administrator in the chat for this
-        to work and must have the ``can_pin_messages`` admin right in a
-        supergroup or :attr:`telegram.ChatMemberAdministrator.can_edit_messages` admin right in a
-        channel.
+        to work and must have the :paramref:`~telegram.ChatAdministratorRights.can_pin_messages`
+        admin right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages`
+        admin right in a channel.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
