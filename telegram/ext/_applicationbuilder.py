@@ -135,6 +135,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_persistence",
         "_pool_timeout",
         "_post_init",
+        "_post_shutdown",
         "_private_key",
         "_private_key_password",
         "_proxy_url",
@@ -178,6 +179,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._concurrent_updates: DVInput[Union[int, bool]] = DEFAULT_FALSE
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
+        self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
         prefix = "_get_updates_" if get_updates else "_"
@@ -271,6 +273,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             persistence=persistence,
             context_types=DefaultValue.get_value(self._context_types),
             post_init=self._post_init,
+            post_shutdown=self._post_shutdown,
             **self._application_kwargs,  # For custom Application subclasses
         )
 
@@ -932,6 +935,42 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
         self._post_init = post_init
+        return self
+
+    def post_shutdown(
+        self: BuilderType, post_shutdown: Callable[[Application], Coroutine[Any, Any, None]]
+    ) -> BuilderType:
+        """
+        Sets a callback to be executed by :meth:`Application.run_polling` and
+        :meth:`Application.run_webhook` *after* executing :meth:`Updater.shutdown`
+        and :meth:`Application.shutdown`.
+
+        Tip:
+            This can be used for custom shutdown logic that requires to await coroutines, e.g.
+            closing a database connection
+
+        Example:
+            .. code::
+
+                async def post_shutdown(application: Application) -> None:
+                    await application.bot_data['database'].close()
+
+                application = Application.builder()
+                                        .token("TOKEN")
+                                        .post_shutdown(post_shutdown)
+                                        .build()
+
+        Args:
+            post_shutdown (:term:`coroutine function`): The custom callback. Must be a
+                :term:`coroutine function` and must accept exactly one positional argument, which
+                is the :class:`~telegram.ext.Application`::
+
+                    async def post_shutdown(application: Application) -> None:
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        self._post_shutdown = post_shutdown
         return self
 
 
