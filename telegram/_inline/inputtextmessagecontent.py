@@ -61,7 +61,7 @@ class InputTextMessageContent(InputMessageContent):
             sent message.
 
     .. seealso:: `inlinebot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/inlinebot.py>`_
+         python-telegram-bot/blob/master/examples/inlinebot.py>`_
     """
 
     __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")
