@@ -7345,7 +7345,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return result  # type: ignore[return-value]
 
     @_log
-    def delete_my_commands(
+    async def delete_my_commands(
         self,
         scope: BotCommandScope = None,
         language_code: str = None,
@@ -7402,7 +7402,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if language_code:
             data["language_code"] = language_code
 
-        result = self._post(
+        result = await self._post(
             "deleteMyCommands",
             data,
             read_timeout=read_timeout,

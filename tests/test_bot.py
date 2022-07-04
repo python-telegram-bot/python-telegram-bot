@@ -2944,3 +2944,23 @@ class TestBot:
             if not camel_case_function:
                 not_available_camelcase_functions.append(function_name)
         assert not_available_camelcase_functions == []
+
+    def test_coroutine_functions(self):
+        """Check that all bot methods are defined as async def  ..."""
+        non_coroutine_functions = set()
+        for attr_name, attribute in Bot.__dict__.items():
+            # not islower() skips the camelcase aliases
+            if not callable(attribute) or attr_name.startswith("_") or not attr_name.islower():
+                continue
+            # unfortunately `inspect.iscoroutinefunction` doesn't do the trick directly,
+            # as the @_log decorator interferes
+            source = "".join(inspect.getsourcelines(attribute)[0])
+            if (
+                "pool_timeout: ODVInput[float]" in source
+                and f"async def {attr_name}" not in source
+            ):
+                non_coroutine_functions.add(attr_name)
+        assert non_coroutine_functions == set(), (
+            "The following methods should be defined as coroutine functions: "
+            f"{','.join(non_coroutine_functions)} "
+        )
