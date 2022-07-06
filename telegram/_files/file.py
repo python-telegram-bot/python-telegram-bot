@@ -44,7 +44,7 @@ class File(TelegramObject):
 
     Note:
         * Maximum file size to download is
-            :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD`.
+          :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD`.
         * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
           then it will automatically be decrypted as it downloads when you call :meth:`download()`.
 
@@ -111,7 +111,7 @@ class File(TelegramObject):
         original filename as reported by Telegram. If the file has no filename, it the file ID will
         be used as filename. If a :paramref:`custom_path` is supplied, it will be saved to that
         path instead. If :paramref:`out` is defined, the file contents will be saved to that object
-        using the ``out.write`` method.
+        using the :obj:`out.write<io.BufferedWriter.write>` method.
 
         Note:
             * :paramref:`custom_path` and :paramref:`out` are mutually exclusive.
@@ -144,8 +144,8 @@ class File(TelegramObject):
 
         Returns:
             :class:`pathlib.Path` | :obj:`io.BufferedWriter`: The same object as :paramref:`out` if
-                specified. Otherwise, returns the filename downloaded to or the file path of the
-                local file.
+            specified. Otherwise, returns the filename downloaded to or the file path of the
+            local file.
 
         Raises:
             ValueError: If both :paramref:`custom_path` and :paramref:`out` are passed.
@@ -214,7 +214,7 @@ class File(TelegramObject):
 
         Returns:
             :obj:`bytearray`: The same object as :paramref:`buf` if it was specified. Otherwise a
-                newly allocated :obj:`bytearray`.
+            newly allocated :obj:`bytearray`.
 
         """
         if buf is None:
