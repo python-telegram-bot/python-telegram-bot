@@ -182,6 +182,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         post_init (:term:`coroutine function`): Optional. A callback that will be executed by
             :meth:`Application.run_polling` and :meth:`Application.run_webhook` after initializing
             the application via :meth:`initialize`.
+        post_shutdown (:term:`coroutine function`): Optional. A callback that will be executed by
+            :meth:`Application.run_polling` and :meth:`Application.run_webhook` after shutting down
+            the application via :meth:`shutdown`.
 
     """
 
@@ -213,6 +216,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         "job_queue",
         "persistence",
         "post_init",
+        "post_shutdown",
         "update_queue",
         "updater",
         "user_data",
@@ -229,6 +233,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         persistence: Optional[BasePersistence],
         context_types: ContextTypes[CCT, UD, CD, BD],
         post_init: Optional[
+            Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
+        ],
+        post_shutdown: Optional[
             Callable[["Application[BT, CCT, UD, CD, BD, JQ]"], Coroutine[Any, Any, None]]
         ],
     ):
@@ -248,11 +255,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         self.handlers: Dict[int, List[BaseHandler]] = {}
         self.error_handlers: Dict[Callable, Union[bool, DefaultValue]] = {}
         self.post_init = post_init
+        self.post_shutdown = post_shutdown
 
         if isinstance(concurrent_updates, int) and concurrent_updates < 0:
             raise ValueError("`concurrent_updates` must be a non-negative integer!")
         if concurrent_updates is True:
-            concurrent_updates = 4096
+            concurrent_updates = 256
         self._concurrent_updates_sem = asyncio.BoundedSemaphore(concurrent_updates or 1)
         self._concurrent_updates: int = concurrent_updates or 0
 
@@ -361,6 +369,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         * :attr:`updater` by calling :meth:`telegram.ext.Updater.shutdown`
         * :attr:`persistence` by calling :meth:`update_persistence` and
           :meth:`BasePersistence.flush`
+
+        Does *not* call :attr:`post_shutdown` - that is only done by :meth:`run_polling` and
+        :meth:`run_webhook`.
 
         .. seealso::
             :meth:`initialize`
@@ -573,6 +584,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         If :attr:`post_init` is set, it will be called between :meth:`initialize` and
         :meth:`telegram.ext.Updater.start_polling`.
 
+        If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
+        and :meth:`telegram.ext.Updater.shutdown`.
+
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
             :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`
@@ -682,6 +696,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         If :attr:`post_init` is set, it will be called between :meth:`initialize` and
         :meth:`telegram.ext.Updater.start_webhook`.
+
+        If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
+        and :meth:`telegram.ext.Updater.shutdown`.
 
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
@@ -813,7 +830,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 if self.running:
                     loop.run_until_complete(self.stop())
                 loop.run_until_complete(self.shutdown())
-                loop.run_until_complete(self.updater.shutdown())  # type: ignore[union-attr]
+                if self.post_shutdown:
+                    loop.run_until_complete(self.post_shutdown(self))
             finally:
                 if close_loop:
                     loop.close()

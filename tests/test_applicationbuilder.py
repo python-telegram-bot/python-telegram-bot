@@ -93,7 +93,7 @@ class TestApplicationBuilder:
         )
 
         client = app.bot.request._client
-        assert client.limits == httpx.Limits(max_connections=128, max_keepalive_connections=128)
+        assert client.limits == httpx.Limits(max_connections=256, max_keepalive_connections=256)
         assert client.proxies is None
         assert client.timeout == httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=1.0)
 
@@ -107,6 +107,7 @@ class TestApplicationBuilder:
 
         assert app.persistence is None
         assert app.post_init is None
+        assert app.post_shutdown is None
 
     @pytest.mark.parametrize(
         "method, description", _BOT_CHECKS, ids=[entry[0] for entry in _BOT_CHECKS]
@@ -322,6 +323,9 @@ class TestApplicationBuilder:
         async def post_init(app: Application) -> None:
             pass
 
+        async def post_shutdown(app: Application) -> None:
+            pass
+
         app = (
             builder.token(bot.token)
             .job_queue(job_queue)
@@ -330,6 +334,7 @@ class TestApplicationBuilder:
             .context_types(context_types)
             .concurrent_updates(concurrent_updates)
             .post_init(post_init)
+            .post_shutdown(post_shutdown)
         ).build()
         assert app.job_queue is job_queue
         assert app.job_queue.application is app
@@ -341,6 +346,7 @@ class TestApplicationBuilder:
         assert app.context_types is context_types
         assert app.concurrent_updates == concurrent_updates
         assert app.post_init is post_init
+        assert app.post_shutdown is post_shutdown
 
         updater = Updater(bot=bot, update_queue=update_queue)
         app = ApplicationBuilder().updater(updater).build()

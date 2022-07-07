@@ -740,6 +740,12 @@ class TestConversationHandler:
             ],
             bot=bot,
         )
+
+        # First check that updates without user won't be handled
+        message.from_user = None
+        assert not handler.check_update(Update(update_id=0, message=message))
+
+        message.from_user = user1
         async with app:
             await app.process_update(Update(update_id=0, message=message))
 
