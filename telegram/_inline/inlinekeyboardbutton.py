@@ -66,8 +66,8 @@ class InlineKeyboardButton(TelegramObject):
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
 
-    .. seealso:: `Inline Keyboard Example 1<examples.inlinekeyboard.html>`_,
-        `Inline Keyboard Example 2<examples.inlinekeyboard2.html>`_
+    .. seealso:: `Inline Keyboard Example 1 <examples.inlinekeyboard.html>`_,
+        `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_
         `InlineKeyboard Example <https://github.com/python-telegram-bot/
         python-telegram-bot/wiki/InlineKeyboard-Example>`_
 

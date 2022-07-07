@@ -36,8 +36,8 @@ class InlineKeyboardMarkup(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their size of :attr:`inline_keyboard` and all the buttons are equal.
 
-    .. seealso:: `Inline Keyboard Example 1<examples.inlinekeyboard.html>`_,
-        `Inline Keyboard Example 2<examples.inlinekeyboard2.html>`_
+    .. seealso:: `Inline Keyboard Example 1 <examples.inlinekeyboard.html>`_,
+        `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_
         `InlineKeyboard Example <https://github.com/python-telegram-bot/
         python-telegram-bot/wiki/InlineKeyboard-Example>`_
 
