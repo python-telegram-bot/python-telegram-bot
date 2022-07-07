@@ -35,8 +35,7 @@ class KeyboardButtonPollType(TelegramObject):
             passed, only regular polls will be allowed. Otherwise, the user will be allowed to
             create a poll of any type.
 
-    .. seealso:: `pollbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/pollbot.py>`_
+    .. seealso:: `Pollbot Example <examples.pollbot.html>`_
     """
 
     __slots__ = ("type",)

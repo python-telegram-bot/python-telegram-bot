@@ -33,6 +33,8 @@ class InputTextMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_text` is equal.
 
+    .. seealso:: `Inline Example <examples.inlinebot.html>`_
+
     Args:
         message_text (:obj:`str`): Text of the message to be sent,
             1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
@@ -60,8 +62,6 @@ class InputTextMessageContent(InputMessageContent):
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
-    .. seealso:: `inlinebot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/inlinebot.py>`_
     """
 
     __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")

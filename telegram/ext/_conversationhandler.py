@@ -186,6 +186,11 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         conversation. For an example on nested :class:`ConversationHandler` s, see
         :any:`examples.conversationbot`.
 
+    .. seealso:: `Conversation Example <examples.conversationbot.html>`_,
+        `Conversation Example 2 <examples.conversationbot2.html>`_,
+        `Nested Conversation Example <examples.nestedconversationbot.html>`_,
+        `Persistent Conversation Example <examples.persistentconversationbot.html>`_
+
     Args:
         entry_points (List[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`
             objects that
@@ -243,15 +248,6 @@ class ConversationHandler(BaseHandler[Update, CCT]):
 
             .. versionchanged:: 20.0
                 No longer overrides the handlers settings. Resolution order was changed.
-
-    .. seealso:: `conversationbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/conversationbot.py>`_,
-        `conversationbot2.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/conversationbot2.py>`_,
-        `nestedconversationbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/nestedconversationbot.py>`_,
-        `persistentconversationbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/persistentconversationbot.py>`_
 
     Raises:
         :exc:`ValueError`: If :paramref:`persistent` is used but :paramref:`name` was not set, or

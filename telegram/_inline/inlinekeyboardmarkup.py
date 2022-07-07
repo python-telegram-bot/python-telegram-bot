@@ -36,6 +36,11 @@ class InlineKeyboardMarkup(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their size of :attr:`inline_keyboard` and all the buttons are equal.
 
+    .. seealso:: `Inline Keyboard Example 1<examples.inlinekeyboard.html>`_,
+        `Inline Keyboard Example 2<examples.inlinekeyboard2.html>`_
+        `InlineKeyboard Example <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/InlineKeyboard-Example>`_
+
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
             each represented by a list of InlineKeyboardButton objects.
@@ -45,10 +50,6 @@ class InlineKeyboardMarkup(TelegramObject):
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
             each represented by a list of InlineKeyboardButton objects.
 
-    .. seealso:: `inlinekeyboardbutton.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/telegram/_inline/inlinekeyboardbutton.py>`_,
-        `inlinekeyboard2.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/inlinekeyboard2.py>`_, `InlineKeyboard Example <https://github.com/python-telegram-bot/python-telegram-bot/wiki/InlineKeyboard-Example>`_
     """
 
     __slots__ = ("inline_keyboard",)

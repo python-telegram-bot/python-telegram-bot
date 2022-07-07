@@ -49,8 +49,7 @@ class JobQueue:
 
     .. seealso:: :attr:`telegram.ext.Application.job_queue`,
         :attr:`telegram.ext.CallbackContext.job_queue`,
-        `timerbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/timerbot.py>`_,
+        `Timerbot Example <examples.timerbot.html>`_,
         `Job Queue <https://github.com/python-telegram-bot/
         python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
 

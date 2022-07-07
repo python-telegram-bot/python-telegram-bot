@@ -143,15 +143,14 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
     Examples:
         ``create_deep_linked_url(bot.get_me().username, "some-params")``
 
+    .. seealso:: `Deeplinking Example <examples.deeplinking.html>`_
+
     Args:
         bot_username (:obj:`str`): The username to link to
         payload (:obj:`str`, optional): Parameters to encode in the created URL
         group (:obj:`bool`, optional): If :obj:`True` the user is prompted to select a group to
             add the bot to. If :obj:`False`, opens a one-on-one conversation with the bot.
             Defaults to :obj:`False`.
-
-    .. seealso:: `deeplinking.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/deeplinking.py>`_
 
     Returns:
         :obj:`str`: An URL to start the bot with specific parameters

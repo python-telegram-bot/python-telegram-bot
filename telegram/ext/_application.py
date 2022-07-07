@@ -1399,6 +1399,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         Note:
             Attempts to add the same callback multiple times will be ignored.
 
+        .. seealso:: `Errorhandler Example<examples.errorhandlerbot.py>`_
+
         Args:
             callback (:term:`coroutine function`): The callback function for this error handler.
                 Will be called when an error is raised. Callback signature::
@@ -1411,8 +1413,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 should be awaited before processing the next error handler in
                 :meth:`process_error`. Defaults to :obj:`True`.
 
-        .. seealso:: `errorhandlerbot.py <https://github.com/python-telegram-bot/
-            python-telegram-bot/blob/master/examples/errorhandlerbot.py>`_
         """
         if callback in self.error_handlers:
             _logger.warning("The callback is already registered as an error handler. Ignoring.")

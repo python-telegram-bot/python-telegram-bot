@@ -66,6 +66,11 @@ class InlineKeyboardButton(TelegramObject):
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.
 
+    .. seealso:: `Inline Keyboard Example 1<examples.inlinekeyboard.html>`_,
+        `Inline Keyboard Example 2<examples.inlinekeyboard2.html>`_
+        `InlineKeyboard Example <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/InlineKeyboard-Example>`_
+
     Args:
         text (:obj:`str`): Label text on the button.
         url (:obj:`str`, optional): HTTP or tg:// url to be opened when the button is pressed.
@@ -145,12 +150,6 @@ class InlineKeyboardButton(TelegramObject):
             be launched when the user presses the button.
         pay (:obj:`bool`): Optional. Specify :obj:`True`, to send a Pay button.
 
-    .. seealso:: `inlinekeyboardbutton.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/telegram/_inline/inlinekeyboardbutton.py>`_,
-        `inlinekeyboard2.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/inlinekeyboard2.py>`_,
-        `InlineKeyboard Example <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/InlineKeyboard-Example>`_
     """
 
     __slots__ = (

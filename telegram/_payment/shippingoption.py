@@ -33,6 +33,8 @@ class ShippingOption(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
+    .. seealso:: `Paymentbot Example <examples.paymentbot.html>`_
+
     Args:
         id (:obj:`str`): Shipping option identifier.
         title (:obj:`str`): Option title.
@@ -44,8 +46,6 @@ class ShippingOption(TelegramObject):
         title (:obj:`str`): Option title.
         prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
 
-    .. seealso:: `paymentbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/paymentbot.py>`_
     """
 
     __slots__ = ("prices", "title", "id")

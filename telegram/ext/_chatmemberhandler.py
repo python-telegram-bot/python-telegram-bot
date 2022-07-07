@@ -37,6 +37,8 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    .. seealso:: `Chat Member Example <examples.chatmemberbot.html>`_
+
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
@@ -63,8 +65,6 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
 
-    .. seealso:: `chatmemberbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/chatmemberbot.py>`_
     """
 
     __slots__ = ("chat_member_types",)

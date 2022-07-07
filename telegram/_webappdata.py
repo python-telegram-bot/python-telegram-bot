@@ -47,8 +47,7 @@ class WebAppData(TelegramObject):
                 Be aware that a bad client can send
             arbitrary data in this field.
 
-    .. seealso:: `webappbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/webappbot.py>`_
+    .. seealso:: `Webappbot Example <examples.webappbot.html>`_
     """
 
     __slots__ = ("data", "button_text")

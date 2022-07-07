@@ -53,6 +53,8 @@ class ChatMember(TelegramObject):
         * The constant ``ChatMember.CREATOR`` was replaced by :attr:`~telegram.ChatMember.OWNER`
         * The constant ``ChatMember.KICKED`` was replaced by :attr:`~telegram.ChatMember.BANNED`
 
+    .. seealso:: `Chat Member Example <examples.chatmemberbot.html>`_
+
     Args:
         user (:class:`telegram.User`): Information about the user.
         status (:obj:`str`): The member's status in the chat. Can be

@@ -42,8 +42,7 @@ class WebAppInfo(TelegramObject):
             in `Initializing Web Apps \
             <https://core.telegram.org/bots/webapps#initializing-web-apps>`_.
 
-    .. seealso:: `webappbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/webappbot.py>`_
+    .. seealso:: `Webappbot Example <examples.webappbot.html>`_
     """
 
     __slots__ = ("url",)

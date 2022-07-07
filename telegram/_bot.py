@@ -2927,7 +2927,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.User.get_profile_photos`
+        .. seealso:: :meth:`telegram.User.get_profile_photos`
 
         Returns:
             :class:`telegram.UserProfilePhotos`
@@ -4788,7 +4788,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Message.reply_invoice`,  :attr:`telegram.Chat.send_invoice`
+        .. seealso:: :attr:`telegram.Message.reply_invoice`, :attr:`telegram.Chat.send_invoice`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
