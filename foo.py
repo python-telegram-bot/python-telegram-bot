@@ -1,8 +1,8 @@
 import inspect
 import re
 from pathlib import Path
-from telegram import Bot
 
+from telegram import Bot
 
 ext_bot_path = Path(r"telegram\ext\_extbot.py")
 bot_path = Path(r"telegram\_bot.py")
@@ -17,7 +17,7 @@ def build_function(method_name: str, sig: inspect.Signature) -> str:
     params = params.replace(
         "api_kwargs=api_kwargs",
         "api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs)",
-    )
+    ).replace("self=self,", "")
     call = f"return await super().{method_name}({params})"
     match = re.search(
         rf"async def {re.escape(method_name)}\(([^\)]+)\)([^:]+):",
