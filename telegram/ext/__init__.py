@@ -19,6 +19,7 @@
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
 __all__ = (
+    "AIORateLimiter",
     "Application",
     "ApplicationBuilder",
     "ApplicationHandlerStop",
@@ -57,6 +58,7 @@ __all__ = (
 )
 
 from . import filters
+from ._aioratelimiter import AIORateLimiter
 from ._application import Application, ApplicationHandlerStop
 from ._applicationbuilder import ApplicationBuilder
 from ._basepersistence import BasePersistence, PersistenceInput

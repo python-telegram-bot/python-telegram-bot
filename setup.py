@@ -73,6 +73,7 @@ def get_setup_kwargs(raw=False):
             "socks": "httpx[socks]",
             # 3.4-3.4.3 contained some cyclical import bugs
             "passport": "cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=3.0",
+            "ratelimiter": "aiolimiter~=1.0.0",
         },
         include_package_data=True,
         classifiers=[

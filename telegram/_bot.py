@@ -314,7 +314,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def _do_post(
         self,
         endpoint: str,
-        data: JSONDict,  # type: ignore[unused-argument]
+        data: JSONDict,  # pylint: disable=unused-argument
         request_data: RequestData,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

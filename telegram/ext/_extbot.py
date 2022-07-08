@@ -204,22 +204,26 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[bool, JSONDict, None]:
+        if not self.rate_limiter:
+            return await self._do_post(
+                endpoint=endpoint,
+                data=data,
+                request_data=request_data,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+                read_timeout=read_timeout,
+            )
+
         rate_limit_kwargs = self._extract_rl_kwargs(data)
         callback = super()._do_post
-        args = (
-            endpoint,
-            data,
-            request_data,
-        )
+        args = (endpoint, data, request_data)
         kwargs = {
             "read_timeout": read_timeout,
             "write_timeout": write_timeout,
             "connect_timeout": connect_timeout,
             "pool_timeout": pool_timeout,
         }
-        if not self.rate_limiter:
-            return await callback(*args, **kwargs)
-
         self._logger.debug(
             "Passing request through rate limiter of type %s with rate_limit_kwargs %s",
             type(self.rate_limiter),

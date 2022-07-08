@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Any, Callable, Coroutine, Dict, Optional, Union
 
 from telegram._utils.types import JSONDict
 
@@ -33,6 +33,11 @@ class BaseRateLimiter(ABC):
 
     @abstractmethod
     async def process_request(
-        self, callback, args, kwargs, data, rate_limit_kwargs
+        self,
+        callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, None]]],
+        args: Any,
+        kwargs: Dict[str, Any],
+        data: Dict[str, Any],
+        rate_limit_kwargs: Optional[Dict[str, Any]],
     ) -> Union[bool, JSONDict, None]:
         ...
