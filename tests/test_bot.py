@@ -982,6 +982,7 @@ class TestBot:
     @pytest.mark.asyncio
     async def test_answer_web_app_query(self, bot, monkeypatch):
         params = False
+
         # For now just test that our internals pass the correct data
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -2963,4 +2964,19 @@ class TestBot:
         assert non_coroutine_functions == set(), (
             "The following methods should be defined as coroutine functions: "
             f"{','.join(non_coroutine_functions)} "
+        )
+
+    def test_api_kwargs_present(self):
+        """Check that all bot methods have `api_kwargs` params."""
+        functions_missing_api_kwargs = set()
+        for attr_name, attribute in Bot.__dict__.items():
+            # not islower() skips the camelcase aliases
+            if not callable(attribute) or attr_name.startswith("_") or not attr_name.islower():
+                continue
+            params = inspect.signature(attribute).parameters
+            if "pool_timeout" in params and "api_kwargs" not in params:
+                functions_missing_api_kwargs.add(attr_name)
+        assert functions_missing_api_kwargs == set(), (
+            "The following methods should have a `api_kwargs` parameter: "
+            f"{','.join(functions_missing_api_kwargs)} "
         )
