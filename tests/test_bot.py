@@ -137,6 +137,34 @@ xfail = pytest.mark.xfail(
 )
 
 
+def bot_methods(ext_bot=True):
+    arg_values = []
+    ids = []
+    non_api_methods = [
+        "de_json",
+        "de_list",
+        "to_dict",
+        "to_json",
+        "parse_data",
+        "get_bot",
+        "set_bot",
+        "initialize",
+        "shutdown",
+        "insert_callback_data",
+    ]
+    classes = (Bot, ExtBot) if ext_bot else (Bot,)
+    for cls in classes:
+        for name, attribute in inspect.getmembers(cls, predicate=inspect.isfunction):
+            if name.startswith("_") or name in non_api_methods:
+                continue
+            arg_values.append((name, attribute))
+            ids.append(f"{cls.__name__}.{name}")
+
+    return pytest.mark.parametrize(
+        argnames="bot_method_name,bot_method", argvalues=arg_values, ids=ids
+    )
+
+
 class TestBot:
     """
     Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
@@ -366,29 +394,8 @@ class TestBot:
         with pytest.raises(pickle.PicklingError, match="Bot objects cannot be pickled"):
             pickle.dumps(bot)
 
-    @pytest.mark.parametrize(
-        "bot_method_name",
-        argvalues=[
-            name
-            for name, _ in inspect.getmembers(Bot, predicate=inspect.isfunction)
-            if not name.startswith("_")
-            and name
-            not in [
-                "de_json",
-                "de_list",
-                "to_dict",
-                "to_json",
-                "parse_data",
-                "get_updates",
-                "getUpdates",
-                "get_bot",
-                "set_bot",
-                "initialize",
-                "shutdown",
-            ]
-        ],
-    )
-    async def test_defaults_handling(self, bot_method_name, bot, raw_bot, monkeypatch):
+    @bot_methods(ext_bot=False)
+    async def test_defaults_handling(self, bot_method_name, bot_method, bot, raw_bot, monkeypatch):
         """
         Here we check that the bot methods handle tg.ext.Defaults correctly. This has two parts:
 
@@ -2946,37 +2953,35 @@ class TestBot:
                 not_available_camelcase_functions.append(function_name)
         assert not_available_camelcase_functions == []
 
-    def test_coroutine_functions(self):
+    @bot_methods()
+    def test_coroutine_functions(self, bot_method_name, bot_method):
         """Check that all bot methods are defined as async def  ..."""
-        non_coroutine_functions = set()
-        for attr_name, attribute in Bot.__dict__.items():
-            # not islower() skips the camelcase aliases
-            if not callable(attribute) or attr_name.startswith("_") or not attr_name.islower():
-                continue
-            # unfortunately `inspect.iscoroutinefunction` doesn't do the trick directly,
-            # as the @_log decorator interferes
-            source = "".join(inspect.getsourcelines(attribute)[0])
-            if (
-                "pool_timeout: ODVInput[float]" in source
-                and f"async def {attr_name}" not in source
-            ):
-                non_coroutine_functions.add(attr_name)
-        assert non_coroutine_functions == set(), (
-            "The following methods should be defined as coroutine functions: "
-            f"{','.join(non_coroutine_functions)} "
-        )
+        # not islower() skips the camelcase aliases
+        if not bot_method_name.islower():
+            return
+        # unfortunately `inspect.iscoroutinefunction` doesn't do the trick directly,
+        # as the @_log decorator interferes
+        source = "".join(inspect.getsourcelines(bot_method)[0])
+        assert (
+            f"async def {bot_method_name}" in source
+        ), f"{bot_method_name} should be a coroutine function"
 
-    def test_api_kwargs_present(self):
-        """Check that all bot methods have `api_kwargs` params."""
-        functions_missing_api_kwargs = set()
-        for attr_name, attribute in Bot.__dict__.items():
-            # not islower() skips the camelcase aliases
-            if not callable(attribute) or attr_name.startswith("_") or not attr_name.islower():
-                continue
-            params = inspect.signature(attribute).parameters
-            if "pool_timeout" in params and "api_kwargs" not in params:
-                functions_missing_api_kwargs.add(attr_name)
-        assert functions_missing_api_kwargs == set(), (
-            "The following methods should have a `api_kwargs` parameter: "
-            f"{','.join(functions_missing_api_kwargs)} "
-        )
+    @bot_methods()
+    def test_api_kwargs_and_timeouts_present(self, bot_method_name, bot_method):
+        """Check that all bot methods have `api_kwargs` and timeout params."""
+        param_names = inspect.signature(bot_method).parameters.keys()
+        assert (
+            "pool_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `pool_timeout`"
+        assert (
+            "read_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `read_timeout`"
+        assert (
+            "connect_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `connect_timeout`"
+        assert (
+            "write_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `write_timeout`"
+        assert (
+            "api_kwargs" in param_names
+        ), f"{bot_method_name} is missing the parameter `api_kwargs`"
