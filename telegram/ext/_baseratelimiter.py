@@ -24,6 +24,8 @@ from telegram.ext._utils.types import RLARGS
 
 
 class BaseRateLimiter(ABC, Generic[RLARGS]):
+    __slots__ = ()
+
     @abstractmethod
     async def initialize(self) -> None:
         ...
