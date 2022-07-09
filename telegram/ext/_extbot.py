@@ -24,6 +24,7 @@ from typing import (
     TYPE_CHECKING,
     Callable,
     Dict,
+    Generic,
     List,
     Optional,
     Sequence,
@@ -32,7 +33,9 @@ from typing import (
     Union,
     cast,
     no_type_check,
+    overload,
 )
+from uuid import uuid4
 
 from telegram import (
     Animation,
@@ -78,6 +81,7 @@ from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram.ext._callbackdatacache import CallbackDataCache
+from telegram.ext._utils.types import RLARGS
 from telegram.request import BaseRequest, RequestData
 
 if TYPE_CHECKING:
@@ -95,7 +99,7 @@ if TYPE_CHECKING:
 HandledTypes = TypeVar("HandledTypes", bound=Union[Message, CallbackQuery, Chat])
 
 
-class ExtBot(Bot):
+class ExtBot(Bot, Generic[RLARGS]):
     """This object represents a Telegram Bot with convenience extensions.
 
     Warning:
@@ -125,7 +129,40 @@ class ExtBot(Bot):
     """
 
     __slots__ = ("arbitrary_callback_data", "callback_data_cache", "_defaults", "rate_limiter")
-    __RL_KEY = object()
+
+    # using object() would be a tiny bit safer, but a string plays better with the typing setup
+    __RL_KEY = uuid4().hex
+
+    @overload
+    def __init__(
+        self: "ExtBot[None]",
+        token: str,
+        base_url: str = "https://api.telegram.org/bot",
+        base_file_url: str = "https://api.telegram.org/file/bot",
+        request: BaseRequest = None,
+        get_updates_request: BaseRequest = None,
+        private_key: bytes = None,
+        private_key_password: bytes = None,
+        defaults: "Defaults" = None,
+        arbitrary_callback_data: Union[bool, int] = False,
+    ):
+        ...
+
+    @overload
+    def __init__(
+        self: "ExtBot[RLARGS]",
+        token: str,
+        base_url: str = "https://api.telegram.org/bot",
+        base_file_url: str = "https://api.telegram.org/file/bot",
+        request: BaseRequest = None,
+        get_updates_request: BaseRequest = None,
+        private_key: bytes = None,
+        private_key_password: bytes = None,
+        defaults: "Defaults" = None,
+        arbitrary_callback_data: Union[bool, int] = False,
+        rate_limiter: "BaseRateLimiter[RLARGS]" = None,
+    ):
+        ...
 
     def __init__(
         self,
@@ -174,24 +211,24 @@ class ExtBot(Bot):
 
     @classmethod
     def _merge_api_rl_kwargs(
-        cls, api_kwargs: Optional[JSONDict], rate_limit_kwargs: Optional[JSONDict]
+        cls, api_kwargs: Optional[JSONDict], rate_limit_args: Optional[RLARGS]
     ) -> Optional[JSONDict]:
-        """Inserts the `rate_limit_kwargs` into `api_kwargs` with the special key `__RL_KEY` so
+        """Inserts the `rate_limit_args` into `api_kwargs` with the special key `__RL_KEY` so
         that we can extract them later without having to modify the `telegram.Bot` class.
         """
-        if not rate_limit_kwargs:
+        if not rate_limit_args:
             return api_kwargs
         if api_kwargs is None:
             api_kwargs = {}
-        api_kwargs[cls.__RL_KEY] = rate_limit_kwargs  # type: ignore[index]
+        api_kwargs[cls.__RL_KEY] = rate_limit_args
         return api_kwargs
 
     @classmethod
-    def _extract_rl_kwargs(cls, data: Optional[JSONDict]) -> Optional[JSONDict]:
-        """Extracts the `rate_limit_kwargs` from `data` if it exists."""
+    def _extract_rl_kwargs(cls, data: Optional[JSONDict]) -> Optional[RLARGS]:
+        """Extracts the `rate_limit_args` from `data` if it exists."""
         if not data:
             return None
-        return data.pop(cls.__RL_KEY, None)  # type: ignore[call-overload]
+        return data.pop(cls.__RL_KEY, None)
 
     async def _do_post(
         self,
@@ -204,7 +241,8 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[bool, JSONDict, None]:
-        if not self.rate_limiter:
+        # getting updates should not be rate limited!
+        if endpoint == "getUpdate" or not self.rate_limiter:
             return await self._do_post(
                 endpoint=endpoint,
                 data=data,
@@ -215,7 +253,7 @@ class ExtBot(Bot):
                 read_timeout=read_timeout,
             )
 
-        rate_limit_kwargs = self._extract_rl_kwargs(data)
+        rate_limit_args = self._extract_rl_kwargs(data)
         callback = super()._do_post
         args = (endpoint, data, request_data)
         kwargs = {
@@ -225,12 +263,17 @@ class ExtBot(Bot):
             "pool_timeout": pool_timeout,
         }
         self._logger.debug(
-            "Passing request through rate limiter of type %s with rate_limit_kwargs %s",
+            "Passing request through rate limiter of type %s with rate_limit_args %s",
             type(self.rate_limiter),
-            rate_limit_kwargs,
+            rate_limit_args,
         )
         return await self.rate_limiter.process_request(
-            callback, args=args, kwargs=kwargs, data=data, rate_limit_kwargs=rate_limit_kwargs
+            callback,
+            args=args,
+            kwargs=kwargs,
+            endpoint=endpoint,
+            data=data,
+            rate_limit_args=rate_limit_args,
         )
 
     @property
@@ -484,7 +527,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().add_sticker_to_set(
             user_id=user_id,
@@ -498,7 +541,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def answer_callback_query(
@@ -514,7 +557,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().answer_callback_query(
             callback_query_id=callback_query_id,
@@ -526,7 +569,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def answer_inline_query(
@@ -547,7 +590,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().answer_inline_query(
             inline_query_id=inline_query_id,
@@ -562,7 +605,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def answer_pre_checkout_query(
@@ -576,7 +619,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().answer_pre_checkout_query(
             pre_checkout_query_id=pre_checkout_query_id,
@@ -586,7 +629,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def answer_shipping_query(
@@ -601,7 +644,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().answer_shipping_query(
             shipping_query_id=shipping_query_id,
@@ -612,7 +655,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def answer_web_app_query(
@@ -625,7 +668,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> SentWebAppMessage:
         return await super().answer_web_app_query(
             web_app_query_id=web_app_query_id,
@@ -634,7 +677,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def approve_chat_join_request(
@@ -647,7 +690,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().approve_chat_join_request(
             chat_id=chat_id,
@@ -656,7 +699,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def ban_chat_member(
@@ -671,7 +714,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().ban_chat_member(
             chat_id=chat_id,
@@ -682,7 +725,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def ban_chat_sender_chat(
@@ -695,7 +738,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().ban_chat_sender_chat(
             chat_id=chat_id,
@@ -704,7 +747,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def copy_message(
@@ -726,7 +769,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> MessageId:
         return await super().copy_message(
             chat_id=chat_id,
@@ -744,7 +787,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def create_chat_invite_link(
@@ -760,7 +803,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> ChatInviteLink:
         return await super().create_chat_invite_link(
             chat_id=chat_id,
@@ -772,7 +815,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def create_invoice_link(
@@ -803,7 +846,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> str:
         return await super().create_invoice_link(
             title=title,
@@ -830,7 +873,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def create_new_sticker_set(
@@ -850,7 +893,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().create_new_sticker_set(
             user_id=user_id,
@@ -866,7 +909,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def decline_chat_join_request(
@@ -879,7 +922,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().decline_chat_join_request(
             chat_id=chat_id,
@@ -888,7 +931,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def delete_chat_photo(
@@ -900,7 +943,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().delete_chat_photo(
             chat_id=chat_id,
@@ -908,7 +951,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def delete_chat_sticker_set(
@@ -920,7 +963,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().delete_chat_sticker_set(
             chat_id=chat_id,
@@ -928,7 +971,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def delete_message(
@@ -941,7 +984,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().delete_message(
             chat_id=chat_id,
@@ -950,7 +993,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def delete_my_commands(
@@ -963,7 +1006,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().delete_my_commands(
             scope=scope,
@@ -972,7 +1015,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def delete_sticker_from_set(
@@ -984,7 +1027,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().delete_sticker_from_set(
             sticker=sticker,
@@ -992,7 +1035,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def delete_webhook(
@@ -1004,7 +1047,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().delete_webhook(
             drop_pending_updates=drop_pending_updates,
@@ -1012,7 +1055,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def edit_chat_invite_link(
@@ -1029,7 +1072,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> ChatInviteLink:
         return await super().edit_chat_invite_link(
             chat_id=chat_id,
@@ -1042,7 +1085,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def edit_message_caption(
@@ -1060,7 +1103,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_caption(
             chat_id=chat_id,
@@ -1074,7 +1117,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def edit_message_live_location(
@@ -1095,7 +1138,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_live_location(
             chat_id=chat_id,
@@ -1112,7 +1155,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def edit_message_media(
@@ -1128,7 +1171,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_media(
             media=media,
@@ -1140,7 +1183,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def edit_message_reply_markup(
@@ -1155,7 +1198,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_reply_markup(
             chat_id=chat_id,
@@ -1166,7 +1209,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def edit_message_text(
@@ -1185,7 +1228,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Union[Message, bool]:
         return await super().edit_message_text(
             text=text,
@@ -1200,7 +1243,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def export_chat_invite_link(
@@ -1212,7 +1255,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> str:
         return await super().export_chat_invite_link(
             chat_id=chat_id,
@@ -1220,7 +1263,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def forward_message(
@@ -1236,7 +1279,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().forward_message(
             chat_id=chat_id,
@@ -1248,7 +1291,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_chat(
@@ -1260,7 +1303,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Chat:
         return await super().get_chat(
             chat_id=chat_id,
@@ -1268,7 +1311,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_chat_administrators(
@@ -1280,7 +1323,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> List[ChatMember]:
         return await super().get_chat_administrators(
             chat_id=chat_id,
@@ -1288,7 +1331,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_chat_member(
@@ -1301,7 +1344,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> ChatMember:
         return await super().get_chat_member(
             chat_id=chat_id,
@@ -1310,7 +1353,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_chat_member_count(
@@ -1322,7 +1365,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> int:
         return await super().get_chat_member_count(
             chat_id=chat_id,
@@ -1330,7 +1373,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_chat_menu_button(
@@ -1342,7 +1385,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> MenuButton:
         return await super().get_chat_menu_button(
             chat_id=chat_id,
@@ -1350,7 +1393,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_file(
@@ -1364,7 +1407,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> File:
         return await super().get_file(
             file_id=file_id,
@@ -1372,7 +1415,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_game_high_scores(
@@ -1387,7 +1430,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> List[GameHighScore]:
         return await super().get_game_high_scores(
             user_id=user_id,
@@ -1398,7 +1441,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_me(
@@ -1409,14 +1452,14 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> User:
         return await super().get_me(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_my_commands(
@@ -1429,7 +1472,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> List[BotCommand]:
         return await super().get_my_commands(
             scope=scope,
@@ -1438,7 +1481,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_my_default_administrator_rights(
@@ -1450,7 +1493,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> ChatAdministratorRights:
         return await super().get_my_default_administrator_rights(
             for_channels=for_channels,
@@ -1458,7 +1501,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_sticker_set(
@@ -1470,7 +1513,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> StickerSet:
         return await super().get_sticker_set(
             name=name,
@@ -1478,7 +1521,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_user_profile_photos(
@@ -1492,7 +1535,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Optional[UserProfilePhotos]:
         return await super().get_user_profile_photos(
             user_id=user_id,
@@ -1502,7 +1545,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def get_webhook_info(
@@ -1513,14 +1556,14 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> WebhookInfo:
         return await super().get_webhook_info(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def leave_chat(
@@ -1532,7 +1575,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().leave_chat(
             chat_id=chat_id,
@@ -1540,7 +1583,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def log_out(
@@ -1551,14 +1594,14 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().log_out(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(None, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(None, rate_limit_args),
         )
 
     async def pin_chat_message(
@@ -1572,7 +1615,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().pin_chat_message(
             chat_id=chat_id,
@@ -1582,7 +1625,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def promote_chat_member(
@@ -1606,7 +1649,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().promote_chat_member(
             chat_id=chat_id,
@@ -1626,7 +1669,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def restrict_chat_member(
@@ -1641,7 +1684,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().restrict_chat_member(
             chat_id=chat_id,
@@ -1652,7 +1695,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def revoke_chat_invite_link(
@@ -1665,7 +1708,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> ChatInviteLink:
         return await super().revoke_chat_invite_link(
             chat_id=chat_id,
@@ -1674,7 +1717,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_animation(
@@ -1700,7 +1743,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_animation(
             chat_id=chat_id,
@@ -1722,7 +1765,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_audio(
@@ -1748,7 +1791,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_audio(
             chat_id=chat_id,
@@ -1770,7 +1813,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_chat_action(
@@ -1783,7 +1826,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().send_chat_action(
             chat_id=chat_id,
@@ -1792,7 +1835,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_contact(
@@ -1814,7 +1857,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_contact(
             chat_id=chat_id,
@@ -1832,7 +1875,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_dice(
@@ -1850,7 +1893,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_dice(
             chat_id=chat_id,
@@ -1864,7 +1907,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_document(
@@ -1888,7 +1931,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_document(
             chat_id=chat_id,
@@ -1908,7 +1951,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_game(
@@ -1926,7 +1969,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_game(
             chat_id=chat_id,
@@ -1940,7 +1983,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_invoice(
@@ -1978,7 +2021,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_invoice(
             chat_id=chat_id,
@@ -2012,7 +2055,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_location(
@@ -2036,7 +2079,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_location(
             chat_id=chat_id,
@@ -2056,7 +2099,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_media_group(
@@ -2075,7 +2118,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> List[Message]:
         return await super().send_media_group(
             chat_id=chat_id,
@@ -2088,7 +2131,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_message(
@@ -2109,7 +2152,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_message(
             chat_id=chat_id,
@@ -2126,7 +2169,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_photo(
@@ -2148,7 +2191,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_photo(
             chat_id=chat_id,
@@ -2166,7 +2209,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_poll(
@@ -2195,7 +2238,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_poll(
             chat_id=chat_id,
@@ -2220,7 +2263,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_sticker(
@@ -2238,7 +2281,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_sticker(
             chat_id=chat_id,
@@ -2252,7 +2295,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_venue(
@@ -2278,7 +2321,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_venue(
             chat_id=chat_id,
@@ -2300,7 +2343,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_video(
@@ -2327,7 +2370,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_video(
             chat_id=chat_id,
@@ -2350,7 +2393,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_video_note(
@@ -2372,7 +2415,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_video_note(
             chat_id=chat_id,
@@ -2390,7 +2433,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def send_voice(
@@ -2413,7 +2456,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Message:
         return await super().send_voice(
             chat_id=chat_id,
@@ -2432,7 +2475,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_chat_administrator_custom_title(
@@ -2446,7 +2489,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_chat_administrator_custom_title(
             chat_id=chat_id,
@@ -2456,7 +2499,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_chat_description(
@@ -2469,7 +2512,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_chat_description(
             chat_id=chat_id,
@@ -2478,7 +2521,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_chat_menu_button(
@@ -2491,7 +2534,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_chat_menu_button(
             chat_id=chat_id,
@@ -2500,7 +2543,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_chat_permissions(
@@ -2513,7 +2556,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_chat_permissions(
             chat_id=chat_id,
@@ -2522,7 +2565,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_chat_photo(
@@ -2535,7 +2578,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_chat_photo(
             chat_id=chat_id,
@@ -2544,7 +2587,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_chat_sticker_set(
@@ -2557,7 +2600,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_chat_sticker_set(
             chat_id=chat_id,
@@ -2566,7 +2609,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_chat_title(
@@ -2579,7 +2622,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_chat_title(
             chat_id=chat_id,
@@ -2588,7 +2631,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_game_score(
@@ -2606,7 +2649,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Union[Message, bool]:
         return await super().set_game_score(
             user_id=user_id,
@@ -2620,7 +2663,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_my_commands(
@@ -2634,7 +2677,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_my_commands(
             commands=commands,
@@ -2644,7 +2687,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_my_default_administrator_rights(
@@ -2657,7 +2700,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_my_default_administrator_rights(
             rights=rights,
@@ -2666,7 +2709,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_passport_data_errors(
@@ -2679,7 +2722,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_passport_data_errors(
             user_id=user_id,
@@ -2688,7 +2731,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_sticker_position_in_set(
@@ -2701,7 +2744,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_sticker_position_in_set(
             sticker=sticker,
@@ -2710,7 +2753,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_sticker_set_thumb(
@@ -2724,7 +2767,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_sticker_set_thumb(
             name=name,
@@ -2734,7 +2777,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def set_webhook(
@@ -2752,7 +2795,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().set_webhook(
             url=url,
@@ -2766,7 +2809,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def stop_message_live_location(
@@ -2781,7 +2824,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Union[Message, bool]:
         return await super().stop_message_live_location(
             chat_id=chat_id,
@@ -2792,7 +2835,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def stop_poll(
@@ -2806,7 +2849,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> Poll:
         return await super().stop_poll(
             chat_id=chat_id,
@@ -2816,7 +2859,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def unban_chat_member(
@@ -2830,7 +2873,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().unban_chat_member(
             chat_id=chat_id,
@@ -2840,7 +2883,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def unban_chat_sender_chat(
@@ -2853,7 +2896,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().unban_chat_sender_chat(
             chat_id=chat_id,
@@ -2862,7 +2905,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def unpin_all_chat_messages(
@@ -2874,7 +2917,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().unpin_all_chat_messages(
             chat_id=chat_id,
@@ -2882,7 +2925,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def unpin_chat_message(
@@ -2895,7 +2938,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> bool:
         return await super().unpin_chat_message(
             chat_id=chat_id,
@@ -2904,7 +2947,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def upload_sticker_file(
@@ -2917,7 +2960,7 @@ class ExtBot(Bot):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-        rate_limit_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
     ) -> File:
         return await super().upload_sticker_file(
             user_id=user_id,
@@ -2926,7 +2969,7 @@ class ExtBot(Bot):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_kwargs),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     # updated camelCase aliases

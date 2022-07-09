@@ -36,7 +36,7 @@ else:
         yield None
 
 
-class AIORateLimiter(BaseRateLimiter):
+class AIORateLimiter(BaseRateLimiter[Dict[str, Any]]):
     def __init__(self) -> None:
         self._base_limiter = AsyncLimiter(max_rate=1, time_period=1)
         self._group_limiter = AsyncLimiter(max_rate=1, time_period=3)
@@ -63,8 +63,9 @@ class AIORateLimiter(BaseRateLimiter):
         callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, None]]],
         args: Any,
         kwargs: Dict[str, Any],
+        endpoint: str,
         data: Dict[str, Any],
-        rate_limit_kwargs: Optional[Dict[str, Any]],
+        rate_limit_args: Optional[Dict[str, Any]],
     ) -> Union[bool, JSONDict, None]:
         group = False
         chat_id = data.get("chat_id")

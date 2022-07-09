@@ -17,12 +17,13 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Coroutine, Dict, Optional, Union
+from typing import Any, Callable, Coroutine, Dict, Generic, Optional, Union
 
 from telegram._utils.types import JSONDict
+from telegram.ext._utils.types import RLARGS
 
 
-class BaseRateLimiter(ABC):
+class BaseRateLimiter(ABC, Generic[RLARGS]):
     @abstractmethod
     async def initialize(self) -> None:
         ...
@@ -37,7 +38,8 @@ class BaseRateLimiter(ABC):
         callback: Callable[..., Coroutine[Any, Any, Union[bool, JSONDict, None]]],
         args: Any,
         kwargs: Dict[str, Any],
+        endpoint: str,
         data: Dict[str, Any],
-        rate_limit_kwargs: Optional[Dict[str, Any]],
+        rate_limit_args: Optional[RLARGS],
     ) -> Union[bool, JSONDict, None]:
         ...
