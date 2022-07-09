@@ -415,6 +415,9 @@ class TestBot:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
+        if bot_method_name.lower().replace("_", "") == "getupdates":
+            return
+
         try:
             # Check that ExtBot does the right thing
             bot_method = getattr(bot, bot_method_name)
