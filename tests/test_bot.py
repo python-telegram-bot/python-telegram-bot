@@ -137,6 +137,34 @@ xfail = pytest.mark.xfail(
 )
 
 
+def bot_methods(ext_bot=True):
+    arg_values = []
+    ids = []
+    non_api_methods = [
+        "de_json",
+        "de_list",
+        "to_dict",
+        "to_json",
+        "parse_data",
+        "get_bot",
+        "set_bot",
+        "initialize",
+        "shutdown",
+        "insert_callback_data",
+    ]
+    classes = (Bot, ExtBot) if ext_bot else (Bot,)
+    for cls in classes:
+        for name, attribute in inspect.getmembers(cls, predicate=inspect.isfunction):
+            if name.startswith("_") or name in non_api_methods:
+                continue
+            arg_values.append((cls, name, attribute))
+            ids.append(f"{cls.__name__}.{name}")
+
+    return pytest.mark.parametrize(
+        argnames="bot_class, bot_method_name,bot_method", argvalues=arg_values, ids=ids
+    )
+
+
 class TestBot:
     """
     Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
@@ -366,29 +394,10 @@ class TestBot:
         with pytest.raises(pickle.PicklingError, match="Bot objects cannot be pickled"):
             pickle.dumps(bot)
 
-    @pytest.mark.parametrize(
-        "bot_method_name",
-        argvalues=[
-            name
-            for name, _ in inspect.getmembers(Bot, predicate=inspect.isfunction)
-            if not name.startswith("_")
-            and name
-            not in [
-                "de_json",
-                "de_list",
-                "to_dict",
-                "to_json",
-                "parse_data",
-                "get_updates",
-                "getUpdates",
-                "get_bot",
-                "set_bot",
-                "initialize",
-                "shutdown",
-            ]
-        ],
-    )
-    async def test_defaults_handling(self, bot_method_name, bot, raw_bot, monkeypatch):
+    @bot_methods(ext_bot=False)
+    async def test_defaults_handling(
+        self, bot_class, bot_method_name, bot_method, bot, raw_bot, monkeypatch
+    ):
         """
         Here we check that the bot methods handle tg.ext.Defaults correctly. This has two parts:
 
@@ -408,6 +417,9 @@ class TestBot:
         Finally, there are some tests for Defaults.{parse_mode, quote, allow_sending_without_reply}
         at the appropriate places, as those are the only things we can actually check.
         """
+        if bot_method_name.lower().replace("_", "") == "getupdates":
+            return
+
         try:
             # Check that ExtBot does the right thing
             bot_method = getattr(bot, bot_method_name)
@@ -982,6 +994,7 @@ class TestBot:
     @pytest.mark.asyncio
     async def test_answer_web_app_query(self, bot, monkeypatch):
         params = False
+
         # For now just test that our internals pass the correct data
 
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
@@ -2923,44 +2936,42 @@ class TestBot:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    def test_camel_case_redefinition_extbot(self):
-        invalid_camel_case_functions = []
-        for function_name, function in ExtBot.__dict__.items():
-            camel_case_function = getattr(ExtBot, to_camel_case(function_name), False)
-            if callable(function) and camel_case_function and camel_case_function is not function:
-                invalid_camel_case_functions.append(function_name)
-        assert invalid_camel_case_functions == []
+    @bot_methods()
+    def test_camel_case_aliases(self, bot_class, bot_method_name, bot_method):
+        camel_case_name = to_camel_case(bot_method_name)
+        camel_case_function = getattr(bot_class, camel_case_name, False)
+        assert camel_case_function is not False, f"{camel_case_name} not found"
+        assert camel_case_function is bot_method, f"{camel_case_name} is not {bot_method}"
 
-    def test_camel_case_bot(self):
-        not_available_camelcase_functions = []
-        for function_name, function in Bot.__dict__.items():
-            if (
-                function_name.startswith("_")
-                or not callable(function)
-                or function_name in ["to_dict"]
-            ):
-                continue
-            camel_case_function = getattr(Bot, to_camel_case(function_name), False)
-            if not camel_case_function:
-                not_available_camelcase_functions.append(function_name)
-        assert not_available_camelcase_functions == []
-
-    def test_coroutine_functions(self):
+    @bot_methods()
+    def test_coroutine_functions(self, bot_class, bot_method_name, bot_method):
         """Check that all bot methods are defined as async def  ..."""
-        non_coroutine_functions = set()
-        for attr_name, attribute in Bot.__dict__.items():
-            # not islower() skips the camelcase aliases
-            if not callable(attribute) or attr_name.startswith("_") or not attr_name.islower():
-                continue
-            # unfortunately `inspect.iscoroutinefunction` doesn't do the trick directly,
-            # as the @_log decorator interferes
-            source = "".join(inspect.getsourcelines(attribute)[0])
-            if (
-                "pool_timeout: ODVInput[float]" in source
-                and f"async def {attr_name}" not in source
-            ):
-                non_coroutine_functions.add(attr_name)
-        assert non_coroutine_functions == set(), (
-            "The following methods should be defined as coroutine functions: "
-            f"{','.join(non_coroutine_functions)} "
-        )
+        # not islower() skips the camelcase aliases
+        if not bot_method_name.islower():
+            return
+        # unfortunately `inspect.iscoroutinefunction` doesn't do the trick directly,
+        # as the @_log decorator interferes
+        source = "".join(inspect.getsourcelines(bot_method)[0])
+        assert (
+            f"async def {bot_method_name}" in source
+        ), f"{bot_method_name} should be a coroutine function"
+
+    @bot_methods()
+    def test_api_kwargs_and_timeouts_present(self, bot_class, bot_method_name, bot_method):
+        """Check that all bot methods have `api_kwargs` and timeout params."""
+        param_names = inspect.signature(bot_method).parameters.keys()
+        assert (
+            "pool_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `pool_timeout`"
+        assert (
+            "read_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `read_timeout`"
+        assert (
+            "connect_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `connect_timeout`"
+        assert (
+            "write_timeout" in param_names
+        ), f"{bot_method_name} is missing the parameter `write_timeout`"
+        assert (
+            "api_kwargs" in param_names
+        ), f"{bot_method_name} is missing the parameter `api_kwargs`"
