@@ -67,9 +67,8 @@ class InlineKeyboardButton(TelegramObject):
        equality.
 
     .. seealso:: `Inline Keyboard Example 1 <examples.inlinekeyboard.html>`_,
-        `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_
-        `InlineKeyboard Example <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/InlineKeyboard-Example>`_
+        `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_,
+        :class:`telegram.InlineKeyboardMarkup`
 
     Args:
         text (:obj:`str`): Label text on the button.

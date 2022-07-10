@@ -31,6 +31,8 @@ class WebAppData(TelegramObject):
 
     .. versionadded:: 20.0
 
+    .. seealso:: `Webappbot Example <examples.webappbot.html>`_
+
     Args:
         data (:obj:`str`): The data. Be aware that a bad client can send arbitrary data in this
             field.
@@ -47,7 +49,6 @@ class WebAppData(TelegramObject):
                 Be aware that a bad client can send
             arbitrary data in this field.
 
-    .. seealso:: `Webappbot Example <examples.webappbot.html>`_
     """
 
     __slots__ = ("data", "button_text")

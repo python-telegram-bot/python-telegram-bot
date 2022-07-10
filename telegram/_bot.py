@@ -1186,7 +1186,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Message.reply_document`,  :attr:`telegram.Chat.send_document`
+        .. seealso:: :attr:`telegram.Message.reply_document`, :attr:`telegram.Chat.send_document`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.

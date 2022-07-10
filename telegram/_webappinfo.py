@@ -32,6 +32,8 @@ class WebAppInfo(TelegramObject):
 
     .. versionadded:: 20.0
 
+    .. seealso:: `Webappbot Example <examples.webappbot.html>`_
+
     Args:
         url (:obj:`str`): An HTTPS URL of a Web App to be opened with additional data as specified
             in `Initializing Web Apps \
@@ -42,7 +44,6 @@ class WebAppInfo(TelegramObject):
             in `Initializing Web Apps \
             <https://core.telegram.org/bots/webapps#initializing-web-apps>`_.
 
-    .. seealso:: `Webappbot Example <examples.webappbot.html>`_
     """
 
     __slots__ = ("url",)

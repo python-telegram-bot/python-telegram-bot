@@ -38,8 +38,6 @@ class InlineKeyboardMarkup(TelegramObject):
 
     .. seealso:: `Inline Keyboard Example 1 <examples.inlinekeyboard.html>`_,
         `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_
-        `InlineKeyboard Example <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/InlineKeyboard-Example>`_
 
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
