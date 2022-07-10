@@ -30,7 +30,7 @@ from telegram import (
     User,
 )
 from telegram.error import TelegramError
-from telegram.ext import ApplicationBuilder, CallbackContext
+from telegram.ext import ApplicationBuilder, CallbackContext, Job
 
 """
 CallbackContext.refresh_data is tested in TestBasePersistence
@@ -131,6 +131,23 @@ class TestCallbackContext:
         assert callback_context.job_queue is app.job_queue
         assert callback_context.update_queue is app.update_queue
         assert callback_context.coroutine is coroutine
+        assert callback_context.job is job
+
+    def test_from_error_job_user_chat_data(self, app):
+        error = TelegramError("test")
+        job = Job(callback=lambda x: x, data=None, chat_id=42, user_id=43)
+
+        callback_context = CallbackContext.from_error(
+            update=None, error=error, application=app, job=job
+        )
+
+        assert callback_context.error is error
+        assert callback_context.chat_data == {}
+        assert callback_context.user_data == {}
+        assert callback_context.bot_data is app.bot_data
+        assert callback_context.bot is app.bot
+        assert callback_context.job_queue is app.job_queue
+        assert callback_context.update_queue is app.update_queue
         assert callback_context.job is job
 
     def test_match(self, app):
