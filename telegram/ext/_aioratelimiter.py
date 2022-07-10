@@ -56,11 +56,20 @@ class AIORateLimiter(BaseRateLimiter[Dict[str, Any]]):
         group_time_period: float = 60,
         max_retries: int = 0,
     ) -> None:
-        self._base_limiter = AsyncLimiter(
-            max_rate=overall_max_rate, time_period=overall_time_period
-        )
-        self._group_max_rate = group_max_rate
-        self._group_time_period = group_time_period
+        if overall_max_rate and overall_time_period:
+            self._base_limiter = AsyncLimiter(
+                max_rate=overall_max_rate, time_period=overall_time_period
+            )
+        else:
+            self._base_limiter = None
+
+        if group_max_rate and group_time_period:
+            self._group_max_rate = group_max_rate
+            self._group_time_period = group_time_period
+        else:
+            self._group_max_rate = 0
+            self._group_time_period = 0
+
         self._group_limiters: Dict[Union[str, int], AsyncLimiter] = {}
         self._max_retries = max_retries
         self._logger = logging.getLogger(__name__)
@@ -100,8 +109,13 @@ class AIORateLimiter(BaseRateLimiter[Dict[str, Any]]):
         args: Any,
         kwargs: Dict[str, Any],
     ) -> Union[bool, JSONDict, None]:
-        async with (self._base_limiter if chat else null_context()):
-            async with (self._get_group_limiter(group) if group else null_context()):
+        chat_context = self._base_limiter if (chat and self._base_limiter) else null_context()
+        group_context = (
+            self._get_group_limiter(group) if group and self._group_max_rate else null_context()
+        )
+
+        async with chat_context:
+            async with group_context:
                 # In case a retry_after was hit, we wait with processing the request
                 await self._retry_after_event.wait()
 
