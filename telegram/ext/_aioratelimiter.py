@@ -17,7 +17,8 @@
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an implementation of the BaseRateLimiter class based on the aiolimiter
-library."""
+library.
+"""
 import asyncio
 import contextlib
 import logging
@@ -56,8 +57,8 @@ class AIORateLimiter(BaseRateLimiter[int]):
     The rate limiting is applied by combining to throttles and :meth:`process_request` roughly
     boils down to::
 
-        async with overall_limiter:
-            async with group_limiter(group_id):
+        async with group_limiter(group_id):
+            async with overall_limiter:
                 await callback(*args, **kwargs)
 
     Here, ``group_id`` is determined by checking if there is a ``chat_id`` parameter in the
@@ -174,13 +175,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
         args: Any,
         kwargs: Dict[str, Any],
     ) -> Union[bool, JSONDict, None]:
-        chat_context = self._base_limiter if (chat and self._base_limiter) else null_context()
+        base_context = self._base_limiter if (chat and self._base_limiter) else null_context()
         group_context = (
             self._get_group_limiter(group) if group and self._group_max_rate else null_context()
         )
 
-        async with chat_context:
-            async with group_context:
+        async with group_context:  # skipcq: PPTC-W0062
+            async with base_context:
                 # In case a retry_after was hit, we wait with processing the request
                 await self._retry_after_event.wait()
 
