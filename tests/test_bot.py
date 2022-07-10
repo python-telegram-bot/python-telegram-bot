@@ -157,11 +157,11 @@ def bot_methods(ext_bot=True):
         for name, attribute in inspect.getmembers(cls, predicate=inspect.isfunction):
             if name.startswith("_") or name in non_api_methods:
                 continue
-            arg_values.append((name, attribute))
+            arg_values.append((cls, name, attribute))
             ids.append(f"{cls.__name__}.{name}")
 
     return pytest.mark.parametrize(
-        argnames="bot_method_name,bot_method", argvalues=arg_values, ids=ids
+        argnames="bot_class, bot_method_name,bot_method", argvalues=arg_values, ids=ids
     )
 
 
@@ -395,7 +395,9 @@ class TestBot:
             pickle.dumps(bot)
 
     @bot_methods(ext_bot=False)
-    async def test_defaults_handling(self, bot_method_name, bot_method, bot, raw_bot, monkeypatch):
+    async def test_defaults_handling(
+        self, bot_class, bot_method_name, bot_method, bot, raw_bot, monkeypatch
+    ):
         """
         Here we check that the bot methods handle tg.ext.Defaults correctly. This has two parts:
 
@@ -2934,30 +2936,15 @@ class TestBot:
             bot.callback_data_cache.clear_callback_data()
             bot.callback_data_cache.clear_callback_queries()
 
-    def test_camel_case_redefinition_extbot(self):
-        invalid_camel_case_functions = []
-        for function_name, function in ExtBot.__dict__.items():
-            camel_case_function = getattr(ExtBot, to_camel_case(function_name), False)
-            if callable(function) and camel_case_function and camel_case_function is not function:
-                invalid_camel_case_functions.append(function_name)
-        assert invalid_camel_case_functions == []
-
-    def test_camel_case_bot(self):
-        not_available_camelcase_functions = []
-        for function_name, function in Bot.__dict__.items():
-            if (
-                function_name.startswith("_")
-                or not callable(function)
-                or function_name in ["to_dict"]
-            ):
-                continue
-            camel_case_function = getattr(Bot, to_camel_case(function_name), False)
-            if not camel_case_function:
-                not_available_camelcase_functions.append(function_name)
-        assert not_available_camelcase_functions == []
+    @bot_methods()
+    def test_camel_case_aliases(self, bot_class, bot_method_name, bot_method):
+        camel_case_name = to_camel_case(bot_method_name)
+        camel_case_function = getattr(bot_class, camel_case_name, False)
+        assert camel_case_function is not False, f"{camel_case_name} not found"
+        assert camel_case_function is bot_method, f"{camel_case_name} is not {bot_method}"
 
     @bot_methods()
-    def test_coroutine_functions(self, bot_method_name, bot_method):
+    def test_coroutine_functions(self, bot_class, bot_method_name, bot_method):
         """Check that all bot methods are defined as async def  ..."""
         # not islower() skips the camelcase aliases
         if not bot_method_name.islower():
@@ -2970,7 +2957,7 @@ class TestBot:
         ), f"{bot_method_name} should be a coroutine function"
 
     @bot_methods()
-    def test_api_kwargs_and_timeouts_present(self, bot_method_name, bot_method):
+    def test_api_kwargs_and_timeouts_present(self, bot_class, bot_method_name, bot_method):
         """Check that all bot methods have `api_kwargs` and timeout params."""
         param_names = inspect.signature(bot_method).parameters.keys()
         assert (
