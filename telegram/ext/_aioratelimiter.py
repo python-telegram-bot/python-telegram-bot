@@ -22,7 +22,12 @@ import logging
 import sys
 from typing import Any, AsyncIterator, Callable, Coroutine, Dict, Optional, Union
 
-from aiolimiter import AsyncLimiter
+try:
+    from aiolimiter import AsyncLimiter
+
+    AIO_LIMITER_AVAILABLE = True
+except ImportError:
+    AIO_LIMITER_AVAILABLE = False
 
 from telegram._utils.types import JSONDict
 from telegram.error import RetryAfter
@@ -56,8 +61,13 @@ class AIORateLimiter(BaseRateLimiter[Dict[str, Any]]):
         group_time_period: float = 60,
         max_retries: int = 0,
     ) -> None:
+        if not AIO_LIMITER_AVAILABLE:
+            raise RuntimeError(
+                "To use `AIORateLimiter`, PTB must be installed via `pip install "
+                "python-telegram-bot[rate-limiter]`."
+            )
         if overall_max_rate and overall_time_period:
-            self._base_limiter = AsyncLimiter(
+            self._base_limiter: Optional[AsyncLimiter] = AsyncLimiter(
                 max_rate=overall_max_rate, time_period=overall_time_period
             )
         else:

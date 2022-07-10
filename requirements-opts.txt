@@ -1,0 +1,7 @@
+# Format:
+# package_name==version # req-1, req-2, req-3!ext
+# `pip install ptb-raw[req-1/2]` will install `package_name`
+# `pip install ptb[req-1/2/3]` will also install `package_name`
+httpx[socks] # socks
+cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=3.0 # passport
+aiolimiter~=1.0.0 # rate-limiter!ext
