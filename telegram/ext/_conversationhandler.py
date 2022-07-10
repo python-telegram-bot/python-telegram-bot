@@ -184,7 +184,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         states to continue the parent conversation after the child conversation has ended or even
         map a state to :attr:`END` to end the *parent* conversation from within the child
         conversation. For an example on nested :class:`ConversationHandler` s, see
-        :any:`examples.nestedconversationbot.html`.
+        :any:`examples.nestedconversationbot`.
 
     .. seealso:: `Conversation Example <examples.conversationbot.html>`_,
         `Conversation Example 2 <examples.conversationbot2.html>`_,
