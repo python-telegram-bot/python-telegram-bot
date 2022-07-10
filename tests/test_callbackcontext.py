@@ -116,11 +116,10 @@ class TestCallbackContext:
         update = Update(
             0, message=Message(0, None, Chat(1, "chat"), from_user=User(1, "user", False))
         )
-        job = object()
         coroutine = object()
 
         callback_context = CallbackContext.from_error(
-            update=update, error=error, application=app, job=job, coroutine=coroutine
+            update=update, error=error, application=app, coroutine=coroutine
         )
 
         assert callback_context.error is error
@@ -131,7 +130,6 @@ class TestCallbackContext:
         assert callback_context.job_queue is app.job_queue
         assert callback_context.update_queue is app.update_queue
         assert callback_context.coroutine is coroutine
-        assert callback_context.job is job
 
     def test_from_error_job_user_chat_data(self, app):
         error = TelegramError("test")
