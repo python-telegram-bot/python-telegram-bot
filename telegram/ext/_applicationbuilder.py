@@ -40,12 +40,13 @@ from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._jobqueue import JobQueue
 from telegram.ext._updater import Updater
-from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, RLARGS, UD
+from telegram.ext._utils.types import BD, BT, CCT, CD, JQ, UD
 from telegram.request import BaseRequest
 from telegram.request._httpxrequest import HTTPXRequest
 
 if TYPE_CHECKING:
     from telegram.ext import BasePersistence, BaseRateLimiter, CallbackContext, Defaults
+    from telegram.ext._utils.types import RLARGS
 
 # Type hinting is a bit complicated here because we try to get to a sane level of
 # leveraging generics and therefore need a number of type variables.
@@ -980,6 +981,16 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self: "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]",
         rate_limiter: "BaseRateLimiter[RLARGS]",
     ) -> "ApplicationBuilder[ExtBot[RLARGS], CCT, UD, CD, BD, JQ]":
+        """Sets a :class:`telegram.ext.BaseRateLimiter` instance for the
+        :paramref:`telegram.ext.ExtBot.rate_limiter` parameter of
+        :attr:`telegram.ext.Application.bot`.
+
+        Args:
+            rate_limiter (:class:`telegram.ext.BaseRateLimiter`): The rate limiter.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
         if self._bot is not DEFAULT_NONE:
             raise RuntimeError(_TWO_ARGS_REQ.format("rate_limiter", "bot instance"))
         if self._updater not in (DEFAULT_NONE, None):

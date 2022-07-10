@@ -118,6 +118,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             Pass an integer to specify the maximum number of objects cached in memory. For more
             details, please see our `wiki <https://github.com/python-telegram-bot\
                 /python-telegram-bot/wiki/Arbitrary-callback_data>`_. Defaults to :obj:`False`.
+        rate_limiter (:class:`telegram.ext.BaseRateLimiter`, optional): A rate limiter to use for
+            limiting the number of requests made by the bot per time interval.
 
     Attributes:
         arbitrary_callback_data (:obj:`bool` | :obj:`int`): Whether this bot instance
@@ -128,7 +130,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     """
 
-    __slots__ = ("arbitrary_callback_data", "callback_data_cache", "_defaults", "rate_limiter")
+    __slots__ = ("arbitrary_callback_data", "callback_data_cache", "_defaults", "_rate_limiter")
 
     # using object() would be a tiny bit safer, but a string plays better with the typing setup
     __RL_KEY = uuid4().hex
@@ -187,7 +189,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             private_key_password=private_key_password,
         )
         self._defaults = defaults
-        self.rate_limiter = rate_limiter
+        self._rate_limiter = rate_limiter
 
         # set up callback_data
         if not isinstance(arbitrary_callback_data, bool):
@@ -200,13 +202,13 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     async def initialize(self) -> None:
         await super().initialize()
-        if self.rate_limiter:
-            await self.rate_limiter.initialize()
+        if self._rate_limiter:
+            await self._rate_limiter.initialize()
 
     async def shutdown(self) -> None:
         # Shut down the rate limiter before shutting down the request objects!
-        if self.rate_limiter:
-            await self.rate_limiter.shutdown()
+        if self._rate_limiter:
+            await self._rate_limiter.shutdown()
         await super().shutdown()
 
     @classmethod
@@ -242,7 +244,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[bool, JSONDict, None]:
         # getting updates should not be rate limited!
-        if endpoint == "getUpdate" or not self.rate_limiter:
+        if endpoint == "getUpdate" or not self._rate_limiter:
             return await self._do_post(
                 endpoint=endpoint,
                 data=data,
@@ -264,10 +266,10 @@ class ExtBot(Bot, Generic[RLARGS]):
         }
         self._logger.debug(
             "Passing request through rate limiter of type %s with rate_limit_args %s",
-            type(self.rate_limiter),
+            type(self._rate_limiter),
             rate_limit_args,
         )
-        return await self.rate_limiter.process_request(
+        return await self._rate_limiter.process_request(
             callback,
             args=args,
             kwargs=kwargs,

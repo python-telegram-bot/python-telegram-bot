@@ -16,6 +16,8 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
+"""This module contains an implementation of the BaseRateLimiter class based on the aiolimiter
+library."""
 import asyncio
 import contextlib
 import logging
@@ -42,7 +44,60 @@ else:
         yield None
 
 
-class AIORateLimiter(BaseRateLimiter[Dict[str, Any]]):
+class AIORateLimiter(BaseRateLimiter[int]):
+    """
+    Implementation of :class:`~telegram.ext.BaseRateLimiter` using the library
+    `aiolimiter <https://aiolimiter.readthedocs.io/>`_.
+
+    Important:
+        If you want to use this class, you must install PTB with the optional requirement
+        ``rate-limiter``, i.e. ``pip install python-telegram-bot[rate-limiter]``.
+
+    The rate limiting is applied by combining to throttles and :meth:`process_request` roughly
+    boils down to::
+
+        async with overall_limiter:
+            async with group_limiter(group_id):
+                await callback(*args, **kwargs)
+
+    Here, ``group_id`` is determined by checking if there is a ``chat_id`` parameter in the
+    :paramref:`~telegram.ext.BaseRateLimiter.process_request.data`.
+
+    Attention:
+        * Some bot methods accept a ``chat_id`` parameter in form of a ``@username`` for
+          supergroups and channels. As we can't know which ``@username`` corresponds to which
+          integer ``chat_id``, these will be treated as different groups, which may lead to
+          exceeding the rate limit.
+        * As channels can't be differentiated from supergroups by the ``@username`` or integer
+          ``chat_id``, this also applies the group related rate limits to channels.
+
+    Note:
+        This class is to be understood as minimal effort reference implementation.
+        If you would like to handle rate limiting in a more sophisticated, fine-tuned way, we
+        welcome you to implement your own subclass of :class:`~telegram.ext.BaseRateLimiter`.
+        Feel tree to check out the source code of this class for inspiration.
+
+    .. versionadded:: 20.0
+
+    Args:
+        overall_max_rate (:obj:`float`): The maximum number of requests allowed for the entire bot
+            per :paramref:`overall_time_period`. When set to 0, no rate limiting will be applied.
+            Defaults to 30.
+        overall_time_period (:obj:`float`): The time period (in seconds) during which the
+            :paramref:`overall_max_rate` is enforced.  When set to 0, no rate limiting will be
+            applied. Defaults to 1.
+        group_max_rate (:obj:`float`): The maximum number of requests allowed for requests related
+            to groups and channels per :paramref:`group_time_period`.  When set to 0, no rate
+            limiting will be applied. Defaults to 20.
+        group_time_period (:obj:`float`): The time period (in seconds) during which the
+            :paramref:`group_time_period` is enforced.  When set to 0, no rate limiting will be
+            applied. Defaults to 60.
+        max_retries (:obj:`int`): The maximum number of retries to be made in case of a
+            :exc:`~telegram.error.RetryAfter` exception.
+            If set to 0, no retries will be made.
+
+    """
+
     __slots__ = (
         "_base_limiter",
         "_group_limiters",
@@ -87,10 +142,10 @@ class AIORateLimiter(BaseRateLimiter[Dict[str, Any]]):
         self._retry_after_event.set()
 
     async def initialize(self) -> None:
-        pass
+        """Does nothing."""
 
     async def shutdown(self) -> None:
-        pass
+        """Does nothing."""
 
     def _get_group_limiter(self, group_id: Union[str, int, bool]) -> AsyncLimiter:
         # Remove limiters that haven't been used for so long that they are at max capacity
@@ -139,9 +194,19 @@ class AIORateLimiter(BaseRateLimiter[Dict[str, Any]]):
         kwargs: Dict[str, Any],
         endpoint: str,
         data: Dict[str, Any],
-        rate_limit_args: Optional[Dict[str, Any]],
+        rate_limit_args: Optional[int],
     ) -> Union[bool, JSONDict, None]:
-        max_retries = data.get("max_retries", self._max_retries)
+        """
+        Processes a request by applying rate limiting.
+
+        See :meth:`telegram.ext.BaseRateLimiter.process_request` for detailed information on the
+        arguments.
+
+        Args:
+            rate_limit_args (:obj:`None` | :obj:`int`): If set, specifies the maximum number of
+                retries to be made in case of a :exc:`~telegram.error.RetryAfter` exception.
+        """
+        max_retries = rate_limit_args or self._max_retries
 
         group: Union[int, str, bool] = False
         chat = False
