@@ -958,9 +958,11 @@ class TestBot:
         assert not unprotected_dice.has_protected_content
 
     @flaky(3, 1)
-    async def test_send_chat_action(self, bot, chat_id):
-        for action in ChatAction:
-            assert await bot.send_chat_action(chat_id, action)
+    @pytest.mark.parametrize("chat_action", list(ChatAction))
+    async def test_send_chat_action(self, bot, chat_id, chat_action):
+        assert await bot.send_chat_action(chat_id, chat_action)
+
+    async def test_wrong_chat_action(self, bot, chat_id):
         with pytest.raises(BadRequest, match="Wrong parameter action"):
             await bot.send_chat_action(chat_id, "unknown action")
 
