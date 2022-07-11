@@ -109,12 +109,12 @@ class ExtBot(Bot, Generic[RLARGS]):
     :class:`telegram.Bot`.
 
     All API methods of this class have an additional keyword argument ``rate_limit_args``.
-    This can be used to pass additional information to the rate limiter, specifically
-    :paramref:`telegram.ext.BaseRateLimiter.process_requset.rate_limit_args`.
+    This can be used to pass additional information to the rate limiter, specifically to
+    :paramref:`telegram.ext.BaseRateLimiter.process_request.rate_limit_args`.
 
     Warning:
         * The keyword argument ``rate_limit_args`` can `not` be used, if :attr:`rate_limiter`
-          is `None`.
+          is :obj:`None`.
         * The method :meth:`~telegram.Bot.get_updates` is the only method that does not have the
           additional argument, as this method will never be rate limited.
 

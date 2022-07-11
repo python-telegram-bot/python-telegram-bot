@@ -37,7 +37,7 @@ from telegram.error import RetryAfter
 from telegram.ext._baseratelimiter import BaseRateLimiter
 
 if sys.version_info >= (3, 10):
-    null_context = contextlib.nullcontext()
+    null_context = contextlib.nullcontext  # pylint: disable=invalid-name
 else:
 
     @contextlib.asynccontextmanager
@@ -180,7 +180,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
             self._get_group_limiter(group) if group and self._group_max_rate else null_context()
         )
 
-        async with group_context:  # skipcq: PPTC-W0062
+        async with group_context:  # skipcq: PTC-W0062
             async with base_context:
                 # In case a retry_after was hit, we wait with processing the request
                 await self._retry_after_event.wait()
