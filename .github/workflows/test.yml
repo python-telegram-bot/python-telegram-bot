@@ -33,10 +33,11 @@ jobs:
           python -W ignore -m pip install -r requirements-dev.txt
 
       - name: Test with pytest
-        # We run 3 different suites here
+        # We run 4 different suites here
         # 1. Test just utils.datetime.py without pytz being installed
         # 2. Test just test_no_passport.py without passport dependencies being installed
-        # 3. Test everything else
+        # 3. Test just test_rate_limiter.py without passport dependencies being installed
+        # 4. Test everything else
         # The first & second one are achieved by mocking the corresponding import
         # See test_helpers.py & test_no_passport.py for details
         run: |
@@ -46,9 +47,16 @@ jobs:
           pytest -v --cov --cov-append -k test_helpers.py
           no_pytz_exit=$?
           export TEST_NO_PYTZ='false'
+          export TEST_NO_RATE_LIMITER='true'
+          pip uninstall aiolimiter -y
+          pytest -v --cov --cov-append -k test_ratelimiter.py
+          no_rate_limiter_exit=$?
+          export TEST_NO_RATE_LIMITER='false'
+          pip install -r requirements-opts.txt
           pytest -v --cov --cov-append
           full_exit=$?
           special_exit=$(( no_pytz_exit > no_passport_exit ? no_pytz_exit : no_passport_exit ))
+          special_exit=$(( special_exit > no_rate_limiter_exit ? special_exit : no_rate_limiter_exit ))
           global_exit=$(( special_exit > full_exit ? special_exit : full_exit ))
           exit ${global_exit}
         env:

@@ -294,17 +294,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         # Drop any None values because Telegram doesn't handle them well
         data = {key: value for key, value in data.items() if value is not None}
 
-        # This also converts datetimes into timestamps.
-        # We don't do this earlier so that _insert_defaults (see above) has a chance to convert
-        # to the default timezone in case this is called by ExtBot
-        request_data = RequestData(
-            parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
-        )
-
         return await self._do_post(
             endpoint=endpoint,
             data=data,
-            request_data=request_data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -314,17 +306,20 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     async def _do_post(
         self,
         endpoint: str,
-        data: JSONDict,  # pylint: disable=unused-argument
-        request_data: RequestData,
+        data: JSONDict,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[bool, JSONDict, None]:
-        # data is present as argument so that ExtBot can pass it to the RateLimiter
-        # We could also build the request_data only in here, but then we'd have to build that
-        # multiple times in case the RateLimiter has to retry the request
+        # This also converts datetimes into timestamps.
+        # We don't do this earlier so that _insert_defaults (see above) has a chance to convert
+        # to the default timezone in case this is called by ExtBot
+        request_data = RequestData(
+            parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
+        )
+
         if endpoint == "getUpdates":
             request = self._request[0]
         else:

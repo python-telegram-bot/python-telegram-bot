@@ -82,7 +82,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.ext._utils.types import RLARGS
-from telegram.request import BaseRequest, RequestData
+from telegram.request import BaseRequest
 
 if TYPE_CHECKING:
     from telegram import (
@@ -108,6 +108,16 @@ class ExtBot(Bot, Generic[RLARGS]):
     For the documentation of the arguments, methods and attributes, please see
     :class:`telegram.Bot`.
 
+    All API methods of this class have an additional keyword argument ``rate_limit_args``.
+    This can be used to pass additional information to the rate limiter, specifically
+    :paramref:`telegram.ext.BaseRateLimiter.process_requset.rate_limit_args`.
+
+    Warning:
+        * The keyword argument ``rate_limit_args`` can `not` be used, if :attr:`rate_limiter`
+          is `None`.
+        * The method :meth:`~telegram.Bot.get_updates` is the only method that does not have the
+          additional argument, as this method will never be rate limited.
+
     .. versionadded:: 13.6
 
     Args:
@@ -120,6 +130,8 @@ class ExtBot(Bot, Generic[RLARGS]):
                 /python-telegram-bot/wiki/Arbitrary-callback_data>`_. Defaults to :obj:`False`.
         rate_limiter (:class:`telegram.ext.BaseRateLimiter`, optional): A rate limiter to use for
             limiting the number of requests made by the bot per time interval.
+
+            .. versionadded:: 20.0
 
     Attributes:
         arbitrary_callback_data (:obj:`bool` | :obj:`int`): Whether this bot instance
@@ -201,14 +213,15 @@ class ExtBot(Bot, Generic[RLARGS]):
         self.callback_data_cache: CallbackDataCache = CallbackDataCache(bot=self, maxsize=maxsize)
 
     async def initialize(self) -> None:
+        # Initialize before calling super, because super calls get_me
+        if self.rate_limiter:
+            await self.rate_limiter.initialize()
         await super().initialize()
-        if self._rate_limiter:
-            await self._rate_limiter.initialize()
 
     async def shutdown(self) -> None:
         # Shut down the rate limiter before shutting down the request objects!
-        if self._rate_limiter:
-            await self._rate_limiter.shutdown()
+        if self.rate_limiter:
+            await self.rate_limiter.shutdown()
         await super().shutdown()
 
     @classmethod
@@ -236,28 +249,29 @@ class ExtBot(Bot, Generic[RLARGS]):
         self,
         endpoint: str,
         data: JSONDict,
-        request_data: RequestData,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[bool, JSONDict, None]:
+        rate_limit_args = self._extract_rl_kwargs(data)
+        if not self.rate_limiter and rate_limit_args is not None:
+            raise ValueError(
+                "`rate_limit_args` can only be used if a `ExtBot.rate_limiter` is set."
+            )
+
         # getting updates should not be rate limited!
-        if endpoint == "getUpdate" or not self._rate_limiter:
-            return await self._do_post(
+        if endpoint == "getUpdates" or not self.rate_limiter:
+            return await super()._do_post(
                 endpoint=endpoint,
                 data=data,
-                request_data=request_data,
                 write_timeout=write_timeout,
                 connect_timeout=connect_timeout,
                 pool_timeout=pool_timeout,
                 read_timeout=read_timeout,
             )
 
-        rate_limit_args = self._extract_rl_kwargs(data)
-        callback = super()._do_post
-        args = (endpoint, data, request_data)
         kwargs = {
             "read_timeout": read_timeout,
             "write_timeout": write_timeout,
@@ -266,12 +280,12 @@ class ExtBot(Bot, Generic[RLARGS]):
         }
         self._logger.debug(
             "Passing request through rate limiter of type %s with rate_limit_args %s",
-            type(self._rate_limiter),
+            type(self.rate_limiter),
             rate_limit_args,
         )
-        return await self._rate_limiter.process_request(
-            callback,
-            args=args,
+        return await self.rate_limiter.process_request(
+            callback=super()._do_post,
+            args=(endpoint, data),
             kwargs=kwargs,
             endpoint=endpoint,
             data=data,
@@ -283,6 +297,15 @@ class ExtBot(Bot, Generic[RLARGS]):
         """The :class:`telegram.ext.Defaults` used by this bot, if any."""
         # This is a property because defaults shouldn't be changed at runtime
         return self._defaults
+
+    @property
+    def rate_limiter(self) -> Optional["BaseRateLimiter"]:
+        """The :class:`telegram.ext.BaseRateLimiter` used by this bot, if any.
+
+        .. versionadded:: 20.0
+        """
+        # This is a property because the rate limiter shouldn't be changed at runtime
+        return self._rate_limiter
 
     def _insert_defaults(self, data: Dict[str, object]) -> None:
         """Inserts the defaults values for optional kwargs for which tg.ext.Defaults provides
