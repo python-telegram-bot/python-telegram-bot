@@ -148,7 +148,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
     async def shutdown(self) -> None:
         """Does nothing."""
 
-    def _get_group_limiter(self, group_id: Union[str, int, bool]) -> AsyncLimiter:
+    def _get_group_limiter(self, group_id: Union[str, int, bool]) -> "AsyncLimiter":
         # Remove limiters that haven't been used for so long that they are at max capacity
         # We only do that if we have a lot of limiters lying around to avoid looping on every call
         # This is a minimal effort approach - a full-fledged cache could use a TTL approach
