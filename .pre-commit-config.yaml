@@ -32,7 +32,7 @@ repos:
 
         additional_dependencies:
           - httpx~=0.23.0
-          - tornado~=6.1
+          - tornado~=6.2
           - APScheduler~=3.9.1
           - cachetools~=5.2.0
           - . # this basically does `pip install -e .`
@@ -48,7 +48,7 @@ repos:
           - types-cryptography
           - types-cachetools
           - httpx~=0.23.0
-          - tornado~=6.1
+          - tornado~=6.2
           - APScheduler~=3.9.1
           - cachetools~=5.2.0
           - . # this basically does `pip install -e .`
@@ -59,7 +59,7 @@ repos:
         - --no-strict-optional
         - --follow-imports=silent
       additional_dependencies:
-        - tornado~=6.1
+        - tornado~=6.2
         - APScheduler~=3.9.1
         - cachetools~=5.2.0
         - . # this basically does `pip install -e .`
