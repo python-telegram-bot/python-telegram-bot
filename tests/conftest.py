@@ -566,9 +566,13 @@ async def check_shortcut_call(
     """
     if not skip_params:
         skip_params = set()
+    else:
+        skip_params = set(skip_params)
     skip_params.add("rate_limit_args")
     if not shortcut_kwargs:
         shortcut_kwargs = set()
+    else:
+        shortcut_kwargs = set(shortcut_kwargs)
 
     orig_bot_method = getattr(bot, bot_method_name)
     bot_signature = inspect.signature(orig_bot_method)

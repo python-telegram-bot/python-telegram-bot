@@ -212,11 +212,12 @@ class AIORateLimiter(BaseRateLimiter[int]):
         group: Union[int, str, bool] = False
         chat = False
         chat_id = data.get("chat_id")
+        if chat_id is not None:
+            chat = True
         if (isinstance(chat_id, int) and chat_id < 0) or isinstance(chat_id, str):
             # string chat_id only works for channels and supergroups
-            # We can't really channels from groups though ...
+            # We can't really tell channels from groups though ...
             group = chat_id
-            chat = True
 
         for i in range(max_retries + 1):
             try:
