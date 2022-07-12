@@ -172,7 +172,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
 
-    .. include:: bot_methods.rst
+    .. include:: inclusions/bot_methods.rst
 
     """
 
@@ -6994,6 +6994,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
+            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
+                receive a notification with no sound.
+            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
+                original message.
+            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
+                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
+                Additional interface options. An object for an inline keyboard, custom reply
+                keyboard, instructions to remove reply keyboard or to force a reply from the user
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
                 Currently, must be one of :class:`telegram.constants.DiceEmoji`. Dice can have
                 values 1-6 for :tg-const:`telegram.constants.DiceEmoji.DICE`,
@@ -7005,22 +7013,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :tg-const:`telegram.constants.DiceEmoji.DICE`.
 
                 .. versionchanged:: 13.4
-                   Added the :tg-const:`telegram.constants.DiceEmoji.BOWLING` emoji.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
+                   Added the :tg-const:`telegram.constants.DiceEmoji.BOWLING` emoji..
+            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
+                should be sent even if the specified replied-to message is not found.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
                 forwarding and saving.
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
-            reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
-                :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
-                Additional interface options. An object for an inline keyboard, custom reply
-                keyboard, instructions to remove reply keyboard or to force a reply from the user.
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -7345,7 +7344,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return result  # type: ignore[return-value]
 
     @_log
-    def delete_my_commands(
+    async def delete_my_commands(
         self,
         scope: BotCommandScope = None,
         language_code: str = None,
@@ -7402,7 +7401,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if language_code:
             data["language_code"] = language_code
 
-        result = self._post(
+        result = await self._post(
             "deleteMyCommands",
             data,
             read_timeout=read_timeout,
