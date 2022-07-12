@@ -21,13 +21,16 @@
 We mostly test on directly on AIORateLimiter here, b/c BaseRateLimiter doesn't contain anything
 notable
 """
+import asyncio
 import json
 import os
+import time
 
 import pytest
 
-from telegram import BotCommand
+from telegram import BotCommand, User
 from telegram.constants import ParseMode
+from telegram.error import RetryAfter
 from telegram.ext import AIORateLimiter, BaseRateLimiter, Defaults, ExtBot
 from telegram.request import BaseRequest, RequestData
 from tests.conftest import env_var_2_bool
@@ -129,7 +132,85 @@ class TestBaseRateLimiter:
 
 
 @pytest.mark.skipif(
-    not TEST_NO_RATE_LIMITER, reason="Only relevant if the optional dependency is installed"
+    TEST_NO_RATE_LIMITER, reason="Only relevant if the optional dependency is installed"
 )
 class TestAIORateLimiter:
-    pass
+    count = 0
+    call_times = []
+
+    class CountRequest(BaseRequest):
+        def __init__(self, retry_after=None):
+            self.retry_after = retry_after
+
+        async def initialize(self) -> None:
+            pass
+
+        async def shutdown(self) -> None:
+            pass
+
+        async def do_request(self, *args, **kwargs):
+            TestAIORateLimiter.count += 1
+            TestAIORateLimiter.call_times.append(time.time())
+            if self.retry_after:
+                raise RetryAfter(retry_after=1)
+            else:
+                # return bot.bot.to_dict() for the `get_me` call in `Bot.initialize`
+                return (
+                    200,
+                    json.dumps(
+                        {"ok": True, "result": User(id=1, first_name="bot", is_bot=True)}
+                    ).encode(),
+                )
+
+    @pytest.fixture(autouse=True)
+    def reset(self):
+        self.count = 0
+        TestAIORateLimiter.count = 0
+        self.call_times = []
+        TestAIORateLimiter.call_times = []
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("max_retries", [0, 1, 4])
+    async def test_max_retries(self, bot, max_retries):
+
+        bot = ExtBot(
+            token=bot.token,
+            request=self.CountRequest(retry_after=1),
+            rate_limiter=AIORateLimiter(
+                max_retries=max_retries, overall_max_rate=0, group_max_rate=0
+            ),
+        )
+        with pytest.raises(RetryAfter):
+            await bot.get_me()
+
+        # Check that we retried the request the correct number of times
+        assert TestAIORateLimiter.count == max_retries + 1
+
+        # Check that the retries were delayed correctly
+        times = TestAIORateLimiter.call_times
+        if len(times) <= 1:
+            return
+        delays = [j - i for i, j in zip(times[:-1], times[1:])]
+        assert delays == pytest.approx([1.1 for _ in range(max_retries)], rel=0.05)
+
+    @pytest.mark.asyncio
+    async def test_delay_all_pending_on_retry(self, bot):
+        # Makes sure that a RetryAfter blocks *all* pending requests
+        bot = ExtBot(
+            token=bot.token,
+            request=self.CountRequest(retry_after=1),
+            rate_limiter=AIORateLimiter(max_retries=1, overall_max_rate=0, group_max_rate=0),
+        )
+        task_1 = asyncio.create_task(bot.get_me())
+        await asyncio.sleep(0.1)
+        task_2 = asyncio.create_task(bot.get_me())
+
+        assert not task_1.done()
+        assert not task_2.done()
+
+        await asyncio.sleep(1.1)
+        assert isinstance(task_1.exception(), RetryAfter)
+        assert not task_2.done()
+
+        await asyncio.sleep(1.1)
+        assert isinstance(task_2.exception(), RetryAfter)
