@@ -99,6 +99,7 @@ from telegram.request._requestparameter import RequestParameter
 if TYPE_CHECKING:
     from telegram import (
         InlineQueryResult,
+        InputFile,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
@@ -156,6 +157,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
           ``location``, ``filename``, ``venue``, ``contact``,
           ``{read, write, connect, pool}_timeout``, ``api_kwargs``. Use a named argument for those,
           and notice that some positional arguments changed position as a result.
+        * For uploading files, file paths are now always accepted. If :paramref:`local_mode` is
+          :obj:`False`, the file contents will be read in binary mode and uploaded. Otherwise,
+          the file path will be passed in the
+          `file URL scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
 
     Args:
         token (:obj:`str`): Bot's unique authentication token.
@@ -171,6 +176,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.request.HTTPXRequest` will be used.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
+        local_mode (:obj:`bool`, optional): Set to :obj:`True`, if the :paramref:`base_url` is
+            the URL of a `Local Bot API Server <https://core.telegram.org/bots/api#using-a-local\
+            -bot-api-server>`_ that runs with the ``--local`` flag. Currently the only effect of
+            this is that files are uploaded using their local path in the
+            `file URL scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
+            Defaults to :obj:`False`.
+
+            .. versionadded:: 20.0.
 
     .. include:: inclusions/bot_methods.rst
 
@@ -185,6 +198,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         "_request",
         "_logger",
         "_initialized",
+        "local_mode",
     )
 
     def __init__(
@@ -196,11 +210,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         get_updates_request: BaseRequest = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
+        local_mode: bool = False,
     ):
         self.token = self._validate_token(token)
 
         self.base_url = base_url + self.token
         self.base_file_url = base_file_url + self.token
+        self.local_mode = local_mode
         self._bot_user: Optional[User] = None
         self.private_key = None
         self._logger = logging.getLogger(__name__)
@@ -239,6 +255,21 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             return result
 
         return decorator
+
+    def _parse_file_input(
+        self,
+        file_input: Union[FileInput, "TelegramObject"],
+        tg_type: Type["TelegramObject"] = None,
+        filename: str = None,
+        attach: bool = False,
+    ) -> Union[str, "InputFile", Any]:
+        return parse_file_input(
+            file_input=file_input,
+            tg_type=tg_type,
+            filename=filename,
+            attach=attach,
+            local_mode=self.local_mode,
+        )
 
     def _insert_defaults(self, data: Dict[str, object]) -> None:  # pylint: disable=no-self-use
         """This method is here to make ext.Defaults work. Because we need to be able to tell
@@ -894,7 +925,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "photo": parse_file_input(photo, PhotoSize, filename=filename),
+            "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -1036,7 +1067,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "audio": parse_file_input(audio, Audio, filename=filename),
+            "audio": self._parse_file_input(audio, Audio, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -1052,7 +1083,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if caption_entities:
             data["caption_entities"] = caption_entities
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             "sendAudio",
@@ -1180,7 +1211,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "document": parse_file_input(document, Document, filename=filename),
+            "document": self._parse_file_input(document, Document, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -1192,7 +1223,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if disable_content_type_detection is not None:
             data["disable_content_type_detection"] = disable_content_type_detection
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             "sendDocument",
@@ -1283,7 +1314,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "sticker": parse_file_input(sticker, Sticker)}
+        data: JSONDict = {"chat_id": chat_id, "sticker": self._parse_file_input(sticker, Sticker)}
         return await self._send_message(  # type: ignore[return-value]
             "sendSticker",
             data,
@@ -1420,7 +1451,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "video": parse_file_input(video, Video, filename=filename),
+            "video": self._parse_file_input(video, Video, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -1437,7 +1468,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if height:
             data["height"] = height
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             "sendVideo",
@@ -1555,7 +1586,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "video_note": parse_file_input(video_note, VideoNote, filename=filename),
+            "video_note": self._parse_file_input(video_note, VideoNote, filename=filename),
         }
 
         if duration is not None:
@@ -1563,7 +1594,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if length is not None:
             data["length"] = length
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             "sendVideoNote",
@@ -1695,7 +1726,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "animation": parse_file_input(animation, Animation, filename=filename),
+            "animation": self._parse_file_input(animation, Animation, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -1706,7 +1737,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if height:
             data["height"] = height
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
         if caption:
             data["caption"] = caption
         if caption_entities:
@@ -1830,7 +1861,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "voice": parse_file_input(voice, Voice, filename=filename),
+            "voice": self._parse_file_input(voice, Voice, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -3906,7 +3937,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {"url": url}
 
         if certificate:
-            data["certificate"] = parse_file_input(certificate)
+            data["certificate"] = self._parse_file_input(certificate)
         if max_connections is not None:
             data["max_connections"] = max_connections
         if allowed_updates is not None:
@@ -5801,7 +5832,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "photo": parse_file_input(photo)}
+        data: JSONDict = {"chat_id": chat_id, "photo": self._parse_file_input(photo)}
         result = await self._post(
             "setChatPhoto",
             data,
@@ -6275,7 +6306,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"user_id": user_id, "png_sticker": parse_file_input(png_sticker)}
+        data: JSONDict = {"user_id": user_id, "png_sticker": self._parse_file_input(png_sticker)}
         result = await self._post(
             "uploadStickerFile",
             data,
@@ -6385,11 +6416,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {"user_id": user_id, "name": name, "title": title, "emojis": emojis}
 
         if png_sticker is not None:
-            data["png_sticker"] = parse_file_input(png_sticker)
+            data["png_sticker"] = self._parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data["tgs_sticker"] = parse_file_input(tgs_sticker)
+            data["tgs_sticker"] = self._parse_file_input(tgs_sticker)
         if webm_sticker is not None:
-            data["webm_sticker"] = parse_file_input(webm_sticker)
+            data["webm_sticker"] = self._parse_file_input(webm_sticker)
         if contains_masks is not None:
             data["contains_masks"] = contains_masks
         if mask_position is not None:
@@ -6497,11 +6528,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {"user_id": user_id, "name": name, "emojis": emojis}
 
         if png_sticker is not None:
-            data["png_sticker"] = parse_file_input(png_sticker)
+            data["png_sticker"] = self._parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data["tgs_sticker"] = parse_file_input(tgs_sticker)
+            data["tgs_sticker"] = self._parse_file_input(tgs_sticker)
         if webm_sticker is not None:
-            data["webm_sticker"] = parse_file_input(webm_sticker)
+            data["webm_sticker"] = self._parse_file_input(webm_sticker)
         if mask_position is not None:
             data["mask_position"] = mask_position
 
@@ -6686,7 +6717,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {"name": name, "user_id": user_id}
         if thumb is not None:
-            data["thumb"] = parse_file_input(thumb)
+            data["thumb"] = self._parse_file_input(thumb)
 
         result = await self._post(
             "setStickerSetThumb",

@@ -100,6 +100,7 @@ class ExtBot(Bot):
         private_key_password: bytes = None,
         defaults: "Defaults" = None,
         arbitrary_callback_data: Union[bool, int] = False,
+        local_mode: bool = False,
     ):
         super().__init__(
             token=token,
@@ -109,6 +110,7 @@ class ExtBot(Bot):
             get_updates_request=get_updates_request,
             private_key=private_key,
             private_key_password=private_key_password,
+            local_mode=local_mode,
         )
         self._defaults = defaults
 
