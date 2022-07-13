@@ -160,6 +160,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             ``chat_data`` needs to be transferred. For details see our `wiki page
             <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
             Storing-bot,-user-and-chat-related-data#chat-migration>`_.
+
+        .. versionchanged:: 20.0
+            The chat data is now also present in error handlers if the error is caused by a job.
         """
         if self._chat_id is not None:
             return self._application.chat_data[self._chat_id]
@@ -176,6 +179,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         """:obj:`ContextTypes.user_data`: Optional. An object that can be used to keep any data in.
         For each update from the same user it will be the same :obj:`ContextTypes.user_data`.
         Defaults to :obj:`dict`.
+
+        .. versionchanged:: 20.0
+            The user data is now also present in error handlers if the error is caused by a job.
         """
         if self._user_id is not None:
             return self._application.user_data[self._user_id]
@@ -275,10 +281,16 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         Returns:
             :class:`telegram.ext.CallbackContext`
         """
-        self = cls.from_update(update, application)
+        # update and job will never be present at the same time
+        if update is not None:
+            self = cls.from_update(update, application)
+        elif job is not None:
+            self = cls.from_job(job, application)
+        else:
+            self = cls(application)  # type: ignore
+
         self.error = error
         self.coroutine = coroutine
-        self.job = job
         return self
 
     @classmethod

@@ -1,6 +1,4 @@
-# Make sure that
-#   * the revs specified here match requirements-dev.txt
-#   * the additional_dependencies here match requirements.txt
+# Make sure that the additional_dependencies here match requirements.txt
 
 ci:
     autofix_prs: false
@@ -11,7 +9,7 @@ ci:
 
 repos:
 -   repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 22.6.0
     hooks:
     -   id: black
         args:
@@ -34,7 +32,7 @@ repos:
 
         additional_dependencies:
           - httpx~=0.23.0
-          - tornado~=6.1
+          - tornado~=6.2
           - APScheduler~=3.9.1
           - cachetools~=5.2.0
           - . # this basically does `pip install -e .`
@@ -50,7 +48,7 @@ repos:
           - types-cryptography
           - types-cachetools
           - httpx~=0.23.0
-          - tornado~=6.1
+          - tornado~=6.2
           - APScheduler~=3.9.1
           - cachetools~=5.2.0
           - . # this basically does `pip install -e .`
@@ -61,7 +59,7 @@ repos:
         - --no-strict-optional
         - --follow-imports=silent
       additional_dependencies:
-        - tornado~=6.1
+        - tornado~=6.2
         - APScheduler~=3.9.1
         - cachetools~=5.2.0
         - . # this basically does `pip install -e .`

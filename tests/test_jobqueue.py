@@ -86,7 +86,12 @@ class TestJobQueue:
         self.job_time = time.time()
 
     async def error_handler_context(self, update, context):
-        self.received_error = (str(context.error), context.job)
+        self.received_error = (
+            str(context.error),
+            context.job,
+            context.user_data,
+            context.chat_data,
+        )
 
     async def error_handler_raise_error(self, *args):
         raise Exception("Failing bigly")
@@ -453,7 +458,7 @@ class TestJobQueue:
     async def test_process_error_context(self, job_queue, app):
         app.add_error_handler(self.error_handler_context)
 
-        job = job_queue.run_once(self.job_with_exception, 0.1)
+        job = job_queue.run_once(self.job_with_exception, 0.1, chat_id=42, user_id=43)
         await asyncio.sleep(0.15)
         assert self.received_error[0] == "Test Error"
         assert self.received_error[1] is job
@@ -461,6 +466,8 @@ class TestJobQueue:
         await job.run(app)
         assert self.received_error[0] == "Test Error"
         assert self.received_error[1] is job
+        assert self.received_error[2] is app.user_data[43]
+        assert self.received_error[3] is app.chat_data[42]
 
         # Remove handler
         app.remove_error_handler(self.error_handler_context)
