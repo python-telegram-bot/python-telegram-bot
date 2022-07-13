@@ -49,7 +49,7 @@ this library, we introduced the
 :class:`telegram.ext.ConversationHandler`
 for that exact purpose. This example uses it to retrieve
 user-information in a conversation-like style. To get a better
-understanding, take a look at the :ref:`state diagrem <conversationbot-diagram>`.
+understanding, take a look at the :ref:`state diagram <conversationbot-diagram>`.
 
 :any:`examples.conversationbot2`
 --------------------------------
