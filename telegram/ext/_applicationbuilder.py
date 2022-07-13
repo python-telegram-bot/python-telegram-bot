@@ -82,6 +82,7 @@ _BOT_CHECKS = [
     ("defaults", "defaults"),
     ("arbitrary_callback_data", "arbitrary_callback_data"),
     ("private_key", "private_key"),
+    ("rate_limiter", "rate_limiter instance"),
 ]
 
 _TWO_ARGS_REQ = "The parameter `{}` may only be set, if no {} was set."
@@ -182,7 +183,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
-        self._rate_limiter: Optional["BaseRateLimiter"] = None
+        self._rate_limiter: ODVInput["BaseRateLimiter"] = DEFAULT_NONE
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
         prefix = "_get_updates_" if get_updates else "_"
@@ -230,7 +231,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             arbitrary_callback_data=DefaultValue.get_value(self._arbitrary_callback_data),
             request=self._build_request(get_updates=False),
             get_updates_request=self._build_request(get_updates=True),
-            rate_limiter=self._rate_limiter,
+            rate_limiter=DefaultValue.get_value(self._rate_limiter),
         )
 
     def build(

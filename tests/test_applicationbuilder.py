@@ -198,6 +198,7 @@ class TestApplicationBuilder:
             "proxy_url",
             "bot",
             "update_queue",
+            "rate_limiter",
         ]
         + [entry[0] for entry in _BOT_CHECKS],
     )

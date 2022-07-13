@@ -315,15 +315,17 @@ class TestAIORateLimiter:
         TestAIORateLimiter.count = 0
         TestAIORateLimiter.call_times = []
 
-    async def test_group_caching(self, bot):
+    @pytest.mark.parametrize("intermediate", [True, False])
+    async def test_group_caching(self, bot, intermediate):
+        max_rate = 1000
         rl_bot = ExtBot(
             token=bot.token,
             request=self.CountRequest(retry_after=None),
             rate_limiter=AIORateLimiter(
-                overall_max_rate=500000,
-                overall_time_period=1 / 2,
-                group_max_rate=500000,
-                group_time_period=1 / 2,
+                overall_max_rate=max_rate,
+                overall_time_period=1,
+                group_max_rate=max_rate,
+                group_time_period=1,
             ),
         )
 
@@ -332,7 +334,10 @@ class TestAIORateLimiter:
         await asyncio.gather(
             *(rl_bot.send_message(chat_id=-(i + 1), text=f"{i}") for i in range(513))
         )
-        assert len(rl_bot.rate_limiter._group_limiters) == 513
-        await asyncio.sleep(1 / 2)
-        await rl_bot.send_message(chat_id=-1, text="999")
-        assert len(rl_bot.rate_limiter._group_limiters) == 1
+        if intermediate:
+            await rl_bot.send_message(chat_id=-1, text="999")
+            assert 1 <= len(rl_bot.rate_limiter._group_limiters) <= 513
+        else:
+            await asyncio.sleep(1)
+            await rl_bot.send_message(chat_id=-1, text="999")
+            assert len(rl_bot.rate_limiter._group_limiters) == 1
