@@ -63,6 +63,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
     Here, ``group_id`` is determined by checking if there is a ``chat_id`` parameter in the
     :paramref:`~telegram.ext.BaseRateLimiter.process_request.data`.
+    The ``overall_limiter`` is applied only if a ``chat_id`` argument is present at all.
 
     Attention:
         * Some bot methods accept a ``chat_id`` parameter in form of a ``@username`` for
