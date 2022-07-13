@@ -82,6 +82,7 @@ class TestApplicationBuilder:
         assert app.bot.private_key is None
         assert app.bot.arbitrary_callback_data is False
         assert app.bot.defaults is None
+        assert app.bot.local_mode is False
 
         get_updates_client = app.bot._request[0]._client
         assert get_updates_client.limits == httpx.Limits(
@@ -251,6 +252,8 @@ class TestApplicationBuilder:
             PRIVATE_KEY
         ).defaults(defaults).arbitrary_callback_data(42).request(request).get_updates_request(
             get_updates_request
+        ).local_mode(
+            True
         )
         built_bot = builder.build().bot
 
@@ -266,6 +269,7 @@ class TestApplicationBuilder:
         assert built_bot._request[0] is get_updates_request
         assert built_bot.callback_data_cache.maxsize == 42
         assert built_bot.private_key
+        assert built_bot.local_mode is True
 
         @dataclass
         class Client:

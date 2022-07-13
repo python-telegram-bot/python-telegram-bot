@@ -81,6 +81,7 @@ _BOT_CHECKS = [
     ("defaults", "defaults"),
     ("arbitrary_callback_data", "arbitrary_callback_data"),
     ("private_key", "private_key"),
+    ("local_mode", "local_mode setting"),
 ]
 
 _TWO_ARGS_REQ = "The parameter `{}` may only be set, if no {} was set."
@@ -145,6 +146,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_update_queue",
         "_updater",
         "_write_timeout",
+        "_local_mode",
     )
 
     def __init__(self: "InitApplicationBuilder"):
@@ -169,6 +171,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._private_key_password: ODVInput[bytes] = DEFAULT_NONE
         self._defaults: ODVInput["Defaults"] = DEFAULT_NONE
         self._arbitrary_callback_data: DVInput[Union[bool, int]] = DEFAULT_FALSE
+        self._local_mode: DVInput[bool] = DEFAULT_FALSE
         self._bot: DVInput[Bot] = DEFAULT_NONE
         self._update_queue: DVInput[Queue] = DefaultValue(Queue())
         self._job_queue: ODVInput["JobQueue"] = DefaultValue(JobQueue())
@@ -227,6 +230,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             arbitrary_callback_data=DefaultValue.get_value(self._arbitrary_callback_data),
             request=self._build_request(get_updates=False),
             get_updates_request=self._build_request(get_updates=True),
+            local_mode=DefaultValue.get_value(self._local_mode),
         )
 
     def build(
@@ -725,6 +729,27 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         if self._updater not in (DEFAULT_NONE, None):
             raise RuntimeError(_TWO_ARGS_REQ.format("arbitrary_callback_data", "updater"))
         self._arbitrary_callback_data = arbitrary_callback_data
+        return self
+
+    def local_mode(self: BuilderType, local_mode: bool) -> BuilderType:
+        """Specifies the value for :paramref:`~telegram.Bot.local_mode` for the
+         :attr:`telegram.ext.Application.bot`.
+         If not called, will default to :obj:`False`.
+
+        .. seealso:: `Local Bot API Server <https://github.com/python-telegram-bot/\
+            python-telegram-bot/wiki/Local-Bot-API-Server>`_,
+
+        Args:
+            local_mode (:obj:`bool`): The setting
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format("local_mode", "bot instance"))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format("local_mode", "updater"))
+        self._local_mode = local_mode
         return self
 
     def bot(
