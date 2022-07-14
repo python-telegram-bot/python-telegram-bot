@@ -33,6 +33,9 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     Convenience class to gather customizable types of the :class:`telegram.ext.CallbackContext`
     interface.
 
+    .. seealso:: `contexttypesbot.py <https://github.com/python-telegram-bot/
+        python-telegram-bot/blob/master/examples/contexttypesbot.py>`_
+
     .. versionadded:: 13.6
 
     Args:
@@ -53,8 +56,6 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
             and job callbacks. Defaults to :obj:`dict`. Must support instantiating without
             arguments.
 
-    .. seealso:: `contexttypesbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/contexttypesbot.py>`_
     """
 
     DEFAULT_TYPE = CallbackContext["ExtBot", dict, dict, dict]

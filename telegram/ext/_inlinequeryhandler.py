@@ -46,6 +46,9 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
           chats and may not be set for inline queries coming from third-party clients. These
           updates won't be handled, if :attr:`chat_types` is passed.
 
+    .. seealso:: `inlinebot.py <https://github.com/python-telegram-bot/
+        python-telegram-bot/blob/master/examples/inlinebot.py>`_
+
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
@@ -77,8 +80,6 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
             awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`.
 
-    .. seealso:: `inlinebot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/inlinebot.py>`_
     """
 
     __slots__ = ("pattern", "chat_types")

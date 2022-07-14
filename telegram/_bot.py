@@ -139,6 +139,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
           serialized instance will not reflect that change. Trying to pickle a bot instance will
           raise :exc:`pickle.PicklingError`.
 
+    .. seealso:: :attr:`telegram.ext.Application.bot`,
+        :attr:`telegram.ext.CallbackContext.bot`,
+        :attr:`telegram.ext.Updater.bot`
+
     .. versionadded:: 13.2
         Objects of this class are comparable in terms of equality. Two objects of this class are
         considered equal, if their :attr:`bot` is equal.
@@ -172,9 +176,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
 
-    .. seealso:: :attr:`telegram.ext.Application.bot`,
-        :attr:`telegram.ext.CallbackContext.bot`,
-        :attr:`telegram.ext.Updater.bot`
     .. include:: inclusions/bot_methods.rst
 
     """
@@ -579,6 +580,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """Use this method to send text messages.
 
+        .. seealso:: :attr:`telegram.Message.reply_text`, :attr:`telegram.Chat.send_message`,
+            :attr:`telegram.User.send_message`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -623,8 +627,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_text`, :attr:`telegram.Chat.send_message`
 
         Returns:
             :class:`telegram.Message`: On success, the sent message is returned.
@@ -685,6 +687,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             - If the bot has :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
               permission in a supergroup or a channel, it can delete any message there.
 
+        .. seealso:: :attr:`telegram.Message.delete`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -705,8 +709,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.delete`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -753,6 +755,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             As a workaround, it is still possible to use :meth:`copy_message`. However, this
             behaviour is undocumented and might be changed by Telegram.
 
+        .. seealso:: :attr:`telegram.Message.forward`, :attr:`telegram.Chat.forward_to`,
+            :attr:`telegram.Chat.forward_from`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -781,10 +786,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.forward`,
-            :attr:`telegram.Chat.forward_to`,
-            :attr:`telegram.Chat.forward_from`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -838,6 +839,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Note:
             The photo argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
+
+        .. seealso:: :attr:`telegram.Message.reply_photo`, :attr:`telegram.Chat.send_photo`,
+            :attr:`telegram.User.send_photo`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -895,8 +899,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_photo`, :attr:`telegram.Chat.send_photo`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -971,6 +973,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             The audio argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
 
+        .. seealso:: :attr:`telegram.Message.reply_audio`, :attr:`telegram.Chat.send_audio`,
+            :attr:`telegram.User.send_audio`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1039,8 +1044,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_audio`, :attr:`telegram.Chat.send_audio`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1120,6 +1123,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
             * Sending by URL will currently only work ``GIF``, ``PDF`` & ``ZIP`` files.
 
+        .. seealso:: :attr:`telegram.Message.reply_document`, :attr:`telegram.Chat.send_document`,
+            :attr:`telegram.User.send_document`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1186,8 +1192,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Message.reply_document`, :attr:`telegram.Chat.send_document`
-
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
 
@@ -1250,6 +1254,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             The :paramref:`sticker` argument can be either a file_id, an URL or a file from disk
             ``open(filename, 'rb')``
 
+        .. seealso:: :attr:`telegram.Message.reply_sticker`, :attr:`telegram.Chat.send_sticker`,
+            :attr:`telegram.User.send_sticker`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1292,8 +1299,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_sticker`, :attr:`telegram.Chat.send_sticker`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1358,6 +1363,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             * :paramref:`thumb` will be ignored for small video files, for which Telegram can
               easily generate thumbnails. However, this behaviour is undocumented and might be
               changed by Telegram.
+
+        .. seealso:: :attr:`telegram.Message.reply_video`, :attr:`telegram.Chat.send_video`,
+            :attr:`telegram.User.send_video`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -1429,8 +1437,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_video`, :attr:`telegram.Chat.send_video`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1507,6 +1513,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
               easily generate thumbnails. However, this behaviour is undocumented and might be
               changed by Telegram.
 
+        .. seealso:: :attr:`telegram.Message.reply_video_note`, :attr:`telegram.Chat.send_video_note`
+            :attr:`telegram.User.send_video_note`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1566,9 +1575,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_video_note`,
-            :attr:`telegram.Chat.send_video_note`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1640,6 +1646,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             generate thumb nails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
+        .. seealso:: :attr:`telegram.Message.reply_animation`, :attr:`telegram.Chat.send_animation`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1709,8 +1717,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_animation`, :attr:`telegram.Chat.send_animation`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -1789,6 +1795,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             * To use this method, the file must have the type :mimetype:`audio/ogg` and be no more
               than ``1MB`` in size. ``1-20MB`` voice notes will be sent as files.
 
+        .. seealso:: :attr:`telegram.Message.reply_voice`, :attr:`telegram.Chat.send_voice`,
+            :attr:`telegram.User.send_voice`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1847,8 +1856,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Message.reply_voice`, :attr:`telegram.Chat.send_voice`
-
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
 
@@ -1905,6 +1912,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
 
+        .. seealso:: :attr:`telegram.Message.reply_media_group`, :attr:`telegram.Chat.send_media_group`,
+            :attr:`telegram.User.send_media_group`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -1937,8 +1947,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_media_group`, :attr:`telegram.Chat.send_action`
 
         Returns:
             List[:class:`telegram.Message`]: An array of the sent Messages.
@@ -1998,6 +2006,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             You can either supply a :paramref:`latitude` and :paramref:`longitude` or a
             :paramref:`location`.
 
+        .. seealso:: :attr:`telegram.Message.reply_location`,  :attr:`telegram.Chat.send_location`,
+            :attr:`telegram.User.send_location`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -2046,8 +2057,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_location`,  :attr:`telegram.Chat.send_location`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -2124,6 +2133,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             You can either supply a :paramref:`latitude` and :paramref:`longitude` or a
             :paramref:`location`.
 
+        .. seealso:: :attr:`telegram.Message.edit_live_location`, :attr:`telegram.CallbackQuery.edit_message_live_location`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
@@ -2161,8 +2172,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.edit_live_location`
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -2225,6 +2234,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Union[Message, bool]:
         """Use this method to stop updating a live location message sent by the bot or via the bot
         (for inline bots) before live_period expires.
+
+        .. seealso:: :attr:`telegram.Message.stop_live_location`
+            :attr:`telegram.CallbackQuery.stop_message_live_location`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Required if inline_message_id is not specified.
@@ -2312,6 +2324,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             * Foursquare details and Google Place details are mutually exclusive. However, this
               behaviour is undocumented and might be changed by Telegram.
 
+        .. seealso:: :attr:`telegram.Message.reply_venue`, :attr:`telegram.Chat.send_venue`,
+            :attr:`telegram.User.send_venue`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -2359,8 +2374,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_venue`, :attr:`telegram.Chat.send_venue`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -2452,6 +2465,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :paramref:`first_name` with optionally :paramref:`last_name` and optionally
             :paramref:`vcard`.
 
+        .. seealso:: :attr:`telegram.Message.reply_contact`,  :attr:`telegram.Chat.send_contact`,
+            :attr:`telegram.User.send_contact`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -2492,8 +2508,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_contact`,  :attr:`telegram.Chat.send_contact`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -2565,6 +2579,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """Use this method to send a game.
 
+        .. seealso:: :attr:`telegram.Message.reply_game`, :attr:`telegram.Chat.send_game`,
+            :attr:`telegram.User.send_game`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat.
             game_short_name (:obj:`str`): Short name of the game, serves as the unique identifier
@@ -2599,8 +2616,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_game`, :attr:`telegram.Chat.send_game`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -2644,6 +2659,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Telegram clients clear its typing status). Telegram only recommends using this method when
         a response from the bot will take a noticeable amount of time to arrive.
 
+        .. seealso:: :attr:`telegram.Message.reply_chat_action`, :attr:`telegram.Chat.send_action`,
+            :attr:`telegram.User.send_chat_action`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -2666,8 +2684,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_chat_action`, :attr:`telegram.Chat.send_action`
 
         Returns:
             :obj:`bool`:  On success, :obj:`True` is returned.
@@ -2795,6 +2811,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :paramref:`telegram.InlineQuery.answer.auto_pagination` set to :obj:`True`, which will
             take care of passing the correct value.
 
+        .. seealso:: :attr:`telegram.InlineQuery.answer`
+
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.
             results (List[:class:`telegram.InlineQueryResult`] | Callable): A list of results for
@@ -2849,8 +2867,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             bot can offer a switch_inline button so that the user can easily return to the chat
             where they wanted to use the bot's inline capabilities.
 
-        .. seealso:: :attr:`telegram.InlineQuery.answer`
-
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
@@ -2904,6 +2920,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Optional[UserProfilePhotos]:
         """Use this method to get a list of profile pictures for a user.
 
+        .. seealso:: :meth:`telegram.User.get_profile_photos`
+
         Args:
             user_id (:obj:`int`): Unique identifier of the target user.
             offset (:obj:`int`, optional): Sequential number of the first photo to be returned.
@@ -2926,8 +2944,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :meth:`telegram.User.get_profile_photos`
 
         Returns:
             :class:`telegram.UserProfilePhotos`
@@ -3060,6 +3076,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         using invite links, etc., unless unbanned first. The bot must be an administrator in the
         chat for this to work and must have the appropriate admin rights.
 
+        .. seealso:: :attr:`telegram.Chat.ban_member`
+
          .. versionadded:: 13.7
 
         Args:
@@ -3095,8 +3113,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.ban_member`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3143,6 +3159,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         their channels**. The bot must be an administrator in the supergroup or channel for this
         to work and must have the appropriate administrator rights.
 
+        .. seealso:: :attr:`telegram.Chat.ban_chat`, :attr:`telegram.Chat.ban_sender_chat`
+
         .. versionadded:: 13.9
 
         Args:
@@ -3165,8 +3183,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.ban_chat`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3210,6 +3226,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         join it. So if the user is a member of the chat they will also be *removed* from the chat.
         If you don't want this, use the parameter :paramref:`only_if_banned`.
 
+        .. seealso:: :attr:`telegram.Chat.unban_member`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
@@ -3231,8 +3249,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.unban_member`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3274,6 +3290,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         The bot must be an administrator for this to work and must have the
         appropriate administrator rights.
 
+        .. seealso:: :attr:`telegram.Chat.unban_chat`
+
         .. versionadded:: 13.9
 
         Args:
@@ -3296,8 +3314,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.unban_chat`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3344,6 +3360,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         and accept the terms. Otherwise, you may use links like t.me/your_bot?start=XXXX that open
         your bot with a parameter.
 
+        .. seealso:: :attr:`telegram.CallbackQuery.answer`
+
         Args:
             callback_query_id (:obj:`str`): Unique identifier for the query to be answered.
             text (:obj:`str`, optional): Text of the notification. If not specified, nothing will
@@ -3376,8 +3394,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.CallbackQuery.answer`
 
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
@@ -3434,6 +3450,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             It is currently only possible to edit messages without
             :attr:`telegram.Message.reply_markup` or with inline keyboards.
 
+        .. seealso:: :attr:`telegram.Message.edit_text`, :attr:`telegram.CallbackQuery.edit_message_text`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
@@ -3471,8 +3489,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.edit_text`
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -3532,6 +3548,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             It is currently only possible to edit messages without
             :attr:`telegram.Message.reply_markup` or with inline keyboards
 
+        .. seealso:: :attr:`telegram.Message.edit_caption`, :attr:`telegram.CallbackQuery.edit_message_caption`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
@@ -3567,8 +3585,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.edit_caption`
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -3628,6 +3644,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             It is currently only possible to edit messages without
             :attr:`telegram.Message.reply_markup` or with inline keyboards
 
+        .. seealso:: :attr:`telegram.Message.edit_media`, :attr:`telegram.CallbackQuery.edit_message_media`
+
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content
                 of the message.
@@ -3656,8 +3674,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.edit_media`
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -3708,6 +3724,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             It is currently only possible to edit messages without
             :attr:`telegram.Message.reply_markup` or with inline keyboards
 
+        .. seealso:: :attr:`telegram.Message.edit_reply_markup`, :attr:`telegram.CallbackQuery.edit_message_reply_markup`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
                 specified. Unique identifier for the target chat or username of the target channel
@@ -3734,8 +3752,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.edit_reply_markup`
 
         Returns:
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
@@ -4066,6 +4082,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> bool:
         """Use this method for your bot to leave a group, supergroup or channel.
 
+        .. seealso:: :attr:`telegram.Chat.leave`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
@@ -4085,8 +4103,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.leave`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4179,6 +4195,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to get a list of administrators in a chat.
 
+        .. seealso:: :attr:`telegram.Chat.get_administrators`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
@@ -4198,8 +4216,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.get_administrators`
 
         Returns:
             List[:class:`telegram.ChatMember`]: On success, returns a list of ``ChatMember``
@@ -4236,6 +4252,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> int:
         """Use this method to get the number of members in a chat.
 
+        .. seealso:: :attr:`telegram.Chat.get_member_count`
+
         .. versionadded:: 13.7
 
         Args:
@@ -4257,8 +4275,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.get_member_count`
 
         Returns:
             :obj:`int`: Number of members in the chat.
@@ -4293,6 +4309,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> ChatMember:
         """Use this method to get information about a member of a chat.
 
+        .. seealso:: :attr:`telegram.Chat.get_member`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target supergroup or channel (in the format ``@channelusername``).
@@ -4313,8 +4331,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.get_member`
 
         Returns:
             :class:`telegram.ChatMember`
@@ -4505,6 +4521,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to set the score of the specified user in a game message.
 
+        .. seealso::`telegram.CallbackQuery.set_game_score`
+
         Args:
             user_id (:obj:`int`): User identifier.
             score (:obj:`int`): New score, must be non-negative.
@@ -4589,6 +4607,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             This method will currently return scores for the target user, plus two of their
             closest neighbors on each side. Will also return the top three users if the user and
             his neighbors are not among them. Please note that this behavior is subject to change.
+
+        .. seealso:: :attr:`telegram.CallbackQuery.get_game_high_scores`
 
         Args:
             user_id (:obj:`int`): Target user id.
@@ -4686,6 +4706,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             As of API 5.2 :paramref:`start_parameter` is an optional argument and therefore the
             order of the arguments had to be changed. Use keyword arguments to make sure that the
             arguments are passed correctly.
+
+        .. seealso:: :attr:`telegram.Message.reply_invoice`, :attr:`telegram.Chat.send_invoice`,
+            :attr:`telegram.User.send_invoice`
 
         .. versionchanged:: 13.5
             As of Bot API 5.2, the parameter :paramref:`start_parameter` is optional.
@@ -4788,8 +4811,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Message.reply_invoice`, :attr:`telegram.Chat.send_invoice`
-
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
 
@@ -4872,6 +4893,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :class:`telegram.Update` with a :attr:`telegram.Update.shipping_query` field to the bot.
         Use this method to reply to shipping queries.
 
+        .. seealso:: :attr:`telegram.ShippingQuery.answer`
+
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
             ok (:obj:`bool`): Specify :obj:`True` if delivery to the specified address is possible
@@ -4899,8 +4922,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.ShippingQuery.answer`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4951,6 +4972,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             The Bot API must receive an answer within 10 seconds after the pre-checkout
             query was sent.
 
+        .. seealso:: :attr:`telegram.PreCheckoutQuery.answer`
+
         Args:
             pre_checkout_query_id (:obj:`str`): Unique identifier for the query to be answered.
             ok (:obj:`bool`): Specify :obj:`True` if everything is alright
@@ -4977,8 +5000,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.PreCheckoutQuery.answer`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5083,7 +5104,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         the supergroup for this to work and must have the appropriate admin rights. Pass
         :obj:`True` for all boolean parameters to lift restrictions from a user.
 
-        .. seealso:: :meth:`telegram.ChatPermissions.all_permissions`
+        .. seealso:: :meth:`telegram.ChatPermissions.all_permissions`, :attr:`telegram.Chat.restrict_member`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -5114,8 +5135,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.restrict_member`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5171,6 +5190,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
         an administrator in the chat for this to work and must have the appropriate admin rights.
         Pass :obj:`False` for all boolean parameters to demote a user.
+
+        .. seealso:: :attr:`telegram.Chat.promote_member`
 
         .. versionchanged:: 20.0
            The argument ``can_manage_voice_chats`` was renamed to
@@ -5228,8 +5249,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.promote_member`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5292,6 +5311,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         administrator in the group or a supergroup for this to work and must have the
         :attr:`telegram.ChatMemberAdministrator.can_restrict_members` admin rights.
 
+        .. seealso:: :attr:`telegram.Chat.set_permissions`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
                 the target supergroup (in the format `@supergroupusername`).
@@ -5312,8 +5333,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.set_permissions`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5351,6 +5370,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to set a custom title for administrators promoted by the bot in a
         supergroup. The bot must be an administrator for this to work.
 
+        .. seealso:: :attr:`telegram.Chat.set_administrator_custom_title`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
                 the target supergroup (in the format `@supergroupusername`).
@@ -5373,8 +5394,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.set_administrator_custom_title`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5413,6 +5432,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         link is revoked. The bot must be an administrator in the chat for this to work and must
         have the appropriate admin rights.
 
+        .. seealso:: :attr:`telegram.Chat.export_invite_link`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -5439,8 +5460,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             links, it will need to generate its own link using :meth:`export_chat_invite_link` or
             by calling the :meth:`get_chat` method. If your bot needs to generate a new primary
             invite link replacing its previous one, use :attr:`export_chat_invite_link` again.
-
-        .. seealso:: :attr:`telegram.Chat.export_invite_link`
 
         Returns:
             :obj:`str`: New invite link on success.
@@ -5481,6 +5500,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         administrator in the chat for this to work and must have the appropriate admin rights.
         The link can be revoked using the method :meth:`revoke_chat_invite_link`.
 
+        .. seealso:: :attr:`telegram.Chat.create_invite_link`
+
         .. versionadded:: 13.4
 
         Args:
@@ -5519,8 +5540,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.create_invite_link`
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -5580,6 +5599,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             optional parameters that are explicitly passed, but also replaces all other optional
             parameters to the default values. However, since not documented, this behaviour may
             change unbeknown to PTB.
+
+        .. seealso:: :attr:`telegram.Chat.edit_invite_link`
 
         .. versionadded:: 13.4
 
@@ -5675,6 +5696,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         revoked, a new link is automatically generated. The bot must be an administrator in the
         chat for this to work and must have the appropriate admin rights.
 
+        .. seealso:: :attr:`telegram.Chat.revoke_invite_link`
+
         .. versionadded:: 13.4
 
         Args:
@@ -5700,8 +5723,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.revoke_invite_link`
 
         Returns:
             :class:`telegram.ChatInviteLink`
@@ -5742,6 +5763,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         The bot must be an administrator in the chat for this to work and must have the
         :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
 
+        .. seealso:: :attr:`telegram.Chat.approve_join_request`,
+            :attr:`telegram.ChatJoinRequest.approve`, :attr:`telegram.User.approve_join_request`
+
         .. versionadded:: 13.8
 
         Args:
@@ -5764,9 +5788,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.approve_join_request`,
-            :attr:`telegram.ChatJoinRequest.approve`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5805,6 +5826,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         The bot must be an administrator in the chat for this to work and must have the
         :attr:`telegram.ChatPermissions.can_invite_users` administrator right.
 
+        .. seealso:: :attr:`telegram.Chat.decline_join_request`,
+            :attr:`telegram.ChatJoinRequest.decline`, :attr:`telegram.User.decline_join_request`
+
         .. versionadded:: 13.8
 
         Args:
@@ -5827,9 +5851,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.decline_join_request`,
-            :attr:`telegram.ChatJoinRequest.decline`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5867,6 +5888,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Photos can't be changed for private chats. The bot must be an administrator in the chat
         for this to work and must have the appropriate admin rights.
+
+        .. seealso:: :attr:`telegram.Chat.set_photo`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -5927,6 +5950,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         must be an administrator in the chat for this to work and must have the appropriate admin
         rights.
 
+        .. seealso:: :attr:`telegram.Chat.delete_photo`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -5983,6 +6008,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         The bot must be an administrator in the chat for this to work and must have the appropriate
         admin rights.
 
+        .. seealso:: :attr:`telegram.Chat.set_title`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -6003,8 +6030,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.set_title`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6042,6 +6067,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         must be an administrator in the chat for this to work and must have the appropriate admin
         rights.
 
+        .. seealso:: :attr:`telegram.Chat.set_description`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -6062,8 +6089,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.set_description`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6107,6 +6132,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
         right in a channel.
 
+        .. seealso:: :attr:`telegram.Chat.pin_message`, :attr:`telegram.User.pin_message`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -6130,8 +6157,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.pin_message`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6175,6 +6200,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
         right in a channel.
 
+        .. seealso:: :attr:`telegram.Chat.unpin_message`, :attr:`telegram.User.unpin_message`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -6196,8 +6223,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.unpin_message`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6239,6 +6264,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         admin right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages`
         admin right in a channel.
 
+        .. seealso:: :attr:`telegram.Chat.unpin_all_messages`, :attr:`telegram.User.unpin_all_messages`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -6258,8 +6285,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.unpin_all_messages`
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6901,6 +6926,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to send a native poll.
 
+        .. seealso:: :attr:`telegram.Message.reply_poll`, :attr:`telegram.Chat.send_poll`,
+            :attr:`telegram.User.send_poll`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -6969,8 +6997,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Message.reply_poll`, :attr:`telegram.Chat.send_poll`
-
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
 
@@ -7035,6 +7061,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to stop a poll which was sent by the bot.
 
+        .. seealso:: :attr:`telegram.Message.stop_poll`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -7057,8 +7085,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.stop_poll`
 
         Returns:
             :class:`telegram.Poll`: On success, the stopped Poll is returned.
@@ -7102,6 +7128,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """
         Use this method to send an animated emoji that will display a random value.
+
+        .. seealso:: :attr:`telegram.Message.reply_dice`,  :attr:`telegram.Chat.send_dice`,
+            :attr:`telegram.User.send_dice`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -7149,8 +7178,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.reply_dice`,  :attr:`telegram.Chat.send_dice`
 
         Returns:
             :class:`telegram.Message`: On success, the sent Message is returned.
@@ -7647,6 +7674,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         be copied. The method is analogous to the method :meth:`forward_message`, but the copied
         message doesn't have a link to the original message.
 
+        .. seealso:: :attr:`telegram.Message.copy`, :attr:`telegram.Chat.send_copy`,
+            :attr:`telegram.Chat.copy_message`, :attr:`telegram.User.send_copy`
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
@@ -7692,10 +7722,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Message.copy`,
-            :attr:`telegram.Chat.send_copy`,
-            :attr:`telegram.Chat.copy_message`
 
         Returns:
             :class:`telegram.MessageId`: On success
@@ -7775,8 +7801,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        .. seealso:: :attr:`telegram.Chat.set_menu_button`
-
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
 
@@ -7835,8 +7859,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        .. seealso:: :attr:`telegram.Chat.get_menu_button`
 
         Returns:
             :class:`telegram.MenuButton`: On success, the current menu button is returned.

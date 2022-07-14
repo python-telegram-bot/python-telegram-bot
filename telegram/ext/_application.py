@@ -1412,7 +1412,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             block (:obj:`bool`, optional): Determines whether the return value of the callback
                 should be awaited before processing the next error handler in
                 :meth:`process_error`. Defaults to :obj:`True`.
-
         """
         if callback in self.error_handlers:
             _logger.warning("The callback is already registered as an error handler. Ignoring.")

@@ -44,6 +44,8 @@ class ChatMember(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` and :attr:`status` are equal.
 
+    .. seealso:: `Chat Member Example <examples.chatmemberbot.html>`_
+
     .. versionchanged:: 20.0
 
         * As of Bot API 5.3, :class:`ChatMember` is nothing but the base class for the subclasses
@@ -52,8 +54,6 @@ class ChatMember(TelegramObject):
           use :class:`ChatMember` directly.
         * The constant ``ChatMember.CREATOR`` was replaced by :attr:`~telegram.ChatMember.OWNER`
         * The constant ``ChatMember.KICKED`` was replaced by :attr:`~telegram.ChatMember.BANNED`
-
-    .. seealso:: `Chat Member Example <examples.chatmemberbot.html>`_
 
     Args:
         user (:class:`telegram.User`): Information about the user.

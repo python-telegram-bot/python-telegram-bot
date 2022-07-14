@@ -30,9 +30,9 @@ class WebAppInfo(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`url` are equal.
 
-    .. versionadded:: 20.0
-
     .. seealso:: `Webappbot Example <examples.webappbot.html>`_
+
+    .. versionadded:: 20.0
 
     Args:
         url (:obj:`str`): An HTTPS URL of a Web App to be opened with additional data as specified
@@ -43,7 +43,6 @@ class WebAppInfo(TelegramObject):
         url (:obj:`str`): An HTTPS URL of a Web App to be opened with additional data as specified
             in `Initializing Web Apps \
             <https://core.telegram.org/bots/webapps#initializing-web-apps>`_.
-
     """
 
     __slots__ = ("url",)
