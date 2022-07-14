@@ -96,9 +96,7 @@ def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> s
     tg_link = f"tg://user?id={user_id}"
     if version == 1:
         return f"[{name}]({tg_link})"
-    if version == 2:
-        return f"[{escape_markdown(name, version=version)}]({tg_link})"
-    raise ValueError("Markdown version must be either 1 or 2!")
+    return f"[{escape_markdown(name, version=version)}]({tg_link})"
 
 
 def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:

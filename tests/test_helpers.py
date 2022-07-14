@@ -149,6 +149,9 @@ class TestHelpers:
         [
             ("the name", "[the name](tg://user?id=1)"),
             ("under_score", "[under_score](tg://user?id=1)"),
+            ("starred*text", "[starred*text](tg://user?id=1)"),
+            ("`backtick`", "[`backtick`](tg://user?id=1)"),
+            ("[square brackets", "[[square brackets](tg://user?id=1)"),
         ],
     )
     def test_mention_markdown(self, test_str, expected):
