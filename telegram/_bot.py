@@ -1513,7 +1513,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
               easily generate thumbnails. However, this behaviour is undocumented and might be
               changed by Telegram.
 
-        .. seealso:: :attr:`telegram.Message.reply_video_note`, :attr:`telegram.Chat.send_video_note`
+        .. seealso:: :attr:`telegram.Message.reply_video_note`,
+            :attr:`telegram.Chat.send_video_note`,
             :attr:`telegram.User.send_video_note`
 
         Args:
@@ -1912,7 +1913,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
 
-        .. seealso:: :attr:`telegram.Message.reply_media_group`, :attr:`telegram.Chat.send_media_group`,
+        .. seealso:: :attr:`telegram.Message.reply_media_group`,
+            :attr:`telegram.Chat.send_media_group`,
             :attr:`telegram.User.send_media_group`
 
         Args:
@@ -2133,7 +2135,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             You can either supply a :paramref:`latitude` and :paramref:`longitude` or a
             :paramref:`location`.
 
-        .. seealso:: :attr:`telegram.Message.edit_live_location`, :attr:`telegram.CallbackQuery.edit_message_live_location`
+        .. seealso:: :attr:`telegram.Message.edit_live_location`,
+            :attr:`telegram.CallbackQuery.edit_message_live_location`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -3450,7 +3453,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             It is currently only possible to edit messages without
             :attr:`telegram.Message.reply_markup` or with inline keyboards.
 
-        .. seealso:: :attr:`telegram.Message.edit_text`, :attr:`telegram.CallbackQuery.edit_message_text`
+        .. seealso:: :attr:`telegram.Message.edit_text`,
+            :attr:`telegram.CallbackQuery.edit_message_text`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -3548,7 +3552,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             It is currently only possible to edit messages without
             :attr:`telegram.Message.reply_markup` or with inline keyboards
 
-        .. seealso:: :attr:`telegram.Message.edit_caption`, :attr:`telegram.CallbackQuery.edit_message_caption`
+        .. seealso:: :attr:`telegram.Message.edit_caption`,
+            :attr:`telegram.CallbackQuery.edit_message_caption`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -3644,7 +3649,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             It is currently only possible to edit messages without
             :attr:`telegram.Message.reply_markup` or with inline keyboards
 
-        .. seealso:: :attr:`telegram.Message.edit_media`, :attr:`telegram.CallbackQuery.edit_message_media`
+        .. seealso:: :attr:`telegram.Message.edit_media`,
+            :attr:`telegram.CallbackQuery.edit_message_media`
 
         Args:
             media (:class:`telegram.InputMedia`): An object for a new media content
@@ -3724,7 +3730,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             It is currently only possible to edit messages without
             :attr:`telegram.Message.reply_markup` or with inline keyboards
 
-        .. seealso:: :attr:`telegram.Message.edit_reply_markup`, :attr:`telegram.CallbackQuery.edit_message_reply_markup`
+        .. seealso:: :attr:`telegram.Message.edit_reply_markup`,
+            :attr:`telegram.CallbackQuery.edit_message_reply_markup`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
@@ -5104,7 +5111,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         the supergroup for this to work and must have the appropriate admin rights. Pass
         :obj:`True` for all boolean parameters to lift restrictions from a user.
 
-        .. seealso:: :meth:`telegram.ChatPermissions.all_permissions`, :attr:`telegram.Chat.restrict_member`
+        .. seealso:: :meth:`telegram.ChatPermissions.all_permissions`,
+            :attr:`telegram.Chat.restrict_member`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -6264,7 +6272,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         admin right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages`
         admin right in a channel.
 
-        .. seealso:: :attr:`telegram.Chat.unpin_all_messages`, :attr:`telegram.User.unpin_all_messages`
+        .. seealso:: :attr:`telegram.Chat.unpin_all_messages`,
+            :attr:`telegram.User.unpin_all_messages`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
