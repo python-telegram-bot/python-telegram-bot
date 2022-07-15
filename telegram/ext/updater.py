@@ -323,7 +323,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
         self.user_sig_handler = user_sig_handler
         self.last_update_id = 0
         self.running = False
-        self.is_idle = False
+        self.is_idle = Event()
         self.httpd = None
         self.__lock = Lock()
         self.__threads: List[Thread] = []
@@ -858,7 +858,6 @@ class Updater(Generic[CCT, UD, CD, BD]):
 
     @no_type_check
     def _signal_handler(self, signum, frame) -> None:
-        self.is_idle = False
         if self.running:
             self.logger.info(
                 'Received signal %s (%s), stopping...', signum, get_signal_name(signum)
@@ -870,6 +869,7 @@ class Updater(Generic[CCT, UD, CD, BD]):
             self.stop()
             if self.user_sig_handler:
                 self.user_sig_handler(signum, frame)
+            self.is_idle.set()
         else:
             self.logger.warning('Exiting immediately!')
             # pylint: disable=C0415,W0212
@@ -889,7 +889,4 @@ class Updater(Generic[CCT, UD, CD, BD]):
         for sig in stop_signals:
             signal(sig, self._signal_handler)
 
-        self.is_idle = True
-
-        while self.is_idle:
-            sleep(1)
+        self.is_idle.wait()
