@@ -190,7 +190,7 @@ class TestAIORateLimiter:
 
         bot = ExtBot(
             token=bot.token,
-            request=self.CountRequest(retry_after=1.5),
+            request=self.CountRequest(retry_after=1),
             rate_limiter=AIORateLimiter(
                 max_retries=max_retries, overall_max_rate=0, group_max_rate=0
             ),
@@ -206,7 +206,7 @@ class TestAIORateLimiter:
         if len(times) <= 1:
             return
         delays = [j - i for i, j in zip(times[:-1], times[1:])]
-        assert delays == pytest.approx([1.6 for _ in range(max_retries)], rel=0.1)
+        assert delays == pytest.approx([1.1 for _ in range(max_retries)], rel=0.05)
 
     async def test_delay_all_pending_on_retry(self, bot):
         # Makes sure that a RetryAfter blocks *all* pending requests
@@ -229,7 +229,7 @@ class TestAIORateLimiter:
         await asyncio.sleep(1.1)
         assert isinstance(task_2.exception(), RetryAfter)
 
-    @flaky(4, 1)
+    @flaky(3, 1)
     @pytest.mark.parametrize("group_id", [-1, "@username"])
     async def test_basic_rate_limiting(self, bot, group_id):
         try:
@@ -267,8 +267,8 @@ class TestAIORateLimiter:
                 assert sum(1 for task in non_group_tasks.values() if task.done()) < 8
                 assert sum(1 for task in group_tasks.values() if task.done()) < 4
 
-                # 3 seconds after start + some grace time
-                await asyncio.sleep(3.5 - 0.85)
+                # 3 seconds after start
+                await asyncio.sleep(3.1 - 0.85)
                 assert all(task.done() for task in non_group_tasks.values())
                 assert all(task.done() for task in group_tasks.values())
 
@@ -278,7 +278,7 @@ class TestAIORateLimiter:
             TestAIORateLimiter.count = 0
             TestAIORateLimiter.call_times = []
 
-    @flaky(4, 1)
+    @flaky(3, 1)
     async def test_rate_limiting_no_chat_id(self, bot):
         try:
             rl_bot = ExtBot(
