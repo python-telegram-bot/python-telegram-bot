@@ -534,7 +534,7 @@ class TestUser:
 
         assert user.mention_markdown() == expected.format(user.full_name, user.id)
         assert user.mention_markdown("the_name*\u2022") == expected.format(
-            "the\\_name\\*\u2022", user.id
+            "the_name*\u2022", user.id
         )
         assert user.mention_markdown(user.username) == expected.format(user.username, user.id)
 
