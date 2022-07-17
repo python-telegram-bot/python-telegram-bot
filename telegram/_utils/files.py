@@ -29,12 +29,45 @@ Warning:
 """
 
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Optional, Type, Union, cast
+from typing import IO, TYPE_CHECKING, Any, Optional, Tuple, Type, TypeVar, Union, cast, overload
 
 from telegram._utils.types import FileInput, FilePathInput
 
 if TYPE_CHECKING:
     from telegram import InputFile, TelegramObject
+
+_T = TypeVar("_T", bound=Union[bytes, "InputFile", str, Path, None])
+
+
+@overload
+def load_file(obj: IO[bytes]) -> Tuple[Optional[str], bytes]:
+    ...
+
+
+@overload
+def load_file(obj: _T) -> Tuple[None, _T]:
+    ...
+
+
+def load_file(
+    obj: Optional[FileInput],
+) -> Tuple[Optional[str], Union[bytes, "InputFile", str, Path, None]]:
+    """If the input is a file handle, read the data and name and return it. Otherwise, return
+    the input unchanged."""
+    if obj is None:
+        return None, None
+
+    try:
+        contents = obj.read()  # type: ignore[union-attr]
+    except AttributeError:
+        return None, cast(Union[bytes, "InputFile", str, Path], obj)
+
+    if hasattr(obj, "name") and not isinstance(obj.name, int):  # type: ignore[union-attr]
+        filename = Path(obj.name).name  # type: ignore[union-attr]
+    else:
+        filename = None
+
+    return filename, contents
 
 
 def is_local_file(obj: Optional[FilePathInput]) -> bool:

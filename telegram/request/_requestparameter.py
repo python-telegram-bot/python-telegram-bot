@@ -86,6 +86,7 @@ class RequestParameter:
     @staticmethod
     def _value_and_input_files_from_input(  # pylint: disable=too-many-return-statements
         value: object,
+        local_mode: bool,
     ) -> Tuple[object, List[InputFile]]:
         """Converts `value` into something that we can json-dump. Returns two values:
         1. the JSON-dumpable value. Maybe be `None` in case the value is an InputFile which must
@@ -115,31 +116,41 @@ class RequestParameter:
                 return value.attach_uri, [value]
             return None, [value]
 
-        if isinstance(value, InputMedia) and isinstance(value.media, InputFile):
+        if isinstance(value, InputMedia):
             # We call to_dict and change the returned dict instead of overriding
             # value.media in case the same value is reused for another request
             data = value.to_dict()
-            if value.media.attach_uri:
-                data["media"] = value.media.attach_uri
+            media = value.parsed_media(local_mode=local_mode)
+            return_media = []
+            if isinstance(media, InputFile):
+                if media.attach_uri:
+                    data["media"] = media.attach_uri
+                else:
+                    data.pop("media", None)
+                return_media.append(media)
             else:
-                data.pop("media", None)
+                data["media"] = media
 
-            thumb = data.get("thumb", None)
+            try:
+                thumb = value.parsed_thumb(local_mode=local_mode)  # type: ignore[attr-defined]
+            except AttributeError:
+                thumb = None
+
             if isinstance(thumb, InputFile):
                 if thumb.attach_uri:
                     data["thumb"] = thumb.attach_uri
                 else:
                     data.pop("thumb", None)
-                return data, [value.media, thumb]
+                return_media.append(thumb)
 
-            return data, [value.media]
+            return data, return_media
         if isinstance(value, TelegramObject):
             # Needs to be last, because InputMedia is a subclass of TelegramObject
             return value.to_dict(), []
         return value, []
 
     @classmethod
-    def from_input(cls, key: str, value: object) -> "RequestParameter":
+    def from_input(cls, key: str, value: object, local_mode: bool = False) -> "RequestParameter":
         """Builds an instance of this class for a given key-value pair that represents the raw
         input as passed along from a method of :class:`telegram.Bot`.
         """
@@ -147,7 +158,9 @@ class RequestParameter:
             param_values = []
             input_files = []
             for obj in value:
-                param_value, input_file = cls._value_and_input_files_from_input(obj)
+                param_value, input_file = cls._value_and_input_files_from_input(
+                    obj, local_mode=local_mode
+                )
                 if param_value is not None:
                     param_values.append(param_value)
                 input_files.extend(input_file)
@@ -155,7 +168,9 @@ class RequestParameter:
                 name=key, value=param_values, input_files=input_files if input_files else None
             )
 
-        param_value, input_files = cls._value_and_input_files_from_input(value)
+        param_value, input_files = cls._value_and_input_files_from_input(
+            value, local_mode=local_mode
+        )
         return RequestParameter(
             name=key, value=param_value, input_files=input_files if input_files else None
         )

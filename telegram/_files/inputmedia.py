@@ -28,11 +28,9 @@ from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.files import parse_file_input
+from telegram._utils.files import load_file, parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput
 from telegram.constants import InputMediaType
-
-MediaType = Union[Animation, Audio, Document, PhotoSize, Video]
 
 
 class InputMedia(TelegramObject):
@@ -72,21 +70,48 @@ class InputMedia(TelegramObject):
             entities that appear in the caption.
     """
 
-    __slots__ = ("caption", "caption_entities", "media", "parse_mode", "type")
+    __slots__ = (
+        "caption",
+        "caption_entities",
+        "_media",
+        "parse_mode",
+        "type",
+        "_filename",
+        "_thumb",
+    )
 
     def __init__(
         self,
         media_type: str,
-        media: Union[str, InputFile, MediaType],
+        media: FileInput,
         caption: str = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
+        filename: str = None,
     ):
         self.type = media_type
-        self.media = media
         self.caption = caption
         self.caption_entities = caption_entities
         self.parse_mode = parse_mode
+        self._thumb: Optional[FileInput] = None
+
+        # We load the media here already to cover cases where we're handed an open file that
+        # will be closed before this object is passed to the request backend,
+        # e.g. `with open(...) as f: InputMedia(media=f, ...)``
+        reported_filename, effective_media = load_file(media)
+        self._media = effective_media
+        self._filename = filename or reported_filename
+
+    @property
+    def media(self) -> Union[str, InputFile]:
+        """The media to send."""
+        return self.parsed_media(local_mode=False)
+
+    def parsed_media(self, local_mode: bool = False) -> Union[str, InputFile]:
+        out = parse_file_input(
+            file_input=self._media, local_mode=local_mode, attach=True, filename=self._filename
+        )
+        return out
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -97,12 +122,20 @@ class InputMedia(TelegramObject):
 
         return data
 
-    @staticmethod
-    def _parse_thumb_input(thumb: Optional[FileInput]) -> Optional[Union[str, InputFile]]:
-        return parse_file_input(thumb, attach=True) if thumb is not None else thumb
+
+class _InputMediaThumbed(InputMedia):
+    @property
+    def thumb(self) -> Optional[Union[str, InputFile]]:
+        return self.parsed_thumb(local_mode=False)
+
+    def parsed_thumb(self, local_mode: bool = False) -> Optional[Union[str, InputFile]]:
+        if self._thumb is None:
+            return None
+
+        return parse_file_input(file_input=self._thumb, attach=True, local_mode=local_mode)
 
 
-class InputMediaAnimation(InputMedia):
+class InputMediaAnimation(_InputMediaThumbed):
     """Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 
     Note:
@@ -153,7 +186,6 @@ class InputMediaAnimation(InputMedia):
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
         caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption.
-        thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
         width (:obj:`int`): Optional. Animation width.
         height (:obj:`int`): Optional. Animation height.
         duration (:obj:`int`): Optional. Animation duration in seconds.
@@ -179,11 +211,16 @@ class InputMediaAnimation(InputMedia):
             height = media.height if height is None else height
             duration = media.duration if duration is None else duration
             media = media.file_id
-        else:
-            media = parse_file_input(media, filename=filename, attach=True)
 
-        super().__init__(InputMediaType.ANIMATION, media, caption, caption_entities, parse_mode)
-        self.thumb = self._parse_thumb_input(thumb)
+        super().__init__(
+            InputMediaType.ANIMATION,
+            media=media,
+            caption=caption,
+            caption_entities=caption_entities,
+            parse_mode=parse_mode,
+            filename=filename,
+        )
+        _, self._thumb = load_file(thumb)
         self.width = width
         self.height = height
         self.duration = duration
@@ -236,11 +273,19 @@ class InputMediaPhoto(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        media = parse_file_input(media, PhotoSize, filename=filename, attach=True)
-        super().__init__(InputMediaType.PHOTO, media, caption, caption_entities, parse_mode)
+        if isinstance(media, PhotoSize):
+            media = media.file_id
+        super().__init__(
+            InputMediaType.PHOTO,
+            media=media,
+            caption=caption,
+            parse_mode=parse_mode,
+            filename=filename,
+            caption_entities=caption_entities,
+        )
 
 
-class InputMediaVideo(InputMedia):
+class InputMediaVideo(_InputMediaThumbed):
     """Represents a video to be sent.
 
     Note:
@@ -301,7 +346,6 @@ class InputMediaVideo(InputMedia):
         duration (:obj:`int`): Optional. Video duration in seconds.
         supports_streaming (:obj:`bool`): Optional. Pass :obj:`True`, if the uploaded video is
             suitable for streaming.
-        thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
 
     """
 
@@ -326,18 +370,23 @@ class InputMediaVideo(InputMedia):
             height = height if height is not None else media.height
             duration = duration if duration is not None else media.duration
             media = media.file_id
-        else:
-            media = parse_file_input(media, filename=filename, attach=True)
 
-        super().__init__(InputMediaType.VIDEO, media, caption, caption_entities, parse_mode)
+        super().__init__(
+            InputMediaType.VIDEO,
+            media=media,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            filename=filename,
+        )
         self.width = width
         self.height = height
         self.duration = duration
-        self.thumb = self._parse_thumb_input(thumb)
+        _, self._thumb = load_file(thumb)
         self.supports_streaming = supports_streaming
 
 
-class InputMediaAudio(InputMedia):
+class InputMediaAudio(_InputMediaThumbed):
     """Represents an audio file to be treated as music to be sent.
 
     Note:
@@ -394,7 +443,6 @@ class InputMediaAudio(InputMedia):
         performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
-        thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
 
     """
 
@@ -417,17 +465,22 @@ class InputMediaAudio(InputMedia):
             performer = media.performer if performer is None else performer
             title = media.title if title is None else title
             media = media.file_id
-        else:
-            media = parse_file_input(media, filename=filename, attach=True)
 
-        super().__init__(InputMediaType.AUDIO, media, caption, caption_entities, parse_mode)
-        self.thumb = self._parse_thumb_input(thumb)
+        super().__init__(
+            InputMediaType.AUDIO,
+            media=media,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            filename=filename,
+        )
+        _, self._thumb = load_file(thumb)
         self.duration = duration
         self.title = title
         self.performer = performer
 
 
-class InputMediaDocument(InputMedia):
+class InputMediaDocument(_InputMediaThumbed):
     """Represents a general file to be sent.
 
     Args:
@@ -473,7 +526,6 @@ class InputMediaDocument(InputMedia):
         parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
         caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption.
-        thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
         disable_content_type_detection (:obj:`bool`): Optional. Disables automatic server-side
             content type detection for files uploaded using multipart/form-data. Always true, if
             the document is sent as part of an album.
@@ -492,7 +544,15 @@ class InputMediaDocument(InputMedia):
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
     ):
-        media = parse_file_input(media, Document, filename=filename, attach=True)
-        super().__init__(InputMediaType.DOCUMENT, media, caption, caption_entities, parse_mode)
-        self.thumb = self._parse_thumb_input(thumb)
+        if isinstance(media, Document):
+            media = media.file_id
+        super().__init__(
+            InputMediaType.DOCUMENT,
+            media=media,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
+            filename=filename,
+        )
+        _, self._thumb = load_file(thumb)
         self.disable_content_type_detection = disable_content_type_detection
