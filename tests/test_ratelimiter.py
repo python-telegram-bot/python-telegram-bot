@@ -24,6 +24,7 @@ notable
 import asyncio
 import json
 import os
+import platform
 import time
 from datetime import datetime
 from http import HTTPStatus
@@ -137,6 +138,11 @@ class TestBaseRateLimiter:
 @pytest.mark.skipif(
     TEST_NO_RATE_LIMITER, reason="Only relevant if the optional dependency is installed"
 )
+@pytest.mark.skipif(
+    os.getenv("GITHUB_ACTIONS", False) and platform.system() == "Darwin",
+    reason="The timings are apparently rather inaccurate on MacOS.",
+)
+@flaky(10, 1)  # Timings aren't quite perfect
 class TestAIORateLimiter:
     count = 0
     call_times = []
@@ -229,7 +235,6 @@ class TestAIORateLimiter:
         await asyncio.sleep(1.1)
         assert isinstance(task_2.exception(), RetryAfter)
 
-    @flaky(3, 1)
     @pytest.mark.parametrize("group_id", [-1, "@username"])
     async def test_basic_rate_limiting(self, bot, group_id):
         try:
@@ -278,7 +283,6 @@ class TestAIORateLimiter:
             TestAIORateLimiter.count = 0
             TestAIORateLimiter.call_times = []
 
-    @flaky(3, 1)
     async def test_rate_limiting_no_chat_id(self, bot):
         try:
             rl_bot = ExtBot(
