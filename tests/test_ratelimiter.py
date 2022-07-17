@@ -232,112 +232,121 @@ class TestAIORateLimiter:
     @flaky(3, 1)
     @pytest.mark.parametrize("group_id", [-1, "@username"])
     async def test_basic_rate_limiting(self, bot, group_id):
-        rl_bot = ExtBot(
-            token=bot.token,
-            request=self.CountRequest(retry_after=None),
-            rate_limiter=AIORateLimiter(
-                overall_max_rate=1,
-                overall_time_period=1 / 4,
-                group_max_rate=1,
-                group_time_period=1 / 2,
-            ),
-        )
+        try:
+            rl_bot = ExtBot(
+                token=bot.token,
+                request=self.CountRequest(retry_after=None),
+                rate_limiter=AIORateLimiter(
+                    overall_max_rate=1,
+                    overall_time_period=1 / 4,
+                    group_max_rate=1,
+                    group_time_period=1 / 2,
+                ),
+            )
 
-        async with rl_bot:
-            non_group_tasks = {}
-            group_tasks = {}
-            for i in range(4):
-                group_tasks[i] = asyncio.create_task(
-                    rl_bot.send_message(chat_id=group_id, text="test")
-                )
-            for i in range(8):
-                non_group_tasks[i] = asyncio.create_task(
-                    rl_bot.send_message(chat_id=1, text="test")
-                )
+            async with rl_bot:
+                non_group_tasks = {}
+                group_tasks = {}
+                for i in range(4):
+                    group_tasks[i] = asyncio.create_task(
+                        rl_bot.send_message(chat_id=group_id, text="test")
+                    )
+                for i in range(8):
+                    non_group_tasks[i] = asyncio.create_task(
+                        rl_bot.send_message(chat_id=1, text="test")
+                    )
 
-            await asyncio.sleep(0.85)
-            # We expect 5 requests:
-            # 1: `get_me` from `async with rl_bot`
-            # 2: `send_message` at time 0.00
-            # 3: `send_message` at time 0.25
-            # 4: `send_message` at time 0.50
-            # 5: `send_message` at time 0.75
-            assert TestAIORateLimiter.count == 5
-            assert sum(1 for task in non_group_tasks.values() if task.done()) == 2
-            assert sum(1 for task in group_tasks.values() if task.done()) == 2
+                await asyncio.sleep(0.85)
+                # We expect 5 requests:
+                # 1: `get_me` from `async with rl_bot`
+                # 2: `send_message` at time 0.00
+                # 3: `send_message` at time 0.25
+                # 4: `send_message` at time 0.50
+                # 5: `send_message` at time 0.75
+                assert TestAIORateLimiter.count == 5
+                assert sum(1 for task in non_group_tasks.values() if task.done()) < 8
+                assert sum(1 for task in group_tasks.values() if task.done()) < 4
 
-            # 3 seconds after start
-            await asyncio.sleep(3.1 - 0.85)
-            assert all(task.done() for task in non_group_tasks.values())
-            assert all(task.done() for task in group_tasks.values())
+                # 3 seconds after start
+                await asyncio.sleep(3.1 - 0.85)
+                assert all(task.done() for task in non_group_tasks.values())
+                assert all(task.done() for task in group_tasks.values())
 
-        # cleanup
-        await asyncio.gather(*non_group_tasks.values(), *group_tasks.values())
-        TestAIORateLimiter.count = 0
-        TestAIORateLimiter.call_times = []
+        finally:
+            # cleanup
+            await asyncio.gather(*non_group_tasks.values(), *group_tasks.values())
+            TestAIORateLimiter.count = 0
+            TestAIORateLimiter.call_times = []
 
     @flaky(3, 1)
     async def test_rate_limiting_no_chat_id(self, bot):
-        rl_bot = ExtBot(
-            token=bot.token,
-            request=self.CountRequest(retry_after=None),
-            rate_limiter=AIORateLimiter(
-                overall_max_rate=1,
-                overall_time_period=1 / 2,
-            ),
-        )
+        try:
+            rl_bot = ExtBot(
+                token=bot.token,
+                request=self.CountRequest(retry_after=None),
+                rate_limiter=AIORateLimiter(
+                    overall_max_rate=1,
+                    overall_time_period=1 / 2,
+                ),
+            )
 
-        async with rl_bot:
-            non_chat_tasks = {}
-            chat_tasks = {}
-            for i in range(4):
-                chat_tasks[i] = asyncio.create_task(rl_bot.send_message(chat_id=-1, text="test"))
-            for i in range(8):
-                non_chat_tasks[i] = asyncio.create_task(rl_bot.get_me())
+            async with rl_bot:
+                non_chat_tasks = {}
+                chat_tasks = {}
+                for i in range(4):
+                    chat_tasks[i] = asyncio.create_task(
+                        rl_bot.send_message(chat_id=-1, text="test")
+                    )
+                for i in range(8):
+                    non_chat_tasks[i] = asyncio.create_task(rl_bot.get_me())
 
-            await asyncio.sleep(0.6)
-            # We expect 11 requests:
-            # 1: `get_me` from `async with rl_bot`
-            # 2: `send_message` at time 0.00
-            # 3: `send_message` at time 0.05
-            # 4: 8 times `get_me`
-            assert TestAIORateLimiter.count == 11
-            assert sum(1 for task in non_chat_tasks.values() if task.done()) == 8
-            assert sum(1 for task in chat_tasks.values() if task.done()) == 2
+                await asyncio.sleep(0.6)
+                # We expect 11 requests:
+                # 1: `get_me` from `async with rl_bot`
+                # 2: `send_message` at time 0.00
+                # 3: `send_message` at time 0.05
+                # 4: 8 times `get_me`
+                assert TestAIORateLimiter.count == 11
+                assert sum(1 for task in non_chat_tasks.values() if task.done()) == 8
+                assert sum(1 for task in chat_tasks.values() if task.done()) == 2
 
-            # 1.6 seconds after start
-            await asyncio.sleep(1.6 - 0.6)
-            assert all(task.done() for task in non_chat_tasks.values())
-            assert all(task.done() for task in chat_tasks.values())
-
-        # cleanup
-        await asyncio.gather(*non_chat_tasks.values(), *chat_tasks.values())
-        TestAIORateLimiter.count = 0
-        TestAIORateLimiter.call_times = []
+                # 1.6 seconds after start
+                await asyncio.sleep(1.6 - 0.6)
+                assert all(task.done() for task in non_chat_tasks.values())
+                assert all(task.done() for task in chat_tasks.values())
+        finally:
+            # cleanup
+            await asyncio.gather(*non_chat_tasks.values(), *chat_tasks.values())
+            TestAIORateLimiter.count = 0
+            TestAIORateLimiter.call_times = []
 
     @pytest.mark.parametrize("intermediate", [True, False])
     async def test_group_caching(self, bot, intermediate):
-        max_rate = 1000
-        rl_bot = ExtBot(
-            token=bot.token,
-            request=self.CountRequest(retry_after=None),
-            rate_limiter=AIORateLimiter(
-                overall_max_rate=max_rate,
-                overall_time_period=1,
-                group_max_rate=max_rate,
-                group_time_period=1,
-            ),
-        )
+        try:
+            max_rate = 1000
+            rl_bot = ExtBot(
+                token=bot.token,
+                request=self.CountRequest(retry_after=None),
+                rate_limiter=AIORateLimiter(
+                    overall_max_rate=max_rate,
+                    overall_time_period=1,
+                    group_max_rate=max_rate,
+                    group_time_period=1,
+                ),
+            )
 
-        # Unfortunately, there is no reliable way to test this without checking the internals
-        assert len(rl_bot.rate_limiter._group_limiters) == 0
-        await asyncio.gather(
-            *(rl_bot.send_message(chat_id=-(i + 1), text=f"{i}") for i in range(513))
-        )
-        if intermediate:
-            await rl_bot.send_message(chat_id=-1, text="999")
-            assert 1 <= len(rl_bot.rate_limiter._group_limiters) <= 513
-        else:
-            await asyncio.sleep(1)
-            await rl_bot.send_message(chat_id=-1, text="999")
-            assert len(rl_bot.rate_limiter._group_limiters) == 1
+            # Unfortunately, there is no reliable way to test this without checking the internals
+            assert len(rl_bot.rate_limiter._group_limiters) == 0
+            await asyncio.gather(
+                *(rl_bot.send_message(chat_id=-(i + 1), text=f"{i}") for i in range(513))
+            )
+            if intermediate:
+                await rl_bot.send_message(chat_id=-1, text="999")
+                assert 1 <= len(rl_bot.rate_limiter._group_limiters) <= 513
+            else:
+                await asyncio.sleep(1)
+                await rl_bot.send_message(chat_id=-1, text="999")
+                assert len(rl_bot.rate_limiter._group_limiters) == 1
+        finally:
+            TestAIORateLimiter.count = 0
+            TestAIORateLimiter.call_times = []
