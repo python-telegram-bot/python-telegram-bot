@@ -1,6 +1,3 @@
-# cryptography is an optional dependency, but running the tests properly requires it
-cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3
-
 pre-commit
 
 pytest==7.1.2
