@@ -30,6 +30,7 @@ jobs:
           python -W ignore -m pip install --upgrade pip
           python -W ignore -m pip install -U codecov pytest-cov
           python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-opts.txt
           python -W ignore -m pip install -r requirements-dev.txt
 
       - name: Test with pytest
@@ -91,6 +92,7 @@ jobs:
         run: |
           python -W ignore -m pip install --upgrade pip
           python -W ignore -m pip install -r requirements.txt
+          python -W ignore -m pip install -r requirements-opts.txt
           python -W ignore -m pip install -r requirements-dev.txt
       - name: Compare to official api
         run: |
