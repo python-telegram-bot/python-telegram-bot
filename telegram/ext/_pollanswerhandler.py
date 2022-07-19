@@ -32,8 +32,7 @@ class PollAnswerHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. seealso:: `pollbot.py <https://github.com/python-telegram-bot/
-        python-telegram-bot/blob/master/examples/pollbot.py>`_
+    .. seealso:: `Pollbot EXample <examples.pollbot.html>`_
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

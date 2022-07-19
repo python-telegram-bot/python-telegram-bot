@@ -1647,7 +1647,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             generate thumb nails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
-        .. seealso:: :attr:`telegram.Message.reply_animation`, :attr:`telegram.Chat.send_animation`
+        .. seealso:: :attr:`telegram.Message.reply_animation`, :attr:`telegram.Chat.send_animation`,
+            :attr:`telegram.User.send_animation`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -7684,7 +7685,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         message doesn't have a link to the original message.
 
         .. seealso:: :attr:`telegram.Message.copy`, :attr:`telegram.Chat.send_copy`,
-            :attr:`telegram.Chat.copy_message`, :attr:`telegram.User.send_copy`
+            :attr:`telegram.Chat.copy_message`, :attr:`telegram.User.send_copy`,
+            :attr:`telegram.User.copy_message`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -7784,7 +7786,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         button.
 
         .. seealso:: :meth:`get_chat_menu_button`, :meth:`telegram.Chat.set_menu_button`,
-            :meth:`telegram.User.set_menu_button`
+            :meth:`telegram.Chat.get_menu_button`, meth:`telegram.User.set_menu_button`,
+            :meth:`telegram.User.get_menu_button`
 
         .. versionadded:: 20.0
 
@@ -7845,7 +7848,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         the default menu button.
 
         .. seealso:: :meth:`set_chat_menu_button`, :meth:`telegram.Chat.get_menu_button`,
-            :meth:`telegram.User.get_menu_button`
+            :meth:`telegram.Chat.set_menu_button`, :meth:`telegram.User.get_menu_button`,
+            :meth:`telegram.User.set_menu_button`
 
         .. versionadded:: 20.0
 
