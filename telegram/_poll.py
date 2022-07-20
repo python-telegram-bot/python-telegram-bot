@@ -112,6 +112,8 @@ class Poll(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
+    .. seealso:: `Pollbot Example <examples.pollbot.html>`_
+
     Args:
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, 1-300 characters.

@@ -46,6 +46,8 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
           chats and may not be set for inline queries coming from third-party clients. These
           updates won't be handled, if :attr:`chat_types` is passed.
 
+    .. seealso:: `Inlinebot Example <examples.inlinebot.html>`_
+
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by

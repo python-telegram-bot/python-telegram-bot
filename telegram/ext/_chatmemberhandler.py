@@ -31,11 +31,13 @@ RT = TypeVar("RT")
 class ChatMemberHandler(BaseHandler[Update, CCT]):
     """BaseHandler class to handle Telegram updates that contain a chat member update.
 
-    .. versionadded:: 13.4
-
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
+
+    .. seealso:: `Chat Member Example <examples.chatmemberbot.html>`_
+
+    .. versionadded:: 13.4
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

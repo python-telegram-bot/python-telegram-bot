@@ -67,6 +67,10 @@ class ExtBot(Bot):
     For the documentation of the arguments, methods and attributes, please see
     :class:`telegram.Bot`.
 
+    .. seealso:: `Arbitrary Callback Example <examples.arbitrarycallbackdatabot.html>`_,
+        `Arbitrary callback_data <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/Arbitrary-callback_data>`_
+
     .. versionadded:: 13.6
 
     Args:
