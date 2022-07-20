@@ -1647,7 +1647,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             generate thumb nails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
-        .. seealso:: :attr:`telegram.Message.reply_animation`, :attr:`telegram.Chat.send_animation`,
+        .. seealso:: :attr:`telegram.Message.reply_animation`,
+            :attr:`telegram.Chat.send_animation`,
             :attr:`telegram.User.send_animation`
 
         Args:
