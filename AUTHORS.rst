@@ -59,6 +59,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `ihoru <https://github.com/ihoru>`_
 - `Jasmin Bom <https://github.com/jsmnbom>`_
 - `JASON0916 <https://github.com/JASON0916>`_
+- `Javad94 <https://github.com/javad94>`_
 - `jeffffc <https://github.com/jeffffc>`_
 - `Jelle Besseling <https://github.com/pingiun>`_
 - `jh0ker <https://github.com/jh0ker>`_
