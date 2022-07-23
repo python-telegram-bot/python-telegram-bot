@@ -22,6 +22,7 @@ import asyncio
 import functools
 import logging
 import pickle
+import string
 from contextlib import AbstractAsyncContextManager
 from datetime import datetime
 from types import TracebackType
@@ -420,13 +421,30 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
     @staticmethod
     def _validate_token(token: str) -> str:
-        """A very basic validation on token."""
-        if any(x.isspace() for x in token):
-            raise InvalidToken()
+        """Performs a validation on token by verifying the correct syntax and giving meaningful
+        error messages when it's incorrect.
+
+        .. versionchanged:: 20.0
+           Now returns a more descriptful error message.
+
+        """
+        # To pinpoint where exactly there is a illegal character, we multiply the current index to
+        # a whitespace and then add a caret (^) for easy identification. This is similar to what
+        # Python does with SyntaxErrors.
+        for idx, char in enumerate(token):
+            if char not in tuple(string.ascii_letters + string.digits) + ("-", "_", ":"):
+                err_msg = "Illegal character found in the bot token: "
+                raise InvalidToken(f"{err_msg}\n{token}\n{' ' * idx}^")
 
         left, sep, _right = token.partition(":")
-        if (not sep) or (not left.isdigit()) or (len(left) < 3):
-            raise InvalidToken()
+        if not sep:
+            raise InvalidToken("Missing `:` separator in the token")
+
+        if not left.isdigit():
+            raise InvalidToken("All characters left of the `:` separator must be digits!")
+
+        if len(left) < 3:
+            raise InvalidToken("Number of digits left of the `:` separator must be greater than 3")
 
         return token
 
