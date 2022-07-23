@@ -4,4 +4,5 @@ sphinx-pypi-upload
 # More instructions at source/_static/dark.css
 # Ofc once https://github.com/readthedocs/sphinx_rtd_theme/issues/224 is closed, we should use that
 sphinx_rtd_theme==0.5.2
+# Restricted to fix ImportError for v3.1 and higher of Jinja2 alongside sphinx v3.5.4 as discussed in https://github.com/python-telegram-bot/python-telegram-bot/pull/3164#issuecomment-1193002217
 Jinja2<3.1
