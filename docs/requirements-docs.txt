@@ -4,3 +4,4 @@ sphinx-pypi-upload
 # More instructions at source/_static/dark.css
 # Ofc once https://github.com/readthedocs/sphinx_rtd_theme/issues/224 is closed, we should use that
 sphinx_rtd_theme==0.5.2
+Jinja2<3.1
