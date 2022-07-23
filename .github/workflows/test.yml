@@ -4,7 +4,7 @@ on:
     branches:
       - master
   push:
-    branches: 
+    branches:
       - master
   schedule:
     # Run monday and friday morning at 03:07 - odd time to spread load on GitHub Actions
@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11.0-beta.4']
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: False
     steps:
