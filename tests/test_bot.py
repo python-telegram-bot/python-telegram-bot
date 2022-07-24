@@ -291,30 +291,12 @@ class TestBot:
             assert acd_bot.arbitrary_callback_data == acd
             assert acd_bot.callback_data_cache.maxsize == maxsize
 
-    async def test_invalid_token_ptb_check(self):
-        with pytest.raises(InvalidToken, match="Illegal character") as excinfo:
-            Bot("1234:white space")
-        # checks for correct caret position-
-        assert excinfo.value.message.split("\n")[-1].index("^") == 10
+    async def test_no_token_passed(self):
+        with pytest.raises(InvalidToken, match="You must pass the token"):
+            Bot("")
 
-        with pytest.raises(InvalidToken, match="Illegal character") as excinfo:
-            Bot('1234:extra_quote"')
-        assert excinfo.value.message.split("\n")[-1].index("^") == 16
-
-        with pytest.raises(InvalidToken, match="Missing `:`"):
-            Bot("1234abcde")
-
-        with pytest.raises(InvalidToken, match="All characters left of "):
-            Bot("abcde:fghij_")
-
-        with pytest.raises(InvalidToken, match="Number of digits left of the "):
-            Bot("12:AAc_def")
-
-        Bot("123456789:AAFbcD_-1234")  # no exception raised
-
-    async def test_invalid_token_server_response(self, monkeypatch):
-        monkeypatch.setattr("telegram.Bot._validate_token", lambda x, y: "")
-        with pytest.raises(InvalidToken):
+    async def test_invalid_token_server_response(self):
+        with pytest.raises(InvalidToken, match="The token: 12 was rejected by the server"):
             async with make_bot(token="12") as bot:
                 await bot.get_me()
 
