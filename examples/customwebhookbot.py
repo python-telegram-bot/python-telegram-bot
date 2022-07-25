@@ -18,6 +18,7 @@ import html
 import logging
 from dataclasses import dataclass
 from http import HTTPStatus
+from pathlib import Path
 
 import uvicorn
 from starlette.applications import Starlette
@@ -110,9 +111,9 @@ async def webhook_update(update: WebhookUpdate, context: CustomContext) -> None:
 
 async def main() -> None:
     """Set up the application and a custom webserver."""
-    url = "https://domain.tld"
+    port = 8443
+    url = f"https://domain.tld:{port}"
     admin_chat_id = 123456
-    port = 8000
 
     context_types = ContextTypes(context=CustomContext)
     # Here we set updater to None because we want our custom webhook server to handle the updates
@@ -129,7 +130,7 @@ async def main() -> None:
     application.add_handler(TypeHandler(type=WebhookUpdate, callback=webhook_update))
 
     # Pass webhook settings to telegram
-    await application.bot.set_webhook(url=f"{url}/telegram")
+    await application.bot.set_webhook(url=f"{url}/telegram", certificate=Path("/path/to/cert.pem").read_bytes())
 
     # Set up webserver
     async def telegram(request: Request) -> Response:
@@ -177,7 +178,9 @@ async def main() -> None:
             app=starlette_app,
             port=port,
             use_colors=False,
-            host="127.0.0.1",
+            host="0.0.0.0",
+            ssl_keyfile="/path/to/private.key",
+            ssl_certfile="/path/to/cert.pem"
         )
     )
 
