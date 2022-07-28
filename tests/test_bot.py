@@ -296,9 +296,9 @@ class TestBot:
             Bot("")
 
     async def test_invalid_token_server_response(self):
-        with pytest.raises(InvalidToken, match="The token: 12 was rejected by the server"):
-            async with make_bot(token="12") as bot:
-                await bot.get_me()
+        with pytest.raises(InvalidToken, match="The token 12 was rejected by the server."):
+            async with make_bot(token="12"):
+                pass
 
     async def test_unknown_kwargs(self, bot, monkeypatch):
         async def post(url, request_data: RequestData, *args, **kwargs):

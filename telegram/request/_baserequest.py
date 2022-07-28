@@ -320,11 +320,7 @@ class BaseRequest(
             #   2) correct tokens but non-existing method, e.g. api.tg.org/botTOKEN/unkonwnMethod
             # We can basically rule out 2) since we don't let users make requests manually
             # TG returns 401 Unauthorized for correctly formatted tokens that are not valid
-
-            # retrieve token from the url-
-            start = url[url.find("/bot") + 4 :]
-            token = start[: start.find("/")]
-            raise InvalidToken(message + f"\nThe token: {token} was rejected by the server.")
+            raise InvalidToken(message)
         if code == HTTPStatus.BAD_REQUEST:  # 400
             raise BadRequest(message)
         if code == HTTPStatus.CONFLICT:  # 409

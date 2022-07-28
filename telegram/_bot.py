@@ -374,7 +374,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             return
 
         await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
-        await self.get_me()
+        try:
+            await self.get_me()
+        except InvalidToken as exc:
+            raise InvalidToken(f"The token {self.token} was rejected by the server.") from exc
         self._initialized = True
 
     async def shutdown(self) -> None:
