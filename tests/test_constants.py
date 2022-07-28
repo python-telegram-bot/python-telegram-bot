@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import json
+import sys
 from enum import IntEnum
 
 import pytest
@@ -62,8 +63,24 @@ class TestConstants:
         assert json.dumps(IntEnumTest.FOO) == json.dumps(1)
 
     def test_string_representation(self):
+        # test repr
         assert repr(StrEnumTest.FOO) == "<StrEnumTest.FOO>"
+
+        # test __format__
+        assert f"{StrEnumTest.FOO} this {StrEnumTest.BAR}" == "foo this bar"
+        assert f"{StrEnumTest.FOO} this {StrEnumTest.BAR}" == "foo this bar"
+        assert f"{StrEnumTest.FOO:*^10}" == "***foo****"
+
+        # test __str__
         assert str(StrEnumTest.FOO) == "StrEnumTest.FOO"
+
+    def test_int_representation(self):
+        assert repr(IntEnumTest.FOO) == "<IntEnumTest.FOO: 1>"
+        if sys.version_info < (3, 11):
+            assert str(IntEnumTest.FOO) == "IntEnumTest.FOO"
+        else:
+            assert str(IntEnumTest.FOO) == "1"
+        assert f"{IntEnumTest.FOO}" == "1"
 
     def test_string_inheritance(self):
         assert isinstance(StrEnumTest.FOO, str)
