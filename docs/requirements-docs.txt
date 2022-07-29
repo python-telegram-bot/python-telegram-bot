@@ -1,4 +1,4 @@
-sphinx==5.0.2
+sphinx==5.1.1
 sphinx-pypi-upload
 furo==2022.6.21
 sphinx-paramlinks==0.5.4
