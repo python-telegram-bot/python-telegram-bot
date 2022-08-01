@@ -27,7 +27,7 @@ repos:
           - --rcfile=setup.cfg
         additional_dependencies:
           - certifi
-          - tornado>=6.1
+          - tornado==6.1
           - APScheduler==3.6.3
           - cachetools==4.2.2
           - . # this basically does `pip install -e .`
@@ -39,7 +39,7 @@ repos:
         files: ^telegram/.*\.py$
         additional_dependencies:
           - certifi
-          - tornado>=6.1
+          - tornado==6.1
           - APScheduler==3.6.3
           - cachetools==4.2.2
           - . # this basically does `pip install -e .`
@@ -51,7 +51,7 @@ repos:
           - --follow-imports=silent
         additional_dependencies:
           - certifi
-          - tornado>=6.1
+          - tornado==6.1
           - APScheduler==3.6.3
           - cachetools==4.2.2
           - . # this basically does `pip install -e .`
