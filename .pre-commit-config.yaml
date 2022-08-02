@@ -15,8 +15,8 @@ repos:
         args:
         - --diff
         - --check
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 4.0.1
+-   repo: https://github.com/PyCQA/flake8
+    rev: 5.0.2
     hooks:
     -   id: flake8
 -   repo: https://github.com/PyCQA/pylint
@@ -37,7 +37,7 @@ repos:
           - cachetools~=5.2.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.961
+    rev: v0.971
     hooks:
     -   id: mypy
         name: mypy-ptb
@@ -64,7 +64,7 @@ repos:
         - cachetools~=5.2.0
         - . # this basically does `pip install -e .`
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.34.0
+    rev: v2.37.3
     hooks:
     -   id: pyupgrade
         files: ^(telegram|examples|tests)/.*\.py$
