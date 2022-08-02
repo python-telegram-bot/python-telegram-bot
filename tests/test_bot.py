@@ -296,7 +296,7 @@ class TestBot:
             Bot("")
 
     async def test_invalid_token_server_response(self):
-        with pytest.raises(InvalidToken, match="The token 12 was rejected by the server."):
+        with pytest.raises(InvalidToken, match="The token `12` was rejected by the server."):
             async with make_bot(token="12"):
                 pass
 
