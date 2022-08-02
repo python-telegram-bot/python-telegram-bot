@@ -2852,7 +2852,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> Optional[UserProfilePhotos]:
+    ) -> UserProfilePhotos:
         """Use this method to get a list of profile pictures for a user.
 
         Args:
@@ -2902,7 +2902,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs=api_kwargs,
         )
 
-        return UserProfilePhotos.de_json(result, self)  # type: ignore[arg-type]
+        return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @_log
     async def get_file(
