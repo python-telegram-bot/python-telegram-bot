@@ -36,6 +36,9 @@ from telegram._utils.types import JSONDict
 from telegram.error import RetryAfter
 from telegram.ext._baseratelimiter import BaseRateLimiter
 
+# Useful for something like:
+#    async with group_limiter if group else null_context():
+# so we don't have to differentiate between "I'm using a context manager" and "I'm not"
 if sys.version_info >= (3, 10):
     null_context = contextlib.nullcontext  # pylint: disable=invalid-name
 else:
@@ -58,8 +61,8 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
            pip install python-telegram-bot[rate-limiter]
 
-    The rate limiting is applied by combining to throttles and :meth:`process_request` roughly
-    boils down to::
+    The rate limiting is applied by combining two levels of throttling and :meth:`process_request`
+    roughly boils down to::
 
         async with group_limiter(group_id):
             async with overall_limiter:
@@ -154,12 +157,13 @@ class AIORateLimiter(BaseRateLimiter[int]):
         """Does nothing."""
 
     def _get_group_limiter(self, group_id: Union[str, int, bool]) -> "AsyncLimiter":
-        # Remove limiters that haven't been used for so long that they are at max capacity
+        # Remove limiters that haven't been used for so long that all their capacity is unused
         # We only do that if we have a lot of limiters lying around to avoid looping on every call
         # This is a minimal effort approach - a full-fledged cache could use a TTL approach
         # or at least adapt the threshold dynamically depending on the number of active limiters
         if len(self._group_limiters) > 512:
-            for key, limiter in list(self._group_limiters.items()):
+            # We copy to avoid modifying the dict while we iterate over it
+            for key, limiter in self._group_limiters.copy().items():
                 if key == group_id:
                     continue
                 if limiter.has_capacity(limiter.max_rate):
@@ -211,11 +215,12 @@ class AIORateLimiter(BaseRateLimiter[int]):
         Args:
             rate_limit_args (:obj:`None` | :obj:`int`): If set, specifies the maximum number of
                 retries to be made in case of a :exc:`~telegram.error.RetryAfter` exception.
+                Defaults to :paramref:`AIORateLimiter.max_retries`.
         """
         max_retries = rate_limit_args or self._max_retries
 
         group: Union[int, str, bool] = False
-        chat = False
+        chat: bool = False
         chat_id = data.get("chat_id")
         if chat_id is not None:
             chat = True

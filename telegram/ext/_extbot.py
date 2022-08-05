@@ -213,12 +213,19 @@ class ExtBot(Bot, Generic[RLARGS]):
         self.callback_data_cache: CallbackDataCache = CallbackDataCache(bot=self, maxsize=maxsize)
 
     async def initialize(self) -> None:
+        """See :meth:`telegram.Bot.initialize`. Also initializes the
+        :paramref:`ExtBot.rate_limiter` (if set)
+        by calling :meth:`telegram.ext.BaseRateLimiter.initialize`.
+        """
         # Initialize before calling super, because super calls get_me
         if self.rate_limiter:
             await self.rate_limiter.initialize()
         await super().initialize()
 
     async def shutdown(self) -> None:
+        """See :meth:`telegram.Bot.shutdown`. Also shuts down the
+        :paramref:`ExtBot.rate_limiter` (if set) by
+        calling :meth:`telegram.ext.BaseRateLimiter.shutdown`."""
         # Shut down the rate limiter before shutting down the request objects!
         if self.rate_limiter:
             await self.rate_limiter.shutdown()
@@ -255,6 +262,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> Union[bool, JSONDict, None]:
+        """Order of method calls is: Bot.some_method -> Bot._post -> Bot._do_post.
+        So we can override Bot._do_post to add rate limiting.
+        """
         rate_limit_args = self._extract_rl_kwargs(data)
         if not self.rate_limiter and rate_limit_args is not None:
             raise ValueError(

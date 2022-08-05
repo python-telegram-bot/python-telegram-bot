@@ -128,7 +128,7 @@ class BaseRateLimiter(ABC, Generic[RLARGS]):
 
                         {"chat_id": 1, "text": "Hello world!", "custom": "arg"}
 
-            rate_limit_args (:obj:`None` | :class:`object`): Custom arguments passed to the method
+            rate_limit_args (:obj:`None` | :class:`object`): Custom arguments passed to the methods
                 of :class:`~telegram.ext.ExtBot`. Can e.g. be used to specify the priority of
                 the request.
 
