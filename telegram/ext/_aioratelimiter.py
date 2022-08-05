@@ -52,7 +52,11 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
     Important:
         If you want to use this class, you must install PTB with the optional requirement
-        ``rate-limiter``, i.e. ``pip install python-telegram-bot[rate-limiter]``.
+        ``rate-limiter``, i.e. 
+        
+        .. code-block:: bash
+
+           pip install python-telegram-bot[rate-limiter]
 
     The rate limiting is applied by combining to throttles and :meth:`process_request` roughly
     boils down to::
@@ -77,14 +81,14 @@ class AIORateLimiter(BaseRateLimiter[int]):
         This class is to be understood as minimal effort reference implementation.
         If you would like to handle rate limiting in a more sophisticated, fine-tuned way, we
         welcome you to implement your own subclass of :class:`~telegram.ext.BaseRateLimiter`.
-        Feel tree to check out the source code of this class for inspiration.
+        Feel free to check out the source code of this class for inspiration.
 
     .. versionadded:: 20.0
 
     Args:
         overall_max_rate (:obj:`float`): The maximum number of requests allowed for the entire bot
             per :paramref:`overall_time_period`. When set to 0, no rate limiting will be applied.
-            Defaults to 30.
+            Defaults to ``30``.
         overall_time_period (:obj:`float`): The time period (in seconds) during which the
             :paramref:`overall_max_rate` is enforced.  When set to 0, no rate limiting will be
             applied. Defaults to 1.
@@ -96,7 +100,7 @@ class AIORateLimiter(BaseRateLimiter[int]):
             applied. Defaults to 60.
         max_retries (:obj:`int`): The maximum number of retries to be made in case of a
             :exc:`~telegram.error.RetryAfter` exception.
-            If set to 0, no retries will be made.
+            If set to 0, no retries will be made. Defaults to ``0``.
 
     """
 

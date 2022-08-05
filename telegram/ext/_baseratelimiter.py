@@ -69,7 +69,7 @@ class BaseRateLimiter(ABC, Generic[RLARGS]):
         Important:
             This method must only return once the result of :paramref:`callback` is known!
 
-        If a :exc:`~telegram.error.RetryAfter` error is raised, this method way try to make
+        If a :exc:`~telegram.error.RetryAfter` error is raised, this method may try to make
         a new request by calling the callback again.
 
         Warning:
@@ -94,13 +94,13 @@ class BaseRateLimiter(ABC, Generic[RLARGS]):
             * It is usually desirable to call :meth:`telegram.Bot.answer_inline_query`
               as quickly as possible, while delaying :meth:`telegram.Bot.send_message`
               is acceptable.
-            * There are different rate limits for group chats and private chats.
-            * when sending broadcast messages to a large number of users, these requests can
+            * There are `different <https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this>`_ rate limits for group chats and private chats.
+            * When sending broadcast messages to a large number of users, these requests can
               typically be delayed for a longer time than messages that are direct replies to a
               user input.
 
         Args:
-            callback (Callable[..., :term:`coroutine`]): The callback function that must be called
+            callback (Callable[..., :term:`coroutine`]): The coroutine function that must be called
                 to make the request.
             args (Tuple[:obj:`object`]): The positional arguments for the :paramref:`callback`
                 function.
@@ -132,5 +132,5 @@ class BaseRateLimiter(ABC, Generic[RLARGS]):
 
         Returns:
             :obj:`bool` | Dict[:obj:`str`, :obj:`object`] | :obj:`None`: The result of the
-            callback  function.
+            callback function.
         """
