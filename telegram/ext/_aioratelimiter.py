@@ -52,8 +52,8 @@ class AIORateLimiter(BaseRateLimiter[int]):
 
     Important:
         If you want to use this class, you must install PTB with the optional requirement
-        ``rate-limiter``, i.e. 
-        
+        ``rate-limiter``, i.e.
+
         .. code-block:: bash
 
            pip install python-telegram-bot[rate-limiter]
