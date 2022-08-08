@@ -25,7 +25,9 @@ enums. If they are related to a specific class, then they are also available as 
 those classes.
 
 .. versionchanged:: 20.0
-    Since v20.0, most of the constants in this module are grouped into enums.
+
+    * Most of the constants in this module are grouped into enums.
+    * ``str(<Enum>)`` now returns the value of the enum instead of the name of the enum.
 """
 
 __all__ = [
