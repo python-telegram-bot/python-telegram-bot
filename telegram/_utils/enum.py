@@ -24,7 +24,7 @@ Warning:
     the changelog.
 """
 import sys
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Type, TypeVar, Union
 
 if sys.version_info >= (3, 11):
@@ -47,7 +47,7 @@ def get_member(enum: Type[_Enum], value: _A, default: _B) -> Union[_Enum, _A, _B
 
 # Python 3.11 and above has a different output for mixin classes for IntEnum, StrEnum and IntFlag
 # see https://docs.python.org/3.11/library/enum.html#notes. We want e.g. str(StrEnumTest.FOO) to
-# return "StrEnumTest.FOO" instead of "foo".
+# return "foo" instead of "StrEnumTest.FOO", which is not the case < py3.11
 if sys.version_info < (3, 11):
 
     class StringEnum(str, Enum):
@@ -59,6 +59,9 @@ if sys.version_info < (3, 11):
 
         def __repr__(self) -> str:
             return f"<{self.__class__.__name__}.{self.name}>"
+
+        def __str__(self) -> str:
+            return str.__str__(self)
 
 else:
 
@@ -72,8 +75,19 @@ else:
         def __repr__(self) -> str:
             return f"<{self.__class__.__name__}.{self.name}>"
 
-        def __str__(self) -> str:
-            return f"{self.__class__.__name__}.{self.name}"
 
-        def __format__(self, format_spec: str) -> str:
-            return str.__format__(self.value, format_spec)
+# Apply the __repr__ modification and __str__ fix to IntEnum
+class IntEnum(IntEnum):  # type: ignore[no-redef]  # pylint: disable=function-redefined
+    """Helper class for int enums where the value is not important to be displayed on
+    stringification.
+    """
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}.{self.name}>"
+
+    if sys.version_info < (3, 11):
+
+        def __str__(self) -> str:
+            return str(self.value)

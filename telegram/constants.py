@@ -61,10 +61,9 @@ __all__ = [
     "UpdateType",
 ]
 
-from enum import IntEnum
 from typing import List, NamedTuple
 
-from telegram._utils.enum import StringEnum
+from telegram._utils.enum import IntEnum, StringEnum
 
 
 class _BotAPIVersion(NamedTuple):
