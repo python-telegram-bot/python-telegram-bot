@@ -23,21 +23,21 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-import enum
+import enum as _enum
 import sys
 from typing import Type, TypeVar, Union
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
-_Enum = TypeVar("_Enum", bound=enum.Enum)
+_Enum = TypeVar("_Enum", bound=_enum.Enum)
 
 
-def get_member(_enum: Type[_Enum], value: _A, default: _B) -> Union[_Enum, _A, _B]:
-    """Tries to call ``enum(value)`` to convert the value into an enumeration member.
+def get_member(enum_cls: Type[_Enum], value: _A, default: _B) -> Union[_Enum, _A, _B]:
+    """Tries to call ``enum_cls(value)`` to convert the value into an enumeration member.
     If that fails, the ``default`` is returned.
     """
     try:
-        return _enum(value)
+        return enum_cls(value)
     except ValueError:
         return default
 
@@ -45,7 +45,7 @@ def get_member(_enum: Type[_Enum], value: _A, default: _B) -> Union[_Enum, _A, _
 # Python 3.11 and above has a different output for mixin classes for IntEnum, StrEnum and IntFlag
 # see https://docs.python.org/3.11/library/enum.html#notes. We want e.g. str(StrEnumTest.FOO) to
 # return "foo" instead of "StrEnumTest.FOO", which is not the case < py3.11
-class StringEnum(str, enum.Enum):
+class StringEnum(str, _enum.Enum):
     """Helper class for string enums where ``str(member)`` prints the value, but ``repr(member)``
     gives ``EnumName.MEMBER_NAME``.
     """
@@ -60,7 +60,7 @@ class StringEnum(str, enum.Enum):
 
 
 # Apply the __repr__ modification and __str__ fix to IntEnum
-class IntEnum(enum.IntEnum):
+class IntEnum(_enum.IntEnum):
     """Helper class for int enums where ``str(member)`` prints the value, but ``repr(member)``
     gives ``EnumName.MEMBER_NAME``.
     """
