@@ -93,7 +93,7 @@ Installing both ``python-telegram-bot`` and ``python-telegram-bot-raw`` in conju
 Telegram API support
 ====================
 
-All types and methods of the Telegram Bot API **6.1** are supported.
+All types and methods of the Telegram Bot API **6.2** are supported.
 
 Installing
 ==========

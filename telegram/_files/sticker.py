@@ -54,6 +54,15 @@ class Sticker(_BaseThumbedMedium):
         is_video (:obj:`bool`): :obj:`True`, if the sticker is a video sticker.
 
             .. versionadded:: 13.11
+        type (:obj:`str`): Type of the sticker. Currently one of :attr:`REGULAR`,
+            :attr:`MASK`, :attr:`CUSTOM_EMOJI`. The type of the sticker is independent from its
+             format, which is determined by the fields :attr:`is_animated and :attr:`is_video`.
+
+             .. versionadded:: 12.0
+        is_premium (:obj:`bool`): :obj:`True`, if the sticker can be used only by
+            Telegram Premium users.
+
+            .. versionadded:: 12.0
         thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
@@ -63,8 +72,12 @@ class Sticker(_BaseThumbedMedium):
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size in bytes.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        premium_animation (:class:`telegram.File`, optional): Premium animation for the sticker,
-            if the sticker is premium.
+        premium_animation (:class:`telegram.File`, optional): For premium regular stickers,
+            premium animation for the sticker.
+
+            .. versionadded:: 20.0
+        custom_emoji (:obj:`str`, optional): For custom emoji stickers, unique identifier of the
+            custom emoji.
 
             .. versionadded:: 20.0
         _kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -104,6 +117,9 @@ class Sticker(_BaseThumbedMedium):
         "set_name",
         "width",
         "premium_animation",
+        "type",
+        "is_premium",
+        "custom_emoji_id",
     )
 
     def __init__(
@@ -114,6 +130,8 @@ class Sticker(_BaseThumbedMedium):
         height: int,
         is_animated: bool,
         is_video: bool,
+        type: str,  # pylint: disable=redefined-builtin
+        is_premium: bool,
         thumb: PhotoSize = None,
         emoji: str = None,
         file_size: int = None,
@@ -121,6 +139,7 @@ class Sticker(_BaseThumbedMedium):
         mask_position: "MaskPosition" = None,
         bot: "Bot" = None,
         premium_animation: "File" = None,
+        custom_emoji_id: str = None,
         **_kwargs: Any,
     ):
         super().__init__(
@@ -135,11 +154,21 @@ class Sticker(_BaseThumbedMedium):
         self.height = height
         self.is_animated = is_animated
         self.is_video = is_video
+        self.type = type
+        self.is_premium = is_premium
         # Optional
         self.emoji = emoji
         self.set_name = set_name
         self.mask_position = mask_position
         self.premium_animation = premium_animation
+        self.custom_emoji_id = custom_emoji_id
+
+    REGULAR: ClassVar[str] = constants.StickerType.REGULAR
+    """:const:`telegram.constants.StickerType.REGULAR`"""
+    MASK: ClassVar[str] = constants.StickerType.MASK
+    """:const:`telegram.constants.StickerType.MASK`"""
+    CUSTOM_EMOJI: ClassVar[str] = constants.StickerType.CUSTOM_EMOJI
+    """:const:`telegram.constants.StickerType.CUSTOM_EMOJI`"""
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Sticker"]:
@@ -167,6 +196,9 @@ class StickerSet(TelegramObject):
         arguments had to be changed. Use keyword arguments to make sure that the arguments are
         passed correctly.
 
+    Note:
+        As of v20.0 `contains_masks` has been removed. Use :paramref:`sticker_type` instead.
+
     Args:
         name (:obj:`str`): Sticker set name.
         title (:obj:`str`): Sticker set title.
@@ -174,8 +206,12 @@ class StickerSet(TelegramObject):
         is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
 
             .. versionadded:: 13.11
-        contains_masks (:obj:`bool`): :obj:`True`, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+        sticker_type (:obj:`str`): Type of stickers in the set, currently one of
+            :attr:`telegram.Sticker.REGULAR`, :attr:`telegram.Sticker.MASK`,
+            :attr:`telegram.Sticker.CUSTOM_EMOJI`.
+
+            .. versionadded:: 20.0
         thumb (:class:`telegram.PhotoSize`, optional): Sticker set thumbnail in the ``.WEBP``,
             ``.TGS``, or ``.WEBM`` format.
 
@@ -186,21 +222,21 @@ class StickerSet(TelegramObject):
         is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
 
             .. versionadded:: 13.11
-        contains_masks (:obj:`bool`): :obj:`True`, if the sticker set contains masks.
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+        sticker_type (:obj:`str`): Type of stickers in the set.
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
             ``.TGS`` or ``.WEBM`` format.
 
     """
 
     __slots__ = (
-        "contains_masks",
         "is_animated",
         "is_video",
         "name",
         "stickers",
         "thumb",
         "title",
+        "sticker_type",
     )
 
     def __init__(
@@ -208,9 +244,9 @@ class StickerSet(TelegramObject):
         name: str,
         title: str,
         is_animated: bool,
-        contains_masks: bool,
         stickers: List[Sticker],
         is_video: bool,
+        sticker_type: str,
         thumb: PhotoSize = None,
         **_kwargs: Any,
     ):
@@ -218,8 +254,8 @@ class StickerSet(TelegramObject):
         self.title = title
         self.is_animated = is_animated
         self.is_video = is_video
-        self.contains_masks = contains_masks
         self.stickers = stickers
+        self.sticker_type = sticker_type
         # Optional
         self.thumb = thumb
 
