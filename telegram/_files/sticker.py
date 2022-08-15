@@ -56,9 +56,9 @@ class Sticker(_BaseThumbedMedium):
             .. versionadded:: 13.11
         type (:obj:`str`): Type of the sticker. Currently one of :attr:`REGULAR`,
             :attr:`MASK`, :attr:`CUSTOM_EMOJI`. The type of the sticker is independent from its
-             format, which is determined by the fields :attr:`is_animated and :attr:`is_video`.
+            format, which is determined by the fields :attr:`is_animated and :attr:`is_video`.
 
-             .. versionadded:: 12.0
+            .. versionadded:: 12.0
         is_premium (:obj:`bool`): :obj:`True`, if the sticker can be used only by
             Telegram Premium users.
 

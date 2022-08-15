@@ -6237,7 +6237,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             custom_emoji_ids (:obj:List[`str`]): List of custom emoji identifiers.
-                At most 200 custom emoji identifiers can be specified.
+                At most :tg-const:`telegram.constants.CustomEmojiIdentifiersLimit.\
+CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
