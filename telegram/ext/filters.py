@@ -111,6 +111,7 @@ from telegram import Message, MessageEntity, Update
 from telegram import User as TGUser
 from telegram._utils.types import SCT
 from telegram.constants import DiceEmoji as DiceEmojiEnum
+from telegram.constants import StickerType as StickerTypeEnum
 
 DataDict = Dict[str, list]
 
@@ -1917,7 +1918,7 @@ class Sticker:
 
     ANIMATED = _Animated(name="filters.Sticker.ANIMATED")
     """Messages that contain :attr:`telegram.Message.sticker` and
-    :attr:`is animated <telegram.Sticker.is_animated>`.
+    :attr:`are animated <telegram.Sticker.is_animated>`.
 
     .. versionadded:: 20.0
     """
@@ -1932,7 +1933,7 @@ class Sticker:
             )
 
     STATIC = _Static(name="filters.Sticker.STATIC")
-    """Messages that contain :attr:`telegram.Message.sticker` and is a static sticker, i.e. does
+    """Messages that contain :attr:`telegram.Message.sticker` and are a static sticker, i.e. does
     not contain :attr:`telegram.Sticker.is_animated` or :attr:`telegram.Sticker.is_video`.
 
     .. versionadded:: 20.0
@@ -1945,7 +1946,7 @@ class Sticker:
             return bool(message.sticker) and bool(message.sticker.is_video)  # type: ignore
 
     VIDEO = _Video(name="filters.Sticker.VIDEO")
-    """Messages that contain :attr:`telegram.Message.sticker` and is a
+    """Messages that contain :attr:`telegram.Message.sticker` and are a
     :attr:`video sticker <telegram.Sticker.is_video>`.
 
     .. versionadded:: 20.0
@@ -1962,6 +1963,37 @@ class Sticker:
     PREMIUM = _Premium(name="filters.Sticker.PREMIUM")
     """Messages that contain :attr:`telegram.Message.sticker` and have a
     :attr:`premium animation <telegram.Sticker.premium_animation>`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _CustomEmoji(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+
+            return bool(message.sticker) and (
+                message.sticker.type == StickerTypeEnum.CUSTOM_EMOJI  # type: ignore
+            )
+
+    CUSTOM_EMOJI = _CustomEmoji(name="filters.Sticker.CUSTOM_EMOJI")
+    """Messages that contain :attr:`telegram.Message.sticker` and are a custom emoji, so the
+    :paramref:`type <telegram.Sticker.type>` equals :tg-const:`telegram.Sticker.CUSTOM_EMOJI`.
+
+    .. versionadded:: 20.0
+    """
+
+    class _Mask(MessageFilter):
+        __slots__ = ()
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.sticker) and (
+                message.sticker.type == StickerTypeEnum.MASK  # type: ignore
+            )
+
+    MASK = _Mask(name="filters.Sticker.MASK")
+    """Messages that contain :attr:`telegram.Message.sticker` and are a mask, so the
+    :paramref:`type <telegram.Sticker.type>` equals :tg-const:`telegram.Sticker.MASK`.
 
     .. versionadded:: 20.0
     """
