@@ -357,11 +357,11 @@ class TestSticker:
     async def test_custom_emoji(self, bot):
         # testing custom emoji stickers is as much of an annoyance as the premium animation, see
         # in test_premium_animation
-        custom_emoji_set = await bot.get_sticker_set("allhailtheblobs")
+        custom_emoji_set = await bot.get_sticker_set("PTBStaticEmojiTestPack")
         # the first one to appear here is a sticker with unique file id of AQADjBsAAkKD0Uty
         # this could change in the future ofc.
         custom_emoji_sticker = custom_emoji_set.stickers[0]
-        assert custom_emoji_sticker.custom_emoji_id == "5463292142468209548"
+        assert custom_emoji_sticker.custom_emoji_id == "6046140249875156202"
 
     def test_equality(self, sticker):
         a = Sticker(
@@ -383,7 +383,13 @@ class TestSticker:
             self.type,
         )
         c = Sticker(
-            sticker.file_id, sticker.file_unique_id, 0, 0, False, True, self.type,
+            sticker.file_id,
+            sticker.file_unique_id,
+            0,
+            0,
+            False,
+            True,
+            self.type,
         )
         d = Sticker(
             "",
@@ -468,7 +474,7 @@ class TestStickerSet:
     title = "Test stickers"
     is_animated = True
     is_video = True
-    stickers = [Sticker("file_id", "file_un_id", 512, 512, True, True, Sticker.REGULAR, False)]
+    stickers = [Sticker("file_id", "file_un_id", 512, 512, True, True, Sticker.REGULAR)]
     name = "NOTAREALNAME"
     sticker_type = Sticker.REGULAR
 

@@ -117,7 +117,6 @@ class Sticker(_BaseThumbedMedium):
         "width",
         "premium_animation",
         "type",
-        "is_premium",
         "custom_emoji_id",
     )
 
