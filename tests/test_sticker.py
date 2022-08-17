@@ -859,18 +859,18 @@ class TestMaskPosition:
 class TestGetCustomEmojiSticker:
     async def test_custom_emoji_sticker(self, bot):
         # we use the same ID as in test_custom_emoji
-        emoji_sticker_list = await bot.get_custom_emoji_stickers(["5463292142468209548"])
+        emoji_sticker_list = await bot.get_custom_emoji_stickers(["6046140249875156202"])
         assert emoji_sticker_list[0].emoji == "😎"
         assert emoji_sticker_list[0].height == 100
         assert emoji_sticker_list[0].width == 100
         assert not emoji_sticker_list[0].is_animated
         assert not emoji_sticker_list[0].is_video
-        assert emoji_sticker_list[0].set_name == "AllHailTheBlobs"
+        assert emoji_sticker_list[0].set_name == "PTBStaticEmojiTestPack"
         assert emoji_sticker_list[0].type == Sticker.CUSTOM_EMOJI
-        assert emoji_sticker_list[0].custom_emoji_id == "5463292142468209548"
+        assert emoji_sticker_list[0].custom_emoji_id == "6046140249875156202"
         assert emoji_sticker_list[0].thumb.width == 100
         assert emoji_sticker_list[0].thumb.height == 100
         assert emoji_sticker_list[0].thumb.file_size == 3614
-        assert emoji_sticker_list[0].thumb.file_unique_id == "AQADjBsAAkKD0Uty"
+        assert emoji_sticker_list[0].thumb.file_unique_id == "AQAD6gwAAoY06FNy"
         assert emoji_sticker_list[0].file_size == 3678
-        assert emoji_sticker_list[0].file_unique_id == "AgADjBsAAkKD0Us"
+        assert emoji_sticker_list[0].file_unique_id == "AgAD6gwAAoY06FM"
