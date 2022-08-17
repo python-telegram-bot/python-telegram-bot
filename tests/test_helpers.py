@@ -76,14 +76,6 @@ class TestHelpers:
             test_str, version=2, entity_type=MessageEntity.TEXT_LINK
         )
 
-    def test_escape_markdown_v2_custom_emoji(self):
-        test_str = "tg://emoji?id=536832))\\4170671202286"
-        expected_str = "tg://emoji?id=536832\\)\\)\\\\4170671202286"
-
-        assert expected_str == helpers.escape_markdown(
-            test_str, version=2, entity_type=MessageEntity.TEXT_LINK
-        )
-
     def test_markdown_invalid_version(self):
         with pytest.raises(ValueError, match="Markdown version must be either"):
             helpers.escape_markdown("abc", version=-1)

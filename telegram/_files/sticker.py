@@ -101,7 +101,14 @@ class Sticker(_BaseThumbedMedium):
             sticker, if the sticker is premium.
 
             .. versionadded:: 20.0
+        premium_animation (:class:`telegram.File`): Optional. For premium regular stickers,
+            premium animation for the sticker.
 
+            .. versionadded:: 20.0
+        custom_emoji (:obj:`str`): Optional. For custom emoji stickers, unique identifier of the
+            custom emoji.
+
+            .. versionadded:: 20.0
     """
 
     __slots__ = (
