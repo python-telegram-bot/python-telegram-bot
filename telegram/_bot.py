@@ -6233,7 +6233,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> List[Sticker]:
-        """Use this method to get information about emoji stickers by their identifiers.
+        """
+        Use this method to get information about emoji stickers by their identifiers.
 
         Args:
             custom_emoji_ids (List[:obj:`str`]): List of custom emoji identifiers.
