@@ -6236,7 +6236,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """Use this method to get information about emoji stickers by their identifiers.
 
         Args:
-            custom_emoji_ids (:obj:List[`str`]): List of custom emoji identifiers.
+            custom_emoji_ids (List[:obj:`str`]): List of custom emoji identifiers.
                 At most :tg-const:`telegram.constants.CustomEmojiIdentifiersLimit.\
 CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
