@@ -25,7 +25,8 @@ enums. If they are related to a specific class, then they are also available as 
 those classes.
 
 .. versionchanged:: 20.0
-    Since v20.0, most of the constants in this module are grouped into enums.
+
+    * Most of the constants in this module are grouped into enums.
 """
 
 __all__ = [
@@ -61,10 +62,9 @@ __all__ = [
     "UpdateType",
 ]
 
-from enum import IntEnum
 from typing import List, NamedTuple
 
-from telegram._utils.enum import StringEnum
+from telegram._utils.enum import IntEnum, StringEnum
 
 
 class _BotAPIVersion(NamedTuple):
