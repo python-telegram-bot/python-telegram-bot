@@ -6375,8 +6375,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             The :paramref:`png_sticker` and :paramref:`tgs_sticker` argument can be either a
             file_id, an URL or a file from disk ``open(filename, 'rb')``
 
-        Note:
-            As of V12, `contains_masks` has been removed. Use :paramref:`sticker_type` instead.
+        .. versionchanged:: 20.0
+            The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
