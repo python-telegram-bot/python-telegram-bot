@@ -6313,7 +6313,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :paramref:`telegram.request.BaseRdoc buildequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
@@ -6362,8 +6362,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to create new sticker set owned by a user.
         The bot will be able to edit the created sticker set.
-        You must use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`, or
-        :paramref:`webm_sticker`.
+        You must use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`,
+        or :paramref:`webm_sticker`.
 
         Warning:
             As of API 4.7 :paramref:`png_sticker` is an optional argument and therefore the order

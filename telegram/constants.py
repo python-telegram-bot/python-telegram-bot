@@ -290,7 +290,7 @@ class CustomEmojiIdentifiersLimit(IntEnum):
 
     CUSTOM_EMOJI_IDENTIFIER_LIMIT = 200
     """:obj:`int`: Maximum amount of custom emoji identifiers which can be specified for the
-    :paramref:`~telegram.Bot.get_custom_emoji_stickers.custom_emoji_ids` parameter of 
+    :paramref:`~telegram.Bot.get_custom_emoji_stickers.custom_emoji_ids` parameter of
     :meth:`telegram.Bot.get_custom_emoji_stickers`.
     """
 
@@ -625,7 +625,7 @@ class MessageEntityType(StringEnum):
     """:obj:`str`: Message entities representing spoiler text."""
     CUSTOM_EMOJI = "custom_emoji"
     """:obj:`str`: Message entities representing inline custom emoji stickers.
-    
+
     .. versionadded:: 20.0
     """
 
