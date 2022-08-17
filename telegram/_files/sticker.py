@@ -56,13 +56,9 @@ class Sticker(_BaseThumbedMedium):
             .. versionadded:: 13.11
         type (:obj:`str`): Type of the sticker. Currently one of :attr:`REGULAR`,
             :attr:`MASK`, :attr:`CUSTOM_EMOJI`. The type of the sticker is independent from its
-            format, which is determined by the fields :attr:`is_animated and :attr:`is_video`.
+            format, which is determined by the fields :attr:`is_animated` and :attr:`is_video`.
 
-            .. versionadded:: 12.0
-        is_premium (:obj:`bool`): :obj:`True`, if the sticker can be used only by
-            Telegram Premium users.
-
-            .. versionadded:: 12.0
+            .. versionadded:: 20.0
         thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
@@ -131,7 +127,6 @@ class Sticker(_BaseThumbedMedium):
         is_animated: bool,
         is_video: bool,
         type: str,  # pylint: disable=redefined-builtin
-        is_premium: bool,
         thumb: PhotoSize = None,
         emoji: str = None,
         file_size: int = None,
@@ -155,7 +150,6 @@ class Sticker(_BaseThumbedMedium):
         self.is_animated = is_animated
         self.is_video = is_video
         self.type = type
-        self.is_premium = is_premium
         # Optional
         self.emoji = emoji
         self.set_name = set_name
@@ -196,8 +190,8 @@ class StickerSet(TelegramObject):
         arguments had to be changed. Use keyword arguments to make sure that the arguments are
         passed correctly.
 
-    Note:
-        As of v20.0 `contains_masks` has been removed. Use :paramref:`sticker_type` instead.
+    .. versionchanged:: 20.0:
+        The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
 
     Args:
         name (:obj:`str`): Sticker set name.

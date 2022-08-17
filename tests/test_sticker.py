@@ -88,7 +88,6 @@ class TestSticker:
     thumb_height = 320
     thumb_file_size = 21472
     type = Sticker.REGULAR
-    is_premium = False
     custom_emoji_id = "ThisIsSuchACustomEmojiID"
 
     sticker_file_id = "5a3128a4d2a04750b5b58397f3b5e812"
@@ -124,7 +123,6 @@ class TestSticker:
         assert sticker.thumb.height == self.thumb_height
         assert sticker.thumb.file_size == self.thumb_file_size
         assert sticker.type == self.type
-        assert sticker.is_premium == self.is_premium
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == self.premium_animation
 
@@ -145,7 +143,6 @@ class TestSticker:
         assert message.sticker.is_video == sticker.is_video
         assert message.sticker.file_size == sticker.file_size
         assert message.sticker.type == sticker.type
-        assert message.sticker.is_premium == sticker.is_premium
         assert message.has_protected_content
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert message.sticker.premium_animation == sticker.premium_animation
@@ -205,7 +202,6 @@ class TestSticker:
         assert message.sticker.is_video == sticker.is_video
         assert message.sticker.file_size == sticker.file_size
         assert message.sticker.type == sticker.type
-        assert message.sticker.is_premium == sticker.is_premium
 
         assert isinstance(message.sticker.thumb, PhotoSize)
         assert isinstance(message.sticker.thumb.file_id, str)
@@ -229,7 +225,6 @@ class TestSticker:
             "file_size": self.file_size,
             "premium_animation": self.premium_animation.to_dict(),
             "type": self.type,
-            "is_premium": self.is_premium,
             "custom_emoji_id": self.custom_emoji_id,
         }
         json_sticker = Sticker.de_json(json_dict, bot)
@@ -245,7 +240,6 @@ class TestSticker:
         assert json_sticker.thumb == sticker.thumb
         assert json_sticker.premium_animation == self.premium_animation
         assert json_sticker.type == self.type
-        assert json_sticker.is_premium == self.is_premium
         assert json_sticker.custom_emoji_id == self.custom_emoji_id
 
     async def test_send_with_sticker(self, monkeypatch, bot, chat_id, sticker):
@@ -326,7 +320,6 @@ class TestSticker:
         assert sticker_dict["file_size"] == sticker.file_size
         assert sticker_dict["thumb"] == sticker.thumb.to_dict()
         assert sticker_dict["type"] == sticker.type
-        assert sticker_dict["is_premium"] == sticker.is_premium
 
     @flaky(3, 1)
     async def test_error_send_empty_file(self, bot, chat_id):
@@ -379,7 +372,6 @@ class TestSticker:
             self.is_animated,
             self.is_video,
             self.type,
-            self.is_premium,
         )
         b = Sticker(
             "",
@@ -389,10 +381,9 @@ class TestSticker:
             self.is_animated,
             self.is_video,
             self.type,
-            self.is_premium,
         )
         c = Sticker(
-            sticker.file_id, sticker.file_unique_id, 0, 0, False, True, self.type, self.is_premium
+            sticker.file_id, sticker.file_unique_id, 0, 0, False, True, self.type,
         )
         d = Sticker(
             "",
@@ -402,7 +393,6 @@ class TestSticker:
             self.is_animated,
             self.is_video,
             self.type,
-            self.is_premium,
         )
         e = PhotoSize(
             sticker.file_id,
@@ -864,13 +854,11 @@ class TestGetCustomEmojiSticker:
     async def test_custom_emoji_sticker(self, bot):
         # we use the same ID as in test_custom_emoji
         emoji_sticker_list = await bot.get_custom_emoji_stickers(["5463292142468209548"])
-        print(emoji_sticker_list[0])
         assert emoji_sticker_list[0].emoji == "😎"
         assert emoji_sticker_list[0].height == 100
         assert emoji_sticker_list[0].width == 100
         assert not emoji_sticker_list[0].is_animated
         assert not emoji_sticker_list[0].is_video
-        assert emoji_sticker_list[0].is_premium
         assert emoji_sticker_list[0].set_name == "AllHailTheBlobs"
         assert emoji_sticker_list[0].type == Sticker.CUSTOM_EMOJI
         assert emoji_sticker_list[0].custom_emoji_id == "5463292142468209548"

@@ -137,6 +137,8 @@ class Chat(TelegramObject):
         has_restricted_voice_and_video_messages (:obj:`bool`, optional): :obj:`True`, if the
             privacy settings of the other party restrict sending voice and video note messages
             in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
+            
+            .. versionadded:: 20.0
 
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
