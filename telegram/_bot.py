@@ -6314,7 +6314,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRdoc buildequest.post.connect_timeout`. Defaults to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
@@ -6376,7 +6376,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             file_id, an URL or a file from disk ``open(filename, 'rb')``
 
         .. versionchanged:: 20.0
-            The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
+            The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type`
+            instead.
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
