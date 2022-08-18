@@ -6263,7 +6263,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
 
-        """
+        """  # skipcq: FLK-D207
         data: JSONDict = {"custom_emoji_ids": custom_emoji_ids}
         result = await self._post(
             "getCustomEmojiStickers",
