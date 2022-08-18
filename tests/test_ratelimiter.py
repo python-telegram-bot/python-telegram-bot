@@ -124,6 +124,9 @@ class TestBaseRateLimiter:
             (43, "test-1"),
         )
         assert len(self.request_received) == 4
+        # self.request_received[i] = i-th received request
+        # self.request_received[i][0] = i-th received request's args
+        # self.request_received[i][1] = i-th received request's kwargs
         assert self.request_received[0][1]["url"].endswith("getMe")
         assert self.request_received[2][1]["url"].endswith("getMe")
         assert self.request_received[1][0] == self.request_received[3][0]
