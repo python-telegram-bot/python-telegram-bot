@@ -48,16 +48,16 @@ Because imports in pytest are intricate, we just run
 
     pytest -k test_helpers.py
 
-with the TEST_NO_PYTZ environment variable set in addition to the regular test suite.
+with the TEST_PYTZ environment variable set to False in addition to the regular test suite.
 Because actually uninstalling pytz would lead to errors in the test suite we just mock the
 import to raise the expected exception.
 
 Note that a fixture that just does this for every test that needs it is a nice idea, but for some
 reason makes test_updater.py hang indefinitely on GitHub Actions (at least when Hinrich tried that)
 """
-TEST_NO_PYTZ = env_var_2_bool(os.getenv("TEST_NO_PYTZ", False))
+TEST_PYTZ = env_var_2_bool(os.getenv("TEST_PYTZ", True))
 
-if TEST_NO_PYTZ:
+if not TEST_PYTZ:
     orig_import = __import__
 
     def import_mock(module_name, *args, **kwargs):
@@ -72,7 +72,7 @@ if TEST_NO_PYTZ:
 class TestDatetime:
     def test_helpers_utc(self):
         # Here we just test, that we got the correct UTC variant
-        if TEST_NO_PYTZ:
+        if not TEST_PYTZ:
             assert tg_dtm.UTC is tg_dtm.DTM_UTC
         else:
             assert tg_dtm.UTC is not tg_dtm.DTM_UTC
