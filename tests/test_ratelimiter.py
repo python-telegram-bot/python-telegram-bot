@@ -235,8 +235,9 @@ class TestAIORateLimiter:
         await asyncio.sleep(1.1)
         assert isinstance(task_2.exception(), RetryAfter)
 
-    @pytest.mark.parametrize("group_id", [-1, "@username"])
-    async def test_basic_rate_limiting(self, bot, group_id):
+    @pytest.mark.parametrize("group_id", [-1, "-1", "@username"])
+    @pytest.mark.parametrize("chat_id", [1, "1"])
+    async def test_basic_rate_limiting(self, bot, group_id, chat_id):
         try:
             rl_bot = ExtBot(
                 token=bot.token,
@@ -258,7 +259,7 @@ class TestAIORateLimiter:
                     )
                 for i in range(8):
                     non_group_tasks[i] = asyncio.create_task(
-                        rl_bot.send_message(chat_id=1, text="test")
+                        rl_bot.send_message(chat_id=chat_id, text="test")
                     )
 
                 await asyncio.sleep(0.85)
