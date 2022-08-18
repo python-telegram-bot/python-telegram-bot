@@ -183,22 +183,6 @@ class TestBot:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    @pytest.mark.parametrize(
-        "token",
-        argvalues=[
-            "123",
-            "12a:abcd1234",
-            "12:abcd1234",
-            "1234:abcd1234\n",
-            " 1234:abcd1234",
-            " 1234:abcd1234\r",
-            "1234:abcd 1234",
-        ],
-    )
-    async def test_invalid_token(self, token):
-        with pytest.raises(InvalidToken, match="Invalid token"):
-            Bot(token)
-
     async def test_initialize_and_shutdown(self, bot, monkeypatch):
         async def initialize(*args, **kwargs):
             self.test_flag = ["initialize"]
@@ -307,12 +291,14 @@ class TestBot:
             assert acd_bot.arbitrary_callback_data == acd
             assert acd_bot.callback_data_cache.maxsize == maxsize
 
-    @flaky(3, 1)
-    async def test_invalid_token_server_response(self, monkeypatch):
-        monkeypatch.setattr("telegram.Bot._validate_token", lambda x, y: "")
-        with pytest.raises(InvalidToken):
-            async with make_bot(token="12") as bot:
-                await bot.get_me()
+    async def test_no_token_passed(self):
+        with pytest.raises(InvalidToken, match="You must pass the token"):
+            Bot("")
+
+    async def test_invalid_token_server_response(self):
+        with pytest.raises(InvalidToken, match="The token `12` was rejected by the server."):
+            async with make_bot(token="12"):
+                pass
 
     async def test_unknown_kwargs(self, bot, monkeypatch):
         async def post(url, request_data: RequestData, *args, **kwargs):

@@ -312,20 +312,20 @@ class BaseRequest(
 
             message += f"\nThe server response contained unknown parameters: {parameters}"
 
-        if code == HTTPStatus.FORBIDDEN:
+        if code == HTTPStatus.FORBIDDEN:  # 403
             raise Forbidden(message)
-        if code in (HTTPStatus.NOT_FOUND, HTTPStatus.UNAUTHORIZED):
+        if code in (HTTPStatus.NOT_FOUND, HTTPStatus.UNAUTHORIZED):  # 404 and 401
             # TG returns 404 Not found for
             #   1) malformed tokens
             #   2) correct tokens but non-existing method, e.g. api.tg.org/botTOKEN/unkonwnMethod
             # We can basically rule out 2) since we don't let users make requests manually
             # TG returns 401 Unauthorized for correctly formatted tokens that are not valid
             raise InvalidToken(message)
-        if code == HTTPStatus.BAD_REQUEST:
+        if code == HTTPStatus.BAD_REQUEST:  # 400
             raise BadRequest(message)
-        if code == HTTPStatus.CONFLICT:
+        if code == HTTPStatus.CONFLICT:  # 409
             raise Conflict(message)
-        if code == HTTPStatus.BAD_GATEWAY:
+        if code == HTTPStatus.BAD_GATEWAY:  # 502
             raise NetworkError(description or "Bad Gateway")
         raise NetworkError(f"{message} ({code})")
 

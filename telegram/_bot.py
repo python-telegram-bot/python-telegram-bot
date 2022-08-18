@@ -197,7 +197,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         private_key: bytes = None,
         private_key_password: bytes = None,
     ):
-        self.token = self._validate_token(token)
+        if not token:
+            raise InvalidToken("You must pass the token you received from https://t.me/Botfather!")
+        self.token = token
 
         self.base_url = base_url + self.token
         self.base_file_url = base_file_url + self.token
@@ -391,7 +393,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             return
 
         await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
-        await self.get_me()
+        # Since the bot is to be initialized only once, we can also use it for
+        # verifying the token passed and raising an exception if it's invalid.
+        try:
+            await self.get_me()
+        except InvalidToken as exc:
+            raise InvalidToken(f"The token `{self.token}` was rejected by the server.") from exc
         self._initialized = True
 
     async def shutdown(self) -> None:
@@ -436,18 +443,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             should *not* be used manually.
         """
         return self._request[1]
-
-    @staticmethod
-    def _validate_token(token: str) -> str:
-        """A very basic validation on token."""
-        if any(x.isspace() for x in token):
-            raise InvalidToken()
-
-        left, sep, _right = token.partition(":")
-        if (not sep) or (not left.isdigit()) or (len(left) < 3):
-            raise InvalidToken()
-
-        return token
 
     @property
     def bot(self) -> User:

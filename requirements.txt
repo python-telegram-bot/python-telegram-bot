@@ -10,7 +10,7 @@ httpx ~= 0.23.0
 # only telegram.ext: # Keep this line here; used in setup(-raw).py
 
 # tornado is rather stable, but let's not allow the next mayor release without prior testing
-tornado~=6.1
+tornado~=6.2
 
 # Cachetools and APS don't have a strict stability policy.
 # Let's be cautious for now.
