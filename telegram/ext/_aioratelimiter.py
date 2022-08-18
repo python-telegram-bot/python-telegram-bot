@@ -79,6 +79,10 @@ class AIORateLimiter(BaseRateLimiter[int]):
           exceeding the rate limit.
         * As channels can't be differentiated from supergroups by the ``@username`` or integer
           ``chat_id``, this also applies the group related rate limits to channels.
+        * A :exec:`~telegram.error.RetryAfter` exception will halt *all* requests for
+          :attr:`~telegram.error.RetryAfter.retry_after` + 0.1 seconds. This may be stricter than
+          necessary in some cases, e.g. the bot may hit a rate limit in one group but might still
+          be allowed to send messages in another group.
 
     Note:
         This class is to be understood as minimal effort reference implementation.
