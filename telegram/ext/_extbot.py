@@ -1599,7 +1599,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> Optional[UserProfilePhotos]:
+    ) -> UserProfilePhotos:
         return await super().get_user_profile_photos(
             user_id=user_id,
             offset=offset,
