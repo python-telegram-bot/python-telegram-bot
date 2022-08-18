@@ -6233,6 +6233,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> List[Sticker]:
+        # skipcq: FLK-D207
         """
         Use this method to get information about emoji stickers by their identifiers.
 
@@ -6263,7 +6264,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
 
-        """  # skipcq: FLK-D207
+        """
         data: JSONDict = {"custom_emoji_ids": custom_emoji_ids}
         result = await self._post(
             "getCustomEmojiStickers",
