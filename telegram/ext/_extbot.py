@@ -223,10 +223,10 @@ class ExtBot(Bot, Generic[RLARGS]):
         await super().initialize()
 
     async def shutdown(self) -> None:
-        """
-        See :meth:`telegram.Bot.shutdown`. Also shuts down the
+        """See :meth:`telegram.Bot.shutdown`. Also shuts down the
         :paramref:`ExtBot.rate_limiter` (if set) by
-        calling :meth:`telegram.ext.BaseRateLimiter.shutdown`."""
+        calling :meth:`telegram.ext.BaseRateLimiter.shutdown`.
+        """
         # Shut down the rate limiter before shutting down the request objects!
         if self.rate_limiter:
             await self.rate_limiter.shutdown()
