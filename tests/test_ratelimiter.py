@@ -107,20 +107,23 @@ class TestBaseRateLimiter:
 
         async with standard_bot:
             await standard_bot.set_my_commands(
-                commands=[BotCommand("test", "test")], language_code="en"
+                commands=[BotCommand("test", "test")],
+                language_code="en",
+                api_kwargs={"api": "kwargs"},
             )
         async with rl_bot:
             await rl_bot.set_my_commands(
                 commands=[BotCommand("test", "test")],
                 language_code="en",
                 rate_limit_args=(43, "test-1"),
+                api_kwargs={"api": "kwargs"},
             )
 
         assert len(self.rl_received) == 2
         assert self.rl_received[0] == ("getMe", {}, None)
         assert self.rl_received[1] == (
             "setMyCommands",
-            dict(commands=[BotCommand("test", "test")], language_code="en"),
+            dict(commands=[BotCommand("test", "test")], language_code="en", api="kwargs"),
             (43, "test-1"),
         )
         assert len(self.request_received) == 4
@@ -134,6 +137,7 @@ class TestBaseRateLimiter:
         for key, value in self.request_received[1][1].items():
             if isinstance(value, RequestData):
                 assert value.parameters == self.request_received[3][1][key].parameters
+                assert value.parameters["api"] == "kwargs"
             else:
                 assert value == self.request_received[3][1][key]
 
