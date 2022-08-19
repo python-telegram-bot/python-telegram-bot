@@ -279,7 +279,7 @@ class ChatType(StringEnum):
     """:obj:`str`: A :class:`telegram.Chat` that is a channel."""
 
 
-class CustomEmojiIdentifiersLimit(IntEnum):
+class CustomEmojiStickerLimit(IntEnum):
     """This enum contains limitations for :meth:`telegram.Bot.get_custom_emoji_stickers`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
