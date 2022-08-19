@@ -370,6 +370,8 @@ class Message(TelegramObject):
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
+    .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
+        by this function. Instead, the supplied replacement for the emoji will be used.
     """
 
     # fmt: on
@@ -3093,6 +3095,8 @@ class Message(TelegramObject):
             :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
             Telegram for backward compatibility. You should use :meth:`text_markdown_v2` instead.
 
+            |custom_emoji_formatting_note|
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
@@ -3171,6 +3175,8 @@ class Message(TelegramObject):
             Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
             instead.
 
+            |custom_emoji_formatting_note|
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
@@ -3188,6 +3194,9 @@ class Message(TelegramObject):
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown in the same way the original message was formatted.
+
+        Note:
+            |custom_emoji_formatting_note|
 
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
@@ -3212,6 +3221,8 @@ class Message(TelegramObject):
             Telegram for backward compatibility. You should use :meth:`caption_markdown_v2_urled`
             instead.
 
+            |custom_emoji_formatting_note|
+
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
 
@@ -3229,6 +3240,9 @@ class Message(TelegramObject):
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Note:
+            |custom_emoji_formatting_note|
 
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
