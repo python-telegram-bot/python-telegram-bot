@@ -38,7 +38,7 @@ __all__ = [
     "ChatInviteLinkLimit",
     "ChatMemberStatus",
     "ChatType",
-    "CustomEmojiIdentifiersLimit",
+    "CustomEmojiStickerLimit",
     "DiceEmoji",
     "FileSizeLimit",
     "FloodLimit",

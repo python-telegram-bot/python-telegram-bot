@@ -6239,7 +6239,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             custom_emoji_ids (List[:obj:`str`]): List of custom emoji identifiers.
-                At most :tg-const:`telegram.constants.CustomEmojiIdentifiersLimit.\
+                At most :tg-const:`telegram.constants.CustomEmojiStickerLimit.\
 CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Keyword Args:
@@ -6419,6 +6419,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`. Custom emoji
                 sticker sets can't be created via the Bot API at the moment. By default, a
                 regular sticker set is created.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to

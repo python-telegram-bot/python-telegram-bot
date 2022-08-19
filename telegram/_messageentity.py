@@ -46,6 +46,9 @@ class MessageEntity(TelegramObject):
             :attr:`CODE` (monowidth string), :attr:`PRE` (monowidth block), :attr:`TEXT_LINK` (for
             clickable text URLs), :attr:`TEXT_MENTION` (for users without usernames),
             :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
+
+            .. versionadded:: 20.0
+                added inline custom emoji
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`, optional): For :attr:`TEXT_LINK` only, url that will be opened after
@@ -58,6 +61,8 @@ class MessageEntity(TelegramObject):
             of the custom emoji. Use :meth:`telegram.Bot.get_custom_emoji_stickers` to get full
             information about the sticker.
 
+            .. versionadded:: 20.0
+
     Attributes:
         type (:obj:`str`): Type of the entity.
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
@@ -66,6 +71,8 @@ class MessageEntity(TelegramObject):
         user (:class:`telegram.User`): Optional. The mentioned user.
         language (:obj:`str`): Optional. Programming language of the entity text.
         custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji.
+
+            .. versionadded:: 20.0
 
     """
 

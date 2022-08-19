@@ -828,7 +828,7 @@ class TestFilters:
 
     def test_filters_sticker(self, update):
         assert not filters.Sticker.ALL.check_update(update)
-        update.message.sticker = Sticker("1", "uniq", 1, 2, False, False)
+        update.message.sticker = Sticker("1", "uniq", 1, 2, False, False, Sticker.REGULAR)
         assert filters.Sticker.ALL.check_update(update)
         assert filters.Sticker.STATIC.check_update(update)
         assert not filters.Sticker.VIDEO.check_update(update)

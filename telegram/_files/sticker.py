@@ -220,6 +220,8 @@ class StickerSet(TelegramObject):
             .. versionadded:: 13.11
         stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
         sticker_type (:obj:`str`): Type of stickers in the set.
+
+            .. versionadded:: 20.0
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker set thumbnail in the ``.WEBP``,
             ``.TGS`` or ``.WEBM`` format.
 
