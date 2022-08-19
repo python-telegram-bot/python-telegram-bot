@@ -542,7 +542,8 @@ class TestMessage:
         )
         assert expected == message.text_markdown
 
-    def test_text_html_custom_emoji(self):
+    @pytest.mark.parametrize("type_", argvalues=["text_html", "text_markdown_v2"])
+    def test_text_custom_emoji(self, type_):
         text = "Look a custom emoji: 😎"
         expected = "Look a custom emoji: 😎"
         emoji_entity = MessageEntity(
@@ -559,26 +560,7 @@ class TestMessage:
             text=text,
             entities=[emoji_entity],
         )
-        assert expected == message.text_html
-
-    def test_text_markdown_custom_emoji(self):
-        text = "Look a custom emoji: 😎"
-        expected = "Look a custom emoji: 😎"
-        emoji_entity = MessageEntity(
-            type=MessageEntity.CUSTOM_EMOJI,
-            offset=21,
-            length=2,
-            custom_emoji_id="5472409228461217725",
-        )
-        message = Message(
-            1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
-            text=text,
-            entities=[emoji_entity],
-        )
-        assert expected == message.text_markdown_v2
+        assert expected == message[type_]
 
     def test_caption_html_simple(self):
         test_html_string = (
@@ -689,7 +671,8 @@ class TestMessage:
         )
         assert expected == message.caption_markdown
 
-    def test_caption_html_custom_emoji(self):
+    @pytest.mark.parametrize("type_", argvalues=["caption_html", "caption_markdown_v2"])
+    def test_caption_html_custom_emoji(self, type_):
         caption = "Look a custom emoji: 😎"
         expected = "Look a custom emoji: 😎"
         emoji_entity = MessageEntity(
@@ -706,26 +689,7 @@ class TestMessage:
             caption=caption,
             caption_entities=[emoji_entity],
         )
-        assert expected == message.caption_html
-
-    def test_caption_markdown_custom_emoji(self):
-        caption = "Look a custom emoji: 😎"
-        expected = "Look a custom emoji: 😎"
-        emoji_entity = MessageEntity(
-            type=MessageEntity.CUSTOM_EMOJI,
-            offset=21,
-            length=2,
-            custom_emoji_id="5472409228461217725",
-        )
-        message = Message(
-            1,
-            from_user=self.from_user,
-            date=self.date,
-            chat=self.chat,
-            caption=caption,
-            caption_entities=[emoji_entity],
-        )
-        assert expected == message.caption_markdown_v2
+        assert expected == message[type_]
 
     async def test_parse_entities_url_emoji(self):
         url = b"http://github.com/?unicode=\\u2713\\U0001f469".decode("unicode-escape")
