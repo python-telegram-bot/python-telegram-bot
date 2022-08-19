@@ -828,14 +828,11 @@ class TestFilters:
 
     def test_filters_sticker(self, update):
         assert not filters.Sticker.ALL.check_update(update)
-        update.message.sticker = Sticker("1", "uniq", 1, 2, False, False, Sticker.REGULAR)
+        update.message.sticker = Sticker("1", "uniq", 1, 2, False, False)
         assert filters.Sticker.ALL.check_update(update)
         assert filters.Sticker.STATIC.check_update(update)
         assert not filters.Sticker.VIDEO.check_update(update)
         assert not filters.Sticker.PREMIUM.check_update(update)
-        # doing this once is enough since the type is not changed
-        assert not filters.Sticker.CUSTOM_EMOJI.check_update(update)
-        assert not filters.Sticker.MASK.check_update(update)
         update.message.sticker.is_animated = True
         assert filters.Sticker.ANIMATED.check_update(update)
         assert not filters.Sticker.VIDEO.check_update(update)
@@ -854,12 +851,6 @@ class TestFilters:
         assert not filters.Sticker.STATIC.check_update(update)
         assert filters.Sticker.VIDEO.check_update(update)
         assert filters.Sticker.PREMIUM.check_update(update)
-        update.message.sticker.type = Sticker.CUSTOM_EMOJI
-        assert filters.Sticker.CUSTOM_EMOJI.check_update(update)
-        assert not filters.Sticker.MASK.check_update(update)
-        update.message.sticker.type = Sticker.MASK
-        assert not filters.Sticker.CUSTOM_EMOJI.check_update(update)
-        assert filters.Sticker.MASK.check_update(update)
 
     def test_filters_video(self, update):
         assert not filters.VIDEO.check_update(update)
