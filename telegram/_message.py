@@ -2866,6 +2866,9 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as HTML in
         the same way the original message was formatted.
 
+        Note:
+            |custom_emoji_formatting_note|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
@@ -2881,6 +2884,9 @@ class Message(TelegramObject):
 
         Use this if you want to retrieve the message text with the entities formatted as HTML.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Note:
+            |custom_emoji_formatting_note|
 
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
@@ -2899,6 +2905,9 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML in the same way the original message was formatted.
 
+        Note:
+            |custom_emoji_formatting_note|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
 
@@ -2914,6 +2923,9 @@ class Message(TelegramObject):
 
         Use this if you want to retrieve the message caption with the caption entities formatted as
         HTML. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Note:
+            |custom_emoji_formatting_note|
 
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as HTML.
@@ -3115,6 +3127,9 @@ class Message(TelegramObject):
         Use this if you want to retrieve the message text with the entities formatted as Markdown
         in the same way the original message was formatted.
 
+        Note:
+            |custom_emoji_formatting_note|
+
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
 
@@ -3136,6 +3151,8 @@ class Message(TelegramObject):
             Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
             instead.
 
+            |custom_emoji_formatting_note|
+
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
 
@@ -3153,6 +3170,9 @@ class Message(TelegramObject):
 
         Use this if you want to retrieve the message text with the entities formatted as Markdown.
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
+
+        Note:
+            |custom_emoji_formatting_note|
 
         .. versionchanged:: 13.10
            Spoiler entities are now formatted as Markdown V2.
