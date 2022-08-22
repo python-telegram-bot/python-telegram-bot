@@ -102,6 +102,8 @@ def check_method(h4):
         ignored |= {'current_offset'}  # Added for ease of use
     elif name == 'promoteChatMember':
         ignored |= {'can_manage_voice_chats'}  # for backwards compatibility
+    elif name == 'createNewStickerSet':
+        ignored |= {'contains_masks'}  # for backwards compatibility
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
