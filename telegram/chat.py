@@ -126,6 +126,10 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.13
+        has_restricted_voice_and_video_messages (:obj:`bool`, optional): :obj:`True`, if the
+            privacy settings of the other party restrict sending voice and video note messages
+            in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
+            .. versionadded:: 13.14
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -180,6 +184,11 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.13
+        has_restricted_voice_and_video_messages (:obj:`bool`): Optional. :obj:`True`, if the
+            privacy settings of the other party restrict sending voice and video note messages
+            in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.14
     """
 
     __slots__ = (
@@ -207,6 +216,7 @@ class Chat(TelegramObject):
         'has_private_forwards',
         'join_to_send_messages',
         'join_by_request',
+        'has_restricted_voice_and_video_messages',
         '_id_attrs',
     )
 
@@ -249,6 +259,7 @@ class Chat(TelegramObject):
         has_protected_content: bool = None,
         join_to_send_messages: bool = None,
         join_by_request: bool = None,
+        has_restricted_voice_and_video_messages: bool = None,
         **_kwargs: Any,
     ):
         # Required
@@ -279,6 +290,7 @@ class Chat(TelegramObject):
         self.location = location
         self.join_to_send_messages = join_to_send_messages
         self.join_by_request = join_by_request
+        self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
 
         self.bot = bot
         self._id_attrs = (self.id,)

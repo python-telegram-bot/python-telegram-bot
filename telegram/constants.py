@@ -21,7 +21,7 @@ The following constants were extracted from the
 `Telegram Bots API <https://core.telegram.org/bots/api>`_.
 
 Attributes:
-    BOT_API_VERSION (:obj:`str`): `6.1`. Telegram Bot API version supported by this
+    BOT_API_VERSION (:obj:`str`): `6.2`. Telegram Bot API version supported by this
         version of `python-telegram-bot`. Also available as ``telegram.bot_api_version``.
 
         .. versionadded:: 13.4
@@ -144,6 +144,9 @@ Attributes:
     MESSAGEENTITY_SPOILER (:obj:`str`): ``'spoiler'``
 
         .. versionadded:: 13.10
+    MESSAGEENTITY_CUSTOM_EMOJI (:obj:`str`): ``'custom_emoji'``
+
+        .. versionadded:: 13.14
     MESSAGEENTITY_ALL_TYPES (List[:obj:`str`]): List of all the types of message entity.
 
 :class:`telegram.ParseMode`:
@@ -160,6 +163,19 @@ Attributes:
     POLL_QUIZ (:obj:`str`): ``'quiz'``
     MAX_POLL_QUESTION_LENGTH (:obj:`int`): 300
     MAX_POLL_OPTION_LENGTH (:obj:`int`): 100
+:class:`telegram.Sticker`:
+
+Attributes:
+
+    STICKER_REGULAR (:obj:`str`)= ``'regular'``
+
+        .. versionadded:: 13.14
+    STICKER_MASK (:obj:`str`) = ``'mask'``
+
+        .. versionadded:: 13.14
+    STICKER_CUSTOM_EMOJI (:obj:`str`) = ``'custom_emoji'``
+
+        .. versionadded:: 13.14
 
 :class:`telegram.MaskPosition`:
 
@@ -247,7 +263,7 @@ Attributes:
 """
 from typing import List
 
-BOT_API_VERSION: str = '6.1'
+BOT_API_VERSION: str = '6.2'
 MAX_MESSAGE_LENGTH: int = 4096
 MAX_CAPTION_LENGTH: int = 1024
 ANONYMOUS_ADMIN_ID: int = 1087968824
@@ -325,6 +341,7 @@ MESSAGEENTITY_TEXT_MENTION: str = 'text_mention'
 MESSAGEENTITY_UNDERLINE: str = 'underline'
 MESSAGEENTITY_STRIKETHROUGH: str = 'strikethrough'
 MESSAGEENTITY_SPOILER: str = 'spoiler'
+MESSAGEENTITY_CUSTOM_EMOJI: str = 'custom_emoji'
 MESSAGEENTITY_ALL_TYPES: List[str] = [
     MESSAGEENTITY_MENTION,
     MESSAGEENTITY_HASHTAG,
@@ -342,6 +359,7 @@ MESSAGEENTITY_ALL_TYPES: List[str] = [
     MESSAGEENTITY_UNDERLINE,
     MESSAGEENTITY_STRIKETHROUGH,
     MESSAGEENTITY_SPOILER,
+    MESSAGEENTITY_CUSTOM_EMOJI,
 ]
 
 PARSEMODE_MARKDOWN: str = 'Markdown'
@@ -352,6 +370,10 @@ POLL_REGULAR: str = 'regular'
 POLL_QUIZ: str = 'quiz'
 MAX_POLL_QUESTION_LENGTH: int = 300
 MAX_POLL_OPTION_LENGTH: int = 100
+
+STICKER_REGULAR: str = "regular"
+STICKER_MASK: str = "mask"
+STICKER_CUSTOM_EMOJI: str = "custom_emoji"
 
 STICKER_FOREHEAD: str = 'forehead'
 STICKER_EYES: str = 'eyes'
