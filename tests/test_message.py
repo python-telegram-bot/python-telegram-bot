@@ -542,7 +542,17 @@ class TestMessage:
         )
         assert expected == message.text_markdown
 
-    @pytest.mark.parametrize("type_", argvalues=["text_html", "text_markdown_v2"])
+    @pytest.mark.parametrize(
+        "type_",
+        argvalues=[
+            "text_html",
+            "text_html_urled",
+            "text_markdown",
+            "text_markdown_urled",
+            "text_markdown_v2",
+            "text_markdown_v2_urled",
+        ],
+    )
     def test_text_custom_emoji(self, type_):
         text = "Look a custom emoji: 😎"
         expected = "Look a custom emoji: 😎"
@@ -671,8 +681,18 @@ class TestMessage:
         )
         assert expected == message.caption_markdown
 
-    @pytest.mark.parametrize("type_", argvalues=["caption_html", "caption_markdown_v2"])
-    def test_caption_html_custom_emoji(self, type_):
+    @pytest.mark.parametrize(
+        "type_",
+        argvalues=[
+            "caption_html",
+            "caption_html_urled",
+            "caption_markdown",
+            "caption_markdown_urled",
+            "caption_markdown_v2",
+            "caption_markdown_v2_urled",
+        ],
+    )
+    def test_caption_custom_emoji(self, type_):
         caption = "Look a custom emoji: 😎"
         expected = "Look a custom emoji: 😎"
         emoji_entity = MessageEntity(

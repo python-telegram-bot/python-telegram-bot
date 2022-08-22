@@ -771,7 +771,7 @@ class TestStickerSet:
             self.is_video,
             self.sticker_type,
         )
-        c = StickerSet(self.name, None, None, None, None, None, Sticker.CUSTOM_EMOJI)
+        c = StickerSet(self.name, None, None, None, None, Sticker.CUSTOM_EMOJI)
         d = StickerSet(
             "blah",
             self.title,
