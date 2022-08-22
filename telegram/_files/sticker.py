@@ -89,6 +89,11 @@ class Sticker(_BaseThumbedMedium):
         is_video (:obj:`bool`): :obj:`True`, if the sticker is a video sticker.
 
             .. versionadded:: 13.11
+        type (:obj:`str`): Type of the sticker. Currently one of :attr:`REGULAR`,
+            :attr:`MASK`, :attr:`CUSTOM_EMOJI`. The type of the sticker is independent from its
+            format, which is determined by the fields :attr:`is_animated` and :attr:`is_video`.
+
+            .. versionadded:: 20.0
         thumb (:class:`telegram.PhotoSize`): Optional. Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
         emoji (:obj:`str`): Optional. Emoji associated with the sticker.
