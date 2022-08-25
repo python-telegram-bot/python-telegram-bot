@@ -967,10 +967,10 @@ class ExtBot(Bot, Generic[RLARGS]):
         title: str,
         emojis: str,
         png_sticker: FileInput = None,
-        contains_masks: bool = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
+        sticker_type: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -985,7 +985,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             title=title,
             emojis=emojis,
             png_sticker=png_sticker,
-            contains_masks=contains_masks,
             mask_position=mask_position,
             tgs_sticker=tgs_sticker,
             webm_sticker=webm_sticker,
@@ -1581,6 +1580,26 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> StickerSet:
         return await super().get_sticker_set(
             name=name,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
+        )
+
+    async def get_custom_emoji_stickers(
+        self,
+        custom_emoji_ids: List[str],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+        rate_limit_args: RLARGS = None,
+    ) -> List[Sticker]:
+        return await super().get_custom_emoji_stickers(
+            custom_emoji_ids=custom_emoji_ids,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3098,6 +3117,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     unpinChatMessage = unpin_chat_message
     unpinAllChatMessages = unpin_all_chat_messages
     getStickerSet = get_sticker_set
+    getCustomEmojiStickers = get_custom_emoji_stickers
     uploadStickerFile = upload_sticker_file
     createNewStickerSet = create_new_sticker_set
     addStickerToSet = add_sticker_to_set
