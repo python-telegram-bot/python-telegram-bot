@@ -988,6 +988,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             mask_position=mask_position,
             tgs_sticker=tgs_sticker,
             webm_sticker=webm_sticker,
+            sticker_type=sticker_type,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
