@@ -2239,8 +2239,8 @@ class TestBot:
         )
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
-    # set_sticker_position_in_set and delete_sticker_from_set are tested in the
-    # test_sticker module.
+    # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers
+    # are tested in the test_sticker module.
 
     async def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
         # Use BaseException that's not a subclass of Exception such that

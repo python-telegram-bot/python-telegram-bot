@@ -105,7 +105,7 @@ def message(bot):
             )
         },
         {"photo": [PhotoSize("photo_id", "unique_id", 50, 50)], "caption": "photo_file"},
-        {"sticker": Sticker("sticker_id", "unique_id", 50, 50, True, False)},
+        {"sticker": Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)},
         {"video": Video("video_id", "unique_id", 12, 12, 12), "caption": "video_file"},
         {"voice": Voice("voice_id", "unique_id", 5)},
         {"video_note": VideoNote("video_note_id", "unique_id", 20, 12)},
@@ -542,6 +542,36 @@ class TestMessage:
         )
         assert expected == message.text_markdown
 
+    @pytest.mark.parametrize(
+        "type_",
+        argvalues=[
+            "text_html",
+            "text_html_urled",
+            "text_markdown",
+            "text_markdown_urled",
+            "text_markdown_v2",
+            "text_markdown_v2_urled",
+        ],
+    )
+    def test_text_custom_emoji(self, type_):
+        text = "Look a custom emoji: 😎"
+        expected = "Look a custom emoji: 😎"
+        emoji_entity = MessageEntity(
+            type=MessageEntity.CUSTOM_EMOJI,
+            offset=21,
+            length=2,
+            custom_emoji_id="5472409228461217725",
+        )
+        message = Message(
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            text=text,
+            entities=[emoji_entity],
+        )
+        assert expected == message[type_]
+
     def test_caption_html_simple(self):
         test_html_string = (
             "<u>Test</u> for &lt;<b>bold</b>, <i>ita_lic</i>, "
@@ -650,6 +680,36 @@ class TestMessage:
             caption_entities=[bold_entity],
         )
         assert expected == message.caption_markdown
+
+    @pytest.mark.parametrize(
+        "type_",
+        argvalues=[
+            "caption_html",
+            "caption_html_urled",
+            "caption_markdown",
+            "caption_markdown_urled",
+            "caption_markdown_v2",
+            "caption_markdown_v2_urled",
+        ],
+    )
+    def test_caption_custom_emoji(self, type_):
+        caption = "Look a custom emoji: 😎"
+        expected = "Look a custom emoji: 😎"
+        emoji_entity = MessageEntity(
+            type=MessageEntity.CUSTOM_EMOJI,
+            offset=21,
+            length=2,
+            custom_emoji_id="5472409228461217725",
+        )
+        message = Message(
+            1,
+            from_user=self.from_user,
+            date=self.date,
+            chat=self.chat,
+            caption=caption,
+            caption_entities=[emoji_entity],
+        )
+        assert expected == message[type_]
 
     async def test_parse_entities_url_emoji(self):
         url = b"http://github.com/?unicode=\\u2713\\U0001f469".decode("unicode-escape")
