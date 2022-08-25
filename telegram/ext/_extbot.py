@@ -1685,7 +1685,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(None, rate_limit_args),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def close(
@@ -1703,7 +1703,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
-            api_kwargs=self._merge_api_rl_kwargs(None, rate_limit_args),
+            api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
         )
 
     async def pin_chat_message(
