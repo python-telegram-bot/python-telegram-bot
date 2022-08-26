@@ -558,6 +558,7 @@ async def check_shortcut_call(
         bot: The bot
         bot_method_name: The bot methods name, e.g. `'send_message'`
         skip_params: Parameters that are allowed to be missing, e.g. `['inline_message_id']`
+            `rate_limit_args` will be skipped by default
         shortcut_kwargs: The kwargs passed by the shortcut directly, e.g. ``chat_id``
 
     Returns:
@@ -565,8 +566,13 @@ async def check_shortcut_call(
     """
     if not skip_params:
         skip_params = set()
+    else:
+        skip_params = set(skip_params)
+    skip_params.add("rate_limit_args")
     if not shortcut_kwargs:
         shortcut_kwargs = set()
+    else:
+        shortcut_kwargs = set(shortcut_kwargs)
 
     orig_bot_method = getattr(bot, bot_method_name)
     bot_signature = inspect.signature(orig_bot_method)

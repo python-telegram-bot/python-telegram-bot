@@ -296,6 +296,25 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         # Drop any None values because Telegram doesn't handle them well
         data = {key: value for key, value in data.items() if value is not None}
 
+        return await self._do_post(
+            endpoint=endpoint,
+            data=data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+        )
+
+    async def _do_post(
+        self,
+        endpoint: str,
+        data: JSONDict,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+    ) -> Union[bool, JSONDict, None]:
         # This also converts datetimes into timestamps.
         # We don't do this earlier so that _insert_defaults (see above) has a chance to convert
         # to the default timezone in case this is called by ExtBot
@@ -2902,7 +2921,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs=api_kwargs,
         )
 
-        return UserProfilePhotos.de_json(result, self)  # type: ignore[return-value, arg-type]
+        return UserProfilePhotos.de_json(result, self)  # type: ignore[arg-type,return-value]
 
     @_log
     async def get_file(
