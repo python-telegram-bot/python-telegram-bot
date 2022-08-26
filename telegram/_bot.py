@@ -676,18 +676,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to delete a message, including service messages, with the following
         limitations:
 
-            - A message can only be deleted if it was sent less than 48 hours ago.
-            - A dice message in a private chat can only be deleted if it was sent more than 24
-              hours ago.
-            - Bots can delete outgoing messages in private chats, groups, and supergroups.
-            - Bots can delete incoming messages in private chats.
-            - Bots granted :attr:`~telegram.ChatMemberAdministrator.can_post_messages` permissions
-              can delete outgoing messages in channels.
-            - If the bot is an administrator of a group, it can delete any message there.
-            - If the bot has :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
-              permission in a supergroup or a channel, it can delete any message there.
+        - A message can only be deleted if it was sent less than 48 hours ago.
+        - A dice message in a private chat can only be deleted if it was sent more than 24
+          hours ago.
+        - Bots can delete outgoing messages in private chats, groups, and supergroups.
+        - Bots can delete incoming messages in private chats.
+        - Bots granted :attr:`~telegram.ChatMemberAdministrator.can_post_messages` permissions
+          can delete outgoing messages in channels.
+        - If the bot is an administrator of a group, it can delete any message there.
+        - If the bot has :attr:`~telegram.ChatMemberAdministrator.can_delete_messages`
+          permission in a supergroup or a channel, it can delete any message there.
 
-        .. seealso:: :attr:`telegram.Message.delete`
+        .. seealso:: :meth:`telegram.Message.delete`,
+            :meth:`telegram.CallbackQuery.delete_message`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
