@@ -25,32 +25,50 @@ from telegram.constants import MessageType
 
 
 class TestHelpers:
-    def test_escape_markdown(self):
-        test_str = "*bold*, _italic_, `code`, [text_link](http://github.com/)"
-        expected_str = r"\*bold\*, \_italic\_, \`code\`, \[text\_link](http://github.com/)"
+    @pytest.mark.parametrize(
+        "test_str,expected",
+        [
+            ("*bold*", r"\*bold\*"),
+            ("_italic_", r"\_italic\_"),
+            ("`code`", r"\`code\`"),
+            ("[text_link](https://github.com/)", r"\[text\_link](https://github.com/)"),
+        ],
+        ids=["bold", "italic", "code", "text_link"],
+    )
+    def test_escape_markdown(self, test_str, expected):
+        assert expected == helpers.escape_markdown(test_str)
 
-        assert expected_str == helpers.escape_markdown(test_str)
+    @pytest.mark.parametrize(
+        "test_str, expected",
+        [
+            (r"a_b*c[d]e", r"a\_b\*c\[d\]e"),
+            (r"(fg) ", r"\(fg\) "),
+            (r"h~I`>JK#L+MN", r"h\~I\`\>JK\#L\+MN"),
+            (r"-O=|p{qr}s.t!\ ", r"\-O\=\|p\{qr\}s\.t\!\\ "),
+            (r"\u", r"\\u"),
+        ],
+    )
+    def test_escape_markdown_v2(self, test_str, expected):
+        assert expected == helpers.escape_markdown(test_str, version=2)
 
-    def test_escape_markdown_v2(self):
-        test_str = r"a_b*c[d]e (fg) h~I`>JK#L+MN -O=|p{qr}s.t!\ \u"
-        expected_str = r"a\_b\*c\[d\]e \(fg\) h\~I\`\>JK\#L\+MN \-O\=\|p\{qr\}s\.t\!\\ \\u"
-
-        assert expected_str == helpers.escape_markdown(test_str, version=2)
-
-    def test_escape_markdown_v2_monospaced(self):
-
-        test_str = r"mono/pre: `abc` \int (`\some \`stuff)"
-        expected_str = "mono/pre: \\`abc\\` \\\\int (\\`\\\\some \\\\\\`stuff)"
-
-        assert expected_str == helpers.escape_markdown(
+    @pytest.mark.parametrize(
+        "test_str, expected",
+        [
+            (r"mono/pre:", r"mono/pre:"),
+            ("`abc`", r"\`abc\`"),
+            (r"\int", r"\\int"),
+            (r"(`\some \` stuff)", r"(\`\\some \\\` stuff)"),
+        ],
+    )
+    def test_escape_markdown_v2_monospaced(self, test_str, expected):
+        assert expected == helpers.escape_markdown(
             test_str, version=2, entity_type=MessageEntity.PRE
         )
-        assert expected_str == helpers.escape_markdown(
+        assert expected == helpers.escape_markdown(
             test_str, version=2, entity_type=MessageEntity.CODE
         )
 
     def test_escape_markdown_v2_text_link(self):
-
         test_str = "https://url.containing/funny)cha)\\ra\\)cter\\s"
         expected_str = "https://url.containing/funny\\)cha\\)\\\\ra\\\\\\)cter\\\\s"
 
@@ -59,8 +77,10 @@ class TestHelpers:
         )
 
     def test_markdown_invalid_version(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Markdown version must be either"):
             helpers.escape_markdown("abc", version=-1)
+        with pytest.raises(ValueError, match="Markdown version must be either"):
+            helpers.mention_markdown(1, "abc", version=-1)
 
     def test_create_deep_linked_url(self):
         username = "JamesTheMock"
@@ -124,12 +144,20 @@ class TestHelpers:
 
         assert expected == helpers.mention_html(1, "the name")
 
-    def test_mention_markdown(self):
-        expected = "[the name](tg://user?id=1)"
-
-        assert expected == helpers.mention_markdown(1, "the name")
+    @pytest.mark.parametrize(
+        "test_str, expected",
+        [
+            ("the name", "[the name](tg://user?id=1)"),
+            ("under_score", "[under_score](tg://user?id=1)"),
+            ("starred*text", "[starred*text](tg://user?id=1)"),
+            ("`backtick`", "[`backtick`](tg://user?id=1)"),
+            ("[square brackets", "[[square brackets](tg://user?id=1)"),
+        ],
+    )
+    def test_mention_markdown(self, test_str, expected):
+        assert expected == helpers.mention_markdown(1, test_str)
 
     def test_mention_markdown_2(self):
         expected = r"[the\_name](tg://user?id=1)"
 
-        assert expected == helpers.mention_markdown(1, "the_name")
+        assert expected == helpers.mention_markdown(1, "the_name", 2)

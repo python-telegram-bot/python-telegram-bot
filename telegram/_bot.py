@@ -201,7 +201,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         private_key: bytes = None,
         private_key_password: bytes = None,
     ):
-        self.token = self._validate_token(token)
+        if not token:
+            raise InvalidToken("You must pass the token you received from https://t.me/Botfather!")
+        self.token = token
 
         self.base_url = base_url + self.token
         self.base_file_url = base_file_url + self.token
@@ -298,6 +300,25 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         # Drop any None values because Telegram doesn't handle them well
         data = {key: value for key, value in data.items() if value is not None}
 
+        return await self._do_post(
+            endpoint=endpoint,
+            data=data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+        )
+
+    async def _do_post(
+        self,
+        endpoint: str,
+        data: JSONDict,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+    ) -> Union[bool, JSONDict, None]:
         # This also converts datetimes into timestamps.
         # We don't do this earlier so that _insert_defaults (see above) has a chance to convert
         # to the default timezone in case this is called by ExtBot
@@ -376,7 +397,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             return
 
         await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
-        await self.get_me()
+        # Since the bot is to be initialized only once, we can also use it for
+        # verifying the token passed and raising an exception if it's invalid.
+        try:
+            await self.get_me()
+        except InvalidToken as exc:
+            raise InvalidToken(f"The token `{self.token}` was rejected by the server.") from exc
         self._initialized = True
 
     async def shutdown(self) -> None:
@@ -421,18 +447,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             should *not* be used manually.
         """
         return self._request[1]
-
-    @staticmethod
-    def _validate_token(token: str) -> str:
-        """A very basic validation on token."""
-        if any(x.isspace() for x in token):
-            raise InvalidToken()
-
-        left, sep, _right = token.partition(":")
-        if (not sep) or (not left.isdigit()) or (len(left) < 3):
-            raise InvalidToken()
-
-        return token
 
     @property
     def bot(self) -> User:
@@ -2923,7 +2937,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> Optional[UserProfilePhotos]:
+    ) -> UserProfilePhotos:
         """Use this method to get a list of profile pictures for a user.
 
         .. seealso:: :meth:`telegram.User.get_profile_photos`
@@ -2975,7 +2989,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs=api_kwargs,
         )
 
-        return UserProfilePhotos.de_json(result, self)  # type: ignore[arg-type]
+        return UserProfilePhotos.de_json(result, self)  # type: ignore[arg-type,return-value]
 
     @_log
     async def get_file(
@@ -6368,6 +6382,61 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return StickerSet.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @_log
+    async def get_custom_emoji_stickers(
+        self,
+        custom_emoji_ids: List[str],
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> List[Sticker]:
+        # skipcq: FLK-D207
+        """
+        Use this method to get information about emoji stickers by their identifiers.
+
+        Args:
+            custom_emoji_ids (List[:obj:`str`]): List of custom emoji identifiers.
+                At most :tg-const:`telegram.constants.CustomEmojiStickerLimit.\
+CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            List[:class:`telegram.Sticker`]
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {"custom_emoji_ids": custom_emoji_ids}
+        result = await self._post(
+            "getCustomEmojiStickers",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return Sticker.de_list(result, self)  # type: ignore[return-value, arg-type]
+
+    @_log
     async def upload_sticker_file(
         self,
         user_id: Union[str, int],
@@ -6440,10 +6509,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         title: str,
         emojis: str,
         png_sticker: FileInput = None,
-        contains_masks: bool = None,
         mask_position: MaskPosition = None,
         tgs_sticker: FileInput = None,
         webm_sticker: FileInput = None,
+        sticker_type: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -6454,8 +6523,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to create new sticker set owned by a user.
         The bot will be able to edit the created sticker set.
-        You must use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`, or
-        :paramref:`webm_sticker`.
+        You must use exactly one of the fields :paramref:`png_sticker`, :paramref:`tgs_sticker`,
+        or :paramref:`webm_sticker`.
 
         Warning:
             As of API 4.7 :paramref:`png_sticker` is an optional argument and therefore the order
@@ -6465,6 +6534,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Note:
             The :paramref:`png_sticker` and :paramref:`tgs_sticker` argument can be either a
             file_id, an URL or a file from disk ``open(filename, 'rb')``
+
+        .. versionchanged:: 20.0
+            The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type`
+            instead.
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -6499,10 +6572,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 13.11
 
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
-            contains_masks (:obj:`bool`, optional): Pass :obj:`True`, if a set of mask stickers
-                should be created.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
+            sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
+                :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`. Custom emoji
+                sticker sets can't be created via the Bot API at the moment. By default, a
+                regular sticker set is created.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -6535,10 +6612,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data["tgs_sticker"] = parse_file_input(tgs_sticker)
         if webm_sticker is not None:
             data["webm_sticker"] = parse_file_input(webm_sticker)
-        if contains_masks is not None:
-            data["contains_masks"] = contains_masks
         if mask_position is not None:
             data["mask_position"] = mask_position
+        if sticker_type is not None:
+            data["sticker_type"] = sticker_type
 
         result = await self._post(
             "createNewStickerSet",
@@ -8200,6 +8277,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     """Alias for :meth:`unpin_chat_message`"""
     unpinAllChatMessages = unpin_all_chat_messages
     """Alias for :meth:`unpin_all_chat_messages`"""
+    getCustomEmojiStickers = get_custom_emoji_stickers
+    """Alias for :meth:`get_custom_emoji_stickers`"""
     getStickerSet = get_sticker_set
     """Alias for :meth:`get_sticker_set`"""
     uploadStickerFile = upload_sticker_file

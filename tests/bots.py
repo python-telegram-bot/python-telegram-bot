@@ -58,7 +58,7 @@ def get(name, fallback):
     if GITHUB_ACTION is not None and BOTS is not None and JOB_INDEX is not None:
         try:
             return BOTS[JOB_INDEX][name]
-        except KeyError:
+        except (KeyError, IndexError):
             pass
 
     # Otherwise go with the fallback

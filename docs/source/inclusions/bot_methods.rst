@@ -206,6 +206,8 @@
       - Used for getting a sticker set
     * - :meth:`~telegram.Bot.upload_sticker_file`
       - Used for uploading a sticker file
+    * - :meth:`~telegram.Bot.get_custom_emoji_stickers`
+      - Used for getting custom emoji files based on their IDs
 
 .. raw:: html
 

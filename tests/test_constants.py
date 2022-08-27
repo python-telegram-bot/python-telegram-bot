@@ -17,13 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import json
-from enum import IntEnum
 
 import pytest
 from flaky import flaky
 
 from telegram import constants
-from telegram._utils.enum import StringEnum
+from telegram._utils.enum import IntEnum, StringEnum
 from telegram.error import BadRequest
 from tests.conftest import data_file
 
@@ -62,8 +61,24 @@ class TestConstants:
         assert json.dumps(IntEnumTest.FOO) == json.dumps(1)
 
     def test_string_representation(self):
+        # test __repr__
         assert repr(StrEnumTest.FOO) == "<StrEnumTest.FOO>"
-        assert str(StrEnumTest.FOO) == "StrEnumTest.FOO"
+
+        # test __format__
+        assert f"{StrEnumTest.FOO} this {StrEnumTest.BAR}" == "foo this bar"
+        assert f"{StrEnumTest.FOO:*^10}" == "***foo****"
+
+        # test __str__
+        assert str(StrEnumTest.FOO) == "foo"
+
+    def test_int_representation(self):
+        # test __repr__
+        assert repr(IntEnumTest.FOO) == "<IntEnumTest.FOO>"
+        # test __format__
+        assert f"{IntEnumTest.FOO}/0 is undefined!" == "1/0 is undefined!"
+        assert f"{IntEnumTest.FOO:*^10}" == "****1*****"
+        # test __str__
+        assert str(IntEnumTest.FOO) == "1"
 
     def test_string_inheritance(self):
         assert isinstance(StrEnumTest.FOO, str)

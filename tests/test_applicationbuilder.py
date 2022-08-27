@@ -23,6 +23,7 @@ import httpx
 import pytest
 
 from telegram.ext import (
+    AIORateLimiter,
     Application,
     ApplicationBuilder,
     ContextTypes,
@@ -82,6 +83,7 @@ class TestApplicationBuilder:
         assert app.bot.private_key is None
         assert app.bot.arbitrary_callback_data is False
         assert app.bot.defaults is None
+        assert app.bot.rate_limiter is None
 
         get_updates_client = app.bot._request[0]._client
         assert get_updates_client.limits == httpx.Limits(
@@ -196,6 +198,7 @@ class TestApplicationBuilder:
             "proxy_url",
             "bot",
             "update_queue",
+            "rate_limiter",
         ]
         + [entry[0] for entry in _BOT_CHECKS],
     )
@@ -247,10 +250,13 @@ class TestApplicationBuilder:
         defaults = Defaults()
         request = HTTPXRequest()
         get_updates_request = HTTPXRequest()
+        rate_limiter = AIORateLimiter()
         builder.token(bot.token).base_url("base_url").base_file_url("base_file_url").private_key(
             PRIVATE_KEY
         ).defaults(defaults).arbitrary_callback_data(42).request(request).get_updates_request(
             get_updates_request
+        ).rate_limiter(
+            rate_limiter
         )
         built_bot = builder.build().bot
 
@@ -266,6 +272,7 @@ class TestApplicationBuilder:
         assert built_bot._request[0] is get_updates_request
         assert built_bot.callback_data_cache.maxsize == 42
         assert built_bot.private_key
+        assert built_bot.rate_limiter is rate_limiter
 
         @dataclass
         class Client:

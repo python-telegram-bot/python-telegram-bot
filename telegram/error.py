@@ -35,7 +35,7 @@ __all__ = (
     "TimedOut",
 )
 
-from typing import Optional, Tuple, Union
+from typing import Tuple, Union
 
 
 def _lstrip_str(in_s: str, lstr: str) -> str:
@@ -100,14 +100,10 @@ class InvalidToken(TelegramError):
             .. versionadded:: 20.0
     """
 
-    __slots__ = ("_message",)
+    __slots__ = ()
 
     def __init__(self, message: str = None) -> None:
-        self._message = message
-        super().__init__("Invalid token" if self._message is None else self._message)
-
-    def __reduce__(self) -> Tuple[type, Tuple[Optional[str]]]:  # type: ignore[override]
-        return self.__class__, (self._message,)
+        super().__init__("Invalid token" if message is None else message)
 
 
 class NetworkError(TelegramError):
