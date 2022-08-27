@@ -2,6 +2,77 @@
 Changelog
 =========
 
+Version 20.0a3
+==============
+*Released 2022-08-27*
+
+This is the technical changelog for version 20.0a3. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- Full Support for API 6.2 (`#3195`_)
+
+New Features
+------------
+
+- New Rate Limiting Mechanism (`#3148`_)
+- Make ``chat/user_data`` Available in Error Handler for Errors in Jobs (`#3152`_)
+- Add ``Application.post_shutdown`` (`#3126`_)
+
+Bug Fixes
+---------
+
+- Fix ``helpers.mention_markdown`` for Markdown V1 and Improve Related Unit Tests (`#3155`_)
+- Add ``api_kwargs`` Parameter to ``Bot.log_out`` and Improve Related Unit Tests (`#3147`_)
+- Make ``Bot.delete_my_commands`` a Coroutine Function (`#3136`_)
+- Fix ``ConversationHandler.check_update`` not respecting ``per_user`` (`#3128`_)
+
+Minor Changes, Documentation Improvements and CI
+------------------------------------------------
+
+- Add Python 3.11 to Test Suite & Adapt Enum Behaviour (`#3168`_)
+- Drop Manual Token Validation (`#3167`_)
+- Simplify Unit Tests for ``Bot.send_chat_action`` (`#3151`_)
+- Drop ``pre-commit`` Dependencies from ``requirements-dev.txt`` (`#3120`_)
+- Change Default Values for ``concurrent_updates`` and ``connection_pool_size`` (`#3127`_)
+- Documentation Improvements (`#3139`_, `#3153`_, `#3135`_)
+- Type Hinting Fixes (`#3202`_)
+
+Dependencies
+------------
+
+- Bump ``sphinx`` from 5.0.2 to 5.1.1 (`#3177`_)
+- Update ``pre-commit`` Dependencies (`#3085`_)
+- Bump ``pytest-asyncio`` from 0.18.3 to 0.19.0 (`#3158`_)
+- Update ``tornado`` requirement from ~=6.1 to ~=6.2 (`#3149`_)
+- Bump ``black`` from 22.3.0 to 22.6.0 (`#3132`_)
+- Bump ``actions/setup-python`` from 3 to 4 (`#3131`_)
+
+.. _`#3195`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3195
+.. _`#3148`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3148
+.. _`#3152`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3152
+.. _`#3126`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3126
+.. _`#3155`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3155
+.. _`#3147`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3147
+.. _`#3136`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3136
+.. _`#3128`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3128
+.. _`#3168`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3168
+.. _`#3167`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3167
+.. _`#3151`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3151
+.. _`#3120`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3120
+.. _`#3127`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3127
+.. _`#3139`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3139
+.. _`#3153`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3153
+.. _`#3135`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3135
+.. _`#3202`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3202
+.. _`#3177`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3177
+.. _`#3085`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3085
+.. _`#3158`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3158
+.. _`#3149`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3149
+.. _`#3132`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3132
+.. _`#3131`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3131
+
 Version 20.0a2
 ==============
 *Released 2022-06-27*
