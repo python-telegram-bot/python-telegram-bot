@@ -48,8 +48,11 @@ def get_optional_requirements(raw=False):
             dependency = dependency.strip()
             for name in names.split(","):
                 name = name.strip()
-                if name.endswith("!ext") and raw:
-                    continue
+                if name.endswith("!ext"):
+                    if raw:
+                        continue
+                    else:
+                        name = name[:-4]
                 requirements[name].append(dependency)
 
     return requirements
