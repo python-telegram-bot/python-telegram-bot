@@ -2,6 +2,7 @@
 """The setup and build script for the python-telegram-bot library."""
 import subprocess
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 from setuptools import find_packages, setup
@@ -33,6 +34,25 @@ def get_packages_requirements(raw=False):
     packs = find_packages(exclude=exclude)
 
     return packs, reqs
+
+
+def get_optional_requirements(raw=False):
+    """Build the optional dependencies"""
+    requirements = defaultdict(list)
+
+    with Path("requirements-opts.txt").open() as reqs:
+        for line in reqs:
+            if line.startswith("#"):
+                continue
+            dependency, names = line.split("#")
+            dependency = dependency.strip()
+            for name in names.split(","):
+                name = name.strip()
+                if name.endswith("!ext") and raw:
+                    continue
+                requirements[name].append(dependency)
+
+    return requirements
 
 
 def get_setup_kwargs(raw=False):
@@ -69,11 +89,7 @@ def get_setup_kwargs(raw=False):
         long_description_content_type="text/x-rst",
         packages=packages,
         install_requires=requirements,
-        extras_require={
-            "socks": "httpx[socks]",
-            # 3.4-3.4.3 contained some cyclical import bugs
-            "passport": "cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=3.0",
-        },
+        extras_require=get_optional_requirements(raw=raw),
         include_package_data=True,
         classifiers=[
             "Development Status :: 5 - Production/Stable",

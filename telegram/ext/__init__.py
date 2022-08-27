@@ -19,10 +19,13 @@
 """Extensions over the Telegram Bot API to facilitate bot making"""
 
 __all__ = (
+    "AIORateLimiter",
     "Application",
     "ApplicationBuilder",
     "ApplicationHandlerStop",
+    "BaseHandler",
     "BasePersistence",
+    "BaseRateLimiter",
     "CallbackContext",
     "CallbackDataCache",
     "CallbackQueryHandler",
@@ -36,7 +39,6 @@ __all__ = (
     "DictPersistence",
     "ExtBot",
     "filters",
-    "BaseHandler",
     "InlineQueryHandler",
     "InvalidCallbackData",
     "Job",
@@ -56,9 +58,11 @@ __all__ = (
 )
 
 from . import filters
+from ._aioratelimiter import AIORateLimiter
 from ._application import Application, ApplicationHandlerStop
 from ._applicationbuilder import ApplicationBuilder
 from ._basepersistence import BasePersistence, PersistenceInput
+from ._baseratelimiter import BaseRateLimiter
 from ._callbackcontext import CallbackContext
 from ._callbackdatacache import CallbackDataCache, InvalidCallbackData
 from ._callbackqueryhandler import CallbackQueryHandler

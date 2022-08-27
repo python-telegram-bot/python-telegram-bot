@@ -39,8 +39,10 @@ from typing import (
 )
 
 if TYPE_CHECKING:
+    from typing import Optional
+
     from telegram import Bot
-    from telegram.ext import CallbackContext, JobQueue
+    from telegram.ext import BaseRateLimiter, CallbackContext, JobQueue
 
 CCT = TypeVar("CCT", bound="CallbackContext")
 """An instance of :class:`telegram.ext.CallbackContext` or a custom subclass.
@@ -99,5 +101,15 @@ BD = TypeVar("BD")
 """
 JQ = TypeVar("JQ", bound=Union[None, "JobQueue"])
 """Type of the job queue.
+
+.. versionadded:: 20.0"""
+
+RL = TypeVar("RL", bound="Optional[BaseRateLimiter]")
+"""Type of the rate limiter.
+
+.. versionadded:: 20.0"""
+
+RLARGS = TypeVar("RLARGS")
+"""Type of the rate limiter arguments.
 
 .. versionadded:: 20.0"""

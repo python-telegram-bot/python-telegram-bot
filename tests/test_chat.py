@@ -44,6 +44,7 @@ def chat(bot):
         has_protected_content=True,
         join_to_send_messages=True,
         join_by_request=True,
+        has_restricted_voice_and_video_messages=True,
     )
 
 
@@ -68,6 +69,7 @@ class TestChat:
     has_private_forwards = True
     join_to_send_messages = True
     join_by_request = True
+    has_restricted_voice_and_video_messages = True
 
     def test_slot_behaviour(self, chat, mro_slots):
         for attr in chat.__slots__:
@@ -92,6 +94,9 @@ class TestChat:
             "location": self.location.to_dict(),
             "join_to_send_messages": self.join_to_send_messages,
             "join_by_request": self.join_by_request,
+            "has_restricted_voice_and_video_messages": (
+                self.has_restricted_voice_and_video_messages
+            ),
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -112,6 +117,10 @@ class TestChat:
         assert chat.location.address == self.location.address
         assert chat.join_to_send_messages == self.join_to_send_messages
         assert chat.join_by_request == self.join_by_request
+        assert (
+            chat.has_restricted_voice_and_video_messages
+            == self.has_restricted_voice_and_video_messages
+        )
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -131,6 +140,10 @@ class TestChat:
         assert chat_dict["location"] == chat.location.to_dict()
         assert chat_dict["join_to_send_messages"] == chat.join_to_send_messages
         assert chat_dict["join_by_request"] == chat.join_by_request
+        assert (
+            chat_dict["has_restricted_voice_and_video_messages"]
+            == chat.has_restricted_voice_and_video_messages
+        )
 
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")

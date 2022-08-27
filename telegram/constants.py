@@ -39,6 +39,7 @@ __all__ = [
     "ChatInviteLinkLimit",
     "ChatMemberStatus",
     "ChatType",
+    "CustomEmojiStickerLimit",
     "DiceEmoji",
     "FileSizeLimit",
     "FloodLimit",
@@ -58,6 +59,7 @@ __all__ = [
     "PollLimit",
     "PollType",
     "SUPPORTED_WEBHOOK_PORTS",
+    "StickerType",
     "WebhookLimit",
     "UpdateType",
 ]
@@ -92,7 +94,7 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=1)
+BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=2)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -275,6 +277,22 @@ class ChatType(StringEnum):
     """:obj:`str`: A :class:`telegram.Chat` that is a supergroup."""
     CHANNEL = "channel"
     """:obj:`str`: A :class:`telegram.Chat` that is a channel."""
+
+
+class CustomEmojiStickerLimit(IntEnum):
+    """This enum contains limitations for :meth:`telegram.Bot.get_custom_emoji_stickers`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    CUSTOM_EMOJI_IDENTIFIER_LIMIT = 200
+    """:obj:`int`: Maximum amount of custom emoji identifiers which can be specified for the
+    :paramref:`~telegram.Bot.get_custom_emoji_stickers.custom_emoji_ids` parameter of
+    :meth:`telegram.Bot.get_custom_emoji_stickers`.
+    """
 
 
 class DiceEmoji(StringEnum):
@@ -605,6 +623,11 @@ class MessageEntityType(StringEnum):
     """:obj:`str`: Message entities representing strikethrough text."""
     SPOILER = "spoiler"
     """:obj:`str`: Message entities representing spoiler text."""
+    CUSTOM_EMOJI = "custom_emoji"
+    """:obj:`str`: Message entities representing inline custom emoji stickers.
+
+    .. versionadded:: 20.0
+    """
 
 
 class MessageLimit(IntEnum):
@@ -716,6 +739,23 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_ended`."""
     VIDEO_CHAT_PARTICIPANTS_INVITED = "video_chat_participants_invited"
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_participants_invited`."""
+
+
+class StickerType(StringEnum):
+    """This enum contains the available types of :class:`telegram.Sticker`. The enum
+    members of this enumeration are instances of :class:`str` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    REGULAR = "regular"
+    """:obj:`str`: Regular sticker."""
+    MASK = "mask"
+    """:obj:`str`: Mask sticker."""
+    CUSTOM_EMOJI = "custom_emoji"
+    """:obj:`str`: Custom emoji sticker."""
 
 
 class ParseMode(StringEnum):

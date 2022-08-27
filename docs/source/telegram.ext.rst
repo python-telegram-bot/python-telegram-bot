@@ -55,3 +55,11 @@ Arbitrary Callback Data
 
     telegram.ext.callbackdatacache
     telegram.ext.invalidcallbackdata
+
+Rate Limiting
+-------------
+
+.. toctree::
+
+    telegram.ext.baseratelimiter
+    telegram.ext.aioratelimiter

@@ -35,6 +35,7 @@ repos:
           - tornado~=6.2
           - APScheduler~=3.9.1
           - cachetools~=5.2.0
+          - aiolimiter~=1.0.0
           - . # this basically does `pip install -e .`
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.971
@@ -43,7 +44,6 @@ repos:
         name: mypy-ptb
         files: ^telegram/.*\.py$
         additional_dependencies:
-          - types-ujson
           - types-pytz
           - types-cryptography
           - types-cachetools
@@ -51,6 +51,7 @@ repos:
           - tornado~=6.2
           - APScheduler~=3.9.1
           - cachetools~=5.2.0
+          - aiolimiter~=1.0.0
           - . # this basically does `pip install -e .`
     - id: mypy
       name: mypy-examples

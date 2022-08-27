@@ -24,7 +24,7 @@ Currently this only means that cryptography is not installed.
 Because imports in pytest are intricate, we just run
     pytest -k test_no_passport.py
 
-with the TEST_NO_PASSPORT environment variable set in addition to the regular test suite.
+with the TEST_PASSPORT environment variable set to False in addition to the regular test suite.
 Because actually uninstalling the optional dependencies would lead to errors in the test suite we
 just mock the import to raise the expected exception.
 
@@ -41,9 +41,9 @@ from telegram import _bot as bot
 from telegram._passport import credentials as credentials
 from tests.conftest import env_var_2_bool
 
-TEST_NO_PASSPORT = env_var_2_bool(os.getenv("TEST_NO_PASSPORT", False))
+TEST_PASSPORT = env_var_2_bool(os.getenv("TEST_PASSPORT", True))
 
-if TEST_NO_PASSPORT:
+if not TEST_PASSPORT:
     orig_import = __import__
 
     def import_mock(module_name, *args, **kwargs):
@@ -58,24 +58,24 @@ if TEST_NO_PASSPORT:
 
 class TestNoPassport:
     """
-    The monkeypatches simulate cryptography not being installed even when TEST_NO_PASSPORT is
-    False, though that doesn't test the actual imports
+    The monkeypatches simulate cryptography not being installed even when TEST_PASSPORT is
+    True, though that doesn't test the actual imports
     """
 
     def test_bot_init(self, bot_info, monkeypatch):
-        if not TEST_NO_PASSPORT:
+        if TEST_PASSPORT:
             monkeypatch.setattr(bot, "CRYPTO_INSTALLED", False)
         with pytest.raises(RuntimeError, match="passport"):
             bot.Bot(bot_info["token"], private_key=1, private_key_password=2)
 
     def test_credentials_decrypt(self, monkeypatch):
-        if not TEST_NO_PASSPORT:
+        if TEST_PASSPORT:
             monkeypatch.setattr(credentials, "CRYPTO_INSTALLED", False)
         with pytest.raises(RuntimeError, match="passport"):
             credentials.decrypt(1, 1, 1)
 
     def test_encrypted_credentials_decrypted_secret(self, monkeypatch):
-        if not TEST_NO_PASSPORT:
+        if TEST_PASSPORT:
             monkeypatch.setattr(credentials, "CRYPTO_INSTALLED", False)
         ec = credentials.EncryptedCredentials("data", "hash", "secret")
         with pytest.raises(RuntimeError, match="passport"):

@@ -490,7 +490,7 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
         # Now convert `telegram._message.Message` to `telegram.Message` etc
         match = re.search(pattern=r"(telegram(\.ext|))\.[_\w\.]+", string=base)
         if not match or "_utils" in base:
-            return
+            continue
 
         parts = match.group(0).split(".")
 
