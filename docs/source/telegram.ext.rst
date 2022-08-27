@@ -16,11 +16,4 @@ telegram.ext package
     telegram.ext.handlers-tree.rst
     telegram.ext.persistence-tree.rst
     telegram.ext.acd-tree.rst
-
-Rate Limiting
--------------
-
-.. toctree::
-
-    telegram.ext.baseratelimiter
-    telegram.ext.aioratelimiter
+    telegram.ext.rate-limiting-tree.rst
