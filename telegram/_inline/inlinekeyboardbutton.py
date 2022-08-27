@@ -62,6 +62,10 @@ class InlineKeyboardButton(TelegramObject):
 
         * After Bot API 6.1, only ``HTTPS`` links will be allowed in :paramref:`login_url`.
 
+    .. seealso:: `Inline Keyboard Example 1 <examples.inlinekeyboard.html>`_,
+        `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_,
+        :class:`telegram.InlineKeyboardMarkup`
+
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
        equality.

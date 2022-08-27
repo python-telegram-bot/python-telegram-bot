@@ -33,6 +33,8 @@ class InputTextMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_text` is equal.
 
+    .. seealso:: `Inline Example <examples.inlinebot.html>`_
+
     Args:
         message_text (:obj:`str`): Text of the message to be sent,
             1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities

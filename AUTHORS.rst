@@ -86,6 +86,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Paradox <https://github.com/paradox70>`_
 - `Patrick Hofmann <https://github.com/PH89>`_
 - `Paul Larsen <https://github.com/PaulSonOfLars>`_
+- `Pawan <https://github.com/pawanrai9999>`_
 - `Pieter Schutz <https://github.com/eldinnie>`_
 - `Piraty <https://github.com/piraty>`_
 - `Poolitzer <https://github.com/Poolitzer>`_

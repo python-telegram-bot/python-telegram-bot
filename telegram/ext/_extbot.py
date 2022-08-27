@@ -118,6 +118,10 @@ class ExtBot(Bot, Generic[RLARGS]):
         * The method :meth:`~telegram.Bot.get_updates` is the only method that does not have the
           additional argument, as this method will never be rate limited.
 
+    .. seealso:: `Arbitrary Callback Example <examples.arbitrarycallbackdatabot.html>`_,
+        `Arbitrary callback_data <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/Arbitrary-callback_data>`_
+
     .. versionadded:: 13.6
 
     Args:
