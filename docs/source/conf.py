@@ -29,9 +29,9 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "20.0a2"  # telegram.__version__[:3]
+version = "20.0a4"  # telegram.__version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = "20.0a2"  # telegram.__version__
+release = "20.0a4"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "4.5.0"
@@ -478,6 +478,10 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
             bases.insert(0, ":class:`str`")
             continue
 
+        if "IntEnum" in base:
+            bases[idx] = ":class:`enum.IntEnum`"
+            continue
+
         # Drop generics (at least for now)
         if base.endswith("]"):
             base = base.split("[", maxsplit=1)[0]
@@ -486,7 +490,7 @@ def autodoc_process_bases(app, name, obj, option, bases: list):
         # Now convert `telegram._message.Message` to `telegram.Message` etc
         match = re.search(pattern=r"(telegram(\.ext|))\.[_\w\.]+", string=base)
         if not match or "_utils" in base:
-            return
+            continue
 
         parts = match.group(0).split(".")
 

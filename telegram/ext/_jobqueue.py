@@ -40,13 +40,18 @@ class JobQueue:
     """This class allows you to periodically perform tasks with the bot. It is a convenience
     wrapper for the APScheduler library.
 
+    .. seealso:: :attr:`telegram.ext.Application.job_queue`,
+        :attr:`telegram.ext.CallbackContext.job_queue`,
+        `Timerbot Example <examples.timerbot.html>`_,
+        `Job Queue <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
 
             .. versionchanged:: 20.0
                 Uses :class:`~apscheduler.schedulers.asyncio.AsyncIOScheduler` instead of
                 :class:`~apscheduler.schedulers.background.BackgroundScheduler`
-
 
     """
 
@@ -567,7 +572,11 @@ class JobQueue:
             await asyncio.sleep(0.01)
 
     def jobs(self) -> Tuple["Job", ...]:
-        """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`."""
+        """Returns a tuple of all *scheduled* jobs that are currently in the :class:`JobQueue`.
+
+        Returns:
+            Tuple[:class:`Job`]: Tuple of all *scheduled* jobs.
+        """
         return tuple(
             Job._from_aps_job(job)  # pylint: disable=protected-access
             for job in self.scheduler.get_jobs()
@@ -576,6 +585,9 @@ class JobQueue:
     def get_jobs_by_name(self, name: str) -> Tuple["Job", ...]:
         """Returns a tuple of all *pending/scheduled* jobs with the given name that are currently
         in the :class:`JobQueue`.
+
+        Returns:
+            Tuple[:class:`Job`]: Tuple of all *pending* or *scheduled* jobs matching the name.
         """
         return tuple(job for job in self.jobs() if job.name == name)
 

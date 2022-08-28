@@ -134,6 +134,12 @@ class Chat(TelegramObject):
             :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        has_restricted_voice_and_video_messages (:obj:`bool`, optional): :obj:`True`, if the
+            privacy settings of the other party restrict sending voice and video note messages
+            in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 20.0
+
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -188,6 +194,11 @@ class Chat(TelegramObject):
             in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        has_restricted_voice_and_video_messages (:obj:`bool`): Optional. :obj:`True`, if the
+            privacy settings of the other party restrict sending voice and video note messages
+            in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 20.0
 
     """
 
@@ -215,6 +226,7 @@ class Chat(TelegramObject):
         "has_private_forwards",
         "join_to_send_messages",
         "join_by_request",
+        "has_restricted_voice_and_video_messages",
     )
 
     SENDER: ClassVar[str] = constants.ChatType.SENDER
@@ -256,6 +268,7 @@ class Chat(TelegramObject):
         has_protected_content: bool = None,
         join_to_send_messages: bool = None,
         join_by_request: bool = None,
+        has_restricted_voice_and_video_messages: bool = None,
         **_kwargs: Any,
     ):
         # Required
@@ -286,6 +299,7 @@ class Chat(TelegramObject):
         self.location = location
         self.join_to_send_messages = join_to_send_messages
         self.join_by_request = join_by_request
+        self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
 
         self.set_bot(bot)
         self._id_attrs = (self.id,)
@@ -2375,7 +2389,7 @@ class Chat(TelegramObject):
         Caution:
             Can only work, if the chat is a private chat.
 
-        ..seealso:: :meth:`get_menu_button`
+        .. seealso:: :meth:`get_menu_button`
 
         .. versionadded:: 20.0
 
@@ -2411,7 +2425,7 @@ class Chat(TelegramObject):
         Caution:
             Can only work, if the chat is a private chat.
 
-        ..seealso:: :meth:`set_menu_button`
+        .. seealso:: :meth:`set_menu_button`
 
         .. versionadded:: 20.0
 

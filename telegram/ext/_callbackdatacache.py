@@ -94,6 +94,11 @@ class CallbackDataCache:
     sent via inline mode.
     If necessary, will drop the least recently used items.
 
+    .. seealso:: :attr:`telegram.ext.ExtBot.callback_data_cache`,
+        `Arbitrary callback_data <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/Arbitrary-callback_data>`_,
+        Arbitrary Callback Data Example <examples.arbitrarycallbackdatabot.html>
+
     .. versionadded:: 13.6
 
     Args:

@@ -27,8 +27,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -W ignore -m pip install --upgrade pip
-          python -W ignore -m pip install -r requirements.txt
-          python -W ignore -m pip install -r requirements-dev.txt
-          python -W ignore -m pip install -r docs/requirements-docs.txt
+          python -W ignore -m pip install -r requirements-all.txt
       - name: Build docs
         run: sphinx-build docs/source docs/build/html -W --keep-going -j auto

@@ -708,7 +708,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
                 `127.0.0.1 <https://en.wikipedia.org/wiki/Localhost>`_.
             port (:obj:`int`, optional): Port the bot should be listening on. Must be one of
-                :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`. Defaults to ``80``.
+                :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS` unless the bot is running
+                behind a proxy. Defaults to ``80``.
             url_path (:obj:`str`, optional): Path inside url. Defaults to `` '' ``
             cert (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL certificate file.
             key (:class:`pathlib.Path` | :obj:`str`, optional): Path to the SSL key file.
@@ -1416,6 +1417,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         Note:
             Attempts to add the same callback multiple times will be ignored.
+
+        .. seealso:: `Errorhandler Example <examples.errorhandlerbot.py>`_
 
         Args:
             callback (:term:`coroutine function`): The callback function for this error handler.

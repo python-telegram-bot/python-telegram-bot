@@ -1965,6 +1965,7 @@ class Sticker:
 
     .. versionadded:: 20.0
     """
+    # neither mask nor emoji can be a message.sticker, so no filters for them
 
 
 class _SuccessfulPayment(MessageFilter):

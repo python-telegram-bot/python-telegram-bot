@@ -240,7 +240,7 @@ class TestRequest:
         )
 
         with pytest.raises(exception_class, match="Test Message"):
-            await httpx_request.post(None, None, None)
+            await httpx_request.post("", None, None)
 
     @pytest.mark.parametrize(
         ["exception", "catch_class", "match"],

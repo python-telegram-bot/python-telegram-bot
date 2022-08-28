@@ -93,7 +93,10 @@ def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> s
     Returns:
         :obj:`str`: The inline mention for the user as Markdown.
     """
-    return f"[{escape_markdown(name, version=version)}](tg://user?id={user_id})"
+    tg_link = f"tg://user?id={user_id}"
+    if version == 1:
+        return f"[{name}]({tg_link})"
+    return f"[{escape_markdown(name, version=version)}]({tg_link})"
 
 
 def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
@@ -142,6 +145,8 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
 
     Examples:
         ``create_deep_linked_url(bot.get_me().username, "some-params")``
+
+    .. seealso:: `Deeplinking Example <examples.deeplinking.html>`_
 
     Args:
         bot_username (:obj:`str`): The username to link to

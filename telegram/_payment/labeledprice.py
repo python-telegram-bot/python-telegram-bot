@@ -29,6 +29,8 @@ class LabeledPrice(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`label` and :attr:`amount` are equal.
 
+    .. seealso:: `Paymentbot Example <examples.paymentbot.html>`_
+
     Args:
         label (:obj:`str`): Portion label.
         amount (:obj:`int`): Price of the product in the smallest units of the currency (integer,

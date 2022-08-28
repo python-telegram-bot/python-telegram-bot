@@ -1463,7 +1463,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.set_chat_menu_button`.
 
-        ..seealso:: :meth:`get_menu_button`
+        .. seealso:: :meth:`get_menu_button`
 
         .. versionadded:: 20.0
 
@@ -1496,7 +1496,7 @@ class User(TelegramObject):
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.get_chat_menu_button`.
 
-        ..seealso:: :meth:`set_menu_button`
+        .. seealso:: :meth:`set_menu_button`
 
         .. versionadded:: 20.0
 

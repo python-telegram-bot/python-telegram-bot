@@ -184,22 +184,6 @@ class TestBot:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    @pytest.mark.parametrize(
-        "token",
-        argvalues=[
-            "123",
-            "12a:abcd1234",
-            "12:abcd1234",
-            "1234:abcd1234\n",
-            " 1234:abcd1234",
-            " 1234:abcd1234\r",
-            "1234:abcd 1234",
-        ],
-    )
-    async def test_invalid_token(self, token):
-        with pytest.raises(InvalidToken, match="Invalid token"):
-            Bot(token)
-
     async def test_initialize_and_shutdown(self, bot, monkeypatch):
         async def initialize(*args, **kwargs):
             self.test_flag = ["initialize"]
@@ -308,12 +292,14 @@ class TestBot:
             assert acd_bot.arbitrary_callback_data == acd
             assert acd_bot.callback_data_cache.maxsize == maxsize
 
-    @flaky(3, 1)
-    async def test_invalid_token_server_response(self, monkeypatch):
-        monkeypatch.setattr("telegram.Bot._validate_token", lambda x, y: "")
-        with pytest.raises(InvalidToken):
-            async with make_bot(token="12") as bot:
-                await bot.get_me()
+    async def test_no_token_passed(self):
+        with pytest.raises(InvalidToken, match="You must pass the token"):
+            Bot("")
+
+    async def test_invalid_token_server_response(self):
+        with pytest.raises(InvalidToken, match="The token `12` was rejected by the server."):
+            async with make_bot(token="12"):
+                pass
 
     async def test_unknown_kwargs(self, bot, monkeypatch):
         async def post(url, request_data: RequestData, *args, **kwargs):
@@ -496,9 +482,9 @@ class TestBot:
         corresponding methods of tg.Bot.
         """
         # Some methods of ext.ExtBot
-        global_extra_args = set()
+        global_extra_args = {"rate_limit_args"}
         extra_args_per_method = defaultdict(
-            set, {"__init__": {"arbitrary_callback_data", "defaults"}}
+            set, {"__init__": {"arbitrary_callback_data", "defaults", "rate_limiter"}}
         )
         different_hints_per_method = defaultdict(set, {"__setattr__": {"ext_bot"}})
 
@@ -2262,8 +2248,8 @@ class TestBot:
         )
 
     # get_sticker_set, upload_sticker_file, create_new_sticker_set, add_sticker_to_set,
-    # set_sticker_position_in_set and delete_sticker_from_set are tested in the
-    # test_sticker module.
+    # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers
+    # are tested in the test_sticker module.
 
     async def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
         # Use BaseException that's not a subclass of Exception such that
@@ -2971,3 +2957,8 @@ class TestBot:
         assert (
             "api_kwargs" in param_names
         ), f"{bot_method_name} is missing the parameter `api_kwargs`"
+
+        if bot_class is ExtBot and bot_method_name.replace("_", "").lower() != "getupdates":
+            assert (
+                "rate_limit_args" in param_names
+            ), f"{bot_method_name} of ExtBot is missing the parameter `rate_limit_args`"

@@ -45,7 +45,8 @@ from telegram.request import BaseRequest
 from telegram.request._httpxrequest import HTTPXRequest
 
 if TYPE_CHECKING:
-    from telegram.ext import BasePersistence, CallbackContext, Defaults
+    from telegram.ext import BasePersistence, BaseRateLimiter, CallbackContext, Defaults
+    from telegram.ext._utils.types import RLARGS
 
 # Type hinting is a bit complicated here because we try to get to a sane level of
 # leveraging generics and therefore need a number of type variables.
@@ -81,6 +82,7 @@ _BOT_CHECKS = [
     ("defaults", "defaults"),
     ("arbitrary_callback_data", "arbitrary_callback_data"),
     ("private_key", "private_key"),
+    ("rate_limiter", "rate_limiter instance"),
     ("local_mode", "local_mode setting"),
 ]
 
@@ -140,6 +142,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         "_private_key",
         "_private_key_password",
         "_proxy_url",
+        "_rate_limiter",
         "_read_timeout",
         "_request",
         "_token",
@@ -183,6 +186,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._updater: ODVInput[Updater] = DEFAULT_NONE
         self._post_init: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
         self._post_shutdown: Optional[Callable[[Application], Coroutine[Any, Any, None]]] = None
+        self._rate_limiter: ODVInput["BaseRateLimiter"] = DEFAULT_NONE
 
     def _build_request(self, get_updates: bool) -> BaseRequest:
         prefix = "_get_updates_" if get_updates else "_"
@@ -230,6 +234,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             arbitrary_callback_data=DefaultValue.get_value(self._arbitrary_callback_data),
             request=self._build_request(get_updates=False),
             get_updates_request=self._build_request(get_updates=True),
+            rate_limiter=DefaultValue.get_value(self._rate_limiter),
             local_mode=DefaultValue.get_value(self._local_mode),
         )
 
@@ -998,10 +1003,31 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         self._post_shutdown = post_shutdown
         return self
 
+    def rate_limiter(
+        self: "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]",
+        rate_limiter: "BaseRateLimiter[RLARGS]",
+    ) -> "ApplicationBuilder[ExtBot[RLARGS], CCT, UD, CD, BD, JQ]":
+        """Sets a :class:`telegram.ext.BaseRateLimiter` instance for the
+        :paramref:`telegram.ext.ExtBot.rate_limiter` parameter of
+        :attr:`telegram.ext.Application.bot`.
+
+        Args:
+            rate_limiter (:class:`telegram.ext.BaseRateLimiter`): The rate limiter.
+
+        Returns:
+            :class:`ApplicationBuilder`: The same builder with the updated argument.
+        """
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format("rate_limiter", "bot instance"))
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format("rate_limiter", "updater"))
+        self._rate_limiter = rate_limiter
+        return self  # type: ignore[return-value]
+
 
 InitApplicationBuilder = (  # This is defined all the way down here so that its type is inferred
     ApplicationBuilder[  # by Pylance correctly.
-        ExtBot,
+        ExtBot[None],
         ContextTypes.DEFAULT_TYPE,
         Dict,
         Dict,
