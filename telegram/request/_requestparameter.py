@@ -120,7 +120,7 @@ class RequestParameter:
             # We call to_dict and change the returned dict instead of overriding
             # value.media in case the same value is reused for another request
             data = value.to_dict()
-            media = value.parsed_media(local_mode=local_mode)
+            media = value.parse_media(local_mode=local_mode)
             return_media = []
             if isinstance(media, InputFile):
                 if media.attach_uri:
