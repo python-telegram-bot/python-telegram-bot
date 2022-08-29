@@ -197,7 +197,8 @@ def check_object(h4):
             'voice_chat_scheduled',
             'voice_chat_started',
         }
-
+    elif name == 'StickerSet':
+        ignored |= {'contains_masks'}  # for backwards compatibility
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
 
