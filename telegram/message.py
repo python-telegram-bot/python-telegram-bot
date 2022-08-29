@@ -407,7 +407,7 @@ class Message(TelegramObject):
             to the message.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
-        .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
+    .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
         by this function. Instead, the supplied replacement for the emoji will be used.
     """
 

@@ -4821,9 +4821,10 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> List[Sticker]:
-        # skipcq: FLK-D207
         """
         Use this method to get information about emoji stickers by their identifiers.
+
+        .. versionadded:: 13.14
 
         Args:
             custom_emoji_ids (List[:obj:`str`]): List of custom emoji identifiers.
@@ -4919,8 +4920,8 @@ class Bot(TelegramObject):
             disk ``open(filename, 'rb')``
 
         .. versionchanged:: 13.14
-            The parameter ``contains_masks`` has been depreciated. Use ``sticker_type``
-            instead.
+            The parameter ``contains_masks`` has been depreciated as of Bot API 6.2.
+            Use ``sticker_type`` instead.
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -4964,7 +4965,7 @@ class Bot(TelegramObject):
                 sticker sets can't be created via the Bot API at the moment. By default, a
                 regular sticker set is created.
 
-                .. versionadded:: 13.13
+                .. versionadded:: 13.14
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).

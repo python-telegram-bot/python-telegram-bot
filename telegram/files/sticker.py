@@ -68,7 +68,7 @@ class Sticker(TelegramObject):
         premium_animation (:class:`telegram.File`, optional): For premium regular stickers,
             premium animation for the sticker.
 
-            .. versionadded:: 13.14
+            .. versionadded:: 13.13
         custom_emoji (:obj:`str`, optional): For custom emoji stickers, unique identifier of the
             custom emoji.
 
@@ -101,7 +101,7 @@ class Sticker(TelegramObject):
         premium_animation (:class:`telegram.File`): Optional. For premium regular stickers,
             premium animation for the sticker.
 
-            .. versionadded:: 13.14
+            .. versionadded:: 13.13
         custom_emoji (:obj:`str`): Optional. For custom emoji stickers, unique identifier of the
             custom emoji.
 
@@ -203,11 +203,20 @@ class Sticker(TelegramObject):
         return self.bot.get_file(file_id=self.file_id, timeout=timeout, api_kwargs=api_kwargs)
 
     REGULAR: ClassVar[str] = constants.STICKER_REGULAR
-    """:const:`telegram.constants.STICKER_REGULAR`"""
+    """:const:`telegram.constants.STICKER_REGULAR`
+
+    .. versionadded:: 13.14
+    """
     MASK: ClassVar[str] = constants.STICKER_MASK
-    """:const:`telegram.constants.STICKER_MASK`"""
+    """:const:`telegram.constants.STICKER_MASK`
+
+    .. versionadded:: 13.14
+    """
     CUSTOM_EMOJI: ClassVar[str] = constants.STICKER_CUSTOM_EMOJI
-    """:const:`telegram.constants.STICKER_CUSTOM_EMOJI`"""
+    """:const:`telegram.constants.STICKER_CUSTOM_EMOJI`
+
+    .. versionadded:: 13.14
+    """
 
 
 class StickerSet(TelegramObject):
@@ -222,7 +231,7 @@ class StickerSet(TelegramObject):
         passed correctly.
 
     .. versionchanged:: 13.14:
-        The parameter ``contains_masks`` has been depreciated.
+        The parameter ``contains_masks`` has been depreciated as of Bot API 6.2.
         Use ``sticker_type`` instead.
 
     Args:
