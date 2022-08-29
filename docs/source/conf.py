@@ -5,7 +5,7 @@ import subprocess
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Tuple
+from typing import Any, Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -46,6 +46,7 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx_paramlinks",
     "sphinxcontrib.mermaid",
+    "sphinx_search.extension",
 ]
 
 # Use intersphinx to reference the python builtin library docs
@@ -376,7 +377,7 @@ file_root = Path(inspect.getsourcefile(telegram)).parent.parent.resolve()
 import telegram.ext  # Needed for checking if an object is a BaseFilter
 
 
-def autodoc_process_docstring(app: Sphinx, what, name: str, obj: object, options, lines):
+def autodoc_process_docstring(app: Sphinx, what, name: str, obj: Any, options, lines):
     """We misuse this autodoc hook to get the file names & line numbers because we have access
     to the actual object here.
     """
