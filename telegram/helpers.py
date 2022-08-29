@@ -110,7 +110,7 @@ def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
 
     Returns:
         :obj:`str` | :obj:`None`: One of :class:`telegram.constants.MessageType` if the entity
-            contains a message that matches one of those types. :obj:`None` otherwise.
+        contains a message that matches one of those types. :obj:`None` otherwise.
 
     """
     # Importing on file-level yields cyclic Import Errors

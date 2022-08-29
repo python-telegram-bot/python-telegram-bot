@@ -700,7 +700,7 @@ class Message(TelegramObject):
         * :class:`telegram.VideoNote`
         * :class:`telegram.Voice`
 
-         Otherwise :obj:`None` is returned.
+        Otherwise :obj:`None` is returned.
 
         .. versionchanged:: 20.0
             :attr:`dice`, :attr:`passport_data` and :attr:`poll` are now also considered to be an
