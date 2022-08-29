@@ -1,0 +1,82 @@
+/* This will style PTB's search box to dark mode, otherwise the theme is broken w/ furo */
+
+.search__outer {  /* fullscreen search box */
+    border-color: rgb(57, 61, 64);
+    background-color: rgb(26, 28, 29);
+    box-shadow: rgba(0, 0, 0, 0.09) 1px 3px 4px;
+}
+
+/* Modify search box scrollbar colors */
+.search__outer::-webkit-scrollbar-track {
+    background-color: #292727;
+}
+
+.search__outer::-webkit-scrollbar {
+    background-color: #292727;
+}
+
+.search__outer::-webkit-scrollbar-thumb {
+    background-color: #4b4848;
+}
+
+.search__outer .search__result__title span {  /* if search result is a heading */
+    background-color: #2f2f2f;
+    padding-bottom: 3px;
+    border-bottom-color: black;
+}
+
+.outer_div_page_results:hover {  /* change color when hovering over a search result */
+    background-color: rgb(30, 32, 33);
+}
+
+.search__result__single {  /* The full block of a search result */
+    border-bottom-color: rgb(55, 60, 62);
+    border-color: rgb(57, 61, 64);
+}
+
+.search__result__subheading {  /* search result subheading */
+    color: rgb(232, 230, 227);
+}
+
+.search__result__subheading span {  /* search result subheading content underline */
+    border-bottom-color: rgb(140, 130, 115);
+}
+
+.search__result__content {  /* This is the text that appears in the content of the results */
+    color: rgb(232, 230, 227);
+}
+
+.rtd__search__credits {  /* This is the "Search by" text */
+    background-image: initial;
+    background-color: rgb(34, 36, 38);
+    border-color: rgb(53, 57, 59);
+    color: rgb(232, 230, 227);
+}
+
+.rtd__search__credits a {  /* This is the link to the search provider */
+    color: rgb(232, 230, 227);
+}
+
+.search__result__title {  /* This is the title of the search result */
+    color: rgb(108, 174, 236);
+    border-bottom-color: rgb(18, 64, 134);
+}
+
+.search__outer__input {  /* This is the search box */
+    outline-color: initial;
+    background-color: rgb(26, 28, 29);
+    border-top-color: initial;
+    border-right-color: initial;
+    border-left-color: initial;
+    border-bottom-color: rgb(101, 94, 83);
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGRlZnM+PGZpbHRlciBpZD0iZGFya3JlYWRlci1pbWFnZS1maWx0ZXIiPjxmZUNvbG9yTWF0cml4IHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwLjI0OSAtMC42MTQgLTAuNjcyIDAuMDAwIDEuMDM1IC0wLjY0NiAwLjI4OCAtMC42NjQgMC4wMDAgMS4wMjAgLTAuNjM2IC0wLjYwOSAwLjI1MCAwLjAwMCAwLjk5NCAwLjAwMCAwLjAwMCAwLjAwMCAxLjAwMCAwLjAwMCIgLz48L2ZpbHRlcj48L2RlZnM+PGltYWdlIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWx0ZXI9InVybCgjZGFya3JlYWRlci1pbWFnZS1maWx0ZXIpIiB4bGluazpocmVmPSJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBEOTRiV3dnZG1WeWMybHZiajBpTVM0d0lpQmxibU52WkdsdVp6MGlhWE52TFRnNE5Ua3RNU0kvUGcwS1BDRXRMU0JIWlc1bGNtRjBiM0k2SUVGa2IySmxJRWxzYkhWemRISmhkRzl5SURFNUxqRXVNQ3dnVTFaSElFVjRjRzl5ZENCUWJIVm5MVWx1SUM0Z1UxWkhJRlpsY25OcGIyNDZJRFl1TURBZ1FuVnBiR1FnTUNrZ0lDMHRQZzBLUEhOMlp5QjJaWEp6YVc5dVBTSXhMakVpSUdsa1BTSkRZWEJoWHpFaUlIaHRiRzV6UFNKb2RIUndPaTh2ZDNkM0xuY3pMbTl5Wnk4eU1EQXdMM04yWnlJZ2VHMXNibk02ZUd4cGJtczlJbWgwZEhBNkx5OTNkM2N1ZHpNdWIzSm5MekU1T1RrdmVHeHBibXNpSUhnOUlqQndlQ0lnZVQwaU1IQjRJZzBLQ1NCMmFXVjNRbTk0UFNJd0lEQWdORFV4SURRMU1TSWdjM1I1YkdVOUltVnVZV0pzWlMxaVlXTnJaM0p2ZFc1a09tNWxkeUF3SURBZ05EVXhJRFExTVRzaUlIaHRiRHB6Y0dGalpUMGljSEpsYzJWeWRtVWlQZzBLUEdjK0RRb0pQSEJoZEdnZ1pEMGlUVFEwTnk0d05TdzBNamhzTFRFd09TNDJMVEV3T1M0Mll6STVMalF0TXpNdU9DdzBOeTR5TFRjM0xqa3NORGN1TWkweE1qWXVNVU16T0RRdU5qVXNPRFl1TWl3eU9UZ3VNelVzTUN3eE9USXVNelVzTUVNNE5pNHlOU3d3TERBdU1EVXNPRFl1TXl3d0xqQTFMREU1TWk0ekRRb0pDWE00Tmk0ekxERTVNaTR6TERFNU1pNHpMREU1TWk0ell6UTRMaklzTUN3NU1pNHpMVEUzTGpnc01USTJMakV0TkRjdU1rdzBNamd1TURVc05EUTNZekl1Tml3eUxqWXNOaTR4TERRc09TNDFMRFJ6Tmk0NUxURXVNeXc1TGpVdE5BMEtDUWxETkRVeUxqSTFMRFEwTVM0NExEUTFNaTR5TlN3ME16TXVNaXcwTkRjdU1EVXNOREk0ZWlCTk1qWXVPVFVzTVRreUxqTmpNQzA1TVM0eUxEYzBMakl0TVRZMUxqTXNNVFkxTGpNdE1UWTFMak5qT1RFdU1pd3dMREUyTlM0ekxEYzBMaklzTVRZMUxqTXNNVFkxTGpNTkNna0pjeTAzTkM0eExERTJOUzQwTFRFMk5TNHpMREUyTlM0MFF6RXdNUzR4TlN3ek5UY3VOeXd5Tmk0NU5Td3lPRE11TlN3eU5pNDVOU3d4T1RJdU0zb2lMejROQ2p3dlp6NE5DanhuUGcwS1BDOW5QZzBLUEdjK0RRbzhMMmMrRFFvOFp6NE5Dand2Wno0TkNqeG5QZzBLUEM5blBnMEtQR2MrRFFvOEwyYytEUW84Wno0TkNqd3ZaejROQ2p4blBnMEtQQzluUGcwS1BHYytEUW84TDJjK0RRbzhaejROQ2p3dlp6NE5DanhuUGcwS1BDOW5QZzBLUEdjK0RRbzhMMmMrRFFvOFp6NE5Dand2Wno0TkNqeG5QZzBLUEM5blBnMEtQR2MrRFFvOEwyYytEUW84Wno0TkNqd3ZaejROQ2p3dmMzWm5QZzBLIiAvPjwvc3ZnPg==");
+}
+
+.search__error__box {  /* This will style the error message when no results are found */
+    color: rgb(232, 230, 227);
+}
+
+.search__outer .search__result__content span {  /* style the underlined result */
+    background-color: rgb(31, 34, 35);
+    border-bottom-color: rgb(140, 130, 115);
+}
