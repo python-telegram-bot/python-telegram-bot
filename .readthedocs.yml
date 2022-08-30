@@ -27,12 +27,14 @@ build:
 
 search:
    ranking:  # bump up rank of commonly searched pages: (default: 0, values range from -10 to 10)
-      '*/telegram.bot.html': 3
-      '*/telegram.message.html': 2
-      '*/telegram.update.html': 2
+      '*/telegram.bot.html': 4
+      '*/telegram.message.html': 3
+      '*/telegram.update.html': 3
       '*/telegram.user.html': 2
       '*/telegram.chat.html': 2
-      '*/telegram.ext.application.html': 2
-      '*/telegram.ext.filters.html': 2
+      '*/telegram.ext.application.html': 3
+      '*/telegram.ext.filters.html': 3
       '*/telegram.ext.callbackcontext.html': 2
       '*/telegram.ext.inlinekeyboardbutton.html': 1
+
+      '*/telegram.passport*.html': -6
