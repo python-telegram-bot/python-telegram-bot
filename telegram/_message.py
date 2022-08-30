@@ -118,7 +118,7 @@ class Message(TelegramObject):
             or from anonymous administrators, information about the original sender chat.
         forward_from_message_id (:obj:`int`, optional): For forwarded channel posts, identifier of
             the original message in the channel.
-        forward_sender_name	(:obj:`str`, optional): Sender's name for messages forwarded from
+        forward_sender_name (:obj:`str`, optional): Sender's name for messages forwarded from
             users who disallow adding a link to their account in forwarded messages.
         forward_date (:class:`datetime.datetime`, optional): For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
@@ -199,15 +199,9 @@ class Message(TelegramObject):
 
             .. versionadded:: 13.4
         migrate_to_chat_id (:obj:`int`, optional): The group has been migrated to a supergroup
-            with the specified identifier. This number may be greater than 32 bits and some
-            programming languages may have difficulty/silent defects in interpreting it. But it is
-            smaller than 52 bits, so a signed 64 bit integer or double-precision float type are
-            safe for storing this identifier.
+            with the specified identifier.
         migrate_from_chat_id (:obj:`int`, optional): The supergroup has been migrated from a group
-            with the specified identifier. This number may be greater than 32 bits and some
-            programming languages may have difficulty/silent defects in interpreting it. But it is
-            smaller than 52 bits, so a signed 64 bit integer or double-precision float type are
-            safe for storing this identifier.
+            with the specified identifier.
         pinned_message (:class:`telegram.Message`, optional): Specified message was pinned. Note
             that the Message object in this field will not contain further 
             :attr:`reply_to_message` fields even if it is itself a reply.
@@ -259,7 +253,7 @@ class Message(TelegramObject):
             sent to channels. For backward compatibility, this will contain a fake sender user in
             non-channel chats, if the message was sent on behalf of a chat.
         sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
-            chat.  For example, the channel itself for channel posts, the supergroup itself for
+            chat. For example, the channel itself for channel posts, the supergroup itself for
             messages from anonymous group administrators, the linked channel for messages
             automatically forwarded to the discussion group. For backward compatibility,
             :attr:`from_user` contains a fake sender user in non-channel chats, if the message was
@@ -379,8 +373,8 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
-        dice (:class:`telegram.Dice`): Optional. Message is a dice with random value from 1 to 6.
-        via_bot (:class:`telegram.User`): Optional. Message was sent through an inline bot.
+        dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.
+        via_bot (:class:`telegram.User`): Optional. Bot through which message was sent.
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`): Optional. Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
@@ -405,7 +399,7 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message. ``login_url`` buttons are represented as ordinary url buttons.
+            to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are represented as ordinary url buttons.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
