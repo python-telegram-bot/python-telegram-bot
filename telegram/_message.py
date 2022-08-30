@@ -160,7 +160,7 @@ class Message(TelegramObject):
             of the photo. This list is empty if the message does not contain a photo.
         sticker (:class:`telegram.Sticker`, optional): Message is a sticker, information
             about the sticker.
-        video (:class:`telegram.Video`, optional): Message is a video, information about the 
+        video (:class:`telegram.Video`, optional): Message is a video, information about the
             video.
         voice (:class:`telegram.Voice`, optional): Message is a voice message, information about
             the file.
@@ -175,8 +175,8 @@ class Message(TelegramObject):
             about the contact.
         location (:class:`telegram.Location`, optional): Message is a shared location, information
             about the location.
-        venue (:class:`telegram.Venue`, optional): Message is a venue, information about the 
-            venue. For backward compatibility, when this field is set, the location field will 
+        venue (:class:`telegram.Venue`, optional): Message is a venue, information about the
+            venue. For backward compatibility, when this field is set, the location field will
             also be set.
         left_chat_member (:class:`telegram.User`, optional): A member was removed from the group,
             information about them (this member may be the bot itself).
@@ -203,7 +203,7 @@ class Message(TelegramObject):
         migrate_from_chat_id (:obj:`int`, optional): The supergroup has been migrated from a group
             with the specified identifier.
         pinned_message (:class:`telegram.Message`, optional): Specified message was pinned. Note
-            that the Message object in this field will not contain further 
+            that the Message object in this field will not contain further
             :attr:`reply_to_message` fields even if it is itself a reply.
         invoice (:class:`telegram.Invoice`, optional): Message is an invoice for a payment,
             information about the invoice.
@@ -218,8 +218,8 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
-        dice (:class:`telegram.Dice`, optional): Message is a dice with random value from 1 to 6.
-        via_bot (:class:`telegram.User`, optional): Message was sent through an inline bot.
+        dice (:class:`telegram.Dice`, optional): Message is a dice with random value.
+        via_bot (:class:`telegram.User`, optional): Bot through which message was sent.
         proximity_alert_triggered (:class:`telegram.ProximityAlertTriggered`, optional): Service
             message. A user in the chat triggered another user's proximity alert while sharing
             Live Location.
@@ -244,7 +244,8 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
-            to the message. ``login_url`` buttons are represented as ordinary url buttons.
+            to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are
+            represented as ordinary url buttons.
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Attributes:
@@ -261,7 +262,7 @@ class Message(TelegramObject):
         date (:class:`datetime.datetime`): Date the message was sent in Unix time. Converted to
             :class:`datetime.datetime`.
         chat (:class:`telegram.Chat`): Conversation the message belongs to.
-        forward_from (:class:`telegram.User`): Optional. For forwarded messages, sender of the 
+        forward_from (:class:`telegram.User`): Optional. For forwarded messages, sender of the
             original message.
         forward_from_chat (:class:`telegram.Chat`): Optional. For messages forwarded from channels
             or from anonymous administrators, information about the original sender chat.
@@ -307,7 +308,7 @@ class Message(TelegramObject):
             of the photo. This list is empty if the message does not contain a photo.
         sticker (:class:`telegram.Sticker`): Optional. Message is a sticker, information
             about the sticker.
-        video (:class:`telegram.Video`): Optional. Message is a video, information about the 
+        video (:class:`telegram.Video`): Optional. Message is a video, information about the
             video.
         voice (:class:`telegram.Voice`): Optional. Message is a voice message, information about
             the file.
@@ -322,8 +323,8 @@ class Message(TelegramObject):
             about the contact.
         location (:class:`telegram.Location`): Optional. Message is a shared location, information
             about the location.
-        venue (:class:`telegram.Venue`): Optional. Message is a venue, information about the 
-            venue. For backward compatibility, when this field is set, the location field will 
+        venue (:class:`telegram.Venue`): Optional. Message is a venue, information about the
+            venue. For backward compatibility, when this field is set, the location field will
             also be set.
         left_chat_member (:class:`telegram.User`): Optional. A member was removed from the group,
             information about them (this member may be the bot itself).
@@ -346,17 +347,11 @@ class Message(TelegramObject):
 
             .. versionadded:: 13.4
         migrate_to_chat_id (:obj:`int`): Optional. The group has been migrated to a supergroup
-            with the specified identifier. This number may be greater than 32 bits and some
-            programming languages may have difficulty/silent defects in interpreting it. But it is
-            smaller than 52 bits, so a signed 64 bit integer or double-precision float type are
-            safe for storing this identifier.
+            with the specified identifier.
         migrate_from_chat_id (:obj:`int`): Optional. The supergroup has been migrated from a group
-            with the specified identifier. This number may be greater than 32 bits and some
-            programming languages may have difficulty/silent defects in interpreting it. But it is
-            smaller than 52 bits, so a signed 64 bit integer or double-precision float type are
-            safe for storing this identifier.
+            with the specified identifier.
         pinned_message (:class:`telegram.Message`): Optional. Specified message was pinned. Note
-            that the Message object in this field will not contain further 
+            that the Message object in this field will not contain further
             :attr:`reply_to_message` fields even if it is itself a reply.
         invoice (:class:`telegram.Invoice`): Optional. Message is an invoice for a payment,
             information about the invoice.
@@ -399,7 +394,8 @@ class Message(TelegramObject):
 
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are represented as ordinary url buttons.
+            to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are
+            represented as ordinary url buttons.
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
