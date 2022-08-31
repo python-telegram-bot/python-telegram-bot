@@ -361,7 +361,7 @@ class Message(TelegramObject):
             has logged in.
         forward_signature (:obj:`str`): Optional. For messages forwarded from channels, signature
             of the post author if present.
-        forward_sender_name	(:obj:`str`): Optional. Sender's name for messages forwarded from
+        forward_sender_name (:obj:`str`): Optional. Sender's name for messages forwarded from
             users who disallow adding a link to their account in forwarded messages.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
