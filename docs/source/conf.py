@@ -216,9 +216,7 @@ html_static_path = ["_static"]
 html_css_files = [
     "style_external_link.css",
     "style_mermaid_diagrams.css",
-    "style_search_box.css",
 ]
-html_js_files = ["sort_search_results.js"]
 
 html_permalinks_icon = "¶"  # Furo's default permalink icon is `#`` which doesn't look great imo.
 
