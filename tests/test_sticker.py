@@ -700,18 +700,20 @@ class TestStickerSet:
                         and isinstance(data.get("webm_sticker"), InputFile)
                     )
 
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        await bot.create_new_sticker_set(
-            chat_id,
-            "name",
-            "title",
-            "emoji",
-            png_sticker=file,
-            tgs_sticker=file,
-            webm_sticker=file,
-        )
-        assert test_flag
-        monkeypatch.delattr(bot, "_post")
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.create_new_sticker_set(
+                chat_id,
+                "name",
+                "title",
+                "emoji",
+                png_sticker=file,
+                tgs_sticker=file,
+                webm_sticker=file,
+            )
+            assert test_flag
+            monkeypatch.delattr(bot, "_post")
+        finally:
+            bot.local_mode = False
 
     async def test_create_new_sticker_all_params(self, monkeypatch, bot, chat_id, mask_position):
         async def make_assertion(_, data, *args, **kwargs):
