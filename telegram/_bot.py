@@ -1181,6 +1181,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 (recommended), pass an HTTP URL as a String for Telegram to get a file from the
                 Internet, or upload a new one using multipart/form-data. Lastly you can pass
                 an existing :class:`telegram.Document` object to send.
+                |fileinput|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.

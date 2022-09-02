@@ -1,0 +1,1 @@
+.. |fileinput| replace:: Some text to insert
