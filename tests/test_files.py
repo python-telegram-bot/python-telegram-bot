@@ -16,6 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -125,3 +128,34 @@ class TestFiles:
 
         assert isinstance(parsed, InputFile)
         assert bool(parsed.attach_name) is attach
+
+    def test_load_file_none(self):
+        assert telegram._utils.files.load_file(None) == (None, None)
+
+    @pytest.mark.parametrize("arg", [b"bytes", "string", InputFile(b"content"), Path("file/path")])
+    def test_load_file_no_file(self, arg):
+        out = telegram._utils.files.load_file(arg)
+        assert out[0] is None
+        assert out[1] is arg
+
+    def test_load_file_file_handle(self):
+        out = telegram._utils.files.load_file(data_file("telegram.gif").open("rb"))
+        assert out[0] == "telegram.gif"
+        assert out[1] == data_file("telegram.gif").read_bytes()
+
+    def test_load_file_subprocess_pipe(self):
+        png_file = data_file("telegram.png")
+        cmd_str = "type" if sys.platform == "win32" else "cat"
+        cmd = [cmd_str, str(png_file)]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=(sys.platform == "win32"))
+        out = telegram._utils.files.load_file(proc.stdout)
+
+        assert out[0] is None
+        assert out[1] == png_file.read_bytes()
+
+        try:
+            proc.kill()
+        except ProcessLookupError:
+            # This exception may be thrown if the process has finished before we had the chance
+            # to kill it.
+            pass
