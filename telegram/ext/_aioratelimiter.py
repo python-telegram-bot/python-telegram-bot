@@ -51,7 +51,7 @@ else:
 class AIORateLimiter(BaseRateLimiter[int]):
     """
     Implementation of :class:`~telegram.ext.BaseRateLimiter` using the library
-    `aiolimiter <https://aiolimiter.readthedocs.io/>`_.
+    `aiolimiter <https://aiolimiter.readthedocs.io/en/stable>`_.
 
     Important:
         If you want to use this class, you must install PTB with the optional requirement

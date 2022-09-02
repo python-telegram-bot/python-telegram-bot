@@ -33,7 +33,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     Convenience class to gather customizable types of the :class:`telegram.ext.CallbackContext`
     interface.
 
-    .. seealso:: `ContextTypes Example <examples.contexttypesbot.html>`_
+    .. seealso:: :any:`ContextTypes Example <examples.contexttypesbot>`
 
     .. versionadded:: 13.6
 

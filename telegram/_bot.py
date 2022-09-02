@@ -6559,14 +6559,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                    Accept :obj:`bytes` as input.
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **TGS** animation with the sticker, uploaded using multipart/form-data.
-                See https://core.telegram.org/stickers#animated-sticker-requirements for technical
+                See https://core.telegram.org/stickers#animation-requirements for technical
                 requirements.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
                 optional): **WEBM** video with the sticker, uploaded using multipart/form-data.
-                See https://core.telegram.org/stickers#video-sticker-requirements for
+                See https://core.telegram.org/stickers#video-requirements for
                 technical requirements.
 
                 .. versionadded:: 13.11
@@ -6678,14 +6678,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                    Accept :obj:`bytes` as input.
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **TGS** animation with the sticker, uploaded using multipart/form-data.
-                See https://core.telegram.org/stickers#animated-sticker-requirements for technical
+                See https://core.telegram.org/stickers#animation-requirements for technical
                 requirements.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
                 optional): **WEBM** video with the sticker, uploaded using multipart/form-data.
-                See https://core.telegram.org/stickers#video-sticker-requirements for
+                See https://core.telegram.org/stickers#video-requirements for
                 technical requirements.
 
                 .. versionadded:: 13.11
@@ -6871,10 +6871,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 optional): A **PNG** image with the thumbnail, must
                 be up to 128 kilobytes in size and have width and height exactly 100px, or a
                 **TGS** animation with the thumbnail up to 32 kilobytes in size; see
-                https://core.telegram.org/stickers#animated-sticker-requirements for animated
+                https://core.telegram.org/stickers#animation-requirements for animated
                 sticker technical requirements, or a **WEBM** video with the thumbnail up to 32
                 kilobytes in size; see
-                https://core.telegram.org/stickers#video-sticker-requirements for video sticker
+                https://core.telegram.org/stickers#video-requirements for video sticker
                 technical requirements. Pass a file_id as a String to send a file that
                 already exists on the Telegram servers, pass an HTTP URL as a String for Telegram
                 to get a file from the Internet, or upload a new one using multipart/form-data.
