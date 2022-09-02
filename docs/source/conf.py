@@ -463,7 +463,6 @@ PRIVATE_BASE_CLASSES = {
     "_BaseThumbedMedium": "TelegramObject",
     "_BaseMedium": "TelegramObject",
     "_CredentialsBase": "TelegramObject",
-    "_InputMediaThumbed": "InputMedia",
 }
 
 

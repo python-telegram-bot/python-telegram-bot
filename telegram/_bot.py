@@ -354,10 +354,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         # We don't do this earlier so that _insert_defaults (see above) has a chance to convert
         # to the default timezone in case this is called by ExtBot
         request_data = RequestData(
-            parameters=[
-                RequestParameter.from_input(key, value, local_mode=self.local_mode)
-                for key, value in data.items()
-            ],
+            parameters=[RequestParameter.from_input(key, value) for key, value in data.items()],
         )
 
         if endpoint == "getUpdates":
