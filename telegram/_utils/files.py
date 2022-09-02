@@ -53,7 +53,8 @@ def load_file(
     obj: Optional[FileInput],
 ) -> Tuple[Optional[str], Union[bytes, "InputFile", str, Path, None]]:
     """If the input is a file handle, read the data and name and return it. Otherwise, return
-    the input unchanged."""
+    the input unchanged.
+    """
     if obj is None:
         return None, None
 
