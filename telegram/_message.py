@@ -3132,10 +3132,11 @@ class Message(TelegramObject):
         in the same way the original message was formatted.
 
         Note:
-            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-            Telegram for backward compatibility. You should use :meth:`text_markdown_v2` instead.
+            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+                Telegram for backward compatibility. You should use
+                :meth:`text_markdown_v2` instead.
 
-            |custom_emoji_formatting_note|
+            * |custom_emoji_formatting_note|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3175,11 +3176,11 @@ class Message(TelegramObject):
         This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         Note:
-            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-            Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
-            instead.
+            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+                Telegram for backward compatibility. You should use :meth:`text_markdown_v2_urled`
+                instead.
 
-            |custom_emoji_formatting_note|
+            * |custom_emoji_formatting_note|
 
         Returns:
             :obj:`str`: Message text with entities formatted as Markdown.
@@ -3219,11 +3220,11 @@ class Message(TelegramObject):
         Markdown in the same way the original message was formatted.
 
         Note:
-            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-            Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
-            instead.
+            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+              Telegram for backward compatibility. You should use :meth:`caption_markdown_v2`
+              instead.
 
-            |custom_emoji_formatting_note|
+            * |custom_emoji_formatting_note|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
@@ -3265,11 +3266,11 @@ class Message(TelegramObject):
         Markdown. This also formats :attr:`telegram.MessageEntity.URL` as a hyperlink.
 
         Note:
-            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
-            Telegram for backward compatibility. You should use :meth:`caption_markdown_v2_urled`
-            instead.
+            * :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+                Telegram for backward compatibility. You should use
+                :meth:`caption_markdown_v2_urled` instead.
 
-            |custom_emoji_formatting_note|
+            * |custom_emoji_formatting_note|
 
         Returns:
             :obj:`str`: Message caption with caption entities formatted as Markdown.
