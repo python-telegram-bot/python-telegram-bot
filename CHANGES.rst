@@ -2,6 +2,27 @@
 Changelog
 =========
 
+Version 13.14
+=============
+*Released 2022-09-04*
+
+This is the technical changelog for version 13.14. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+**Major Changes:**
+
+- Full Support for API 6.2 (`#3203`_)
+
+**Minor Changes:**
+
+- Documentation Improvements (`#3144`_, `#3140`_, `#3164`_)
+- Pin `tornado` to Version 6.1 (`#3145`_)
+
+.. _`#3203`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3203
+.. _`#3144`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3144
+.. _`#3140`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3140
+.. _`#3164`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3164
+.. _`#3145`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3145
+
 Version 13.13
 =============
 *Released 2022-06-28*
