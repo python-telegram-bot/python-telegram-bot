@@ -2429,8 +2429,8 @@ class Bot(TelegramObject):
         if result.get('file_path') and not is_local_file(  # type: ignore[union-attr]
             result['file_path']  # type: ignore[index]
         ):
-            result['file_path'] = '{}/{}'.format(  # type: ignore[index]
-                self.base_file_url, result['file_path']  # type: ignore[index]
+            result['file_path'] = (  # type: ignore[index]
+                f"{self.base_file_url}/" f"{result['file_path']}"  # type: ignore[index]
             )
 
         return File.de_json(result, self)  # type: ignore[return-value, arg-type]
@@ -4814,6 +4814,37 @@ class Bot(TelegramObject):
         return StickerSet.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @log
+    def get_custom_emoji_stickers(
+        self,
+        custom_emoji_ids: List[str],
+        *,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> List[Sticker]:
+        """
+        Use this method to get information about emoji stickers by their identifiers.
+
+        .. versionadded:: 13.14
+
+        Args:
+            custom_emoji_ids (List[:obj:`str`]): List of custom emoji identifiers.
+                At most 200 custom emoji identifiers can be specified.
+        Keyword Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during
+                creation of the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+        Returns:
+            List[:class:`telegram.Sticker`]
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {"custom_emoji_ids": custom_emoji_ids}
+        result = self._post("getCustomEmojiStickers", data, timeout=timeout, api_kwargs=api_kwargs)
+        return Sticker.de_list(result, self)  # type: ignore[return-value, arg-type]
+
+    @log
     def upload_sticker_file(
         self,
         user_id: Union[str, int],
@@ -4871,6 +4902,7 @@ class Bot(TelegramObject):
         tgs_sticker: FileInput = None,
         api_kwargs: JSONDict = None,
         webm_sticker: FileInput = None,
+        sticker_type: str = None,
     ) -> bool:
         """
         Use this method to create new sticker set owned by a user.
@@ -4886,6 +4918,10 @@ class Bot(TelegramObject):
         Note:
             The png_sticker and tgs_sticker argument can be either a file_id, an URL or a file from
             disk ``open(filename, 'rb')``
+
+        .. versionchanged:: 13.14
+            The parameter ``contains_masks`` has been depreciated as of Bot API 6.2.
+            Use ``sticker_type`` instead.
 
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -4924,6 +4960,12 @@ class Bot(TelegramObject):
                 should be created.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
+            sticker_type (:obj:`str`, optional): Type of stickers in the set, pass
+                :attr:`telegram.Sticker.REGULAR` or :attr:`telegram.Sticker.MASK`. Custom emoji
+                sticker sets can't be created via the Bot API at the moment. By default, a
+                regular sticker set is created.
+
+                .. versionadded:: 13.14
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during
                 creation of the connection pool).
@@ -4951,7 +4993,8 @@ class Bot(TelegramObject):
             # We need to_json() instead of to_dict() here, because we're sending a media
             # message here, which isn't json dumped by utils.request
             data['mask_position'] = mask_position.to_json()
-
+        if sticker_type is not None:
+            data['sticker_type'] = sticker_type
         result = self._post('createNewStickerSet', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return result  # type: ignore[return-value]
@@ -6206,6 +6249,8 @@ class Bot(TelegramObject):
     """Alias for :meth:`unpin_all_chat_messages`"""
     getStickerSet = get_sticker_set
     """Alias for :meth:`get_sticker_set`"""
+    getCustomEmojiStickers = get_custom_emoji_stickers
+    """Alias for :meth:`get_custom_emoji_stickers`"""
     uploadStickerFile = upload_sticker_file
     """Alias for :meth:`upload_sticker_file`"""
     createNewStickerSet = create_new_sticker_set

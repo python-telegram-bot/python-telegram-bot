@@ -1,4 +1,6 @@
 sphinx==3.5.4
+# sphinx breaks because it relies on an removed param from jinja2, so pinning to old version
+Jinja2<3.1
 sphinx-pypi-upload
 # When bumping this, make sure to rebuild the dark-mode CSS
 # More instructions at source/_static/dark.css

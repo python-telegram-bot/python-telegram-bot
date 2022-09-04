@@ -56,7 +56,7 @@ class TelegramError(Exception):
         self.message = msg
 
     def __str__(self) -> str:
-        return '%s' % self.message
+        return f'{self.message}'
 
     def __reduce__(self) -> Tuple[type, Tuple[str]]:
         return self.__class__, (self.message,)
