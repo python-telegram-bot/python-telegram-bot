@@ -259,7 +259,6 @@ latex_logo = "ptb-logo_1024.png"
 # (source start file, name, description, authors, manual section).
 man_pages = [(master_doc, "python-telegram-bot", "python-telegram-bot Documentation", [author], 1)]
 
-
 # rtd_sphinx_search_file_type = "un-minified"  # Configuration for rtd-sphinx-search
 
 # -- Options for Texinfo output -------------------------------------------
