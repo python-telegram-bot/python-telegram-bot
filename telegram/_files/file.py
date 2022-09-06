@@ -21,7 +21,7 @@ import shutil
 import urllib.parse as urllib_parse
 from base64 import b64decode
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Optional, Union
+from typing import IO, TYPE_CHECKING, Any, Optional, Union, overload
 
 from telegram._passport.credentials import decrypt
 from telegram._telegramobject import TelegramObject
@@ -97,10 +97,31 @@ class File(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
+    @overload
     async def download(
         self,
-        custom_path: FilePathInput = None,
+        out: FilePathInput = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+    ) -> Union[Path, IO]:
+        ...
+
+    @overload
+    async def download(
+        self,
         out: IO = None,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+    ) -> Union[Path, IO]:
+        ...
+
+    async def download(
+        self,
+        out: Union[IO, FilePathInput] = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -108,27 +129,29 @@ class File(TelegramObject):
     ) -> Union[Path, IO]:
         """
         Download this file. By default, the file is saved in the current working directory with its
-        original filename as reported by Telegram. If the file has no filename, it the file ID will
-        be used as filename. If a :paramref:`custom_path` is supplied, it will be saved to that
-        path instead. If :paramref:`out` is defined, the file contents will be saved to that object
-        using the :obj:`out.write<io.BufferedWriter.write>` method.
+        original filename as reported by Telegram. If the file has no filename, the file ID will
+        be used as filename. If :paramref:`out` is supplied with an :obj:`str` or
+        :obj:`pathlib.Path`, it will be saved to that path; if it is supplied with a
+        :obj:`io.BufferedWriter`, the file contents will be saved to that object using the
+        :obj:`out.write<io.BufferedWriter.write>` method.
 
         Note:
-            * :paramref:`custom_path` and :paramref:`out` are mutually exclusive.
-            * If neither :paramref:`custom_path` nor :paramref:`out` is provided and
-              :attr:`file_path` is the path of a local file (which is the case when a Bot API
-              Server is running in local mode), this method will just return the path.
+            * If :paramref:`out` isn't provided and :attr:`file_path` is the path of a local file
+              (which is the case when a Bot API Server is running in local mode), this method
+              will just return the path.
 
         .. versionchanged:: 20.0
 
             * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
             * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
               returned.
+            * Merging :paramref:`custom_path` and :paramref:`out` and overloading the type hint.
+
 
         Args:
-            custom_path (:class:`pathlib.Path` | :obj:`str`, optional): Custom path.
-            out (:obj:`io.BufferedWriter`, optional): A file-like object. Must be opened for
-                writing in binary mode, if applicable.
+            out (:obj:`io.BufferedWriter` | :class:`pathlib.Path` | :obj:`str` , optional): A
+                file-like object or a Path. Must be opened for writing in binary mode, if
+                applicable.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -151,14 +174,24 @@ class File(TelegramObject):
             ValueError: If both :paramref:`custom_path` and :paramref:`out` are passed.
 
         """
-        if custom_path is not None and out is not None:
-            raise ValueError("`custom_path` and `out` are mutually exclusive")
 
         local_file = is_local_file(self.file_path)
         url = None if local_file else self._get_encoded_url()
         path = Path(self.file_path) if local_file else None
 
-        if out:
+        # the following setup was done this way because while we only document BufferedWriter as
+        # out argument, there could be different ones applicable (e.g. tests broke because we pass
+        # a tempfile instance). So we can not check the instance of out for all the file like
+        # inputs, we can however check if they are a string or a Path, which is the only allowed
+        # input for a filename. The idea is to check if it is a filename, if it isn't but it
+        # exists, it must be a file like input.
+        # sadly, mypy can not see the isinstance connection, which means we need to ignore it
+        custom_path = None
+
+        if isinstance(out, (str, Path)):
+            custom_path = out
+
+        if not custom_path and out:
             if local_file:
                 buf = path.read_bytes()
             else:
@@ -167,8 +200,8 @@ class File(TelegramObject):
                     buf = decrypt(
                         b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
                     )
-            out.write(buf)
-            return out
+            out.write(buf)  # type: ignore[union-attr]
+            return out  # type: ignore[return-value]
 
         if custom_path is not None and local_file:
             shutil.copyfile(self.file_path, str(custom_path))
