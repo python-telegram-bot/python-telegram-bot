@@ -174,7 +174,6 @@ class File(TelegramObject):
             ValueError: If both :paramref:`custom_path` and :paramref:`out` are passed.
 
         """
-
         local_file = is_local_file(self.file_path)
         url = None if local_file else self._get_encoded_url()
         path = Path(self.file_path) if local_file else None
