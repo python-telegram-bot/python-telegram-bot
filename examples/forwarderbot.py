@@ -7,11 +7,12 @@ Simple Bot to forward a user's message to a chat.
 
 For the bot to forward the message to the group the following steps are necessary:
 - Add the bot to the group
-- Get the group's or chat's id => https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id
-- Store the group's or chat's id in the "destination_id" variable (line 36)
+- Get the group's or chat's id:
+    https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id
+- Save the group's or chat's id in the "destination_id" variable (line 36)
 
 Usage:
-Basic bot to forward messages to a determined group or chat
+Basic bot to forward messages to a determined group
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
@@ -48,31 +49,31 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-destination_id = '863408203'
+destination_id = "id"
 
 async def start(update:Update, context:CallbackContext) -> None:
+    """Starts the conversation and asks the user to send a message"""
     user = update.effective_user.first_name
     await update.message.reply_text(f'''
         Hi {user}, send a message to forward it to the designated chat
         ''')
-    return
 
 
 async def forward_message(update:Update, context:CallbackContext) -> None:
+    """Forwards the user's message to the designated group or chat"""
     await context.bot.forward_message(
         chat_id=destination_id,
         from_chat_id=update.effective_chat.id, 
         message_id=update.message.message_id
         )
     await update.message.reply_text("Message forwarded!")
-    return
 
 
 
 def main() -> None:
     """Run bot."""
     # Create the Updater and pass it your bot's token.
-    application = Application.builder().token("5178932040:AAEZMvRxHPuc-85EGMqqMcJGffnlV4lrm1Y").build()
+    application = Application.builder().token("TOKEN").build()
 
     # Handle the /start command
     start_handler = CommandHandler("start", start)
