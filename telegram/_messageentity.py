@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageEntity."""
 
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
+from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -87,7 +87,7 @@ class MessageEntity(TelegramObject):
         user: User = None,
         language: str = None,
         custom_emoji_id: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.type = enum.get_member(constants.MessageEntityType, type, type)

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Dice."""
-from typing import Any, ClassVar, List
+from typing import ClassVar, Dict, List
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -67,7 +67,7 @@ class Dice(TelegramObject):
 
     __slots__ = ("emoji", "value")
 
-    def __init__(self, value: int, emoji: str, **_kwargs: Any):
+    def __init__(self, value: int, emoji: str, api_kwargs: Dict[str, object] = None):
         self.value = value
         self.emoji = emoji
 

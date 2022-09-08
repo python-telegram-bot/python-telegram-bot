@@ -236,7 +236,7 @@ class Update(TelegramObject):
         my_chat_member: ChatMemberUpdated = None,
         chat_member: ChatMemberUpdated = None,
         chat_join_request: ChatJoinRequest = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.update_id = update_id

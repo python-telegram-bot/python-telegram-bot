@@ -60,7 +60,7 @@ class Animation(_BaseThumbedMedium):
         file_name (:obj:`str`): Optional. Original animation filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -77,8 +77,7 @@ class Animation(_BaseThumbedMedium):
         file_name: str = None,
         mime_type: str = None,
         file_size: int = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         super().__init__(
             file_id=file_id,

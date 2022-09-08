@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputContactMessageContent."""
 
-from typing import Any
+from typing import Dict
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 
@@ -54,8 +54,10 @@ class InputContactMessageContent(InputMessageContent):
         first_name: str,
         last_name: str = None,
         vcard: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.phone_number = phone_number
         self.first_name = first_name

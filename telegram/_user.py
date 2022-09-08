@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
@@ -104,7 +104,6 @@ class User(TelegramObject):
             disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
         supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
         is_premium (:obj:`bool`): Optional. :obj:`True`, if this user is a Telegram
             Premium user.
 
@@ -140,10 +139,9 @@ class User(TelegramObject):
         can_join_groups: bool = None,
         can_read_all_group_messages: bool = None,
         supports_inline_queries: bool = None,
-        bot: "Bot" = None,
         is_premium: bool = None,
         added_to_attachment_menu: bool = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.id = id  # pylint: disable=invalid-name

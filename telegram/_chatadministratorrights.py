@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class which represents a Telegram ChatAdministratorRights."""
 
-from typing import Any
+from typing import Dict
 
 from telegram._telegramobject import TelegramObject
 
@@ -119,7 +119,7 @@ class ChatAdministratorRights(TelegramObject):
         can_post_messages: bool = None,
         can_edit_messages: bool = None,
         can_pin_messages: bool = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ) -> None:
         # Required
         self.is_anonymous = is_anonymous

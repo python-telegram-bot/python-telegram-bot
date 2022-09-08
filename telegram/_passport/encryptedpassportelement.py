@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 from base64 import b64decode
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
@@ -110,7 +110,7 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+        
 
     """
 
@@ -139,10 +139,11 @@ class EncryptedPassportElement(TelegramObject):
         reverse_side: PassportFile = None,
         selfie: PassportFile = None,
         translation: List[PassportFile] = None,
-        bot: "Bot" = None,
         credentials: "Credentials" = None,  # pylint: disable=unused-argument
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.type = type
         # Optionals

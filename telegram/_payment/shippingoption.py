@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
 
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Dict, List
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -55,8 +55,10 @@ class ShippingOption(TelegramObject):
         id: str,  # pylint: disable=redefined-builtin, invalid-name
         title: str,
         prices: List["LabeledPrice"],
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         self.id = id  # pylint: disable=invalid-name
         self.title = title
         self.prices = prices

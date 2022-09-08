@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Video."""
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Dict
 
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
@@ -61,7 +61,7 @@ class Video(_BaseThumbedMedium):
         file_name (:obj:`str`): Optional. Original filename as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of a file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -77,9 +77,8 @@ class Video(_BaseThumbedMedium):
         thumb: PhotoSize = None,
         mime_type: str = None,
         file_size: int = None,
-        bot: "Bot" = None,
         file_name: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         super().__init__(
             file_id=file_id,

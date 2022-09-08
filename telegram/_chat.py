@@ -251,7 +251,6 @@ class Chat(TelegramObject):
         username: str = None,
         first_name: str = None,
         last_name: str = None,
-        bot: "Bot" = None,
         photo: ChatPhoto = None,
         description: str = None,
         invite_link: str = None,
@@ -269,7 +268,7 @@ class Chat(TelegramObject):
         join_to_send_messages: bool = None,
         join_by_request: bool = None,
         has_restricted_voice_and_video_messages: bool = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.id = id  # pylint: disable=invalid-name

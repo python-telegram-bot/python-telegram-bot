@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
-from typing import Any
+from typing import Dict
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 
@@ -72,7 +72,7 @@ class InputLocationMessageContent(InputMessageContent):
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.latitude = latitude

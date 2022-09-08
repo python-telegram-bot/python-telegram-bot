@@ -52,7 +52,11 @@ class InlineKeyboardMarkup(TelegramObject):
 
     __slots__ = ("inline_keyboard",)
 
-    def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]], **_kwargs: Any):
+    def __init__(
+        self,
+        inline_keyboard: List[List[InlineKeyboardButton]],
+        api_kwargs: Dict[str, object] = None,
+    ):
         if not check_keyboard_type(inline_keyboard):
             raise ValueError(
                 "The parameter `inline_keyboard` should be a list of "

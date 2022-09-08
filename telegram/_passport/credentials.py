@@ -19,7 +19,7 @@
 # pylint: disable=missing-module-docstring,  redefined-builtin
 import json
 from base64 import b64decode
-from typing import TYPE_CHECKING, Any, List, Optional, no_type_check
+from typing import TYPE_CHECKING, Dict, List, Optional, no_type_check
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -137,7 +137,13 @@ class EncryptedCredentials(TelegramObject):
         "_decrypted_data",
     )
 
-    def __init__(self, data: str, hash: str, secret: str, bot: "Bot" = None, **_kwargs: Any):
+    def __init__(
+        self,
+        data: str,
+        hash: str,
+        secret: str,
+        api_kwargs: Dict[str, object] = None,
+    ):
         # Required
         self.data = data
         self.hash = hash
@@ -208,7 +214,12 @@ class Credentials(TelegramObject):
 
     __slots__ = ("nonce", "secure_data")
 
-    def __init__(self, secure_data: "SecureData", nonce: str, bot: "Bot" = None, **_kwargs: Any):
+    def __init__(
+        self,
+        secure_data: "SecureData",
+        nonce: str,
+        api_kwargs: Dict[str, object] = None,
+    ):
         # Required
         self.secure_data = secure_data
         self.nonce = nonce
@@ -365,8 +376,7 @@ class SecureValue(TelegramObject):
         selfie: "FileCredentials" = None,
         files: List["FileCredentials"] = None,
         translation: List["FileCredentials"] = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.data = data
         self.front_side = front_side
@@ -409,7 +419,7 @@ class _CredentialsBase(TelegramObject):
 
     __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
-    def __init__(self, hash: str, secret: str, bot: "Bot" = None, **_kwargs: Any):
+    def __init__(self, hash: str, secret: str, api_kwargs: Dict[str, object] = None):
         self.hash = hash
         self.secret = secret
 
@@ -436,8 +446,8 @@ class DataCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, data_hash: str, secret: str, **_kwargs: Any):
-        super().__init__(data_hash, secret, **_kwargs)
+    def __init__(self, data_hash: str, secret: str, api_kwargs: Dict[str, object] = None):
+        super().__init__(data_hash, secret, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -465,8 +475,8 @@ class FileCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, file_hash: str, secret: str, **_kwargs: Any):
-        super().__init__(file_hash, secret, **_kwargs)
+    def __init__(self, file_hash: str, secret: str, api_kwargs: Dict[str, object] = None):
+        super().__init__(file_hash, secret, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

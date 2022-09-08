@@ -83,7 +83,12 @@ class ChatMember(TelegramObject):
     RESTRICTED: ClassVar[str] = constants.ChatMemberStatus.RESTRICTED
     """:const:`telegram.constants.ChatMemberStatus.RESTRICTED`"""
 
-    def __init__(self, user: User, status: str, **_kwargs: object):
+    def __init__(
+        self,
+        user: User,
+        status: str,
+        api_kwargs: Dict[str, object] = None,
+    ):
         # Required by all subclasses
         self.user = user
         self.status = status
@@ -154,7 +159,7 @@ class ChatMemberOwner(ChatMember):
         user: User,
         is_anonymous: bool,
         custom_title: str = None,
-        **_kwargs: object,
+        api_kwargs: Dict[str, object] = None,
     ):
         super().__init__(status=ChatMember.OWNER, user=user)
         self.is_anonymous = is_anonymous
@@ -276,7 +281,7 @@ class ChatMemberAdministrator(ChatMember):
         can_edit_messages: bool = None,
         can_pin_messages: bool = None,
         custom_title: str = None,
-        **_kwargs: object,
+        api_kwargs: Dict[str, object] = None,
     ):
         super().__init__(status=ChatMember.ADMINISTRATOR, user=user)
         self.can_be_edited = can_be_edited
@@ -313,7 +318,11 @@ class ChatMemberMember(ChatMember):
 
     __slots__ = ()
 
-    def __init__(self, user: User, **_kwargs: object):
+    def __init__(
+        self,
+        user: User,
+        api_kwargs: Dict[str, object] = None,
+    ):
         super().__init__(status=ChatMember.MEMBER, user=user)
 
 
@@ -400,7 +409,7 @@ class ChatMemberRestricted(ChatMember):
         can_send_other_messages: bool,
         can_add_web_page_previews: bool,
         until_date: datetime.datetime,
-        **_kwargs: object,
+        api_kwargs: Dict[str, object] = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user)
         self.is_member = is_member
@@ -433,7 +442,11 @@ class ChatMemberLeft(ChatMember):
 
     __slots__ = ()
 
-    def __init__(self, user: User, **_kwargs: object):
+    def __init__(
+        self,
+        user: User,
+        api_kwargs: Dict[str, object] = None,
+    ):
         super().__init__(status=ChatMember.LEFT, user=user)
 
 
@@ -460,6 +473,11 @@ class ChatMemberBanned(ChatMember):
 
     __slots__ = ("until_date",)
 
-    def __init__(self, user: User, until_date: datetime.datetime, **_kwargs: object):
+    def __init__(
+        self,
+        user: User,
+        until_date: datetime.datetime,
+        api_kwargs: Dict[str, object] = None,
+    ):
         super().__init__(status=ChatMember.BANNED, user=user)
         self.until_date = until_date

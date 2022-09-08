@@ -83,7 +83,7 @@ class ChatMemberUpdated(TelegramObject):
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
         invite_link: ChatInviteLink = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.chat = chat

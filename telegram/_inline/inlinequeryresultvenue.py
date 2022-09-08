@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVenue."""
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Dict
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
@@ -114,7 +114,7 @@ class InlineQueryResultVenue(InlineQueryResult):
         thumb_height: int = None,
         google_place_id: str = None,
         google_place_type: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
 
         # Required

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Web App Info."""
 
-from typing import Any
+from typing import Dict
 
 from telegram._telegramobject import TelegramObject
 
@@ -47,7 +47,7 @@ class WebAppInfo(TelegramObject):
 
     __slots__ = ("url",)
 
-    def __init__(self, url: str, **_kwargs: Any):
+    def __init__(self, url: str, api_kwargs: Dict[str, object] = None):
         # Required
         self.url = url
 

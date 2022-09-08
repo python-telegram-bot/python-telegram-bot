@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Sent Web App Message."""
 
-from typing import Any
+from typing import Dict
 
 from telegram._telegramobject import TelegramObject
 
@@ -44,7 +44,7 @@ class SentWebAppMessage(TelegramObject):
 
     __slots__ = ("inline_message_id",)
 
-    def __init__(self, inline_message_id: str = None, **_kwargs: Any):
+    def __init__(self, inline_message_id: str = None, api_kwargs: Dict[str, object] = None):
         # Optionals
         self.inline_message_id = inline_message_id
 

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LoginUrl."""
-from typing import Any
+from typing import Dict
 
 from telegram._telegramobject import TelegramObject
 
@@ -76,7 +76,7 @@ class LoginUrl(TelegramObject):
         forward_text: bool = None,
         bot_username: str = None,
         request_write_access: bool = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.url = url

@@ -52,7 +52,7 @@ class ChatLocation(TelegramObject):
         self,
         location: Location,
         address: str,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.location = location
         self.address = address

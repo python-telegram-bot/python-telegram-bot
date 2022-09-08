@@ -92,7 +92,7 @@ class InlineQueryResultContact(InlineQueryResult):
         thumb_width: int = None,
         thumb_height: int = None,
         vcard: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         super().__init__(InlineQueryResultType.CONTACT, id)

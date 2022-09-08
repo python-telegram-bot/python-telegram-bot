@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import Any, List, Sequence, Union
+from typing import Dict, List, Sequence, Union
 
 from telegram._keyboardbutton import KeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -92,7 +92,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         one_time_keyboard: bool = None,
         selective: bool = None,
         input_field_placeholder: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         if not check_keyboard_type(keyboard):
             raise ValueError(

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram PreCheckoutQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Dict, Optional
 
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
@@ -65,7 +65,7 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -88,8 +88,7 @@ class PreCheckoutQuery(TelegramObject):
         invoice_payload: str,
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user

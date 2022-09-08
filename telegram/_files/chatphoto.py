@@ -78,8 +78,7 @@ class ChatPhoto(TelegramObject):
         small_file_unique_id: str,
         big_file_id: str,
         big_file_unique_id: str,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.small_file_id = small_file_id
         self.small_file_unique_id = small_file_unique_id

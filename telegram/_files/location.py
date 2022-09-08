@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Location."""
 
-from typing import Any
+from typing import Dict
 
 from telegram._telegramobject import TelegramObject
 
@@ -73,7 +73,7 @@ class Location(TelegramObject):
         live_period: int = None,
         heading: int = None,
         proximity_alert_radius: int = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.longitude = longitude

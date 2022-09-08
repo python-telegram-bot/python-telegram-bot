@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebAppData."""
 
-from typing import Any
+from typing import Dict
 
 from telegram._telegramobject import TelegramObject
 
@@ -52,7 +52,7 @@ class WebAppData(TelegramObject):
 
     __slots__ = ("data", "button_text")
 
-    def __init__(self, data: str, button_text: str, **_kwargs: Any):
+    def __init__(self, data: str, button_text: str, api_kwargs: Dict[str, object] = None):
         # Required
         self.data = data
         self.button_text = button_text

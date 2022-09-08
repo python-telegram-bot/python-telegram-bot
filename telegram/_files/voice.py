@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Voice."""
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Dict
 
 from telegram._files._basemedium import _BaseMedium
 
@@ -52,7 +52,7 @@ class Voice(_BaseMedium):
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -65,8 +65,7 @@ class Voice(_BaseMedium):
         duration: int,
         mime_type: str = None,
         file_size: int = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         super().__init__(
             file_id=file_id,

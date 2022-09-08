@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Invoice."""
 
-from typing import Any, ClassVar
+from typing import ClassVar, Dict
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -69,7 +69,7 @@ class Invoice(TelegramObject):
         start_parameter: str,
         currency: str,
         total_amount: int,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.title = title
         self.description = description

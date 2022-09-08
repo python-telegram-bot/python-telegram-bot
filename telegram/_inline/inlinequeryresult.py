@@ -19,7 +19,7 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram InlineQueryResult."""
 
-from typing import Any
+from typing import Dict
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -48,7 +48,11 @@ class InlineQueryResult(TelegramObject):
 
     __slots__ = ("type", "id")
 
-    def __init__(self, type: str, id: str, **_kwargs: Any):  # pylint: disable=invalid-name
+    def __init__(
+        self, type: str, id: str, api_kwargs: Dict[str, object] = None
+    ):  # pylint: disable=invalid-name
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.type = type
         self.id = str(id)  # pylint: disable=invalid-name

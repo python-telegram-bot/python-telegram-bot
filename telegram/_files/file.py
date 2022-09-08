@@ -21,7 +21,7 @@ import shutil
 import urllib.parse as urllib_parse
 from base64 import b64decode
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Optional, Union
+from typing import IO, TYPE_CHECKING, Dict, Optional, Union
 
 from telegram._passport.credentials import decrypt
 from telegram._telegramobject import TelegramObject
@@ -81,10 +81,9 @@ class File(TelegramObject):
         self,
         file_id: str,
         file_unique_id: str,
-        bot: "Bot" = None,
         file_size: int = None,
         file_path: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.file_id = str(file_id)

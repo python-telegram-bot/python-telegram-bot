@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
+import inspect
 import json
 from copy import deepcopy
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -48,24 +49,14 @@ class TelegramObject:
         special cases like :attr:`Message.from_user` that deviate from the official Bot API.
     """
 
-    # type hints in __new__ are not read by mypy (https://github.com/python/mypy/issues/1021). As a
-    # workaround we can type hint instance variables in __new__ using a syntax defined in PEP 526 -
-    # https://www.python.org/dev/peps/pep-0526/#class-and-instance-variable-annotations
-    if TYPE_CHECKING:
-        _id_attrs: Tuple[object, ...]
-        _bot: Optional["Bot"]
-    # Adding slots reduces memory usage & allows for faster attribute access.
-    # Only instance variables should be added to __slots__.
-    __slots__ = ("_id_attrs", "_bot")
+    __slots__ = ("_id_attrs", "_bot", "api_kwargs")
 
-    # pylint: disable=unused-argument
-    def __new__(cls, *args: object, **kwargs: object) -> "TelegramObject":
-        # We add _id_attrs in __new__ instead of __init__ since we want to add this to the slots
-        # w/o calling __init__ in all of the subclasses.
-        instance = super().__new__(cls)
-        instance._id_attrs = ()
-        instance._bot = None
-        return instance
+    __INIT_PARAMS: Optional[Set[str]] = None
+
+    def __int__(self, api_kwargs: Dict[str, object] = None) -> None:
+        self._id_attrs: Tuple[object, ...] = ()
+        self._bot: Optional["Bot"] = None
+        self.api_kwargs: Dict[str, object] = api_kwargs or {}
 
     def __str__(self) -> str:
         return str(self.to_dict())
@@ -177,14 +168,29 @@ class TelegramObject:
             The Telegram object.
 
         """
+        if cls.__INIT_PARAMS is None:
+            signature = inspect.signature(cls)
+            cls.__INIT_PARAMS = set(signature.parameters.keys())
+
         data = cls._parse_data(data)
 
         if data is None:
             return None
 
-        if cls == TelegramObject:
-            return cls()
-        return cls(bot=bot, **data)
+        # try-except is significantly faster in case we already have a correct argument set
+        try:
+            obj = cls(**data)
+        except TypeError as exc:
+            if str(exc).startswith("__init__() got an unexpected keyword argument"):
+                kwargs = {}
+                api_kwargs = {}
+                for key, value in data.items():
+                    (kwargs if key in cls.__INIT_PARAMS else api_kwargs)[key] = value
+                obj = cls(api_kwargs=api_kwargs, **kwargs)
+            else:
+                raise exc
+
+        obj.set_bot(bot=bot)
 
     @classmethod
     def de_list(

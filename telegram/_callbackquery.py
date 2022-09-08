@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional, Tuple, Union
 
 from telegram import constants
 from telegram._files.location import Location
@@ -119,8 +119,7 @@ class CallbackQuery(TelegramObject):
         data: str = None,
         inline_message_id: str = None,
         game_short_name: str = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.id = id  # pylint: disable=invalid-name

@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChosenInlineResult."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Dict, Optional
 
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
@@ -72,8 +72,10 @@ class ChosenInlineResult(TelegramObject):
         query: str,
         location: Location = None,
         inline_message_id: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.result_id = result_id
         self.from_user = from_user

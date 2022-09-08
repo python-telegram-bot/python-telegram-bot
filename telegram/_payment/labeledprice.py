@@ -49,7 +49,7 @@ class LabeledPrice(TelegramObject):
 
     __slots__ = ("label", "amount")
 
-    def __init__(self, label: str, amount: int, **_kwargs: Any):
+    def __init__(self, label: str, amount: int, api_kwargs: Dict[str, object] = None):
         self.label = label
         self.amount = amount
 

@@ -21,7 +21,7 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -368,7 +368,6 @@ class Message(TelegramObject):
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
         by this function. Instead, the supplied replacement for the emoji will be used.
@@ -487,7 +486,6 @@ class Message(TelegramObject):
         poll: Poll = None,
         forward_sender_name: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        bot: "Bot" = None,
         dice: Dice = None,
         via_bot: User = None,
         proximity_alert_triggered: ProximityAlertTriggered = None,
@@ -500,8 +498,10 @@ class Message(TelegramObject):
         is_automatic_forward: bool = None,
         has_protected_content: bool = None,
         web_app_data: WebAppData = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.message_id = message_id
         # Optionals

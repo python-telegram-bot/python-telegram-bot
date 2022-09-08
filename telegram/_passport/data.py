@@ -71,8 +71,7 @@ class PersonalDetails(TelegramObject):
         last_name_native: str = None,
         middle_name: str = None,
         middle_name_native: str = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.first_name = first_name
@@ -119,8 +118,7 @@ class ResidentialAddress(TelegramObject):
         state: str,
         country_code: str,
         post_code: str,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.street_line1 = street_line1
@@ -144,7 +142,12 @@ class IdDocumentData(TelegramObject):
 
     __slots__ = ("document_no", "expiry_date")
 
-    def __init__(self, document_no: str, expiry_date: str, bot: "Bot" = None, **_kwargs: Any):
+    def __init__(
+        self,
+        document_no: str,
+        expiry_date: str,
+        api_kwargs: Dict[str, object] = None,
+    ):
         self.document_no = document_no
         self.expiry_date = expiry_date
 

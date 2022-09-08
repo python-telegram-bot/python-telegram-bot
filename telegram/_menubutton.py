@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Optional, Type
+from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -54,7 +54,9 @@ class MenuButton(TelegramObject):
 
     __slots__ = ("type",)
 
-    def __init__(self, type: str, **_kwargs: Any):  # pylint: disable=redefined-builtin
+    def __init__(
+        self, type: str, api_kwargs: Dict[str, object] = None
+    ):  # pylint: disable=redefined-builtin
         self.type = type
 
         self._id_attrs = (self.type,)
@@ -106,7 +108,7 @@ class MenuButtonCommands(MenuButton):
 
     __slots__ = ()
 
-    def __init__(self, **_kwargs: Any):
+    def __init__(self, api_kwargs: Dict[str, object] = None):
         super().__init__(type=constants.MenuButtonType.COMMANDS)
 
 
@@ -136,7 +138,7 @@ class MenuButtonWebApp(MenuButton):
 
     __slots__ = ("text", "web_app")
 
-    def __init__(self, text: str, web_app: WebAppInfo, **_kwargs: Any):
+    def __init__(self, text: str, web_app: WebAppInfo, api_kwargs: Dict[str, object] = None):
         super().__init__(type=constants.MenuButtonType.WEB_APP)
         self.text = text
         self.web_app = web_app
@@ -173,5 +175,5 @@ class MenuButtonDefault(MenuButton):
 
     __slots__ = ()
 
-    def __init__(self, **_kwargs: Any):
+    def __init__(self, api_kwargs: Dict[str, object] = None):
         super().__init__(type=constants.MenuButtonType.DEFAULT)

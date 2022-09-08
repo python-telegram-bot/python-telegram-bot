@@ -91,7 +91,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
 
         # Required

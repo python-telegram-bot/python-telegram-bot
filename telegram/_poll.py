@@ -20,7 +20,7 @@
 
 import datetime
 import sys
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Optional
+from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional
 
 from telegram import constants
 from telegram._messageentity import MessageEntity
@@ -53,7 +53,7 @@ class PollOption(TelegramObject):
 
     __slots__ = ("voter_count", "text")
 
-    def __init__(self, text: str, voter_count: int, **_kwargs: Any):
+    def __init__(self, text: str, voter_count: int, api_kwargs: Dict[str, object] = None):
         self.text = text
         self.voter_count = voter_count
 
@@ -85,7 +85,9 @@ class PollAnswer(TelegramObject):
 
     __slots__ = ("option_ids", "user", "poll_id")
 
-    def __init__(self, poll_id: str, user: User, option_ids: List[int], **_kwargs: Any):
+    def __init__(
+        self, poll_id: str, user: User, option_ids: List[int], api_kwargs: Dict[str, object] = None
+    ):
         self.poll_id = poll_id
         self.user = user
         self.option_ids = option_ids
@@ -190,7 +192,7 @@ class Poll(TelegramObject):
         explanation_entities: List[MessageEntity] = None,
         open_period: int = None,
         close_date: datetime.datetime = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.id = id  # pylint: disable=invalid-name
         self.question = question

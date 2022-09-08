@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents an invite link for a chat."""
 import datetime
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Dict, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -113,7 +113,7 @@ class ChatInviteLink(TelegramObject):
         member_limit: int = None,
         name: str = None,
         pending_join_request_count: int = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.invite_link = invite_link

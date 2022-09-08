@@ -42,7 +42,10 @@ class VideoChatStarted(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, **_kwargs: object):  # skipcq: PTC-W0049
+    def __init__(
+        self,
+        api_kwargs: Dict[str, object] = None,
+    ):  # skipcq: PTC-W0049
         pass
 
 
@@ -70,7 +73,11 @@ class VideoChatEnded(TelegramObject):
 
     __slots__ = ("duration",)
 
-    def __init__(self, duration: int, **_kwargs: object) -> None:
+    def __init__(
+        self,
+        duration: int,
+        api_kwargs: Dict[str, object] = None,
+    ) -> None:
         self.duration = duration
         self._id_attrs = (self.duration,)
 
@@ -97,7 +104,11 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     __slots__ = ("users",)
 
-    def __init__(self, users: List[User], **_kwargs: object) -> None:
+    def __init__(
+        self,
+        users: List[User],
+        api_kwargs: Dict[str, object] = None,
+    ) -> None:
         self.users = users
         self._id_attrs = (self.users,)
 
@@ -148,7 +159,11 @@ class VideoChatScheduled(TelegramObject):
 
     __slots__ = ("start_date",)
 
-    def __init__(self, start_date: dtm.datetime, **_kwargs: object) -> None:
+    def __init__(
+        self,
+        start_date: dtm.datetime,
+        api_kwargs: Dict[str, object] = None,
+    ) -> None:
         self.start_date = start_date
 
         self._id_attrs = (self.start_date,)

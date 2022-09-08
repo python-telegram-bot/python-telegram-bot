@@ -20,7 +20,7 @@
 deletion.
 """
 
-from typing import Any
+from typing import Dict
 
 from telegram._telegramobject import TelegramObject
 
@@ -49,7 +49,7 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
     def __init__(
         self,
         message_auto_delete_time: int,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.message_auto_delete_time = message_auto_delete_time
 

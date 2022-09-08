@@ -90,9 +90,8 @@ class InlineQuery(TelegramObject):
         query: str,
         offset: str,
         location: Location = None,
-        bot: "Bot" = None,
         chat_type: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.id = id  # pylint: disable=invalid-name

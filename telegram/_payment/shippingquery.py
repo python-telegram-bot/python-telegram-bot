@@ -53,7 +53,7 @@ class ShippingQuery(TelegramObject):
         from_user (:class:`telegram.User`): User who sent the query.
         invoice_payload (:obj:`str`): Bot specified invoice payload.
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -65,8 +65,7 @@ class ShippingQuery(TelegramObject):
         from_user: User,
         invoice_payload: str,
         shipping_address: ShippingAddress,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user

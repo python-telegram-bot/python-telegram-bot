@@ -64,7 +64,7 @@ class Audio(_BaseThumbedMedium):
         file_size (:obj:`int`): Optional. File size in bytes.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
             which the music file belongs.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -80,9 +80,8 @@ class Audio(_BaseThumbedMedium):
         mime_type: str = None,
         file_size: int = None,
         thumb: PhotoSize = None,
-        bot: "Bot" = None,
         file_name: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         super().__init__(
             file_id=file_id,

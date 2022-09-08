@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
 
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
+from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
@@ -101,7 +101,7 @@ class Sticker(_BaseThumbedMedium):
         mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
             where the mask should be placed.
         file_size (:obj:`int`): Optional. File size in bytes.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
         premium_animation (:class:`telegram.File`): Optional. For premium regular stickers,
             premium animation for the sticker.
 
@@ -139,10 +139,9 @@ class Sticker(_BaseThumbedMedium):
         file_size: int = None,
         set_name: str = None,
         mask_position: "MaskPosition" = None,
-        bot: "Bot" = None,
         premium_animation: "File" = None,
         custom_emoji_id: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         super().__init__(
             file_id=file_id,
@@ -251,7 +250,7 @@ class StickerSet(TelegramObject):
         is_video: bool,
         sticker_type: str,
         thumb: PhotoSize = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.name = name
         self.title = title
@@ -324,7 +323,14 @@ class MaskPosition(TelegramObject):
     CHIN: ClassVar[str] = constants.MaskPosition.CHIN
     """:const:`telegram.constants.MaskPosition.CHIN`"""
 
-    def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **_kwargs: Any):
+    def __init__(
+        self,
+        point: str,
+        x_shift: float,
+        y_shift: float,
+        scale: float,
+        api_kwargs: Dict[str, object] = None,
+    ):
         self.point = point
         self.x_shift = x_shift
         self.y_shift = y_shift

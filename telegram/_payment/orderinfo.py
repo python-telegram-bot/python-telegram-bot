@@ -58,7 +58,7 @@ class OrderInfo(TelegramObject):
         phone_number: str = None,
         email: str = None,
         shipping_address: str = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         self.name = name
         self.phone_number = phone_number

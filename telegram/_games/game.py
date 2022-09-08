@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram Game."""
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
@@ -88,7 +88,7 @@ class Game(TelegramObject):
         text: str = None,
         text_entities: List[MessageEntity] = None,
         animation: Animation = None,
-        **_kwargs: Any,
+        api_kwargs: Dict[str, object] = None,
     ):
         # Required
         self.title = title
