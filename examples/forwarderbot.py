@@ -34,13 +34,7 @@ if __version_info__ < (20, 0, 0, "alpha", 1):
     )
 
 from telegram import Update
-from telegram.ext import (
-    Application,
-    CallbackContext,
-    MessageHandler,
-    CommandHandler,
-    filters,
-)
+from telegram.ext import Application, CallbackContext, CommandHandler, MessageHandler, filters
 
 # Enable logging
 logging.basicConfig(
@@ -49,7 +43,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-destination_id = "id"
+DESTINATION_ID = "id"
 
 
 async def start(update: Update, context: CallbackContext) -> None:
@@ -65,7 +59,7 @@ async def start(update: Update, context: CallbackContext) -> None:
 async def forward_message(update: Update, context: CallbackContext) -> None:
     """Forwards the user's message to the designated group or chat"""
     await context.bot.forward_message(
-        chat_id=destination_id,
+        chat_id=DESTINATION_ID,
         from_chat_id=update.effective_chat.id,
         message_id=update.message.message_id,
     )
