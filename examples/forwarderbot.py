@@ -51,23 +51,25 @@ logger = logging.getLogger(__name__)
 
 destination_id = "id"
 
-async def start(update:Update, context:CallbackContext) -> None:
+
+async def start(update: Update, context: CallbackContext) -> None:
     """Starts the conversation and asks the user to send a message"""
     user = update.effective_user.first_name
-    await update.message.reply_text(f'''
+    await update.message.reply_text(
+        f"""
         Hi {user}, send a message to forward it to the designated chat
-        ''')
+        """
+    )
 
 
-async def forward_message(update:Update, context:CallbackContext) -> None:
+async def forward_message(update: Update, context: CallbackContext) -> None:
     """Forwards the user's message to the designated group or chat"""
     await context.bot.forward_message(
         chat_id=destination_id,
-        from_chat_id=update.effective_chat.id, 
-        message_id=update.message.message_id
-        )
+        from_chat_id=update.effective_chat.id,
+        message_id=update.message.message_id,
+    )
     await update.message.reply_text("Message forwarded!")
-
 
 
 def main() -> None:
@@ -77,7 +79,7 @@ def main() -> None:
 
     # Handle the /start command
     start_handler = CommandHandler("start", start)
-    
+
     application.add_handler(start_handler)
 
     # Hadle the /forward command
@@ -85,10 +87,9 @@ def main() -> None:
 
     application.add_handler(forward_handler)
 
-
     # Start the Bot until Ctrl-C is pressed
     application.run_polling()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
