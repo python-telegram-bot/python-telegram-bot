@@ -81,7 +81,7 @@ class PreCheckoutQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin, invalid-name
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         currency: str,
         total_amount: int,
@@ -112,7 +112,7 @@ class PreCheckoutQuery(TelegramObject):
         data["from_user"] = User.de_json(data.pop("from"), bot)
         data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     async def answer(  # pylint: disable=invalid-name
         self,

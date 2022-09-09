@@ -111,7 +111,7 @@ class PassportFile(TelegramObject):
 
         data["credentials"] = credentials
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     @classmethod
     def de_list_decrypted(

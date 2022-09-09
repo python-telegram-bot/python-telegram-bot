@@ -70,4 +70,4 @@ class ChatLocation(TelegramObject):
 
         data["location"] = Location.de_json(data.get("location"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)

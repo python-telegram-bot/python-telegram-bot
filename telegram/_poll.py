@@ -181,7 +181,7 @@ class Poll(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin, invalid-name
+        id: str,  # pylint: disable=redefined-builtin
         question: str,
         options: List[PollOption],
         total_voter_count: int,

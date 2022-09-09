@@ -80,7 +80,7 @@ class PassportData(TelegramObject):
         data["data"] = EncryptedPassportElement.de_list(data.get("data"), bot)
         data["credentials"] = EncryptedCredentials.de_json(data.get("credentials"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

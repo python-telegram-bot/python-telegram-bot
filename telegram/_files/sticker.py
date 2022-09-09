@@ -182,7 +182,7 @@ class Sticker(_BaseThumbedMedium):
         data["mask_position"] = MaskPosition.de_json(data.get("mask_position"), bot)
         data["premium_animation"] = File.de_json(data.get("premium_animation"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
 
 class StickerSet(TelegramObject):
@@ -273,7 +273,7 @@ class StickerSet(TelegramObject):
         data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
         data["stickers"] = Sticker.de_list(data.get("stickers"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

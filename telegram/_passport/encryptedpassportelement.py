@@ -179,7 +179,7 @@ class EncryptedPassportElement(TelegramObject):
         data["selfie"] = PassportFile.de_json(data.get("selfie"), bot)
         data["translation"] = PassportFile.de_list(data.get("translation"), bot) or None
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     @classmethod
     def de_json_decrypted(
@@ -242,7 +242,7 @@ class EncryptedPassportElement(TelegramObject):
                 or None
             )
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

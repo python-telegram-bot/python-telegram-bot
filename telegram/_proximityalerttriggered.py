@@ -68,4 +68,4 @@ class ProximityAlertTriggered(TelegramObject):
         data["traveler"] = User.de_json(data.get("traveler"), bot)
         data["watcher"] = User.de_json(data.get("watcher"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)

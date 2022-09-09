@@ -61,7 +61,7 @@ class ShippingQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin, invalid-name
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         invoice_payload: str,
         shipping_address: ShippingAddress,
@@ -86,7 +86,7 @@ class ShippingQuery(TelegramObject):
         data["from_user"] = User.de_json(data.pop("from"), bot)
         data["shipping_address"] = ShippingAddress.de_json(data.get("shipping_address"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     async def answer(  # pylint: disable=invalid-name
         self,

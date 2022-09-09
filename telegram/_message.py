@@ -653,7 +653,7 @@ class Message(TelegramObject):
         )
         data["web_app_data"] = WebAppData.de_json(data.get("web_app_data"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     @property
     def effective_attachment(

@@ -117,7 +117,7 @@ class ChatMember(TelegramObject):
         }
 
         if cls is ChatMember:
-            return _class_mapping.get(data["status"], cls)(**data, bot=bot)
+            return _class_mapping.get(data["status"], cls).de_json(data=data, bot=bot)
         return cls(**data)
 
     def to_dict(self) -> JSONDict:

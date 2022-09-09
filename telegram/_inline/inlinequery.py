@@ -85,7 +85,7 @@ class InlineQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin, invalid-name
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         query: str,
         offset: str,
@@ -117,7 +117,7 @@ class InlineQuery(TelegramObject):
         data["from_user"] = User.de_json(data.get("from"), bot)
         data["location"] = Location.de_json(data.get("location"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     async def answer(
         self,

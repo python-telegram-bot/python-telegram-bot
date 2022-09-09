@@ -248,4 +248,4 @@ class InputInvoiceMessageContent(InputMessageContent):
 
         data["prices"] = LabeledPrice.de_list(data.get("prices"), bot)
 
-        return cls(**data, bot=bot)
+        return super().de_json(data=data, bot=bot)

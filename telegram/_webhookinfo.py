@@ -143,4 +143,4 @@ class WebhookInfo(TelegramObject):
             data.get("last_synchronization_error_date")
         )
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)

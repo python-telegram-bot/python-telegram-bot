@@ -145,7 +145,7 @@ class CallbackQuery(TelegramObject):
         data["from_user"] = User.de_json(data.get("from"), bot)
         data["message"] = Message.de_json(data.get("message"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     async def answer(
         self,

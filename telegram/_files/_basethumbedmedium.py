@@ -88,4 +88,4 @@ class _BaseThumbedMedium(_BaseMedium):
 
         data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)

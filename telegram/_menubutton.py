@@ -88,7 +88,7 @@ class MenuButton(TelegramObject):
 
         if cls is MenuButton and data["type"] in _class_mapping:
             return _class_mapping[data["type"]].de_json(data, bot=bot)
-        return cls(**data, bot=bot)
+        return super().de_json(data=data, bot=bot)
 
     COMMANDS: ClassVar[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""
@@ -156,7 +156,7 @@ class MenuButtonWebApp(MenuButton):
 
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

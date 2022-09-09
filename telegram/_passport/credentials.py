@@ -235,7 +235,7 @@ class Credentials(TelegramObject):
 
         data["secure_data"] = SecureData.de_json(data.get("secure_data"), bot=bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
 
 class SecureData(TelegramObject):
@@ -334,7 +334,7 @@ class SecureData(TelegramObject):
         data["passport"] = SecureValue.de_json(data.get("passport"), bot=bot)
         data["personal_details"] = SecureValue.de_json(data.get("personal_details"), bot=bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
 
 class SecureValue(TelegramObject):
@@ -399,7 +399,7 @@ class SecureValue(TelegramObject):
         data["files"] = FileCredentials.de_list(data.get("files"), bot=bot)
         data["translation"] = FileCredentials.de_list(data.get("translation"), bot=bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

@@ -101,7 +101,7 @@ class ChatJoinRequest(TelegramObject):
         data["date"] = from_timestamp(data.get("date", None))
         data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
