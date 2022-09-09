@@ -56,7 +56,27 @@ class TelegramObject:
     def __init__(self, api_kwargs: JSONDict = None) -> None:
         self._id_attrs: Tuple[object, ...] = ()
         self._bot: Optional["Bot"] = None
+        # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
         self.api_kwargs: JSONDict = api_kwargs or {}
+
+    def _apply_api_kwargs(self) -> None:
+        """Loops through the api kwargs and for every key that exists as attribute of the
+        object (and is None), it moves the value from `api_kwargs` to the attribute.
+
+        This method is currently only called in the unpickling process, i.e. not on "normal" init.
+        This is because
+        * automating this is tricky to get right: It should be called at the *end* of the __init__,
+          preferably only once at the end of the __init__ of the last child class. This could be
+          done via __init_subclass__, but it's hard to not destroy the signature of __init__ in the
+          process.
+        * calling it manually in every __init__ is tedious
+        * There probably is no use case for it anyway. If you manually initialize a TO subclass,
+          then you can pass everything as proper argument.
+        """
+        # we convert to list to ensure that the list doesn't change length while we loop
+        for key in list(self.api_kwargs.keys()):
+            if getattr(self, key, True) is None:
+                setattr(self, key, self.api_kwargs.pop(key))
 
     def __str__(self) -> str:
         return str(self.to_dict())
