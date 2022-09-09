@@ -18,13 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Audio."""
 
-from typing import TYPE_CHECKING, Any
-
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-
-if TYPE_CHECKING:
-    from telegram import Bot
+from telegram._utils.types import JSONDict
 
 
 class Audio(_BaseThumbedMedium):
@@ -47,7 +43,7 @@ class Audio(_BaseThumbedMedium):
         file_size (:obj:`int`, optional): File size in bytes.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -81,14 +77,14 @@ class Audio(_BaseThumbedMedium):
         file_size: int = None,
         thumb: PhotoSize = None,
         file_name: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(
             file_id=file_id,
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
-            bot=bot,
+            api_kwargs=api_kwargs,
         )
         # Required
         self.duration = duration

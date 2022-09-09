@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
-from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, ClassVar, List, Optional, Tuple, Union
 
 from telegram import constants
 from telegram._files.location import Location
@@ -79,7 +79,7 @@ class CallbackQuery(TelegramObject):
             inline mode, that originated the query.
         game_short_name (:obj:`str`, optional): Short name of a Game to be returned, serves as
             the unique identifier for the game
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
@@ -96,7 +96,7 @@ class CallbackQuery(TelegramObject):
         inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
                 inline mode, that originated the query.
         game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
 
     """
 
@@ -119,8 +119,9 @@ class CallbackQuery(TelegramObject):
         data: str = None,
         inline_message_id: str = None,
         game_short_name: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
@@ -130,8 +131,6 @@ class CallbackQuery(TelegramObject):
         self.data = data
         self.inline_message_id = inline_message_id
         self.game_short_name = game_short_name
-
-        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 

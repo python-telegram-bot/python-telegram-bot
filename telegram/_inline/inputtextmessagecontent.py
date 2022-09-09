@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
-from typing import Any, List, Tuple, Union
+from typing import List, Tuple, Union
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
@@ -72,8 +72,9 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.message_text = message_text
         # Optionals

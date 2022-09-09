@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Invoice."""
 
-from typing import ClassVar, Dict
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class Invoice(TelegramObject):
@@ -69,8 +70,9 @@ class Invoice(TelegramObject):
         start_parameter: str,
         currency: str,
         total_amount: int,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.title = title
         self.description = description
         self.start_parameter = start_parameter

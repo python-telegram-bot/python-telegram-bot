@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -55,8 +55,9 @@ class InlineKeyboardMarkup(TelegramObject):
     def __init__(
         self,
         inline_keyboard: List[List[InlineKeyboardButton]],
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(inline_keyboard):
             raise ValueError(
                 "The parameter `inline_keyboard` should be a list of "

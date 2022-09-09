@@ -247,7 +247,6 @@ class Message(TelegramObject):
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -498,7 +497,7 @@ class Message(TelegramObject):
         is_automatic_forward: bool = None,
         has_protected_content: bool = None,
         web_app_data: WebAppData = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -563,7 +562,6 @@ class Message(TelegramObject):
         self.video_chat_participants_invited = video_chat_participants_invited
         self.reply_markup = reply_markup
         self.web_app_data = web_app_data
-        self.set_bot(bot)
 
         self._effective_attachment = DEFAULT_NONE
 

@@ -44,9 +44,9 @@ class VideoChatStarted(TelegramObject):
 
     def __init__(
         self,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):  # skipcq: PTC-W0049
-        pass
+        super().__init__(api_kwargs=api_kwargs)
 
 
 class VideoChatEnded(TelegramObject):
@@ -76,8 +76,9 @@ class VideoChatEnded(TelegramObject):
     def __init__(
         self,
         duration: int,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
         self.duration = duration
         self._id_attrs = (self.duration,)
 
@@ -107,8 +108,9 @@ class VideoChatParticipantsInvited(TelegramObject):
     def __init__(
         self,
         users: List[User],
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
         self.users = users
         self._id_attrs = (self.users,)
 
@@ -162,8 +164,9 @@ class VideoChatScheduled(TelegramObject):
     def __init__(
         self,
         start_date: dtm.datetime,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
         self.start_date = start_date
 
         self._id_attrs = (self.start_date,)
@@ -178,7 +181,9 @@ class VideoChatScheduled(TelegramObject):
 
         data["start_date"] = from_timestamp(data["start_date"])
 
-        return cls(**data, bot=bot)
+        obj = cls(**data)
+        obj.set_bot(bot)
+        return obj
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

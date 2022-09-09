@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardRemove."""
-from typing import Dict
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class ReplyKeyboardRemove(TelegramObject):
@@ -57,7 +57,8 @@ class ReplyKeyboardRemove(TelegramObject):
 
     __slots__ = ("selective", "remove_keyboard")
 
-    def __init__(self, selective: bool = None, api_kwargs: Dict[str, object] = None):
+    def __init__(self, selective: bool = None, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.remove_keyboard = True
         # Optionals

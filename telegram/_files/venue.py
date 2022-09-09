@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Venue."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
@@ -81,8 +81,10 @@ class Venue(TelegramObject):
         foursquare_type: str = None,
         google_place_id: str = None,
         google_place_type: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.location = location
         self.title = title

@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputContactMessageContent."""
 
-from typing import Dict
-
 from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._utils.types import JSONDict
 
 
 class InputContactMessageContent(InputMessageContent):
@@ -54,7 +53,7 @@ class InputContactMessageContent(InputMessageContent):
         first_name: str,
         last_name: str = None,
         vcard: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 

@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
-from typing import Dict
-
 from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._utils.types import JSONDict
 
 
 class InputLocationMessageContent(InputMessageContent):
@@ -72,8 +71,9 @@ class InputLocationMessageContent(InputMessageContent):
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.latitude = latitude
         self.longitude = longitude

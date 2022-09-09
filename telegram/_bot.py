@@ -201,6 +201,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         private_key: bytes = None,
         private_key_password: bytes = None,
     ):
+        super().__init__(api_kwargs=None)
         if not token:
             raise InvalidToken("You must pass the token you received from https://t.me/Botfather!")
         self.token = token

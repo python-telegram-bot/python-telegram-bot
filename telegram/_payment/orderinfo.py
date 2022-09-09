@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram OrderInfo."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._telegramobject import TelegramObject
@@ -58,8 +58,9 @@ class OrderInfo(TelegramObject):
         phone_number: str = None,
         email: str = None,
         shipping_address: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.name = name
         self.phone_number = phone_number
         self.email = email

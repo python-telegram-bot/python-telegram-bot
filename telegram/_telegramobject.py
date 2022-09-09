@@ -53,10 +53,10 @@ class TelegramObject:
 
     __INIT_PARAMS: Optional[Set[str]] = None
 
-    def __int__(self, api_kwargs: Dict[str, object] = None) -> None:
+    def __init__(self, api_kwargs: JSONDict = None) -> None:
         self._id_attrs: Tuple[object, ...] = ()
         self._bot: Optional["Bot"] = None
-        self.api_kwargs: Dict[str, object] = api_kwargs or {}
+        self.api_kwargs: JSONDict = api_kwargs or {}
 
     def __str__(self) -> str:
         return str(self.to_dict())
@@ -191,6 +191,7 @@ class TelegramObject:
                 raise exc
 
         obj.set_bot(bot=bot)
+        return obj
 
     @classmethod
     def de_list(
@@ -257,13 +258,13 @@ class TelegramObject:
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
-            if self._id_attrs == ():
+            if not self._id_attrs:
                 warn(
                     f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
                     " equivalence.",
                     stacklevel=2,
                 )
-            if other._id_attrs == ():
+            if not other._id_attrs:
                 warn(
                     f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
                     " for equivalence.",

@@ -17,12 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=missing-module-docstring
-from typing import TYPE_CHECKING, Any
 
 from telegram._telegramobject import TelegramObject
-
-if TYPE_CHECKING:
-    from telegram import Bot
+from telegram._utils.types import JSONDict
 
 
 class PersonalDetails(TelegramObject):
@@ -71,8 +68,9 @@ class PersonalDetails(TelegramObject):
         last_name_native: str = None,
         middle_name: str = None,
         middle_name_native: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.first_name = first_name
         self.last_name = last_name
@@ -84,8 +82,6 @@ class PersonalDetails(TelegramObject):
         self.first_name_native = first_name_native
         self.last_name_native = last_name_native
         self.middle_name_native = middle_name_native
-
-        self.set_bot(bot)
 
 
 class ResidentialAddress(TelegramObject):
@@ -118,8 +114,9 @@ class ResidentialAddress(TelegramObject):
         state: str,
         country_code: str,
         post_code: str,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.street_line1 = street_line1
         self.street_line2 = street_line2
@@ -127,8 +124,6 @@ class ResidentialAddress(TelegramObject):
         self.state = state
         self.country_code = country_code
         self.post_code = post_code
-
-        self.set_bot(bot)
 
 
 class IdDocumentData(TelegramObject):
@@ -146,9 +141,8 @@ class IdDocumentData(TelegramObject):
         self,
         document_no: str,
         expiry_date: str,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.document_no = document_no
         self.expiry_date = expiry_date
-
-        self.set_bot(bot)

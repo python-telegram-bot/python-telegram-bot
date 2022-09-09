@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 from base64 import b64decode
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
@@ -75,8 +75,6 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",
@@ -110,7 +108,6 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-        
 
     """
 
@@ -140,7 +137,7 @@ class EncryptedPassportElement(TelegramObject):
         selfie: PassportFile = None,
         translation: List[PassportFile] = None,
         credentials: "Credentials" = None,  # pylint: disable=unused-argument
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -167,8 +164,6 @@ class EncryptedPassportElement(TelegramObject):
             self.reverse_side,
             self.selfie,
         )
-
-        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["EncryptedPassportElement"]:

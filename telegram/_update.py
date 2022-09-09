@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
+from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from telegram import constants
 from telegram._callbackquery import CallbackQuery
@@ -236,8 +236,9 @@ class Update(TelegramObject):
         my_chat_member: ChatMemberUpdated = None,
         chat_member: ChatMemberUpdated = None,
         chat_join_request: ChatJoinRequest = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.update_id = update_id
         # Optionals

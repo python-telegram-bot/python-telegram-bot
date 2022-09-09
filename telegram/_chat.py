@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, ClassVar, List, Optional, Tuple, Union
 
 from telegram import constants
 from telegram._chatlocation import ChatLocation
@@ -114,7 +114,7 @@ class Chat(TelegramObject):
             be forwarded to other chats. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.9
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
@@ -268,8 +268,9 @@ class Chat(TelegramObject):
         join_to_send_messages: bool = None,
         join_by_request: bool = None,
         has_restricted_voice_and_video_messages: bool = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.id = id  # pylint: disable=invalid-name
         self.type = enum.get_member(constants.ChatType, type, type)
@@ -279,7 +280,9 @@ class Chat(TelegramObject):
         self.first_name = first_name
         self.last_name = last_name
         # TODO: Remove (also from tests), when Telegram drops this completely
-        self.all_members_are_administrators = _kwargs.get("all_members_are_administrators")
+        self.all_members_are_administrators = (
+            api_kwargs.pop("all_members_are_administrators", None) if api_kwargs else None
+        )
         self.photo = photo
         self.bio = bio
         self.has_private_forwards = has_private_forwards
@@ -300,7 +303,6 @@ class Chat(TelegramObject):
         self.join_by_request = join_by_request
         self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
 
-        self.set_bot(bot)
         self._id_attrs = (self.id,)
 
     @property

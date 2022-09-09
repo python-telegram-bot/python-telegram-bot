@@ -18,10 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGame."""
 
-from typing import Dict
-
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._utils.types import JSONDict
 from telegram.constants import InlineQueryResultType
 
 
@@ -51,10 +50,10 @@ class InlineQueryResultGame(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         game_short_name: str,
         reply_markup: InlineKeyboardMarkup = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         # Required
-        super().__init__(InlineQueryResultType.GAME, id)
+        super().__init__(InlineQueryResultType.GAME, id, api_kwargs=api_kwargs)
         self.id = id
         self.game_short_name = game_short_name
 

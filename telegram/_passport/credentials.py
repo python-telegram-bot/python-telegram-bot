@@ -19,7 +19,7 @@
 # pylint: disable=missing-module-docstring,  redefined-builtin
 import json
 from base64 import b64decode
-from typing import TYPE_CHECKING, Dict, List, Optional, no_type_check
+from typing import TYPE_CHECKING, List, Optional, no_type_check
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -142,8 +142,9 @@ class EncryptedCredentials(TelegramObject):
         data: str,
         hash: str,
         secret: str,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.data = data
         self.hash = hash
@@ -151,7 +152,6 @@ class EncryptedCredentials(TelegramObject):
 
         self._id_attrs = (self.data, self.hash, self.secret)
 
-        self.set_bot(bot)
         self._decrypted_secret: Optional[str] = None
         self._decrypted_data: Optional["Credentials"] = None
 
@@ -218,13 +218,12 @@ class Credentials(TelegramObject):
         self,
         secure_data: "SecureData",
         nonce: str,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.secure_data = secure_data
         self.nonce = nonce
-
-        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Credentials"]:
@@ -294,9 +293,10 @@ class SecureData(TelegramObject):
         rental_agreement: "SecureValue" = None,
         passport_registration: "SecureValue" = None,
         temporary_registration: "SecureValue" = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Optionals
         self.temporary_registration = temporary_registration
         self.passport_registration = passport_registration
@@ -309,8 +309,6 @@ class SecureData(TelegramObject):
         self.internal_passport = internal_passport
         self.passport = passport
         self.personal_details = personal_details
-
-        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SecureData"]:
@@ -376,16 +374,15 @@ class SecureValue(TelegramObject):
         selfie: "FileCredentials" = None,
         files: List["FileCredentials"] = None,
         translation: List["FileCredentials"] = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.data = data
         self.front_side = front_side
         self.reverse_side = reverse_side
         self.selfie = selfie
         self.files = files
         self.translation = translation
-
-        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SecureValue"]:
@@ -419,15 +416,14 @@ class _CredentialsBase(TelegramObject):
 
     __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
-    def __init__(self, hash: str, secret: str, api_kwargs: Dict[str, object] = None):
+    def __init__(self, hash: str, secret: str, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         self.hash = hash
         self.secret = secret
 
         # Aliases just to be sure
         self.file_hash = self.hash
         self.data_hash = self.hash
-
-        self.set_bot(bot)
 
 
 class DataCredentials(_CredentialsBase):
@@ -446,7 +442,7 @@ class DataCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, data_hash: str, secret: str, api_kwargs: Dict[str, object] = None):
+    def __init__(self, data_hash: str, secret: str, api_kwargs: JSONDict = None):
         super().__init__(data_hash, secret, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:
@@ -475,7 +471,7 @@ class FileCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, file_hash: str, secret: str, api_kwargs: Dict[str, object] = None):
+    def __init__(self, file_hash: str, secret: str, api_kwargs: JSONDict = None):
         super().__init__(file_hash, secret, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:

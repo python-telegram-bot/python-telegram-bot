@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
 
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import from_timestamp
@@ -102,8 +102,9 @@ class WebhookInfo(TelegramObject):
         allowed_updates: List[str] = None,
         ip_address: str = None,
         last_synchronization_error_date: int = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.url = url
         self.has_custom_certificate = has_custom_certificate

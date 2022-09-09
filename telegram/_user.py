@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
@@ -33,7 +33,6 @@ if TYPE_CHECKING:
     from telegram import (
         Animation,
         Audio,
-        Bot,
         Contact,
         Document,
         InlineKeyboardMarkup,
@@ -82,7 +81,7 @@ class User(TelegramObject):
             disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
         supports_inline_queries (:obj:`str`, optional): :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         is_premium (:obj:`bool`, optional): :obj:`True`, if this user is a Telegram Premium user.
 
             .. versionadded:: 20.0
@@ -141,8 +140,9 @@ class User(TelegramObject):
         supports_inline_queries: bool = None,
         is_premium: bool = None,
         added_to_attachment_menu: bool = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.id = id  # pylint: disable=invalid-name
         self.first_name = first_name
@@ -156,7 +156,6 @@ class User(TelegramObject):
         self.supports_inline_queries = supports_inline_queries
         self.is_premium = is_premium
         self.added_to_attachment_menu = added_to_attachment_menu
-        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 

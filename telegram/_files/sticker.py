@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
 
-from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional
+from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
@@ -67,7 +67,7 @@ class Sticker(_BaseThumbedMedium):
         mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size in bytes.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         premium_animation (:class:`telegram.File`, optional): For premium regular stickers,
             premium animation for the sticker.
 
@@ -141,14 +141,14 @@ class Sticker(_BaseThumbedMedium):
         mask_position: "MaskPosition" = None,
         premium_animation: "File" = None,
         custom_emoji_id: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(
             file_id=file_id,
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
-            bot=bot,
+            api_kwargs=api_kwargs,
         )
         # Required
         self.width = width
@@ -250,8 +250,9 @@ class StickerSet(TelegramObject):
         is_video: bool,
         sticker_type: str,
         thumb: PhotoSize = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.name = name
         self.title = title
         self.is_animated = is_animated
@@ -329,8 +330,9 @@ class MaskPosition(TelegramObject):
         x_shift: float,
         y_shift: float,
         scale: float,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.point = point
         self.x_shift = x_shift
         self.y_shift = y_shift

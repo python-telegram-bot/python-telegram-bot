@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram KeyboardButton."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._telegramobject import TelegramObject
@@ -88,8 +88,9 @@ class KeyboardButton(TelegramObject):
         request_location: bool = None,
         request_poll: KeyboardButtonPollType = None,
         web_app: WebAppInfo = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.text = text
         # Optionals

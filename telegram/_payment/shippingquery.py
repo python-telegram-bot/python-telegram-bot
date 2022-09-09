@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingQuery."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._payment.shippingoption import ShippingOption
@@ -45,7 +45,7 @@ class ShippingQuery(TelegramObject):
         from_user (:class:`telegram.User`): User who sent the query.
         invoice_payload (:obj:`str`): Bot specified invoice payload.
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -65,14 +65,13 @@ class ShippingQuery(TelegramObject):
         from_user: User,
         invoice_payload: str,
         shipping_address: ShippingAddress,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
         self.invoice_payload = invoice_payload
         self.shipping_address = shipping_address
-
-        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 

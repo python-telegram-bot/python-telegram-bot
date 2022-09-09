@@ -88,8 +88,9 @@ class Game(TelegramObject):
         text: str = None,
         text_entities: List[MessageEntity] = None,
         animation: Animation = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.title = title
         self.description = description

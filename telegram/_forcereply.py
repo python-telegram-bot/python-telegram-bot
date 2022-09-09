@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ForceReply."""
 
-from typing import Dict
-
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class ForceReply(TelegramObject):
@@ -70,8 +69,9 @@ class ForceReply(TelegramObject):
         self,
         selective: bool = None,
         input_field_placeholder: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.force_reply = True
         self.selective = selective
         self.input_field_placeholder = input_field_placeholder

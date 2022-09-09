@@ -19,9 +19,8 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram PassportElementError."""
 
-from typing import Any
-
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class PassportElementError(TelegramObject):
@@ -47,7 +46,8 @@ class PassportElementError(TelegramObject):
 
     __slots__ = ("message", "source", "type")
 
-    def __init__(self, source: str, type: str, message: str, api_kwargs: Dict[str, object] = None):
+    def __init__(self, source: str, type: str, message: str, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.source = str(source)
         self.type = str(type)
@@ -92,7 +92,7 @@ class PassportElementErrorDataField(PassportElementError):
         field_name: str,
         data_hash: str,
         message: str,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         # Required
         super().__init__("data", type, message)
@@ -130,11 +130,9 @@ class PassportElementErrorFile(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(
-        self, type: str, file_hash: str, message: str, api_kwargs: Dict[str, object] = None
-    ):
+    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("file", type, message)
+        super().__init__("file", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -168,11 +166,9 @@ class PassportElementErrorFiles(PassportElementError):
 
     __slots__ = ("file_hashes",)
 
-    def __init__(
-        self, type: str, file_hashes: str, message: str, api_kwargs: Dict[str, object] = None
-    ):
+    def __init__(self, type: str, file_hashes: str, message: str, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("files", type, message)
+        super().__init__("files", type, message, api_kwargs=api_kwargs)
         self.file_hashes = file_hashes
 
         self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
@@ -206,11 +202,9 @@ class PassportElementErrorFrontSide(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(
-        self, type: str, file_hash: str, message: str, api_kwargs: Dict[str, object] = None
-    ):
+    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("front_side", type, message)
+        super().__init__("front_side", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -244,11 +238,9 @@ class PassportElementErrorReverseSide(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(
-        self, type: str, file_hash: str, message: str, api_kwargs: Dict[str, object] = None
-    ):
+    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("reverse_side", type, message)
+        super().__init__("reverse_side", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -280,11 +272,9 @@ class PassportElementErrorSelfie(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(
-        self, type: str, file_hash: str, message: str, api_kwargs: Dict[str, object] = None
-    ):
+    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("selfie", type, message)
+        super().__init__("selfie", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -320,11 +310,9 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(
-        self, type: str, file_hash: str, message: str, api_kwargs: Dict[str, object] = None
-    ):
+    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("translation_file", type, message)
+        super().__init__("translation_file", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -360,11 +348,9 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
     __slots__ = ("file_hashes",)
 
-    def __init__(
-        self, type: str, file_hashes: str, message: str, api_kwargs: Dict[str, object] = None
-    ):
+    def __init__(self, type: str, file_hashes: str, message: str, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("translation_files", type, message)
+        super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
         self.file_hashes = file_hashes
 
         self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
@@ -394,11 +380,9 @@ class PassportElementErrorUnspecified(PassportElementError):
 
     __slots__ = ("element_hash",)
 
-    def __init__(
-        self, type: str, element_hash: str, message: str, api_kwargs: Dict[str, object] = None
-    ):
+    def __init__(self, type: str, element_hash: str, message: str, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("unspecified", type, message)
+        super().__init__("unspecified", type, message, api_kwargs=api_kwargs)
         self.element_hash = element_hash
 
         self._id_attrs = (self.source, self.type, self.element_hash, self.message)

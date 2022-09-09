@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultCachedSticker."""
 
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._utils.types import JSONDict
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -62,10 +63,10 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         sticker_file_id: str,
         reply_markup: InlineKeyboardMarkup = None,
         input_message_content: "InputMessageContent" = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         # Required
-        super().__init__(InlineQueryResultType.STICKER, id)
+        super().__init__(InlineQueryResultType.STICKER, id, api_kwargs=api_kwargs)
         self.sticker_file_id = sticker_file_id
 
         # Optionals

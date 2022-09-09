@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Callable, ClassVar, Optional, Sequence, Union
 
 from telegram import constants
 from telegram._files.location import Location
@@ -65,7 +65,7 @@ class InlineQuery(TelegramObject):
             .. versionadded:: 13.5
         location (:class:`telegram.Location`, optional): Sender location, only for bots that
             request user location.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -91,8 +91,9 @@ class InlineQuery(TelegramObject):
         offset: str,
         location: Location = None,
         chat_type: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
@@ -103,7 +104,6 @@ class InlineQuery(TelegramObject):
         self.location = location
         self.chat_type = chat_type
 
-        self.set_bot(bot)
         self._id_attrs = (self.id,)
 
     @classmethod

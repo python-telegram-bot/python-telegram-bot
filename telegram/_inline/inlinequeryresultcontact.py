@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultContact."""
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._utils.types import JSONDict
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -92,10 +93,10 @@ class InlineQueryResultContact(InlineQueryResult):
         thumb_width: int = None,
         thumb_height: int = None,
         vcard: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         # Required
-        super().__init__(InlineQueryResultType.CONTACT, id)
+        super().__init__(InlineQueryResultType.CONTACT, id, api_kwargs=api_kwargs)
         self.phone_number = phone_number
         self.first_name = first_name
 

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatJoinRequest."""
 import datetime
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
@@ -53,7 +53,7 @@ class ChatJoinRequest(TelegramObject):
         bio (:obj:`str`, optional): Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link that was used
             by the user to send the join request.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
@@ -74,8 +74,9 @@ class ChatJoinRequest(TelegramObject):
         date: datetime.datetime,
         bio: str = None,
         invite_link: ChatInviteLink = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.chat = chat
         self.from_user = from_user
@@ -85,7 +86,6 @@ class ChatJoinRequest(TelegramObject):
         self.bio = bio
         self.invite_link = invite_link
 
-        self.set_bot(bot)
         self._id_attrs = (self.chat, self.from_user, self.date)
 
     @classmethod

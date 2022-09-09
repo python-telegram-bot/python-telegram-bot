@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMemberUpdated."""
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
@@ -83,8 +83,9 @@ class ChatMemberUpdated(TelegramObject):
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
         invite_link: ChatInviteLink = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.chat = chat
         self.from_user = from_user

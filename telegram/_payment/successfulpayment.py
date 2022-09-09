@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram SuccessfulPayment."""
 
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
@@ -82,8 +82,9 @@ class SuccessfulPayment(TelegramObject):
         provider_payment_charge_id: str,
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.currency = currency
         self.total_amount = total_amount
         self.invoice_payload = invoice_payload

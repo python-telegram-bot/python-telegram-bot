@@ -81,7 +81,9 @@ class InputMedia(TelegramObject):
         caption: str = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.type = media_type
         self.media = media
         self.caption = caption

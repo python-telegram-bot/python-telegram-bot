@@ -18,13 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram VideoNote."""
 
-from typing import TYPE_CHECKING, Dict
-
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-
-if TYPE_CHECKING:
-    from telegram import Bot
+from telegram._utils.types import JSONDict
 
 
 class VideoNote(_BaseThumbedMedium):
@@ -44,7 +40,7 @@ class VideoNote(_BaseThumbedMedium):
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
         file_size (:obj:`int`, optional): File size in bytes.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -70,7 +66,7 @@ class VideoNote(_BaseThumbedMedium):
         duration: int,
         thumb: PhotoSize = None,
         file_size: int = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(
             file_id=file_id,

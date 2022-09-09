@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVenue."""
 
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._utils.types import JSONDict
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -114,11 +115,11 @@ class InlineQueryResultVenue(InlineQueryResult):
         thumb_height: int = None,
         google_place_id: str = None,
         google_place_type: str = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
 
         # Required
-        super().__init__(InlineQueryResultType.VENUE, id)
+        super().__init__(InlineQueryResultType.VENUE, id, api_kwargs=api_kwargs)
         self.latitude = latitude
         self.longitude = longitude
         self.title = title

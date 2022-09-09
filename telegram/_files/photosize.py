@@ -18,12 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram PhotoSize."""
 
-from typing import TYPE_CHECKING, Dict
-
 from telegram._files._basemedium import _BaseMedium
-
-if TYPE_CHECKING:
-    from telegram import Bot
+from telegram._utils.types import JSONDict
 
 
 class PhotoSize(_BaseMedium):
@@ -41,7 +37,7 @@ class PhotoSize(_BaseMedium):
         width (:obj:`int`): Photo width.
         height (:obj:`int`): Photo height.
         file_size (:obj:`int`, optional): File size in bytes.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -65,10 +61,13 @@ class PhotoSize(_BaseMedium):
         width: int,
         height: int,
         file_size: int = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(
-            file_id=file_id, file_unique_id=file_unique_id, file_size=file_size, bot=bot
+            file_id=file_id,
+            file_unique_id=file_unique_id,
+            file_size=file_size,
+            api_kwargs=api_kwargs,
         )
         # Required
         self.width = width

@@ -75,7 +75,8 @@ class BotCommandScope(TelegramObject):
     CHAT_MEMBER: ClassVar[str] = constants.BotCommandScopeType.CHAT_MEMBER
     """:const:`telegram.constants.BotCommandScopeType.CHAT_MEMBER`"""
 
-    def __init__(self, type: str, api_kwargs: Dict[str, object] = None):
+    def __init__(self, type: str, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         self.type = type
         self._id_attrs = (self.type,)
 
@@ -126,7 +127,7 @@ class BotCommandScopeDefault(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, api_kwargs: Dict[str, object] = None):
+    def __init__(self, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.DEFAULT)
 
 
@@ -141,7 +142,7 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, api_kwargs: Dict[str, object] = None):
+    def __init__(self, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.ALL_PRIVATE_CHATS)
 
 
@@ -156,7 +157,7 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, api_kwargs: Dict[str, object] = None):
+    def __init__(self, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.ALL_GROUP_CHATS)
 
 
@@ -171,7 +172,7 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
 
     __slots__ = ()
 
-    def __init__(self, api_kwargs: Dict[str, object] = None):
+    def __init__(self, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.ALL_CHAT_ADMINISTRATORS)
 
 
@@ -195,7 +196,7 @@ class BotCommandScopeChat(BotCommandScope):
 
     __slots__ = ("chat_id",)
 
-    def __init__(self, chat_id: Union[str, int], api_kwargs: Dict[str, object] = None):
+    def __init__(self, chat_id: Union[str, int], api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.CHAT)
         self.chat_id = (
             chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
@@ -224,7 +225,7 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
 
     __slots__ = ("chat_id",)
 
-    def __init__(self, chat_id: Union[str, int], api_kwargs: Dict[str, object] = None):
+    def __init__(self, chat_id: Union[str, int], api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.CHAT_ADMINISTRATORS)
         self.chat_id = (
             chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
@@ -255,9 +256,7 @@ class BotCommandScopeChatMember(BotCommandScope):
 
     __slots__ = ("chat_id", "user_id")
 
-    def __init__(
-        self, chat_id: Union[str, int], user_id: int, api_kwargs: Dict[str, object] = None
-    ):
+    def __init__(self, chat_id: Union[str, int], user_id: int, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.CHAT_MEMBER)
         self.chat_id = (
             chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)

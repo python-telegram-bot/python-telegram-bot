@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Encrypted PassportFile."""
 
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -44,7 +44,7 @@ class PassportFile(TelegramObject):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): File size in bytes.
         file_date (:obj:`int`): Unix time when the file was uploaded.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -73,7 +73,7 @@ class PassportFile(TelegramObject):
         file_date: int,
         file_size: int,
         credentials: "FileCredentials" = None,
-        api_kwargs: Dict[str, object] = None,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
@@ -83,7 +83,7 @@ class PassportFile(TelegramObject):
         self.file_size = file_size
         self.file_date = file_date
         # Optionals
-        self.set_bot(bot)
+
         self._credentials = credentials
 
         self._id_attrs = (self.file_unique_id,)
