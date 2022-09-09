@@ -156,7 +156,7 @@ class MenuButtonWebApp(MenuButton):
 
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
-        return super().de_json(data=data, bot=bot)
+        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

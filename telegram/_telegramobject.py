@@ -102,7 +102,7 @@ class TelegramObject:
 
         result.set_bot(bot)  # Assign the bots back
         self.set_bot(bot)
-        return result  # type: ignore[return-value]
+        return result
 
     def _get_attrs(
         self,
@@ -140,7 +140,7 @@ class TelegramObject:
                 value = getattr(self, key, None)
                 if value is not None:
                     if recursive and hasattr(value, "to_dict"):
-                        data[key] = value.to_dict()
+                        data[key] = value.to_dict()  # pylint: disable=no-member
                     else:
                         data[key] = value
                 elif not recursive:
@@ -184,10 +184,13 @@ class TelegramObject:
             obj = cls(**data)
         except TypeError as exc:
             if str(exc).startswith("__init__() got an unexpected keyword argument"):
-                kwargs = {}
-                api_kwargs = {}
+                kwargs: JSONDict = {}
+                api_kwargs: JSONDict = {}
                 for key, value in data.items():
-                    (kwargs if key in cls.__INIT_PARAMS else api_kwargs)[key] = value
+                    if key in cls.__INIT_PARAMS:  # pylint: disable=unsupported-membership-test
+                        kwargs[key] = value
+                    else:
+                        api_kwargs[key] = value
                 obj = cls(api_kwargs=api_kwargs, **kwargs)
             else:
                 raise exc

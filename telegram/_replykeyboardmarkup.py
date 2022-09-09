@@ -178,7 +178,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
-            **kwargs,
+            **kwargs,  # type: ignore[arg-type]
         )
 
     @classmethod
@@ -231,7 +231,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
-            **kwargs,
+            **kwargs,  # type: ignore[arg-type]
         )
 
     @classmethod
@@ -285,7 +285,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
-            **kwargs,
+            **kwargs,  # type: ignore[arg-type]
         )
 
     def __hash__(self) -> int:

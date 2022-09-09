@@ -112,7 +112,7 @@ class CallbackQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=invalid-name
+        id: str,
         from_user: User,
         chat_instance: str,
         message: Message = None,

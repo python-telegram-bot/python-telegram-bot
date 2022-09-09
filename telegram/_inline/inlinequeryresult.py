@@ -46,9 +46,7 @@ class InlineQueryResult(TelegramObject):
 
     __slots__ = ("type", "id")
 
-    def __init__(
-        self, type: str, id: str, api_kwargs: JSONDict = None
-    ):  # pylint: disable=invalid-name
+    def __init__(self, type: str, id: str, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required

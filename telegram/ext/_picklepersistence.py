@@ -54,7 +54,7 @@ def _reconstruct_to(cls: Type[TO], kwargs: dict) -> TO:
     """
     obj = cls.__new__(cls)
     obj.__setstate__(kwargs)
-    return obj  # type: ignore[return-value]
+    return obj
 
 
 def _custom_reduction(cls: TO) -> Tuple[Callable, Tuple[Type[TO], dict]]:

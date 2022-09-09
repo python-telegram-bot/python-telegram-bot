@@ -110,7 +110,7 @@ class InlineKeyboardMarkup(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
-        return cls([[button]], **kwargs)
+        return cls([[button]], **kwargs)  # type: ignore[arg-type]
 
     @classmethod
     def from_row(
@@ -128,7 +128,7 @@ class InlineKeyboardMarkup(TelegramObject):
             **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
-        return cls([button_row], **kwargs)
+        return cls([button_row], **kwargs)  # type: ignore[arg-type]
 
     @classmethod
     def from_column(
@@ -147,7 +147,7 @@ class InlineKeyboardMarkup(TelegramObject):
 
         """
         button_grid = [[button] for button in button_column]
-        return cls(button_grid, **kwargs)
+        return cls(button_grid, **kwargs)  # type: ignore[arg-type]
 
     def __hash__(self) -> int:
         return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))
