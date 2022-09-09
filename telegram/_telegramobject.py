@@ -154,6 +154,10 @@ class TelegramObject:
 
     @staticmethod
     def _parse_data(data: Optional[JSONDict]) -> Optional[JSONDict]:
+        """Should be called by subclasses that override de_json to ensure that the input
+        is not altered. Whoever calls de_json might still want to use the original input
+        for something else.
+        """
         return None if data is None else data.copy()
 
     @classmethod
@@ -171,8 +175,6 @@ class TelegramObject:
         if cls.__INIT_PARAMS is None:
             signature = inspect.signature(cls)
             cls.__INIT_PARAMS = set(signature.parameters.keys())
-
-        data = cls._parse_data(data)
 
         if data is None:
             return None
