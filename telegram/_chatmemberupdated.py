@@ -113,7 +113,7 @@ class ChatMemberUpdated(TelegramObject):
             return None
 
         data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["date"] = from_timestamp(data.get("date"))
         data["old_chat_member"] = ChatMember.de_json(data.get("old_chat_member"), bot)
         data["new_chat_member"] = ChatMember.de_json(data.get("new_chat_member"), bot)

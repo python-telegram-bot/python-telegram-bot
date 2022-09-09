@@ -31,8 +31,8 @@ def callback_query(bot, request):
         TestCallbackQuery.chat_instance,
         data=TestCallbackQuery.data,
         game_short_name=TestCallbackQuery.game_short_name,
-        bot=bot,
     )
+    cbq.set_bot(bot)
     if request.param == "message":
         cbq.message = TestCallbackQuery.message
         cbq.message.set_bot(bot)

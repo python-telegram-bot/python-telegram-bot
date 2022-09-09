@@ -97,7 +97,7 @@ class ChatJoinRequest(TelegramObject):
             return None
 
         data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["date"] = from_timestamp(data.get("date", None))
         data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)
 

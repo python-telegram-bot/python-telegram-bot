@@ -109,7 +109,7 @@ class PreCheckoutQuery(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data.pop("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
 
         return super().de_json(data=data, bot=bot)

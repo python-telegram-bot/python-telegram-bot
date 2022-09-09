@@ -42,7 +42,7 @@ def json_dict():
 
 @pytest.fixture(scope="function")
 def user(bot):
-    return User(
+    user = User(
         id=TestUser.id_,
         first_name=TestUser.first_name,
         is_bot=TestUser.is_bot,
@@ -52,10 +52,11 @@ def user(bot):
         can_join_groups=TestUser.can_join_groups,
         can_read_all_group_messages=TestUser.can_read_all_group_messages,
         supports_inline_queries=TestUser.supports_inline_queries,
-        bot=bot,
         is_premium=TestUser.is_premium,
         added_to_attachment_menu=TestUser.added_to_attachment_menu,
     )
+    user.set_bot(bot)
+    return user
 
 
 class TestUser:

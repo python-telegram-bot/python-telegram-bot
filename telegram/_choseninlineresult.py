@@ -95,7 +95,7 @@ class ChosenInlineResult(TelegramObject):
             return None
 
         # Required
-        data["from_user"] = User.de_json(data.pop("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         # Optionals
         data["location"] = Location.de_json(data.get("location"), bot)
 

@@ -83,7 +83,7 @@ class ShippingQuery(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data.pop("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["shipping_address"] = ShippingAddress.de_json(data.get("shipping_address"), bot)
 
         return super().de_json(data=data, bot=bot)

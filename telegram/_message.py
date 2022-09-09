@@ -603,7 +603,7 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
         data["date"] = from_timestamp(data["date"])
         data["chat"] = Chat.de_json(data.get("chat"), bot)

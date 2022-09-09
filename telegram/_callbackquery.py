@@ -142,7 +142,7 @@ class CallbackQuery(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["message"] = Message.de_json(data.get("message"), bot)
 
         return super().de_json(data=data, bot=bot)

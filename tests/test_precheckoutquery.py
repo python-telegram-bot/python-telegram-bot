@@ -25,7 +25,7 @@ from tests.conftest import check_defaults_handling, check_shortcut_call, check_s
 
 @pytest.fixture(scope="class")
 def pre_checkout_query(bot):
-    return PreCheckoutQuery(
+    pcq = PreCheckoutQuery(
         TestPreCheckoutQuery.id_,
         TestPreCheckoutQuery.from_user,
         TestPreCheckoutQuery.currency,
@@ -33,8 +33,9 @@ def pre_checkout_query(bot):
         TestPreCheckoutQuery.invoice_payload,
         shipping_option_id=TestPreCheckoutQuery.shipping_option_id,
         order_info=TestPreCheckoutQuery.order_info,
-        bot=bot,
     )
+    pcq.set_bot(bot)
+    return pcq
 
 
 class TestPreCheckoutQuery:

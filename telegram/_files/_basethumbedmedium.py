@@ -86,6 +86,8 @@ class _BaseThumbedMedium(_BaseMedium):
         if not data:
             return None
 
-        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
+        # In case this wasn't already done by the subclass
+        if not isinstance(data.get("thumb"), PhotoSize):
+            data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
 
         return super().de_json(data=data, bot=bot)

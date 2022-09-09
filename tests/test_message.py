@@ -61,13 +61,14 @@ from tests.test_passport import RAW_PASSPORT_DATA
 
 @pytest.fixture(scope="class")
 def message(bot):
-    return Message(
+    message = Message(
         message_id=TestMessage.id_,
         date=TestMessage.date,
         chat=TestMessage.chat,
         from_user=TestMessage.from_user,
-        bot=bot,
     )
+    message.set_bot(bot)
+    return message
 
 
 @pytest.fixture(
@@ -83,7 +84,7 @@ def message(bot):
         {"edit_date": datetime.utcnow()},
         {
             "text": "a text message",
-            "enitites": [MessageEntity("bold", 10, 4), MessageEntity("italic", 16, 7)],
+            "entites": [MessageEntity("bold", 10, 4), MessageEntity("italic", 16, 7)],
         },
         {
             "caption": "A message caption",
@@ -247,14 +248,15 @@ def message(bot):
     ],
 )
 def message_params(bot, request):
-    return Message(
+    message = Message(
         message_id=TestMessage.id_,
         from_user=TestMessage.from_user,
         date=TestMessage.date,
         chat=TestMessage.chat,
-        bot=bot,
         **request.param,
     )
+    message.set_bot(bot)
+    return message
 
 
 class TestMessage:

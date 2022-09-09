@@ -154,7 +154,7 @@ class TelegramObject:
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
         for cls in self.__class__.__mro__[:-1]:
             for key in cls.__slots__:  # type: ignore[attr-defined]
-                if not include_private and key.startswith("_"):
+                if (not include_private and key.startswith("_")) or (key == "api_kwargs"):
                     continue
 
                 value = getattr(self, key, None)
@@ -203,7 +203,7 @@ class TelegramObject:
         try:
             obj = cls(**data)
         except TypeError as exc:
-            if str(exc).startswith("__init__() got an unexpected keyword argument"):
+            if "__init__() got an unexpected keyword argument" in str(exc):
                 kwargs: JSONDict = {}
                 api_kwargs: JSONDict = {}
                 for key, value in data.items():

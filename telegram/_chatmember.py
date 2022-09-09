@@ -104,9 +104,6 @@ class ChatMember(TelegramObject):
         if not data:
             return None
 
-        data["user"] = User.de_json(data.get("user"), bot)
-        data["until_date"] = from_timestamp(data.get("until_date", None))
-
         _class_mapping: Dict[str, Type["ChatMember"]] = {
             cls.OWNER: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
@@ -117,8 +114,12 @@ class ChatMember(TelegramObject):
         }
 
         if cls is ChatMember:
-            return _class_mapping.get(data["status"], cls).de_json(data=data, bot=bot)
-        return cls(**data)
+            return _class_mapping.get(data.pop("status"), cls).de_json(data=data, bot=bot)
+
+        data["user"] = User.de_json(data.get("user"), bot)
+        data["until_date"] = from_timestamp(data.get("until_date", None))
+
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
