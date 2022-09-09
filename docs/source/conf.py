@@ -215,7 +215,7 @@ html_favicon = "ptb-logo_1024.ico"
 html_static_path = ["_static"]
 html_css_files = ["style_external_link.css", "style_mermaid_diagrams.css"]
 
-html_permalinks_icon = "¶"  # Furo's default permalink icon is `#`` which doesn't look great imo.
+html_permalinks_icon = "¶"  # Furo's default permalink icon is `#` which doesn't look great imo.
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "python-telegram-bot-doc"
