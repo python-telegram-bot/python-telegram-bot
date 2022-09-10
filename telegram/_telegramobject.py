@@ -192,6 +192,12 @@ class TelegramObject:
             The Telegram object.
 
         """
+        return cls._de_json(data=data, bot=bot)
+
+    @classmethod
+    def _de_json(
+        cls: Type[TO_co], data: Optional[JSONDict], bot: "Bot", api_kwargs: JSONDict = None
+    ) -> Optional[TO_co]:
         if cls.__INIT_PARAMS is None:
             signature = inspect.signature(cls)
             cls.__INIT_PARAMS = set(signature.parameters.keys())
@@ -199,13 +205,14 @@ class TelegramObject:
         if data is None:
             return None
 
+        api_kwargs = api_kwargs or {}
+
         # try-except is significantly faster in case we already have a correct argument set
         try:
-            obj = cls(**data)
+            obj = cls(**data, api_kwargs=api_kwargs)
         except TypeError as exc:
             if "__init__() got an unexpected keyword argument" in str(exc):
                 kwargs: JSONDict = {}
-                api_kwargs: JSONDict = {}
                 for key, value in data.items():
                     if key in cls.__INIT_PARAMS:  # pylint: disable=unsupported-membership-test
                         kwargs[key] = value

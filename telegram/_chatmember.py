@@ -113,8 +113,8 @@ class ChatMember(TelegramObject):
             cls.BANNED: ChatMemberBanned,
         }
 
-        if cls is ChatMember:
-            return _class_mapping.get(data.pop("status"), cls).de_json(data=data, bot=bot)
+        if cls is ChatMember and data.get("status") in _class_mapping:
+            return _class_mapping[data["status"]].de_json(data=data, bot=bot)
 
         data["user"] = User.de_json(data.get("user"), bot)
         data["until_date"] = from_timestamp(data.get("until_date", None))

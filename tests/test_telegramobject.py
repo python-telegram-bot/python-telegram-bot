@@ -128,8 +128,10 @@ class TestTelegramObject:
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)
         date = datetime.datetime.now()
-        photo = PhotoSize("file_id", "unique", 21, 21, bot=bot)
-        msg = Message(1, date, chat, from_user=user, text="foobar", bot=bot, photo=[photo])
+        photo = PhotoSize("file_id", "unique", 21, 21)
+        photo.set_bot(bot)
+        msg = Message(1, date, chat, from_user=user, text="foobar", photo=[photo])
+        msg.set_bot(bot)
 
         # Test pickling of TGObjects, we choose Message since it's contains the most subclasses.
         assert msg.get_bot()
@@ -147,8 +149,10 @@ class TestTelegramObject:
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)
         date = datetime.datetime.now()
-        photo = PhotoSize("file_id", "unique", 21, 21, bot=bot)
-        msg = Message(1, date, chat, from_user=user, text="foobar", bot=bot, photo=[photo])
+        photo = PhotoSize("file_id", "unique", 21, 21)
+        photo.set_bot(bot)
+        msg = Message(1, date, chat, from_user=user, text="foobar", photo=[photo])
+        msg.set_bot(bot)
 
         new_msg = deepcopy(msg)
 

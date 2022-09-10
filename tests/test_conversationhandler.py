@@ -976,7 +976,7 @@ class TestConversationHandler:
         callback_query.set_bot(bot)
         chosen_inline_result = ChosenInlineResult(0, user1, "query")
         chosen_inline_result.set_bot(bot)
-        inline_query = InlineQuery(0, user1, "query")
+        inline_query = InlineQuery(0, user1, "query", offset="")
         inline_query.set_bot(bot)
         pre_checkout_query = PreCheckoutQuery(0, user1, "USD", 100, [])
         pre_checkout_query.set_bot(bot)

@@ -220,7 +220,6 @@ class Chat(TelegramObject):
         "title",
         "photo",
         "linked_chat_id",
-        "all_members_are_administrators",
         "message_auto_delete_time",
         "has_protected_content",
         "has_private_forwards",
@@ -279,10 +278,6 @@ class Chat(TelegramObject):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
-        # TODO: Remove (also from tests), when Telegram drops this completely
-        self.all_members_are_administrators = (
-            api_kwargs.pop("all_members_are_administrators", None) if api_kwargs else None
-        )
         self.photo = photo
         self.bio = bio
         self.has_private_forwards = has_private_forwards
@@ -347,7 +342,15 @@ class Chat(TelegramObject):
         data["permissions"] = ChatPermissions.de_json(data.get("permissions"), bot)
         data["location"] = ChatLocation.de_json(data.get("location"), bot)
 
-        return super().de_json(data=data, bot=bot)
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if "all_members_are_administrators" in data:
+            api_kwargs["all_members_are_administrators"] = data.pop(
+                "all_members_are_administrators"
+            )
+
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
     async def leave(
         self,

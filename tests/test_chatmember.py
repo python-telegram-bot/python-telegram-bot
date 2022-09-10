@@ -35,7 +35,7 @@ from telegram import (
 )
 from telegram._utils.datetime import to_timestamp
 
-ignored = ["self", "_kwargs"]
+ignored = ["self", "api_kwargs"]
 
 
 class CMDefaults:

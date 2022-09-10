@@ -78,8 +78,14 @@ def scope_class_and_type(request):
 
 @pytest.fixture(scope="class")
 def menu_button(scope_class_and_type):
-    return scope_class_and_type[0](
-        type=scope_class_and_type[1], text=TestMenuButton.text, web_app=TestMenuButton.web_app
+    # We use de_json here so that we don't have to worry about which class gets which arguments
+    return scope_class_and_type[0].de_json(
+        dict(
+            type=scope_class_and_type[1],
+            text=TestMenuButton.text,
+            web_app=TestMenuButton.web_app.to_dict(),
+        ),
+        bot=None,
     )
 
 

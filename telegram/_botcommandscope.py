@@ -108,7 +108,7 @@ class BotCommandScope(TelegramObject):
             cls.CHAT_MEMBER: BotCommandScopeChatMember,
         }
 
-        if cls is BotCommandScope and data["type"] in _class_mapping:
+        if cls is BotCommandScope and data.get("type") in _class_mapping:
             return _class_mapping[data["type"]].de_json(data=data, bot=bot)
         return super().de_json(data=data, bot=bot)
 

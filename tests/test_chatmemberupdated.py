@@ -227,7 +227,7 @@ class TestChatMemberUpdated:
         [
             name
             for name, param in inspect.signature(ChatMember).parameters.items()
-            if name != "self" and param.default != inspect.Parameter.empty
+            if name not in ["self", "api_kwargs"] and param.default != inspect.Parameter.empty
         ],
     )
     def test_difference_optionals(self, optional_attribute, user, chat):

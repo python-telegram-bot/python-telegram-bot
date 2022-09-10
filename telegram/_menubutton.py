@@ -86,7 +86,7 @@ class MenuButton(TelegramObject):
             cls.DEFAULT: MenuButtonDefault,
         }
 
-        if cls is MenuButton and data["type"] in _class_mapping:
+        if cls is MenuButton and data.get("type") in _class_mapping:
             return _class_mapping[data["type"]].de_json(data, bot=bot)
         return super().de_json(data=data, bot=bot)
 
