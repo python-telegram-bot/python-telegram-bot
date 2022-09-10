@@ -273,7 +273,13 @@ class StickerSet(TelegramObject):
         data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
         data["stickers"] = Sticker.de_list(data.get("stickers"), bot)
 
-        return super().de_json(data=data, bot=bot)
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if "contains_masks" in data:
+            api_kwargs["contains_masks"] = data.pop("contains_masks")
+
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
