@@ -40,8 +40,9 @@ search:
       telegram.passport*.html: -7
 
    ignore:
+      - changelog.html
       - coc.html
-      - bot_methods.html
+      - bot_methods.html#
       # Defaults
       - search.html
       - search/index.html
