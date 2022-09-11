@@ -67,7 +67,6 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
             handle inline queries with the appropriate :attr:`telegram.InlineQuery.chat_type`.
 
             .. versionadded:: 13.5
-
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): Optional. Regex pattern to test

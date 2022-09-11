@@ -39,10 +39,12 @@ class InlineKeyboardMarkup(TelegramObject):
     .. seealso:: `Inline Keyboard Example 1 <examples.inlinekeyboard.html>`_,
         `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
             each represented by a list of InlineKeyboardButton objects.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
@@ -107,7 +109,6 @@ class InlineKeyboardMarkup(TelegramObject):
 
         Args:
             button (:class:`telegram.InlineKeyboardButton`): The button to use in the markup
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
         return cls([[button]], **kwargs)  # type: ignore[arg-type]
@@ -125,7 +126,6 @@ class InlineKeyboardMarkup(TelegramObject):
         Args:
             button_row (List[:class:`telegram.InlineKeyboardButton`]): The button to use in the
                 markup
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
         return cls([button_row], **kwargs)  # type: ignore[arg-type]
@@ -143,7 +143,6 @@ class InlineKeyboardMarkup(TelegramObject):
         Args:
             button_column (List[:class:`telegram.InlineKeyboardButton`]): The button to use in the
                 markup
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
         button_grid = [[button] for button in button_column]

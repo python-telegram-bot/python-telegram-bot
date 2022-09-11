@@ -46,6 +46,9 @@ class ChatJoinRequest(TelegramObject):
 
     .. versionadded:: 13.8
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
         from_user (:class:`telegram.User`): User that sent the join request.
@@ -53,7 +56,6 @@ class ChatJoinRequest(TelegramObject):
         bio (:obj:`str`, optional): Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link that was used
             by the user to send the join request.
-
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.

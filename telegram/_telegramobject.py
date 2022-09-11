@@ -52,7 +52,6 @@ class TelegramObject:
         api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|
 
             .. versionadded:: 20.0
-
     Attributes:
         api_kwargs (Dict[:obj:`str`, any]): |toapikwargsattr|
 

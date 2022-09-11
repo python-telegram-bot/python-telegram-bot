@@ -30,6 +30,9 @@ class LabeledPrice(TelegramObject):
 
     .. seealso:: `Paymentbot Example <examples.paymentbot.html>`_
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         label (:obj:`str`): Portion label.
         amount (:obj:`int`): Price of the product in the smallest units of the currency (integer,
@@ -38,7 +41,6 @@ class LabeledPrice(TelegramObject):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         label (:obj:`str`): Portion label.

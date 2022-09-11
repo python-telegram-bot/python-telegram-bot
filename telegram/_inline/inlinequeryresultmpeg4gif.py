@@ -38,6 +38,9 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     use :attr:`input_message_content` to send a message with the specified content instead of the
     animation.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
@@ -61,7 +64,6 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the video animation.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.MPEG4GIF`.

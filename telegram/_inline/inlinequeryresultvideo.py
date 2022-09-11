@@ -42,6 +42,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         If an InlineQueryResultVideo message contains an embedded video (e.g., YouTube), you must
         replace its content using :attr:`input_message_content`.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.
@@ -67,7 +70,6 @@ class InlineQueryResultVideo(InlineQueryResult):
             message to be sent instead of the video. This field is required if
             InlineQueryResultVideo is used to send an HTML-page as a result
             (e.g., a YouTube video).
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VIDEO`.

@@ -32,10 +32,12 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
 
     .. versionadded:: 13.4
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the
             chat.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the

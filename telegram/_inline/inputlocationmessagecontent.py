@@ -30,6 +30,9 @@ class InputLocationMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`latitude` and :attr:`longitude` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
@@ -43,7 +46,6 @@ class InputLocationMessageContent(InputMessageContent):
         proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance for
             proximity alerts about approaching another chat member, in meters. Must be between 1
             and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.

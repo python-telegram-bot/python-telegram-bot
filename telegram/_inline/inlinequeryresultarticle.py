@@ -48,7 +48,6 @@ class InlineQueryResultArticle(InlineQueryResult):
         thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.ARTICLE`.

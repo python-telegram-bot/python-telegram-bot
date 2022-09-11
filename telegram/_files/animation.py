@@ -29,6 +29,9 @@ class Animation(_BaseThumbedMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -42,8 +45,6 @@ class Animation(_BaseThumbedMedium):
         file_name (:obj:`str`, optional): Original animation filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size in bytes.
-
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): File identifier.

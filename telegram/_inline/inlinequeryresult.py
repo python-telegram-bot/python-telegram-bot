@@ -33,10 +33,12 @@ class InlineQueryResult(TelegramObject):
         All URLs passed in inline query results will be available to end users and therefore must
         be assumed to be *public*.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): Type of the result.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): Type of the result.

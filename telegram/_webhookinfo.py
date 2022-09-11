@@ -40,8 +40,9 @@ class WebhookInfo(TelegramObject):
     :attr:`last_synchronization_error_date` are equal.
 
     .. versionchanged:: 20.0
-       :attr:`last_synchronization_error_date` is considered as well when comparing objects of
-       this type in terms of equality.
+       * :attr:`last_synchronization_error_date` is considered as well when comparing objects of
+         this type in terms of equality.
+       * |removedkwargs|
 
     Args:
         url (:obj:`str`): Webhook URL, may be empty if webhook is not set up.
@@ -61,7 +62,6 @@ class WebhookInfo(TelegramObject):
             that happened when trying to synchronize available updates with Telegram datacenters.
 
             .. versionadded:: 20.0
-
     Attributes:
         url (:obj:`str`): Webhook URL.
         has_custom_certificate (:obj:`bool`): If a custom certificate was provided for webhook.

@@ -128,7 +128,6 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
             seconds.
 
             .. versionadded:: 20.0
-
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.

@@ -38,6 +38,9 @@ class InlineQueryResultDocument(InlineQueryResult):
     specified content instead of the file. Currently, only .PDF and .ZIP files can be sent
     using this method.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         title (:obj:`str`): Title for the result.
@@ -61,7 +64,6 @@ class InlineQueryResultDocument(InlineQueryResult):
         thumb_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the file.
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.DOCUMENT`.

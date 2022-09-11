@@ -39,6 +39,9 @@ class PreCheckoutQuery(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         id (:obj:`str`): Unique query identifier.
         from_user (:class:`telegram.User`): User who sent the query.
@@ -53,8 +56,6 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
-
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         id (:obj:`str`): Unique query identifier.

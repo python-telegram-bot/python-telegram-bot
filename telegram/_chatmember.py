@@ -54,6 +54,7 @@ class ChatMember(TelegramObject):
           use :class:`ChatMember` directly.
         * The constant ``ChatMember.CREATOR`` was replaced by :attr:`~telegram.ChatMember.OWNER`
         * The constant ``ChatMember.KICKED`` was replaced by :attr:`~telegram.ChatMember.BANNED`
+        * |removedkwargs|
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -138,6 +139,9 @@ class ChatMemberOwner(ChatMember):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         user (:class:`telegram.User`): Information about the user.
         is_anonymous (:obj:`bool`): :obj:`True`, if the
@@ -163,7 +167,7 @@ class ChatMemberOwner(ChatMember):
         custom_title: str = None,
         api_kwargs: JSONDict = None,
     ):
-        super().__init__(status=ChatMember.OWNER, user=user)
+        super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
         self.is_anonymous = is_anonymous
         self.custom_title = custom_title
 
@@ -174,9 +178,11 @@ class ChatMemberAdministrator(ChatMember):
 
     .. versionadded:: 13.7
     .. versionchanged:: 20.0
-       Argument and attribute ``can_manage_voice_chats`` were renamed to
-       :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
-       Bot API 6.0.
+
+       * Argument and attribute ``can_manage_voice_chats`` were renamed to
+         :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
+         Bot API 6.0.
+       * |removedkwargs|
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -285,7 +291,7 @@ class ChatMemberAdministrator(ChatMember):
         custom_title: str = None,
         api_kwargs: JSONDict = None,
     ):
-        super().__init__(status=ChatMember.ADMINISTRATOR, user=user)
+        super().__init__(status=ChatMember.ADMINISTRATOR, user=user, api_kwargs=api_kwargs)
         self.can_be_edited = can_be_edited
         self.is_anonymous = is_anonymous
         self.can_manage_chat = can_manage_chat
@@ -308,6 +314,9 @@ class ChatMemberMember(ChatMember):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         user (:class:`telegram.User`): Information about the user.
 
@@ -325,7 +334,7 @@ class ChatMemberMember(ChatMember):
         user: User,
         api_kwargs: JSONDict = None,
     ):
-        super().__init__(status=ChatMember.MEMBER, user=user)
+        super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
 
 
 class ChatMemberRestricted(ChatMember):
@@ -334,6 +343,9 @@ class ChatMemberRestricted(ChatMember):
     in the chat. Supergroups only.
 
     .. versionadded:: 13.7
+
+    .. versionchanged:: 20.0
+        |removedkwargs|
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -413,7 +425,7 @@ class ChatMemberRestricted(ChatMember):
         until_date: datetime.datetime,
         api_kwargs: JSONDict = None,
     ):
-        super().__init__(status=ChatMember.RESTRICTED, user=user)
+        super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
         self.is_member = is_member
         self.can_change_info = can_change_info
         self.can_invite_users = can_invite_users
@@ -433,6 +445,9 @@ class ChatMemberLeft(ChatMember):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         user (:class:`telegram.User`): Information about the user.
 
@@ -449,7 +464,7 @@ class ChatMemberLeft(ChatMember):
         user: User,
         api_kwargs: JSONDict = None,
     ):
-        super().__init__(status=ChatMember.LEFT, user=user)
+        super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
 
 
 class ChatMemberBanned(ChatMember):
@@ -458,6 +473,9 @@ class ChatMemberBanned(ChatMember):
     can't return to the chat or view chat messages.
 
     .. versionadded:: 13.7
+
+    .. versionchanged:: 20.0
+        |removedkwargs|
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -481,5 +499,5 @@ class ChatMemberBanned(ChatMember):
         until_date: datetime.datetime,
         api_kwargs: JSONDict = None,
     ):
-        super().__init__(status=ChatMember.BANNED, user=user)
+        super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
         self.until_date = until_date

@@ -65,6 +65,9 @@ class CallbackQuery(TelegramObject):
 
           .. versionadded:: 13.6
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
@@ -79,7 +82,6 @@ class CallbackQuery(TelegramObject):
             inline mode, that originated the query.
         game_short_name (:obj:`str`, optional): Short name of a Game to be returned, serves as
             the unique identifier for the game
-
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.

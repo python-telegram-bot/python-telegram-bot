@@ -35,12 +35,14 @@ class OrderInfo(TelegramObject):
     considered equal, if their :attr:`name`, :attr:`phone_number`, :attr:`email` and
     :attr:`shipping_address` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         name (:obj:`str`, optional): User name.
         phone_number (:obj:`str`, optional): User's phone number.
         email (:obj:`str`, optional): User email.
         shipping_address (:class:`telegram.ShippingAddress`, optional): User shipping address.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         name (:obj:`str`): Optional. User name.

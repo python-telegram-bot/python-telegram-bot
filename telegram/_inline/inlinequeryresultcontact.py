@@ -35,6 +35,9 @@ class InlineQueryResultContact(InlineQueryResult):
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the contact.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         phone_number (:obj:`str`): Contact's phone number.
@@ -49,7 +52,6 @@ class InlineQueryResultContact(InlineQueryResult):
         thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.CONTACT`.

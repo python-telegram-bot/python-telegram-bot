@@ -38,6 +38,9 @@ class InputInvoiceMessageContent(InputMessageContent):
 
     .. versionadded:: 13.5
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
             :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
@@ -89,7 +92,6 @@ class InputInvoiceMessageContent(InputMessageContent):
             should be sent to provider.
         is_flexible (:obj:`bool`, optional): Pass :obj:`True`, if the final price depends on the
             shipping method.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-

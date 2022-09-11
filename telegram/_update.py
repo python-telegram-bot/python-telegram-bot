@@ -46,6 +46,9 @@ class Update(TelegramObject):
     Note:
         At most one of the optional parameters can be present in any given update.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if
@@ -94,8 +97,6 @@ class Update(TelegramObject):
             receive these updates.
 
             .. versionadded:: 13.8
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         update_id (:obj:`int`): The update's unique identifier.
         message (:class:`telegram.Message`): Optional. New incoming message.

@@ -136,7 +136,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             limiting the number of requests made by the bot per time interval.
 
             .. versionadded:: 20.0
-
     Attributes:
         arbitrary_callback_data (:obj:`bool` | :obj:`int`): Whether this bot instance
             allows to use arbitrary objects as callback data for

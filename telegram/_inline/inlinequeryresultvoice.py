@@ -35,8 +35,11 @@ class InlineQueryResultVoice(InlineQueryResult):
     """
     Represents a link to a voice recording in an .ogg container encoded with OPUS. By default,
     this voice recording will be sent by the user. Alternatively, you can use
-    :attr:`input_message_content` to send a message with the specified content instead of the
+    :attr:`input_message_content` to send a message with the specified content instead of
     the voice message.
+
+    .. versionchanged:: 20.0
+        |removedkwargs|
 
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
@@ -56,7 +59,6 @@ class InlineQueryResultVoice(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the voice recording.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VOICE`.

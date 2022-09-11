@@ -67,8 +67,10 @@ class InlineKeyboardButton(TelegramObject):
         :class:`telegram.InlineKeyboardMarkup`
 
     .. versionchanged:: 20.0
-       :attr:`web_app` is considered as well when comparing objects of this type in terms of
-       equality.
+
+       * :attr:`web_app` is considered as well when comparing objects of this type in terms of
+         equality.
+       * |removedkwargs|
 
     Args:
         text (:obj:`str`): Label text on the button.
@@ -115,7 +117,6 @@ class InlineKeyboardButton(TelegramObject):
         pay (:obj:`bool`, optional): Specify :obj:`True`, to send a Pay button. This type of button
             must always be the `first` button in the first row and can only be used in invoice
             messages.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         text (:obj:`str`): Label text on the button.

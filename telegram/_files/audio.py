@@ -29,6 +29,10 @@ class Audio(_BaseThumbedMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -43,8 +47,6 @@ class Audio(_BaseThumbedMedium):
         file_size (:obj:`int`, optional): File size in bytes.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
-
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file.

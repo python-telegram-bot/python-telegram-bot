@@ -28,13 +28,15 @@ class Contact(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`phone_number` is equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         phone_number (:obj:`str`): Contact's phone number.
         first_name (:obj:`str`): Contact's first name.
         last_name (:obj:`str`, optional): Contact's last name.
         user_id (:obj:`int`, optional): Contact's user identifier in Telegram.
         vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         phone_number (:obj:`str`): Contact's phone number.

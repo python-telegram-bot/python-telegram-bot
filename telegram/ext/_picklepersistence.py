@@ -161,7 +161,6 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
 
             .. versionadded:: 20.0
-
     Attributes:
         filepath (:obj:`str` | :obj:`pathlib.Path`): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.

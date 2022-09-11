@@ -42,6 +42,9 @@ class Sticker(_BaseThumbedMedium):
         arguments had to be changed. Use keyword arguments to make sure that the arguments are
         passed correctly.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -72,11 +75,10 @@ class Sticker(_BaseThumbedMedium):
             premium animation for the sticker.
 
             .. versionadded:: 20.0
-        custom_emoji (:obj:`str`, optional): For custom emoji stickers, unique identifier of the
+        custom_emoji_id (:obj:`str`, optional): For custom emoji stickers, unique identifier of the
             custom emoji.
 
             .. versionadded:: 20.0
-        _kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file.
@@ -197,7 +199,9 @@ class StickerSet(TelegramObject):
         passed correctly.
 
     .. versionchanged:: 20.0:
-        The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
+
+        * The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
+        * |removedkwargs|
 
     Args:
         name (:obj:`str`): Sticker set name.
@@ -296,6 +300,9 @@ class MaskPosition(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`point`, :attr:`x_shift`, :attr:`y_shift` and, :attr:`scale`
     are equal.
+
+    .. versionchanged:: 20.0
+        |removedkwargs|
 
     Args:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.

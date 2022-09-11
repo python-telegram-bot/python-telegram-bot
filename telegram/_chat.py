@@ -73,6 +73,9 @@ class Chat(TelegramObject):
           ``api_kwargs``. Use a named argument for those,
           and notice that some positional arguments changed position as a result.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
             and some programming languages may have difficulty/silent defects in interpreting it.
@@ -139,9 +142,6 @@ class Chat(TelegramObject):
             in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
-
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
         type (:obj:`str`): Type of chat.

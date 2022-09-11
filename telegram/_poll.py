@@ -41,6 +41,9 @@ class PollOption(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         text (:obj:`str`): Option text, 1-100 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
@@ -70,6 +73,9 @@ class PollAnswer(TelegramObject):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`option_ids` are equal.
+
+    .. versionchanged:: 20.0
+        |removedkwargs|
 
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
@@ -117,6 +123,9 @@ class Poll(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     .. seealso:: `Pollbot Example <examples.pollbot.html>`_
+
+    .. versionchanged:: 20.0
+        |removedkwargs|
 
     Args:
         id (:obj:`str`): Unique poll identifier.

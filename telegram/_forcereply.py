@@ -33,8 +33,10 @@ class ForceReply(TelegramObject):
     considered equal, if their :attr:`selective` is equal.
 
     .. versionchanged:: 20.0
-        The (undocumented) argument ``force_reply`` was removed and instead :attr:`force_reply`
-        is now always set to :obj:`True` as expected by the Bot API.
+
+        * The (undocumented) argument ``force_reply`` was removed and instead :attr:`force_reply`
+          is now always set to :obj:`True` as expected by the Bot API.
+        * |removedkwargs|
 
     Args:
         selective (:obj:`bool`, optional): Use this parameter if you want to force reply from
@@ -49,8 +51,6 @@ class ForceReply(TelegramObject):
             field when the reply is active; 1-64 characters.
 
             .. versionadded:: 13.7
-
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         force_reply (:obj:`True`): Shows reply interface to the user, as if they manually selected

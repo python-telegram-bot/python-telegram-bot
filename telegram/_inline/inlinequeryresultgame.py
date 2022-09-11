@@ -27,12 +27,14 @@ from telegram.constants import InlineQueryResultType
 class InlineQueryResultGame(InlineQueryResult):
     """Represents a :class:`telegram.Game`.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         game_short_name (:obj:`str`): Short name of the game.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GAME`.

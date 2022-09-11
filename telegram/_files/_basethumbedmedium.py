@@ -37,6 +37,9 @@ class _BaseThumbedMedium(_BaseMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -45,7 +48,6 @@ class _BaseThumbedMedium(_BaseMedium):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): File size.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
-
 
     Attributes:
         file_id (:obj:`str`): File identifier.

@@ -36,6 +36,9 @@ class ReplyKeyboardMarkup(TelegramObject):
         A user requests to change the bot's language, bot replies to the request with a keyboard
         to select the new language. Other users in the group don't see the keyboard.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         keyboard (List[List[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of button rows,
             each represented by an Array of :class:`telegram.KeyboardButton` objects.
@@ -61,8 +64,6 @@ class ReplyKeyboardMarkup(TelegramObject):
             field when the keyboard is active; 1-64 characters.
 
             .. versionadded:: 13.7
-
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
@@ -170,7 +171,6 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
         """
         return cls(
             [[button]],
@@ -222,7 +222,6 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
         return cls(
@@ -275,7 +274,6 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
         button_grid = [[button] for button in button_column]

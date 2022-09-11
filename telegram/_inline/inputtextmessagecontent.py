@@ -35,6 +35,9 @@ class InputTextMessageContent(InputMessageContent):
 
     .. seealso:: `Inline Example <examples.inlinebot.html>`_
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         message_text (:obj:`str`): Text of the message to be sent,
             1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
@@ -47,7 +50,6 @@ class InputTextMessageContent(InputMessageContent):
             :paramref:`parse_mode`.
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent,

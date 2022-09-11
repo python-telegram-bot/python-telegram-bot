@@ -102,7 +102,6 @@ class MenuButtonCommands(MenuButton):
     """Represents a menu button, which opens the bot's list of commands.
 
     .. versionadded:: 20.0
-
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.COMMANDS`.
     """
@@ -169,7 +168,6 @@ class MenuButtonDefault(MenuButton):
     """Describes that no specific value for the menu button was set.
 
     .. versionadded:: 20.0
-
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.DEFAULT`.
     """

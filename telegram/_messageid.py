@@ -28,8 +28,14 @@ class MessageId(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_id` is equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
+    Args:
+        message_id (:obj:`int`): Unique message identifier.
+
     Attributes:
-        message_id (:obj:`int`): Unique message identifier
+        message_id (:obj:`int`): Unique message identifier.
     """
 
     __slots__ = ("message_id",)

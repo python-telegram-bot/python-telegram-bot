@@ -32,6 +32,9 @@ class Invoice(TelegramObject):
     considered equal, if their :attr:`title`, :attr:`description`, :paramref:`start_parameter`,
     :attr:`currency` and :attr:`total_amount` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         title (:obj:`str`): Product name.
         description (:obj:`str`): Product description.
@@ -44,7 +47,6 @@ class Invoice(TelegramObject):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         title (:obj:`str`): Product name.

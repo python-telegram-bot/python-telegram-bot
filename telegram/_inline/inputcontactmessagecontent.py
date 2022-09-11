@@ -28,13 +28,15 @@ class InputContactMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`phone_number` is equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         phone_number (:obj:`str`): Contact's phone number.
         first_name (:obj:`str`): Contact's first name.
         last_name (:obj:`str`, optional): Contact's last name.
         vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
             0-2048 bytes.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         phone_number (:obj:`str`): Contact's phone number.

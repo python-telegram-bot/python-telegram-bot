@@ -32,10 +32,12 @@ class PassportElementError(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`source` and :attr:`type` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         source (:obj:`str`): Error source.
         type (:obj:`str`): The section of the user's Telegram Passport which has the error.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         source (:obj:`str`): Error source.
@@ -65,6 +67,9 @@ class PassportElementErrorDataField(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`field_name`, :attr:`data_hash` and :attr:`message` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
             ``"personal_details"``, ``"passport"``, ``"driver_license"``, ``"identity_card"``,
@@ -72,7 +77,6 @@ class PassportElementErrorDataField(PassportElementError):
         field_name (:obj:`str`): Name of the data field which has the error.
         data_hash (:obj:`str`): Base64-encoded data hash.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
@@ -111,13 +115,15 @@ class PassportElementErrorFile(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
             ``"passport_registration"``, ``"temporary_registration"``.
         file_hash (:obj:`str`): Base64-encoded file hash.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -147,13 +153,15 @@ class PassportElementErrorFiles(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
             ``"passport_registration"``, ``"temporary_registration"``.
         file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -183,13 +191,15 @@ class PassportElementErrorFrontSide(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
         file_hash (:obj:`str`): Base64-encoded hash of the file with the front side of the
             document.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -219,13 +229,15 @@ class PassportElementErrorReverseSide(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"driver_license"``, ``"identity_card"``.
         file_hash (:obj:`str`): Base64-encoded hash of the file with the reverse side of the
             document.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -255,12 +267,14 @@ class PassportElementErrorSelfie(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
         file_hash (:obj:`str`): Base64-encoded hash of the file with the selfie.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -289,6 +303,9 @@ class PassportElementErrorTranslationFile(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
@@ -296,7 +313,6 @@ class PassportElementErrorTranslationFile(PassportElementError):
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
         file_hash (:obj:`str`): Base64-encoded hash of the file.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
@@ -327,6 +343,9 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
@@ -334,7 +353,6 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
         file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
@@ -365,11 +383,13 @@ class PassportElementErrorUnspecified(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`element_hash`, and :attr:`message` are equal.
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
         element_hash (:obj:`str`): Base64-encoded element hash.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.

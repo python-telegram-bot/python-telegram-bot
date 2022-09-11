@@ -49,6 +49,7 @@ class InlineQuery(TelegramObject):
           ``{read, write, connect, pool}_timeout``, :paramref:`answer.api_kwargs`,
           ``auto_pagination``. Use a named argument for those,
           and notice that some positional arguments changed position as a result.
+        * |removedbotandkwargs|
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -65,8 +66,6 @@ class InlineQuery(TelegramObject):
             .. versionadded:: 13.5
         location (:class:`telegram.Location`, optional): Sender location, only for bots that
             request user location.
-
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.

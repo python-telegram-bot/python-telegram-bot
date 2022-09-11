@@ -54,7 +54,6 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the voice message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VOICE`.

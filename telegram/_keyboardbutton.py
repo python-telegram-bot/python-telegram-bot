@@ -48,8 +48,9 @@ class KeyboardButton(TelegramObject):
           Older clients will display unsupported message.
 
     .. versionchanged:: 20.0
-       :attr:`web_app` is considered as well when comparing objects of this type in terms of
-       equality.
+       * :attr:`web_app` is considered as well when comparing objects of this type in terms of
+         equality.
+       * |removedkwargs|
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -67,7 +68,6 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.0
-
     Attributes:
         text (:obj:`str`): Text of the button.
         request_contact (:obj:`bool`): Optional. The user's phone number will be sent.

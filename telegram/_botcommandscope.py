@@ -51,6 +51,9 @@ class BotCommandScope(TelegramObject):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         type (:obj:`str`): Scope type.
 
@@ -121,6 +124,8 @@ class BotCommandScopeDefault(BotCommandScope):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.DEFAULT`.
     """
@@ -128,7 +133,7 @@ class BotCommandScopeDefault(BotCommandScope):
     __slots__ = ()
 
     def __init__(self, api_kwargs: JSONDict = None):
-        super().__init__(type=BotCommandScope.DEFAULT)
+        super().__init__(type=BotCommandScope.DEFAULT, api_kwargs=api_kwargs)
 
 
 class BotCommandScopeAllPrivateChats(BotCommandScope):
@@ -136,6 +141,8 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_PRIVATE_CHATS`.
     """
@@ -143,7 +150,7 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
     __slots__ = ()
 
     def __init__(self, api_kwargs: JSONDict = None):
-        super().__init__(type=BotCommandScope.ALL_PRIVATE_CHATS)
+        super().__init__(type=BotCommandScope.ALL_PRIVATE_CHATS, api_kwargs=api_kwargs)
 
 
 class BotCommandScopeAllGroupChats(BotCommandScope):
@@ -151,6 +158,8 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_GROUP_CHATS`.
     """
@@ -158,7 +167,7 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
     __slots__ = ()
 
     def __init__(self, api_kwargs: JSONDict = None):
-        super().__init__(type=BotCommandScope.ALL_GROUP_CHATS)
+        super().__init__(type=BotCommandScope.ALL_GROUP_CHATS, api_kwargs=api_kwargs)
 
 
 class BotCommandScopeAllChatAdministrators(BotCommandScope):
@@ -166,6 +175,8 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_CHAT_ADMINISTRATORS`.
     """
@@ -173,7 +184,7 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
     __slots__ = ()
 
     def __init__(self, api_kwargs: JSONDict = None):
-        super().__init__(type=BotCommandScope.ALL_CHAT_ADMINISTRATORS)
+        super().__init__(type=BotCommandScope.ALL_CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
 
 
 class BotCommandScopeChat(BotCommandScope):
@@ -184,10 +195,12 @@ class BotCommandScopeChat(BotCommandScope):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
             target supergroup (in the format ``@supergroupusername``)
-
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT`.
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
@@ -197,7 +210,7 @@ class BotCommandScopeChat(BotCommandScope):
     __slots__ = ("chat_id",)
 
     def __init__(self, chat_id: Union[str, int], api_kwargs: JSONDict = None):
-        super().__init__(type=BotCommandScope.CHAT)
+        super().__init__(type=BotCommandScope.CHAT, api_kwargs=api_kwargs)
         self.chat_id = (
             chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
         )
@@ -213,10 +226,12 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
 
     .. versionadded:: 13.7
 
+    .. versionchanged:: 20.0
+        |removedkwargs|
+
     Args:
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
             target supergroup (in the format ``@supergroupusername``)
-
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT_ADMINISTRATORS`.
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
@@ -226,7 +241,7 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
     __slots__ = ("chat_id",)
 
     def __init__(self, chat_id: Union[str, int], api_kwargs: JSONDict = None):
-        super().__init__(type=BotCommandScope.CHAT_ADMINISTRATORS)
+        super().__init__(type=BotCommandScope.CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
         self.chat_id = (
             chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
         )
@@ -241,6 +256,9 @@ class BotCommandScopeChatMember(BotCommandScope):
     considered equal, if their :attr:`type`, :attr:`chat_id` and :attr:`user_id` are equal.
 
     .. versionadded:: 13.7
+
+    .. versionchanged:: 20.0
+        |removedkwargs|
 
     Args:
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
@@ -257,7 +275,7 @@ class BotCommandScopeChatMember(BotCommandScope):
     __slots__ = ("chat_id", "user_id")
 
     def __init__(self, chat_id: Union[str, int], user_id: int, api_kwargs: JSONDict = None):
-        super().__init__(type=BotCommandScope.CHAT_MEMBER)
+        super().__init__(type=BotCommandScope.CHAT_MEMBER, api_kwargs=api_kwargs)
         self.chat_id = (
             chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
         )

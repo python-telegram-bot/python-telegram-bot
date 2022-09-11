@@ -37,7 +37,8 @@ class VideoChatStarted(TelegramObject):
 
     .. versionadded:: 13.4
     .. versionchanged:: 20.0
-        This class was renamed from ``VoiceChatStarted`` in accordance to Bot API 6.0.
+        * This class was renamed from ``VoiceChatStarted`` in accordance to Bot API 6.0.
+        * |removedkwargs|
     """
 
     __slots__ = ()
@@ -64,7 +65,6 @@ class VideoChatEnded(TelegramObject):
 
     Args:
         duration (:obj:`int`): Voice chat duration in seconds.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         duration (:obj:`int`): Voice chat duration in seconds.
@@ -96,7 +96,6 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     Args:
         users (List[:class:`telegram.User`]): New members that were invited to the video chat.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         users (List[:class:`telegram.User`]): New members that were invited to the video chat.
@@ -151,8 +150,6 @@ class VideoChatScheduled(TelegramObject):
     Args:
         start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the video
             chat is supposed to be started by a chat administrator
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the video
             chat is supposed to be started by a chat administrator

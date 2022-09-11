@@ -29,6 +29,9 @@ class VideoNote(_BaseThumbedMedium):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -41,8 +44,6 @@ class VideoNote(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`, optional): Video thumbnail.
         file_size (:obj:`int`, optional): File size in bytes.
 
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         file_id (:obj:`str`): Identifier for this file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
@@ -52,7 +53,6 @@ class VideoNote(_BaseThumbedMedium):
         duration (:obj:`int`): Duration of the video in seconds as defined by sender.
         thumb (:class:`telegram.PhotoSize`): Optional. Video thumbnail.
         file_size (:obj:`int`): Optional. File size in bytes.
-
 
     """
 
