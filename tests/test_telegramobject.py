@@ -22,7 +22,7 @@ from copy import deepcopy
 
 import pytest
 
-from telegram import Chat, Message, PhotoSize, TelegramObject, User
+from telegram import BotCommand, Chat, Message, PhotoSize, TelegramObject, User
 
 
 class TestTelegramObject:
@@ -167,3 +167,33 @@ class TestTelegramObject:
         assert d._private == s._private  # Can't test for identity since two equal strings is True
         assert d._bot == s._bot and d._bot is s._bot
         assert d.normal == s.normal
+
+    def test_string_representation(self):
+        class TGO(TelegramObject):
+            def __init__(self):
+                super().__init__()
+                self.string_attr = "string"
+                self.int_attr = 42
+                self.to_attr = BotCommand("command", "description")
+                self.list_attr = [
+                    BotCommand("command_1", "description_1"),
+                    BotCommand("command_2", "description_2"),
+                ]
+                self.dict_attr = {
+                    BotCommand("command_1", "description_1"): BotCommand(
+                        "command_2", "description_2"
+                    )
+                }
+                # Should not be included in string representation
+                self.none_attr = None
+
+        expected = (
+            "TGO(string_attr='string', int_attr=42, to_attr=BotCommand("
+            "description='description', command='command'), list_attr=[BotCommand("
+            "description='description_1', command='command_1'), BotCommand("
+            "description='description_2', command='command_2')], dict_attr={BotCommand("
+            "description='description_1', command='command_1'): BotCommand("
+            "description='description_2', command='command_2')})"
+        )
+        assert str(TGO()) == expected
+        assert repr(TGO()) == expected

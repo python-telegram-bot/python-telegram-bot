@@ -44,8 +44,12 @@ class TelegramObject:
         assert telegram_object.get_bot() is copy.deepcopy(telegram_object).get_bot()
 
     .. versionchanged:: 20.0
-        ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
-        special cases like :attr:`Message.from_user` that deviate from the official Bot API.
+
+       * ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
+         special cases like :attr:`Message.from_user` that deviate from the official Bot API.
+       * ``str(telegram_object)`` and ``repr(telegram_object)`` now both return a string of the
+         form ``ClassName(attr_1=value_1, attr_2=value_2, ...)``, where attributes with the
+         value :obj:`None` are omitted.
     """
 
     # type hints in __new__ are not read by mypy (https://github.com/python/mypy/issues/1021). As a
@@ -67,8 +71,19 @@ class TelegramObject:
         instance._bot = None
         return instance
 
-    def __str__(self) -> str:
-        return str(self.to_dict())
+    def __repr__(self) -> str:
+        """
+        * `__repr__` goal is to be unambiguous
+        * `__str__` goal is to be readable
+        * `str()` calls `__repr__`, if `__str__` is not defined
+
+        In our case "unambiguous" and "readable" largely coincide, so we can use the same logic.
+
+        Prints the object in the form `ClassName(arg=value, arg=value, ...)`
+        """
+        as_dict = self._get_attrs(recursive=False, include_private=False)
+        contents = {", ".join(f"{k}={v!r}" for k, v in as_dict.items() if v is not None)}
+        return f"{self.__class__.__name__}({contents})"
 
     def __getitem__(self, item: str) -> object:
         if item == "from":
