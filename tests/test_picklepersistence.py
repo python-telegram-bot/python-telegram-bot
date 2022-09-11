@@ -238,6 +238,7 @@ class TestPicklePersistence:
 
     class DictSub(TelegramObject):  # Used for testing our custom (Un)Pickler.
         def __init__(self, private, normal, b):
+            super().__init__()
             self._private = private
             self.normal = normal
             self._bot = b
@@ -246,6 +247,7 @@ class TestPicklePersistence:
         __slots__ = ("new_var", "_private")
 
         def __init__(self, new_var, private):
+            super().__init__()
             self.new_var = new_var
             self._private = private
 
