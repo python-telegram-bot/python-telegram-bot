@@ -169,7 +169,7 @@ class TelegramObject:
         if recursive and data.get("from_user"):
             data["from"] = data.pop("from_user", None)
         if remove_bot:
-            data.pop("_bot", None)
+            data["_bot"] = None
         return data
 
     @staticmethod

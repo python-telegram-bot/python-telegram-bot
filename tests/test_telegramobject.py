@@ -28,6 +28,7 @@ from telegram import Chat, Message, PhotoSize, TelegramObject, User
 class TestTelegramObject:
     class Sub(TelegramObject):
         def __init__(self, private, normal, b):
+            super().__init__()
             self._private = private
             self.normal = normal
             self._bot = b
@@ -155,6 +156,9 @@ class TestTelegramObject:
         msg.set_bot(bot)
 
         new_msg = deepcopy(msg)
+
+        assert new_msg == msg
+        assert new_msg is not msg
 
         # The same bot should be present when deepcopying.
         assert new_msg.get_bot() == bot and new_msg.get_bot() is bot
