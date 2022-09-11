@@ -82,7 +82,7 @@ class TelegramObject:
         Prints the object in the form `ClassName(arg=value, arg=value, ...)`
         """
         as_dict = self._get_attrs(recursive=False, include_private=False)
-        contents = {", ".join(f"{k}={v!r}" for k, v in as_dict.items() if v is not None)}
+        contents = ", ".join(f"{k}={v!r}" for k, v in as_dict.items() if v is not None)
         return f"{self.__class__.__name__}({contents})"
 
     def __getitem__(self, item: str) -> object:
