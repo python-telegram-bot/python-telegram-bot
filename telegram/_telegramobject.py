@@ -154,7 +154,7 @@ class TelegramObject:
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
         for cls in self.__class__.__mro__[:-1]:
             for key in cls.__slots__:  # type: ignore[attr-defined]
-                if (not include_private and key.startswith("_")) or (key == "api_kwargs"):
+                if not include_private and key.startswith("_"):
                     continue
 
                 value = getattr(self, key, None)
@@ -246,6 +246,7 @@ class TelegramObject:
 
     def to_json(self) -> str:
         """Gives a JSON representation of object.
+        This includes all entries of :attr:`api_kwargs`.
 
         Returns:
             :obj:`str`
@@ -254,11 +255,14 @@ class TelegramObject:
 
     def to_dict(self) -> JSONDict:
         """Gives representation of object as :obj:`dict`.
+        This includes all entries of :attr:`api_kwargs`.
 
         Returns:
             :obj:`dict`
         """
-        return self._get_attrs(recursive=True)
+        out = self._get_attrs(recursive=True)
+        out.update(out.pop("api_kwargs", {}))  # type: ignore[call-overload]
+        return out
 
     def get_bot(self) -> "Bot":
         """Returns the :class:`telegram.Bot` instance associated with this object.

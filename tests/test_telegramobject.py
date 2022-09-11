@@ -59,11 +59,16 @@ class TestTelegramObject:
             __slots__ = ("a", "_b")  # Added slots so that the attrs are converted to dict
 
             def __init__(self):
+                super().__init__()
                 self.a = 1
                 self._b = 2
 
         subclass_instance = TelegramObjectSubclass()
         assert subclass_instance.to_dict() == {"a": 1}
+
+    def test_to_dict_api_kwargs(self):
+        to = TelegramObject(api_kwargs={"foo": "bar"})
+        assert to.to_dict() == {"foo": "bar"}
 
     def test_slot_behaviour(self, mro_slots):
         inst = TelegramObject()
