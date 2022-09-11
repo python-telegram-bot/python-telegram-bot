@@ -47,6 +47,17 @@ class TelegramObject:
     .. versionchanged:: 20.0
         ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
         special cases like :attr:`Message.from_user` that deviate from the official Bot API.
+
+    Arguments:
+        api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|
+
+            .. versionadded:: 20.0
+
+    Attributes:
+        api_kwargs (Dict[:obj:`str`, any]): |toapikwargsattr|
+
+            .. versionadded:: 20.0
+
     """
 
     __slots__ = ("_id_attrs", "_bot", "api_kwargs")
@@ -247,7 +258,9 @@ class TelegramObject:
 
     def to_json(self) -> str:
         """Gives a JSON representation of object.
-        This includes all entries of :attr:`api_kwargs`.
+
+        .. versionchanged:: 20.0
+            Now includes all entries of :attr:`api_kwargs`.
 
         Returns:
             :obj:`str`
@@ -256,7 +269,9 @@ class TelegramObject:
 
     def to_dict(self) -> JSONDict:
         """Gives representation of object as :obj:`dict`.
-        This includes all entries of :attr:`api_kwargs`.
+
+        .. versionchanged:: 20.0
+            Now includes all entries of :attr:`api_kwargs`.
 
         Returns:
             :obj:`dict`
