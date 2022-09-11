@@ -106,6 +106,7 @@ class TelegramObject:
         """
         for key, val in state.items():
             setattr(self, key, val)
+        self._apply_api_kwargs()
 
     def __deepcopy__(self: TO_co, memodict: dict) -> TO_co:
         """This method deepcopies the object and sets the bot on the newly created copy."""

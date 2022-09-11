@@ -33,6 +33,11 @@ class TestTelegramObject:
             self.normal = normal
             self._bot = b
 
+    class ChangingTO(TelegramObject):
+        # Don't use in any tests, this is just for testing the pickle behaviour and the
+        # class is altered during the test procedure
+        pass
+
     def test_to_json(self, monkeypatch):
         # to_json simply takes whatever comes from to_dict, therefore we only need to test it once
         telegram_object = TelegramObject()
@@ -150,6 +155,18 @@ class TestTelegramObject:
         assert unpickled.from_user == user
         assert unpickled.date == date
         assert unpickled.photo[0] == photo
+
+    def test_pickle_apply_api_kwargs(self, bot):
+        """Makes sure that when a class gets new attributes, the api_kwargs are moved to the
+        new attributes on unpickling."""
+        obj = self.ChangingTO(api_kwargs={"foo": "bar"})
+        pickled = pickle.dumps(obj)
+
+        self.ChangingTO.foo = None
+        obj = pickle.loads(pickled)
+
+        assert obj.foo == "bar"
+        assert obj.api_kwargs == {}
 
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
