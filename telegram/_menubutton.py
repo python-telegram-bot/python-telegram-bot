@@ -55,7 +55,7 @@ class MenuButton(TelegramObject):
     __slots__ = ("type",)
 
     def __init__(
-        self, type: str, api_kwargs: JSONDict = None
+        self, type: str, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
     ):  # pylint: disable=redefined-builtin
         super().__init__(api_kwargs=api_kwargs)
         self.type = type
