@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 
 
 @no_type_check
-def decrypt(secret, hash, data):
+def decrypt(secret, hash, data):  # skipcq: PYL-W0622
     """
     Decrypt per telegram docs at https://core.telegram.org/passport.
 
@@ -95,7 +95,7 @@ def decrypt(secret, hash, data):
 
 
 @no_type_check
-def decrypt_json(secret, hash, data):
+def decrypt_json(secret, hash, data):  # skipcq: PYL-W0622
     """Decrypts data using secret and hash and then decodes utf-8 string and loads json"""
     return json.loads(decrypt(secret, hash, data).decode("utf-8"))
 
@@ -140,7 +140,7 @@ class EncryptedCredentials(TelegramObject):
     def __init__(
         self,
         data: str,
-        hash: str,
+        hash: str,  # skipcq: PYL-W0622
         secret: str,
         api_kwargs: JSONDict = None,
     ):
@@ -416,7 +416,7 @@ class _CredentialsBase(TelegramObject):
 
     __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
-    def __init__(self, hash: str, secret: str, api_kwargs: JSONDict = None):
+    def __init__(self, hash: str, secret: str, api_kwargs: JSONDict = None):  # skipcq: PYL-W0622
         super().__init__(api_kwargs=api_kwargs)
         self.hash = hash
         self.secret = secret
