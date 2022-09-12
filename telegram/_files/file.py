@@ -231,7 +231,13 @@ class File(TelegramObject):
         if local_file:
             buf = path.read_bytes()
         else:
-            buf = await self.get_bot().request.retrieve(url)
+            buf = await self.get_bot().request.retrieve(
+                url,
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+            )
             if self._credentials:
                 buf = decrypt(
                     b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
