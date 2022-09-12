@@ -97,7 +97,7 @@ class TestFile:
             return self.file_content
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
-        out_file = await file.download()
+        out_file = await file.download_to_drive()
 
         try:
             assert out_file.read_bytes() == self.file_content
@@ -105,7 +105,7 @@ class TestFile:
             out_file.unlink()
 
     async def test_download_local_file(self, local_file):
-        assert await local_file.download() == Path(local_file.file_path)
+        assert await local_file.download_to_drive() == Path(local_file.file_path)
 
     @pytest.mark.parametrize(
         "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]
@@ -118,7 +118,7 @@ class TestFile:
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
         try:
-            out_file = await file.download(custom_path_type(custom_path))
+            out_file = await file.download_to_drive(custom_path_type(custom_path))
             assert out_file == custom_path
             assert out_file.read_bytes() == self.file_content
         finally:
@@ -132,7 +132,7 @@ class TestFile:
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
         try:
-            out_file = await local_file.download(custom_path_type(custom_path))
+            out_file = await local_file.download_to_drive(custom_path_type(custom_path))
             assert out_file == custom_path
             assert out_file.read_bytes() == self.file_content
         finally:
@@ -146,7 +146,7 @@ class TestFile:
         file.file_path = None
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
-        out_file = await file.download()
+        out_file = await file.download_to_drive()
 
         assert str(out_file)[-len(file.file_id) :] == file.file_id
         try:
@@ -160,7 +160,7 @@ class TestFile:
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         with TemporaryFile() as custom_fobj:
-            out_fobj = await file.download(out=custom_fobj)
+            out_fobj = await file.download_to_object(out=custom_fobj)
             assert out_fobj is custom_fobj
 
             out_fobj.seek(0)
@@ -168,7 +168,7 @@ class TestFile:
 
     async def test_download_file_obj_local_file(self, local_file):
         with TemporaryFile() as custom_fobj:
-            out_fobj = await local_file.download(out=custom_fobj)
+            out_fobj = await local_file.download_to_object(out=custom_fobj)
             assert out_fobj is custom_fobj
 
             out_fobj.seek(0)

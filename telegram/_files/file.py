@@ -21,7 +21,7 @@ import shutil
 import urllib.parse as urllib_parse
 from base64 import b64decode
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Optional, Union, overload
+from typing import IO, TYPE_CHECKING, Any, Optional
 
 from telegram._passport.credentials import decrypt
 from telegram._telegramobject import TelegramObject
@@ -97,61 +97,45 @@ class File(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
-    @overload
-    async def download(
-        self,
-        out: FilePathInput = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Union[Path, IO]:
-        ...
+    def _get_encoded_url(self) -> str:
+        """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""
+        sres = urllib_parse.urlsplit(str(self.file_path))
+        return urllib_parse.urlunsplit(
+            urllib_parse.SplitResult(
+                sres.scheme, sres.netloc, urllib_parse.quote(sres.path), sres.query, sres.fragment
+            )
+        )
 
-    @overload
-    async def download(
+    async def download_to_drive(
         self,
-        out: IO = None,
+        custom_path: FilePathInput = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Union[Path, IO]:
-        ...
-
-    async def download(
-        self,
-        out: Union[IO, FilePathInput] = None,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Union[Path, IO]:
+    ) -> Path:
         """
         Download this file. By default, the file is saved in the current working directory with its
         original filename as reported by Telegram. If the file has no filename, the file ID will
-        be used as filename. If :paramref:`out` is supplied with an :obj:`str` or
-        :obj:`pathlib.Path`, it will be saved to that path; if it is supplied with a
-        :obj:`io.BufferedWriter`, the file contents will be saved to that object using the
-        :obj:`out.write<io.BufferedWriter.write>` method.
+        be used as filename. If :paramref:`custom_path` is supplied with an :obj:`str` or
+        :obj:`pathlib.Path`, it will be saved to that path.
 
         Note:
-            * If :paramref:`out` isn't provided and :attr:`file_path` is the path of a local file
-              (which is the case when a Bot API Server is running in local mode), this method
-              will just return the path.
+            * If :paramref:`custom_path` isn't provided and :attr:`file_path` is the path of a
+              local file (which is the case when a Bot API Server is running in local mode), this
+              method will just return the path.
 
         .. versionchanged:: 20.0
 
             * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
             * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
               returned.
-            * Merging :paramref:`custom_path` and :paramref:`out` and overloading the type hint.
+            * Splitting :paramref:`custom_path` and :paramref:`out` in two functions.
 
 
         Args:
-            out (:obj:`io.BufferedWriter` | :class:`pathlib.Path` | :obj:`str` , optional): A
-                file-like object or a Path. Must be opened for writing in binary mode, if
-                applicable.
+            custom_path (:class:`pathlib.Path` | :obj:`str` , optional): The path where the file
+                will be saved to.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -166,41 +150,12 @@ class File(TelegramObject):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
         Returns:
-            :class:`pathlib.Path` | :obj:`io.BufferedWriter`: The same object as :paramref:`out` if
-            specified. Otherwise, returns the filename downloaded to or the file path of the
-            local file.
-
-        Raises:
-            ValueError: If both :paramref:`custom_path` and :paramref:`out` are passed.
+            :class:`pathlib.Path`: Returns the filename downloaded to
+            or the file path of the local file.
 
         """
         local_file = is_local_file(self.file_path)
         url = None if local_file else self._get_encoded_url()
-        path = Path(self.file_path) if local_file else None
-
-        # the following setup was done this way because while we only document BufferedWriter as
-        # out argument, there could be different ones applicable (e.g. tests broke because we pass
-        # a tempfile instance). So we can not check the instance of out for all the file like
-        # inputs, we can however check if they are a string or a Path, which is the only allowed
-        # input for a filename. The idea is to check if it is a filename, if it isn't but it
-        # exists, it must be a file like input.
-        # sadly, mypy can not see the isinstance connection, which means we need to ignore it
-        custom_path = None
-
-        if isinstance(out, (str, Path)):
-            custom_path = out
-
-        if not custom_path and out:
-            if local_file:
-                buf = path.read_bytes()
-            else:
-                buf = await self.get_bot().request.retrieve(url)
-                if self._credentials:
-                    buf = decrypt(
-                        b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
-                    )
-            out.write(buf)  # type: ignore[union-attr]
-            return out  # type: ignore[return-value]
 
         if custom_path is not None and local_file:
             shutil.copyfile(self.file_path, str(custom_path))
@@ -229,14 +184,60 @@ class File(TelegramObject):
         filename.write_bytes(buf)
         return filename
 
-    def _get_encoded_url(self) -> str:
-        """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""
-        sres = urllib_parse.urlsplit(str(self.file_path))
-        return urllib_parse.urlunsplit(
-            urllib_parse.SplitResult(
-                sres.scheme, sres.netloc, urllib_parse.quote(sres.path), sres.query, sres.fragment
-            )
-        )
+    async def download_to_object(
+        self,
+        out: IO,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+    ) -> IO:
+        """
+        Download this file. paramref:`out` needs to be supplied with a
+        :obj:`io.BufferedWriter`, the file contents will be saved to that object using the
+        :obj:`out.write<io.BufferedWriter.write>` method.
+
+        .. versionchanged:: 20.0
+
+            * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
+            * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
+              returned.
+            * Splitting :paramref:`custom_path` and :paramref:`out` in two functions.
+
+
+        Args:
+            out (:obj:`io.BufferedWriter`): A file-like object. Must be opened for writing in
+                binary mode.
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+        Returns:
+            :obj:`io.BufferedWriter`: The same object as :paramref:`out`.
+
+        """
+        local_file = is_local_file(self.file_path)
+        url = None if local_file else self._get_encoded_url()
+        path = Path(self.file_path) if local_file else None
+        if local_file:
+            buf = path.read_bytes()
+        else:
+            buf = await self.get_bot().request.retrieve(url)
+            if self._credentials:
+                buf = decrypt(
+                    b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
+                )
+        out.write(buf)
+        return out
 
     async def download_as_bytearray(self, buf: bytearray = None) -> bytearray:
         """Download this file and return it as a bytearray.
