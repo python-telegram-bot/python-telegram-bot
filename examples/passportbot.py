@@ -111,7 +111,7 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             for file in data.translation:
                 actual_file = await file.get_file()
                 print(actual_file)
-                await actual_file.download()
+                await actual_file.download_to_drive()
 
 
 def main() -> None:

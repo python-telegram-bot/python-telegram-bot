@@ -154,6 +154,7 @@ class TestFile:
         finally:
             out_file.unlink()
 
+    @pytest.mark.dev
     async def test_download_file_obj(self, monkeypatch, file):
         async def test(*args, **kwargs):
             return self.file_content
@@ -165,6 +166,7 @@ class TestFile:
 
             out_fobj.seek(0)
             assert out_fobj.read() == self.file_content
+        raise ValueError
 
     async def test_download_file_obj_local_file(self, local_file):
         with TemporaryFile() as custom_fobj:
