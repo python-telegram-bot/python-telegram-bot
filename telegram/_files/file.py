@@ -120,11 +120,11 @@ class File(TelegramObject):
         """
         Download this file. By default, the file is saved in the current working directory with its
         original filename as reported by Telegram. If the file has no filename, the file ID will
-        be used as filename. If :paramref:`custom_path` is supplied with an :obj:`str` or
+        be used as filename. If :paramref:`custom_path` is supplied as a :obj:`str` or
         :obj:`pathlib.Path`, it will be saved to that path.
 
         Note:
-            * If :paramref:`custom_path` isn't provided and :attr:`file_path` is the path of a
+            If :paramref:`custom_path` isn't provided and :attr:`file_path` is the path of a
               local file (which is the case when a Bot API Server is running in local mode), this
               method will just return the path.
 
@@ -133,7 +133,7 @@ class File(TelegramObject):
             * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
             * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
               returned.
-            * Splitting :paramref:`custom_path` and :paramref:`out` in two functions.
+            * This method was previously called ``download``. It was split into :meth:`download_to_drive` and :meth:`download_to_obj`
 
 
         Args:
