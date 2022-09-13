@@ -160,19 +160,15 @@ class TestFile:
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         with TemporaryFile() as custom_fobj:
-            out_fobj = await file.download_to_object(out=custom_fobj)
-            assert out_fobj is custom_fobj
-
-            out_fobj.seek(0)
-            assert out_fobj.read() == self.file_content
+            await file.download_to_object(out=custom_fobj)
+            custom_fobj.seek(0)
+            assert custom_fobj.read() == self.file_content
 
     async def test_download_file_obj_local_file(self, local_file):
         with TemporaryFile() as custom_fobj:
-            out_fobj = await local_file.download_to_object(out=custom_fobj)
-            assert out_fobj is custom_fobj
-
-            out_fobj.seek(0)
-            assert out_fobj.read() == self.file_content
+            await local_file.download_to_object(out=custom_fobj)
+            custom_fobj.seek(0)
+            assert custom_fobj.read() == self.file_content
 
     async def test_download_bytearray(self, monkeypatch, file):
         async def test(*args, **kwargs):
