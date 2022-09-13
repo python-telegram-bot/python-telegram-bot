@@ -21,7 +21,7 @@ import shutil
 import urllib.parse as urllib_parse
 from base64 import b64decode
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, BinaryIO, Optional
 
 from telegram._passport.credentials import decrypt
 from telegram._telegramobject import TelegramObject
@@ -47,7 +47,9 @@ class File(TelegramObject):
           :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD`.
         * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
           then it will automatically be decrypted as it downloads when you call e.g.
-          :meth:`download_to_drive()`.
+          :meth:`download_to_drive`.
+        * Since version 20.0, ``download`` was split into :meth:`download_to_drive` and
+          :meth:`download_to_object`.
 
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -56,7 +58,7 @@ class File(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): Optional. File size in bytes, if known.
-        file_path (:obj:`str`, optional): File path. Use e.g. :attr:`download_to_drive` to get the
+        file_path (:obj:`str`, optional): File path. Use e.g. :meth:`download_to_drive` to get the
             file.
         bot (:obj:`telegram.Bot`, optional): Bot to use with shortcut method.
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
@@ -67,7 +69,7 @@ class File(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`str`): Optional. File size in bytes.
-        file_path (:obj:`str`): Optional. File path. Use e.g. :meth:`download_to_drive()` to get
+        file_path (:obj:`str`): Optional. File path. Use e.g. :meth:`download_to_drive` to get
             the file.
 
     """
@@ -133,7 +135,8 @@ class File(TelegramObject):
             * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
             * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
               returned.
-            * This method was previously called ``download``. It was split into :meth:`download_to_drive` and :meth:`download_to_obj`
+            * This method was previously called ``download``. It was split into
+              :meth:`download_to_drive` and :meth:`download_to_obj`.
 
 
         Args:
@@ -189,27 +192,28 @@ class File(TelegramObject):
 
     async def download_to_object(
         self,
-        out: IO,
+        out: BinaryIO,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> IO:
+    ) -> None:
         """
         Download this file. paramref:`out` needs to be supplied with a
-        :obj:`io.BufferedWriter`, the file contents will be saved to that object using the
-        :obj:`out.write<io.BufferedWriter.write>` method.
+        :obj:`io.BufferedIOBase`, the file contents will be saved to that object using the
+        :obj:`out.write<io.BufferedIOBase.write>` method.
 
         .. versionchanged:: 20.0
 
             * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
             * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
               returned.
-            * Splitting :paramref:`custom_path` and :paramref:`out` in two functions.
+            * This method was previously called ``download``. It was split into
+              :meth:`download_to_drive` and :meth:`download_to_obj`.
 
 
         Args:
-            out (:obj:`io.BufferedWriter`): A file-like object. Must be opened for writing in
+            out (:obj:`io.BufferedIOBase`): A file-like object. Must be opened for writing in
                 binary mode.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
@@ -223,10 +227,6 @@ class File(TelegramObject):
             pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-
-        Returns:
-            :obj:`io.BufferedWriter`: The same object as :paramref:`out`.
-
         """
         local_file = is_local_file(self.file_path)
         url = None if local_file else self._get_encoded_url()
@@ -246,7 +246,6 @@ class File(TelegramObject):
                     b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
                 )
         out.write(buf)
-        return out
 
     async def download_as_bytearray(self, buf: bytearray = None) -> bytearray:
         """Download this file and return it as a bytearray.
