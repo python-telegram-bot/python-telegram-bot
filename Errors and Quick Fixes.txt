@@ -1,0 +1,12 @@
+Here are some errors and fixes often encountered.
+Some point to be remembered-
+        * If you are running your code from pc then bot will only repond until your pc is connected to internet, for non stop engagement you have to deploy it on server.
+		
+
+
+Error 1:
+	type object 'ContextTypes' has no attribute 'DEFAULT_TYPE'
+	
+	Fix:
+		 pip install python-telegram-bot -U --pre
+		 Run this command in cmd or shell, if the problem continues, restart IDE and again run the command in cmd.
