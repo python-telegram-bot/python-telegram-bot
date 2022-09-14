@@ -66,6 +66,14 @@
    :target: https://telegram.me/pythontelegrambotgroup
    :alt: Telegram Group
 
+.. image:: https://kandi.openweaver.com/badges/xray.svg
+   :target: https://kandi.openweaver.com/python/python-telegram-bot/python-telegram-bot
+   :alt: kandi X-Ray
+   
+.. image:: https://kandi.openweaver.com/badges/featured.svg
+   :target: https://kandi.openweaver.com/collections/python/python-telegram-bot
+   :alt: kandi Featured
+
 We have made you a wrapper you can't refuse
 
 We have a vibrant community of developers helping each other in our `Telegram group <https://telegram.me/pythontelegrambotgroup>`_. Join us!
