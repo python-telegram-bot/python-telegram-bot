@@ -238,6 +238,14 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             local_mode=DefaultValue.get_value(self._local_mode),
         )
 
+    def _bot_check(self, name: str) -> None:
+        if self._bot is not DEFAULT_NONE:
+            raise RuntimeError(_TWO_ARGS_REQ.format(name, "bot instance"))
+
+    def _updater_check(self, name: str) -> None:
+        if self._updater not in (DEFAULT_NONE, None):
+            raise RuntimeError(_TWO_ARGS_REQ.format(name, "updater"))
+
     def build(
         self: "ApplicationBuilder[BT, CCT, UD, CD, BD, JQ]",
     ) -> Application[BT, CCT, UD, CD, BD, JQ]:
@@ -330,10 +338,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if self._bot is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format("token", "bot instance"))
-        if self._updater not in (DEFAULT_NONE, None):
-            raise RuntimeError(_TWO_ARGS_REQ.format("token", "updater"))
+        self._bot_check("token")
+        self._updater_check("token")
         self._token = token
         return self
 
@@ -351,10 +357,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if self._bot is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format("base_url", "bot instance"))
-        if self._updater not in (DEFAULT_NONE, None):
-            raise RuntimeError(_TWO_ARGS_REQ.format("base_url", "updater"))
+        self._bot_check("base_url")
+        self._updater_check("base_url")
         self._base_url = base_url
         return self
 
@@ -372,10 +376,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if self._bot is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format("base_file_url", "bot instance"))
-        if self._updater not in (DEFAULT_NONE, None):
-            raise RuntimeError(_TWO_ARGS_REQ.format("base_file_url", "updater"))
+        self._bot_check("base_file_url")
+        self._updater_check("base_file_url")
         self._base_file_url = base_file_url
         return self
 
@@ -392,8 +394,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             raise RuntimeError(_TWO_ARGS_REQ.format(name, "connection_pool_size"))
         if not isinstance(getattr(self, f"_{prefix}proxy_url"), DefaultValue):
             raise RuntimeError(_TWO_ARGS_REQ.format(name, "proxy_url"))
-        if self._bot is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format(name, "bot instance"))
+        self._bot_check(name)
         if self._updater not in (DEFAULT_NONE, None):
             raise RuntimeError(_TWO_ARGS_REQ.format(name, "updater instance"))
 
@@ -674,10 +675,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if self._bot is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format("private_key", "bot instance"))
-        if self._updater not in (DEFAULT_NONE, None):
-            raise RuntimeError(_TWO_ARGS_REQ.format("private_key", "updater"))
+        self._bot_check("private_key")
+        self._updater_check("private_key")
 
         self._private_key = (
             private_key if isinstance(private_key, bytes) else Path(private_key).read_bytes()
@@ -702,10 +701,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if self._bot is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format("defaults", "bot instance"))
-        if self._updater not in (DEFAULT_NONE, None):
-            raise RuntimeError(_TWO_ARGS_REQ.format("defaults", "updater"))
+        self._bot_check("defaults")
+        self._updater_check("defaults")
         self._defaults = defaults
         return self
 
@@ -729,10 +726,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if self._bot is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format("arbitrary_callback_data", "bot instance"))
-        if self._updater not in (DEFAULT_NONE, None):
-            raise RuntimeError(_TWO_ARGS_REQ.format("arbitrary_callback_data", "updater"))
+        self._bot_check("arbitrary_callback_data")
+        self._updater_check("arbitrary_callback_data")
         self._arbitrary_callback_data = arbitrary_callback_data
         return self
 
@@ -750,10 +745,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if self._bot is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format("local_mode", "bot instance"))
-        if self._updater not in (DEFAULT_NONE, None):
-            raise RuntimeError(_TWO_ARGS_REQ.format("local_mode", "updater"))
+        self._bot_check("local_mode")
+        self._updater_check("local_mode")
         self._local_mode = local_mode
         return self
 
@@ -771,8 +764,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if self._updater not in (DEFAULT_NONE, None):
-            raise RuntimeError(_TWO_ARGS_REQ.format("bot", "updater"))
+        self._updater_check("bot")
         for attr, error in _BOT_CHECKS:
             if not isinstance(getattr(self, f"_{attr}"), DefaultValue):
                 raise RuntimeError(_TWO_ARGS_REQ.format("bot", error))
@@ -1017,10 +1009,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
         """
-        if self._bot is not DEFAULT_NONE:
-            raise RuntimeError(_TWO_ARGS_REQ.format("rate_limiter", "bot instance"))
-        if self._updater not in (DEFAULT_NONE, None):
-            raise RuntimeError(_TWO_ARGS_REQ.format("rate_limiter", "updater"))
+        self._bot_check("rate_limiter")
+        self._updater_check("rate_limiter")
         self._rate_limiter = rate_limiter
         return self  # type: ignore[return-value]
 
