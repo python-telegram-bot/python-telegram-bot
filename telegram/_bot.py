@@ -164,7 +164,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         * For uploading files, file paths are now always accepted. If :paramref:`local_mode` is
           :obj:`False`, the file contents will be read in binary mode and uploaded. Otherwise,
           the file path will be passed in the
-          `file URL scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
+          `file URI scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
 
     Args:
         token (:obj:`str`): Bot's unique authentication token.
@@ -181,10 +181,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         local_mode (:obj:`bool`, optional): Set to :obj:`True`, if the :paramref:`base_url` is
-            the URL of a `Local Bot API Server <https://core.telegram.org/bots/api#using-a-local\
+            the URI of a `Local Bot API Server <https://core.telegram.org/bots/api#using-a-local\
             -bot-api-server>`_ that runs with the ``--local`` flag. Currently the only effect of
             this is that files are uploaded using their local path in the
-            `file URL scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
+            `file URI scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
             Defaults to :obj:`False`.
 
             .. versionadded:: 20.0.
@@ -897,8 +897,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             caption (:obj:`str`, optional): Photo caption (may also be used when resending photos
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
@@ -1028,8 +1028,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             caption (:obj:`str`, optional): Audio caption,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
@@ -1064,8 +1064,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the audio, when uploading a
@@ -1177,8 +1177,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             caption (:obj:`str`, optional): Document caption (may also be used when resending
                 documents by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
@@ -1212,8 +1212,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the document, when uploading a
@@ -1306,8 +1306,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -1416,8 +1416,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             duration (:obj:`int`, optional): Duration of sent video in seconds.
             width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
@@ -1454,8 +1454,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video, when uploading a
@@ -1569,8 +1569,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             duration (:obj:`int`, optional): Duration of sent video in seconds.
             length (:obj:`int`, optional): Video width and height, i.e. diameter of the video
                 message.
@@ -1596,8 +1596,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video note, when uploading a
@@ -1713,8 +1713,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
                 animations by file_id),
@@ -1851,8 +1851,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             caption (:obj:`str`, optional): Voice message caption,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
@@ -3959,8 +3959,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             1. You will not be able to receive updates using :meth:`get_updates` for long as an
                outgoing webhook is set up.
             2. To use a self-signed certificate, you need to upload your public key certificate
-               using certificate parameter. Please upload as InputFile, sending a String will not
-               work.
+               using :paramref:`certificate` parameter. Please upload as
+               :class:`~telegram.InputFile`, sending a String will not work.
             3. Ports currently supported for Webhooks:
                :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
 
@@ -3973,8 +3973,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             certificate (:term:`file object`): Upload your public key certificate so that the root
                 certificate in use can be checked. See our `self-signed guide <https://github.com/\
                 python-telegram-bot/python-telegram-bot/wiki/Webhooks#creating-a-self-signed-\
-                certificate-using-openssl>`_ for details. Most be a :term:`file object`, e.g.
-                ``open("filename, "rb")``.
+                certificate-using-openssl>`_ for details. Must be a :term:`file object`, e.g.
+                ``open("filename", "rb")``.
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
@@ -5945,8 +5945,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -6488,8 +6488,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -6578,8 +6578,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **TGS** animation with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#animated-sticker-requirements for technical
@@ -6589,8 +6589,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
                 optional): **WEBM** video with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#video-sticker-requirements for
@@ -6599,8 +6599,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 13.11
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
@@ -6703,8 +6703,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **TGS** animation with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#animated-sticker-requirements for technical
@@ -6714,8 +6714,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                    Accept :obj:`bytes` as input.
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
                 optional): **WEBM** video with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#video-sticker-requirements for
@@ -6724,8 +6724,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 13.11
 
                 .. versionchanged:: 20.0
-                    File pathes as input is also accepted for bots *not* running in
-                    :paramref:`~telegram.Bot.local mode`.
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.

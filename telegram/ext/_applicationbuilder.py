@@ -745,7 +745,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
             python-telegram-bot/wiki/Local-Bot-API-Server>`_,
 
         Args:
-            local_mode (:obj:`bool`): The setting
+            local_mode (:obj:`bool`): Whether the bot should run in local mode.
 
         Returns:
             :class:`ApplicationBuilder`: The same builder with the updated argument.
