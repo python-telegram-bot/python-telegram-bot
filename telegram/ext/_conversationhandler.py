@@ -855,13 +855,13 @@ class ConversationHandler(BaseHandler[Update, CCT]):
                         )
 
         if isinstance(self.map_to_parent, dict) and new_state in self.map_to_parent:
-            self._update_state(self.END, conversation_key)
+            self._update_state(self.END, conversation_key, handler)
             if raise_dp_handler_stop:
                 raise ApplicationHandlerStop(self.map_to_parent.get(new_state))
             return self.map_to_parent.get(new_state)
 
         if current_state != self.WAITING:
-            self._update_state(new_state, conversation_key)
+            self._update_state(new_state, conversation_key, handler)
 
         if raise_dp_handler_stop:
             # Don't pass the new state here. If we're in a nested conversation, the parent is
@@ -870,7 +870,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         # Signals a possible parent conversation to stay in the current state
         return None
 
-    def _update_state(self, new_state: object, key: ConversationKey) -> None:
+    def _update_state(
+        self, new_state: object, key: ConversationKey, handler: BaseHandler = None
+    ) -> None:
         if new_state == self.END:
             if key in self._conversations:
                 # If there is no key in conversations, nothing is done.
@@ -884,7 +886,8 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         elif new_state is not None:
             if new_state not in self.states:
                 warn(
-                    f"BaseHandler returned state {new_state} which is unknown to the "
+                    f"{repr(handler.callback.__name__) if handler is not None else 'BaseHandler'} "
+                    f"returned state {new_state} which is unknown to the "
                     f"ConversationHandler{' ' + self.name if self.name is not None else ''}.",
                     stacklevel=2,
                 )
