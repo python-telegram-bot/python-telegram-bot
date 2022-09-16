@@ -28,6 +28,7 @@ those classes.
 
     * Most of the constants in this module are grouped into enums.
 """
+# TODO: Remove this when https://github.com/PyCQA/pylint/issues/6887 is resolved.
 # pylint: disable=invalid-enum-extension
 
 __all__ = [
