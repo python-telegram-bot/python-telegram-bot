@@ -28,6 +28,7 @@ those classes.
 
     * Most of the constants in this module are grouped into enums.
 """
+# pylint: disable=invalid-enum-extension
 
 __all__ = [
     "BOT_API_VERSION",

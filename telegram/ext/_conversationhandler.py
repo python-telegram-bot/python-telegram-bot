@@ -16,13 +16,12 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=no-self-use
 """This module contains the ConversationHandler."""
 import asyncio
 import datetime
 import logging
 from dataclasses import dataclass
-from typing import (  # pylint: disable=unused-import  # for the "Any" import
+from typing import (
     TYPE_CHECKING,
     Any,
     ClassVar,

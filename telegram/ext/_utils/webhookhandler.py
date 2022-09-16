@@ -115,7 +115,7 @@ class TelegramHandler(tornado.web.RequestHandler):
         self.secret_token = secret_token
         if secret_token:
             self._logger.debug(
-                "The webhook server has a secret token, " "expecting it in incoming requests now"
+                "The webhook server has a secret token, expecting it in incoming requests now"
             )
 
     def set_default_headers(self) -> None:
