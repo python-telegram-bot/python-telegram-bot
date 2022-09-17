@@ -2042,17 +2042,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """Use this method to stop updating a live location message sent by the bot or via the bot
         (for inline bots) before :paramref:`~telegram.Location.live_period` expires.
 
-        .. seealso:: :attr:`telegram.Message.stop_live_location`
+        .. seealso:: :attr:`telegram.Message.stop_live_location`,
             :attr:`telegram.CallbackQuery.stop_message_live_location`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Required if inline_message_id is not specified.
-                Unique identifier for the target chat or username of the target channel
-                (in the format ``@channelusername``).
-            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
-                Identifier of the sent message with live location to stop.
-            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
-                specified. Identifier of the inline message.
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
+                is not specified. Unique identifier for the target chat or username of the target
+                channel (in the format ``@channelusername``).
+            message_id (:obj:`int`, optional): Required if :paramref:`inline_message_id` is not
+                specified. Identifier of the sent message with live location to stop.
+            inline_message_id (:obj:`str`, optional): Required if :paramref:`chat_id` and
+                :paramref:`message_id` are not specified. Identifier of the inline message.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard.
 

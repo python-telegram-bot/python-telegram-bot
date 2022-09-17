@@ -396,11 +396,9 @@ read_timeout_sub = [
 ]
 read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
 
-excluded_methods = ["initialize", "to_dict", "shutdown"]
-
 
 def find_insert_pos(lines: List[str]) -> int:
-    """Finds the correct position to insert the keyword arguments and returns the modified list."""
+    """Finds the correct position to insert the keyword arguments and returns the index."""
     for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
         if value.startswith(":returns:"):
             return idx
@@ -412,6 +410,22 @@ def is_write_timeout_20(obj: object) -> int:
     """inspects the default value of write_timeout parameter of the bot method."""
     sig = inspect.signature(obj)
     return 1 if (sig.parameters["write_timeout"].default == 20) else 0
+
+
+def check_timeout_and_api_kwargs_presence(obj: object) -> int:
+    """Checks if the method has timeout and api_kwargs keyword only parameters."""
+    sig = inspect.signature(obj)
+    params_to_check = (
+        "read_timeout",
+        "write_timeout",
+        "connect_timeout",
+        "pool_timeout",
+        "api_kwargs",
+    )
+    return all(
+        param in sig.parameters and sig.parameters[param].kind == inspect.Parameter.KEYWORD_ONLY
+        for param in params_to_check
+    )
 
 
 def autodoc_process_docstring(
@@ -429,8 +443,7 @@ def autodoc_process_docstring(
         name.startswith("telegram.Bot.")
         and what == "method"
         and method_name.islower()
-        and not method_name.startswith("_")
-        and method_name not in excluded_methods
+        and check_timeout_and_api_kwargs_presence(obj)
     ):
         insert_index = find_insert_pos(lines)
         long_write_timeout = is_write_timeout_20(obj)
