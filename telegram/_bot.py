@@ -246,7 +246,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         return decorator
 
-    def _insert_defaults(self, data: Dict[str, object]) -> None:
+    def _insert_defaults(self, data: Dict[str, object]) -> None:  # skipcq: PYL-R0201
         """This method is here to make ext.Defaults work. Because we need to be able to tell
         e.g. `send_message(chat_id, text)` from `send_message(chat_id, text, parse_mode=None)`, the
         default values for `parse_mode` etc are not `None` but `DEFAULT_NONE`. While this *could*
@@ -2724,7 +2724,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
         return result  # type: ignore[return-value]
 
-    def _effective_inline_results(
+    def _effective_inline_results(  # skipcq: PYL-R0201
         self,
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]

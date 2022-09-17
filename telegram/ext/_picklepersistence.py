@@ -80,7 +80,7 @@ class _BotPickler(pickle.Pickler):
                 self.dispatch_table[obj] = _custom_reduction
         super().__init__(*args, **kwargs)
 
-    def reducer_override(
+    def reducer_override(  # skipcq: PYL-R0201
         self, obj: TelegramObj
     ) -> Tuple[Callable, Tuple[Type[TelegramObj], dict]]:
         if not isinstance(obj, TelegramObject):
