@@ -1418,7 +1418,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         Note:
             Attempts to add the same callback multiple times will be ignored.
 
-        .. seealso:: `Errorhandler Example <examples.errorhandlerbot.py>`_
+        .. seealso:: :any:`Errorhandler Example <examples.errorhandlerbot>`
 
         Args:
             callback (:term:`coroutine function`): The callback function for this error handler.

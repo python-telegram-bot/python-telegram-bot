@@ -2,6 +2,19 @@
 Changelog
 =========
 
+Version 20.0a4
+==============
+*Released 2022-08-27*
+
+This is the technical changelog for version 20.0a4. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Hot Fixes
+---------
+
+* Fix a Bug in ``setup.py`` Regarding Optional Dependencies (`#3209`_)
+
+.. _`#3209`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3209
+
 Version 20.0a3
 ==============
 *Released 2022-08-27*

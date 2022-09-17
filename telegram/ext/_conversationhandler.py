@@ -186,10 +186,10 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         conversation. For an example on nested :class:`ConversationHandler` s, see
         :any:`examples.nestedconversationbot`.
 
-    .. seealso:: `Conversation Example <examples.conversationbot.html>`_,
-        `Conversation Example 2 <examples.conversationbot2.html>`_,
-        `Nested Conversation Example <examples.nestedconversationbot.html>`_,
-        `Persistent Conversation Example <examples.persistentconversationbot.html>`_
+    .. seealso:: :any:`Conversation Example <examples.conversationbot>`,
+        :any:`Conversation Example 2 <examples.conversationbot2>`,
+        :any:`Nested Conversation Example <examples.nestedconversationbot>`,
+        :any:`Persistent Conversation Example <examples.persistentconversationbot>`
 
     Args:
         entry_points (List[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`
