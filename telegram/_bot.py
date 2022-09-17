@@ -246,7 +246,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         return decorator
 
-    def _insert_defaults(self, data: Dict[str, object]) -> None:  # pylint: disable=no-self-use
+    def _insert_defaults(self, data: Dict[str, object]) -> None:  # skipcq: PYL-R0201
         """This method is here to make ext.Defaults work. Because we need to be able to tell
         e.g. `send_message(chat_id, text)` from `send_message(chat_id, text, parse_mode=None)`, the
         default values for `parse_mode` etc are not `None` but `DEFAULT_NONE`. While this *could*
@@ -2724,7 +2724,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
         return result  # type: ignore[return-value]
 
-    def _effective_inline_results(  # pylint: disable=no-self-use
+    def _effective_inline_results(  # skipcq: PYL-R0201
         self,
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
@@ -2781,9 +2781,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return effective_results, next_offset
 
     @no_type_check  # mypy doesn't play too well with hasattr
-    def _insert_defaults_for_ilq_results(  # pylint: disable=no-self-use
-        self, res: "InlineQueryResult"
-    ) -> None:
+    def _insert_defaults_for_ilq_results(self, res: "InlineQueryResult") -> None:
         """The reason why this method exists is similar to the description of _insert_defaults
         The reason why we do this in rather than in _insert_defaults is because converting
         DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries

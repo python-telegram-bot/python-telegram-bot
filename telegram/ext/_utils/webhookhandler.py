@@ -110,12 +110,12 @@ class TelegramHandler(tornado.web.RequestHandler):
         """Initialize for each request - that's the interface provided by tornado"""
         # pylint: disable=attribute-defined-outside-init
         self.bot = bot
-        self.update_queue = update_queue
-        self._logger = logging.getLogger(__name__)
-        self.secret_token = secret_token
+        self.update_queue = update_queue  # skipcq: PYL-W0201
+        self._logger = logging.getLogger(__name__)  # skipcq: PYL-W0201
+        self.secret_token = secret_token  # skipcq: PYL-W0201
         if secret_token:
             self._logger.debug(
-                "The webhook server has a secret token, " "expecting it in incoming requests now"
+                "The webhook server has a secret token, expecting it in incoming requests now"
             )
 
     def set_default_headers(self) -> None:
