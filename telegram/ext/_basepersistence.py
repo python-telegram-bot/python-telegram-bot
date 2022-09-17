@@ -161,7 +161,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
         return self._update_interval
 
     @update_interval.setter
-    def update_interval(self, value: object) -> NoReturn:  # pylint: disable=no-self-use
+    def update_interval(self, value: object) -> NoReturn:
         raise AttributeError(
             "You can not assign a new value to update_interval after initialization."
         )

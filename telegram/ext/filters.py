@@ -182,8 +182,7 @@ class BaseFilter:
         self._name = self.__class__.__name__ if name is None else name
         self._data_filter = data_filter
 
-    # pylint: disable=no-self-use
-    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:
+    def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:  # skipcq: PYL-R0201
         """Checks if the specified update is a message."""
         if (  # Only message updates should be handled.
             update.channel_post
