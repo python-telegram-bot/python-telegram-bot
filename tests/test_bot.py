@@ -1579,18 +1579,25 @@ class TestBot:
 
     @flaky(3, 1)
     @pytest.mark.parametrize("use_ip", [True, False])
-    async def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot, use_ip):
+    # local file path as file_input is tested below in test_set_webhook_params
+    @pytest.mark.parametrize("file_input", ["bytes", "file_handle"])
+    async def test_set_webhook_get_webhook_info_and_delete_webhook(self, bot, use_ip, file_input):
         url = "https://python-telegram-bot.org/test/webhook"
         # Get the ip address of the website - dynamically just in case it ever changes
         ip = socket.gethostbyname("python-telegram-bot.org")
         max_connections = 7
         allowed_updates = ["message"]
+        file_input = (
+            data_file("sslcert.pem").read_bytes()
+            if file_input == "bytes"
+            else data_file("sslcert.pem").open("rb")
+        )
         await bot.set_webhook(
             url,
             max_connections=max_connections,
             allowed_updates=allowed_updates,
             ip_address=ip if use_ip else None,
-            certificate=data_file("sslcert.pem").read_bytes() if use_ip else None,
+            certificate=file_input if use_ip else None,
         )
 
         await asyncio.sleep(1)
@@ -1621,16 +1628,25 @@ class TestBot:
         assert await bot.set_webhook("", drop_pending_updates=drop_pending_updates)
         assert await bot.delete_webhook(drop_pending_updates=drop_pending_updates)
 
-    async def test_set_webhook_params(self, bot, monkeypatch):
+    @pytest.mark.parametrize("local_file", ["str", "Path", False])
+    async def test_set_webhook_params(self, bot, monkeypatch, local_file):
         # actually making calls to TG is done in
         # test_set_webhook_get_webhook_info_and_delete_webhook. Sadly secret_token can't be tested
         # there so we have this function \o/
         async def make_assertion(*args, **_):
             kwargs = args[1]
+
+            if local_file is False:
+                cert_assertion = (
+                    kwargs["certificate"].input_file_content
+                    == data_file("sslcert.pem").read_bytes()
+                )
+            else:
+                cert_assertion = data_file("sslcert.pem").as_uri()
+
             return (
                 kwargs["url"] == "example.com"
-                and kwargs["certificate"].input_file_content
-                == data_file("sslcert.pem").read_bytes()
+                and cert_assertion
                 and kwargs["max_connections"] == 7
                 and kwargs["allowed_updates"] == ["messages"]
                 and kwargs["ip_address"] == "127.0.0.1"
@@ -1640,9 +1656,17 @@ class TestBot:
 
         monkeypatch.setattr(bot, "_post", make_assertion)
 
+        cert_path = data_file("sslcert.pem")
+        if local_file == "str":
+            certificate = str(cert_path)
+        elif local_file == "Path":
+            certificate = cert_path
+        else:
+            certificate = cert_path.read_bytes()
+
         assert await bot.set_webhook(
             "example.com",
-            data_file("sslcert.pem").read_bytes(),
+            certificate,
             7,
             ["messages"],
             "127.0.0.1",

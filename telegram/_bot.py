@@ -3970,11 +3970,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             url (:obj:`str`): HTTPS url to send updates to. Use an empty string to remove webhook
                 integration.
-            certificate (:term:`file object`): Upload your public key certificate so that the root
+            certificate (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`):
+                Upload your public key certificate so that the root
                 certificate in use can be checked. See our `self-signed guide <https://github.com/\
                 python-telegram-bot/python-telegram-bot/wiki/Webhooks#creating-a-self-signed-\
-                certificate-using-openssl>`_ for details. Must be a :term:`file object`, e.g.
-                ``open("filename", "rb")``.
+                certificate-using-openssl>`_ for details. |uploadinputnopath|
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
