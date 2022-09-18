@@ -101,7 +101,19 @@ class TelegramObject:
             super().__setattr__(key, value)
             return
 
-        raise AttributeError(f"Attribute {key} of class {self.__class__.__name__} can't be set!")
+        raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be set!"
+        )
+
+    def __delattr__(self, key: str) -> None:
+        # protected attributes can always be set for convenient internal use
+        if (key == "_frozen") or (not self._frozen) or key.startswith("_"):
+            super().__delattr__(key)
+            return
+
+        raise AttributeError(
+            f"Attribute `{key}` of class `{self.__class__.__name__}` can't be deleted!"
+        )
 
     def __str__(self) -> str:
         return str(self.to_dict())

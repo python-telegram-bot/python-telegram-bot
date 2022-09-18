@@ -225,3 +225,35 @@ class TestTelegramObject:
 
         source_lines, first_line = inspect.getsourcelines(cls.__init__)
         assert " self._freeze()" in source_lines[-1], f"{cls.__name__} is not frozen correctly"
+
+    def test_freeze_unfreeze(self):
+        class TestSub(TelegramObject):
+            def __init__(self):
+                super().__init__()
+                self._protected = True
+                self.public = True
+                self._freeze()
+
+        foo = TestSub()
+        foo._protected = False
+        assert foo._protected is False
+
+        with pytest.raises(
+            AttributeError, match="Attribute `public` of class `TestSub` can't be set!"
+        ):
+            foo.public = False
+
+        with pytest.raises(
+            AttributeError, match="Attribute `public` of class `TestSub` can't be deleted!"
+        ):
+            del foo.public
+
+        foo._unfreeze()
+        foo._protected = True
+        assert foo._protected is True
+        foo.public = False
+        assert foo.public is False
+        del foo.public
+        del foo._protected
+        assert not hasattr(foo, "public")
+        assert not hasattr(foo, "_protected")
