@@ -17,12 +17,24 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
 import pickle
 from copy import deepcopy
 
 import pytest
 
 from telegram import Chat, Message, PhotoSize, TelegramObject, User
+
+
+def all_subclasses(cls):
+    # Gets all subclasses of the specified object, recursively. from
+    # https://stackoverflow.com/a/3862957/9706202
+    return set(cls.__subclasses__()).union(
+        [s for c in cls.__subclasses__() for s in all_subclasses(c)]
+    )
+
+
+TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
 
 
 class TestTelegramObject:
@@ -197,3 +209,19 @@ class TestTelegramObject:
         assert d._private == s._private  # Can't test for identity since two equal strings is True
         assert d._bot == s._bot and d._bot is s._bot
         assert d.normal == s.normal
+
+    @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
+    def test_subclasses_are_frozen(self, cls):
+        if cls.__name__.startswith("_"):
+            return
+
+        # instantiating each subclass would be tedious as some attributes require special init
+        # args. So we inspect the code instead.
+
+        source_file = inspect.getsourcefile(cls.__init__)
+        if source_file.endswith("telegramobject.py"):
+            # classes without their own `__init__` can be ignored
+            return
+
+        source_lines, first_line = inspect.getsourcelines(cls.__init__)
+        assert " self._freeze()" in source_lines[-1], f"{cls.__name__} is not frozen correctly"

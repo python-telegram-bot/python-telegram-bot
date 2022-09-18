@@ -59,15 +59,22 @@ class TelegramObject:
 
     """
 
-    __slots__ = ("_id_attrs", "_bot", "api_kwargs")
+    __slots__ = ("_id_attrs", "_bot", "_frozen", "api_kwargs")
 
     __INIT_PARAMS: Optional[Set[str]] = None
 
     def __init__(self, api_kwargs: JSONDict = None) -> None:
+        self._frozen: bool = False
         self._id_attrs: Tuple[object, ...] = ()
         self._bot: Optional["Bot"] = None
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
         self.api_kwargs: JSONDict = api_kwargs or {}
+
+    def _freeze(self) -> None:
+        self._frozen = True
+
+    def _unfreeze(self) -> None:
+        self._frozen = False
 
     def _apply_api_kwargs(self) -> None:
         """Loops through the api kwargs and for every key that exists as attribute of the
@@ -87,6 +94,14 @@ class TelegramObject:
         for key in list(self.api_kwargs.keys()):
             if getattr(self, key, True) is None:
                 setattr(self, key, self.api_kwargs.pop(key))
+
+    def __setattr__(self, key: str, value: object) -> None:
+        # protected attributes can always be set for convenient internal use
+        if (key == "_frozen") or (not self._frozen) or key.startswith("_"):
+            super().__setattr__(key, value)
+            return
+
+        raise AttributeError(f"Attribute {key} of class {self.__class__.__name__} can't be set!")
 
     def __str__(self) -> str:
         return str(self.to_dict())
