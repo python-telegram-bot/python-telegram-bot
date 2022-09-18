@@ -96,6 +96,7 @@ class InlineQueryResultArticle(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.ARTICLE, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.title = title
         self.input_message_content = input_message_content
 

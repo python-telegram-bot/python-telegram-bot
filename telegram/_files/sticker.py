@@ -152,6 +152,7 @@ class Sticker(_BaseThumbedMedium):
             thumb=thumb,
             api_kwargs=api_kwargs,
         )
+        self._unfreeze()
         # Required
         self.width = width
         self.height = height

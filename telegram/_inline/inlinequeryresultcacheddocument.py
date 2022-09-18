@@ -104,6 +104,7 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.DOCUMENT, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.title = title
         self.document_file_id = document_file_id
 

@@ -137,6 +137,7 @@ class InlineQueryResultVideo(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.video_url = video_url
         self.mime_type = mime_type
         self.thumb_url = thumb_url

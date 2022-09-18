@@ -101,6 +101,7 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.MPEG4GIF, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.mpeg4_file_id = mpeg4_file_id
 
         # Optionals

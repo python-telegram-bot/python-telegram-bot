@@ -88,6 +88,7 @@ class Audio(_BaseThumbedMedium):
             thumb=thumb,
             api_kwargs=api_kwargs,
         )
+        self._unfreeze()
         # Required
         self.duration = duration
         # Optional

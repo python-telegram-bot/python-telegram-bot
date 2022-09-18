@@ -69,6 +69,7 @@ class Voice(_BaseMedium):
             file_size=file_size,
             api_kwargs=api_kwargs,
         )
+        self._unfreeze()
         # Required
         self.duration = duration
         # Optional

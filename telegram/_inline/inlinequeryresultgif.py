@@ -127,6 +127,7 @@ class InlineQueryResultGif(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.gif_url = gif_url
         self.thumb_url = thumb_url
 

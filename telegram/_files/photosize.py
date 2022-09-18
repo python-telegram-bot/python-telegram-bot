@@ -70,6 +70,7 @@ class PhotoSize(_BaseMedium):
             file_size=file_size,
             api_kwargs=api_kwargs,
         )
+        self._unfreeze()
         # Required
         self.width = width
         self.height = height

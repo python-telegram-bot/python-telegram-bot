@@ -96,6 +96,7 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.AUDIO, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.audio_file_id = audio_file_id
 
         # Optionals

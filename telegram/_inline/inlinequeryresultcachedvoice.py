@@ -100,6 +100,7 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.VOICE, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.voice_file_id = voice_file_id
         self.title = title
 

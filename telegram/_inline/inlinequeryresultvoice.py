@@ -109,6 +109,7 @@ class InlineQueryResultVoice(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.VOICE, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.voice_url = voice_url
         self.title = title
 

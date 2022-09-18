@@ -170,6 +170,7 @@ class ChatMemberOwner(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.is_anonymous = is_anonymous
         self.custom_title = custom_title
 
@@ -296,6 +297,7 @@ class ChatMemberAdministrator(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.ADMINISTRATOR, user=user, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.can_be_edited = can_be_edited
         self.is_anonymous = is_anonymous
         self.can_manage_chat = can_manage_chat
@@ -341,6 +343,7 @@ class ChatMemberMember(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
+        self._unfreeze()
 
         self._freeze()
 
@@ -434,6 +437,7 @@ class ChatMemberRestricted(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.is_member = is_member
         self.can_change_info = can_change_info
         self.can_invite_users = can_invite_users
@@ -475,6 +479,7 @@ class ChatMemberLeft(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
+        self._unfreeze()
 
         self._freeze()
 
@@ -512,6 +517,7 @@ class ChatMemberBanned(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.until_date = until_date
 
         self._freeze()

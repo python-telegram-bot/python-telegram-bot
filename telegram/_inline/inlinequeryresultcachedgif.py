@@ -101,6 +101,7 @@ class InlineQueryResultCachedGif(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.gif_file_id = gif_file_id
 
         # Optionals

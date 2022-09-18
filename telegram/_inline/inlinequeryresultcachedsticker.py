@@ -66,6 +66,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.STICKER, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.sticker_file_id = sticker_file_id
 
         # Optionals

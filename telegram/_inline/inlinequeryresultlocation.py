@@ -119,6 +119,7 @@ class InlineQueryResultLocation(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.LOCATION, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.latitude = latitude
         self.longitude = longitude
         self.title = title

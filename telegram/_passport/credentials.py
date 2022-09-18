@@ -441,6 +441,7 @@ class _CredentialsBase(TelegramObject):
 
     def __init__(self, hash: str, secret: str, api_kwargs: JSONDict = None):  # skipcq: PYL-W0622
         super().__init__(api_kwargs=api_kwargs)
+        super()._unfreeze()
         self.hash = hash
         self.secret = secret
 
@@ -470,11 +471,6 @@ class DataCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, data_hash: str, secret: str, api_kwargs: JSONDict = None):
-        super().__init__(data_hash, secret, api_kwargs=api_kwargs)
-
-        self._freeze()
-
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
@@ -500,11 +496,6 @@ class FileCredentials(_CredentialsBase):
     """
 
     __slots__ = ()
-
-    def __init__(self, file_hash: str, secret: str, api_kwargs: JSONDict = None):
-        super().__init__(file_hash, secret, api_kwargs=api_kwargs)
-
-        self._freeze()
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

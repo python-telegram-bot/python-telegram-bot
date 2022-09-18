@@ -105,6 +105,7 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.PHOTO, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.photo_file_id = photo_file_id
 
         # Optionals

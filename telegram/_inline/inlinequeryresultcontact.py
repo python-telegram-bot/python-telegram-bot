@@ -99,6 +99,7 @@ class InlineQueryResultContact(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.CONTACT, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.phone_number = phone_number
         self.first_name = first_name
 

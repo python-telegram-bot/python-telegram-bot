@@ -126,6 +126,7 @@ class InlineQueryResultDocument(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.DOCUMENT, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.document_url = document_url
         self.title = title
         self.mime_type = mime_type

@@ -187,6 +187,7 @@ class InputMediaAnimation(InputMedia):
             media = parse_file_input(media, filename=filename, attach=True)
 
         super().__init__(InputMediaType.ANIMATION, media, caption, caption_entities, parse_mode)
+        self._unfreeze()
         self.thumb = self._parse_thumb_input(thumb)
         self.width = width
         self.height = height
@@ -244,6 +245,7 @@ class InputMediaPhoto(InputMedia):
     ):
         media = parse_file_input(media, PhotoSize, filename=filename, attach=True)
         super().__init__(InputMediaType.PHOTO, media, caption, caption_entities, parse_mode)
+        self._unfreeze()
 
         self._freeze()
 
@@ -338,6 +340,7 @@ class InputMediaVideo(InputMedia):
             media = parse_file_input(media, filename=filename, attach=True)
 
         super().__init__(InputMediaType.VIDEO, media, caption, caption_entities, parse_mode)
+        self._unfreeze()
         self.width = width
         self.height = height
         self.duration = duration
@@ -431,6 +434,7 @@ class InputMediaAudio(InputMedia):
             media = parse_file_input(media, filename=filename, attach=True)
 
         super().__init__(InputMediaType.AUDIO, media, caption, caption_entities, parse_mode)
+        self._unfreeze()
         self.thumb = self._parse_thumb_input(thumb)
         self.duration = duration
         self.title = title
@@ -506,6 +510,7 @@ class InputMediaDocument(InputMedia):
     ):
         media = parse_file_input(media, Document, filename=filename, attach=True)
         super().__init__(InputMediaType.DOCUMENT, media, caption, caption_entities, parse_mode)
+        self._unfreeze()
         self.thumb = self._parse_thumb_input(thumb)
         self.disable_content_type_detection = disable_content_type_detection
 

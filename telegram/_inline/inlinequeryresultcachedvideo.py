@@ -105,6 +105,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.video_file_id = video_file_id
         self.title = title
 

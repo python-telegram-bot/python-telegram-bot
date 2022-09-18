@@ -109,6 +109,7 @@ class InlineQueryResultAudio(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.AUDIO, id, api_kwargs=api_kwargs)
+        self._unfreeze()
         self.audio_url = audio_url
         self.title = title
 
