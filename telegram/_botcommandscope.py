@@ -83,6 +83,8 @@ class BotCommandScope(TelegramObject):
         self.type = type
         self._id_attrs = (self.type,)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["BotCommandScope"]:
         """Converts JSON data to the appropriate :class:`BotCommandScope` object, i.e. takes
@@ -135,6 +137,8 @@ class BotCommandScopeDefault(BotCommandScope):
     def __init__(self, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.DEFAULT, api_kwargs=api_kwargs)
 
+        self._freeze()
+
 
 class BotCommandScopeAllPrivateChats(BotCommandScope):
     """Represents the scope of bot commands, covering all private chats.
@@ -151,6 +155,8 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
 
     def __init__(self, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.ALL_PRIVATE_CHATS, api_kwargs=api_kwargs)
+
+        self._freeze()
 
 
 class BotCommandScopeAllGroupChats(BotCommandScope):
@@ -169,6 +175,8 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
     def __init__(self, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.ALL_GROUP_CHATS, api_kwargs=api_kwargs)
 
+        self._freeze()
+
 
 class BotCommandScopeAllChatAdministrators(BotCommandScope):
     """Represents the scope of bot commands, covering all group and supergroup chat administrators.
@@ -185,6 +193,8 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
 
     def __init__(self, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.ALL_CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
+
+        self._freeze()
 
 
 class BotCommandScopeChat(BotCommandScope):
@@ -216,6 +226,8 @@ class BotCommandScopeChat(BotCommandScope):
         )
         self._id_attrs = (self.type, self.chat_id)
 
+        self._freeze()
+
 
 class BotCommandScopeChatAdministrators(BotCommandScope):
     """Represents the scope of bot commands, covering all administrators of a specific group or
@@ -246,6 +258,8 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
             chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
         )
         self._id_attrs = (self.type, self.chat_id)
+
+        self._freeze()
 
 
 class BotCommandScopeChatMember(BotCommandScope):
@@ -281,3 +295,5 @@ class BotCommandScopeChatMember(BotCommandScope):
         )
         self.user_id = user_id
         self._id_attrs = (self.type, self.chat_id, self.user_id)
+
+        self._freeze()

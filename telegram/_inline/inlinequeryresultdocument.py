@@ -140,3 +140,5 @@ class InlineQueryResultDocument(InlineQueryResult):
         self.thumb_url = thumb_url
         self.thumb_width = thumb_width
         self.thumb_height = thumb_height
+
+        self._freeze()

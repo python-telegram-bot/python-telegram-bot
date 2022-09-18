@@ -49,6 +49,8 @@ class VideoChatStarted(TelegramObject):
     ):  # skipcq: PTC-W0049
         super().__init__(api_kwargs=api_kwargs)
 
+        self._freeze()
+
 
 class VideoChatEnded(TelegramObject):
     """
@@ -82,6 +84,8 @@ class VideoChatEnded(TelegramObject):
         self.duration = duration
         self._id_attrs = (self.duration,)
 
+        self._freeze()
+
 
 class VideoChatParticipantsInvited(TelegramObject):
     """
@@ -112,6 +116,8 @@ class VideoChatParticipantsInvited(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.users = users
         self._id_attrs = (self.users,)
+
+        self._freeze()
 
     @classmethod
     def de_json(
@@ -167,6 +173,8 @@ class VideoChatScheduled(TelegramObject):
         self.start_date = start_date
 
         self._id_attrs = (self.start_date,)
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["VideoChatScheduled"]:

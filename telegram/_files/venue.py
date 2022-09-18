@@ -99,6 +99,8 @@ class Venue(TelegramObject):
 
         self._id_attrs = (self.location, self.title)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Venue"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

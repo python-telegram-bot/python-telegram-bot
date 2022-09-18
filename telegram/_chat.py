@@ -300,6 +300,8 @@ class Chat(TelegramObject):
 
         self._id_attrs = (self.id,)
 
+        self._freeze()
+
     @property
     def full_name(self) -> Optional[str]:
         """

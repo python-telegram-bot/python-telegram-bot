@@ -228,6 +228,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 private_key, password=private_key_password, backend=default_backend()
             )
 
+        self._freeze()
+
     def __reduce__(self) -> NoReturn:
         """Called by pickle.dumps(). Serializing bots is unadvisable, so we forbid pickling."""
         raise pickle.PicklingError("Bot objects cannot be pickled!")

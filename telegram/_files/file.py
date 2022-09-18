@@ -99,6 +99,8 @@ class File(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
+        self._freeze()
+
     async def download(
         self,
         custom_path: FilePathInput = None,

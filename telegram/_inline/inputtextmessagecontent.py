@@ -86,6 +86,8 @@ class InputTextMessageContent(InputMessageContent):
 
         self._id_attrs = (self.message_text,)
 
+        self._freeze()
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()

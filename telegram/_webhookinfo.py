@@ -130,6 +130,8 @@ class WebhookInfo(TelegramObject):
             self.last_synchronization_error_date,
         )
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["WebhookInfo"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

@@ -73,3 +73,5 @@ class Voice(_BaseMedium):
         self.duration = duration
         # Optional
         self.mime_type = mime_type
+
+        self._freeze()

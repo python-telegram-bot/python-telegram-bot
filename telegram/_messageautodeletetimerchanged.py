@@ -56,3 +56,5 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
         self.message_auto_delete_time = message_auto_delete_time
 
         self._id_attrs = (self.message_auto_delete_time,)
+
+        self._freeze()

@@ -125,6 +125,8 @@ class ChatPermissions(TelegramObject):
             self.can_pin_messages,
         )
 
+        self._freeze()
+
     @classmethod
     def all_permissions(cls) -> "ChatPermissions":
         """

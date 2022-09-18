@@ -89,6 +89,8 @@ class PassportFile(TelegramObject):
 
         self._id_attrs = (self.file_unique_id,)
 
+        self._freeze()
+
     @classmethod
     def de_json_decrypted(
         cls, data: Optional[JSONDict], bot: "Bot", credentials: "FileCredentials"

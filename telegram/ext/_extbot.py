@@ -203,6 +203,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             private_key=private_key,
             private_key_password=private_key_password,
         )
+        self._unfreeze()
         self._defaults = defaults
         self._rate_limiter = rate_limiter
 
@@ -214,6 +215,8 @@ class ExtBot(Bot, Generic[RLARGS]):
             maxsize = 1024
             self.arbitrary_callback_data = arbitrary_callback_data
         self.callback_data_cache: CallbackDataCache = CallbackDataCache(bot=self, maxsize=maxsize)
+
+        self._freeze()
 
     async def initialize(self) -> None:
         """See :meth:`telegram.Bot.initialize`. Also initializes the
@@ -522,7 +525,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 # different places
                 new_result = copy(result)
                 markup = self._replace_keyboard(result.reply_markup)  # type: ignore[attr-defined]
-                new_result.reply_markup = markup  # type: ignore[attr-defined]
+                new_result.reply_markup = markup
                 results.append(new_result)
 
         return results, next_offset

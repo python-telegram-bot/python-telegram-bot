@@ -77,3 +77,5 @@ class ForceReply(TelegramObject):
         self.input_field_placeholder = input_field_placeholder
 
         self._id_attrs = (self.selective,)
+
+        self._freeze()

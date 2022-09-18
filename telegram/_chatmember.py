@@ -97,6 +97,8 @@ class ChatMember(TelegramObject):
 
         self._id_attrs = (self.user, self.status)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ChatMember"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -170,6 +172,8 @@ class ChatMemberOwner(ChatMember):
         super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
         self.is_anonymous = is_anonymous
         self.custom_title = custom_title
+
+        self._freeze()
 
 
 class ChatMemberAdministrator(ChatMember):
@@ -306,6 +310,8 @@ class ChatMemberAdministrator(ChatMember):
         self.can_pin_messages = can_pin_messages
         self.custom_title = custom_title
 
+        self._freeze()
+
 
 class ChatMemberMember(ChatMember):
     """
@@ -335,6 +341,8 @@ class ChatMemberMember(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
+
+        self._freeze()
 
 
 class ChatMemberRestricted(ChatMember):
@@ -437,6 +445,8 @@ class ChatMemberRestricted(ChatMember):
         self.can_add_web_page_previews = can_add_web_page_previews
         self.until_date = until_date
 
+        self._freeze()
+
 
 class ChatMemberLeft(ChatMember):
     """
@@ -465,6 +475,8 @@ class ChatMemberLeft(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
+
+        self._freeze()
 
 
 class ChatMemberBanned(ChatMember):
@@ -501,3 +513,5 @@ class ChatMemberBanned(ChatMember):
     ):
         super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
         self.until_date = until_date
+
+        self._freeze()

@@ -157,6 +157,8 @@ class EncryptedCredentials(TelegramObject):
         self._decrypted_secret: Optional[str] = None
         self._decrypted_data: Optional["Credentials"] = None
 
+        self._freeze()
+
     @property
     def decrypted_secret(self) -> str:
         """
@@ -229,6 +231,8 @@ class Credentials(TelegramObject):
         # Required
         self.secure_data = secure_data
         self.nonce = nonce
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Credentials"]:
@@ -318,6 +322,8 @@ class SecureData(TelegramObject):
         self.passport = passport
         self.personal_details = personal_details
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SecureData"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -395,6 +401,8 @@ class SecureValue(TelegramObject):
         self.files = files
         self.translation = translation
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SecureValue"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -440,6 +448,8 @@ class _CredentialsBase(TelegramObject):
         self.file_hash = self.hash
         self.data_hash = self.hash
 
+        self._freeze()
+
 
 class DataCredentials(_CredentialsBase):
     """
@@ -462,6 +472,8 @@ class DataCredentials(_CredentialsBase):
 
     def __init__(self, data_hash: str, secret: str, api_kwargs: JSONDict = None):
         super().__init__(data_hash, secret, api_kwargs=api_kwargs)
+
+        self._freeze()
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -491,6 +503,8 @@ class FileCredentials(_CredentialsBase):
 
     def __init__(self, file_hash: str, secret: str, api_kwargs: JSONDict = None):
         super().__init__(file_hash, secret, api_kwargs=api_kwargs)
+
+        self._freeze()
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

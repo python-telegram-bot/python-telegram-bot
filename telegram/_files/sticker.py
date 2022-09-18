@@ -165,6 +165,8 @@ class Sticker(_BaseThumbedMedium):
         self.premium_animation = premium_animation
         self.custom_emoji_id = custom_emoji_id
 
+        self._freeze()
+
     REGULAR: ClassVar[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""
     MASK: ClassVar[str] = constants.StickerType.MASK
@@ -268,6 +270,8 @@ class StickerSet(TelegramObject):
 
         self._id_attrs = (self.name,)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["StickerSet"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -352,6 +356,8 @@ class MaskPosition(TelegramObject):
         self.scale = scale
 
         self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaskPosition"]:

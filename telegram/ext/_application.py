@@ -440,7 +440,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                     raise ValueError("callback_data must be a tuple of length 2")
                 # Mypy doesn't know that persistence.set_bot (see above) already checks that
                 # self.bot is an instance of ExtBot if callback_data should be stored ...
-                self.bot.callback_data_cache = CallbackDataCache(  # type: ignore[attr-defined]
+                self.bot.callback_data_cache = CallbackDataCache(
                     self.bot,  # type: ignore[arg-type]
                     self.bot.callback_data_cache.maxsize,  # type: ignore[attr-defined]
                     persistent_data=persistent_data,

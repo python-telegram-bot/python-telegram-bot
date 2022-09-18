@@ -216,6 +216,8 @@ class InputInvoiceMessageContent(InputMessageContent):
             self.prices,
         )
 
+        self._freeze()
+
     def __hash__(self) -> int:
         # we override this as self.prices is a list and not hashable
         prices = tuple(self.prices)

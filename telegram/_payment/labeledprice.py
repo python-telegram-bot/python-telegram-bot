@@ -56,3 +56,5 @@ class LabeledPrice(TelegramObject):
         self.amount = amount
 
         self._id_attrs = (self.label, self.amount)
+
+        self._freeze()

@@ -91,3 +91,5 @@ class Animation(_BaseThumbedMedium):
         # Optional
         self.mime_type = mime_type
         self.file_name = file_name
+
+        self._freeze()

@@ -60,3 +60,5 @@ class InlineQueryResultGame(InlineQueryResult):
         self.game_short_name = game_short_name
 
         self.reply_markup = reply_markup
+
+        self._freeze()

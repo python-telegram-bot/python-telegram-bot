@@ -193,6 +193,8 @@ class InlineKeyboardButton(TelegramObject):
         self._id_attrs = ()
         self._set_id_attrs()
 
+        self._freeze()
+
     def _set_id_attrs(self) -> None:
         self._id_attrs = (
             self.text,

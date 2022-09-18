@@ -58,3 +58,5 @@ class WebAppData(TelegramObject):
         self.button_text = button_text
 
         self._id_attrs = (self.data, self.button_text)
+
+        self._freeze()

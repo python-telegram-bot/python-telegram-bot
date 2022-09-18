@@ -90,3 +90,5 @@ class Location(TelegramObject):
         )
 
         self._id_attrs = (self.longitude, self.latitude)
+
+        self._freeze()

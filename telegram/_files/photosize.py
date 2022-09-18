@@ -73,3 +73,5 @@ class PhotoSize(_BaseMedium):
         # Required
         self.width = width
         self.height = height
+
+        self._freeze()

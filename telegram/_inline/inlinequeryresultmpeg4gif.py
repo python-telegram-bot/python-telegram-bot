@@ -141,3 +141,5 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
         self.thumb_mime_type = thumb_mime_type
+
+        self._freeze()

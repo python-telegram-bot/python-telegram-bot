@@ -90,6 +90,8 @@ class InputMedia(TelegramObject):
         self.caption_entities = caption_entities
         self.parse_mode = parse_mode
 
+        self._freeze()
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
@@ -190,6 +192,8 @@ class InputMediaAnimation(InputMedia):
         self.height = height
         self.duration = duration
 
+        self._freeze()
+
 
 class InputMediaPhoto(InputMedia):
     """Represents a photo to be sent.
@@ -240,6 +244,8 @@ class InputMediaPhoto(InputMedia):
     ):
         media = parse_file_input(media, PhotoSize, filename=filename, attach=True)
         super().__init__(InputMediaType.PHOTO, media, caption, caption_entities, parse_mode)
+
+        self._freeze()
 
 
 class InputMediaVideo(InputMedia):
@@ -338,6 +344,8 @@ class InputMediaVideo(InputMedia):
         self.thumb = self._parse_thumb_input(thumb)
         self.supports_streaming = supports_streaming
 
+        self._freeze()
+
 
 class InputMediaAudio(InputMedia):
     """Represents an audio file to be treated as music to be sent.
@@ -428,6 +436,8 @@ class InputMediaAudio(InputMedia):
         self.title = title
         self.performer = performer
 
+        self._freeze()
+
 
 class InputMediaDocument(InputMedia):
     """Represents a general file to be sent.
@@ -498,3 +508,5 @@ class InputMediaDocument(InputMedia):
         super().__init__(InputMediaType.DOCUMENT, media, caption, caption_entities, parse_mode)
         self.thumb = self._parse_thumb_input(thumb)
         self.disable_content_type_detection = disable_content_type_detection
+
+        self._freeze()

@@ -152,3 +152,5 @@ class InlineQueryResultVideo(InlineQueryResult):
         self.description = description
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
+
+        self._freeze()

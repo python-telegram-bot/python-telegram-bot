@@ -114,3 +114,5 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         self.caption_entities = caption_entities
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
+
+        self._freeze()

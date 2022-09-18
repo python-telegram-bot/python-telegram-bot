@@ -70,6 +70,8 @@ class InlineKeyboardMarkup(TelegramObject):
 
         self._id_attrs = (self.inline_keyboard,)
 
+        self._freeze()
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()

@@ -89,3 +89,5 @@ class InputLocationMessageContent(InputMessageContent):
         )
 
         self._id_attrs = (self.latitude, self.longitude)
+
+        self._freeze()

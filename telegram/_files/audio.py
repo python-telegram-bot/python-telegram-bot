@@ -95,3 +95,5 @@ class Audio(_BaseThumbedMedium):
         self.title = title
         self.mime_type = mime_type
         self.file_name = file_name
+
+        self._freeze()

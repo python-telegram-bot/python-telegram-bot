@@ -159,6 +159,8 @@ class User(TelegramObject):
 
         self._id_attrs = (self.id,)
 
+        self._freeze()
+
     @property
     def name(self) -> str:
         """:obj:`str`: Convenience property. If available, returns the user's :attr:`username`

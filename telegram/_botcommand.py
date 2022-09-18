@@ -51,3 +51,5 @@ class BotCommand(TelegramObject):
         self.description = description
 
         self._id_attrs = (self.command, self.description)
+
+        self._freeze()

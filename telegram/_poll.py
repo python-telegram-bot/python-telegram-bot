@@ -63,6 +63,8 @@ class PollOption(TelegramObject):
 
         self._id_attrs = (self.text, self.voter_count)
 
+        self._freeze()
+
     MAX_LENGTH: ClassVar[int] = constants.PollLimit.OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.OPTION_LENGTH`"""
 
@@ -101,6 +103,8 @@ class PollAnswer(TelegramObject):
         self.option_ids = option_ids
 
         self._id_attrs = (self.poll_id, self.user, tuple(self.option_ids))
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["PollAnswer"]:
@@ -221,6 +225,8 @@ class Poll(TelegramObject):
         self.close_date = close_date
 
         self._id_attrs = (self.id,)
+
+        self._freeze()
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Poll"]:

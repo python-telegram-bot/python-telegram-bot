@@ -64,3 +64,5 @@ class ReplyKeyboardRemove(TelegramObject):
         self.remove_keyboard = True
         # Optionals
         self.selective = selective
+
+        self._freeze()

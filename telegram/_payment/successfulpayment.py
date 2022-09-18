@@ -97,6 +97,8 @@ class SuccessfulPayment(TelegramObject):
 
         self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SuccessfulPayment"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

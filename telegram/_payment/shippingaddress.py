@@ -85,3 +85,5 @@ class ShippingAddress(TelegramObject):
             self.street_line2,
             self.post_code,
         )
+
+        self._freeze()

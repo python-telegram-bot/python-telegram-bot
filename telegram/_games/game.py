@@ -105,6 +105,8 @@ class Game(TelegramObject):
 
         self._id_attrs = (self.title, self.description, self.photo)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Game"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

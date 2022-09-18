@@ -71,3 +71,5 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         # Optionals
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
+
+        self._freeze()

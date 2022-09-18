@@ -57,6 +57,8 @@ class PassportElementError(TelegramObject):
 
         self._id_attrs = (self.source, self.type)
 
+        self._freeze()
+
 
 class PassportElementErrorDataField(PassportElementError):
     """
@@ -105,6 +107,8 @@ class PassportElementErrorDataField(PassportElementError):
 
         self._id_attrs = (self.source, self.type, self.field_name, self.data_hash, self.message)
 
+        self._freeze()
+
 
 class PassportElementErrorFile(PassportElementError):
     """
@@ -142,6 +146,8 @@ class PassportElementErrorFile(PassportElementError):
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+
+        self._freeze()
 
 
 class PassportElementErrorFiles(PassportElementError):
@@ -181,6 +187,8 @@ class PassportElementErrorFiles(PassportElementError):
 
         self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
 
+        self._freeze()
+
 
 class PassportElementErrorFrontSide(PassportElementError):
     """
@@ -218,6 +226,8 @@ class PassportElementErrorFrontSide(PassportElementError):
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+
+        self._freeze()
 
 
 class PassportElementErrorReverseSide(PassportElementError):
@@ -257,6 +267,8 @@ class PassportElementErrorReverseSide(PassportElementError):
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
 
+        self._freeze()
+
 
 class PassportElementErrorSelfie(PassportElementError):
     """
@@ -292,6 +304,8 @@ class PassportElementErrorSelfie(PassportElementError):
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+
+        self._freeze()
 
 
 class PassportElementErrorTranslationFile(PassportElementError):
@@ -333,6 +347,8 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
 
+        self._freeze()
+
 
 class PassportElementErrorTranslationFiles(PassportElementError):
     """
@@ -373,6 +389,8 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
         self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
 
+        self._freeze()
+
 
 class PassportElementErrorUnspecified(PassportElementError):
     """
@@ -406,3 +424,5 @@ class PassportElementErrorUnspecified(PassportElementError):
         self.element_hash = element_hash
 
         self._id_attrs = (self.source, self.type, self.element_hash, self.message)
+
+        self._freeze()

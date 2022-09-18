@@ -568,6 +568,8 @@ class Message(TelegramObject):
 
         self._id_attrs = (self.message_id, self.chat)
 
+        self._freeze()
+
     @property
     def chat_id(self) -> int:
         """:obj:`int`: Shortcut for :attr:`telegram.Chat.id` for :attr:`chat`."""

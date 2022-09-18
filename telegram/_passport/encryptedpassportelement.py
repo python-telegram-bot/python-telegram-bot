@@ -168,6 +168,8 @@ class EncryptedPassportElement(TelegramObject):
             self.selfie,
         )
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["EncryptedPassportElement"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

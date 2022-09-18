@@ -70,6 +70,8 @@ class PassportData(TelegramObject):
         self._decrypted_data: Optional[List[EncryptedPassportElement]] = None
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["PassportData"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

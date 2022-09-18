@@ -56,6 +56,8 @@ class GameHighScore(TelegramObject):
 
         self._id_attrs = (self.position, self.user, self.score)
 
+        self._freeze()
+
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["GameHighScore"]:
         """See :meth:`telegram.TelegramObject.de_json`."""

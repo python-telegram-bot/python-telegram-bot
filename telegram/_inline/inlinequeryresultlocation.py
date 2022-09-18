@@ -135,3 +135,5 @@ class InlineQueryResultLocation(InlineQueryResult):
         self.proximity_alert_radius = (
             int(proximity_alert_radius) if proximity_alert_radius else None
         )
+
+        self._freeze()
