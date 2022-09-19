@@ -182,7 +182,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         private_key_password (:obj:`bytes`, optional): Password for above private key.
         local_mode (:obj:`bool`, optional): Set to :obj:`True`, if the :paramref:`base_url` is
             the URI of a `Local Bot API Server <https://core.telegram.org/bots/api#using-a-local\
-            -bot-api-server>`_ that runs with the ``--local`` flag. Currently the only effect of
+            -bot-api-server>`_ that runs with the ``--local`` flag. Currently, the only effect of
             this is that files are uploaded using their local path in the
             `file URI scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
             Defaults to :obj:`False`.
@@ -202,7 +202,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         "_request",
         "_logger",
         "_initialized",
-        "local_mode",
+        "_local_mode",
     )
 
     def __init__(
@@ -222,7 +222,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         self._base_url = base_url + self._token
         self._base_file_url = base_file_url + self._token
-        self.local_mode = local_mode
+        self._local_mode = local_mode
         self._bot_user: Optional[User] = None
         self._private_key = None
         self._logger = logging.getLogger(__name__)
@@ -269,6 +269,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         return self._base_file_url
 
+    @property
+    def local_mode(self) -> bool:
+        """:obj:`bool`: Whether this bot is running in local mode.
+
+        .. versionadded:: 20.0
+        """
+        return self._local_mode
+
     # Proper type hints are difficult because:
     # 1. cryptography doesn't have a nice base class, so it would get lengthy
     # 2. we can't import cryptography if it's not installed
@@ -311,7 +319,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             tg_type=tg_type,
             filename=filename,
             attach=attach,
-            local_mode=self.local_mode,
+            local_mode=self._local_mode,
         )
 
     def _insert_defaults(self, data: Dict[str, object]) -> None:  # skipcq: PYL-R0201
