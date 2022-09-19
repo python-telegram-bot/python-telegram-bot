@@ -64,6 +64,9 @@ source_suffix = ".rst"
 # The master toctree document.
 master_doc = "index"
 
+# Global substitutions
+rst_prolog = (Path.cwd() / "../substitutions/global.rst").read_text(encoding="utf-8")
+
 # -- Extension settings ------------------------------------------------
 napoleon_use_admonition_for_examples = True
 

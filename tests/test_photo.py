@@ -236,19 +236,27 @@ class TestPhoto:
         unprotected = await default_bot.send_photo(chat_id, photo, protect_content=False)
         assert not unprotected.has_protected_content
 
-    async def test_send_photo_local_files(self, monkeypatch, bot, chat_id):
-        # For just test that the correct paths are passed as we have no local bot API set up
-        test_flag = False
-        file = data_file("telegram.jpg")
-        expected = file.as_uri()
+    @pytest.mark.parametrize("local_mode", [True, False])
+    async def test_send_photo_local_files(self, monkeypatch, bot, chat_id, local_mode):
+        try:
+            bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local bot API set up
+            test_flag = False
+            file = data_file("telegram.jpg")
+            expected = file.as_uri()
 
-        async def make_assertion(_, data, *args, **kwargs):
-            nonlocal test_flag
-            test_flag = data.get("photo") == expected
+            async def make_assertion(_, data, *args, **kwargs):
+                nonlocal test_flag
+                if local_mode:
+                    test_flag = data.get("photo") == expected
+                else:
+                    test_flag = isinstance(data.get("photo"), InputFile)
 
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        await bot.send_photo(chat_id, file)
-        assert test_flag
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.send_photo(chat_id, file)
+            assert test_flag
+        finally:
+            bot._local_mode = False
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
