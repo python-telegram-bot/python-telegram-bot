@@ -34,10 +34,10 @@ from telegram.ext._utils.types import BD, CD, UD, CDCData, ConversationDict, Con
 _REPLACED_KNOWN_BOT = "a known bot replaced by PTB's PicklePersistence"
 _REPLACED_UNKNOWN_BOT = "an unknown bot replaced by PTB's PicklePersistence"
 
-TO = TypeVar("TO", bound=TelegramObject)
+TelegramObj = TypeVar("TelegramObj", bound=TelegramObject)
 
 
-def _all_subclasses(cls: Type[TO]) -> Set[Type[TO]]:
+def _all_subclasses(cls: Type[TelegramObj]) -> Set[Type[TelegramObj]]:
     """Gets all subclasses of the specified object, recursively. from
     https://stackoverflow.com/a/3862957/9706202
     """
@@ -45,7 +45,7 @@ def _all_subclasses(cls: Type[TO]) -> Set[Type[TO]]:
     return set(subclasses).union([s for c in subclasses for s in _all_subclasses(c)])
 
 
-def _reconstruct_to(cls: Type[TO], kwargs: dict) -> TO:
+def _reconstruct_to(cls: Type[TelegramObj], kwargs: dict) -> TelegramObj:
     """
     This method is used for unpickling. The data, which is in the form a dictionary, is
     converted back into a class. Works mostly the same as :meth:`TelegramObject.__setstate__`.
@@ -57,7 +57,7 @@ def _reconstruct_to(cls: Type[TO], kwargs: dict) -> TO:
     return obj  # type: ignore[return-value]
 
 
-def _custom_reduction(cls: TO) -> Tuple[Callable, Tuple[Type[TO], dict]]:
+def _custom_reduction(cls: TelegramObj) -> Tuple[Callable, Tuple[Type[TelegramObj], dict]]:
     """
     This method is used for pickling. The bot attribute is preserved so _BotPickler().persistent_id
     works as intended.
@@ -80,9 +80,9 @@ class _BotPickler(pickle.Pickler):
                 self.dispatch_table[obj] = _custom_reduction
         super().__init__(*args, **kwargs)
 
-    def reducer_override(  # pylint: disable=no-self-use
-        self, obj: TO
-    ) -> Tuple[Callable, Tuple[Type[TO], dict]]:
+    def reducer_override(  # skipcq: PYL-R0201
+        self, obj: TelegramObj
+    ) -> Tuple[Callable, Tuple[Type[TelegramObj], dict]]:
         if not isinstance(obj, TelegramObject):
             return NotImplemented
 

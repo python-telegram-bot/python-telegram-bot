@@ -181,10 +181,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     """
 
     __slots__ = (
-        "token",
-        "base_url",
-        "base_file_url",
-        "private_key",
+        "_token",
+        "_base_url",
+        "_base_file_url",
+        "_private_key",
         "_bot_user",
         "_request",
         "_logger",
@@ -203,12 +203,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ):
         if not token:
             raise InvalidToken("You must pass the token you received from https://t.me/Botfather!")
-        self.token = token
+        self._token = token
 
-        self.base_url = base_url + self.token
-        self.base_file_url = base_file_url + self.token
+        self._base_url = base_url + self._token
+        self._base_file_url = base_file_url + self._token
         self._bot_user: Optional[User] = None
-        self.private_key = None
+        self._private_key = None
         self._logger = logging.getLogger(__name__)
         self._initialized = False
 
@@ -223,9 +223,46 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                     "To use Telegram Passports, PTB must be installed via `pip install "
                     "python-telegram-bot[passport]`."
                 )
-            self.private_key = serialization.load_pem_private_key(
+            self._private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
             )
+
+    @property
+    def token(self) -> str:
+        """:obj:`str`: Bot's unique authentication token.
+
+        .. versionadded:: 20.0
+        """
+        return self._token
+
+    @property
+    def base_url(self) -> str:
+        """:obj:`str`: Telegram Bot API service URL, built from :paramref:`Bot.base_url` and
+        :paramref:`Bot.token`.
+
+        .. versionadded:: 20.0
+        """
+        return self._base_url
+
+    @property
+    def base_file_url(self) -> str:
+        """:obj:`str`: Telegram Bot API file URL, built from :paramref:`Bot.base_file_url` and
+        :paramref:`Bot.token`.
+
+        .. versionadded:: 20.0
+        """
+        return self._base_file_url
+
+    # Proper type hints are difficult because:
+    # 1. cryptography doesn't have a nice base class, so it would get lengthy
+    # 2. we can't import cryptography if it's not installed
+    @property
+    def private_key(self) -> Optional[Any]:
+        """Deserialized private key for decryption of telegram passport data.
+
+        .. versionadded:: 20.0
+        """
+        return self._private_key
 
     def __reduce__(self) -> NoReturn:
         """Called by pickle.dumps(). Serializing bots is unadvisable, so we forbid pickling."""
@@ -246,7 +283,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         return decorator
 
-    def _insert_defaults(self, data: Dict[str, object]) -> None:  # pylint: disable=no-self-use
+    def _insert_defaults(self, data: Dict[str, object]) -> None:  # skipcq: PYL-R0201
         """This method is here to make ext.Defaults work. Because we need to be able to tell
         e.g. `send_message(chat_id, text)` from `send_message(chat_id, text, parse_mode=None)`, the
         default values for `parse_mode` etc are not `None` but `DEFAULT_NONE`. While this *could*
@@ -332,7 +369,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             request = self._request[1]
 
         return await request.post(
-            url=f"{self.base_url}/{endpoint}",
+            url=f"{self._base_url}/{endpoint}",
             request_data=request_data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -402,7 +439,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         try:
             await self.get_me()
         except InvalidToken as exc:
-            raise InvalidToken(f"The token `{self.token}` was rejected by the server.") from exc
+            raise InvalidToken(f"The token `{self._token}` was rejected by the server.") from exc
         self._initialized = True
 
     async def shutdown(self) -> None:
@@ -2435,7 +2472,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
         return result  # type: ignore[return-value]
 
-    def _effective_inline_results(  # pylint: disable=no-self-use
+    def _effective_inline_results(  # skipcq: PYL-R0201
         self,
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
@@ -2492,9 +2529,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return effective_results, next_offset
 
     @no_type_check  # mypy doesn't play too well with hasattr
-    def _insert_defaults_for_ilq_results(  # pylint: disable=no-self-use
-        self, res: "InlineQueryResult"
-    ) -> None:
+    def _insert_defaults_for_ilq_results(self, res: "InlineQueryResult") -> None:
         """The reason why this method exists is similar to the description of _insert_defaults
         The reason why we do this in rather than in _insert_defaults is because converting
         DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries
@@ -2737,7 +2772,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         ):
             result[  # type: ignore[index]
                 "file_path"
-            ] = f"{self.base_file_url}/{result['file_path']}"  # type: ignore[index]
+            ] = f"{self._base_file_url}/{result['file_path']}"  # type: ignore[index]
 
         return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 

@@ -27,7 +27,7 @@ from telegram._utils.warnings import warn
 if TYPE_CHECKING:
     from telegram import Bot
 
-TO_co = TypeVar("TO_co", bound="TelegramObject", covariant=True)
+Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
 
 
 class TelegramObject:
@@ -96,7 +96,7 @@ class TelegramObject:
         for key, val in state.items():
             setattr(self, key, val)
 
-    def __deepcopy__(self: TO_co, memodict: dict) -> TO_co:
+    def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
         """This method deepcopies the object and sets the bot on the newly created copy."""
         bot = self._bot  # Save bot so we can set it after copying
         self.set_bot(None)  # set to None so it is not deepcopied
@@ -149,7 +149,7 @@ class TelegramObject:
                 value = getattr(self, key, None)
                 if value is not None:
                     if recursive and hasattr(value, "to_dict"):
-                        data[key] = value.to_dict()
+                        data[key] = value.to_dict()  # pylint: disable=no-member
                     else:
                         data[key] = value
                 elif not recursive:
@@ -166,7 +166,7 @@ class TelegramObject:
         return None if data is None else data.copy()
 
     @classmethod
-    def de_json(cls: Type[TO_co], data: Optional[JSONDict], bot: "Bot") -> Optional[TO_co]:
+    def de_json(cls: Type[Tele_co], data: Optional[JSONDict], bot: "Bot") -> Optional[Tele_co]:
         """Converts JSON data to a Telegram object.
 
         Args:
@@ -188,8 +188,8 @@ class TelegramObject:
 
     @classmethod
     def de_list(
-        cls: Type[TO_co], data: Optional[List[JSONDict]], bot: "Bot"
-    ) -> List[Optional[TO_co]]:
+        cls: Type[Tele_co], data: Optional[List[JSONDict]], bot: "Bot"
+    ) -> List[Optional[Tele_co]]:
         """Converts JSON data to a list of Telegram objects.
 
         Args:
@@ -251,13 +251,13 @@ class TelegramObject:
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
-            if self._id_attrs == ():
+            if not self._id_attrs:
                 warn(
                     f"Objects of type {self.__class__.__name__} can not be meaningfully tested for"
                     " equivalence.",
                     stacklevel=2,
                 )
-            if other._id_attrs == ():
+            if not other._id_attrs:
                 warn(
                     f"Objects of type {other.__class__.__name__} can not be meaningfully tested"
                     " for equivalence.",

@@ -21,13 +21,13 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         experimental: [false]
         include:
-          - python-version: 3.11.0-rc.1
+          - python-version: 3.11.0-rc.2
             os: ubuntu-latest
             experimental: true
-          - python-version: 3.11.0-rc.1
+          - python-version: 3.11.0-rc.2
             os: windows-latest
             experimental: true
-          - python-version: 3.11.0-rc.1
+          - python-version: 3.11.0-rc.2
             os: macos-latest
             experimental: true
       fail-fast: False
