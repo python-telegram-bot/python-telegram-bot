@@ -141,7 +141,7 @@ class File(TelegramObject):
 
         Args:
             custom_path (:class:`pathlib.Path` | :obj:`str` , optional): The path where the file
-                will be saved to.
+                will be saved to. If not specified, will be saved in the current working directory.
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -199,17 +199,11 @@ class File(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
     ) -> None:
         """
-        Download this file. paramref:`out` needs to be supplied with a
+        Download this file into memory. :paramref:`out` needs to be supplied with a
         :obj:`io.BufferedIOBase`, the file contents will be saved to that object using the
         :obj:`out.write<io.BufferedIOBase.write>` method.
 
-        .. versionchanged:: 20.0
-
-            * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
-            * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
-              returned.
-            * This method was previously called ``download``. It was split into
-              :meth:`download_to_drive` and :meth:`download_to_obj`.
+        .. versionadded:: 20.0
 
 
         Args:
