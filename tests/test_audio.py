@@ -237,7 +237,7 @@ class TestAudio:
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_audio_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
-            bot.local_mode = local_mode
+            bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
@@ -257,7 +257,7 @@ class TestAudio:
             assert test_flag
             monkeypatch.delattr(bot, "_post")
         finally:
-            bot.local_mode = False
+            bot._local_mode = False
 
     def test_de_json(self, bot, audio):
         json_dict = {

@@ -205,7 +205,7 @@ class TestAnimation:
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_animation_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
-            bot.local_mode = local_mode
+            bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
@@ -225,7 +225,7 @@ class TestAnimation:
             assert test_flag
             monkeypatch.delattr(bot, "_post")
         finally:
-            bot.local_mode = False
+            bot._local_mode = False
 
     @flaky(3, 1)
     @pytest.mark.parametrize(

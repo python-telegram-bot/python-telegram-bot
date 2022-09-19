@@ -253,7 +253,7 @@ class TestSticker:
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_sticker_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
-            bot.local_mode = local_mode
+            bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
@@ -271,7 +271,7 @@ class TestSticker:
             assert test_flag
             monkeypatch.delattr(bot, "_post")
         finally:
-            bot.local_mode = False
+            bot._local_mode = False
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
@@ -656,7 +656,7 @@ class TestStickerSet:
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_upload_sticker_file_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
-            bot.local_mode = local_mode
+            bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
@@ -674,12 +674,12 @@ class TestStickerSet:
             assert test_flag
             monkeypatch.delattr(bot, "_post")
         finally:
-            bot.local_mode = False
+            bot._local_mode = False
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_create_new_sticker_set_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
-            bot.local_mode = local_mode
+            bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
@@ -713,7 +713,7 @@ class TestStickerSet:
             assert test_flag
             monkeypatch.delattr(bot, "_post")
         finally:
-            bot.local_mode = False
+            bot._local_mode = False
 
     async def test_create_new_sticker_all_params(self, monkeypatch, bot, chat_id, mask_position):
         async def make_assertion(_, data, *args, **kwargs):
@@ -744,7 +744,7 @@ class TestStickerSet:
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_add_sticker_to_set_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
-            bot.local_mode = local_mode
+            bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
@@ -768,12 +768,12 @@ class TestStickerSet:
             assert test_flag
             monkeypatch.delattr(bot, "_post")
         finally:
-            bot.local_mode = False
+            bot._local_mode = False
 
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_set_sticker_set_thumb_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
-            bot.local_mode = local_mode
+            bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
@@ -791,7 +791,7 @@ class TestStickerSet:
             assert test_flag
             monkeypatch.delattr(bot, "_post")
         finally:
-            bot.local_mode = False
+            bot._local_mode = False
 
     async def test_get_file_instance_method(self, monkeypatch, sticker):
         async def make_assertion(*_, **kwargs):

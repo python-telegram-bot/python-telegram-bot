@@ -180,7 +180,7 @@ class TestVideoNote:
     @pytest.mark.parametrize("local_mode", [True, False])
     async def test_send_video_note_local_files(self, monkeypatch, bot, chat_id, local_mode):
         try:
-            bot.local_mode = local_mode
+            bot._local_mode = local_mode
             # For just test that the correct paths are passed as we have no local bot API set up
             test_flag = False
             file = data_file("telegram.jpg")
@@ -201,7 +201,7 @@ class TestVideoNote:
             await bot.send_video_note(chat_id, file, thumb=file)
             assert test_flag
         finally:
-            bot.local_mode = False
+            bot._local_mode = False
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
