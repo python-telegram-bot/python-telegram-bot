@@ -272,10 +272,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         for key, val in data.items():
             # 1)
             if isinstance(val, InputMedia):
+                val._unfreeze()  # pylint: disable=protected-access
                 val.parse_mode = DefaultValue.get_value(val.parse_mode)
+                val._freeze()  # pylint: disable=protected-access
             elif key == "media" and isinstance(val, list):
                 for media in val:
+                    media._unfreeze()  # pylint: disable=protected-access
                     media.parse_mode = DefaultValue.get_value(media.parse_mode)
+                    media._freeze()  # pylint: disable=protected-access
             # 2)
             else:
                 data[key] = DefaultValue.get_value(val)

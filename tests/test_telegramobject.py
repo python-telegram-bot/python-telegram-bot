@@ -20,6 +20,7 @@ import datetime
 import inspect
 import pickle
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
@@ -202,6 +203,17 @@ class TestTelegramObject:
         assert new_msg.from_user == user and new_msg.from_user is not user
         assert new_msg.photo[0] == photo and new_msg.photo[0] is not photo
 
+        # check that deepcopy preserves the freezing status
+        with pytest.raises(
+            AttributeError, match="Attribute `text` of class `Message` can't be set!"
+        ):
+            new_msg.text = "new text"
+
+        msg._unfreeze()
+        new_message = deepcopy(msg)
+        new_message.text = "new text"
+        assert new_message.text == "new text"
+
     def test_deepcopy_subclass_telegram_obj(self, bot):
         s = self.Sub("private", "normal", bot)
         d = deepcopy(s)
@@ -219,7 +231,9 @@ class TestTelegramObject:
         # args. So we inspect the code instead.
 
         source_file = inspect.getsourcefile(cls.__init__)
-        if source_file.endswith("telegramobject.py"):
+        parents = Path(source_file).parents
+        is_test_file = Path(__file__).parent.resolve() in parents
+        if is_test_file or source_file.endswith("telegramobject.py"):
             # classes without their own `__init__` can be ignored
             return
 

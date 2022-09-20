@@ -97,7 +97,7 @@ class TelegramObject:
 
     def __setattr__(self, key: str, value: object) -> None:
         # protected attributes can always be set for convenient internal use
-        if (key == "_frozen") or (not self._frozen) or key.startswith("_"):
+        if (key == "_frozen") or (not getattr(self, "_frozen", True)) or key.startswith("_"):
             super().__setattr__(key, value)
             return
 
@@ -107,7 +107,7 @@ class TelegramObject:
 
     def __delattr__(self, key: str) -> None:
         # protected attributes can always be set for convenient internal use
-        if (key == "_frozen") or (not self._frozen) or key.startswith("_"):
+        if (key == "_frozen") or (not getattr(self, "_frozen", True)) or key.startswith("_"):
             super().__delattr__(key)
             return
 
@@ -141,9 +141,17 @@ class TelegramObject:
         This method is used for unpickling. The data, which is in the form a dictionary, is
         converted back into a class. Should be modified in place.
         """
+        self._unfreeze()
         for key, val in state.items():
+            if key == "_frozen":
+                # Setting the frozen status to True would prevent the attributes from being set
+                continue
             setattr(self, key, val)
         self._apply_api_kwargs()
+
+        # Apply freezing if necessary
+        if state["_frozen"]:
+            self._freeze()
 
     def __deepcopy__(self: TO_co, memodict: dict) -> TO_co:
         """This method deepcopies the object and sets the bot on the newly created copy."""
@@ -154,9 +162,17 @@ class TelegramObject:
         memodict[id(self)] = result  # save the id of the object in the dict
 
         attrs = self._get_attrs(include_private=True)  # get all its attributes
+        setattr(result, "_frozen", False)  # unfreeze the new object for setting the attributes
 
         for k in attrs:  # now we set the attributes in the deepcopied object
+            if k == "_frozen":
+                # Setting the frozen status to True would prevent the attributes from being set
+                continue
             setattr(result, k, deepcopy(getattr(self, k), memodict))
+
+        # Apply freezing if necessary
+        if self._frozen:
+            result._freeze()
 
         result.set_bot(bot)  # Assign the bots back
         self.set_bot(bot)

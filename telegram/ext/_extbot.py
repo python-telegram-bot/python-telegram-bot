@@ -355,11 +355,15 @@ class ExtBot(Bot, Generic[RLARGS]):
 
             # 3)
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
+                val._unfreeze()  # pylint: disable=protected-access
                 val.parse_mode = self.defaults.parse_mode if self.defaults else None
+                val._freeze()  # pylint: disable=protected-access
             elif key == "media" and isinstance(val, list):
                 for media in val:
                     if media.parse_mode is DEFAULT_NONE:
+                        media._unfreeze()  # pylint: disable=protected-access
                         media.parse_mode = self.defaults.parse_mode if self.defaults else None
+                        media._freeze()  # pylint: disable=protected-access
 
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
@@ -536,6 +540,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         `obj`.
         Overriding this to call insert the actual desired default values.
         """
+        res._unfreeze()  # pylint: disable=protected-access
         if hasattr(res, "parse_mode") and res.parse_mode is DEFAULT_NONE:
             res.parse_mode = self.defaults.parse_mode if self.defaults else None
         if hasattr(res, "input_message_content") and res.input_message_content:
@@ -553,6 +558,8 @@ class ExtBot(Bot, Generic[RLARGS]):
                 res.input_message_content.disable_web_page_preview = (
                     self.defaults.disable_web_page_preview if self.defaults else None
                 )
+
+        res._freeze()  # pylint: disable=protected-access
 
     async def stop_poll(
         self,

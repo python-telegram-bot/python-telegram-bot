@@ -39,7 +39,7 @@ from telegram.ext import filters
 
 @pytest.fixture(scope="function")
 def update():
-    return Update(
+    update = Update(
         0,
         Message(
             0,
@@ -52,6 +52,15 @@ def update():
             forward_from_chat=Chat(0, "Channel"),
         ),
     )
+    update._unfreeze()
+    update.message._unfreeze()
+    update.message.chat._unfreeze()
+    update.message.from_user._unfreeze()
+    update.message.via_bot._unfreeze()
+    update.message.sender_chat._unfreeze()
+    update.message.forward_from._unfreeze()
+    update.message.forward_from_chat._unfreeze()
+    return update
 
 
 @pytest.fixture(scope="function", params=MessageEntity.ALL_TYPES)
