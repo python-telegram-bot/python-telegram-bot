@@ -136,7 +136,7 @@ class File(TelegramObject):
             * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
               returned.
             * This method was previously called ``download``. It was split into
-              :meth:`download_to_drive` and :meth:`download_to_obj`.
+              :meth:`download_to_drive` and :meth:`download_to_object`.
 
 
         Args:
