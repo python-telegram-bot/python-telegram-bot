@@ -29,12 +29,46 @@ Warning:
 """
 
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Optional, Type, Union, cast
+from typing import IO, TYPE_CHECKING, Any, Optional, Tuple, Type, TypeVar, Union, cast, overload
 
 from telegram._utils.types import FileInput, FilePathInput
 
 if TYPE_CHECKING:
     from telegram import InputFile, TelegramObject
+
+_T = TypeVar("_T", bound=Union[bytes, "InputFile", str, Path, None])
+
+
+@overload
+def load_file(obj: IO[bytes]) -> Tuple[Optional[str], bytes]:
+    ...
+
+
+@overload
+def load_file(obj: _T) -> Tuple[None, _T]:
+    ...
+
+
+def load_file(
+    obj: Optional[FileInput],
+) -> Tuple[Optional[str], Union[bytes, "InputFile", str, Path, None]]:
+    """If the input is a file handle, read the data and name and return it. Otherwise, return
+    the input unchanged.
+    """
+    if obj is None:
+        return None, None
+
+    try:
+        contents = obj.read()  # type: ignore[union-attr]
+    except AttributeError:
+        return None, cast(Union[bytes, "InputFile", str, Path], obj)
+
+    if hasattr(obj, "name") and not isinstance(obj.name, int):  # type: ignore[union-attr]
+        filename = Path(obj.name).name  # type: ignore[union-attr]
+    else:
+        filename = None
+
+    return filename, contents
 
 
 def is_local_file(obj: Optional[FilePathInput]) -> bool:
@@ -54,18 +88,24 @@ def is_local_file(obj: Optional[FilePathInput]) -> bool:
         return False
 
 
-def parse_file_input(
+def parse_file_input(  # pylint: disable=too-many-return-statements
     file_input: Union[FileInput, "TelegramObject"],
     tg_type: Type["TelegramObject"] = None,
     filename: str = None,
     attach: bool = False,
+    local_mode: bool = False,
 ) -> Union[str, "InputFile", Any]:
     """
     Parses input for sending files:
 
-    * For string input, if the input is an absolute path of a local file,
-      adds the ``file://`` prefix. If the input is a relative path of a local file, computes the
-      absolute path and adds the ``file://`` prefix. Returns the input unchanged, otherwise.
+    * For string input, if the input is an absolute path of a local file:
+
+        * if ``local_mode`` is ``True``, adds the ``file://`` prefix. If the input is a relative
+        path of a local file, computes the absolute path and adds the ``file://`` prefix.
+        * if ``local_mode`` is ``False``, loads the file as binary data and builds an
+          :class:`InputFile` from that
+
+      Returns the input unchanged, otherwise.
     * :class:`pathlib.Path` objects are treated the same way as strings.
     * For IO and bytes input, returns an :class:`telegram.InputFile`.
     * If :attr:`tg_type` is specified and the input is of that type, returns the ``file_id``
@@ -81,6 +121,8 @@ def parse_file_input(
         attach (:obj:`bool`, optional): Pass :obj:`True` if the parameter this file belongs to in
             the request to Telegram should point to the multipart data via an ``attach://`` URI.
             Defaults to `False`. Only relevant if an :class:`telegram.InputFile` is returned.
+        local_mode (:obj:`bool`, optional): Pass :obj:`True` if the bot is running an api server
+            in ``--local`` mode.
 
     Returns:
         :obj:`str` | :class:`telegram.InputFile` | :obj:`object`: The parsed input or the untouched
@@ -90,13 +132,17 @@ def parse_file_input(
     from telegram import InputFile  # pylint: disable=import-outside-toplevel
 
     if isinstance(file_input, str) and file_input.startswith("file://"):
+        if not local_mode:
+            raise ValueError("Specified file input is a file URI, but local mode is not enabled.")
         return file_input
     if isinstance(file_input, (str, Path)):
         if is_local_file(file_input):
-            out = Path(file_input).absolute().as_uri()
-        else:
-            out = file_input  # type: ignore[assignment]
-        return out
+            path = Path(file_input)
+            if local_mode:
+                return path.absolute().as_uri()
+            return InputFile(path.open(mode="rb"), filename=filename, attach=attach)
+
+        return file_input
     if isinstance(file_input, bytes):
         return InputFile(file_input, filename=filename, attach=attach)
     if hasattr(file_input, "read"):

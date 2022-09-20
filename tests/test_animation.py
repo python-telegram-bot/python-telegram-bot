@@ -22,7 +22,7 @@ from pathlib import Path
 import pytest
 from flaky import flaky
 
-from telegram import Animation, Bot, MessageEntity, PhotoSize, Voice
+from telegram import Animation, Bot, InputFile, MessageEntity, PhotoSize, Voice
 from telegram.error import BadRequest, TelegramError
 from telegram.helpers import escape_markdown
 from telegram.request import RequestData
@@ -202,20 +202,30 @@ class TestAnimation:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    async def test_send_animation_local_files(self, monkeypatch, bot, chat_id):
-        # For just test that the correct paths are passed as we have no local bot API set up
-        test_flag = False
-        file = data_file("telegram.jpg")
-        expected = file.as_uri()
+    @pytest.mark.parametrize("local_mode", [True, False])
+    async def test_send_animation_local_files(self, monkeypatch, bot, chat_id, local_mode):
+        try:
+            bot._local_mode = local_mode
+            # For just test that the correct paths are passed as we have no local bot API set up
+            test_flag = False
+            file = data_file("telegram.jpg")
+            expected = file.as_uri()
 
-        async def make_assertion(_, data, *args, **kwargs):
-            nonlocal test_flag
-            test_flag = data.get("animation") == expected and data.get("thumb") == expected
+            async def make_assertion(_, data, *args, **kwargs):
+                nonlocal test_flag
+                if local_mode:
+                    test_flag = data.get("animation") == expected and data.get("thumb") == expected
+                else:
+                    test_flag = isinstance(data.get("animation"), InputFile) and isinstance(
+                        data.get("thumb"), InputFile
+                    )
 
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        await bot.send_animation(chat_id, file, thumb=file)
-        assert test_flag
-        monkeypatch.delattr(bot, "_post")
+            monkeypatch.setattr(bot, "_post", make_assertion)
+            await bot.send_animation(chat_id, file, thumb=file)
+            assert test_flag
+            monkeypatch.delattr(bot, "_post")
+        finally:
+            bot._local_mode = False
 
     @flaky(3, 1)
     @pytest.mark.parametrize(

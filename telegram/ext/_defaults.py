@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=no-self-use
 """This module contains the class Defaults, which allows passing default values to Application."""
 from typing import Any, Dict, NoReturn, Optional
 
