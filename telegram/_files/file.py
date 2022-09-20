@@ -42,14 +42,15 @@ class File(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
+    .. versionchanged:: 20.0:
+        ``download`` was split into :meth:`download_to_drive` and :meth:`download_to_object`.
+
     Note:
         * Maximum file size to download is
           :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD`.
         * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
           then it will automatically be decrypted as it downloads when you call e.g.
           :meth:`download_to_drive`.
-        * Since version 20.0, ``download`` was split into :meth:`download_to_drive` and
-          :meth:`download_to_object`.
 
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -156,8 +157,9 @@ class File(TelegramObject):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
         Returns:
-            :class:`pathlib.Path`: Returns the filename downloaded to
-            or the file path of the local file.
+            :class:`pathlib.Path`: Returns the Path object the file was downloaded to
+            or, if the bot is running with :attr:`local_mode=True<telegram.Bot.local_mode>`,
+            the file path to the local file.
 
         """
         local_file = is_local_file(self.file_path)
