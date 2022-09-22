@@ -44,8 +44,7 @@ FilePathInput = Union[str, Path]
 
 FileInput = Union[FilePathInput, FileLike, bytes, str]
 """Valid input for passing files to Telegram. Either a file id as string, a file like object,
-a local file path as string, :class:`pathlib.Path` or the file contents as :obj:`bytes` or
-:obj:`str`."""
+a local file path as string, :class:`pathlib.Path` or the file contents as :obj:`bytes`."""
 
 JSONDict = Dict[str, Any]
 """Dictionary containing response from Telegram or data to send to the API."""

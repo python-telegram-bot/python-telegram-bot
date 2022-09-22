@@ -32,7 +32,7 @@ from telegram import (
     Update,
     User,
 )
-from telegram.ext import CallbackContext, CallbackQueryHandler, JobQueue
+from telegram.ext import CallbackContext, CallbackQueryHandler, InvalidCallbackData, JobQueue
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -134,6 +134,11 @@ class TestCallbackQueryHandler:
 
         callback_query.callback_query.data = None
         callback_query.callback_query.game_short_name = "this is a short game name"
+        assert not handler.check_update(callback_query)
+
+        callback_query.callback_query.data = object()
+        assert not handler.check_update(callback_query)
+        callback_query.callback_query.data = InvalidCallbackData()
         assert not handler.check_update(callback_query)
 
     def test_with_callable_pattern(self, callback_query):
