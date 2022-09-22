@@ -28,11 +28,11 @@ This module contains filters for use with :class:`telegram.ext.MessageHandler`,
        :mod:`~telegram.ext.filters` module.
     #. The names of all filters has been updated:
 
-        * Filter classes which are ready for use, e.g ``Filters.all`` are now capitalized, e.g
-          ``filters.ALL``.
-        * Filters which need to be initialized are now in CamelCase. E.g. ``filters.User(...)``.
-        * Filters which do both (like ``Filters.text``) are now split as ready-to-use version
-          ``filters.TEXT`` and class version ``filters.Text(...)``.
+       * Filter classes which are ready for use, e.g ``Filters.all`` are now capitalized, e.g
+         ``filters.ALL``.
+       * Filters which need to be initialized are now in CamelCase. E.g. ``filters.User(...)``.
+       * Filters which do both (like ``Filters.text``) are now split as ready-to-use version
+         ``filters.TEXT`` and class version ``filters.Text(...)``.
 
 """
 
