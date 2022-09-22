@@ -34,7 +34,7 @@ version = "20.0a4"  # telegram.__version__[:3]
 release = "20.0a4"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "4.5.0"
+needs_sphinx = "5.1.1"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -46,6 +46,7 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx_paramlinks",
     "sphinxcontrib.mermaid",
+    "sphinx_search.extension",
 ]
 
 # Use intersphinx to reference the python builtin library docs
@@ -212,11 +213,9 @@ html_favicon = "ptb-logo_1024.ico"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = [
-    "style_external_link.css",
-    "style_mermaid_diagrams.css",
-]
-html_permalinks_icon = "¶"  # Furo's default permalink icon is `#`` which doesn't look great imo.
+html_css_files = ["style_external_link.css", "style_mermaid_diagrams.css"]
+
+html_permalinks_icon = "¶"  # Furo's default permalink icon is `#` which doesn't look great imo.
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "python-telegram-bot-doc"
@@ -257,6 +256,7 @@ latex_logo = "ptb-logo_1024.png"
 # (source start file, name, description, authors, manual section).
 man_pages = [(master_doc, "python-telegram-bot", "python-telegram-bot Documentation", [author], 1)]
 
+# rtd_sphinx_search_file_type = "un-minified"  # Configuration for furo-sphinx-search
 
 # -- Options for Texinfo output -------------------------------------------
 
