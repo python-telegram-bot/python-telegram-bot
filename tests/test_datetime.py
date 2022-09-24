@@ -43,7 +43,8 @@ RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
 
 """
-This part is here for ptb-raw, where we don't have pytz (unless the user installs it)
+This part is here because pytz is just installed as dependency of the optional dependency
+APScheduler, so we don't always have pytz (unless the user installs it).
 Because imports in pytest are intricate, we just run
 
     pytest -k test_helpers.py

@@ -31,7 +31,8 @@ import datetime as dtm
 import time
 from typing import Optional, Union
 
-# in PTB-Raw we don't have pytz, so we make a little workaround here
+# pytz is only available if it was installed as dependency of APScheduler, so we make a little
+# workaround here
 DTM_UTC = dtm.timezone.utc
 try:
     import pytz
