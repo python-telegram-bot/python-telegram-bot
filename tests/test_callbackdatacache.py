@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import os
 import time
 from copy import deepcopy
 from datetime import datetime
@@ -26,11 +27,24 @@ import pytz
 
 from telegram import CallbackQuery, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Message, User
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
+from tests.conftest import env_var_2_bool
 
 
 @pytest.fixture(scope="function")
 def callback_data_cache(bot):
     return CallbackDataCache(bot)
+
+
+TEST_CALLBACK_DATA_CACHE = env_var_2_bool(os.getenv("TEST_CALLBACK_DATA_CACHE", True))
+
+
+@pytest.mark.skipif(
+    TEST_CALLBACK_DATA_CACHE, reason="Only relevant if the optional dependency is not installed"
+)
+class TestNoCallbackDataCache:
+    def test_init(self, bot):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[callback-data\]"):
+            CallbackDataCache(bot=bot)
 
 
 class TestInvalidCallbackData:
