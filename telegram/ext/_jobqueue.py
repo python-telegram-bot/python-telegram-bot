@@ -606,7 +606,7 @@ class Job:
 
     Warning:
         This class should not be instantiated manually.
-        Use the methods of :class:`telegram.ext.JobQueue` to shedule jobs.
+        Use the methods of :class:`telegram.ext.JobQueue` to schedule jobs.
 
     .. versionchanged:: 20.0
 
