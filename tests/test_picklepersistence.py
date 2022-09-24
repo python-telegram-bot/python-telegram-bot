@@ -41,11 +41,10 @@ def change_directory(tmp_path: Path):
 
 
 @pytest.fixture(autouse=True)
-def reset_callback_data_cache(bot):
+def reset_callback_data_cache(cdc_bot):
     yield
-    bot.callback_data_cache.clear_callback_data()
-    bot.callback_data_cache.clear_callback_queries()
-    bot.arbitrary_callback_data = False
+    cdc_bot.callback_data_cache.clear_callback_data()
+    cdc_bot.callback_data_cache.clear_callback_queries()
 
 
 @pytest.fixture(scope="function")
@@ -850,10 +849,14 @@ class TestPicklePersistence:
         assert conversations_test["name1"] == conversation1
 
     async def test_custom_pickler_unpickler_simple(
-        self, pickle_persistence, update, good_pickle_files, bot, recwarn
+        self, pickle_persistence, good_pickle_files, cdc_bot, recwarn
     ):
+        bot = cdc_bot
+        update = Update(1)
+        update.set_bot(bot)
+
         pickle_persistence.set_bot(bot)  # assign the current bot to the persistence
-        data_with_bot = {"current_bot": update.message}
+        data_with_bot = {"current_bot": update}
         await pickle_persistence.update_chat_data(
             12345, data_with_bot
         )  # also calls BotPickler.dumps()
@@ -887,8 +890,10 @@ class TestPicklePersistence:
         assert (await pp.get_chat_data())[12345]["unknown_bot_in_user"]._bot is None
 
     async def test_custom_pickler_unpickler_with_custom_objects(
-        self, bot, pickle_persistence, good_pickle_files
+        self, cdc_bot, pickle_persistence, good_pickle_files
     ):
+        bot = cdc_bot
+
         dict_s = self.DictSub("private", "normal", bot)
         slot_s = self.SlotsSub("new_var", "private_var")
         regular = self.NormalClass(12)

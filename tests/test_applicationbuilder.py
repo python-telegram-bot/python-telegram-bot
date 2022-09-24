@@ -81,7 +81,7 @@ class TestApplicationBuilder:
         assert "api.telegram.org" in app.bot.base_file_url
         assert bot.token in app.bot.base_file_url
         assert app.bot.private_key is None
-        assert app.bot.arbitrary_callback_data is False
+        assert app.bot.callback_data_cache is None
         assert app.bot.defaults is None
         assert app.bot.rate_limiter is None
         assert app.bot.local_mode is False
@@ -346,6 +346,7 @@ class TestApplicationBuilder:
             .concurrent_updates(concurrent_updates)
             .post_init(post_init)
             .post_shutdown(post_shutdown)
+            .arbitrary_callback_data(True)
         ).build()
         assert app.job_queue is job_queue
         assert app.job_queue.application is app

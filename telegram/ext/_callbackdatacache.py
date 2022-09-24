@@ -141,6 +141,28 @@ class CallbackDataCache:
                     keyboard_uuid=uuid, access_time=access_time, button_data=data
                 )
 
+    def load_persistence_data(self, persistent_data: CDCData) -> None:
+        """Loads data into the cache.
+
+        Warning:
+            This method is not intended to be called by users directly.
+
+        .. versionadded:: 20.0
+
+        Args:
+            persistent_data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
+            Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
+            Data to load, as returned by \
+            :meth:`telegram.ext.BasePersistence.get_callback_data`.
+        """
+        keyboard_data, callback_queries = persistent_data
+        for key, value in callback_queries.items():
+            self._callback_queries[key] = value
+        for uuid, access_time, data in keyboard_data:
+            self._keyboard_data[uuid] = _KeyboardData(
+                keyboard_uuid=uuid, access_time=access_time, button_data=data
+            )
+
     @property
     def persistence_data(self) -> CDCData:
         """Tuple[List[Tuple[:obj:`str`, :obj:`float`, Dict[:obj:`str`, :class:`object`]]],
