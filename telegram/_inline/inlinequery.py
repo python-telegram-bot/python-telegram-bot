@@ -44,12 +44,10 @@ class InlineQuery(TelegramObject):
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
     .. versionchanged:: 20.0
-
-        * The following are now keyword-only arguments in Bot methods:
-          ``{read, write, connect, pool}_timeout``, :paramref:`answer.api_kwargs`,
-          ``auto_pagination``. Use a named argument for those,
-          and notice that some positional arguments changed position as a result.
-        * |removedbotandkwargs|
+        The following are now keyword-only arguments in Bot methods:
+        ``{read, write, connect, pool}_timeout``, :paramref:`answer.api_kwargs`,
+        ``auto_pagination``. Use a named argument for those,
+        and notice that some positional arguments changed position as a result.
 
     Args:
         id (:obj:`str`): Unique identifier for this query.

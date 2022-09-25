@@ -51,9 +51,6 @@ class BotCommandScope(TelegramObject):
 
     .. versionadded:: 13.7
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): Scope type.
 
@@ -121,9 +118,6 @@ class BotCommandScopeDefault(BotCommandScope):
     .. _`narrower scope`: https://core.telegram.org/bots/api#determining-list-of-commands
 
     .. versionadded:: 13.7
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.DEFAULT`.
     """
@@ -139,9 +133,6 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
 
     .. versionadded:: 13.7
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_PRIVATE_CHATS`.
     """
@@ -156,9 +147,6 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
     """Represents the scope of bot commands, covering all group and supergroup chats.
 
     .. versionadded:: 13.7
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_GROUP_CHATS`.
     """
@@ -173,9 +161,6 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
     """Represents the scope of bot commands, covering all group and supergroup chat administrators.
 
     .. versionadded:: 13.7
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_CHAT_ADMINISTRATORS`.
     """
@@ -193,9 +178,6 @@ class BotCommandScopeChat(BotCommandScope):
     considered equal, if their :attr:`type` and :attr:`chat_id` are equal.
 
     .. versionadded:: 13.7
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
@@ -225,9 +207,6 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
 
     .. versionadded:: 13.7
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
             target supergroup (in the format ``@supergroupusername``)
@@ -255,9 +234,6 @@ class BotCommandScopeChatMember(BotCommandScope):
     considered equal, if their :attr:`type`, :attr:`chat_id` and :attr:`user_id` are equal.
 
     .. versionadded:: 13.7
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the

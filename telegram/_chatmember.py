@@ -54,7 +54,6 @@ class ChatMember(TelegramObject):
           use :class:`ChatMember` directly.
         * The constant ``ChatMember.CREATOR`` was replaced by :attr:`~telegram.ChatMember.OWNER`
         * The constant ``ChatMember.KICKED`` was replaced by :attr:`~telegram.ChatMember.BANNED`
-        * |removedkwargs|
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -140,9 +139,6 @@ class ChatMemberOwner(ChatMember):
 
     .. versionadded:: 13.7
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         user (:class:`telegram.User`): Information about the user.
         is_anonymous (:obj:`bool`): :obj:`True`, if the
@@ -183,7 +179,6 @@ class ChatMemberAdministrator(ChatMember):
        * Argument and attribute ``can_manage_voice_chats`` were renamed to
          :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
          Bot API 6.0.
-       * |removedkwargs|
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -315,9 +310,6 @@ class ChatMemberMember(ChatMember):
 
     .. versionadded:: 13.7
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         user (:class:`telegram.User`): Information about the user.
 
@@ -344,9 +336,6 @@ class ChatMemberRestricted(ChatMember):
     in the chat. Supergroups only.
 
     .. versionadded:: 13.7
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -446,9 +435,6 @@ class ChatMemberLeft(ChatMember):
 
     .. versionadded:: 13.7
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         user (:class:`telegram.User`): Information about the user.
 
@@ -474,9 +460,6 @@ class ChatMemberBanned(ChatMember):
     can't return to the chat or view chat messages.
 
     .. versionadded:: 13.7
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         user (:class:`telegram.User`): Information about the user.

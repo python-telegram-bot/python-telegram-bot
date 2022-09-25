@@ -39,9 +39,6 @@ class InlineQueryResultVenue(InlineQueryResult):
       Foursquare details and Google Pace details are mutually exclusive. However, this
       behaviour is undocumented and might be changed by Telegram.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
         latitude (:obj:`float`): Latitude of the venue location in degrees.

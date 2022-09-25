@@ -44,9 +44,6 @@ class ChatMemberUpdated(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
         from_user (:class:`telegram.User`): Performer of the action, which resulted in the change.

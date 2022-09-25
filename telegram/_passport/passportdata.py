@@ -38,9 +38,6 @@ class PassportData(TelegramObject):
         :attr:`decrypted_data` and the payload can be found in :attr:`decrypted_credentials`'s
         attribute :attr:`telegram.Credentials.nonce`.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
             about documents and other Telegram Passport elements that was shared with the bot.

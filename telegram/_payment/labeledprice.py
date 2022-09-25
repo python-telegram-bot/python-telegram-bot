@@ -30,9 +30,6 @@ class LabeledPrice(TelegramObject):
 
     .. seealso:: `Paymentbot Example <examples.paymentbot.html>`_
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         label (:obj:`str`): Portion label.
         amount (:obj:`int`): Price of the product in the smallest units of the currency (integer,

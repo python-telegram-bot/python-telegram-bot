@@ -38,9 +38,6 @@ class InlineQueryResultCachedPhoto(InlineQueryResult):
     :attr:`input_message_content` to send a message with the specified content instead
     of the photo.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         photo_file_id (:obj:`str`): A valid file identifier of the photo.

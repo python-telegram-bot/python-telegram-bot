@@ -38,9 +38,6 @@ class InlineQueryResultVoice(InlineQueryResult):
     :attr:`input_message_content` to send a message with the specified content instead of
     the voice message.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.

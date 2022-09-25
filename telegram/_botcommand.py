@@ -29,9 +29,6 @@ class BotCommand(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`command` and :attr:`description` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         command (:obj:`str`): Text of the command; 1-32 characters. Can contain only lowercase
             English letters, digits and underscores.

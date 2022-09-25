@@ -37,9 +37,6 @@ class InlineQueryResultPhoto(InlineQueryResult):
     caption. Alternatively, you can use :attr:`input_message_content` to send a message with the
     specified content instead of the photo.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size

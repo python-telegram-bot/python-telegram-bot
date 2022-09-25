@@ -26,9 +26,6 @@ class PersonalDetails(TelegramObject):
     """
     This object represents personal details.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Attributes:
         first_name (:obj:`str`): First Name.
         middle_name (:obj:`str`): Optional. First Name.
@@ -91,9 +88,6 @@ class ResidentialAddress(TelegramObject):
     """
     This object represents a residential address.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Attributes:
         street_line1 (:obj:`str`): First line for the address.
         street_line2 (:obj:`str`): Optional. Second line for the address.
@@ -135,9 +129,6 @@ class ResidentialAddress(TelegramObject):
 class IdDocumentData(TelegramObject):
     """
     This object represents the data of an identity document.
-
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
 
     Attributes:
         document_no (:obj:`str`): Document number.

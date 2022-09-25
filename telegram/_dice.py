@@ -55,9 +55,6 @@ class Dice(TelegramObject):
         /Code-snippets#map-a-slot-machine-dice-value-to-the-corresponding-symbols>`_.
         However, this behaviour is undocumented and might be changed by Telegram.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         value (:obj:`int`): Value of the dice. 1-6 for dice, darts and bowling balls, 1-5 for
             basketball and football/soccer ball, 1-64 for slot machine.

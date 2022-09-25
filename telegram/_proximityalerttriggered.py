@@ -35,9 +35,6 @@ class ProximityAlertTriggered(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`traveler`, :attr:`watcher` and :attr:`distance` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         traveler (:class:`telegram.User`): User that triggered the alert
         watcher (:class:`telegram.User`): User that set the alert

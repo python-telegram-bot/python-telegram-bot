@@ -30,9 +30,6 @@ class InputLocationMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`latitude` and :attr:`longitude` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.

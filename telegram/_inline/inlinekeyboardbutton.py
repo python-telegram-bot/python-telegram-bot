@@ -67,10 +67,8 @@ class InlineKeyboardButton(TelegramObject):
         :class:`telegram.InlineKeyboardMarkup`
 
     .. versionchanged:: 20.0
-
-       * :attr:`web_app` is considered as well when comparing objects of this type in terms of
-         equality.
-       * |removedkwargs|
+       :attr:`web_app` is considered as well when comparing objects of this type in terms of
+       equality.
 
     Args:
         text (:obj:`str`): Label text on the button.

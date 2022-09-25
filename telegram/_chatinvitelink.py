@@ -42,7 +42,6 @@ class ChatInviteLink(TelegramObject):
        * The argument & attribute :attr:`creates_join_request` is now required to comply with the
          Bot API.
        * Comparing objects of this class now also takes :attr:`creates_join_request` into account.
-       * |removedkwargs|
 
     Args:
         invite_link (:obj:`str`): The invite link.

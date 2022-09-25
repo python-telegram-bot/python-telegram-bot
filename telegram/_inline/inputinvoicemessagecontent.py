@@ -38,9 +38,6 @@ class InputInvoiceMessageContent(InputMessageContent):
 
     .. versionadded:: 13.5
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
             :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.

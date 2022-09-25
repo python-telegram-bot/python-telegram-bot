@@ -34,9 +34,6 @@ class ChatPhoto(TelegramObject):
     considered equal, if their :attr:`small_file_unique_id` and :attr:`big_file_unique_id` are
     equal.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         small_file_id (:obj:`str`): Unique file identifier of small (160x160) chat photo. This
             file_id can be used only for photo download and only for as long

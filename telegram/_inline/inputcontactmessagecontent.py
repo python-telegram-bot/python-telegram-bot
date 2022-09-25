@@ -28,9 +28,6 @@ class InputContactMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`phone_number` is equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         phone_number (:obj:`str`): Contact's phone number.
         first_name (:obj:`str`): Contact's first name.

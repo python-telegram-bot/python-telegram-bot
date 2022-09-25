@@ -48,9 +48,8 @@ class KeyboardButton(TelegramObject):
           Older clients will display unsupported message.
 
     .. versionchanged:: 20.0
-       * :attr:`web_app` is considered as well when comparing objects of this type in terms of
-         equality.
-       * |removedkwargs|
+       :attr:`web_app` is considered as well when comparing objects of this type in terms of
+       equality.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be

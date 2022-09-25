@@ -38,9 +38,6 @@ class ReplyKeyboardRemove(TelegramObject):
         User will not be able to summon this keyboard; if you want to hide the keyboard from
         sight but keep it accessible, use :attr:`telegram.ReplyKeyboardMarkup.one_time_keyboard`.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         selective (:obj:`bool`, optional): Use this parameter if you want to remove the keyboard
             for specific users only. Targets:

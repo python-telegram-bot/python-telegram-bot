@@ -37,8 +37,7 @@ class VideoChatStarted(TelegramObject):
 
     .. versionadded:: 13.4
     .. versionchanged:: 20.0
-        * This class was renamed from ``VoiceChatStarted`` in accordance to Bot API 6.0.
-        * |removedkwargs|
+        This class was renamed from ``VoiceChatStarted`` in accordance to Bot API 6.0.
     """
 
     __slots__ = ()

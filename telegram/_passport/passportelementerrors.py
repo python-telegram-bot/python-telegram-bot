@@ -32,9 +32,6 @@ class PassportElementError(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`source` and :attr:`type` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         source (:obj:`str`): Error source.
         type (:obj:`str`): The section of the user's Telegram Passport which has the error.
@@ -66,9 +63,6 @@ class PassportElementErrorDataField(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`field_name`, :attr:`data_hash` and :attr:`message` are equal.
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
@@ -115,9 +109,6 @@ class PassportElementErrorFile(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
@@ -152,9 +143,6 @@ class PassportElementErrorFiles(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -191,9 +179,6 @@ class PassportElementErrorFrontSide(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
@@ -228,9 +213,6 @@ class PassportElementErrorReverseSide(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -267,9 +249,6 @@ class PassportElementErrorSelfie(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
@@ -302,9 +281,6 @@ class PassportElementErrorTranslationFile(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
@@ -343,9 +319,6 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
@@ -382,9 +355,6 @@ class PassportElementErrorUnspecified(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`element_hash`, and :attr:`message` are equal.
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.

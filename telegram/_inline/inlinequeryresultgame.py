@@ -27,9 +27,6 @@ from telegram.constants import InlineQueryResultType
 class InlineQueryResultGame(InlineQueryResult):
     """Represents a :class:`telegram.Game`.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         game_short_name (:obj:`str`): Short name of the game.

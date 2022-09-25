@@ -65,9 +65,6 @@ class CallbackQuery(TelegramObject):
 
           .. versionadded:: 13.6
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.

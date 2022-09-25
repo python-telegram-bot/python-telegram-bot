@@ -31,9 +31,6 @@ class KeyboardButtonPollType(TelegramObject):
 
     .. seealso:: `Pollbot Example <examples.pollbot.html>`_
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Attributes:
         type (:obj:`str`): Optional. If :tg-const:`telegram.Poll.QUIZ` is passed, the user will be
             allowed to create only polls in the quiz mode. If :tg-const:`telegram.Poll.REGULAR` is

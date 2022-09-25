@@ -35,9 +35,6 @@ class OrderInfo(TelegramObject):
     considered equal, if their :attr:`name`, :attr:`phone_number`, :attr:`email` and
     :attr:`shipping_address` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         name (:obj:`str`, optional): User name.
         phone_number (:obj:`str`, optional): User's phone number.

@@ -42,9 +42,6 @@ class InlineQueryResultVideo(InlineQueryResult):
         If an InlineQueryResultVideo message contains an embedded video (e.g., YouTube), you must
         replace its content using :attr:`input_message_content`.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.

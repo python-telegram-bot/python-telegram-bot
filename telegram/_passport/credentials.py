@@ -112,9 +112,6 @@ class EncryptedCredentials(TelegramObject):
         This object is decrypted only when originating from
         :obj:`telegram.PassportData.decrypted_credentials`.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
             nonce, data hashes and secrets used for EncryptedPassportElement decryption and
@@ -209,9 +206,6 @@ class EncryptedCredentials(TelegramObject):
 
 class Credentials(TelegramObject):
     """
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Attributes:
         secure_data (:class:`telegram.SecureData`): Credentials for encrypted data
         nonce (:obj:`str`): Bot-specified nonce
@@ -247,9 +241,6 @@ class SecureData(TelegramObject):
     """
     This object represents the credentials that were used to decrypt the encrypted data.
     All fields are optional and depend on fields that were requested.
-
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
 
     Attributes:
         personal_details (:class:`telegram.SecureValue`, optional): Credentials for encrypted
@@ -350,9 +341,6 @@ class SecureValue(TelegramObject):
     This object represents the credentials that were used to decrypt the encrypted value.
     All fields are optional and depend on the type of field.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Attributes:
         data (:class:`telegram.DataCredentials`, optional): Credentials for encrypted Telegram
             Passport data. Available for "personal_details", "passport", "driver_license",
@@ -423,11 +411,7 @@ class SecureValue(TelegramObject):
 
 
 class _CredentialsBase(TelegramObject):
-    """Base class for DataCredentials and FileCredentials.
-
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-    """
+    """Base class for DataCredentials and FileCredentials."""
 
     __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
@@ -445,9 +429,6 @@ class DataCredentials(_CredentialsBase):
     """
     These credentials can be used to decrypt encrypted data from the data field in
     EncryptedPassportData.
-
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
 
     Args:
         data_hash (:obj:`str`): Checksum of encrypted data

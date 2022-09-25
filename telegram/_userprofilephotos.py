@@ -34,9 +34,6 @@ class UserProfilePhotos(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`total_count` and :attr:`photos` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         total_count (:obj:`int`): Total number of profile pictures the target user has.
         photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to 4

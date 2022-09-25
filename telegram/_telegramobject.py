@@ -45,8 +45,12 @@ class TelegramObject:
         assert telegram_object.get_bot() is copy.deepcopy(telegram_object).get_bot()
 
     .. versionchanged:: 20.0
-        ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
-        special cases like :attr:`Message.from_user` that deviate from the official Bot API.
+
+        * ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
+          special cases like :attr:`Message.from_user` that deviate from the official Bot API.
+        * Removed argument and attribute ``bot`` for several subclasses. Use
+          :meth:`set_bot` and :meth:`get_bot` instead.
+        * Removed the possibility to pass arbitrary keyword arguments for several subclasses.
 
     Arguments:
         api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|

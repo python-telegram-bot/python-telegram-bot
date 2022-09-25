@@ -32,9 +32,6 @@ class Invoice(TelegramObject):
     considered equal, if their :attr:`title`, :attr:`description`, :paramref:`start_parameter`,
     :attr:`currency` and :attr:`total_amount` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         title (:obj:`str`): Product name.
         description (:obj:`str`): Product description.

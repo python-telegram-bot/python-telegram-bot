@@ -28,9 +28,6 @@ class Location(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`longitude` and :attr:`latitude` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         longitude (:obj:`float`): Longitude as defined by sender.
         latitude (:obj:`float`): Latitude as defined by sender.

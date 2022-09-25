@@ -38,9 +38,6 @@ class InlineQueryResultCachedGif(InlineQueryResult):
     use :attr:`input_message_content` to send a message with specified content instead of
     the animation.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         gif_file_id (:obj:`str`): A valid file identifier for the GIF file.
