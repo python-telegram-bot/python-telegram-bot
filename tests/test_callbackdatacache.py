@@ -36,7 +36,7 @@ def callback_data_cache(bot):
     return CallbackDataCache(bot)
 
 
-TEST_WITH_CALLBACK_DATA_CACHE = env_var_2_bool(os.getenv("TEST_WITH_CALLBACK_DATA_CACHE", False))
+TEST_WITH_CALLBACK_DATA_CACHE = env_var_2_bool(os.getenv("TEST_WITH_CALLBACK_DATA_CACHE", True))
 
 
 @pytest.mark.skipif(

@@ -61,7 +61,7 @@ jobs:
           # test without pytz
           pytest -v --cov --cov-append -k test_datetime.py
           status=$(( $? > status ? $? : status))
-          pytest -v --cov --cov-append -k test_default.py
+          pytest -v --cov --cov-append -k test_defaults.py
           status=$(( $? > status ? $? : status))
           pytest -v --cov --cov-append -k test_jobqueue.py
           status=$(( $? > status ? $? : status))

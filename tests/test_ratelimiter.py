@@ -39,7 +39,7 @@ from telegram.ext import AIORateLimiter, BaseRateLimiter, Defaults, ExtBot
 from telegram.request import BaseRequest, RequestData
 from tests.conftest import env_var_2_bool
 
-TEST_WITH_RATE_LIMITER = env_var_2_bool(os.getenv("TEST_WITH_RATE_LIMITER", False))
+TEST_WITH_RATE_LIMITER = env_var_2_bool(os.getenv("TEST_WITH_RATE_LIMITER", True))
 
 
 @pytest.mark.skipif(

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
-from typing import Any, Dict, NoReturn, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, NoReturn, Optional
 
 from telegram._utils.datetime import UTC
 

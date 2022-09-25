@@ -84,8 +84,8 @@ def env_var_2_bool(env_var: object) -> bool:
     return env_var.lower().strip() == "true"
 
 
-TEST_WITH_PASSPORT = env_var_2_bool(os.getenv("TEST_WITH_PASSPORT", False))
-TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", False))
+TEST_WITH_PASSPORT = env_var_2_bool(os.getenv("TEST_WITH_PASSPORT", True))
+TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", True))
 if TEST_WITH_PYTZ:
     import pytz
 
@@ -395,13 +395,25 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
+class BasicTimezone(datetime.tzinfo):
+    def __init__(self, offset, name):
+        self.offset = offset
+        self.name = name
+
+    def utcoffset(self, dt):
+        return self.offset
+
+    def dst(self, dt):
+        return datetime.timedelta(0)
+
+
 @pytest.fixture(params=["Europe/Berlin", "Asia/Singapore", "UTC"])
 def tzinfo(request):
     if TEST_WITH_PYTZ:
         return pytz.timezone(request.param)
     else:
         hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
-        return datetime.timezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
+        return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
 
 
 @pytest.fixture()

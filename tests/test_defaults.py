@@ -27,7 +27,7 @@ from telegram import User
 from telegram.ext import Defaults
 from tests.conftest import env_var_2_bool
 
-TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", False))
+TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", True))
 
 
 class TestDefault:

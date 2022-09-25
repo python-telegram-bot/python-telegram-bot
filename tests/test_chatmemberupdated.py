@@ -31,7 +31,7 @@ from telegram import (
     ChatMemberUpdated,
     User,
 )
-from telegram._utils.datetime import to_timestamp, UTC
+from telegram._utils.datetime import UTC, to_timestamp
 
 
 @pytest.fixture(scope="class")

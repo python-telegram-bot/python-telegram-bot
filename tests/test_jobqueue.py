@@ -30,8 +30,8 @@ from flaky import flaky
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
 from tests.conftest import env_var_2_bool
 
-TEST_WITH_JOB_QUEUE = env_var_2_bool(os.getenv("TEST_WITH_JOB_QUEUE", False))
-TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", False))
+TEST_WITH_JOB_QUEUE = env_var_2_bool(os.getenv("TEST_WITH_JOB_QUEUE", True))
+TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", True))
 
 if TEST_WITH_PYTZ:
     import pytz
@@ -61,11 +61,11 @@ async def job_queue(bot, app):
 )
 class TestNoJobQueue:
     def test_init_job_queue(self):
-        with pytest.raises(RuntimeError, match="python-telegram-bot\[job-queue\]"):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[job-queue\]"):
             JobQueue()
 
     def test_init_job(self):
-        with pytest.raises(RuntimeError, match="python-telegram-bot\[job-queue\]"):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[job-queue\]"):
             Job(None)
 
 

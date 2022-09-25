@@ -41,7 +41,7 @@ from tests.conftest import (
     send_webhook_message,
 )
 
-TEST_WITH_WEBHOOKS = env_var_2_bool(os.getenv("TEST_WITH_WEBHOOKS", False))
+TEST_WITH_WEBHOOKS = env_var_2_bool(os.getenv("TEST_WITH_WEBHOOKS", True))
 
 if TEST_WITH_WEBHOOKS:
     from telegram.ext._utils.webhookhandler import WebhookServer
@@ -52,7 +52,7 @@ if TEST_WITH_WEBHOOKS:
 )
 class TestNoWebhooks:
     async def test_no_webhooks(self, bot):
-        with pytest.raises(RuntimeError, match="python-telegram-bot\[webhooks\]"):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[webhooks\]"):
             async with Updater(bot=bot, update_queue=asyncio.Queue()) as updater:
                 await updater.start_webhook()
 

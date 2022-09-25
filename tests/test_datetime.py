@@ -49,10 +49,16 @@ Because imports in pytest are intricate, we just run
 
 with the TEST_WITH_PYTZ environment variable set to False in addition to the regular test suite.
 """
-TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", False))
+TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", True))
 
 
 class TestDatetime:
+    @staticmethod
+    def localize(dt, tzinfo):
+        if TEST_WITH_PYTZ:
+            return tzinfo.localize(dt)
+        return dt.replace(tzinfo=tzinfo)
+
     def test_helpers_utc(self):
         # Here we just test, that we got the correct UTC variant
         if not TEST_WITH_PYTZ:
@@ -80,7 +86,7 @@ class TestDatetime:
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
-        datetime = timezone.localize(test_datetime)
+        datetime = self.localize(test_datetime, timezone)
         assert (
             tg_dtm.to_float_timestamp(datetime)
             == 1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()
@@ -115,7 +121,10 @@ class TestDatetime:
         ref_datetime = dtm.datetime(1970, 1, 1, 12)
         utc_offset = timezone.utcoffset(ref_datetime)
         ref_t, time_of_day = tg_dtm._datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
-        aware_time_of_day = timezone.localize(ref_datetime).timetz()
+        aware_time_of_day = self.localize(ref_datetime, timezone).timetz()
+        print()
+        print(ref_datetime)
+        print(aware_time_of_day)
 
         # first test that naive time is assumed to be utc:
         assert tg_dtm.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)
@@ -156,7 +165,7 @@ class TestDatetime:
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
-        datetime = timezone.localize(test_datetime)
+        datetime = self.localize(test_datetime, timezone)
         assert (
             tg_dtm.from_timestamp(1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
             == datetime

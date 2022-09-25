@@ -43,6 +43,7 @@ from telegram.error import (
     TimedOut,
 )
 from telegram.request._httpxrequest import HTTPXRequest
+
 from .conftest import env_var_2_bool
 
 # We only need the first fixture, but it uses the others, so pytest needs us to import them as well
@@ -72,7 +73,7 @@ async def httpx_request():
         yield rq
 
 
-TEST_WITH_SOCKS = env_var_2_bool(os.getenv("TEST_WITH_SOCKS", False))
+TEST_WITH_SOCKS = env_var_2_bool(os.getenv("TEST_WITH_SOCKS", True))
 
 
 @pytest.mark.skipif(
@@ -80,7 +81,7 @@ TEST_WITH_SOCKS = env_var_2_bool(os.getenv("TEST_WITH_SOCKS", False))
 )
 class TestNoSocks:
     async def test_init(self, bot):
-        with pytest.raises(RuntimeError, match="python-telegram-bot\[socks\]"):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[socks\]"):
             HTTPXRequest(proxy_url="socks5://foo")
 
 

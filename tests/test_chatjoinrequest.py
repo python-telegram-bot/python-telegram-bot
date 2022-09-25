@@ -21,7 +21,7 @@ import datetime
 import pytest
 
 from telegram import Bot, Chat, ChatInviteLink, ChatJoinRequest, User
-from telegram._utils.datetime import to_timestamp, UTC
+from telegram._utils.datetime import UTC, to_timestamp
 from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 

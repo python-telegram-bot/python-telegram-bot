@@ -34,7 +34,7 @@ from telegram import _bot as bot
 from telegram._passport import credentials as credentials
 from tests.conftest import env_var_2_bool
 
-TEST_WITH_PASSPORT = env_var_2_bool(os.getenv("TEST_WITH_PASSPORT", False))
+TEST_WITH_PASSPORT = env_var_2_bool(os.getenv("TEST_WITH_PASSPORT", True))
 
 
 @pytest.mark.skipif(
