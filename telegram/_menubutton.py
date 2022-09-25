@@ -77,7 +77,7 @@ class MenuButton(TelegramObject):
         """
         data = cls._parse_data(data)
 
-        if not data:
+        if data is None:
             return None
 
         _class_mapping: Dict[str, Type["MenuButton"]] = {
