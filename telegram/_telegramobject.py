@@ -28,7 +28,7 @@ from telegram._utils.warnings import warn
 if TYPE_CHECKING:
     from telegram import Bot
 
-TO_co = TypeVar("TO_co", bound="TelegramObject", covariant=True)
+Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
 
 
 class TelegramObject:
@@ -118,7 +118,7 @@ class TelegramObject:
             setattr(self, key, val)
         self._apply_api_kwargs()
 
-    def __deepcopy__(self: TO_co, memodict: dict) -> TO_co:
+    def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
         """This method deepcopies the object and sets the bot on the newly created copy."""
         bot = self._bot  # Save bot so we can set it after copying
         self.set_bot(None)  # set to None so it is not deepcopied
@@ -192,7 +192,7 @@ class TelegramObject:
         return None if data is None else data.copy()
 
     @classmethod
-    def de_json(cls: Type[TO_co], data: Optional[JSONDict], bot: "Bot") -> Optional[TO_co]:
+    def de_json(cls: Type[Tele_co], data: Optional[JSONDict], bot: "Bot") -> Optional[Tele_co]:
         """Converts JSON data to a Telegram object.
 
         Args:
@@ -207,8 +207,8 @@ class TelegramObject:
 
     @classmethod
     def _de_json(
-        cls: Type[TO_co], data: Optional[JSONDict], bot: "Bot", api_kwargs: JSONDict = None
-    ) -> Optional[TO_co]:
+        cls: Type[Tele_co], data: Optional[JSONDict], bot: "Bot", api_kwargs: JSONDict = None
+    ) -> Optional[Tele_co]:
         if cls.__INIT_PARAMS is None:
             signature = inspect.signature(cls)
             cls.__INIT_PARAMS = set(signature.parameters.keys())
@@ -238,8 +238,8 @@ class TelegramObject:
 
     @classmethod
     def de_list(
-        cls: Type[TO_co], data: Optional[List[JSONDict]], bot: "Bot"
-    ) -> List[Optional[TO_co]]:
+        cls: Type[Tele_co], data: Optional[List[JSONDict]], bot: "Bot"
+    ) -> List[Optional[Tele_co]]:
         """Converts JSON data to a list of Telegram objects.
 
         Args:

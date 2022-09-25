@@ -162,6 +162,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         private_key_password: bytes = None,
         defaults: "Defaults" = None,
         arbitrary_callback_data: Union[bool, int] = False,
+        local_mode: bool = False,
     ):
         ...
 
@@ -177,6 +178,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         private_key_password: bytes = None,
         defaults: "Defaults" = None,
         arbitrary_callback_data: Union[bool, int] = False,
+        local_mode: bool = False,
         rate_limiter: "BaseRateLimiter[RLARGS]" = None,
     ):
         ...
@@ -192,6 +194,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         private_key_password: bytes = None,
         defaults: "Defaults" = None,
         arbitrary_callback_data: Union[bool, int] = False,
+        local_mode: bool = False,
         rate_limiter: "BaseRateLimiter" = None,
     ):
         super().__init__(
@@ -202,6 +205,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             get_updates_request=get_updates_request,
             private_key=private_key,
             private_key_password=private_key_password,
+            local_mode=local_mode,
         )
         self._defaults = defaults
         self._rate_limiter = rate_limiter
