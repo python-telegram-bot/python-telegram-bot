@@ -116,6 +116,10 @@ class TelegramObject:
         This method is used for unpickling. The data, which is in the form a dictionary, is
         converted back into a class. Should be modified in place.
         """
+        # Make sure that we have a `_bot` attribute. This is necessary, since __getstate__ omits
+        # this as Bots are not pickable.
+        setattr(self, "_bot", None)
+
         for key, val in state.items():
             setattr(self, key, val)
         self._apply_api_kwargs()
@@ -182,7 +186,7 @@ class TelegramObject:
         if recursive and data.get("from_user"):
             data["from"] = data.pop("from_user", None)
         if remove_bot:
-            data["_bot"] = None
+            data.pop("_bot", None)
         return data
 
     @staticmethod
