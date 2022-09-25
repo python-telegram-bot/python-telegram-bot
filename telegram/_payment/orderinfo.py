@@ -80,4 +80,4 @@ class OrderInfo(TelegramObject):
 
         data["shipping_address"] = ShippingAddress.de_json(data.get("shipping_address"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

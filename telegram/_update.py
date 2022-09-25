@@ -423,4 +423,4 @@ class Update(TelegramObject):
         data["chat_member"] = ChatMemberUpdated.de_json(data.get("chat_member"), bot)
         data["chat_join_request"] = ChatJoinRequest.de_json(data.get("chat_join_request"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

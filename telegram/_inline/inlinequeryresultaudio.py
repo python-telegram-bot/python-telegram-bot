@@ -37,6 +37,9 @@ class InlineQueryResultAudio(InlineQueryResult):
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the audio.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         audio_url (:obj:`str`): A valid URL for the audio file.

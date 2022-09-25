@@ -124,7 +124,7 @@ class VideoChatParticipantsInvited(TelegramObject):
             return None
 
         data["users"] = User.de_list(data.get("users", []), bot)
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -178,9 +178,7 @@ class VideoChatScheduled(TelegramObject):
 
         data["start_date"] = from_timestamp(data["start_date"])
 
-        obj = cls(**data)
-        obj.set_bot(bot)
-        return obj
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

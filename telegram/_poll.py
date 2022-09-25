@@ -112,7 +112,7 @@ class PollAnswer(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
 
 class Poll(TelegramObject):
@@ -234,7 +234,7 @@ class Poll(TelegramObject):
         data["explanation_entities"] = MessageEntity.de_list(data.get("explanation_entities"), bot)
         data["close_date"] = from_timestamp(data.get("close_date"))
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

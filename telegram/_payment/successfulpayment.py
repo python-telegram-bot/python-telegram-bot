@@ -107,4 +107,4 @@ class SuccessfulPayment(TelegramObject):
 
         data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

@@ -218,7 +218,7 @@ class InlineKeyboardButton(TelegramObject):
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
         data["callback_game"] = CallbackGame.de_json(data.get("callback_game"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def update_callback_data(self, callback_data: Union[str, object]) -> None:
         """

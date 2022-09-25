@@ -118,7 +118,8 @@ class ChatMember(TelegramObject):
             return _class_mapping[data["status"]].de_json(data=data, bot=bot)
 
         data["user"] = User.de_json(data.get("user"), bot)
-        data["until_date"] = from_timestamp(data.get("until_date", None))
+        if "until_date" in data:
+            data["until_date"] = from_timestamp(data["until_date"])
 
         return super().de_json(data=data, bot=bot)
 

@@ -118,4 +118,4 @@ class KeyboardButton(TelegramObject):
         data["request_poll"] = KeyboardButtonPollType.de_json(data.get("request_poll"), bot)
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

@@ -61,6 +61,8 @@ class TelegramObject:
 
     __slots__ = ("_id_attrs", "_bot", "api_kwargs")
 
+    # Used to cache the names of the parameters of the __init__ method of the class
+    # Must be a private attribute to avoid name clashes between subclasses
     __INIT_PARAMS: Optional[Set[str]] = None
 
     def __init__(self, api_kwargs: JSONDict = None) -> None:
@@ -209,29 +211,28 @@ class TelegramObject:
     def _de_json(
         cls: Type[Tele_co], data: Optional[JSONDict], bot: "Bot", api_kwargs: JSONDict = None
     ) -> Optional[Tele_co]:
-        if cls.__INIT_PARAMS is None:
-            signature = inspect.signature(cls)
-            cls.__INIT_PARAMS = set(signature.parameters.keys())
-
         if data is None:
             return None
-
-        api_kwargs = api_kwargs or {}
 
         # try-except is significantly faster in case we already have a correct argument set
         try:
             obj = cls(**data, api_kwargs=api_kwargs)
         except TypeError as exc:
-            if "__init__() got an unexpected keyword argument" in str(exc):
-                kwargs: JSONDict = {}
-                for key, value in data.items():
-                    if key in cls.__INIT_PARAMS:  # pylint: disable=unsupported-membership-test
-                        kwargs[key] = value
-                    else:
-                        api_kwargs[key] = value
-                obj = cls(api_kwargs=api_kwargs, **kwargs)
-            else:
+            if "__init__() got an unexpected keyword argument" not in str(exc):
                 raise exc
+
+            if cls.__INIT_PARAMS is None:
+                signature = inspect.signature(cls)
+                cls.__INIT_PARAMS = set(signature.parameters.keys())
+
+            api_kwargs = api_kwargs or {}
+            existing_kwargs: JSONDict = {}
+            for key, value in data.items():
+                if key in cls.__INIT_PARAMS:  # pylint: disable=unsupported-membership-test
+                    existing_kwargs[key] = value
+                else:
+                    api_kwargs[key] = value
+            obj = cls(api_kwargs=api_kwargs, **existing_kwargs)
 
         obj.set_bot(bot=bot)
         return obj

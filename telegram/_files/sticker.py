@@ -108,7 +108,7 @@ class Sticker(_BaseThumbedMedium):
             premium animation for the sticker.
 
             .. versionadded:: 20.0
-        custom_emoji (:obj:`str`): Optional. For custom emoji stickers, unique identifier of the
+        custom_emoji_id (:obj:`str`): Optional. For custom emoji stickers, unique identifier of the
             custom emoji.
 
             .. versionadded:: 20.0
@@ -361,4 +361,4 @@ class MaskPosition(TelegramObject):
         if data is None:
             return None
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

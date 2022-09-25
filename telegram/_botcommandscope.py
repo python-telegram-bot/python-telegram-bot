@@ -143,6 +143,7 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
 
     .. versionchanged:: 20.0
         |removedkwargs|
+
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_PRIVATE_CHATS`.
     """

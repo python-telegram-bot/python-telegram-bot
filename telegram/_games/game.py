@@ -117,7 +117,7 @@ class Game(TelegramObject):
         data["text_entities"] = MessageEntity.de_list(data.get("text_entities"), bot)
         data["animation"] = Animation.de_json(data.get("animation"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

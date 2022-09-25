@@ -37,6 +37,9 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
     message will be sent by the user. Alternatively, you can use :attr:`input_message_content` to
     send a message with the specified content instead of the voice message.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.

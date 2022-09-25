@@ -38,6 +38,9 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
     :attr:`input_message_content` to send a message with the specified content instead
     of the video.
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         video_file_id (:obj:`str`): A valid file identifier for the video file.

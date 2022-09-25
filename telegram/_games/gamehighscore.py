@@ -66,4 +66,4 @@ class GameHighScore(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

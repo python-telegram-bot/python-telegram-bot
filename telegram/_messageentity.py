@@ -114,7 +114,7 @@ class MessageEntity(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     MENTION: ClassVar[str] = constants.MessageEntityType.MENTION
     """:const:`telegram.constants.MessageEntityType.MENTION`"""

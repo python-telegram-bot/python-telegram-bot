@@ -70,7 +70,7 @@ class UserProfilePhotos(TelegramObject):
 
         data["photos"] = [PhotoSize.de_list(photo, bot) for photo in data["photos"]]
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

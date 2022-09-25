@@ -109,4 +109,4 @@ class Venue(TelegramObject):
 
         data["location"] = Location.de_json(data.get("location"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

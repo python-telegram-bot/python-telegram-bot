@@ -34,6 +34,9 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     .. seealso:: `Inline Example <examples.inlinebot.html>`_
 
+    .. versionchanged:: 20.0
+        |removedbotandkwargs|
+
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
         title (:obj:`str`): Title of the result.
