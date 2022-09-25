@@ -26,6 +26,7 @@ import pytest
 import pytz
 
 from telegram import CallbackQuery, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Message, User
+from telegram.ext import ExtBot
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
 from tests.conftest import env_var_2_bool
 
@@ -45,6 +46,13 @@ class TestNoCallbackDataCache:
     def test_init(self, bot):
         with pytest.raises(RuntimeError, match=r"python-telegram-bot\[callback-data\]"):
             CallbackDataCache(bot=bot)
+
+    def test_bot_init(self):
+        bot = ExtBot(token="TOKEN")
+        assert bot.callback_data_cache is None
+
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[callback-data\]"):
+            ExtBot(token="TOKEN", arbitrary_callback_data=True)
 
 
 class TestInvalidCallbackData:
@@ -67,6 +75,9 @@ class TestKeyboardData:
         ), "duplicate slot"
 
 
+@pytest.mark.skipif(
+    not TEST_CALLBACK_DATA_CACHE, reason="Only relevant if the optional dependency is installed"
+)
 class TestCallbackDataCache:
     def test_slot_behaviour(self, callback_data_cache, mro_slots):
         for attr in callback_data_cache.__slots__:

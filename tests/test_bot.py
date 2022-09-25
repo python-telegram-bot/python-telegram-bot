@@ -169,6 +169,9 @@ def bot_methods(ext_bot=True):
 class TestBot:
     """
     Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
+
+    Behavior for init of ExtBot with missing optional dependency cachetools (for CallbackDataCache)
+    is tested in `test_callbackdatacache`
     """
 
     test_flag = None
