@@ -115,7 +115,7 @@ class ChatMember(TelegramObject):
         }
 
         if cls is ChatMember and data.get("status") in _class_mapping:
-            return _class_mapping[data["status"]].de_json(data=data, bot=bot)
+            return _class_mapping[data.pop("status")].de_json(data=data, bot=bot)
 
         data["user"] = User.de_json(data.get("user"), bot)
         if "until_date" in data:

@@ -63,7 +63,11 @@ class TelegramObject:
 
     # Used to cache the names of the parameters of the __init__ method of the class
     # Must be a private attribute to avoid name clashes between subclasses
-    __INIT_PARAMS: Optional[Set[str]] = None
+    __INIT_PARAMS: Set[str] = set()
+    # Used to check if __INIT_PARAMS has been set for the current class. Unfortunately, we can't
+    # just check if `__INIT_PARAMS is None`, since subclasses use the parent class' __INIT_PARAMS
+    # unless it's overridden
+    __INIT_PARAMS_CHECK: Optional[Type["TelegramObject"]] = None
 
     def __init__(self, api_kwargs: JSONDict = None) -> None:
         self._id_attrs: Tuple[object, ...] = ()
@@ -225,17 +229,16 @@ class TelegramObject:
             if "__init__() got an unexpected keyword argument" not in str(exc):
                 raise exc
 
-            if cls.__INIT_PARAMS is None:
+            if cls.__INIT_PARAMS_CHECK is not cls:
                 signature = inspect.signature(cls)
                 cls.__INIT_PARAMS = set(signature.parameters.keys())
+                cls.__INIT_PARAMS_CHECK = cls
 
             api_kwargs = api_kwargs or {}
             existing_kwargs: JSONDict = {}
             for key, value in data.items():
-                if key in cls.__INIT_PARAMS:  # pylint: disable=unsupported-membership-test
-                    existing_kwargs[key] = value
-                else:
-                    api_kwargs[key] = value
+                (existing_kwargs if key in cls.__INIT_PARAMS else api_kwargs)[key] = value
+
             obj = cls(api_kwargs=api_kwargs, **existing_kwargs)
 
         obj.set_bot(bot=bot)
