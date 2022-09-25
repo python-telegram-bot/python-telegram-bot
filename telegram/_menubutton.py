@@ -75,8 +75,6 @@ class MenuButton(TelegramObject):
             The Telegram object.
 
         """
-        data = cls._parse_data(data)
-
         if not data:
             return None
 

@@ -59,6 +59,20 @@ class TestTelegramObject:
         with pytest.raises(TypeError):
             telegram_object.to_json()
 
+    def test_de_json_api_kwargs(self, bot):
+        to = TelegramObject.de_json(data={"foo": "bar"}, bot=bot)
+        assert to.api_kwargs == {"foo": "bar"}
+        assert to.get_bot() is bot
+
+    def test_de_json_arbitrary_exceptions(self, bot):
+        class SubClass(TelegramObject):
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
+                raise RuntimeError("This is a test")
+
+        with pytest.raises(RuntimeError, match="This is a test"):
+            SubClass.de_json({}, bot)
+
     def test_to_dict_private_attribute(self):
         class TelegramObjectSubclass(TelegramObject):
             __slots__ = ("a", "_b")  # Added slots so that the attrs are converted to dict

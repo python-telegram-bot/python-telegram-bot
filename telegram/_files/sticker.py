@@ -352,13 +352,3 @@ class MaskPosition(TelegramObject):
         self.scale = scale
 
         self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
-
-    @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaskPosition"]:
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if data is None:
-            return None
-
-        return super().de_json(data=data, bot=bot)
