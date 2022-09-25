@@ -43,6 +43,7 @@ class TestChatLocation:
             "address": self.address,
         }
         chat_location = ChatLocation.de_json(json_dict, bot)
+        assert chat_location.api_kwargs == {}
 
         assert chat_location.location == self.location
         assert chat_location.address == self.address

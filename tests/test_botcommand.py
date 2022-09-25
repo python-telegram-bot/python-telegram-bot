@@ -39,6 +39,7 @@ class TestBotCommand:
     def test_de_json(self, bot):
         json_dict = {"command": self.command, "description": self.description}
         bot_command = BotCommand.de_json(json_dict, bot)
+        assert bot_command.api_kwargs == {}
 
         assert bot_command.command == self.command
         assert bot_command.description == self.description

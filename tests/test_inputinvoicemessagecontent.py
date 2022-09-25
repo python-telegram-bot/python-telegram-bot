@@ -210,6 +210,7 @@ class TestInputInvoiceMessageContent:
         }
 
         input_invoice_message_content = InputInvoiceMessageContent.de_json(json_dict, bot=bot)
+        assert input_invoice_message_content.api_kwargs == {}
 
         assert input_invoice_message_content.title == self.title
         assert input_invoice_message_content.description == self.description

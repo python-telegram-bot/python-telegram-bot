@@ -228,6 +228,7 @@ class TestSticker:
             "custom_emoji_id": self.custom_emoji_id,
         }
         json_sticker = Sticker.de_json(json_dict, bot)
+        assert json_sticker.api_kwargs == {}
 
         assert json_sticker.file_id == self.sticker_file_id
         assert json_sticker.file_unique_id == self.sticker_file_unique_id
@@ -873,6 +874,7 @@ class TestMaskPosition:
             "scale": self.scale,
         }
         mask_position = MaskPosition.de_json(json_dict, bot)
+        assert mask_position.api_kwargs == {}
 
         assert mask_position.point == self.point
         assert mask_position.x_shift == self.x_shift

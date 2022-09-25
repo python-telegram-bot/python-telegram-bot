@@ -63,6 +63,7 @@ class TestInvoice:
             },
             bot,
         )
+        assert invoice_json.api_kwargs == {}
 
         assert invoice_json.title == self.title
         assert invoice_json.description == self.description

@@ -49,6 +49,7 @@ class TestVideoChatStarted:
 
     def test_de_json(self):
         video_chat_started = VideoChatStarted.de_json({}, None)
+        assert video_chat_started.api_kwargs == {}
         assert isinstance(video_chat_started, VideoChatStarted)
 
     def test_to_dict(self):
@@ -69,6 +70,7 @@ class TestVideoChatEnded:
     def test_de_json(self):
         json_dict = {"duration": self.duration}
         video_chat_ended = VideoChatEnded.de_json(json_dict, None)
+        assert video_chat_ended.api_kwargs == {}
 
         assert video_chat_ended.duration == self.duration
 
@@ -105,6 +107,7 @@ class TestVideoChatParticipantsInvited:
     def test_de_json(self, user1, user2, bot):
         json_data = {"users": [user1.to_dict(), user2.to_dict()]}
         video_chat_participants = VideoChatParticipantsInvited.de_json(json_data, bot)
+        assert video_chat_participants.api_kwargs == {}
 
         assert isinstance(video_chat_participants.users, list)
         assert video_chat_participants.users[0] == user1
@@ -164,6 +167,7 @@ class TestVideoChatScheduled:
 
         json_dict = {"start_date": to_timestamp(self.start_date)}
         video_chat_scheduled = VideoChatScheduled.de_json(json_dict, bot)
+        assert video_chat_scheduled.api_kwargs == {}
 
         assert abs(video_chat_scheduled.start_date - self.start_date) < dtm.timedelta(seconds=1)
 

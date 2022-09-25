@@ -325,6 +325,7 @@ class TestMessage:
 
     def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
+        assert new.api_kwargs == {}
         assert new.to_dict() == message_params.to_dict()
 
         # Checking that none of the attributes are dicts is a best effort approach to ensure that

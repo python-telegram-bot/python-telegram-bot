@@ -49,6 +49,7 @@ class TestWebAppData:
     def test_de_json(self, bot):
         json_dict = {"data": self.data, "button_text": self.button_text}
         web_app_data = WebAppData.de_json(json_dict, bot)
+        assert web_app_data.api_kwargs == {}
 
         assert web_app_data.data == self.data
         assert web_app_data.button_text == self.button_text

@@ -79,6 +79,7 @@ class TestUser:
 
     def test_de_json(self, json_dict, bot):
         user = User.de_json(json_dict, bot)
+        assert user.api_kwargs == {}
 
         assert user.id == self.id_
         assert user.is_bot == self.is_bot
@@ -96,6 +97,7 @@ class TestUser:
         del json_dict["username"]
 
         user = User.de_json(json_dict, bot)
+        assert user.api_kwargs == {}
 
         assert user.id == self.id_
         assert user.is_bot == self.is_bot
@@ -114,6 +116,7 @@ class TestUser:
         del json_dict["last_name"]
 
         user = User.de_json(json_dict, bot)
+        assert user.api_kwargs == {}
 
         assert user.id == self.id_
         assert user.is_bot == self.is_bot

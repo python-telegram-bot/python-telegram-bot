@@ -272,6 +272,7 @@ class TestVoice:
             "file_size": self.file_size,
         }
         json_voice = Voice.de_json(json_dict, bot)
+        assert json_voice.api_kwargs == {}
 
         assert json_voice.file_id == self.voice_file_id
         assert json_voice.file_unique_id == self.voice_file_unique_id

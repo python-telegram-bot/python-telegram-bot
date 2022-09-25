@@ -49,6 +49,7 @@ class TestContact:
     def test_de_json_required(self, bot):
         json_dict = {"phone_number": self.phone_number, "first_name": self.first_name}
         contact = Contact.de_json(json_dict, bot)
+        assert contact.api_kwargs == {}
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name
@@ -61,6 +62,7 @@ class TestContact:
             "user_id": self.user_id,
         }
         contact = Contact.de_json(json_dict, bot)
+        assert contact.api_kwargs == {}
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name

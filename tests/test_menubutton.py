@@ -108,6 +108,7 @@ class TestMenuButton:
 
         json_dict = {"type": type_, "text": self.text, "web_app": self.web_app.to_dict()}
         menu_button = MenuButton.de_json(json_dict, bot)
+        assert set(menu_button.api_kwargs.keys()) == {"text", "web_app"} - set(cls.__slots__)
 
         assert isinstance(menu_button, MenuButton)
         assert type(menu_button) is cls
@@ -120,6 +121,7 @@ class TestMenuButton:
     def test_de_json_invalid_type(self, bot):
         json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
         menu_button = MenuButton.de_json(json_dict, bot)
+        assert menu_button.api_kwargs == {"text": self.text, "web_app": self.web_app.to_dict()}
 
         assert type(menu_button) is MenuButton
         assert menu_button.type == "invalid"

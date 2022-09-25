@@ -74,6 +74,7 @@ class TestFile:
             "file_size": self.file_size,
         }
         new_file = File.de_json(json_dict, bot)
+        assert new_file.api_kwargs == {}
 
         assert new_file.file_id == self.file_id
         assert new_file.file_unique_id == self.file_unique_id
