@@ -80,6 +80,9 @@ class MenuButton(TelegramObject):
         if data is None:
             return None
 
+        if not data and cls is MenuButton:
+            return None
+
         _class_mapping: Dict[str, Type["MenuButton"]] = {
             cls.COMMANDS: MenuButtonCommands,
             cls.WEB_APP: MenuButtonWebApp,
