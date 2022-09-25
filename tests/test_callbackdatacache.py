@@ -23,9 +23,9 @@ from datetime import datetime
 from uuid import uuid4
 
 import pytest
-import pytz
 
 from telegram import CallbackQuery, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Message, User
+from telegram._utils.datetime import UTC
 from telegram.ext import ExtBot
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
 from tests.conftest import env_var_2_bool
@@ -36,11 +36,12 @@ def callback_data_cache(bot):
     return CallbackDataCache(bot)
 
 
-TEST_CALLBACK_DATA_CACHE = env_var_2_bool(os.getenv("TEST_CALLBACK_DATA_CACHE", True))
+TEST_WITH_CALLBACK_DATA_CACHE = env_var_2_bool(os.getenv("TEST_WITH_CALLBACK_DATA_CACHE", False))
 
 
 @pytest.mark.skipif(
-    TEST_CALLBACK_DATA_CACHE, reason="Only relevant if the optional dependency is not installed"
+    TEST_WITH_CALLBACK_DATA_CACHE,
+    reason="Only relevant if the optional dependency is not installed",
 )
 class TestNoCallbackDataCache:
     def test_init(self, bot):
@@ -76,7 +77,8 @@ class TestKeyboardData:
 
 
 @pytest.mark.skipif(
-    not TEST_CALLBACK_DATA_CACHE, reason="Only relevant if the optional dependency is installed"
+    not TEST_WITH_CALLBACK_DATA_CACHE,
+    reason="Only relevant if the optional dependency is installed",
 )
 class TestCallbackDataCache:
     def test_slot_behaviour(self, callback_data_cache, mro_slots):
@@ -374,7 +376,7 @@ class TestCallbackDataCache:
         if time_method == "time":
             cutoff = time.time()
         elif time_method == "datetime":
-            cutoff = datetime.now(pytz.utc)
+            cutoff = datetime.now(UTC)
         else:
             cutoff = datetime.now(tz_bot.defaults.tzinfo).replace(tzinfo=None)
             callback_data_cache.bot = tz_bot

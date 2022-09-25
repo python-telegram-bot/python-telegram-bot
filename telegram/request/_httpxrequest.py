@@ -111,7 +111,16 @@ class HTTPXRequest(BaseRequest):
             limits=limits,
         )
 
-        self._client = self._build_client()
+        try:
+            self._client = self._build_client()
+        except ImportError as exc:
+            if "httpx[socks]" not in str(exc):
+                raise exc
+
+            raise RuntimeError(
+                "To use Socks5 proxies, PTB must be installed via `pip install "
+                "python-telegram-bot[socks]`."
+            ) from exc
 
     def _build_client(self) -> httpx.AsyncClient:
         return httpx.AsyncClient(**self._client_kwargs)  # type: ignore[arg-type]

@@ -17,9 +17,12 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
-from typing import Any, Dict, NoReturn, Optional
+from typing import Any, Dict, NoReturn, Optional, TYPE_CHECKING
 
-import pytz
+from telegram._utils.datetime import UTC
+
+if TYPE_CHECKING:
+    import pytz
 
 
 class Defaults:
@@ -74,7 +77,7 @@ class Defaults:
         disable_notification: bool = None,
         disable_web_page_preview: bool = None,
         quote: bool = None,
-        tzinfo: pytz.BaseTzInfo = pytz.utc,
+        tzinfo: "pytz.BaseTzInfo" = UTC,
         block: bool = True,
         allow_sending_without_reply: bool = None,
         protect_content: bool = None,
@@ -182,7 +185,7 @@ class Defaults:
         raise AttributeError("You can not assign a new value to quote after initialization.")
 
     @property
-    def tzinfo(self) -> pytz.BaseTzInfo:
+    def tzinfo(self) -> "pytz.BaseTzInfo":
         """:obj:`tzinfo`: A timezone to be used for all date(time) objects appearing
         throughout PTB.
         """

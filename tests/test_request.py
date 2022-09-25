@@ -20,6 +20,7 @@
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
 import json
+import os
 from collections import defaultdict
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -42,6 +43,7 @@ from telegram.error import (
     TimedOut,
 )
 from telegram.request._httpxrequest import HTTPXRequest
+from .conftest import env_var_2_bool
 
 # We only need the first fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
@@ -68,6 +70,18 @@ def mocker_factory(
 async def httpx_request():
     async with HTTPXRequest() as rq:
         yield rq
+
+
+TEST_WITH_SOCKS = env_var_2_bool(os.getenv("TEST_WITH_SOCKS", False))
+
+
+@pytest.mark.skipif(
+    TEST_WITH_SOCKS, reason="Only relevant if the optional dependency is not installed"
+)
+class TestNoSocks:
+    async def test_init(self, bot):
+        with pytest.raises(RuntimeError, match="python-telegram-bot\[socks\]"):
+            HTTPXRequest(proxy_url="socks5://foo")
 
 
 class TestRequest:
