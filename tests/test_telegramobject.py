@@ -68,9 +68,9 @@ class TestTelegramObject:
         class SubClass(TelegramObject):
             def __init__(self, **kwargs):
                 super().__init__(**kwargs)
-                raise RuntimeError("This is a test")
+                raise TypeError("This is a test")
 
-        with pytest.raises(RuntimeError, match="This is a test"):
+        with pytest.raises(TypeError, match="This is a test"):
             SubClass.de_json({}, bot)
 
     def test_to_dict_private_attribute(self):
