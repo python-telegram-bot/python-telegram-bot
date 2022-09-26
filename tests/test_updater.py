@@ -41,14 +41,14 @@ from tests.conftest import (
     send_webhook_message,
 )
 
-TEST_WITH_WEBHOOKS = env_var_2_bool(os.getenv("TEST_WITH_WEBHOOKS", True))
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
-if TEST_WITH_WEBHOOKS:
+if TEST_WITH_OPT_DEPS:
     from telegram.ext._utils.webhookhandler import WebhookServer
 
 
 @pytest.mark.skipif(
-    TEST_WITH_WEBHOOKS, reason="Only relevant if the optional dependency is not installed"
+    TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
 class TestNoWebhooks:
     async def test_no_webhooks(self, bot):
@@ -58,7 +58,7 @@ class TestNoWebhooks:
 
 
 @pytest.mark.skipif(
-    not TEST_WITH_WEBHOOKS,
+    not TEST_WITH_OPT_DEPS,
     reason="Only relevant if the optional dependency is installed",
 )
 class TestUpdater:

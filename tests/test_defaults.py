@@ -27,7 +27,7 @@ from telegram import User
 from telegram.ext import Defaults
 from tests.conftest import env_var_2_bool
 
-TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", True))
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 class TestDefault:
@@ -39,7 +39,7 @@ class TestDefault:
 
     def test_utc(self):
         defaults = Defaults()
-        if not TEST_WITH_PYTZ:
+        if not TEST_WITH_OPT_DEPS:
             assert defaults.tzinfo is dtm.timezone.utc
         else:
             assert defaults.tzinfo is not dtm.timezone.utc

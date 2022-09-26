@@ -47,21 +47,21 @@ Because imports in pytest are intricate, we just run
 
     pytest -k test_datetime.py
 
-with the TEST_WITH_PYTZ environment variable set to False in addition to the regular test suite.
+with the TEST_WITH_OPT_DEPS=False environment variable in addition to the regular test suite.
 """
-TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", True))
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 class TestDatetime:
     @staticmethod
     def localize(dt, tzinfo):
-        if TEST_WITH_PYTZ:
+        if TEST_WITH_OPT_DEPS:
             return tzinfo.localize(dt)
         return dt.replace(tzinfo=tzinfo)
 
     def test_helpers_utc(self):
         # Here we just test, that we got the correct UTC variant
-        if not TEST_WITH_PYTZ:
+        if not TEST_WITH_OPT_DEPS:
             assert tg_dtm.UTC is tg_dtm.DTM_UTC
         else:
             assert tg_dtm.UTC is not tg_dtm.DTM_UTC

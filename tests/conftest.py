@@ -84,9 +84,8 @@ def env_var_2_bool(env_var: object) -> bool:
     return env_var.lower().strip() == "true"
 
 
-TEST_WITH_PASSPORT = env_var_2_bool(os.getenv("TEST_WITH_PASSPORT", True))
-TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", True))
-if TEST_WITH_PYTZ:
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+if TEST_WITH_OPT_DEPS:
     import pytz
 
 
@@ -271,7 +270,7 @@ def make_bot(bot_info=None, **kwargs):
     kwargs.pop("token", None)
     _bot = DictExtBot(
         token=token,
-        private_key=private_key if TEST_WITH_PASSPORT else None,
+        private_key=private_key if TEST_WITH_OPT_DEPS else None,
         request=TestHttpxRequest(8),
         get_updates_request=TestHttpxRequest(1),
         **kwargs,
@@ -409,7 +408,7 @@ class BasicTimezone(datetime.tzinfo):
 
 @pytest.fixture(params=["Europe/Berlin", "Asia/Singapore", "UTC"])
 def tzinfo(request):
-    if TEST_WITH_PYTZ:
+    if TEST_WITH_OPT_DEPS:
         return pytz.timezone(request.param)
     else:
         hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]

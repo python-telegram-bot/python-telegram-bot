@@ -36,11 +36,11 @@ def callback_data_cache(bot):
     return CallbackDataCache(bot)
 
 
-TEST_WITH_CALLBACK_DATA_CACHE = env_var_2_bool(os.getenv("TEST_WITH_CALLBACK_DATA_CACHE", True))
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 @pytest.mark.skipif(
-    TEST_WITH_CALLBACK_DATA_CACHE,
+    TEST_WITH_OPT_DEPS,
     reason="Only relevant if the optional dependency is not installed",
 )
 class TestNoCallbackDataCache:
@@ -77,7 +77,7 @@ class TestKeyboardData:
 
 
 @pytest.mark.skipif(
-    not TEST_WITH_CALLBACK_DATA_CACHE,
+    not TEST_WITH_OPT_DEPS,
     reason="Only relevant if the optional dependency is installed",
 )
 class TestCallbackDataCache:

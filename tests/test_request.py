@@ -73,11 +73,11 @@ async def httpx_request():
         yield rq
 
 
-TEST_WITH_SOCKS = env_var_2_bool(os.getenv("TEST_WITH_SOCKS", True))
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 @pytest.mark.skipif(
-    TEST_WITH_SOCKS, reason="Only relevant if the optional dependency is not installed"
+    TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
 class TestNoSocks:
     async def test_init(self, bot):

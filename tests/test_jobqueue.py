@@ -30,10 +30,9 @@ from flaky import flaky
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
 from tests.conftest import env_var_2_bool
 
-TEST_WITH_JOB_QUEUE = env_var_2_bool(os.getenv("TEST_WITH_JOB_QUEUE", True))
-TEST_WITH_PYTZ = env_var_2_bool(os.getenv("TEST_WITH_PYTZ", True))
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
-if TEST_WITH_PYTZ:
+if TEST_WITH_OPT_DEPS:
     import pytz
 
     UTC = pytz.utc
@@ -57,7 +56,7 @@ async def job_queue(bot, app):
 
 
 @pytest.mark.skipif(
-    TEST_WITH_JOB_QUEUE, reason="Only relevant if the optional dependency is not installed"
+    TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
 class TestNoJobQueue:
     def test_init_job_queue(self):
@@ -70,7 +69,7 @@ class TestNoJobQueue:
 
 
 @pytest.mark.skipif(
-    not TEST_WITH_JOB_QUEUE, reason="Only relevant if the optional dependency is installed"
+    not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
 @pytest.mark.skipif(
     os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Windows", "Darwin"],

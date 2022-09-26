@@ -30,8 +30,8 @@ import pytest
 try:
     import pytz
 except ImportError:
-    # This just happens when we test with TEST_WITH_PYTZ = False while pytest tries to setup the
-    # whole test suite. This file is never run in a setting where pytz is not installed.
+    # This just happens when we test with TEST_WITH_OPT_DEPS = False while pytest tries to setup
+    # the whole test suite. This file is never run in a setting where pytz is not installed.
     pass
 
 

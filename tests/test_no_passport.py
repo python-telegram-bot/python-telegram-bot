@@ -24,7 +24,7 @@ Currently this only means that cryptography is not installed.
 Because imports in pytest are intricate, we just run
     pytest -k test_no_passport.py
 
-with the TEST_WITH_PASSPORT environment variable set to False in addition to the regular test suite
+with the TEST_WITH_OPT_DEPS environment variable set to False in addition to the regular test suite
 """
 import os
 
@@ -34,11 +34,11 @@ from telegram import _bot as bot
 from telegram._passport import credentials as credentials
 from tests.conftest import env_var_2_bool
 
-TEST_WITH_PASSPORT = env_var_2_bool(os.getenv("TEST_WITH_PASSPORT", True))
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 @pytest.mark.skipif(
-    TEST_WITH_PASSPORT, reason="Only relevant if the optional dependency is not installed"
+    TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
 class TestNoPassport:
     def test_bot_init(self, bot_info, monkeypatch):
