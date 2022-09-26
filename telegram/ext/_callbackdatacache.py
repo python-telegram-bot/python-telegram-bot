@@ -87,8 +87,8 @@ class CallbackDataCache:
     """A custom cache for storing the callback data of a :class:`telegram.ext.ExtBot`. Internally,
     it keeps two mappings with fixed maximum size:
 
-        * One for mapping the data received in callback queries to the cached objects
-        * One for mapping the IDs of received callback queries to the cached objects
+    * One for mapping the data received in callback queries to the cached objects
+    * One for mapping the IDs of received callback queries to the cached objects
 
     The second mapping allows to manually drop data that has been cached for keyboards of messages
     sent via inline mode.
@@ -97,7 +97,7 @@ class CallbackDataCache:
     .. seealso:: :attr:`telegram.ext.ExtBot.callback_data_cache`,
         `Arbitrary callback_data <https://github.com/python-telegram-bot/
         python-telegram-bot/wiki/Arbitrary-callback_data>`_,
-        Arbitrary Callback Data Example <examples.arbitrarycallbackdatabot.html>
+        `Arbitrary Callback Data Example <examples.arbitrarycallbackdatabot.html>`_
 
     .. versionadded:: 13.6
 
