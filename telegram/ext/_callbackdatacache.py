@@ -115,7 +115,7 @@ class CallbackDataCache:
 
     .. versionadded:: 13.6
 
-    .. versionchange:: 20.0
+    .. versionchanged:: 20.0
         To use this class, PTB must be installed via
         ``pip install python-telegram-bot[callback-data]``.
 

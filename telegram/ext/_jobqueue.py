@@ -59,7 +59,7 @@ class JobQueue:
         `Job Queue <https://github.com/python-telegram-bot/
         python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
 
-    .. versionchange:: 20.0
+    .. versionchanged:: 20.0
         To use this class, PTB must be installed via
         ``pip install python-telegram-bot[job-queue]``.
 
