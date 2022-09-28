@@ -149,6 +149,9 @@ class TestChatJoinRequestHandler:
         handler = ChatJoinRequestHandler(self.callback, username=["user_b"])
         assert not handler.check_update(chat_join_request_update)
 
+        chat_join_request_update.chat_join_request.from_user.username = None
+        assert not handler.check_update(chat_join_request_update)
+
     def test_other_update_types(self, false_update):
         handler = ChatJoinRequestHandler(self.callback)
         assert not handler.check_update(false_update)
