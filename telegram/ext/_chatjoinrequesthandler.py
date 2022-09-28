@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatJoinRequestHandler class."""
 
-
 from telegram import Update
+from telegram._utils.defaultvalue import DEFAULT_TRUE
+from telegram._utils.types import RT, SCT, DVInput
 from telegram.ext._handler import BaseHandler
-from telegram.ext._utils.types import CCT
+from telegram.ext._utils.types import CCT, HandlerCallback
 
 
 class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
@@ -43,17 +44,60 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
+        chat_id (SCT[:obj:`int`], optional): Filters requests to allow only
+            those which are from a specified chat ID.
+
+            .. versionadded:: 20.0
+        username (SCT[:obj:`str`], optional): Filters requests to allow only
+            those which are from a specified username.
+
+            .. versionadded:: 20.0
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
+        _chat_ids (:frozenset(:obj:`int`), optional):
+            Which chat ID(s) to allow through.
+
+            .. versionadded:: 20.0
+        _usernames (:frozenset(:obj:`str`), optional):
+            Which username(s) to allow through.
+
+            .. versionadded:: 20.0
         block (:obj:`bool`): Determines whether the callback will run in a blocking way..
 
     """
 
-    __slots__ = ()
+    __slots__ = (
+        "_chat_ids",
+        "_usernames",
+    )
+
+    def __init__(
+        self,
+        callback: HandlerCallback[Update, CCT, RT],
+        chat_id: SCT[int] = None,
+        username: SCT[str] = None,
+        block: DVInput[bool] = DEFAULT_TRUE,
+    ):
+        super().__init__(callback, block=block)
+
+        if chat_id is not None:
+            if isinstance(chat_id, int):
+                chat_id = frozenset({chat_id})
+            else:
+                chat_id = frozenset(chat_id)
+
+        if username is not None:
+            if isinstance(username, str):
+                username = frozenset({username})
+            else:
+                username = frozenset(username)
+
+        self._chat_ids = chat_id
+        self._usernames = username
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.
@@ -65,4 +109,12 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
-        return isinstance(update, Update) and bool(update.chat_join_request)
+        if isinstance(update, Update) and update.chat_join_request:
+            chat = update.chat_join_request.chat
+            if self._chat_ids and chat.id not in self._chat_ids:
+                return False
+            from_user = update.chat_join_request.from_user
+            if self._usernames and from_user.username not in self._usernames:
+                return False
+            return True
+        return False
