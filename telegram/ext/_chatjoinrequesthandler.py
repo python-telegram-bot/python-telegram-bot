@@ -44,12 +44,12 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
 
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
-        chat_id (SCT[:obj:`int`], optional): Filters requests to allow only
-            those which are from a specified chat ID.
+        chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
+            those which are from specified chat ID(s).
 
             .. versionadded:: 20.0
-        username (SCT[:obj:`str`], optional): Filters requests to allow only
-            those which are from a specified username.
+        username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
+            those which are from specified username(s).
 
             .. versionadded:: 20.0
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
@@ -58,14 +58,6 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
-        _chat_ids (:frozenset(:obj:`int`), optional):
-            Which chat ID(s) to allow through.
-
-            .. versionadded:: 20.0
-        _usernames (:frozenset(:obj:`str`), optional):
-            Which username(s) to allow through.
-
-            .. versionadded:: 20.0
         block (:obj:`bool`): Determines whether the callback will run in a blocking way..
 
     """
