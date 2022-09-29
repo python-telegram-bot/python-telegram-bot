@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatJoinRequestHandler class."""
 
-from typing import Optional
+from typing import FrozenSet, Optional
 
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
@@ -89,7 +89,7 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
         self._usernames = self._parse_username(username)
 
     @staticmethod
-    def _parse_chat_id(chat_id: Optional[SCT[int]]) -> frozenset[int]:
+    def _parse_chat_id(chat_id: Optional[SCT[int]]) -> FrozenSet[int]:
         if chat_id is None:
             return frozenset()
         if isinstance(chat_id, int):
@@ -97,7 +97,7 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
         return frozenset(chat_id)
 
     @staticmethod
-    def _parse_username(username: Optional[SCT[str]]) -> frozenset[str]:
+    def _parse_username(username: Optional[SCT[str]]) -> FrozenSet[str]:
         if username is None:
             return frozenset()
         if isinstance(username, str):
