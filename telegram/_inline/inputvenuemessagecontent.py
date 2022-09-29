@@ -80,6 +80,7 @@ class InputVenueMessageContent(InputMessageContent):
         foursquare_type: str = None,
         google_place_id: str = None,
         google_place_type: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

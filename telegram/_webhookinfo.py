@@ -101,6 +101,7 @@ class WebhookInfo(TelegramObject):
         allowed_updates: List[str] = None,
         ip_address: str = None,
         last_synchronization_error_date: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

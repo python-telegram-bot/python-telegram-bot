@@ -49,7 +49,9 @@ class ProximityAlertTriggered(TelegramObject):
 
     __slots__ = ("traveler", "distance", "watcher")
 
-    def __init__(self, traveler: User, watcher: User, distance: int, api_kwargs: JSONDict = None):
+    def __init__(
+        self, traveler: User, watcher: User, distance: int, *, api_kwargs: JSONDict = None
+    ):
         super().__init__(api_kwargs=api_kwargs)
         self.traveler = traveler
         self.watcher = watcher

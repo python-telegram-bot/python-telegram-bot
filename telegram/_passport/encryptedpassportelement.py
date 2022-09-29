@@ -137,6 +137,7 @@ class EncryptedPassportElement(TelegramObject):
         selfie: PassportFile = None,
         translation: List[PassportFile] = None,
         credentials: "Credentials" = None,  # pylint: disable=unused-argument
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

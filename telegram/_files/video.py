@@ -72,6 +72,7 @@ class Video(_BaseThumbedMedium):
         mime_type: str = None,
         file_size: int = None,
         file_name: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(

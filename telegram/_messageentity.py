@@ -86,6 +86,7 @@ class MessageEntity(TelegramObject):
         user: User = None,
         language: str = None,
         custom_emoji_id: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

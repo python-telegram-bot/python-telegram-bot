@@ -234,6 +234,7 @@ class Update(TelegramObject):
         my_chat_member: ChatMemberUpdated = None,
         chat_member: ChatMemberUpdated = None,
         chat_join_request: ChatJoinRequest = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

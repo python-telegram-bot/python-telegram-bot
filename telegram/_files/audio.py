@@ -76,6 +76,7 @@ class Audio(_BaseThumbedMedium):
         file_size: int = None,
         thumb: PhotoSize = None,
         file_name: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(

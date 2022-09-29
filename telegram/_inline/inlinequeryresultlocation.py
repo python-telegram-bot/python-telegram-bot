@@ -112,6 +112,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         # Required

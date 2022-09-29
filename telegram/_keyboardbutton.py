@@ -87,6 +87,7 @@ class KeyboardButton(TelegramObject):
         request_location: bool = None,
         request_poll: KeyboardButtonPollType = None,
         web_app: WebAppInfo = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

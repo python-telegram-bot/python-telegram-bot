@@ -53,7 +53,12 @@ class _BaseMedium(TelegramObject):
     __slots__ = ("file_id", "file_size", "file_unique_id")
 
     def __init__(
-        self, file_id: str, file_unique_id: str, file_size: int = None, api_kwargs: JSONDict = None
+        self,
+        file_id: str,
+        file_unique_id: str,
+        file_size: int = None,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 

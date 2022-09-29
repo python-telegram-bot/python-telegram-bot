@@ -118,6 +118,7 @@ class ChatAdministratorRights(TelegramObject):
         can_post_messages: bool = None,
         can_edit_messages: bool = None,
         can_pin_messages: bool = None,
+        *,
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)

@@ -37,7 +37,7 @@ class MessageId(TelegramObject):
 
     __slots__ = ("message_id",)
 
-    def __init__(self, message_id: int, api_kwargs: JSONDict = None):
+    def __init__(self, message_id: int, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         self.message_id = message_id
 

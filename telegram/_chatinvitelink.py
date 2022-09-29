@@ -112,6 +112,7 @@ class ChatInviteLink(TelegramObject):
         member_limit: int = None,
         name: str = None,
         pending_join_request_count: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

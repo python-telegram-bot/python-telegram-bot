@@ -64,6 +64,7 @@ class ShippingAddress(TelegramObject):
         street_line1: str,
         street_line2: str,
         post_code: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

@@ -43,7 +43,7 @@ class SentWebAppMessage(TelegramObject):
 
     __slots__ = ("inline_message_id",)
 
-    def __init__(self, inline_message_id: str = None, api_kwargs: JSONDict = None):
+    def __init__(self, inline_message_id: str = None, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         # Optionals
         self.inline_message_id = inline_message_id

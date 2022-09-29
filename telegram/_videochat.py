@@ -42,12 +42,6 @@ class VideoChatStarted(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(
-        self,
-        api_kwargs: JSONDict = None,
-    ):  # skipcq: PTC-W0049
-        super().__init__(api_kwargs=api_kwargs)
-
 
 class VideoChatEnded(TelegramObject):
     """
@@ -75,6 +69,7 @@ class VideoChatEnded(TelegramObject):
     def __init__(
         self,
         duration: int,
+        *,
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
@@ -106,6 +101,7 @@ class VideoChatParticipantsInvited(TelegramObject):
     def __init__(
         self,
         users: List[User],
+        *,
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
@@ -160,6 +156,7 @@ class VideoChatScheduled(TelegramObject):
     def __init__(
         self,
         start_date: dtm.datetime,
+        *,
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)

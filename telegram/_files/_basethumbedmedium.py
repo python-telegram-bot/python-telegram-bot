@@ -65,6 +65,7 @@ class _BaseThumbedMedium(_BaseMedium):
         file_unique_id: str,
         file_size: int = None,
         thumb: PhotoSize = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(

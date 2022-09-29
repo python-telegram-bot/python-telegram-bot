@@ -87,6 +87,7 @@ class ChatMember(TelegramObject):
         self,
         user: User,
         status: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -162,6 +163,7 @@ class ChatMemberOwner(ChatMember):
         user: User,
         is_anonymous: bool,
         custom_title: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
@@ -285,6 +287,7 @@ class ChatMemberAdministrator(ChatMember):
         can_edit_messages: bool = None,
         can_pin_messages: bool = None,
         custom_title: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.ADMINISTRATOR, user=user, api_kwargs=api_kwargs)
@@ -325,6 +328,7 @@ class ChatMemberMember(ChatMember):
     def __init__(
         self,
         user: User,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
@@ -413,6 +417,7 @@ class ChatMemberRestricted(ChatMember):
         can_send_other_messages: bool,
         can_add_web_page_previews: bool,
         until_date: datetime.datetime,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
@@ -449,6 +454,7 @@ class ChatMemberLeft(ChatMember):
     def __init__(
         self,
         user: User,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
@@ -481,6 +487,7 @@ class ChatMemberBanned(ChatMember):
         self,
         user: User,
         until_date: datetime.datetime,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)

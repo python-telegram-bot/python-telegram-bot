@@ -138,6 +138,7 @@ class User(TelegramObject):
         supports_inline_queries: bool = None,
         is_premium: bool = None,
         added_to_attachment_menu: bool = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

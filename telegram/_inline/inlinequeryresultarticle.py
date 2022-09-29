@@ -91,6 +91,7 @@ class InlineQueryResultArticle(InlineQueryResult):
         thumb_url: str = None,
         thumb_width: int = None,
         thumb_height: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
 

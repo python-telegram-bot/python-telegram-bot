@@ -63,6 +63,7 @@ class Document(_BaseThumbedMedium):
         file_name: str = None,
         mime_type: str = None,
         file_size: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(

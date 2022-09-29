@@ -81,6 +81,7 @@ class SuccessfulPayment(TelegramObject):
         provider_payment_charge_id: str,
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

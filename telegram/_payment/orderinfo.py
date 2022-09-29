@@ -57,6 +57,7 @@ class OrderInfo(TelegramObject):
         phone_number: str = None,
         email: str = None,
         shipping_address: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

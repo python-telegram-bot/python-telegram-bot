@@ -118,6 +118,7 @@ class CallbackQuery(TelegramObject):
         data: str = None,
         inline_message_id: str = None,
         game_short_name: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

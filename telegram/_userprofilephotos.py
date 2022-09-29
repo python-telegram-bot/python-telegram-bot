@@ -48,7 +48,7 @@ class UserProfilePhotos(TelegramObject):
     __slots__ = ("photos", "total_count")
 
     def __init__(
-        self, total_count: int, photos: List[List[PhotoSize]], api_kwargs: JSONDict = None
+        self, total_count: int, photos: List[List[PhotoSize]], *, api_kwargs: JSONDict = None
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required

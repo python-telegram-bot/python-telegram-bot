@@ -114,6 +114,7 @@ class InlineQueryResultPhoto(InlineQueryResult):
         input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         # Required

@@ -141,6 +141,7 @@ class EncryptedCredentials(TelegramObject):
         data: str,
         hash: str,  # skipcq: PYL-W0622
         secret: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -217,6 +218,7 @@ class Credentials(TelegramObject):
         self,
         secure_data: "SecureData",
         nonce: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -292,6 +294,7 @@ class SecureData(TelegramObject):
         rental_agreement: "SecureValue" = None,
         passport_registration: "SecureValue" = None,
         temporary_registration: "SecureValue" = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -373,6 +376,7 @@ class SecureValue(TelegramObject):
         selfie: "FileCredentials" = None,
         files: List["FileCredentials"] = None,
         translation: List["FileCredentials"] = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -415,7 +419,9 @@ class _CredentialsBase(TelegramObject):
 
     __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
-    def __init__(self, hash: str, secret: str, api_kwargs: JSONDict = None):  # skipcq: PYL-W0622
+    def __init__(
+        self, hash: str, secret: str, *, api_kwargs: JSONDict = None
+    ):  # skipcq: PYL-W0622
         super().__init__(api_kwargs=api_kwargs)
         self.hash = hash
         self.secret = secret
@@ -440,9 +446,6 @@ class DataCredentials(_CredentialsBase):
     """
 
     __slots__ = ()
-
-    def __init__(self, data_hash: str, secret: str, api_kwargs: JSONDict = None):
-        super().__init__(data_hash, secret, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -469,9 +472,6 @@ class FileCredentials(_CredentialsBase):
     """
 
     __slots__ = ()
-
-    def __init__(self, file_hash: str, secret: str, api_kwargs: JSONDict = None):
-        super().__init__(file_hash, secret, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

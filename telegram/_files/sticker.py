@@ -140,6 +140,7 @@ class Sticker(_BaseThumbedMedium):
         mask_position: "MaskPosition" = None,
         premium_animation: "File" = None,
         custom_emoji_id: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(
@@ -249,6 +250,7 @@ class StickerSet(TelegramObject):
         is_video: bool,
         sticker_type: str,
         thumb: PhotoSize = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -335,6 +337,7 @@ class MaskPosition(TelegramObject):
         x_shift: float,
         y_shift: float,
         scale: float,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

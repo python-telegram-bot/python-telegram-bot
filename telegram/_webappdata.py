@@ -51,7 +51,7 @@ class WebAppData(TelegramObject):
 
     __slots__ = ("data", "button_text")
 
-    def __init__(self, data: str, button_text: str, api_kwargs: JSONDict = None):
+    def __init__(self, data: str, button_text: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.data = data

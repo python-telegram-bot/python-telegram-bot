@@ -76,6 +76,7 @@ class ChatPhoto(TelegramObject):
         small_file_unique_id: str,
         big_file_id: str,
         big_file_unique_id: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

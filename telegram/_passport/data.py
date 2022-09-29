@@ -68,6 +68,7 @@ class PersonalDetails(TelegramObject):
         last_name_native: str = None,
         middle_name: str = None,
         middle_name_native: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -114,6 +115,7 @@ class ResidentialAddress(TelegramObject):
         state: str,
         country_code: str,
         post_code: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -141,6 +143,7 @@ class IdDocumentData(TelegramObject):
         self,
         document_no: str,
         expiry_date: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

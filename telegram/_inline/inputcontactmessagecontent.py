@@ -52,6 +52,7 @@ class InputContactMessageContent(InputMessageContent):
         first_name: str,
         last_name: str = None,
         vcard: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

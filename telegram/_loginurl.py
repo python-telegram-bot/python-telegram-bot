@@ -76,6 +76,7 @@ class LoginUrl(TelegramObject):
         forward_text: bool = None,
         bot_username: str = None,
         request_write_access: bool = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

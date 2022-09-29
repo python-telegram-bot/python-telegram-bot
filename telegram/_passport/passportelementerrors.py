@@ -45,7 +45,7 @@ class PassportElementError(TelegramObject):
 
     __slots__ = ("message", "source", "type")
 
-    def __init__(self, source: str, type: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, source: str, type: str, message: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.source = str(source)
@@ -90,10 +90,11 @@ class PassportElementErrorDataField(PassportElementError):
         field_name: str,
         data_hash: str,
         message: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         # Required
-        super().__init__("data", type, message)
+        super().__init__("data", type, message, api_kwargs=api_kwargs)
         self.field_name = field_name
         self.data_hash = data_hash
 
@@ -127,7 +128,7 @@ class PassportElementErrorFile(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("file", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
@@ -162,7 +163,7 @@ class PassportElementErrorFiles(PassportElementError):
 
     __slots__ = ("file_hashes",)
 
-    def __init__(self, type: str, file_hashes: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hashes: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("files", type, message, api_kwargs=api_kwargs)
         self.file_hashes = file_hashes
@@ -197,7 +198,7 @@ class PassportElementErrorFrontSide(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("front_side", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
@@ -232,7 +233,7 @@ class PassportElementErrorReverseSide(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("reverse_side", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
@@ -265,7 +266,7 @@ class PassportElementErrorSelfie(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("selfie", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
@@ -302,7 +303,7 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("translation_file", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
@@ -339,7 +340,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
     __slots__ = ("file_hashes",)
 
-    def __init__(self, type: str, file_hashes: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hashes: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
         self.file_hashes = file_hashes
@@ -370,7 +371,7 @@ class PassportElementErrorUnspecified(PassportElementError):
 
     __slots__ = ("element_hash",)
 
-    def __init__(self, type: str, element_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, element_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("unspecified", type, message, api_kwargs=api_kwargs)
         self.element_hash = element_hash

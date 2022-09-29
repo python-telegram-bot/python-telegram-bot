@@ -71,6 +71,7 @@ class Location(TelegramObject):
         live_period: int = None,
         heading: int = None,
         proximity_alert_radius: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

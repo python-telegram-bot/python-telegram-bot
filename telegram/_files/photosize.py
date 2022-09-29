@@ -59,6 +59,7 @@ class PhotoSize(_BaseMedium):
         width: int,
         height: int,
         file_size: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(

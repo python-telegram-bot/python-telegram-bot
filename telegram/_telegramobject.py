@@ -74,7 +74,7 @@ class TelegramObject:
     # unless it's overridden
     __INIT_PARAMS_CHECK: Optional[Type["TelegramObject"]] = None
 
-    def __init__(self, api_kwargs: JSONDict = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict = None) -> None:
         self._id_attrs: Tuple[object, ...] = ()
         self._bot: Optional["Bot"] = None
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs

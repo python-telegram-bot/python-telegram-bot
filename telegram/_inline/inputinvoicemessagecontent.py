@@ -178,6 +178,7 @@ class InputInvoiceMessageContent(InputMessageContent):
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
         is_flexible: bool = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

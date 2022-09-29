@@ -54,6 +54,7 @@ class ShippingOption(TelegramObject):
         id: str,  # pylint: disable=redefined-builtin
         title: str,
         prices: List["LabeledPrice"],
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

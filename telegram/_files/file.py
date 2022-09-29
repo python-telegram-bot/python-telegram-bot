@@ -81,6 +81,7 @@ class File(TelegramObject):
         file_unique_id: str,
         file_size: int = None,
         file_path: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

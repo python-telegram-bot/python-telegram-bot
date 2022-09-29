@@ -63,6 +63,7 @@ class VideoNote(_BaseThumbedMedium):
         duration: int,
         thumb: PhotoSize = None,
         file_size: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(

@@ -114,6 +114,7 @@ class InlineQueryResultVenue(InlineQueryResult):
         thumb_height: int = None,
         google_place_id: str = None,
         google_place_type: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
 

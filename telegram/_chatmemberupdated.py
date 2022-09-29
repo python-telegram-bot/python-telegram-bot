@@ -83,6 +83,7 @@ class ChatMemberUpdated(TelegramObject):
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
         invite_link: ChatInviteLink = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

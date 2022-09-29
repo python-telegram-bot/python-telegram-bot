@@ -71,6 +71,7 @@ class PassportFile(TelegramObject):
         file_date: int,
         file_size: int,
         credentials: "FileCredentials" = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

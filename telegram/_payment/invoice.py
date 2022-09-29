@@ -69,6 +69,7 @@ class Invoice(TelegramObject):
         start_parameter: str,
         currency: str,
         total_amount: int,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

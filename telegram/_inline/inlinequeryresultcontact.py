@@ -92,6 +92,7 @@ class InlineQueryResultContact(InlineQueryResult):
         thumb_width: int = None,
         thumb_height: int = None,
         vcard: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         # Required

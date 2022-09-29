@@ -62,6 +62,7 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
         sticker_file_id: str,
         reply_markup: InlineKeyboardMarkup = None,
         input_message_content: "InputMessageContent" = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         # Required

@@ -49,6 +49,7 @@ class InlineQueryResultGame(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         game_short_name: str,
         reply_markup: InlineKeyboardMarkup = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         # Required

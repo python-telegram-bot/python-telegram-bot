@@ -119,6 +119,7 @@ class InlineQueryResultGif(InlineQueryResult):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb_mime_type: str = None,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
 

@@ -71,6 +71,7 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

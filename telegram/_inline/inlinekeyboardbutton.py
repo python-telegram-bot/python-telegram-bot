@@ -173,6 +173,7 @@ class InlineKeyboardButton(TelegramObject):
         pay: bool = None,
         login_url: LoginUrl = None,
         web_app: WebAppInfo = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

@@ -90,6 +90,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         one_time_keyboard: bool = None,
         selective: bool = None,
         input_field_placeholder: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

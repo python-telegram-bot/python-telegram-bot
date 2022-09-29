@@ -269,6 +269,7 @@ class Chat(TelegramObject):
         join_to_send_messages: bool = None,
         join_by_request: bool = None,
         has_restricted_voice_and_video_messages: bool = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

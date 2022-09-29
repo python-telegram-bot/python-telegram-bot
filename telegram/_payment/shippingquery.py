@@ -63,6 +63,7 @@ class ShippingQuery(TelegramObject):
         from_user: User,
         invoice_payload: str,
         shipping_address: ShippingAddress,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
