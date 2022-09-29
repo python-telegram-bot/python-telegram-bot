@@ -447,6 +447,9 @@ class DataCredentials(_CredentialsBase):
 
     __slots__ = ()
 
+    def __init__(self, data_hash: str, secret: str, *, api_kwargs: JSONDict = None):
+        super().__init__(hash=data_hash, secret=secret, api_kwargs=api_kwargs)
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data = super().to_dict()
@@ -472,6 +475,9 @@ class FileCredentials(_CredentialsBase):
     """
 
     __slots__ = ()
+
+    def __init__(self, file_hash: str, secret: str, *, api_kwargs: JSONDict = None):
+        super().__init__(hash=file_hash, secret=secret, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
