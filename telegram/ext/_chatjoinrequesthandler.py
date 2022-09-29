@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the ChatJoinRequestHandler class."""
 
+from typing import Optional
+
 from telegram import Update
 from telegram._utils.defaultvalue import DEFAULT_TRUE
 from telegram._utils.types import RT, SCT, DVInput
@@ -50,6 +52,7 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
             .. versionadded:: 20.0
         username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
             those which are asking to join the specified username(s).
+            Leading ``'@'`` in username will be discarded.
 
             .. versionadded:: 20.0
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
@@ -76,20 +79,24 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
     ):
         super().__init__(callback, block=block)
 
-        if chat_id is not None:
-            if isinstance(chat_id, int):
-                chat_id = frozenset({chat_id})
-            else:
-                chat_id = frozenset(chat_id)
+        self._chat_ids = self._parse_chat_id(chat_id)
+        self._usernames = self._parse_username(username)
 
-        if username is not None:
-            if isinstance(username, str):
-                username = frozenset({username})
-            else:
-                username = frozenset(username)
+    @staticmethod
+    def _parse_chat_id(chat_id: Optional[SCT[int]]) -> frozenset[int]:
+        if chat_id is None:
+            return frozenset()
+        if isinstance(chat_id, int):
+            return frozenset({chat_id})
+        return frozenset(chat_id)
 
-        self._chat_ids = chat_id
-        self._usernames = username
+    @staticmethod
+    def _parse_username(username: Optional[SCT[str]]) -> frozenset[str]:
+        if username is None:
+            return frozenset()
+        if isinstance(username, str):
+            return frozenset({username[1:] if username.startswith("@") else username})
+        return frozenset({usr[1:] if usr.startswith("@") else usr for usr in username})
 
     def check_update(self, update: object) -> bool:
         """Determines whether an update should be passed to this handler's :attr:`callback`.

@@ -141,12 +141,20 @@ class TestChatJoinRequestHandler:
     def test_with_username(self, chat_join_request_update):
         handler = ChatJoinRequestHandler(self.callback, username="user_a")
         assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username="@user_a")
+        assert handler.check_update(chat_join_request_update)
         handler = ChatJoinRequestHandler(self.callback, username=["user_a"])
+        assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username=["@user_a"])
         assert handler.check_update(chat_join_request_update)
 
         handler = ChatJoinRequestHandler(self.callback, username="user_b")
         assert not handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username="@user_b")
+        assert not handler.check_update(chat_join_request_update)
         handler = ChatJoinRequestHandler(self.callback, username=["user_b"])
+        assert not handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username=["@user_b"])
         assert not handler.check_update(chat_join_request_update)
 
         chat_join_request_update.chat_join_request.from_user.username = None
