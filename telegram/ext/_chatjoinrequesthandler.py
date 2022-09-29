@@ -31,6 +31,12 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
     """BaseHandler class to handle Telegram updates that contain
     :attr:`telegram.Update.chat_join_request`.
 
+    Note:
+        If either the :paramref:`username` or the :paramref:`chat_id` corresponds to one
+        in the appropriate, the request will be passed to this handler.
+
+        .. versionadded:: 20.0
+
     Warning:
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
@@ -109,11 +115,11 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
 
         """
         if isinstance(update, Update) and update.chat_join_request:
-            chat = update.chat_join_request.chat
-            if self._chat_ids and chat.id not in self._chat_ids:
-                return False
-            from_user = update.chat_join_request.from_user
-            if self._usernames and from_user.username not in self._usernames:
-                return False
-            return True
+            if not self._chat_ids and not self._usernames:
+                return True
+            if update.chat_join_request.chat.id in self._chat_ids:
+                return True
+            if update.chat_join_request.from_user.username in self._usernames:
+                return True
+            return False
         return False

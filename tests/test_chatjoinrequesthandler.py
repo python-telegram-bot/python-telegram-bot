@@ -132,6 +132,8 @@ class TestChatJoinRequestHandler:
         assert handler.check_update(chat_join_request_update)
         handler = ChatJoinRequestHandler(self.callback, chat_id=[1])
         assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, chat_id=2, username="@user_a")
+        assert handler.check_update(chat_join_request_update)
 
         handler = ChatJoinRequestHandler(self.callback, chat_id=2)
         assert not handler.check_update(chat_join_request_update)
@@ -146,6 +148,8 @@ class TestChatJoinRequestHandler:
         handler = ChatJoinRequestHandler(self.callback, username=["user_a"])
         assert handler.check_update(chat_join_request_update)
         handler = ChatJoinRequestHandler(self.callback, username=["@user_a"])
+        assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, chat_id=1, username="@user_b")
         assert handler.check_update(chat_join_request_update)
 
         handler = ChatJoinRequestHandler(self.callback, username="user_b")
