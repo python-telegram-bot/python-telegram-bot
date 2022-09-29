@@ -70,9 +70,9 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Loo Zheng Yuan <https://github.com/loozhengyuan>`_
 - `LRezende <https://github.com/lrezende>`_
 - `macrojames <https://github.com/macrojames>`_
-- `miles <https://github.com/miles170>`_
 - `Matheus Lemos <https://github.com/mlemosf>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
+- `miles <https://github.com/miles170>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `neurrone <https://github.com/neurrone>`_
