@@ -45,11 +45,11 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
             The return value of the callback is usually ignored except for the special case of
             :class:`telegram.ext.ConversationHandler`.
         chat_id (:obj:`int` | Collection[:obj:`int`], optional): Filters requests to allow only
-            those which are from specified chat ID(s).
+            those which are asking to join the specified chat ID(s).
 
             .. versionadded:: 20.0
         username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
-            those which are from specified username(s).
+            those which are asking to join the specified username(s).
 
             .. versionadded:: 20.0
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
