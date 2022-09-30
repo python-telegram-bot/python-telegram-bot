@@ -156,13 +156,7 @@ class CallbackDataCache:
         self._callback_queries: MutableMapping[str, str] = LRUCache(maxsize=maxsize)
 
         if persistent_data:
-            keyboard_data, callback_queries = persistent_data
-            for key, value in callback_queries.items():
-                self._callback_queries[key] = value
-            for uuid, access_time, data in keyboard_data:
-                self._keyboard_data[uuid] = _KeyboardData(
-                    keyboard_uuid=uuid, access_time=access_time, button_data=data
-                )
+            self.load_persistence_data(persistent_data)
 
     def load_persistence_data(self, persistent_data: CDCData) -> None:
         """Loads data into the cache.
