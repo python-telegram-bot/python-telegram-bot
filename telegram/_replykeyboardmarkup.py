@@ -119,9 +119,9 @@ class ReplyKeyboardMarkup(TelegramObject):
 
         self._id_attrs = (self.keyboard,)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["keyboard"] = []
         for row in self.keyboard:

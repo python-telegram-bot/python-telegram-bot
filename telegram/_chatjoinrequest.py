@@ -103,9 +103,9 @@ class ChatJoinRequest(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["date"] = to_timestamp(self.date)
 

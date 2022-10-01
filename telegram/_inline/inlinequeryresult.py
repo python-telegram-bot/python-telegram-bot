@@ -54,9 +54,9 @@ class InlineQueryResult(TelegramObject):
 
         self._id_attrs = (self.id,)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         # pylint: disable=no-member
         if (
