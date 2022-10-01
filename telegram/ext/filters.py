@@ -142,7 +142,7 @@ class BaseFilter:
         filters.TEXT & (~ filters.FORWARDED)
 
     Note:
-        Filters use the same short circuiting logic as python's :keyword:`and`, :keyword:`or` and
+        Filters use the same short-circuiting logic as python's :keyword:`and`, :keyword:`or` and
         :keyword:`not`. This means that for example::
 
             filters.Regex(r'(a?x)') | filters.Regex(r'(b?x)')
