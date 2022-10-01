@@ -183,7 +183,15 @@ class BaseFilter:
         self._data_filter = data_filter
 
     def check_update(self, update: Update) -> Optional[Union[bool, DataDict]]:  # skipcq: PYL-R0201
-        """Checks if the specified update is a message."""
+        """
+        Checks if the specified update is a message.
+
+        Args:
+            update (:class:`telegram.Update`): Incoming update.
+
+        Returns:
+            :obj:`bool`
+        """
         if (  # Only message updates should be handled.
             update.channel_post
             or update.message
