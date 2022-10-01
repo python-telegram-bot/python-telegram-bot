@@ -26,6 +26,7 @@ from telegram.ext import (
     AIORateLimiter,
     Application,
     ApplicationBuilder,
+    CallbackDataCache,
     ContextTypes,
     Defaults,
     ExtBot,
@@ -359,6 +360,7 @@ class TestApplicationBuilder:
         assert app.concurrent_updates == concurrent_updates
         assert app.post_init is post_init
         assert app.post_shutdown is post_shutdown
+        assert isinstance(app.bot.callback_data_cache, CallbackDataCache)
 
         updater = Updater(bot=bot, update_queue=update_queue)
         app = ApplicationBuilder().updater(updater).build()
