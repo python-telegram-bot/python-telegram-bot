@@ -191,7 +191,7 @@ class BaseFilter:
             update (:class:`telegram.Update`): Incoming update.
 
         Returns:
-            :obj:`bool` | :obj:`Dict[str, list]`
+            :obj:`bool` | Dict[str, list]
         """
         if (  # Only message updates should be handled.
             update.channel_post
