@@ -22,6 +22,7 @@ import inspect
 import logging
 import pickle
 import socket
+import sys
 import time
 from collections import defaultdict
 
@@ -32,7 +33,9 @@ try:
 except ImportError:
     # This just happens when we test with TEST_WITH_OPT_DEPS = False while pytest tries to setup
     # the whole test suite. This file is never run in a setting where pytz is not installed.
-    pass
+    # Just in case, we exit with a failure code here so that the test suite fails if this branch
+    # is ever reached.
+    sys.exit(1)
 
 
 from flaky import flaky

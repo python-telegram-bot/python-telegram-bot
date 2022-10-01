@@ -122,9 +122,6 @@ class TestDatetime:
         utc_offset = timezone.utcoffset(ref_datetime)
         ref_t, time_of_day = tg_dtm._datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
         aware_time_of_day = self.localize(ref_datetime, timezone).timetz()
-        print()
-        print(ref_datetime)
-        print(aware_time_of_day)
 
         # first test that naive time is assumed to be utc:
         assert tg_dtm.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)

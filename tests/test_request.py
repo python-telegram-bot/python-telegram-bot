@@ -92,6 +92,18 @@ class TestRequest:
     def reset(self):
         self.test_flag = None
 
+    async def test_init_import_errors(self, bot, monkeypatch):
+        """Makes sure that import errors are forwarded - related to TestNoSocks above"""
+
+        def __init__(self, *args, **kwargs):
+            raise ImportError("Other Error Message")
+
+        monkeypatch.setattr(httpx.AsyncClient, "__init__", __init__)
+
+        # Make sure that other exceptions are forwarded
+        with pytest.raises(ImportError, match=r"Other Error Message"):
+            HTTPXRequest(proxy_url="socks5://foo")
+
     def test_slot_behaviour(self, mro_slots):
         inst = HTTPXRequest()
         for attr in inst.__slots__:
