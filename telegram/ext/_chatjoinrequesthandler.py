@@ -32,8 +32,10 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
     :attr:`telegram.Update.chat_join_request`.
 
     Note:
-        If either the :paramref:`username` or the :paramref:`chat_id` corresponds to one
-        in the appropriate, the request will be passed to this handler.
+        If neither of :paramref:`username` and the :paramref:`chat_id` are passed, this handler
+        accepts *any* join request. Otherwise, this handler accepts all requests to join chats
+        for which the chat ID is listed in :paramref:`chat_id` or the username is listed in
+        :paramref:`username`, or both.
 
         .. versionadded:: 20.0
 
