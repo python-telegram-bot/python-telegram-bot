@@ -169,17 +169,19 @@ class TelegramObject:
         """
         data = {}
 
-        if not recursive:
-            try:
-                # __dict__ has attrs from superclasses, so no need to put in the for loop below
-                data.update(self.__dict__)
-            except AttributeError:
-                pass
+        try:
+            # __dict__ has attrs from superclasses, so no need to recompute/duplicate
+            data.update(self.__dict__)
+        except AttributeError:
+            pass
+
+        tuple_data = tuple(data)
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
         for cls in self.__class__.__mro__[:-1]:
-            for key in cls.__slots__:  # type: ignore[attr-defined]
+            # add the class's slots with the user defined subclass __dict__ (class has no slots)
+            for key in tuple(cls.__slots__) + tuple_data:  # type: ignore[attr-defined]
                 if not include_private and key.startswith("_"):
                     continue
 
@@ -279,16 +281,23 @@ class TelegramObject:
         """
         return json.dumps(self.to_dict())
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """Gives representation of object as :obj:`dict`.
 
         .. versionchanged:: 20.0
             Now includes all entries of :attr:`api_kwargs`.
 
+        Args:
+            recursive (:obj:`bool`, optional): If :obj:`True`, will convert any TelegramObjects
+                (if found) in the attributes to a dictionary. Else, preserves it as an object
+                itself. Defaults to :obj:`True`.
+
+            .. versionadded:: 20.0
+
         Returns:
             :obj:`dict`
         """
-        out = self._get_attrs(recursive=True)
+        out = self._get_attrs(recursive=recursive)
         out.update(out.pop("api_kwargs", {}))  # type: ignore[call-overload]
         return out
 
