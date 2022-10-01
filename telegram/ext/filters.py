@@ -418,7 +418,7 @@ class _MergedFilter(UpdateFilter):
 
 
 class _XORFilter(UpdateFilter):
-    """Convenience filter acting as wrapper for :class:`MergedFilter` representing the an XOR gate
+    """Convenience filter acting as wrapper for :class:`MergedFilter` representing the XOR gate
     for two filters.
 
     Args:
@@ -1159,8 +1159,8 @@ class Document:
 
         Args:
             file_extension (:obj:`str` | :obj:`None`): Media file extension you want to filter.
-            case_sensitive (:obj:`bool`, optional): Pass :obj:`True` to make the filter case
-                sensitive. Default: :obj:`False`.
+            case_sensitive (:obj:`bool`, optional): Pass :obj:`True` to make the filter
+                case-sensitive. Default: :obj:`False`.
 
         Example:
             * ``filters.Document.FileExtension("jpg")``
@@ -1520,11 +1520,11 @@ class Regex(MessageFilter):
         Use ``MessageHandler(filters.Regex(r'help'), callback)`` to capture all messages that
         contain the word 'help'. You can also use
         ``MessageHandler(filters.Regex(re.compile(r'help', re.IGNORECASE)), callback)`` if
-        you want your pattern to be case insensitive. This approach is recommended
+        you want your pattern to be case-insensitive. This approach is recommended
         if you need to specify flags on your pattern.
 
     Note:
-        Filters use the same short circuiting logic as python's :keyword:`and`, :keyword:`or` and
+        Filters use the same short-circuiting logic as python's :keyword:`and`, :keyword:`or` and
         :keyword:`not`.
         This means that for example:
 
