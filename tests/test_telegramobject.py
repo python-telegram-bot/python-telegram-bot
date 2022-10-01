@@ -139,24 +139,26 @@ class TestTelegramObject:
         assert to.to_dict() == {"foo": "bar"}
 
     def test_to_dict_recursion(self):
-        class Recusive(TelegramObject):
+        class Recursive(TelegramObject):
+            __slots__ = ("recursive",)
+
             def __init__(self):
                 super().__init__()
                 self.recursive = "recursive"
 
-        class SubClass(TelegramObject):
+        class SubClass(TelegramObject):  # doesn't have `__slots__`, so has `__dict__` instead.
             def __init__(self):
                 super().__init__()
-                self.subclass = Recusive()
+                self.subclass = Recursive()
 
         to = SubClass()
         to_dict_no_recurse = to.to_dict(recursive=False)
         assert to_dict_no_recurse
-        assert isinstance(to_dict_no_recurse["subclass"], Recusive)
-        to_dict_recuse = to.to_dict(recursive=True)
-        assert to_dict_recuse
-        assert isinstance(to_dict_recuse["subclass"], dict)
-        assert to_dict_recuse["subclass"]["recursive"] == "recursive"
+        assert isinstance(to_dict_no_recurse["subclass"], Recursive)
+        to_dict_recurse = to.to_dict(recursive=True)
+        assert to_dict_recurse
+        assert isinstance(to_dict_recurse["subclass"], dict)
+        assert to_dict_recurse["subclass"]["recursive"] == "recursive"
 
     def test_slot_behaviour(self, mro_slots):
         inst = TelegramObject()
