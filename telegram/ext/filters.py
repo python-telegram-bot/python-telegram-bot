@@ -116,7 +116,8 @@ DataDict = Dict[str, list]
 
 
 class BaseFilter:
-    """Base class for all Filters.
+    """
+    Base class for all Filters.
 
     Filters subclassing from this class can combined using bitwise operators:
 
@@ -234,7 +235,8 @@ class BaseFilter:
 
 
 class MessageFilter(BaseFilter):
-    """Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
+    """
+    Base class for all Message Filters. In contrast to :class:`UpdateFilter`, the object passed
     to :meth:`filter` is :obj:`telegram.Update.effective_message`.
 
     Please see :class:`BaseFilter` for details on how to create custom filters.
@@ -257,7 +259,8 @@ class MessageFilter(BaseFilter):
 
     @abstractmethod
     def filter(self, message: Message) -> Optional[Union[bool, DataDict]]:
-        """This method must be overwritten.
+        """
+        This method must be overwritten.
 
         Args:
             message (:class:`telegram.Message`): The message that is tested.
@@ -269,7 +272,8 @@ class MessageFilter(BaseFilter):
 
 
 class UpdateFilter(BaseFilter):
-    """Base class for all Update Filters. In contrast to :class:`MessageFilter`, the object
+    """
+    Base class for all Update Filters. In contrast to :class:`MessageFilter`, the object
     passed to :meth:`filter` is an instance of :class:`telegram.Update`, which allows to create
     filters like :attr:`telegram.ext.filters.UpdateType.EDITED_MESSAGE`.
 
@@ -292,7 +296,8 @@ class UpdateFilter(BaseFilter):
 
     @abstractmethod
     def filter(self, update: Update) -> Optional[Union[bool, DataDict]]:
-        """This method must be overwritten.
+        """
+        This method must be overwritten.
 
         Args:
             update (:class:`telegram.Update`): The update that is tested.
@@ -304,7 +309,8 @@ class UpdateFilter(BaseFilter):
 
 
 class _InvertedFilter(UpdateFilter):
-    """Represents a filter that has been inverted.
+    """
+    Represents a filter that has been inverted.
 
     Args:
         f: The filter to invert.
@@ -330,7 +336,8 @@ class _InvertedFilter(UpdateFilter):
 
 
 class _MergedFilter(UpdateFilter):
-    """Represents a filter consisting of two other filters.
+    """
+    Represents a filter consisting of two other filters.
 
     Args:
         base_filter: Filter 1 of the merged filter.
@@ -418,7 +425,8 @@ class _MergedFilter(UpdateFilter):
 
 
 class _XORFilter(UpdateFilter):
-    """Convenience filter acting as wrapper for :class:`MergedFilter` representing the XOR gate
+    """
+    Convenience filter acting as wrapper for :class:`MergedFilter` representing the XOR gate
     for two filters.
 
     Args:
@@ -494,7 +502,8 @@ AUDIO = _Audio(name="filters.AUDIO")
 
 
 class Caption(MessageFilter):
-    """Messages with a caption. If a list of strings is passed, it filters messages to only
+    """
+    Messages with a caption. If a list of strings is passed, it filters messages to only
     allow those whose caption is appearing in the given list.
 
     Examples:
@@ -658,7 +667,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
 
     @property
     def usernames(self) -> FrozenSet[str]:
-        """Which username(s) to allow through.
+        """
+        Which username(s) to allow through.
 
         Warning:
             :attr:`usernames` will give a *copy* of the saved usernames as :obj:`frozenset`. This
@@ -753,7 +763,8 @@ class _ChatUserBaseFilter(MessageFilter, ABC):
 
 
 class Chat(_ChatUserBaseFilter):
-    """Filters messages to allow only those which are from a specified chat ID or username.
+    """
+    Filters messages to allow only those which are from a specified chat ID or username.
 
     Examples:
         ``MessageHandler(filters.Chat(-1234), callback_method)``
@@ -821,7 +832,8 @@ CHAT = _Chat(name="filters.CHAT")
 
 
 class ChatType:  # A convenience namespace for Chat types.
-    """Subset for filtering the type of chat.
+    """
+    Subset for filtering the type of chat.
 
     Examples:
         Use these filters like: ``filters.ChatType.CHANNEL`` or
@@ -966,7 +978,8 @@ class _Dice(MessageFilter):
 
 
 class Dice(_Dice):
-    """Dice Messages. If an integer or a list of integers is passed, it filters messages to only
+    """
+    Dice Messages. If an integer or a list of integers is passed, it filters messages to only
     allow those whose dice value is appearing in the given list.
 
     .. versionadded:: 13.4
@@ -1002,7 +1015,8 @@ class Dice(_Dice):
     """Dice messages with any value and any emoji."""
 
     class Basketball(_Dice):
-        """Dice messages with the emoji 🏀. Supports passing a list of integers.
+        """
+        Dice messages with the emoji 🏀. Supports passing a list of integers.
 
         Args:
             values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
@@ -1017,7 +1031,8 @@ class Dice(_Dice):
     """Dice messages with the emoji 🏀. Matches any dice value."""
 
     class Bowling(_Dice):
-        """Dice messages with the emoji 🎳. Supports passing a list of integers.
+        """
+        Dice messages with the emoji 🎳. Supports passing a list of integers.
 
         Args:
             values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
@@ -1032,7 +1047,8 @@ class Dice(_Dice):
     """Dice messages with the emoji 🎳. Matches any dice value."""
 
     class Darts(_Dice):
-        """Dice messages with the emoji 🎯. Supports passing a list of integers.
+        """
+        Dice messages with the emoji 🎯. Supports passing a list of integers.
 
         Args:
             values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
@@ -1047,7 +1063,8 @@ class Dice(_Dice):
     """Dice messages with the emoji 🎯. Matches any dice value."""
 
     class Dice(_Dice):
-        """Dice messages with the emoji 🎲. Supports passing a list of integers.
+        """
+        Dice messages with the emoji 🎲. Supports passing a list of integers.
 
         Args:
             values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
@@ -1062,7 +1079,8 @@ class Dice(_Dice):
     """Dice messages with the emoji 🎲. Matches any dice value."""
 
     class Football(_Dice):
-        """Dice messages with the emoji ⚽. Supports passing a list of integers.
+        """
+        Dice messages with the emoji ⚽. Supports passing a list of integers.
 
         Args:
             values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
@@ -1077,7 +1095,8 @@ class Dice(_Dice):
     """Dice messages with the emoji ⚽. Matches any dice value."""
 
     class SlotMachine(_Dice):
-        """Dice messages with the emoji 🎰. Supports passing a list of integers.
+        """
+        Dice messages with the emoji 🎰. Supports passing a list of integers.
 
         Args:
             values (:obj:`int` | Collection[:obj:`int`]): Which values to allow.
@@ -1117,7 +1136,8 @@ class Document:
     """Messages that contain a :attr:`telegram.Message.document`."""
 
     class Category(MessageFilter):
-        """Filters documents by their category in the mime-type attribute.
+        """
+        Filters documents by their category in the mime-type attribute.
 
         Args:
             category (:obj:`str`): Category of the media you want to filter.
@@ -1155,7 +1175,8 @@ class Document:
     """Use as ``filters.Document.TEXT``."""
 
     class FileExtension(MessageFilter):
-        """This filter filters documents by their file ending/extension.
+        """
+        This filter filters documents by their file ending/extension.
 
         Args:
             file_extension (:obj:`str` | :obj:`None`): Media file extension you want to filter.
@@ -1214,7 +1235,8 @@ class Document:
             return filename.endswith(self._file_extension)
 
     class MimeType(MessageFilter):
-        """This Filter filters documents by their mime-type attribute.
+        """
+        This Filter filters documents by their mime-type attribute.
 
         Args:
             mimetype (:obj:`str`): The mimetype to filter.
@@ -1309,7 +1331,8 @@ FORWARDED = _Forwarded(name="filters.FORWARDED")
 
 
 class ForwardedFrom(_ChatUserBaseFilter):
-    """Filters messages to allow only those which are forwarded from the specified chat ID(s)
+    """
+    Filters messages to allow only those which are forwarded from the specified chat ID(s)
     or username(s) based on :attr:`telegram.Message.forward_from` and
     :attr:`telegram.Message.forward_from_chat`.
 
@@ -1427,7 +1450,8 @@ IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name="filters.IS_AUTOMATIC_FORWARD")
 
 
 class Language(MessageFilter):
-    """Filters messages to only allow those which are from users with a certain language code.
+    """
+    Filters messages to only allow those which are from users with a certain language code.
 
     Note:
         According to official Telegram Bot API documentation, not every single user has the
@@ -1572,7 +1596,8 @@ class _SenderChat(MessageFilter):
 
 
 class SenderChat(_ChatUserBaseFilter):
-    """Filters messages to allow only those which are from a specified sender chat's chat ID or
+    """
+    Filters messages to allow only those which are from a specified sender chat's chat ID or
     username.
 
     Examples:
@@ -1672,7 +1697,8 @@ class SenderChat(_ChatUserBaseFilter):
 
 
 class StatusUpdate:
-    """Subset for messages containing a status update.
+    """
+    Subset for messages containing a status update.
 
     Examples:
         Use these filters like: ``filters.StatusUpdate.NEW_CHAT_MEMBERS`` etc. Or use just
@@ -1895,7 +1921,8 @@ class StatusUpdate:
 
 
 class Sticker:
-    """Filters messages which contain a sticker.
+    """
+    Filters messages which contain a sticker.
 
     Examples:
         Use this filter like: ``filters.Sticker.VIDEO``. Or, just use ``filters.Sticker.ALL`` for
@@ -1987,7 +2014,8 @@ SUCCESSFUL_PAYMENT = _SuccessfulPayment(name="filters.SUCCESSFUL_PAYMENT")
 
 
 class Text(MessageFilter):
-    """Text Messages. If a list of strings is passed, it filters messages to only allow those
+    """
+    Text Messages. If a list of strings is passed, it filters messages to only allow those
     whose text is appearing in the given list.
 
     Examples:
@@ -2121,7 +2149,8 @@ class UpdateType:
 
 
 class User(_ChatUserBaseFilter):
-    """Filters messages to allow only those which are from specified user ID(s) or
+    """
+    Filters messages to allow only those which are from specified user ID(s) or
     username(s).
 
     Examples:
@@ -2257,7 +2286,8 @@ VENUE = _Venue(name="filters.VENUE")
 
 
 class ViaBot(_ChatUserBaseFilter):
-    """Filters messages to allow only those which are from specified via_bot ID(s) or username(s).
+    """
+    Filters messages to allow only those which are from specified via_bot ID(s) or username(s).
 
     Examples:
         ``MessageHandler(filters.ViaBot(1234), callback_method)``
