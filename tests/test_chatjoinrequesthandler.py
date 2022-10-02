@@ -78,7 +78,7 @@ def time():
 def chat_join_request(time, bot):
     return ChatJoinRequest(
         chat=Chat(1, Chat.SUPERGROUP),
-        from_user=User(2, "first_name", False),
+        from_user=User(2, "first_name", False, username="user_a"),
         date=time,
         bio="bio",
         invite_link=ChatInviteLink(
@@ -126,6 +126,43 @@ class TestChatJoinRequestHandler:
                 ChatJoinRequest,
             )
         )
+
+    def test_with_chat_id(self, chat_join_request_update):
+        handler = ChatJoinRequestHandler(self.callback, chat_id=1)
+        assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, chat_id=[1])
+        assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, chat_id=2, username="@user_a")
+        assert handler.check_update(chat_join_request_update)
+
+        handler = ChatJoinRequestHandler(self.callback, chat_id=2)
+        assert not handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, chat_id=[2])
+        assert not handler.check_update(chat_join_request_update)
+
+    def test_with_username(self, chat_join_request_update):
+        handler = ChatJoinRequestHandler(self.callback, username="user_a")
+        assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username="@user_a")
+        assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username=["user_a"])
+        assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username=["@user_a"])
+        assert handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, chat_id=1, username="@user_b")
+        assert handler.check_update(chat_join_request_update)
+
+        handler = ChatJoinRequestHandler(self.callback, username="user_b")
+        assert not handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username="@user_b")
+        assert not handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username=["user_b"])
+        assert not handler.check_update(chat_join_request_update)
+        handler = ChatJoinRequestHandler(self.callback, username=["@user_b"])
+        assert not handler.check_update(chat_join_request_update)
+
+        chat_join_request_update.chat_join_request.from_user.username = None
+        assert not handler.check_update(chat_join_request_update)
 
     def test_other_update_types(self, false_update):
         handler = ChatJoinRequestHandler(self.callback)
