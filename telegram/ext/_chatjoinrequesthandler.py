@@ -60,7 +60,6 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
             .. versionadded:: 20.0
         username (:obj:`str` | Collection[:obj:`str`], optional): Filters requests to allow only
             those which are asking to join the specified username(s).
-            Leading ``'@'`` in username will be discarded.
 
             .. versionadded:: 20.0
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
