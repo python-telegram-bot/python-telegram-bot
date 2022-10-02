@@ -98,7 +98,7 @@ You can install or upgrade ``python-telegram-bot`` via
 
 .. code:: shell
 
-    $ pip install python-telegram-bot-raw --upgrade
+    $ python3 -m pip install python-telegram-bot-raw --upgrade
 
 To install a pre-release, use the ``--pre`` `flag <https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-pre>`_ in addition.
 
@@ -108,7 +108,7 @@ You can also install ``python-telegram-bot-raw`` from source, though this is usu
 
     $ git clone https://github.com/python-telegram-bot/python-telegram-bot
     $ cd python-telegram-bot
-    $ python setup-raw.py install
+    $ python3 setup-raw.py install
 
 Note
 ----
@@ -134,8 +134,8 @@ Optional Dependencies
 
 ``python-telegram-bot-raw`` can be installed with optional dependencies:
 
-* ``pip install python-telegram-bot[passport]`` installs the `cryptography <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
-* ``pip install python-telegram-bot[socks]`` installs the `PySocks <https://pypi.org/project/PySocks/>`_ library. Use this, if you want to work behind a Socks5 server.
+* ``python3 -m pip install python-telegram-bot[passport]`` installs the `cryptography <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``python3 -m pip install python-telegram-bot[socks]`` installs the `PySocks <https://pypi.org/project/PySocks/>`_ library. Use this, if you want to work behind a Socks5 server.
 
 Quick Start
 ===========
