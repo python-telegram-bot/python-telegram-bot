@@ -20,6 +20,7 @@
 import inspect
 import json
 from copy import deepcopy
+from itertools import chain
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 from telegram._utils.types import JSONDict
@@ -175,20 +176,19 @@ class TelegramObject:
         except AttributeError:
             pass
 
-        tuple_data = tuple(data)
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
         for cls in self.__class__.__mro__[:-1]:
-            # add the class's slots with the user defined subclass __dict__ (class has no slots)
-            for key in tuple(cls.__slots__) + tuple_data:  # type: ignore[attr-defined]
+            # chain the class's slots with the user defined subclass __dict__ (class has no slots)
+            for key in chain(cls.__slots__, data):  # type: ignore[attr-defined]
                 if not include_private and key.startswith("_"):
                     continue
 
                 value = getattr(self, key, None)
                 if value is not None:
                     if recursive and hasattr(value, "to_dict"):
-                        data[key] = value.to_dict()  # pylint: disable=no-member
+                        data[key] = value.to_dict(recursive=True)  # pylint: disable=no-member
                     else:
                         data[key] = value
                 elif not recursive:
