@@ -170,29 +170,28 @@ class TelegramObject:
         """
         data = {}
 
-        try:
-            # __dict__ has attrs from superclasses, so no need to recompute/duplicate
-            data.update(self.__dict__)
-        except AttributeError:
-            pass
+        # __dict__ has attrs from superclasses, so no need to recompute/duplicate
+        if hasattr(self, "__dict__"):
+            data.update(self.__dict__)  # important when class has no __slots__.
 
+        org_data = tuple(data)  # make a copy of the keys to avoid changing length during iteration
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
-        for cls in self.__class__.__mro__[:-1]:
-            # chain the class's slots with the user defined subclass __dict__ (class has no slots)
-            for key in chain(cls.__slots__, data):  # type: ignore[attr-defined]
-                if not include_private and key.startswith("_"):
-                    continue
+        all_slots = (slot for cls in self.__class__.__mro__[:-1] for slot in cls.__slots__)
+        # chain the class's slots with the user defined subclass __dict__ (class has no slots)
+        for key in chain(org_data, all_slots):
+            if not include_private and key.startswith("_"):
+                continue
 
-                value = getattr(self, key, None)
-                if value is not None:
-                    if recursive and hasattr(value, "to_dict"):
-                        data[key] = value.to_dict(recursive=True)  # pylint: disable=no-member
-                    else:
-                        data[key] = value
-                elif not recursive:
+            value = getattr(self, key, None)
+            if value is not None:
+                if recursive and hasattr(value, "to_dict"):
+                    data[key] = value.to_dict(recursive=True)  # pylint: disable=no-member
+                else:
                     data[key] = value
+            elif not recursive:
+                data[key] = value
 
         if recursive and data.get("from_user"):
             data["from"] = data.pop("from_user", None)
