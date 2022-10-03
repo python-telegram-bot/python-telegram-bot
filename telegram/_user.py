@@ -238,29 +238,36 @@ class User(TelegramObject):
         return helpers_mention_markdown(self.id, self.full_name)
 
     def mention_markdown_v2(self, name: str = None) -> str:
-        """
-        Args:
-            name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
+        '''PARAMETERS
+                user_id (int) – The user’s id which you want to mention.
 
-        Returns:
-            :obj:`str`: The inline mention for the user as markdown (version 2).
+                name (str) – The name the mention is showing.
 
-        """
+                version (int | str) – Use to specify the version of Telegram’s Markdown. Either 1 or 2. Defaults to 1.
+
+            RETURNS
+                The inline mention for the user as Markdown.
+
+            RETURN TYPE
+                str'''
         if name:
             return helpers_mention_markdown(self.id, name, version=2)
+        # Else returns the chat.id and the fullname (first_name + space + last_name) with version of 2
         return helpers_mention_markdown(self.id, self.full_name, version=2)
 
     def mention_html(self, name: str = None) -> str:
-        """
-        Args:
-            name (:obj:`str`): The name used as a link for the user. Defaults to :attr:`full_name`.
+         '''PARAMETERS
+                user_id (int) – The user’s id which you want to mention.
 
-        Returns:
-            :obj:`str`: The inline mention for the user as HTML.
+                name (str) – The name the mention is showing.
 
-        """
+            RETURNS
+                The inline mention for the user as HTML.
+            RETURN TYPE
+                str'''
         if name:
             return helpers_mention_html(self.id, name)
+        # Else returns the chat.id and the fullname (first_name + space + last_name)
         return helpers_mention_html(self.id, self.full_name)
 
     def mention_button(self, name: str = None) -> InlineKeyboardButton:
