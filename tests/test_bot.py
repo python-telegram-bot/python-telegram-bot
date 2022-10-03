@@ -27,17 +27,6 @@ import time
 from collections import defaultdict
 
 import pytest
-
-try:
-    import pytz
-except ImportError:
-    # This just happens when we test with TEST_WITH_OPT_DEPS = False while pytest tries to setup
-    # the whole test suite. This file is never run in a setting where pytz is not installed.
-    # Just in case, we exit with a failure code here so that the test suite fails if this branch
-    # is ever reached.
-    sys.exit(1)
-
-
 from flaky import flaky
 
 from telegram import (
@@ -73,7 +62,7 @@ from telegram import (
     User,
     WebAppInfo,
 )
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DefaultValue
 from telegram.constants import ChatAction, InlineQueryLimit, MenuButtonType, ParseMode
 from telegram.error import BadRequest, InvalidToken, NetworkError
@@ -184,6 +173,16 @@ class TestBot:
     Behavior for init of ExtBot with missing optional dependency cachetools (for CallbackDataCache)
     is tested in `test_callbackdatacache`
     """
+
+    @staticmethod
+    def localize(dt, tzinfo):
+        try:
+            return tzinfo.localize(dt)
+        except AttributeError:
+            # We get here if tzinfo is not a pytz timezone but a datetime.timezone class
+            # This test class should never be run in if pytz is not installed, we intentionally
+            # fail if this branch is ever reached.
+            sys.exit(1)
 
     test_flag = None
 
@@ -2081,7 +2080,7 @@ class TestBot:
         add_seconds = dtm.timedelta(0, 70)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = pytz.UTC.localize(time_in_future)
+        aware_time_in_future = self.localize(time_in_future, UTC)
 
         invite_link = await bot.create_chat_invite_link(
             channel_id, expire_date=expire_time, member_limit=10
@@ -2094,7 +2093,7 @@ class TestBot:
         add_seconds = dtm.timedelta(0, 80)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = pytz.UTC.localize(time_in_future)
+        aware_time_in_future = self.localize(time_in_future, UTC)
 
         edited_invite_link = await bot.edit_chat_invite_link(
             channel_id,
