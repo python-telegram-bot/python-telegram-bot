@@ -45,7 +45,7 @@ async def job_queue(bot, app):
 
 
 @pytest.mark.skipif(
-    os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Darwin"],
+    os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Windows", "Darwin"],
     reason="On Windows & MacOS precise timings are not accurate.",
 )
 @flaky(10, 1)  # Timings aren't quite perfect
