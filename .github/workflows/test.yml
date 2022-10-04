@@ -65,7 +65,7 @@ jobs:
           no_rate_limiter_exit=$?
           export TEST_RATE_LIMITER='true'
           pip install -r requirements-opts.txt
-          pytest -v --cov --cov-append
+          pytest -v --cov --cov-append -n auto --dist loadfile
           full_exit=$?
           special_exit=$(( no_pytz_exit > no_passport_exit ? no_pytz_exit : no_passport_exit ))
           special_exit=$(( special_exit > no_rate_limiter_exit ? special_exit : no_rate_limiter_exit ))
