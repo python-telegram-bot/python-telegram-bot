@@ -17,19 +17,8 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11.0-rc.2']
         os: [ubuntu-latest, windows-latest, macos-latest]
-        experimental: [false]
-        include:
-          - python-version: 3.11.0-rc.2
-            os: ubuntu-latest
-            experimental: true
-          - python-version: 3.11.0-rc.2
-            os: windows-latest
-            experimental: true
-          - python-version: 3.11.0-rc.2
-            os: macos-latest
-            experimental: true
       fail-fast: False
     steps:
       - uses: actions/checkout@v3
@@ -53,15 +42,16 @@ jobs:
         # 4. Test everything else
         # The first & second one are achieved by mocking the corresponding import
         # See test_helpers.py & test_no_passport.py for details
+        # `--dist loadfile` distributes each test file to a different worker
         run: |
-          pytest -v --cov -k test_no_passport.py
+          pytest -v --cov tests/test_no_passport.py
           no_passport_exit=$?
           export TEST_PASSPORT='true'
-          pytest -v --cov --cov-append -k test_helpers.py
+          pytest -v --cov --cov-append tests/test_helpers.py
           no_pytz_exit=$?
           export TEST_PYTZ='true'
           pip uninstall aiolimiter -y
-          pytest -v --cov --cov-append -k test_ratelimiter.py
+          pytest -v --cov --cov-append tests/test_ratelimiter.py
           no_rate_limiter_exit=$?
           export TEST_RATE_LIMITER='true'
           pip install -r requirements-opts.txt
