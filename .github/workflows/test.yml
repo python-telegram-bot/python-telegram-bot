@@ -43,14 +43,14 @@ jobs:
         # See test_helpers.py & test_no_passport.py for details
         # `--dist loadfile` distributes each test file to a different worker
         run: |
-          pytest -v --cov tests/test_no_passport.py
+          pytest -v --cov -k test_no_passport.py
           no_passport_exit=$?
           export TEST_PASSPORT='true'
-          pytest -v --cov --cov-append tests/test_helpers.py
+          pytest -v --cov --cov-append -k test_helpers.py
           no_pytz_exit=$?
           export TEST_PYTZ='true'
           pip uninstall aiolimiter -y
-          pytest -v --cov --cov-append tests/test_ratelimiter.py
+          pytest -v --cov --cov-append -k test_ratelimiter.py
           no_rate_limiter_exit=$?
           export TEST_RATE_LIMITER='true'
           pip install -r requirements-opts.txt
