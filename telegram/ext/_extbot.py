@@ -126,7 +126,8 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     .. versionchanged:: 20.0
         Removed the attribute ``arbitrary_callback_data``. You can instead use
-        ``bot.callback_data_cache.max_size`` to access the size of the cache.
+        :attr:`bot.callback_data_cache.maxsize <telegram.ext.CallbackDataCache.maxsize>` to
+        access the size of the cache.
 
     Args:
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
