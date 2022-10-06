@@ -45,7 +45,7 @@ async def job_queue(bot, app):
 
 
 @pytest.mark.skipif(
-    os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Windows", "Darwin"],
+    os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Darwin"],
     reason="On Windows & MacOS precise timings are not accurate.",
 )
 @flaky(10, 1)  # Timings aren't quite perfect
@@ -450,10 +450,24 @@ class TestJobQueue:
         await asyncio.sleep(0.5)
         assert self.result == 2
 
-    async def test_job_lt_eq(self, job_queue):
+    async def test_equality(self, job_queue):
         job = job_queue.run_repeating(self.job_run_once, 0.2)
-        assert not job == job_queue
+        job_2 = job_queue.run_repeating(self.job_run_once, 0.2)
+        job_3 = Job(self.job_run_once, 0.2)
+        job_3._job = job.job
+        assert job == job
+        assert job != job_queue
+        assert job != job_2
+        assert job == job_3
+
+        assert hash(job) == hash(job)
+        assert hash(job) != hash(job_queue)
+        assert hash(job) != hash(job_2)
+        assert hash(job) == hash(job_3)
+
         assert not job < job
+        assert not job < job_2
+        assert not job < job_3
 
     async def test_process_error_context(self, job_queue, app):
         app.add_error_handler(self.error_handler_context)
