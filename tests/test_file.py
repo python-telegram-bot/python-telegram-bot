@@ -23,7 +23,7 @@ from tempfile import TemporaryFile, mkstemp
 import pytest
 from flaky import flaky
 
-from telegram import File, Voice
+from telegram import File, FileCredentials, Voice
 from telegram.error import TelegramError
 from tests.conftest import data_file
 
@@ -37,6 +37,19 @@ def file(bot):
         file_size=TestFile.file_size,
         bot=bot,
     )
+
+
+@pytest.fixture(scope="class")
+def encrypted_file(bot):
+    fc = FileCredentials(
+        "Oq3G4sX+bKZthoyms1YlPqvWou9esb+z0Bi/KqQUG8s=",
+        "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
+    )
+    ef = File(
+        TestFile.file_id, TestFile.file_unique_id, bot, TestFile.file_size, TestFile.file_path
+    )
+    ef.set_credentials(fc)
+    return ef
 
 
 @pytest.fixture(scope="class")
@@ -198,6 +211,28 @@ class TestFile:
         assert buf3 is buf2
         assert buf2[len(buf) :] == buf
         assert buf2[: len(buf)] == buf
+
+    async def test_download_encrypted(self, monkeypatch, bot, encrypted_file):
+        async def test(*args, **kwargs):
+            return data_file("image_encrypted.jpg").read_bytes()
+
+        monkeypatch.setattr(encrypted_file.get_bot().request, "retrieve", test)
+        out_file = await encrypted_file.download_to_drive()
+
+        try:
+            assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
+        finally:
+            out_file.unlink()
+
+    async def test_download_file_obj_encrypted(self, monkeypatch, encrypted_file):
+        async def test(*args, **kwargs):
+            return data_file("image_encrypted.jpg").read_bytes()
+
+        monkeypatch.setattr(encrypted_file.get_bot().request, "retrieve", test)
+        with TemporaryFile() as custom_fobj:
+            await encrypted_file.download_to_object(out=custom_fobj)
+            custom_fobj.seek(0)
+            assert custom_fobj.read() == data_file("image_decrypted.jpg").read_bytes()
 
     def test_equality(self, bot):
         a = File(self.file_id, self.file_unique_id, bot)
