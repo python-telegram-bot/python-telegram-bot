@@ -112,6 +112,9 @@ class File(TelegramObject):
             )
         )
 
+    def _prepare_decrypt(self, buf: bytes) -> bytes:
+        return decrypt(b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf)
+
     async def download_to_drive(
         self,
         custom_path: FilePathInput = None,
@@ -186,9 +189,7 @@ class File(TelegramObject):
             pool_timeout=pool_timeout,
         )
         if self._credentials:
-            buf = decrypt(
-                b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
-            )
+            buf = self._prepare_decrypt(buf)
         filename.write_bytes(buf)
         return filename
 
@@ -238,9 +239,7 @@ class File(TelegramObject):
                 pool_timeout=pool_timeout,
             )
             if self._credentials:
-                buf = decrypt(
-                    b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf
-                )
+                buf = self._prepare_decrypt(buf)
         out.write(buf)
 
     async def download_as_bytearray(self, buf: bytearray = None) -> bytearray:
