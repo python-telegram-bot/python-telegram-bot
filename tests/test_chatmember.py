@@ -35,7 +35,7 @@ from telegram import (
 )
 from telegram._utils.datetime import to_timestamp
 
-ignored = ["self", "_kwargs"]
+ignored = ["self", "api_kwargs"]
 
 
 class CMDefaults:
@@ -185,6 +185,7 @@ class TestChatMemberTypes:
 
         json_dict = make_json_dict(chat_member_type)
         const_chat_member = ChatMember.de_json(json_dict, bot)
+        assert const_chat_member.api_kwargs == {}
 
         assert isinstance(const_chat_member, ChatMember)
         assert isinstance(const_chat_member, cls)
@@ -194,6 +195,7 @@ class TestChatMemberTypes:
     def test_de_json_all_args(self, bot, chat_member_type):
         json_dict = make_json_dict(chat_member_type, include_optional_args=True)
         const_chat_member = ChatMember.de_json(json_dict, bot)
+        assert const_chat_member.api_kwargs == {}
 
         assert isinstance(const_chat_member, ChatMember)
         assert isinstance(const_chat_member, chat_member_type.__class__)

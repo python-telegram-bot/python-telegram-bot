@@ -24,7 +24,7 @@ from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
 if TYPE_CHECKING:
-    from telegram import Bot, File
+    from telegram import File
 
 
 class _BaseMedium(TelegramObject):
@@ -39,7 +39,6 @@ class _BaseMedium(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): File size.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Attributes:
         file_id (:obj:`str`): File identifier.
@@ -47,21 +46,27 @@ class _BaseMedium(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): Optional. File size.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
     __slots__ = ("file_id", "file_size", "file_unique_id")
 
     def __init__(
-        self, file_id: str, file_unique_id: str, file_size: int = None, bot: "Bot" = None
+        self,
+        file_id: str,
+        file_unique_id: str,
+        file_size: int = None,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.file_id: str = str(file_id)
         self.file_unique_id = str(file_unique_id)
         # Optionals
         self.file_size = file_size
-        self.set_bot(bot)
 
         self._id_attrs = (self.file_unique_id,)
 

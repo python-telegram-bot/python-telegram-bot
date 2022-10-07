@@ -36,6 +36,7 @@ class TestMessageId:
     def test_de_json(self):
         json_dict = {"message_id": self.m_id}
         message_id = MessageId.de_json(json_dict, None)
+        assert message_id.api_kwargs == {}
 
         assert message_id.message_id == self.m_id
 

@@ -48,7 +48,8 @@ class GameHighScore(TelegramObject):
 
     __slots__ = ("position", "user", "score")
 
-    def __init__(self, position: int, user: User, score: int):
+    def __init__(self, position: int, user: User, score: int, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         self.position = position
         self.user = user
         self.score = score
@@ -65,4 +66,4 @@ class GameHighScore(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

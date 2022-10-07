@@ -57,6 +57,7 @@ class TestShippingAddress:
             "post_code": self.post_code,
         }
         shipping_address = ShippingAddress.de_json(json_dict, bot)
+        assert shipping_address.api_kwargs == {}
 
         assert shipping_address.country_code == self.country_code
         assert shipping_address.state == self.state

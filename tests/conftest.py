@@ -288,15 +288,16 @@ def make_message(text, **kwargs):
     bot = kwargs.pop("bot", None)
     if bot is None:
         bot = make_bot(get_bot())
-    return Message(
+    message = Message(
         message_id=1,
         from_user=kwargs.pop("user", User(id=1, first_name="", is_bot=False)),
         date=kwargs.pop("date", DATE),
         chat=kwargs.pop("chat", Chat(id=1, type="")),
         text=text,
-        bot=bot,
         **kwargs,
     )
+    message.set_bot(bot)
+    return message
 
 
 def make_command_message(text, **kwargs):

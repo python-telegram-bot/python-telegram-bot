@@ -226,7 +226,8 @@ def pickle_files_wo_callback_data(user_data, chat_data, bot_data, conversations)
 def update(bot):
     user = User(id=321, first_name="test_user", is_bot=False)
     chat = Chat(id=123, type="group")
-    message = Message(1, datetime.datetime.now(), chat, from_user=user, text="Hi there", bot=bot)
+    message = Message(1, datetime.datetime.now(), chat, from_user=user, text="Hi there")
+    message.set_bot(bot)
     return Update(0, message=message)
 
 
@@ -236,6 +237,7 @@ class TestPicklePersistence:
 
     class DictSub(TelegramObject):  # Used for testing our custom (Un)Pickler.
         def __init__(self, private, normal, b):
+            super().__init__()
             self._private = private
             self.normal = normal
             self._bot = b
@@ -244,6 +246,7 @@ class TestPicklePersistence:
         __slots__ = ("new_var", "_private")
 
         def __init__(self, new_var, private):
+            super().__init__()
             self.new_var = new_var
             self._private = private
 
@@ -880,7 +883,9 @@ class TestPicklePersistence:
         assert not len(recwarn)
         data_with_bot = {}
         async with make_bot(token=bot.token) as other_bot:
-            data_with_bot["unknown_bot_in_user"] = User(1, "Dev", False, bot=other_bot)
+            user = User(1, "Dev", False)
+            user.set_bot(other_bot)
+            data_with_bot["unknown_bot_in_user"] = user
         await pickle_persistence.update_chat_data(12345, data_with_bot)
         assert len(recwarn) == 1
         assert recwarn[-1].category is PTBUserWarning

@@ -45,7 +45,6 @@ class JobQueue:
         `Timerbot Example <examples.timerbot.html>`_,
         `Job Queue <https://github.com/python-telegram-bot/
         python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
-
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
 
@@ -630,7 +629,6 @@ class Job:
         user_id (:obj:`int`, optional): User id of the user that this job is associated with.
 
             .. versionadded:: 20.0
-
     Attributes:
         callback (:term:`coroutine function`): The callback function that should be executed by the
             new job.

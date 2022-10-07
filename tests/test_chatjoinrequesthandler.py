@@ -76,7 +76,7 @@ def time():
 
 @pytest.fixture(scope="class")
 def chat_join_request(time, bot):
-    return ChatJoinRequest(
+    cjr = ChatJoinRequest(
         chat=Chat(1, Chat.SUPERGROUP),
         from_user=User(2, "first_name", False, username="user_a"),
         date=time,
@@ -89,8 +89,9 @@ def chat_join_request(time, bot):
             is_revoked=False,
             is_primary=False,
         ),
-        bot=bot,
     )
+    cjr.set_bot(bot)
+    return cjr
 
 
 @pytest.fixture(scope="function")

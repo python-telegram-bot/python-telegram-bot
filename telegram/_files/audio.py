@@ -18,13 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Audio."""
 
-from typing import TYPE_CHECKING, Any
-
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-
-if TYPE_CHECKING:
-    from telegram import Bot
+from telegram._utils.types import JSONDict
 
 
 class Audio(_BaseThumbedMedium):
@@ -32,6 +28,7 @@ class Audio(_BaseThumbedMedium):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
+
 
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -47,8 +44,6 @@ class Audio(_BaseThumbedMedium):
         file_size (:obj:`int`, optional): File size in bytes.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail of the album cover to
             which the music file belongs.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file.
@@ -64,7 +59,7 @@ class Audio(_BaseThumbedMedium):
         file_size (:obj:`int`): Optional. File size in bytes.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
             which the music file belongs.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -80,16 +75,16 @@ class Audio(_BaseThumbedMedium):
         mime_type: str = None,
         file_size: int = None,
         thumb: PhotoSize = None,
-        bot: "Bot" = None,
         file_name: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(
             file_id=file_id,
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
-            bot=bot,
+            api_kwargs=api_kwargs,
         )
         # Required
         self.duration = duration

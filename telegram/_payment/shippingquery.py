@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingQuery."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._payment.shippingoption import ShippingOption
@@ -45,15 +45,13 @@ class ShippingQuery(TelegramObject):
         from_user (:class:`telegram.User`): User who sent the query.
         invoice_payload (:obj:`str`): Bot specified invoice payload.
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         id (:obj:`str`): Unique query identifier.
         from_user (:class:`telegram.User`): User who sent the query.
         invoice_payload (:obj:`str`): Bot specified invoice payload.
         shipping_address (:class:`telegram.ShippingAddress`): User specified shipping address.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -61,19 +59,18 @@ class ShippingQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin, invalid-name
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         invoice_payload: str,
         shipping_address: ShippingAddress,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
         self.invoice_payload = invoice_payload
         self.shipping_address = shipping_address
-
-        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 
@@ -85,10 +82,10 @@ class ShippingQuery(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data.pop("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["shipping_address"] = ShippingAddress.de_json(data.get("shipping_address"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     async def answer(  # pylint: disable=invalid-name
         self,

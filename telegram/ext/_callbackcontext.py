@@ -79,7 +79,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             to provide :attr:`user_data`.
 
             .. versionadded:: 20.0
-
     Attributes:
         coroutine (:term:`coroutine function`): Optional. Only present in error handlers if the
             error was caused by a coroutine run with :meth:`Application.create_task` or a handler

@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardRemove."""
-from typing import Any
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class ReplyKeyboardRemove(TelegramObject):
@@ -46,8 +46,6 @@ class ReplyKeyboardRemove(TelegramObject):
             2) If the bot's message is a reply (has `reply_to_message_id`), sender of the original
                message.
 
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         remove_keyboard (:obj:`True`): Requests clients to remove the custom keyboard.
         selective (:obj:`bool`): Optional. Use this parameter if you want to remove the keyboard
@@ -57,7 +55,8 @@ class ReplyKeyboardRemove(TelegramObject):
 
     __slots__ = ("selective", "remove_keyboard")
 
-    def __init__(self, selective: bool = None, **_kwargs: Any):
+    def __init__(self, selective: bool = None, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.remove_keyboard = True
         # Optionals
