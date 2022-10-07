@@ -20,7 +20,20 @@
 import inspect
 import json
 from copy import deepcopy
-from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
+from types import MappingProxyType
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -58,7 +71,7 @@ class TelegramObject:
             .. versionadded:: 20.0
 
     Attributes:
-        api_kwargs (Dict[:obj:`str`, any]): |toapikwargsattr|
+        api_kwargs (:obj:`types.MappingProxyType` [:obj:`str`, any]): |toapikwargsattr|
 
             .. versionadded:: 20.0
 
@@ -79,7 +92,7 @@ class TelegramObject:
         self._id_attrs: Tuple[object, ...] = ()
         self._bot: Optional["Bot"] = None
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
-        self.api_kwargs: JSONDict = api_kwargs or {}
+        self.api_kwargs: Mapping[str, Any] = MappingProxyType(api_kwargs or {})
 
     def _freeze(self) -> None:
         self._frozen = True
@@ -87,9 +100,10 @@ class TelegramObject:
     def _unfreeze(self) -> None:
         self._frozen = False
 
-    def _apply_api_kwargs(self) -> None:
+    def _apply_api_kwargs(self, api_kwargs: JSONDict) -> None:
         """Loops through the api kwargs and for every key that exists as attribute of the
         object (and is None), it moves the value from `api_kwargs` to the attribute.
+        *Edits `api_kwargs` in pace!*
 
         This method is currently only called in the unpickling process, i.e. not on "normal" init.
         This is because
@@ -102,9 +116,9 @@ class TelegramObject:
           then you can pass everything as proper argument.
         """
         # we convert to list to ensure that the list doesn't change length while we loop
-        for key in list(self.api_kwargs.keys()):
+        for key in list(api_kwargs.keys()):
             if getattr(self, key, True) is None:
-                setattr(self, key, self.api_kwargs.pop(key))
+                setattr(self, key, api_kwargs.pop(key))
 
     def __setattr__(self, key: str, value: object) -> None:
         # protected attributes can always be set for convenient internal use
@@ -145,7 +159,11 @@ class TelegramObject:
         This method is used for pickling. We remove the bot attribute of the object since those
         are not pickable.
         """
-        return self._get_attrs(include_private=True, recursive=False, remove_bot=True)
+        out = self._get_attrs(include_private=True, recursive=False, remove_bot=True)
+        # MappingProxyType is not pickable, so we convert it to a dict and revert in
+        # __setstate__
+        out["api_kwargs"] = dict(self.api_kwargs)
+        return out
 
     def __setstate__(self, state: dict) -> None:
         """
@@ -162,8 +180,17 @@ class TelegramObject:
             if key == "_frozen":
                 # Setting the frozen status to True would prevent the attributes from being set
                 continue
+            if key == "api_kwargs":
+                # See below
+                continue
             setattr(self, key, val)
-        self._apply_api_kwargs()
+
+        # For api_kwargs we first apply any kwargs that are already attributes of the object
+        # and then set the rest as MappingProxyType attribute. Converting to MappingProxyType
+        # is necessary, since __getstate__ converts it to a dict as MPT is not pickable.
+        api_kwargs = state["api_kwargs"]
+        self._apply_api_kwargs(api_kwargs)
+        setattr(self, "api_kwargs", MappingProxyType(api_kwargs))
 
         # Apply freezing if necessary
         if state["_frozen"]:
@@ -184,6 +211,12 @@ class TelegramObject:
             if k == "_frozen":
                 # Setting the frozen status to True would prevent the attributes from being set
                 continue
+            if k == "api_kwargs":
+                # Need to copy api_kwargs manually, since it's a MappingProxyType is not
+                # pickable and deepcopy uses the pickle interface
+                setattr(result, k, MappingProxyType(deepcopy(dict(self.api_kwargs), memodict)))
+                continue
+
             setattr(result, k, deepcopy(getattr(self, k), memodict))
 
         # Apply freezing if necessary

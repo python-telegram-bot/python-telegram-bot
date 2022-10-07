@@ -264,6 +264,8 @@ class InputMediaPhoto(InputMedia):
             api_kwargs=api_kwargs,
         )
 
+        self._freeze()
+
 
 class InputMediaVideo(InputMedia):
     """Represents a video to be sent.

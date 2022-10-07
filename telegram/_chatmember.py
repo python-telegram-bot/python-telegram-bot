@@ -340,6 +340,7 @@ class ChatMemberMember(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class ChatMemberRestricted(ChatMember):
@@ -469,6 +470,7 @@ class ChatMemberLeft(ChatMember):
         api_kwargs: JSONDict = None,
     ):
         super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
+        self._freeze()
 
 
 class ChatMemberBanned(ChatMember):

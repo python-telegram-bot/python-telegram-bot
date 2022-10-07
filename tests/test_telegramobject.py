@@ -21,6 +21,7 @@ import inspect
 import pickle
 from copy import deepcopy
 from pathlib import Path
+from types import MappingProxyType
 
 import pytest
 
@@ -79,6 +80,15 @@ class TestTelegramObject:
         to = TelegramObject.de_json(data={"foo": "bar"}, bot=bot)
         assert to.api_kwargs == {"foo": "bar"}
         assert to.get_bot() is bot
+
+    def test_api_kwargs_read_only(self):
+        tg_object = TelegramObject(api_kwargs={"foo": "bar"})
+        tg_object._freeze()
+        assert isinstance(tg_object.api_kwargs, MappingProxyType)
+        with pytest.raises(TypeError):
+            tg_object.api_kwargs["foo"] = "baz"
+        with pytest.raises(AttributeError, match="can't be set"):
+            tg_object.api_kwargs = {"foo": "baz"}
 
     @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
     def test_subclasses_have_api_kwargs(self, cls):
@@ -237,7 +247,9 @@ class TestTelegramObject:
         date = datetime.datetime.now()
         photo = PhotoSize("file_id", "unique", 21, 21)
         photo.set_bot(bot)
-        msg = Message(1, date, chat, from_user=user, text="foobar", photo=[photo])
+        msg = Message(
+            1, date, chat, from_user=user, text="foobar", photo=[photo], api_kwargs={"foo": "bar"}
+        )
         msg.set_bot(bot)
 
         new_msg = deepcopy(msg)
@@ -252,6 +264,7 @@ class TestTelegramObject:
         assert new_msg.chat == chat and new_msg.chat is not chat
         assert new_msg.from_user == user and new_msg.from_user is not user
         assert new_msg.photo[0] == photo and new_msg.photo[0] is not photo
+        assert new_msg.api_kwargs == {"foo": "bar"} and new_msg.api_kwargs is not msg.api_kwargs
 
         # check that deepcopy preserves the freezing status
         with pytest.raises(
