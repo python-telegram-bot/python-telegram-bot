@@ -38,6 +38,7 @@ from telegram.ext import (
     BasePersistence,
     CallbackContext,
     ConversationHandler,
+    ExtBot,
     MessageHandler,
     PersistenceInput,
     filters,
@@ -389,6 +390,9 @@ class TestBasePersistence:
     def test_set_bot_error(self, papp):
         with pytest.raises(TypeError, match="when using telegram.ext.ExtBot"):
             papp.persistence.set_bot(Bot(papp.bot.token))
+
+        with pytest.raises(TypeError, match="when using telegram.ext.ExtBot"):
+            papp.persistence.set_bot(ExtBot(papp.bot.token))
 
     def test_construction_with_bad_persistence(self, caplog, bot):
         class MyPersistence:
@@ -1024,7 +1028,13 @@ class TestBasePersistence:
             test_flag.append(str(context.error) == "PersistenceError")
             raise Exception("ErrorHandlingError")
 
-        app = ApplicationBuilder().token(bot.token).persistence(ErrorPersistence()).build()
+        app = (
+            ApplicationBuilder()
+            .token(bot.token)
+            .arbitrary_callback_data(True)
+            .persistence(ErrorPersistence())
+            .build()
+        )
 
         async with app:
             app.add_error_handler(error)
