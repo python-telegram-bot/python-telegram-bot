@@ -414,8 +414,10 @@ class TestPassport:
             },
             bot=bot,
         )
+        assert new.api_kwargs == {}
 
         new.credentials._decrypted_data = Credentials.de_json(credentials, bot)
+        assert new.credentials.api_kwargs == {}
 
         assert isinstance(new, PassportData)
         assert new.decrypted_data
@@ -507,6 +509,7 @@ class TestPassport:
 
     def test_de_json_and_to_dict(self, bot):
         passport_data = PassportData.de_json(RAW_PASSPORT_DATA, bot)
+        assert passport_data.api_kwargs == {}
         assert passport_data.to_dict() == RAW_PASSPORT_DATA
 
         assert passport_data.decrypted_data

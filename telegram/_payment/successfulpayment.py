@@ -35,9 +35,6 @@ class SuccessfulPayment(TelegramObject):
     considered equal, if their :attr:`telegram_payment_charge_id` and
     :attr:`provider_payment_charge_id` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         currency (:obj:`str`): Three-letter ISO 4217 currency code.
         total_amount (:obj:`int`): Total price in the smallest units of the currency (integer, not
@@ -84,6 +81,7 @@ class SuccessfulPayment(TelegramObject):
         provider_payment_charge_id: str,
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -109,4 +107,4 @@ class SuccessfulPayment(TelegramObject):
 
         data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

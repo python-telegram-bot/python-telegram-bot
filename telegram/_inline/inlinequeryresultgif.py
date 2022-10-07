@@ -37,9 +37,6 @@ class InlineQueryResultGif(InlineQueryResult):
     the user with optional caption. Alternatively, you can use :attr:`input_message_content` to
     send a message with the specified content instead of the animation.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
@@ -122,6 +119,7 @@ class InlineQueryResultGif(InlineQueryResult):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb_mime_type: str = None,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
 

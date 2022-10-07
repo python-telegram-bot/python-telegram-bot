@@ -44,6 +44,7 @@ class TestWebAppInfo:
     def test_de_json(self, bot):
         json_dict = {"url": self.url}
         web_app_info = WebAppInfo.de_json(json_dict, bot)
+        assert web_app_info.api_kwargs == {}
 
         assert web_app_info.url == self.url
 

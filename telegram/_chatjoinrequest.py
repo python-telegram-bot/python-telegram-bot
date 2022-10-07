@@ -46,9 +46,6 @@ class ChatJoinRequest(TelegramObject):
 
     .. versionadded:: 13.8
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
         from_user (:class:`telegram.User`): User that sent the join request.
@@ -76,6 +73,7 @@ class ChatJoinRequest(TelegramObject):
         date: datetime.datetime,
         bio: str = None,
         invite_link: ChatInviteLink = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

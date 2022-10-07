@@ -46,9 +46,6 @@ class Update(TelegramObject):
     Note:
         At most one of the optional parameters can be present in any given update.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if
@@ -237,6 +234,7 @@ class Update(TelegramObject):
         my_chat_member: ChatMemberUpdated = None,
         chat_member: ChatMemberUpdated = None,
         chat_join_request: ChatJoinRequest = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -425,4 +423,4 @@ class Update(TelegramObject):
         data["chat_member"] = ChatMemberUpdated.de_json(data.get("chat_member"), bot)
         data["chat_join_request"] = ChatJoinRequest.de_json(data.get("chat_join_request"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

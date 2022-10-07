@@ -48,9 +48,6 @@ class File(TelegramObject):
         * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
           then it will automatically be decrypted as it downloads when you call :meth:`download()`.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -84,6 +81,7 @@ class File(TelegramObject):
         file_unique_id: str,
         file_size: int = None,
         file_path: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

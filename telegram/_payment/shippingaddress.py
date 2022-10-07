@@ -29,9 +29,6 @@ class ShippingAddress(TelegramObject):
     considered equal, if their  :attr:`country_code`, :attr:`state`, :attr:`city`,
     :attr:`street_line1`, :attr:`street_line2` and :attr:`post_code` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         country_code (:obj:`str`): ISO 3166-1 alpha-2 country code.
         state (:obj:`str`): State, if applicable.
@@ -67,6 +64,7 @@ class ShippingAddress(TelegramObject):
         street_line1: str,
         street_line2: str,
         post_code: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

@@ -44,9 +44,6 @@ class ChatMemberUpdated(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         chat (:class:`telegram.Chat`): Chat the user belongs to.
         from_user (:class:`telegram.User`): Performer of the action, which resulted in the change.
@@ -86,6 +83,7 @@ class ChatMemberUpdated(TelegramObject):
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
         invite_link: ChatInviteLink = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -124,7 +122,7 @@ class ChatMemberUpdated(TelegramObject):
         data["new_chat_member"] = ChatMember.de_json(data.get("new_chat_member"), bot)
         data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

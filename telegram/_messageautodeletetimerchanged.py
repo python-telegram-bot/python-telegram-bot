@@ -32,9 +32,6 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
 
     .. versionadded:: 13.4
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the
             chat.
@@ -50,6 +47,7 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
     def __init__(
         self,
         message_auto_delete_time: int,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

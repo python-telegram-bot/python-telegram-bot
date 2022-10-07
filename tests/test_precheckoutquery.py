@@ -64,6 +64,7 @@ class TestPreCheckoutQuery:
             "order_info": self.order_info.to_dict(),
         }
         pre_checkout_query = PreCheckoutQuery.de_json(json_dict, bot)
+        assert pre_checkout_query.api_kwargs == {}
 
         assert pre_checkout_query.get_bot() is bot
         assert pre_checkout_query.id == self.id_

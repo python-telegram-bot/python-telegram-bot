@@ -30,9 +30,6 @@ class InputLocationMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`latitude` and :attr:`longitude` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
@@ -73,6 +70,7 @@ class InputLocationMessageContent(InputMessageContent):
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

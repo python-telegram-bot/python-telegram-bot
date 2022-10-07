@@ -33,9 +33,6 @@ class InlineQueryResult(TelegramObject):
         All URLs passed in inline query results will be available to end users and therefore must
         be assumed to be *public*.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): Type of the result.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
@@ -48,7 +45,7 @@ class InlineQueryResult(TelegramObject):
 
     __slots__ = ("type", "id")
 
-    def __init__(self, type: str, id: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, id: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required

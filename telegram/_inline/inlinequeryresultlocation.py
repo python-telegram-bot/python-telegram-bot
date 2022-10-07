@@ -35,9 +35,6 @@ class InlineQueryResultLocation(InlineQueryResult):
     Alternatively, you can use :attr:`input_message_content` to send a message with the specified
     content instead of the location.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         latitude (:obj:`float`): Location latitude in degrees.
@@ -115,6 +112,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         # Required

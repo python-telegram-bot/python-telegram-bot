@@ -90,6 +90,7 @@ class TestCallbackQuery:
             "game_short_name": self.game_short_name,
         }
         callback_query = CallbackQuery.de_json(json_dict, bot)
+        assert callback_query.api_kwargs == {}
 
         assert callback_query.id == self.id_
         assert callback_query.from_user == self.from_user

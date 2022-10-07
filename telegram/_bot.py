@@ -99,6 +99,7 @@ from telegram.request._requestparameter import RequestParameter
 if TYPE_CHECKING:
     from telegram import (
         InlineQueryResult,
+        InputFile,
         InputMediaAudio,
         InputMediaDocument,
         InputMediaPhoto,
@@ -160,6 +161,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
           ``location``, ``filename``, ``venue``, ``contact``,
           ``{read, write, connect, pool}_timeout``, ``api_kwargs``. Use a named argument for those,
           and notice that some positional arguments changed position as a result.
+        * For uploading files, file paths are now always accepted. If :paramref:`local_mode` is
+          :obj:`False`, the file contents will be read in binary mode and uploaded. Otherwise,
+          the file path will be passed in the
+          `file URI scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
 
     Args:
         token (:obj:`str`): Bot's unique authentication token.
@@ -175,20 +180,29 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.request.HTTPXRequest` will be used.
         private_key (:obj:`bytes`, optional): Private key for decryption of telegram passport data.
         private_key_password (:obj:`bytes`, optional): Password for above private key.
+        local_mode (:obj:`bool`, optional): Set to :obj:`True`, if the :paramref:`base_url` is
+            the URI of a `Local Bot API Server <https://core.telegram.org/bots/api#using-a-local\
+            -bot-api-server>`_ that runs with the ``--local`` flag. Currently, the only effect of
+            this is that files are uploaded using their local path in the
+            `file URI scheme <https://en.wikipedia.org/wiki/File_URI_scheme>`_.
+            Defaults to :obj:`False`.
+
+            .. versionadded:: 20.0.
 
     .. include:: inclusions/bot_methods.rst
 
     """
 
     __slots__ = (
-        "token",
-        "base_url",
-        "base_file_url",
-        "private_key",
+        "_token",
+        "_base_url",
+        "_base_file_url",
+        "_private_key",
         "_bot_user",
         "_request",
         "_logger",
         "_initialized",
+        "_local_mode",
     )
 
     def __init__(
@@ -200,16 +214,18 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         get_updates_request: BaseRequest = None,
         private_key: bytes = None,
         private_key_password: bytes = None,
+        local_mode: bool = False,
     ):
         super().__init__(api_kwargs=None)
         if not token:
             raise InvalidToken("You must pass the token you received from https://t.me/Botfather!")
-        self.token = token
+        self._token = token
 
-        self.base_url = base_url + self.token
-        self.base_file_url = base_file_url + self.token
+        self._base_url = base_url + self._token
+        self._base_file_url = base_file_url + self._token
+        self._local_mode = local_mode
         self._bot_user: Optional[User] = None
-        self.private_key = None
+        self._private_key = None
         self._logger = logging.getLogger(__name__)
         self._initialized = False
 
@@ -224,11 +240,56 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                     "To use Telegram Passports, PTB must be installed via `pip install "
                     "python-telegram-bot[passport]`."
                 )
-            self.private_key = serialization.load_pem_private_key(
+            self._private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
             )
 
         self._freeze()
+
+    @property
+    def token(self) -> str:
+        """:obj:`str`: Bot's unique authentication token.
+
+        .. versionadded:: 20.0
+        """
+        return self._token
+
+    @property
+    def base_url(self) -> str:
+        """:obj:`str`: Telegram Bot API service URL, built from :paramref:`Bot.base_url` and
+        :paramref:`Bot.token`.
+
+        .. versionadded:: 20.0
+        """
+        return self._base_url
+
+    @property
+    def base_file_url(self) -> str:
+        """:obj:`str`: Telegram Bot API file URL, built from :paramref:`Bot.base_file_url` and
+        :paramref:`Bot.token`.
+
+        .. versionadded:: 20.0
+        """
+        return self._base_file_url
+
+    @property
+    def local_mode(self) -> bool:
+        """:obj:`bool`: Whether this bot is running in local mode.
+
+        .. versionadded:: 20.0
+        """
+        return self._local_mode
+
+    # Proper type hints are difficult because:
+    # 1. cryptography doesn't have a nice base class, so it would get lengthy
+    # 2. we can't import cryptography if it's not installed
+    @property
+    def private_key(self) -> Optional[Any]:
+        """Deserialized private key for decryption of telegram passport data.
+
+        .. versionadded:: 20.0
+        """
+        return self._private_key
 
     def __reduce__(self) -> NoReturn:
         """Called by pickle.dumps(). Serializing bots is unadvisable, so we forbid pickling."""
@@ -249,7 +310,22 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         return decorator
 
-    def _insert_defaults(self, data: Dict[str, object]) -> None:  # pylint: disable=no-self-use
+    def _parse_file_input(
+        self,
+        file_input: Union[FileInput, "TelegramObject"],
+        tg_type: Type["TelegramObject"] = None,
+        filename: str = None,
+        attach: bool = False,
+    ) -> Union[str, "InputFile", Any]:
+        return parse_file_input(
+            file_input=file_input,
+            tg_type=tg_type,
+            filename=filename,
+            attach=attach,
+            local_mode=self._local_mode,
+        )
+
+    def _insert_defaults(self, data: Dict[str, object]) -> None:  # skipcq: PYL-R0201
         """This method is here to make ext.Defaults work. Because we need to be able to tell
         e.g. `send_message(chat_id, text)` from `send_message(chat_id, text, parse_mode=None)`, the
         default values for `parse_mode` etc are not `None` but `DEFAULT_NONE`. While this *could*
@@ -339,7 +415,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             request = self._request[1]
 
         return await request.post(
-            url=f"{self.base_url}/{endpoint}",
+            url=f"{self._base_url}/{endpoint}",
             request_data=request_data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -409,7 +485,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         try:
             await self.get_me()
         except InvalidToken as exc:
-            raise InvalidToken(f"The token `{self.token}` was rejected by the server.") from exc
+            raise InvalidToken(f"The token `{self._token}` was rejected by the server.") from exc
         self._initialized = True
 
     async def shutdown(self) -> None:
@@ -858,10 +934,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """Use this method to send photos.
 
-        Note:
-            The photo argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
-
         .. seealso:: :attr:`telegram.Message.reply_photo`, :attr:`telegram.Chat.send_photo`,
             :attr:`telegram.User.send_photo`
 
@@ -870,13 +942,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             photo (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.PhotoSize`): Photo to send.
-                Pass a file_id as String to send a photo that exists on the Telegram servers
-                (recommended), pass an HTTP URL as a String for Telegram to get a photo from the
-                Internet, or upload a new photo using multipart/form-data. Lastly you can pass
-                an existing :class:`telegram.PhotoSize` object to send.
+                |fileinput|
+                Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             caption (:obj:`str`, optional): Photo caption (may also be used when resending photos
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
@@ -931,7 +1005,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "photo": parse_file_input(photo, PhotoSize, filename=filename),
+            "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -991,10 +1065,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         For sending voice messages, use the :meth:`send_voice` method instead.
 
-        Note:
-            The audio argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
-
         .. seealso:: :attr:`telegram.Message.reply_audio`, :attr:`telegram.Chat.send_audio`,
             :attr:`telegram.User.send_audio`
 
@@ -1003,13 +1073,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             audio (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Audio`): Audio file to send.
-                Pass a file_id as String to send an audio file that exists on the Telegram servers
-                (recommended), pass an HTTP URL as a String for Telegram to get an audio file from
-                the Internet, or upload a new one using multipart/form-data. Lastly you can pass
-                an existing :class:`telegram.Audio` object to send.
+                |fileinput|
+                Lastly you can pass an existing :class:`telegram.Audio` object to send.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             caption (:obj:`str`, optional): Audio caption,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
@@ -1037,15 +1109,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
-                of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should be
-                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
-                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
-                Thumbnails can't be reused and can be only uploaded as a new file.
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): |thumbdocstring|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the audio, when uploading a
@@ -1076,7 +1148,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "audio": parse_file_input(audio, Audio, filename=filename),
+            "audio": self._parse_file_input(audio, Audio, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -1092,7 +1164,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if caption_entities:
             data["caption_entities"] = caption_entities
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             "sendAudio",
@@ -1139,12 +1211,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_UPLOAD` in size, this limit may be
         changed in the future.
 
-        Note:
-            * The document argument can be either a file_id, an URL or a file from disk
-              ``open(filename, 'rb')``.
-
-            * Sending by URL will currently only work ``GIF``, ``PDF`` & ``ZIP`` files.
-
         .. seealso:: :attr:`telegram.Message.reply_document`, :attr:`telegram.Chat.send_document`,
             :attr:`telegram.User.send_document`
 
@@ -1153,13 +1219,18 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             document (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Document`): File to send.
-                Pass a file_id as String to send a file that exists on the Telegram servers
-                (recommended), pass an HTTP URL as a String for Telegram to get a file from the
-                Internet, or upload a new one using multipart/form-data. Lastly you can pass
-                an existing :class:`telegram.Document` object to send.
+                |fileinput|
+                Lastly you can pass an existing :class:`telegram.Document` object to send.
+
+                Note:
+                    Sending by URL will currently only work ``GIF``, ``PDF`` & ``ZIP`` files.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             caption (:obj:`str`, optional): Document caption (may also be used when resending
                 documents by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
@@ -1186,15 +1257,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
-                of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should be
-                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
-                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
-                Thumbnails can't be reused and can be only uploaded as a new file.
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): |thumbdocstring|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the document, when uploading a
@@ -1223,7 +1294,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "document": parse_file_input(document, Document, filename=filename),
+            "document": self._parse_file_input(document, Document, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -1235,7 +1306,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if disable_content_type_detection is not None:
             data["disable_content_type_detection"] = disable_content_type_detection
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             "sendDocument",
@@ -1272,10 +1343,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to send static ``.WEBP``, animated ``.TGS``, or video ``.WEBM`` stickers.
 
-        Note:
-            The :paramref:`sticker` argument can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
-
         .. seealso:: :attr:`telegram.Message.reply_sticker`, :attr:`telegram.Chat.send_sticker`,
             :attr:`telegram.User.send_sticker`
 
@@ -1284,13 +1351,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Sticker`): Sticker to send.
-                Pass a file_id as String to send a file that exists on the Telegram servers
-                (recommended), pass an HTTP URL as a String for Telegram to get a .webp file from
-                the Internet, or upload a new one using multipart/form-data. Lastly you can pass
-                an existing :class:`telegram.Sticker` object to send.
+                |fileinput|
+                Lastly you can pass an existing :class:`telegram.Sticker` object to send.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -1329,7 +1398,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "sticker": parse_file_input(sticker, Sticker)}
+        data: JSONDict = {"chat_id": chat_id, "sticker": self._parse_file_input(sticker, Sticker)}
         return await self._send_message(  # type: ignore[return-value]
             "sendSticker",
             data,
@@ -1380,11 +1449,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         changed in the future.
 
         Note:
-            * The :paramref:`video` argument can be either a file_id, an URL or a file from disk
-              ``open(filename, 'rb')``
-            * :paramref:`thumb` will be ignored for small video files, for which Telegram can
-              easily generate thumbnails. However, this behaviour is undocumented and might be
-              changed by Telegram.
+            :paramref:`thumb` will be ignored for small video files, for which Telegram can
+            easily generate thumbnails. However, this behaviour is undocumented and might be
+            changed by Telegram.
 
         .. seealso:: :attr:`telegram.Message.reply_video`, :attr:`telegram.Chat.send_video`,
             :attr:`telegram.User.send_video`
@@ -1394,13 +1461,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             video (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Video`): Video file to send.
-                Pass a file_id as String to send an video file that exists on the Telegram servers
-                (recommended), pass an HTTP URL as a String for Telegram to get an video file from
-                the Internet, or upload a new one using multipart/form-data. Lastly you can pass
-                an existing :class:`telegram.Video` object to send.
+                |fileinput|
+                Lastly you can pass an existing :class:`telegram.Video` object to send.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             duration (:obj:`int`, optional): Duration of sent video in seconds.
             width (:obj:`int`, optional): Video width.
             height (:obj:`int`, optional): Video height.
@@ -1430,15 +1499,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
-                of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should be
-                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
-                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
-                Thumbnails can't be reused and can be only uploaded as a new file.
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): |thumbdocstring|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video, when uploading a
@@ -1469,7 +1538,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "video": parse_file_input(video, Video, filename=filename),
+            "video": self._parse_file_input(video, Video, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -1486,7 +1555,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if height:
             data["height"] = height
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             "sendVideo",
@@ -1529,11 +1598,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to send video messages.
 
         Note:
-            * The :paramref:`video_note` argument can be either a file_id or a file from disk
-              ``open(filename, 'rb')``
-            * :paramref:`thumb` will be ignored for small video files, for which Telegram can
-              easily generate thumbnails. However, this behaviour is undocumented and might be
-              changed by Telegram.
+            :paramref:`thumb` will be ignored for small video files, for which Telegram can
+            easily generate thumbnails. However, this behaviour is undocumented and might be
+            changed by Telegram.
 
         .. seealso:: :attr:`telegram.Message.reply_video_note`,
             :attr:`telegram.Chat.send_video_note`,
@@ -1543,14 +1610,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             video_note (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.VideoNote`): Video note
-                to send. Pass a file_id as String to send a video note that exists on the Telegram
-                servers (recommended) or upload a new video using multipart/form-data. Or you can
-                pass an existing :class:`telegram.VideoNote` object to send. Sending video notes by
-                a URL is currently unsupported.
+                :class:`telegram.VideoNote`): Video note to send.
+                Pass a file_id as String to send a video note that exists on the Telegram
+                servers (recommended) or upload a new video using multipart/form-data.
+                |uploadinput|
+                Lastly you can pass an existing :class:`telegram.VideoNote` object to send.
+                Sending video notes by a URL is currently unsupported.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             duration (:obj:`int`, optional): Duration of sent video in seconds.
             length (:obj:`int`, optional): Video width and height, i.e. diameter of the video
                 message.
@@ -1569,15 +1641,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
-                of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should be
-                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
-                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
-                Thumbnails can't be reused and can be only uploaded as a new file.
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): |thumbdocstring|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             filename (:obj:`str`, optional): Custom file name for the video note, when uploading a
@@ -1608,7 +1680,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "video_note": parse_file_input(video_note, VideoNote, filename=filename),
+            "video_note": self._parse_file_input(video_note, VideoNote, filename=filename),
         }
 
         if duration is not None:
@@ -1616,7 +1688,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if length is not None:
             data["length"] = length
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(  # type: ignore[return-value]
             "sendVideoNote",
@@ -1666,7 +1738,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Note:
             :paramref:`thumb` will be ignored for small files, for which Telegram can easily
-            generate thumb nails. However, this behaviour is undocumented and might be changed
+            generate thumbnails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
         .. seealso:: :attr:`telegram.Message.reply_animation`,
@@ -1677,10 +1749,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             animation (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
-                :class:`telegram.Animation`): Animation to
-                send. Pass a file_id as String to send an animation that exists on the Telegram
-                servers (recommended), pass an HTTP URL as a String for Telegram to get an
-                animation from the Internet, or upload a new animation using multipart/form-data.
+                :class:`telegram.Animation`): Animation to send.
+                |fileinput|
                 Lastly you can pass an existing :class:`telegram.Animation` object to send.
 
                 .. versionchanged:: 13.2
@@ -1688,15 +1758,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             duration (:obj:`int`, optional): Duration of sent animation in seconds.
             width (:obj:`int`, optional): Animation width.
             height (:obj:`int`, optional): Animation height.
-            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, optional): Thumbnail
-                of the file sent; can be ignored if
-                thumbnail generation for the file is supported server-side. The thumbnail should be
-                in JPEG format and less than 200 kB in size. A thumbnail's width and height should
-                not exceed 320. Ignored if the file is not uploaded using multipart/form-data.
-                Thumbnails can't be reused and can be only uploaded as a new file.
+            thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
+                optional): |thumbdocstring|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
+
             caption (:obj:`str`, optional): Animation caption (may also be used when resending
                 animations by file_id),
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
@@ -1752,7 +1823,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "animation": parse_file_input(animation, Animation, filename=filename),
+            "animation": self._parse_file_input(animation, Animation, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -1763,7 +1834,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if height:
             data["height"] = height
         if thumb:
-            data["thumb"] = parse_file_input(thumb, attach=True)
+            data["thumb"] = self._parse_file_input(thumb, attach=True)
         if caption:
             data["caption"] = caption
         if caption_entities:
@@ -1814,11 +1885,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         in size, this limit may be changed in the future.
 
         Note:
-            * The :paramref:`voice` argument can be either a file_id, an URL or a file from disk
-              ``open(filename, 'rb')``.
-
-            * To use this method, the file must have the type :mimetype:`audio/ogg` and be no more
-              than ``1MB`` in size. ``1-20MB`` voice notes will be sent as files.
+            To use this method, the file must have the type :mimetype:`audio/ogg` and be no more
+            than ``1MB`` in size. ``1-20MB`` voice notes will be sent as files.
 
         .. seealso:: :attr:`telegram.Message.reply_voice`, :attr:`telegram.Chat.send_voice`,
             :attr:`telegram.User.send_voice`
@@ -1828,13 +1896,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 of the target channel (in the format ``@channelusername``).
             voice (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Voice`): Voice file to send.
-                Pass a file_id as String to send an voice file that exists on the Telegram servers
-                (recommended), pass an HTTP URL as a String for Telegram to get an voice file from
-                the Internet, or upload a new one using multipart/form-data. Lastly you can pass
-                an existing :class:`telegram.Voice` object to send.
+                |fileinput|
+                Lastly you can pass an existing :class:`telegram.Voice` object to send.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             caption (:obj:`str`, optional): Voice message caption,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
@@ -1890,7 +1960,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "chat_id": chat_id,
-            "voice": parse_file_input(voice, Voice, filename=filename),
+            "voice": self._parse_file_input(voice, Voice, filename=filename),
             "parse_mode": parse_mode,
         }
 
@@ -2731,7 +2801,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
         return result  # type: ignore[return-value]
 
-    def _effective_inline_results(  # pylint: disable=no-self-use
+    def _effective_inline_results(  # skipcq: PYL-R0201
         self,
         results: Union[
             Sequence["InlineQueryResult"], Callable[[int], Optional[Sequence["InlineQueryResult"]]]
@@ -2788,9 +2858,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return effective_results, next_offset
 
     @no_type_check  # mypy doesn't play too well with hasattr
-    def _insert_defaults_for_ilq_results(  # pylint: disable=no-self-use
-        self, res: "InlineQueryResult"
-    ) -> None:
+    def _insert_defaults_for_ilq_results(self, res: "InlineQueryResult") -> None:
         """The reason why this method exists is similar to the description of _insert_defaults
         The reason why we do this in rather than in _insert_defaults is because converting
         DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries
@@ -3079,7 +3147,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         ):
             result[  # type: ignore[index]
                 "file_path"
-            ] = f"{self.base_file_url}/{result['file_path']}"  # type: ignore[index]
+            ] = f"{self._base_file_url}/{result['file_path']}"  # type: ignore[index]
 
         return File.de_json(result, self)  # type: ignore[return-value, arg-type]
 
@@ -3474,8 +3542,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to edit text and game messages.
 
         Note:
-            It is currently only possible to edit messages without
-            :attr:`telegram.Message.reply_markup` or with inline keyboards.
+            |editreplymarkup|.
 
         .. seealso:: :attr:`telegram.Message.edit_text`,
             :attr:`telegram.CallbackQuery.edit_message_text`
@@ -3573,8 +3640,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to edit captions of messages.
 
         Note:
-            It is currently only possible to edit messages without
-            :attr:`telegram.Message.reply_markup` or with inline keyboards
+            |editreplymarkup|
 
         .. seealso:: :attr:`telegram.Message.edit_caption`,
             :attr:`telegram.CallbackQuery.edit_message_caption`
@@ -3670,8 +3736,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :attr:`~telegram.File.file_id` or specify a URL.
 
         Note:
-            It is currently only possible to edit messages without
-            :attr:`telegram.Message.reply_markup` or with inline keyboards
+            |editreplymarkup|
 
         .. seealso:: :attr:`telegram.Message.edit_media`,
             :attr:`telegram.CallbackQuery.edit_message_media`
@@ -3751,8 +3816,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         (for inline bots).
 
         Note:
-            It is currently only possible to edit messages without
-            :attr:`telegram.Message.reply_markup` or with inline keyboards
+            |editreplymarkup|
 
         .. seealso:: :attr:`telegram.Message.edit_reply_markup`,
             :attr:`telegram.CallbackQuery.edit_message_reply_markup`
@@ -3828,6 +3892,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> List[Update]:
         """Use this method to receive incoming updates using long polling.
 
+        Note:
+            1. This method will not work if an outgoing webhook is set up.
+            2. In order to avoid getting duplicate updates, recalculate offset after each
+               server response.
+            3. To take full advantage of this library take a look at :class:`telegram.ext.Updater`
+
         Args:
             offset (:obj:`int`, optional): Identifier of the first update to be returned. Must be
                 greater by one than the highest among the identifiers of previously received
@@ -3866,12 +3936,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        Note:
-            1. This method will not work if an outgoing webhook is set up.
-            2. In order to avoid getting duplicate updates, recalculate offset after each
-               server response.
-            3. To take full advantage of this library take a look at :class:`telegram.ext.Updater`
 
         Returns:
             List[:class:`telegram.Update`]
@@ -3942,15 +4006,25 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         ``X-Telegram-Bot-Api-Secret-Token`` with the secret token as content.
 
         Note:
-            The certificate argument should be a file from disk ``open(filename, 'rb')``.
+            1. You will not be able to receive updates using :meth:`get_updates` for long as an
+               outgoing webhook is set up.
+            2. To use a self-signed certificate, you need to upload your public key certificate
+               using :paramref:`certificate` parameter. Please upload as
+               :class:`~telegram.InputFile`, sending a String will not work.
+            3. Ports currently supported for Webhooks:
+               :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
+
+            If you're having any trouble setting up webhooks, please check out this `guide to
+            Webhooks`_.
 
         Args:
             url (:obj:`str`): HTTPS url to send updates to. Use an empty string to remove webhook
                 integration.
-            certificate (:term:`file object`): Upload your public key certificate so that the root
-                certificate in use can be checked. See our self-signed guide for details.
-                (https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks#\
-                creating-a-self-signed-certificate-using-openssl)
+            certificate (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`):
+                Upload your public key certificate so that the root
+                certificate in use can be checked. See our `self-signed guide <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Webhooks#creating-a-self-signed-\
+                certificate-using-openssl>`_ for details. |uploadinputnopath|
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
@@ -3993,18 +4067,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
 
-        Note:
-            1. You will not be able to receive updates using :meth:`get_updates` for long as an
-               outgoing webhook is set up.
-            2. To use a self-signed certificate, you need to upload your public key certificate
-               using certificate parameter. Please upload as InputFile, sending a String will not
-               work.
-            3. Ports currently supported for Webhooks:
-               :attr:`telegram.constants.SUPPORTED_WEBHOOK_PORTS`.
-
-            If you're having any trouble setting up webhooks, please check out this `guide to
-            Webhooks`_.
-
         Returns:
             :obj:`bool` On success, :obj:`True` is returned.
 
@@ -4017,7 +4079,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {"url": url}
 
         if certificate:
-            data["certificate"] = parse_file_input(certificate)
+            data["certificate"] = self._parse_file_input(certificate)
         if max_connections is not None:
             data["max_connections"] = max_connections
         if allowed_updates is not None:
@@ -5464,6 +5526,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         link is revoked. The bot must be an administrator in the chat for this to work and must
         have the appropriate admin rights.
 
+        Note:
+            Each administrator in a chat generates their own invite links. Bots can't use invite
+            links generated by other administrators. If you want your bot to work with invite
+            links, it will need to generate its own link using :meth:`export_chat_invite_link` or
+            by calling the :meth:`get_chat` method. If your bot needs to generate a new primary
+            invite link replacing its previous one, use :attr:`export_chat_invite_link` again.
+
         .. seealso:: :attr:`telegram.Chat.export_invite_link`
 
         Args:
@@ -5485,13 +5554,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-
-        Note:
-            Each administrator in a chat generates their own invite links. Bots can't use invite
-            links generated by other administrators. If you want your bot to work with invite
-            links, it will need to generate its own link using :meth:`export_chat_invite_link` or
-            by calling the :meth:`get_chat` method. If your bot needs to generate a new primary
-            invite link replacing its previous one, use :attr:`export_chat_invite_link` again.
 
         Returns:
             :obj:`str`: New invite link on success.
@@ -5927,9 +5989,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
             photo (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`): New chat photo.
+                |uploadinput|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -5954,7 +6021,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "photo": parse_file_input(photo)}
+        data: JSONDict = {"chat_id": chat_id, "photo": self._parse_file_input(photo)}
         result = await self._post(
             "setChatPhoto",
             data,
@@ -6460,18 +6527,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :meth:`create_new_sticker_set` and :meth:`add_sticker_to_set` methods (can be used multiple
         times).
 
-        Note:
-            The :paramref:`png_sticker` argument can be either a file_id, an URL or a file from
-            disk ``open(filename, 'rb')``
-
         Args:
             user_id (:obj:`int`): User identifier of sticker file owner.
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`):
                 **PNG** image with the sticker, must be up to 512 kilobytes in size,
                 dimensions must not exceed 512px, and either width or height must be exactly 512px.
+                |uploadinput|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -6496,7 +6564,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"user_id": user_id, "png_sticker": parse_file_input(png_sticker)}
+        data: JSONDict = {"user_id": user_id, "png_sticker": self._parse_file_input(png_sticker)}
         result = await self._post(
             "uploadStickerFile",
             data,
@@ -6538,10 +6606,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             of the arguments had to be changed. Use keyword arguments to make sure that the
             arguments are passed correctly.
 
-        Note:
-            The :paramref:`png_sticker` and :paramref:`tgs_sticker` argument can be either a
-            file_id, an URL or a file from disk ``open(filename, 'rb')``
-
         .. versionchanged:: 20.0
             The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type`
             instead.
@@ -6557,26 +6621,36 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
-                and either width or height must be exactly 512px. Pass a file_id as a String to
-                send a file that already exists on the Telegram servers, pass an HTTP URL as a
-                String for Telegram to get a file from the Internet, or upload a new one
-                using multipart/form-data.
+                and either width or height must be exactly 512px.
+                |fileinput|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): **TGS** animation with the sticker, uploaded using multipart/form-data.
+                optional): **TGS** animation with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#animated-sticker-requirements for technical
                 requirements.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
-                optional): **WEBM** video with the sticker, uploaded using multipart/form-data.
+                optional): **WEBM** video with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#video-sticker-requirements for
                 technical requirements.
 
                 .. versionadded:: 13.11
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
 
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
@@ -6614,11 +6688,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         data: JSONDict = {"user_id": user_id, "name": name, "title": title, "emojis": emojis}
 
         if png_sticker is not None:
-            data["png_sticker"] = parse_file_input(png_sticker)
+            data["png_sticker"] = self._parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data["tgs_sticker"] = parse_file_input(tgs_sticker)
+            data["tgs_sticker"] = self._parse_file_input(tgs_sticker)
         if webm_sticker is not None:
-            data["webm_sticker"] = parse_file_input(webm_sticker)
+            data["webm_sticker"] = self._parse_file_input(webm_sticker)
         if mask_position is not None:
             data["mask_position"] = mask_position
         if sticker_type is not None:
@@ -6665,10 +6739,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             of the arguments had to be changed. Use keyword arguments to make sure that the
             arguments are passed correctly.
 
-        Note:
-            The :paramref:`png_sticker` and :paramref:`tgs_sticker` argument can be either a
-            file_id, an URL or a file from disk ``open(filename, 'rb')``
-
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
 
@@ -6676,26 +6746,36 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
-                and either width or height must be exactly 512px. Pass a file_id as a String to
-                send a file that already exists on the Telegram servers, pass an HTTP URL as a
-                String for Telegram to get a file from the Internet, or upload a new one
-                using multipart/form-data.
+                and either width or height must be exactly 512px.
+                |fileinput|
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
-                optional): **TGS** animation with the sticker, uploaded using multipart/form-data.
+                optional): **TGS** animation with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#animated-sticker-requirements for technical
                 requirements.
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
-                optional): **WEBM** video with the sticker, uploaded using multipart/form-data.
+                optional): **WEBM** video with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#video-sticker-requirements for
                 technical requirements.
 
                 .. versionadded:: 13.11
+
+                .. versionchanged:: 20.0
+                    File paths as input is also accepted for bots *not* running in
+                    :paramref:`~telegram.Bot.local_mode`.
             emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
                 should be placed on faces.
@@ -6726,11 +6806,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         data: JSONDict = {"user_id": user_id, "name": name, "emojis": emojis}
 
         if png_sticker is not None:
-            data["png_sticker"] = parse_file_input(png_sticker)
+            data["png_sticker"] = self._parse_file_input(png_sticker)
         if tgs_sticker is not None:
-            data["tgs_sticker"] = parse_file_input(tgs_sticker)
+            data["tgs_sticker"] = self._parse_file_input(tgs_sticker)
         if webm_sticker is not None:
-            data["webm_sticker"] = parse_file_input(webm_sticker)
+            data["webm_sticker"] = self._parse_file_input(webm_sticker)
         if mask_position is not None:
             data["mask_position"] = mask_position
 
@@ -6867,10 +6947,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         for animated sticker sets only. Video thumbnails can be set only for video sticker sets
         only.
 
-        Note:
-            The :paramref:`thumb` can be either a file_id, an URL or a file from disk
-            ``open(filename, 'rb')``
-
         Args:
             name (:obj:`str`): Sticker set name
             user_id (:obj:`int`): User identifier of created sticker set owner.
@@ -6882,9 +6958,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 sticker technical requirements, or a **WEBM** video with the thumbnail up to 32
                 kilobytes in size; see
                 https://core.telegram.org/stickers#video-sticker-requirements for video sticker
-                technical requirements. Pass a file_id as a String to send a file that
-                already exists on the Telegram servers, pass an HTTP URL as a String for Telegram
-                to get a file from the Internet, or upload a new one using multipart/form-data.
+                technical requirements.
+                |fileinput|
                 Animated sticker set thumbnails can't be uploaded via HTTP URL.
 
                 .. versionchanged:: 13.2
@@ -6915,7 +6990,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         data: JSONDict = {"name": name, "user_id": user_id}
         if thumb is not None:
-            data["thumb"] = parse_file_input(thumb)
+            data["thumb"] = self._parse_file_input(thumb)
 
         result = await self._post(
             "setStickerSetThumb",

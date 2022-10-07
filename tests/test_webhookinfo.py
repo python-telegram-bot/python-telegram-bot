@@ -81,6 +81,7 @@ class TestWebhookInfo:
             "last_synchronization_error_date": self.last_synchronization_error_date,
         }
         webhook_info = WebhookInfo.de_json(json_dict, bot)
+        assert webhook_info.api_kwargs == {}
 
         assert webhook_info.url == self.url
         assert webhook_info.has_custom_certificate == self.has_custom_certificate

@@ -34,9 +34,6 @@ class UserProfilePhotos(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`total_count` and :attr:`photos` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         total_count (:obj:`int`): Total number of profile pictures the target user has.
         photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to 4
@@ -51,7 +48,7 @@ class UserProfilePhotos(TelegramObject):
     __slots__ = ("photos", "total_count")
 
     def __init__(
-        self, total_count: int, photos: List[List[PhotoSize]], api_kwargs: JSONDict = None
+        self, total_count: int, photos: List[List[PhotoSize]], *, api_kwargs: JSONDict = None
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
@@ -72,7 +69,7 @@ class UserProfilePhotos(TelegramObject):
 
         data["photos"] = [PhotoSize.de_list(photo, bot) for photo in data["photos"]]
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

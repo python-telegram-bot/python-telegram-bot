@@ -55,6 +55,7 @@ class TestShippingQuery:
             "shipping_address": TestShippingQuery.shipping_address.to_dict(),
         }
         shipping_query = ShippingQuery.de_json(json_dict, bot)
+        assert shipping_query.api_kwargs == {}
 
         assert shipping_query.id == self.id_
         assert shipping_query.invoice_payload == self.invoice_payload

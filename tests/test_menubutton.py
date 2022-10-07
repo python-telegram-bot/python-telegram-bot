@@ -103,11 +103,9 @@ class TestMenuButton:
         cls = scope_class_and_type[0]
         type_ = scope_class_and_type[1]
 
-        assert cls.de_json({}, bot) is None
-        assert cls.de_json(None, bot) is None
-
         json_dict = {"type": type_, "text": self.text, "web_app": self.web_app.to_dict()}
         menu_button = MenuButton.de_json(json_dict, bot)
+        assert set(menu_button.api_kwargs.keys()) == {"text", "web_app"} - set(cls.__slots__)
 
         assert isinstance(menu_button, MenuButton)
         assert type(menu_button) is cls
@@ -117,9 +115,13 @@ class TestMenuButton:
         if "text" in cls.__slots__:
             assert menu_button.text == self.text
 
+        assert cls.de_json(None, bot) is None
+        assert MenuButton.de_json({}, bot) is None
+
     def test_de_json_invalid_type(self, bot):
         json_dict = {"type": "invalid", "text": self.text, "web_app": self.web_app.to_dict()}
         menu_button = MenuButton.de_json(json_dict, bot)
+        assert menu_button.api_kwargs == {"text": self.text, "web_app": self.web_app.to_dict()}
 
         assert type(menu_button) is MenuButton
         assert menu_button.type == "invalid"

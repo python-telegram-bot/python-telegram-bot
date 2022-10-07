@@ -112,9 +112,6 @@ class EncryptedCredentials(TelegramObject):
         This object is decrypted only when originating from
         :obj:`telegram.PassportData.decrypted_credentials`.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
             nonce, data hashes and secrets used for EncryptedPassportElement decryption and
@@ -144,6 +141,7 @@ class EncryptedCredentials(TelegramObject):
         data: str,
         hash: str,  # skipcq: PYL-W0622
         secret: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -211,9 +209,6 @@ class EncryptedCredentials(TelegramObject):
 
 class Credentials(TelegramObject):
     """
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Attributes:
         secure_data (:class:`telegram.SecureData`): Credentials for encrypted data
         nonce (:obj:`str`): Bot-specified nonce
@@ -225,6 +220,7 @@ class Credentials(TelegramObject):
         self,
         secure_data: "SecureData",
         nonce: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -251,9 +247,6 @@ class SecureData(TelegramObject):
     """
     This object represents the credentials that were used to decrypt the encrypted data.
     All fields are optional and depend on fields that were requested.
-
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
 
     Attributes:
         personal_details (:class:`telegram.SecureValue`, optional): Credentials for encrypted
@@ -305,6 +298,7 @@ class SecureData(TelegramObject):
         rental_agreement: "SecureValue" = None,
         passport_registration: "SecureValue" = None,
         temporary_registration: "SecureValue" = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -356,9 +350,6 @@ class SecureValue(TelegramObject):
     This object represents the credentials that were used to decrypt the encrypted value.
     All fields are optional and depend on the type of field.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Attributes:
         data (:class:`telegram.DataCredentials`, optional): Credentials for encrypted Telegram
             Passport data. Available for "personal_details", "passport", "driver_license",
@@ -391,6 +382,7 @@ class SecureValue(TelegramObject):
         selfie: "FileCredentials" = None,
         files: List["FileCredentials"] = None,
         translation: List["FileCredentials"] = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -431,15 +423,13 @@ class SecureValue(TelegramObject):
 
 
 class _CredentialsBase(TelegramObject):
-    """Base class for DataCredentials and FileCredentials.
-
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-    """
+    """Base class for DataCredentials and FileCredentials."""
 
     __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
-    def __init__(self, hash: str, secret: str, api_kwargs: JSONDict = None):  # skipcq: PYL-W0622
+    def __init__(
+        self, hash: str, secret: str, *, api_kwargs: JSONDict = None
+    ):  # skipcq: PYL-W0622
         super().__init__(api_kwargs=api_kwargs)
         super()._unfreeze()
         self.hash = hash
@@ -457,9 +447,6 @@ class DataCredentials(_CredentialsBase):
     These credentials can be used to decrypt encrypted data from the data field in
     EncryptedPassportData.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         data_hash (:obj:`str`): Checksum of encrypted data
         secret (:obj:`str`): Secret of encrypted data
@@ -470,6 +457,9 @@ class DataCredentials(_CredentialsBase):
     """
 
     __slots__ = ()
+
+    def __init__(self, data_hash: str, secret: str, *, api_kwargs: JSONDict = None):
+        super().__init__(hash=data_hash, secret=secret, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -496,6 +486,9 @@ class FileCredentials(_CredentialsBase):
     """
 
     __slots__ = ()
+
+    def __init__(self, file_hash: str, secret: str, *, api_kwargs: JSONDict = None):
+        super().__init__(hash=file_hash, secret=secret, api_kwargs=api_kwargs)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

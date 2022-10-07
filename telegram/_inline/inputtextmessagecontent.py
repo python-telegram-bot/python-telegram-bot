@@ -35,9 +35,6 @@ class InputTextMessageContent(InputMessageContent):
 
     .. seealso:: `Inline Example <examples.inlinebot.html>`_
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         message_text (:obj:`str`): Text of the message to be sent,
             1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
@@ -74,6 +71,7 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

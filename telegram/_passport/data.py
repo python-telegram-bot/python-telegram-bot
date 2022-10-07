@@ -26,9 +26,6 @@ class PersonalDetails(TelegramObject):
     """
     This object represents personal details.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Attributes:
         first_name (:obj:`str`): First Name.
         middle_name (:obj:`str`): Optional. First Name.
@@ -71,6 +68,7 @@ class PersonalDetails(TelegramObject):
         last_name_native: str = None,
         middle_name: str = None,
         middle_name_native: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -92,9 +90,6 @@ class PersonalDetails(TelegramObject):
 class ResidentialAddress(TelegramObject):
     """
     This object represents a residential address.
-
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
 
     Attributes:
         street_line1 (:obj:`str`): First line for the address.
@@ -122,6 +117,7 @@ class ResidentialAddress(TelegramObject):
         state: str,
         country_code: str,
         post_code: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -140,9 +136,6 @@ class IdDocumentData(TelegramObject):
     """
     This object represents the data of an identity document.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Attributes:
         document_no (:obj:`str`): Document number.
         expiry_date (:obj:`str`): Optional. Date of expiry, in DD.MM.YYYY format.
@@ -154,6 +147,7 @@ class IdDocumentData(TelegramObject):
         self,
         document_no: str,
         expiry_date: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

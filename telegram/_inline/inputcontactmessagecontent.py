@@ -28,9 +28,6 @@ class InputContactMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`phone_number` is equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         phone_number (:obj:`str`): Contact's phone number.
         first_name (:obj:`str`): Contact's first name.
@@ -55,6 +52,7 @@ class InputContactMessageContent(InputMessageContent):
         first_name: str,
         last_name: str = None,
         vcard: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

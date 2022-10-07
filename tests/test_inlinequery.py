@@ -57,6 +57,7 @@ class TestInlineQuery:
             "location": self.location.to_dict(),
         }
         inline_query_json = InlineQuery.de_json(json_dict, bot)
+        assert inline_query_json.api_kwargs == {}
 
         assert inline_query_json.id == self.id_
         assert inline_query_json.from_user == self.from_user

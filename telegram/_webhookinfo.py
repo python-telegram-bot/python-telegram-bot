@@ -40,9 +40,8 @@ class WebhookInfo(TelegramObject):
     :attr:`last_synchronization_error_date` are equal.
 
     .. versionchanged:: 20.0
-       * :attr:`last_synchronization_error_date` is considered as well when comparing objects of
-         this type in terms of equality.
-       * |removedkwargs|
+       :attr:`last_synchronization_error_date` is considered as well when comparing objects of
+       this type in terms of equality.
 
     Args:
         url (:obj:`str`): Webhook URL, may be empty if webhook is not set up.
@@ -102,6 +101,7 @@ class WebhookInfo(TelegramObject):
         allowed_updates: List[str] = None,
         ip_address: str = None,
         last_synchronization_error_date: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

@@ -43,9 +43,6 @@ class ChosenInlineResult(TelegramObject):
         * It is necessary to enable inline feedback via `@Botfather <https://t.me/BotFather>`_ in
           order to receive these objects in updates.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         result_id (:obj:`str`): The unique identifier for the result that was chosen.
         from_user (:class:`telegram.User`): The user that chose the result.
@@ -74,6 +71,7 @@ class ChosenInlineResult(TelegramObject):
         query: str,
         location: Location = None,
         inline_message_id: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -103,4 +101,4 @@ class ChosenInlineResult(TelegramObject):
         # Optionals
         data["location"] = Location.de_json(data.get("location"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

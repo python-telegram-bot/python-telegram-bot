@@ -50,6 +50,7 @@ class TestOrderInfo:
             "shipping_address": TestOrderInfo.shipping_address.to_dict(),
         }
         order_info = OrderInfo.de_json(json_dict, bot)
+        assert order_info.api_kwargs == {}
 
         assert order_info.name == self.name
         assert order_info.phone_number == self.phone_number

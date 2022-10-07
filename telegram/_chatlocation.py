@@ -34,9 +34,6 @@ class ChatLocation(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`location` is equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         location (:class:`telegram.Location`): The location to which the supergroup is connected.
             Can't be a live location.
@@ -53,6 +50,7 @@ class ChatLocation(TelegramObject):
         self,
         location: Location,
         address: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

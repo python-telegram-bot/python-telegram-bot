@@ -32,9 +32,6 @@ class Invoice(TelegramObject):
     considered equal, if their :attr:`title`, :attr:`description`, :paramref:`start_parameter`,
     :attr:`currency` and :attr:`total_amount` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         title (:obj:`str`): Product name.
         description (:obj:`str`): Product description.
@@ -72,6 +69,7 @@ class Invoice(TelegramObject):
         start_parameter: str,
         currency: str,
         total_amount: int,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

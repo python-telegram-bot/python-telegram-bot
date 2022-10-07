@@ -33,9 +33,6 @@ class InputVenueMessageContent(InputMessageContent):
       Foursquare details and Google Pace details are mutually exclusive. However, this
       behaviour is undocumented and might be changed by Telegram.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
@@ -83,6 +80,7 @@ class InputVenueMessageContent(InputMessageContent):
         foursquare_type: str = None,
         google_place_id: str = None,
         google_place_type: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

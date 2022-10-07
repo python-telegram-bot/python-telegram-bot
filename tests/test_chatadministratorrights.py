@@ -60,6 +60,7 @@ class TestChatAdministratorRights:
             "is_anonymous": True,
         }
         chat_administrator_rights_de = ChatAdministratorRights.de_json(json_dict, bot)
+        assert chat_administrator_rights_de.api_kwargs == {}
 
         assert chat_admin_rights == chat_administrator_rights_de
 

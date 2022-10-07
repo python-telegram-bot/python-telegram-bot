@@ -28,7 +28,7 @@ from telegram._utils.warnings import warn
 if TYPE_CHECKING:
     from telegram import Bot
 
-TO_co = TypeVar("TO_co", bound="TelegramObject", covariant=True)
+Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
 
 
 class TelegramObject:
@@ -45,13 +45,18 @@ class TelegramObject:
         assert telegram_object.get_bot() is copy.deepcopy(telegram_object).get_bot()
 
     .. versionchanged:: 20.0
-        ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
-        special cases like :attr:`Message.from_user` that deviate from the official Bot API.
+
+        * ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
+          special cases like :attr:`Message.from_user` that deviate from the official Bot API.
+        * Removed argument and attribute ``bot`` for several subclasses. Use
+          :meth:`set_bot` and :meth:`get_bot` instead.
+        * Removed the possibility to pass arbitrary keyword arguments for several subclasses.
 
     Arguments:
         api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|
 
             .. versionadded:: 20.0
+
     Attributes:
         api_kwargs (Dict[:obj:`str`, any]): |toapikwargsattr|
 
@@ -61,9 +66,15 @@ class TelegramObject:
 
     __slots__ = ("_id_attrs", "_bot", "_frozen", "api_kwargs")
 
-    __INIT_PARAMS: Optional[Set[str]] = None
+    # Used to cache the names of the parameters of the __init__ method of the class
+    # Must be a private attribute to avoid name clashes between subclasses
+    __INIT_PARAMS: Set[str] = set()
+    # Used to check if __INIT_PARAMS has been set for the current class. Unfortunately, we can't
+    # just check if `__INIT_PARAMS is None`, since subclasses use the parent class' __INIT_PARAMS
+    # unless it's overridden
+    __INIT_PARAMS_CHECK: Optional[Type["TelegramObject"]] = None
 
-    def __init__(self, api_kwargs: JSONDict = None) -> None:
+    def __init__(self, *, api_kwargs: JSONDict = None) -> None:
         self._frozen: bool = False
         self._id_attrs: Tuple[object, ...] = ()
         self._bot: Optional["Bot"] = None
@@ -142,6 +153,11 @@ class TelegramObject:
         converted back into a class. Should be modified in place.
         """
         self._unfreeze()
+
+        # Make sure that we have a `_bot` attribute. This is necessary, since __getstate__ omits
+        # this as Bots are not pickable.
+        setattr(self, "_bot", None)
+
         for key, val in state.items():
             if key == "_frozen":
                 # Setting the frozen status to True would prevent the attributes from being set
@@ -153,7 +169,7 @@ class TelegramObject:
         if state["_frozen"]:
             self._freeze()
 
-    def __deepcopy__(self: TO_co, memodict: dict) -> TO_co:
+    def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
         """This method deepcopies the object and sets the bot on the newly created copy."""
         bot = self._bot  # Save bot so we can set it after copying
         self.set_bot(None)  # set to None so it is not deepcopied
@@ -223,7 +239,7 @@ class TelegramObject:
         if recursive and data.get("from_user"):
             data["from"] = data.pop("from_user", None)
         if remove_bot:
-            data["_bot"] = None
+            data.pop("_bot", None)
         return data
 
     @staticmethod
@@ -235,7 +251,7 @@ class TelegramObject:
         return None if data is None else data.copy()
 
     @classmethod
-    def de_json(cls: Type[TO_co], data: Optional[JSONDict], bot: "Bot") -> Optional[TO_co]:
+    def de_json(cls: Type[Tele_co], data: Optional[JSONDict], bot: "Bot") -> Optional[Tele_co]:
         """Converts JSON data to a Telegram object.
 
         Args:
@@ -250,39 +266,37 @@ class TelegramObject:
 
     @classmethod
     def _de_json(
-        cls: Type[TO_co], data: Optional[JSONDict], bot: "Bot", api_kwargs: JSONDict = None
-    ) -> Optional[TO_co]:
-        if cls.__INIT_PARAMS is None:
-            signature = inspect.signature(cls)
-            cls.__INIT_PARAMS = set(signature.parameters.keys())
-
+        cls: Type[Tele_co], data: Optional[JSONDict], bot: "Bot", api_kwargs: JSONDict = None
+    ) -> Optional[Tele_co]:
         if data is None:
             return None
-
-        api_kwargs = api_kwargs or {}
 
         # try-except is significantly faster in case we already have a correct argument set
         try:
             obj = cls(**data, api_kwargs=api_kwargs)
         except TypeError as exc:
-            if "__init__() got an unexpected keyword argument" in str(exc):
-                kwargs: JSONDict = {}
-                for key, value in data.items():
-                    if key in cls.__INIT_PARAMS:  # pylint: disable=unsupported-membership-test
-                        kwargs[key] = value
-                    else:
-                        api_kwargs[key] = value
-                obj = cls(api_kwargs=api_kwargs, **kwargs)
-            else:
+            if "__init__() got an unexpected keyword argument" not in str(exc):
                 raise exc
+
+            if cls.__INIT_PARAMS_CHECK is not cls:
+                signature = inspect.signature(cls)
+                cls.__INIT_PARAMS = set(signature.parameters.keys())
+                cls.__INIT_PARAMS_CHECK = cls
+
+            api_kwargs = api_kwargs or {}
+            existing_kwargs: JSONDict = {}
+            for key, value in data.items():
+                (existing_kwargs if key in cls.__INIT_PARAMS else api_kwargs)[key] = value
+
+            obj = cls(api_kwargs=api_kwargs, **existing_kwargs)
 
         obj.set_bot(bot=bot)
         return obj
 
     @classmethod
     def de_list(
-        cls: Type[TO_co], data: Optional[List[JSONDict]], bot: "Bot"
-    ) -> List[Optional[TO_co]]:
+        cls: Type[Tele_co], data: Optional[List[JSONDict]], bot: "Bot"
+    ) -> List[Optional[Tele_co]]:
         """Converts JSON data to a list of Telegram objects.
 
         Args:

@@ -102,6 +102,7 @@ class TestChatMemberUpdated:
         }
 
         chat_member_updated = ChatMemberUpdated.de_json(json_dict, bot)
+        assert chat_member_updated.api_kwargs == {}
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user
@@ -124,6 +125,7 @@ class TestChatMemberUpdated:
         }
 
         chat_member_updated = ChatMemberUpdated.de_json(json_dict, bot)
+        assert chat_member_updated.api_kwargs == {}
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user

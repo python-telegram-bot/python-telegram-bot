@@ -28,9 +28,6 @@ class MessageId(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_id` is equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         message_id (:obj:`int`): Unique message identifier.
 
@@ -40,7 +37,7 @@ class MessageId(TelegramObject):
 
     __slots__ = ("message_id",)
 
-    def __init__(self, message_id: int, api_kwargs: JSONDict = None):
+    def __init__(self, message_id: int, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         self.message_id = message_id
 

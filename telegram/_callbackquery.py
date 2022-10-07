@@ -57,16 +57,13 @@ class CallbackQuery(TelegramObject):
           until you call :attr:`answer`. It is, therefore, necessary to react
           by calling :attr:`telegram.Bot.answer_callback_query` even if no notification to the user
           is needed (e.g., without specifying any of the optional parameters).
-        * If you're using :attr:`telegram.ext.ExtBot.arbitrary_callback_data`, :attr:`data` may be
+        * If you're using :attr:`telegram.ext.ExtBot.callback_data_cache`, :attr:`data` may be
           an instance
           of :class:`telegram.ext.InvalidCallbackData`. This will be the case, if the data
           associated with the button triggering the :class:`telegram.CallbackQuery` was already
           deleted or if :attr:`data` was manipulated by a malicious client.
 
           .. versionadded:: 13.6
-
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -121,6 +118,7 @@ class CallbackQuery(TelegramObject):
         data: str = None,
         inline_message_id: str = None,
         game_short_name: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

@@ -43,9 +43,6 @@ class EncryptedPassportElement(TelegramObject):
         This object is decrypted only when originating from
         :obj:`telegram.PassportData.decrypted_data`.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",
             "identity_card", "internal_passport", "address", "utility_bill", "bank_statement",
@@ -140,6 +137,7 @@ class EncryptedPassportElement(TelegramObject):
         selfie: PassportFile = None,
         translation: List[PassportFile] = None,
         credentials: "Credentials" = None,  # pylint: disable=unused-argument
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

@@ -42,9 +42,6 @@ class Sticker(_BaseThumbedMedium):
         arguments had to be changed. Use keyword arguments to make sure that the arguments are
         passed correctly.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -108,7 +105,7 @@ class Sticker(_BaseThumbedMedium):
             premium animation for the sticker.
 
             .. versionadded:: 20.0
-        custom_emoji (:obj:`str`): Optional. For custom emoji stickers, unique identifier of the
+        custom_emoji_id (:obj:`str`): Optional. For custom emoji stickers, unique identifier of the
             custom emoji.
 
             .. versionadded:: 20.0
@@ -143,6 +140,7 @@ class Sticker(_BaseThumbedMedium):
         mask_position: "MaskPosition" = None,
         premium_animation: "File" = None,
         custom_emoji_id: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(
@@ -202,9 +200,7 @@ class StickerSet(TelegramObject):
         passed correctly.
 
     .. versionchanged:: 20.0:
-
-        * The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
-        * |removedkwargs|
+        The parameter ``contains_masks`` has been removed. Use :paramref:`sticker_type` instead.
 
     Args:
         name (:obj:`str`): Sticker set name.
@@ -257,6 +253,7 @@ class StickerSet(TelegramObject):
         is_video: bool,
         sticker_type: str,
         thumb: PhotoSize = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -306,9 +303,6 @@ class MaskPosition(TelegramObject):
     considered equal, if their :attr:`point`, :attr:`x_shift`, :attr:`y_shift` and, :attr:`scale`
     are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         point (:obj:`str`): The part of the face relative to which the mask should be placed.
             One of :attr:`FOREHEAD`, :attr:`EYES`, :attr:`MOUTH`, or :attr:`CHIN`.
@@ -348,6 +342,7 @@ class MaskPosition(TelegramObject):
         x_shift: float,
         y_shift: float,
         scale: float,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -359,13 +354,3 @@ class MaskPosition(TelegramObject):
         self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
 
         self._freeze()
-
-    @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaskPosition"]:
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if data is None:
-            return None
-
-        return cls(**data)

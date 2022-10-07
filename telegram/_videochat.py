@@ -37,19 +37,10 @@ class VideoChatStarted(TelegramObject):
 
     .. versionadded:: 13.4
     .. versionchanged:: 20.0
-        * This class was renamed from ``VoiceChatStarted`` in accordance to Bot API 6.0.
-        * |removedkwargs|
+        This class was renamed from ``VoiceChatStarted`` in accordance to Bot API 6.0.
     """
 
     __slots__ = ()
-
-    def __init__(
-        self,
-        api_kwargs: JSONDict = None,
-    ):  # skipcq: PTC-W0049
-        super().__init__(api_kwargs=api_kwargs)
-
-        self._freeze()
 
 
 class VideoChatEnded(TelegramObject):
@@ -78,6 +69,7 @@ class VideoChatEnded(TelegramObject):
     def __init__(
         self,
         duration: int,
+        *,
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
@@ -111,6 +103,7 @@ class VideoChatParticipantsInvited(TelegramObject):
     def __init__(
         self,
         users: List[User],
+        *,
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
@@ -130,7 +123,7 @@ class VideoChatParticipantsInvited(TelegramObject):
             return None
 
         data["users"] = User.de_list(data.get("users", []), bot)
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
@@ -167,6 +160,7 @@ class VideoChatScheduled(TelegramObject):
     def __init__(
         self,
         start_date: dtm.datetime,
+        *,
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
@@ -186,9 +180,7 @@ class VideoChatScheduled(TelegramObject):
 
         data["start_date"] = from_timestamp(data["start_date"])
 
-        obj = cls(**data)
-        obj.set_bot(bot)
-        return obj
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

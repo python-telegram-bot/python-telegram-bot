@@ -62,12 +62,10 @@ class User(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     .. versionchanged:: 20.0
-
-        * The following are now keyword-only arguments in Bot methods:
-          ``location``, ``filename``, ``venue``, ``contact``,
-          ``{read, write, connect, pool}_timeout`` ``api_kwargs``. Use a named argument for those,
-          and notice that some positional arguments changed position as a result.
-        * |removedbotandkwargs|
+        The following are now keyword-only arguments in Bot methods:
+        ``location``, ``filename``, ``venue``, ``contact``,
+        ``{read, write, connect, pool}_timeout`` ``api_kwargs``. Use a named argument for those,
+        and notice that some positional arguments changed position as a result.
 
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
@@ -140,6 +138,7 @@ class User(TelegramObject):
         supports_inline_queries: bool = None,
         is_premium: bool = None,
         added_to_attachment_menu: bool = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

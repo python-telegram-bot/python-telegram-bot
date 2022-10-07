@@ -24,7 +24,21 @@ from pathlib import Path
 
 import pytest
 
-from telegram import Chat, Message, PhotoSize, TelegramObject, User
+from telegram import Bot, Chat, Message, PhotoSize, TelegramObject, User
+
+
+def all_subclasses(cls):
+    # Gets all subclasses of the specified object, recursively. from
+    # https://stackoverflow.com/a/3862957/9706202
+    # also includes the class itself
+    return (
+        set(cls.__subclasses__())
+        .union([s for c in cls.__subclasses__() for s in all_subclasses(c)])
+        .union({cls})
+    )
+
+
+TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
 
 
 def all_subclasses(cls):
@@ -71,6 +85,53 @@ class TestTelegramObject:
         monkeypatch.setattr("telegram.TelegramObject.to_dict", lambda _: d)
         with pytest.raises(TypeError):
             telegram_object.to_json()
+
+    def test_de_json_api_kwargs(self, bot):
+        to = TelegramObject.de_json(data={"foo": "bar"}, bot=bot)
+        assert to.api_kwargs == {"foo": "bar"}
+        assert to.get_bot() is bot
+
+    @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
+    def test_subclasses_have_api_kwargs(self, cls):
+        """Checks that all subclasses of TelegramObject have an api_kwargs argument that is
+        kw-only. Also, tries to check that this argument is passed to super - by checking that
+        the `__init__` contains `api_kwargs=api_kwargs`
+        """
+        if issubclass(cls, Bot):
+            # Bot doesn't have api_kwargs, because it's not defined by TG
+            return
+
+        # only relevant for subclasses that have their own init
+        if inspect.getsourcefile(cls.__init__) != inspect.getsourcefile(cls):
+            return
+
+        # Ignore classes in the test directory
+        source_file = Path(inspect.getsourcefile(cls))
+        parents = source_file.parents
+        is_test_file = Path(__file__).parent.resolve() in parents
+        if is_test_file:
+            return
+
+        # check the signature first
+        signature = inspect.signature(cls)
+        assert signature.parameters.get("api_kwargs").kind == inspect.Parameter.KEYWORD_ONLY
+
+        # Now check for `api_kwargs=api_kwargs` in the source code of `__init__`
+        if cls is TelegramObject:
+            # TelegramObject doesn't have a super class
+            return
+        assert "api_kwargs=api_kwargs" in inspect.getsource(
+            cls.__init__
+        ), f"{cls.__name__} doesn't seem to pass `api_kwargs` to `super().__init__`"
+
+    def test_de_json_arbitrary_exceptions(self, bot):
+        class SubClass(TelegramObject):
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
+                raise TypeError("This is a test")
+
+        with pytest.raises(TypeError, match="This is a test"):
+            SubClass.de_json({}, bot)
 
     def test_to_dict_private_attribute(self):
         class TelegramObjectSubclass(TelegramObject):

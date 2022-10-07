@@ -41,9 +41,6 @@ class PollOption(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         text (:obj:`str`): Option text, 1-100 characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
@@ -56,7 +53,7 @@ class PollOption(TelegramObject):
 
     __slots__ = ("voter_count", "text")
 
-    def __init__(self, text: str, voter_count: int, api_kwargs: JSONDict = None):
+    def __init__(self, text: str, voter_count: int, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         self.text = text
         self.voter_count = voter_count
@@ -76,9 +73,6 @@ class PollAnswer(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`poll_id`, :attr:`user` and :attr:`option_ids` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
         user (:class:`telegram.User`): The user, who changed the answer to the poll.
@@ -95,7 +89,7 @@ class PollAnswer(TelegramObject):
     __slots__ = ("option_ids", "user", "poll_id")
 
     def __init__(
-        self, poll_id: str, user: User, option_ids: List[int], api_kwargs: JSONDict = None
+        self, poll_id: str, user: User, option_ids: List[int], *, api_kwargs: JSONDict = None
     ):
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id = poll_id
@@ -116,7 +110,7 @@ class PollAnswer(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
 
 class Poll(TelegramObject):
@@ -127,9 +121,6 @@ class Poll(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     .. seealso:: `Pollbot Example <examples.pollbot.html>`_
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         id (:obj:`str`): Unique poll identifier.
@@ -207,6 +198,7 @@ class Poll(TelegramObject):
         explanation_entities: List[MessageEntity] = None,
         open_period: int = None,
         close_date: datetime.datetime = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -240,7 +232,7 @@ class Poll(TelegramObject):
         data["explanation_entities"] = MessageEntity.de_list(data.get("explanation_entities"), bot)
         data["close_date"] = from_timestamp(data.get("close_date"))
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

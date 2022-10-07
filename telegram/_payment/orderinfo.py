@@ -35,9 +35,6 @@ class OrderInfo(TelegramObject):
     considered equal, if their :attr:`name`, :attr:`phone_number`, :attr:`email` and
     :attr:`shipping_address` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         name (:obj:`str`, optional): User name.
         phone_number (:obj:`str`, optional): User's phone number.
@@ -60,6 +57,7 @@ class OrderInfo(TelegramObject):
         phone_number: str = None,
         email: str = None,
         shipping_address: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -82,4 +80,4 @@ class OrderInfo(TelegramObject):
 
         data["shipping_address"] = ShippingAddress.de_json(data.get("shipping_address"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

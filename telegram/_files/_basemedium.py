@@ -32,9 +32,6 @@ class _BaseMedium(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -56,7 +53,12 @@ class _BaseMedium(TelegramObject):
     __slots__ = ("file_id", "file_size", "file_unique_id")
 
     def __init__(
-        self, file_id: str, file_unique_id: str, file_size: int = None, api_kwargs: JSONDict = None
+        self,
+        file_id: str,
+        file_unique_id: str,
+        file_size: int = None,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 

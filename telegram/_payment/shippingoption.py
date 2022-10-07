@@ -35,9 +35,6 @@ class ShippingOption(TelegramObject):
 
     .. seealso:: `Paymentbot Example <examples.paymentbot.html>`_
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         id (:obj:`str`): Shipping option identifier.
         title (:obj:`str`): Option title.
@@ -57,6 +54,7 @@ class ShippingOption(TelegramObject):
         id: str,  # pylint: disable=redefined-builtin
         title: str,
         prices: List["LabeledPrice"],
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

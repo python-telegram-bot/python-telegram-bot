@@ -38,9 +38,6 @@ class InputInvoiceMessageContent(InputMessageContent):
 
     .. versionadded:: 13.5
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
             :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
@@ -181,6 +178,7 @@ class InputInvoiceMessageContent(InputMessageContent):
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
         is_flexible: bool = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

@@ -31,9 +31,6 @@ class KeyboardButtonPollType(TelegramObject):
 
     .. seealso:: `Pollbot Example <examples.pollbot.html>`_
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Attributes:
         type (:obj:`str`): Optional. If :tg-const:`telegram.Poll.QUIZ` is passed, the user will be
             allowed to create only polls in the quiz mode. If :tg-const:`telegram.Poll.REGULAR` is
@@ -44,7 +41,7 @@ class KeyboardButtonPollType(TelegramObject):
     __slots__ = ("type",)
 
     def __init__(
-        self, type: str = None, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
+        self, type: str = None, *, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
     ):  # pylint: disable=redefined-builtin
         super().__init__(api_kwargs=api_kwargs)
         self.type = type

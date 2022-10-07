@@ -39,9 +39,6 @@ class InlineKeyboardMarkup(TelegramObject):
     .. seealso:: `Inline Keyboard Example 1 <examples.inlinekeyboard.html>`_,
         `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
             each represented by a list of InlineKeyboardButton objects.
@@ -57,6 +54,7 @@ class InlineKeyboardMarkup(TelegramObject):
     def __init__(
         self,
         inline_keyboard: List[List[InlineKeyboardButton]],
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -85,8 +83,6 @@ class InlineKeyboardMarkup(TelegramObject):
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineKeyboardMarkup"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
         if not data:
             return None
 

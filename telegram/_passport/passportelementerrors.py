@@ -32,9 +32,6 @@ class PassportElementError(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`source` and :attr:`type` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         source (:obj:`str`): Error source.
         type (:obj:`str`): The section of the user's Telegram Passport which has the error.
@@ -48,7 +45,7 @@ class PassportElementError(TelegramObject):
 
     __slots__ = ("message", "source", "type")
 
-    def __init__(self, source: str, type: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, source: str, type: str, message: str, *, api_kwargs: JSONDict = None):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.source = str(source)
@@ -68,9 +65,6 @@ class PassportElementErrorDataField(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`field_name`, :attr:`data_hash` and :attr:`message` are equal.
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
@@ -98,6 +92,7 @@ class PassportElementErrorDataField(PassportElementError):
         field_name: str,
         data_hash: str,
         message: str,
+        *,
         api_kwargs: JSONDict = None,
     ):
         # Required
@@ -120,9 +115,6 @@ class PassportElementErrorFile(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
@@ -141,7 +133,7 @@ class PassportElementErrorFile(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("file", type, message, api_kwargs=api_kwargs)
         self._unfreeze()
@@ -161,9 +153,6 @@ class PassportElementErrorFiles(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
@@ -182,7 +171,7 @@ class PassportElementErrorFiles(PassportElementError):
 
     __slots__ = ("file_hashes",)
 
-    def __init__(self, type: str, file_hashes: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hashes: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("files", type, message, api_kwargs=api_kwargs)
         self._unfreeze()
@@ -202,9 +191,6 @@ class PassportElementErrorFrontSide(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
@@ -223,7 +209,7 @@ class PassportElementErrorFrontSide(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("front_side", type, message, api_kwargs=api_kwargs)
         self._unfreeze()
@@ -243,9 +229,6 @@ class PassportElementErrorReverseSide(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"driver_license"``, ``"identity_card"``.
@@ -264,7 +247,7 @@ class PassportElementErrorReverseSide(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("reverse_side", type, message, api_kwargs=api_kwargs)
         self._unfreeze()
@@ -284,9 +267,6 @@ class PassportElementErrorSelfie(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
@@ -303,7 +283,7 @@ class PassportElementErrorSelfie(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("selfie", type, message, api_kwargs=api_kwargs)
         self._unfreeze()
@@ -323,9 +303,6 @@ class PassportElementErrorTranslationFile(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
@@ -346,7 +323,7 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("translation_file", type, message, api_kwargs=api_kwargs)
         self._unfreeze()
@@ -365,9 +342,6 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
-
-    .. versionchanged:: 20.0
-        |removedkwargs|
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
@@ -389,7 +363,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
     __slots__ = ("file_hashes",)
 
-    def __init__(self, type: str, file_hashes: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, file_hashes: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
         self._unfreeze()
@@ -409,9 +383,6 @@ class PassportElementErrorUnspecified(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`element_hash`, and :attr:`message` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
         element_hash (:obj:`str`): Base64-encoded element hash.
@@ -426,7 +397,7 @@ class PassportElementErrorUnspecified(PassportElementError):
 
     __slots__ = ("element_hash",)
 
-    def __init__(self, type: str, element_hash: str, message: str, api_kwargs: JSONDict = None):
+    def __init__(self, type: str, element_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
         super().__init__("unspecified", type, message, api_kwargs=api_kwargs)
         self._unfreeze()

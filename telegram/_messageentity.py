@@ -38,9 +38,6 @@ class MessageEntity(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`type`, :attr:`offset` and :attr:`length` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         type (:obj:`str`): Type of the entity. Can be :attr:`MENTION` (@username),
             :attr:`HASHTAG`, :attr:`BOT_COMMAND`,
@@ -89,6 +86,7 @@ class MessageEntity(TelegramObject):
         user: User = None,
         language: str = None,
         custom_emoji_id: str = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -116,7 +114,7 @@ class MessageEntity(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     MENTION: ClassVar[str] = constants.MessageEntityType.MENTION
     """:const:`telegram.constants.MessageEntityType.MENTION`"""

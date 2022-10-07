@@ -97,7 +97,6 @@ class Message(TelegramObject):
           ``{read, write, connect, pool}_timeout``, ``api_kwargs``, ``contact``, ``quote``,
           ``filename``, ``loaction``, ``venue``. Use a named argument for those,
           and notice that some positional arguments changed position as a result.
-        *  |removedbotandkwargs|
 
     Args:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -498,6 +497,7 @@ class Message(TelegramObject):
         is_automatic_forward: bool = None,
         has_protected_content: bool = None,
         web_app_data: WebAppData = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

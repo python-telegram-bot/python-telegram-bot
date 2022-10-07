@@ -40,9 +40,6 @@ class ShippingQuery(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         id (:obj:`str`): Unique query identifier.
         from_user (:class:`telegram.User`): User who sent the query.
@@ -66,6 +63,7 @@ class ShippingQuery(TelegramObject):
         from_user: User,
         invoice_payload: str,
         shipping_address: ShippingAddress,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

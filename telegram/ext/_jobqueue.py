@@ -204,7 +204,7 @@ class JobQueue:
             **job_kwargs,
         )
 
-        job.job = j
+        job._job = j  # pylint: disable=protected-access
         return job
 
     def run_repeating(
@@ -319,7 +319,7 @@ class JobQueue:
             **job_kwargs,
         )
 
-        job.job = j
+        job._job = j  # pylint: disable=protected-access
         return job
 
     def run_monthly(
@@ -397,7 +397,7 @@ class JobQueue:
             timezone=when.tzinfo or self.scheduler.timezone,
             **job_kwargs,
         )
-        job.job = j
+        job._job = j  # pylint: disable=protected-access
         return job
 
     def run_daily(
@@ -486,7 +486,7 @@ class JobQueue:
             **job_kwargs,
         )
 
-        job.job = j
+        job._job = j  # pylint: disable=protected-access
         return job
 
     def run_custom(
@@ -538,7 +538,7 @@ class JobQueue:
 
         j = self.scheduler.add_job(job.run, args=(self.application,), name=name, **job_kwargs)
 
-        job.job = j
+        job._job = j  # pylint: disable=protected-access
         return job
 
     async def start(self) -> None:
@@ -600,15 +600,18 @@ class Job:
     considered equal, if their :class:`id <apscheduler.job.Job>` is equal.
 
     Note:
-        * All attributes and instance methods of :attr:`job` are also directly available as
-          attributes/methods of the corresponding :class:`telegram.ext.Job` object.
-        * If :attr:`job` isn't passed on initialization, it must be set manually afterwards for
-          this :class:`telegram.ext.Job` to be useful.
+        All attributes and instance methods of :attr:`job` are also directly available as
+        attributes/methods of the corresponding :class:`telegram.ext.Job` object.
+
+    Warning:
+        This class should not be instantiated manually.
+        Use the methods of :class:`telegram.ext.JobQueue` to schedule jobs.
 
     .. versionchanged:: 20.0
 
        * Removed argument and attribute ``job_queue``.
        * Renamed ``Job.context`` to :attr:`Job.data`.
+       * Removed argument ``job``
 
     Args:
         callback (:term:`coroutine function`): The callback function that should be executed by the
@@ -620,7 +623,6 @@ class Job:
             accessed through :attr:`Job.data` in the callback. Defaults to :obj:`None`.
         name (:obj:`str`, optional): The name of the new job. Defaults to
             :external:obj:`callback.__name__ <definition.__name__>`.
-        job (:class:`apscheduler.job.Job`, optional): The APS Job this job is a wrapper for.
         chat_id (:obj:`int`, optional): Chat id of the chat that this job is associated with.
 
             .. versionadded:: 20.0
@@ -632,7 +634,6 @@ class Job:
             new job.
         data (:obj:`object`): Optional. Additional data needed for the callback function.
         name (:obj:`str`): Optional. The name of the new job.
-        job (:class:`apscheduler.job.Job`): Optional. The APS Job this job is a wrapper for.
         chat_id (:obj:`int`): Optional. Chat id of the chat that this job is associated with.
 
             .. versionadded:: 20.0
@@ -647,7 +648,7 @@ class Job:
         "name",
         "_removed",
         "_enabled",
-        "job",
+        "_job",
         "chat_id",
         "user_id",
     )
@@ -657,7 +658,6 @@ class Job:
         callback: JobCallback,
         data: object = None,
         name: str = None,
-        job: APSJob = None,
         chat_id: int = None,
         user_id: int = None,
     ):
@@ -671,7 +671,16 @@ class Job:
         self._removed = False
         self._enabled = False
 
-        self.job = cast(APSJob, job)  # skipcq: PTC-W0052
+        self._job = cast(APSJob, None)  # skipcq: PTC-W0052
+
+    @property
+    def job(self) -> APSJob:
+        """:class:`apscheduler.job.Job`: The APS Job this job is a wrapper for.
+
+        .. versionchanged:: 20.0
+            This property is now read-only.
+        """
+        return self._job
 
     async def run(self, application: "Application") -> None:
         """Executes the callback function independently of the jobs schedule. Also calls
@@ -756,3 +765,6 @@ class Job:
         if isinstance(other, self.__class__):
             return self.id == other.id
         return False
+
+    def __hash__(self) -> int:
+        return hash(self.id)

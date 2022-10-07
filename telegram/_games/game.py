@@ -39,9 +39,6 @@ class Game(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`title`, :attr:`description` and :attr:`photo` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         title (:obj:`str`): Title of the game.
         description (:obj:`str`): Description of the game.
@@ -91,6 +88,7 @@ class Game(TelegramObject):
         text: str = None,
         text_entities: List[MessageEntity] = None,
         animation: Animation = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -119,7 +117,7 @@ class Game(TelegramObject):
         data["text_entities"] = MessageEntity.de_list(data.get("text_entities"), bot)
         data["animation"] = Animation.de_json(data.get("animation"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

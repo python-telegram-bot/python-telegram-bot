@@ -39,9 +39,6 @@ class PreCheckoutQuery(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         id (:obj:`str`): Unique query identifier.
         from_user (:class:`telegram.User`): User who sent the query.
@@ -89,6 +86,7 @@ class PreCheckoutQuery(TelegramObject):
         invoice_payload: str,
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

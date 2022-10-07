@@ -35,9 +35,6 @@ class ProximityAlertTriggered(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`traveler`, :attr:`watcher` and :attr:`distance` are equal.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         traveler (:class:`telegram.User`): User that triggered the alert
         watcher (:class:`telegram.User`): User that set the alert
@@ -52,7 +49,9 @@ class ProximityAlertTriggered(TelegramObject):
 
     __slots__ = ("traveler", "distance", "watcher")
 
-    def __init__(self, traveler: User, watcher: User, distance: int, api_kwargs: JSONDict = None):
+    def __init__(
+        self, traveler: User, watcher: User, distance: int, *, api_kwargs: JSONDict = None
+    ):
         super().__init__(api_kwargs=api_kwargs)
         self.traveler = traveler
         self.watcher = watcher

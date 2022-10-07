@@ -42,7 +42,6 @@ class ChatInviteLink(TelegramObject):
        * The argument & attribute :attr:`creates_join_request` is now required to comply with the
          Bot API.
        * Comparing objects of this class now also takes :attr:`creates_join_request` into account.
-       * |removedkwargs|
 
     Args:
         invite_link (:obj:`str`): The invite link.
@@ -113,6 +112,7 @@ class ChatInviteLink(TelegramObject):
         member_limit: int = None,
         name: str = None,
         pending_join_request_count: int = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -151,7 +151,7 @@ class ChatInviteLink(TelegramObject):
         data["creator"] = User.de_json(data.get("creator"), bot)
         data["expire_date"] = from_timestamp(data.get("expire_date", None))
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""

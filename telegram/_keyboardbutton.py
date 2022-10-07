@@ -48,9 +48,8 @@ class KeyboardButton(TelegramObject):
           Older clients will display unsupported message.
 
     .. versionchanged:: 20.0
-       * :attr:`web_app` is considered as well when comparing objects of this type in terms of
-         equality.
-       * |removedkwargs|
+       :attr:`web_app` is considered as well when comparing objects of this type in terms of
+       equality.
 
     Args:
         text (:obj:`str`): Text of the button. If none of the optional fields are used, it will be
@@ -88,6 +87,7 @@ class KeyboardButton(TelegramObject):
         request_location: bool = None,
         request_poll: KeyboardButtonPollType = None,
         web_app: WebAppInfo = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -120,4 +120,4 @@ class KeyboardButton(TelegramObject):
         data["request_poll"] = KeyboardButtonPollType.de_json(data.get("request_poll"), bot)
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

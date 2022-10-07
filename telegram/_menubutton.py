@@ -55,7 +55,7 @@ class MenuButton(TelegramObject):
     __slots__ = ("type",)
 
     def __init__(
-        self, type: str, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
+        self, type: str, *, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
     ):  # pylint: disable=redefined-builtin
         super().__init__(api_kwargs=api_kwargs)
         self.type = type
@@ -79,7 +79,10 @@ class MenuButton(TelegramObject):
         """
         data = cls._parse_data(data)
 
-        if not data:
+        if data is None:
+            return None
+
+        if not data and cls is MenuButton:
             return None
 
         _class_mapping: Dict[str, Type["MenuButton"]] = {
@@ -89,8 +92,9 @@ class MenuButton(TelegramObject):
         }
 
         if cls is MenuButton and data.get("type") in _class_mapping:
-            return _class_mapping[data["type"]].de_json(data, bot=bot)
-        return super().de_json(data=data, bot=bot)
+            return _class_mapping[data.pop("type")].de_json(data, bot=bot)
+        out = super().de_json(data=data, bot=bot)
+        return out
 
     COMMANDS: ClassVar[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""
@@ -110,8 +114,8 @@ class MenuButtonCommands(MenuButton):
 
     __slots__ = ()
 
-    def __init__(self, api_kwargs: JSONDict = None):
-        super().__init__(type=constants.MenuButtonType.COMMANDS)
+    def __init__(self, *, api_kwargs: JSONDict = None):
+        super().__init__(type=constants.MenuButtonType.COMMANDS, api_kwargs=api_kwargs)
         self._unfreeze()
 
         self._freeze()
@@ -143,8 +147,8 @@ class MenuButtonWebApp(MenuButton):
 
     __slots__ = ("text", "web_app")
 
-    def __init__(self, text: str, web_app: WebAppInfo, api_kwargs: JSONDict = None):
-        super().__init__(type=constants.MenuButtonType.WEB_APP)
+    def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: JSONDict = None):
+        super().__init__(type=constants.MenuButtonType.WEB_APP, api_kwargs=api_kwargs)
         self._unfreeze()
         self.text = text
         self.web_app = web_app
@@ -182,8 +186,8 @@ class MenuButtonDefault(MenuButton):
 
     __slots__ = ()
 
-    def __init__(self, api_kwargs: JSONDict = None):
-        super().__init__(type=constants.MenuButtonType.DEFAULT)
+    def __init__(self, *, api_kwargs: JSONDict = None):
+        super().__init__(type=constants.MenuButtonType.DEFAULT, api_kwargs=api_kwargs)
         self._unfreeze()
 
         self._freeze()

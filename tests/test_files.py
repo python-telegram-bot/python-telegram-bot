@@ -16,6 +16,9 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -43,23 +46,43 @@ class TestFiles:
         assert telegram._utils.files.is_local_file(string) == expected
 
     @pytest.mark.parametrize(
-        "string,expected",
+        "string,expected_local,expected_non_local",
         [
-            (data_file("game.gif"), data_file("game.gif").as_uri()),
-            (TEST_DATA_PATH, TEST_DATA_PATH),
-            ("file://foobar", "file://foobar"),
-            (str(data_file("game.gif")), data_file("game.gif").as_uri()),
-            (str(TEST_DATA_PATH), str(TEST_DATA_PATH)),
-            (data_file("game.gif"), data_file("game.gif").as_uri()),
-            (TEST_DATA_PATH, TEST_DATA_PATH),
+            (data_file("game.gif"), data_file("game.gif").as_uri(), InputFile),
+            (TEST_DATA_PATH, TEST_DATA_PATH, TEST_DATA_PATH),
+            ("file://foobar", "file://foobar", ValueError),
+            (str(data_file("game.gif")), data_file("game.gif").as_uri(), InputFile),
+            (str(TEST_DATA_PATH), str(TEST_DATA_PATH), str(TEST_DATA_PATH)),
             (
+                "https:/api.org/file/botTOKEN/document/file_3",
                 "https:/api.org/file/botTOKEN/document/file_3",
                 "https:/api.org/file/botTOKEN/document/file_3",
             ),
         ],
+        ids=[
+            "Path(local_file)",
+            "Path(directory)",
+            "file_uri",
+            "str-path local file",
+            "str-path directory",
+            "URL",
+        ],
     )
-    def test_parse_file_input_string(self, string, expected):
-        assert telegram._utils.files.parse_file_input(string) == expected
+    def test_parse_file_input_string(self, string, expected_local, expected_non_local):
+        assert telegram._utils.files.parse_file_input(string, local_mode=True) == expected_local
+
+        if expected_non_local is InputFile:
+            assert isinstance(
+                telegram._utils.files.parse_file_input(string, local_mode=False), InputFile
+            )
+        elif expected_non_local is ValueError:
+            with pytest.raises(ValueError):
+                telegram._utils.files.parse_file_input(string, local_mode=False)
+        else:
+            assert (
+                telegram._utils.files.parse_file_input(string, local_mode=False)
+                == expected_non_local
+            )
 
     def test_parse_file_input_file_like(self):
         source_file = data_file("game.gif")
@@ -105,3 +128,34 @@ class TestFiles:
 
         assert isinstance(parsed, InputFile)
         assert bool(parsed.attach_name) is attach
+
+    def test_load_file_none(self):
+        assert telegram._utils.files.load_file(None) == (None, None)
+
+    @pytest.mark.parametrize("arg", [b"bytes", "string", InputFile(b"content"), Path("file/path")])
+    def test_load_file_no_file(self, arg):
+        out = telegram._utils.files.load_file(arg)
+        assert out[0] is None
+        assert out[1] is arg
+
+    def test_load_file_file_handle(self):
+        out = telegram._utils.files.load_file(data_file("telegram.gif").open("rb"))
+        assert out[0] == "telegram.gif"
+        assert out[1] == data_file("telegram.gif").read_bytes()
+
+    def test_load_file_subprocess_pipe(self):
+        png_file = data_file("telegram.png")
+        cmd_str = "type" if sys.platform == "win32" else "cat"
+        cmd = [cmd_str, str(png_file)]
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=(sys.platform == "win32"))
+        out = telegram._utils.files.load_file(proc.stdout)
+
+        assert out[0] is None
+        assert out[1] == png_file.read_bytes()
+
+        try:
+            proc.kill()
+        except ProcessLookupError:
+            # This exception may be thrown if the process has finished before we had the chance
+            # to kill it.
+            pass

@@ -693,11 +693,11 @@ class TestUpdater:
 
     @pytest.mark.parametrize("invalid_data", [True, False], ids=("invalid data", "valid data"))
     async def test_webhook_arbitrary_callback_data(
-        self, monkeypatch, updater, invalid_data, chat_id
+        self, monkeypatch, cdc_bot, invalid_data, chat_id
     ):
         """Here we only test one simple setup. telegram.ext.ExtBot.insert_callback_data is tested
         extensively in test_bot.py in conjunction with get_updates."""
-        updater.bot.arbitrary_callback_data = True
+        updater = Updater(bot=cdc_bot, update_queue=asyncio.Queue())
 
         async def return_true(*args, **kwargs):
             return True
@@ -743,7 +743,6 @@ class TestUpdater:
 
                 await updater.stop()
         finally:
-            updater.bot.arbitrary_callback_data = False
             updater.bot.callback_data_cache.clear_callback_data()
             updater.bot.callback_data_cache.clear_callback_queries()
 

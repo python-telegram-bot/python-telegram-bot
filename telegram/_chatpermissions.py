@@ -35,9 +35,6 @@ class ChatPermissions(TelegramObject):
         permissions that are set, but also sets all the others to :obj:`False`. However, since not
         documented, this behaviour may change unbeknown to PTB.
 
-    .. versionchanged:: 20.0
-        |removedkwargs|
-
     Args:
         can_send_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to send text
             messages, contacts, locations and venues.
@@ -101,6 +98,7 @@ class ChatPermissions(TelegramObject):
         can_change_info: bool = None,
         can_invite_users: bool = None,
         can_pin_messages: bool = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

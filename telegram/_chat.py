@@ -74,7 +74,9 @@ class Chat(TelegramObject):
           and notice that some positional arguments changed position as a result.
 
     .. versionchanged:: 20.0
-        |removedbotandkwargs|
+        Removed the attribute ``all_members_are_administrators``. As long as Telegram provides
+        this field for backwards compatibility, it is available through
+        :attr:`~telegram.TelegramObject.api_kwargs`.
 
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
@@ -267,6 +269,7 @@ class Chat(TelegramObject):
         join_to_send_messages: bool = None,
         join_by_request: bool = None,
         has_restricted_voice_and_video_messages: bool = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

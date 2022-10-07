@@ -36,9 +36,6 @@ class PassportFile(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    .. versionchanged:: 20.0
-        |removedbotandkwargs|
-
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -74,6 +71,7 @@ class PassportFile(TelegramObject):
         file_date: int,
         file_size: int,
         credentials: "FileCredentials" = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)

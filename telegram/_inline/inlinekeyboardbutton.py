@@ -67,10 +67,8 @@ class InlineKeyboardButton(TelegramObject):
         :class:`telegram.InlineKeyboardMarkup`
 
     .. versionchanged:: 20.0
-
-       * :attr:`web_app` is considered as well when comparing objects of this type in terms of
-         equality.
-       * |removedkwargs|
+       :attr:`web_app` is considered as well when comparing objects of this type in terms of
+       equality.
 
     Args:
         text (:obj:`str`): Label text on the button.
@@ -175,6 +173,7 @@ class InlineKeyboardButton(TelegramObject):
         pay: bool = None,
         login_url: LoginUrl = None,
         web_app: WebAppInfo = None,
+        *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
@@ -220,7 +219,7 @@ class InlineKeyboardButton(TelegramObject):
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
         data["callback_game"] = CallbackGame.de_json(data.get("callback_game"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def update_callback_data(self, callback_data: Union[str, object]) -> None:
         """
