@@ -41,17 +41,6 @@ def all_subclasses(cls):
 TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
 
 
-def all_subclasses(cls):
-    # Gets all subclasses of the specified object, recursively. from
-    # https://stackoverflow.com/a/3862957/9706202
-    return set(cls.__subclasses__()).union(
-        [s for c in cls.__subclasses__() for s in all_subclasses(c)]
-    )
-
-
-TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
-
-
 class TestTelegramObject:
     class Sub(TelegramObject):
         def __init__(self, private, normal, b):

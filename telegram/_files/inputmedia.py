@@ -263,9 +263,6 @@ class InputMediaPhoto(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
-        self._unfreeze()
-
-        self._freeze()
 
 
 class InputMediaVideo(InputMedia):

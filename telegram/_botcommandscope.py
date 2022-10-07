@@ -130,9 +130,6 @@ class BotCommandScopeDefault(BotCommandScope):
 
     def __init__(self, *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.DEFAULT, api_kwargs=api_kwargs)
-        self._unfreeze()
-
-        self._freeze()
 
 
 class BotCommandScopeAllPrivateChats(BotCommandScope):
@@ -148,9 +145,6 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
 
     def __init__(self, *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.ALL_PRIVATE_CHATS, api_kwargs=api_kwargs)
-        self._unfreeze()
-
-        self._freeze()
 
 
 class BotCommandScopeAllGroupChats(BotCommandScope):
@@ -165,9 +159,6 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
 
     def __init__(self, *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.ALL_GROUP_CHATS, api_kwargs=api_kwargs)
-        self._unfreeze()
-
-        self._freeze()
 
 
 class BotCommandScopeAllChatAdministrators(BotCommandScope):
@@ -182,9 +173,6 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
 
     def __init__(self, *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.ALL_CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
-        self._unfreeze()
-
-        self._freeze()
 
 
 class BotCommandScopeChat(BotCommandScope):

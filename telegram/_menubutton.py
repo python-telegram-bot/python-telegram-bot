@@ -116,9 +116,6 @@ class MenuButtonCommands(MenuButton):
 
     def __init__(self, *, api_kwargs: JSONDict = None):
         super().__init__(type=constants.MenuButtonType.COMMANDS, api_kwargs=api_kwargs)
-        self._unfreeze()
-
-        self._freeze()
 
 
 class MenuButtonWebApp(MenuButton):
@@ -188,6 +185,3 @@ class MenuButtonDefault(MenuButton):
 
     def __init__(self, *, api_kwargs: JSONDict = None):
         super().__init__(type=constants.MenuButtonType.DEFAULT, api_kwargs=api_kwargs)
-        self._unfreeze()
-
-        self._freeze()
