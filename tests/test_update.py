@@ -114,6 +114,7 @@ class TestUpdate:
         # Convert the single update 'item' to a dict of that item and apply it to the json_dict
         json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
         update = Update.de_json(json_dict, bot)
+        assert update.api_kwargs == {}
 
         assert update.update_id == self.update_id
 

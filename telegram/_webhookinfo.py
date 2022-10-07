@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram WebhookInfo."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import from_timestamp
@@ -61,7 +61,6 @@ class WebhookInfo(TelegramObject):
             that happened when trying to synchronize available updates with Telegram datacenters.
 
             .. versionadded:: 20.0
-
     Attributes:
         url (:obj:`str`): Webhook URL.
         has_custom_certificate (:obj:`bool`): If a custom certificate was provided for webhook.
@@ -102,8 +101,10 @@ class WebhookInfo(TelegramObject):
         allowed_updates: List[str] = None,
         ip_address: str = None,
         last_synchronization_error_date: int = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.url = url
         self.has_custom_certificate = has_custom_certificate
@@ -142,4 +143,4 @@ class WebhookInfo(TelegramObject):
             data.get("last_synchronization_error_date")
         )
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)

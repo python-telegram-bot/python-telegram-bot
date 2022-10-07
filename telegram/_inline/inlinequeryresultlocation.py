@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._utils.types import JSONDict
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -56,7 +57,6 @@ class InlineQueryResultLocation(InlineQueryResult):
         thumb_url (:obj:`str`, optional): Url of the thumbnail for the result.
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.LOCATION`.
@@ -112,10 +112,11 @@ class InlineQueryResultLocation(InlineQueryResult):
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         # Required
-        super().__init__(InlineQueryResultType.LOCATION, id)
+        super().__init__(InlineQueryResultType.LOCATION, id, api_kwargs=api_kwargs)
         self.latitude = latitude
         self.longitude = longitude
         self.title = title

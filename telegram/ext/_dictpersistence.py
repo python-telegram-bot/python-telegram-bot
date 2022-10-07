@@ -68,7 +68,6 @@ class DictPersistence(BasePersistence):
             wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
 
             .. versionadded:: 20.0
-
     Attributes:
         store_data (:class:`PersistenceInput`): Specifies which kinds of data will be saved by this
             persistence instance.

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram PreCheckoutQuery."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
@@ -53,8 +53,6 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id (:obj:`str`, optional): Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`, optional): Order info provided by the user.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         id (:obj:`str`): Unique query identifier.
@@ -65,7 +63,7 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id (:obj:`str`): Optional. Identifier of the shipping option chosen by the
             user.
         order_info (:class:`telegram.OrderInfo`): Optional. Order info provided by the user.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -81,16 +79,17 @@ class PreCheckoutQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin, invalid-name
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         currency: str,
         total_amount: int,
         invoice_payload: str,
         shipping_option_id: str = None,
         order_info: OrderInfo = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
         self.currency = currency
@@ -98,8 +97,6 @@ class PreCheckoutQuery(TelegramObject):
         self.invoice_payload = invoice_payload
         self.shipping_option_id = shipping_option_id
         self.order_info = order_info
-
-        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 
@@ -111,10 +108,10 @@ class PreCheckoutQuery(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data.pop("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["order_info"] = OrderInfo.de_json(data.get("order_info"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     async def answer(  # pylint: disable=invalid-name
         self,

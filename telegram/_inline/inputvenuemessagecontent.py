@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputVenueMessageContent."""
 
-from typing import Any
-
 from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._utils.types import JSONDict
 
 
 class InputVenueMessageContent(InputMessageContent):
@@ -47,7 +46,6 @@ class InputVenueMessageContent(InputMessageContent):
         google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
             `supported types <https://developers.google.com/maps/documentation/places/web-service\
             /supported_types>`_.)
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -82,8 +80,11 @@ class InputVenueMessageContent(InputMessageContent):
         foursquare_type: str = None,
         google_place_id: str = None,
         google_place_type: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.latitude = latitude
         self.longitude = longitude

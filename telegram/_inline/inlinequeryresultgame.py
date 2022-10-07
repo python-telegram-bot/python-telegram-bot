@@ -18,10 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultGame."""
 
-from typing import Any
-
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
+from telegram._utils.types import JSONDict
 from telegram.constants import InlineQueryResultType
 
 
@@ -33,7 +32,6 @@ class InlineQueryResultGame(InlineQueryResult):
         game_short_name (:obj:`str`): Short name of the game.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GAME`.
@@ -51,10 +49,11 @@ class InlineQueryResultGame(InlineQueryResult):
         id: str,  # pylint: disable=redefined-builtin
         game_short_name: str,
         reply_markup: InlineKeyboardMarkup = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         # Required
-        super().__init__(InlineQueryResultType.GAME, id)
+        super().__init__(InlineQueryResultType.GAME, id, api_kwargs=api_kwargs)
         self.id = id
         self.game_short_name = game_short_name
 

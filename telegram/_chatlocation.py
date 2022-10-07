@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a location to which a chat is connected."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
@@ -38,8 +38,6 @@ class ChatLocation(TelegramObject):
         location (:class:`telegram.Location`): The location to which the supergroup is connected.
             Can't be a live location.
         address (:obj:`str`): Location address; 1-64 characters, as defined by the chat owner
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         location (:class:`telegram.Location`): The location to which the supergroup is connected.
         address (:obj:`str`): Location address, as defined by the chat owner
@@ -52,8 +50,10 @@ class ChatLocation(TelegramObject):
         self,
         location: Location,
         address: str,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.location = location
         self.address = address
 
@@ -69,4 +69,4 @@ class ChatLocation(TelegramObject):
 
         data["location"] = Location.de_json(data.get("location"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)

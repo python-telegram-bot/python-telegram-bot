@@ -267,12 +267,12 @@ class TestAudio:
             "performer": self.performer,
             "title": self.title,
             "file_name": self.file_name,
-            "caption": self.caption,
             "mime_type": self.mime_type,
             "file_size": self.file_size,
             "thumb": audio.thumb.to_dict(),
         }
         json_audio = Audio.de_json(json_dict, bot)
+        assert json_audio.api_kwargs == {}
 
         assert json_audio.file_id == self.audio_file_id
         assert json_audio.file_unique_id == self.audio_file_unique_id

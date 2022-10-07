@@ -228,6 +228,7 @@ class TestSticker:
             "custom_emoji_id": self.custom_emoji_id,
         }
         json_sticker = Sticker.de_json(json_dict, bot)
+        assert json_sticker.api_kwargs == {}
 
         assert json_sticker.file_id == self.sticker_file_id
         assert json_sticker.file_unique_id == self.sticker_file_unique_id
@@ -485,6 +486,7 @@ class TestStickerSet:
     stickers = [Sticker("file_id", "file_un_id", 512, 512, True, True, Sticker.REGULAR)]
     name = "NOTAREALNAME"
     sticker_type = Sticker.REGULAR
+    contains_masks = True
 
     def test_de_json(self, bot, sticker):
         name = f"test_by_{bot.username}"
@@ -496,6 +498,7 @@ class TestStickerSet:
             "stickers": [x.to_dict() for x in self.stickers],
             "thumb": sticker.thumb.to_dict(),
             "sticker_type": self.sticker_type,
+            "contains_masks": self.contains_masks,
         }
         sticker_set = StickerSet.de_json(json_dict, bot)
 
@@ -506,6 +509,7 @@ class TestStickerSet:
         assert sticker_set.stickers == self.stickers
         assert sticker_set.thumb == sticker.thumb
         assert sticker_set.sticker_type == self.sticker_type
+        assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks}
 
     async def test_create_sticker_set(
         self, bot, chat_id, sticker_file, animated_sticker_file, video_sticker_file
@@ -870,6 +874,7 @@ class TestMaskPosition:
             "scale": self.scale,
         }
         mask_position = MaskPosition.de_json(json_dict, bot)
+        assert mask_position.api_kwargs == {}
 
         assert mask_position.point == self.point
         assert mask_position.x_shift == self.x_shift

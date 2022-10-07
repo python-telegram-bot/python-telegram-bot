@@ -149,6 +149,7 @@ class TestInlineKeyboardMarkup:
             ]
         }
         inline_keyboard_markup = InlineKeyboardMarkup.de_json(json_dict, None)
+        assert inline_keyboard_markup.api_kwargs == {}
 
         assert isinstance(inline_keyboard_markup, InlineKeyboardMarkup)
         keyboard = inline_keyboard_markup.inline_keyboard

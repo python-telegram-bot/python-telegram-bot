@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Venue."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
@@ -49,7 +49,6 @@ class Venue(TelegramObject):
         google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
             `supported types <https://developers.google.com/maps/documentation/places/web-service\
             /supported_types>`_.)
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         location (:class:`telegram.Location`): Venue location.
@@ -81,8 +80,11 @@ class Venue(TelegramObject):
         foursquare_type: str = None,
         google_place_id: str = None,
         google_place_type: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.location = location
         self.title = title
@@ -105,4 +107,4 @@ class Venue(TelegramObject):
 
         data["location"] = Location.de_json(data.get("location"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

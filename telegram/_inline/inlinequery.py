@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineQuery."""
 
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Optional, Sequence, Union
+from typing import TYPE_CHECKING, Callable, ClassVar, Optional, Sequence, Union
 
 from telegram import constants
 from telegram._files.location import Location
@@ -44,11 +44,10 @@ class InlineQuery(TelegramObject):
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
     .. versionchanged:: 20.0
-
-        * The following are now keyword-only arguments in Bot methods:
-          ``{read, write, connect, pool}_timeout``, :paramref:`answer.api_kwargs`,
-          ``auto_pagination``. Use a named argument for those,
-          and notice that some positional arguments changed position as a result.
+        The following are now keyword-only arguments in Bot methods:
+        ``{read, write, connect, pool}_timeout``, :paramref:`answer.api_kwargs`,
+        ``auto_pagination``. Use a named argument for those,
+        and notice that some positional arguments changed position as a result.
 
     Args:
         id (:obj:`str`): Unique identifier for this query.
@@ -65,8 +64,6 @@ class InlineQuery(TelegramObject):
             .. versionadded:: 13.5
         location (:class:`telegram.Location`, optional): Sender location, only for bots that
             request user location.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
@@ -85,15 +82,16 @@ class InlineQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin, invalid-name
+        id: str,  # pylint: disable=redefined-builtin
         from_user: User,
         query: str,
         offset: str,
         location: Location = None,
-        bot: "Bot" = None,
         chat_type: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
@@ -104,7 +102,6 @@ class InlineQuery(TelegramObject):
         self.location = location
         self.chat_type = chat_type
 
-        self.set_bot(bot)
         self._id_attrs = (self.id,)
 
     @classmethod
@@ -115,10 +112,10 @@ class InlineQuery(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["location"] = Location.de_json(data.get("location"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     async def answer(
         self,

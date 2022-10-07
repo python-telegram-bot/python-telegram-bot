@@ -317,6 +317,7 @@ class TestVideo:
             "file_name": self.file_name,
         }
         json_video = Video.de_json(json_dict, bot)
+        assert json_video.api_kwargs == {}
 
         assert json_video.file_id == self.video_file_id
         assert json_video.file_unique_id == self.video_file_unique_id

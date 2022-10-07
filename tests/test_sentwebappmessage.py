@@ -47,6 +47,7 @@ class TestSentWebAppMessage:
     def test_de_json(self, bot):
         data = {"inline_message_id": self.inline_message_id}
         m = SentWebAppMessage.de_json(data, None)
+        assert m.api_kwargs == {}
         assert m.inline_message_id == self.inline_message_id
 
     def test_equality(self):

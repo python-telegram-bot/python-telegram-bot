@@ -31,6 +31,7 @@ class TestMessageAutoDeleteTimerChanged:
     def test_de_json(self):
         json_dict = {"message_auto_delete_time": self.message_auto_delete_time}
         madtc = MessageAutoDeleteTimerChanged.de_json(json_dict, None)
+        assert madtc.api_kwargs == {}
 
         assert madtc.message_auto_delete_time == self.message_auto_delete_time
 

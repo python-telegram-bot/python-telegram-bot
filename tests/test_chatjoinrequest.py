@@ -32,14 +32,15 @@ def time():
 
 @pytest.fixture(scope="class")
 def chat_join_request(bot, time):
-    return ChatJoinRequest(
+    cjr = ChatJoinRequest(
         chat=TestChatJoinRequest.chat,
         from_user=TestChatJoinRequest.from_user,
         date=time,
         bio=TestChatJoinRequest.bio,
         invite_link=TestChatJoinRequest.invite_link,
-        bot=bot,
     )
+    cjr.set_bot(bot)
+    return cjr
 
 
 class TestChatJoinRequest:
@@ -68,6 +69,7 @@ class TestChatJoinRequest:
             "date": to_timestamp(time),
         }
         chat_join_request = ChatJoinRequest.de_json(json_dict, bot)
+        assert chat_join_request.api_kwargs == {}
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user
@@ -76,6 +78,7 @@ class TestChatJoinRequest:
 
         json_dict.update({"bio": self.bio, "invite_link": self.invite_link.to_dict()})
         chat_join_request = ChatJoinRequest.de_json(json_dict, bot)
+        assert chat_join_request.api_kwargs == {}
 
         assert chat_join_request.chat == self.chat
         assert chat_join_request.from_user == self.from_user

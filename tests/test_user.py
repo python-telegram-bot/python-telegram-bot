@@ -42,7 +42,7 @@ def json_dict():
 
 @pytest.fixture(scope="function")
 def user(bot):
-    return User(
+    user = User(
         id=TestUser.id_,
         first_name=TestUser.first_name,
         is_bot=TestUser.is_bot,
@@ -52,10 +52,11 @@ def user(bot):
         can_join_groups=TestUser.can_join_groups,
         can_read_all_group_messages=TestUser.can_read_all_group_messages,
         supports_inline_queries=TestUser.supports_inline_queries,
-        bot=bot,
         is_premium=TestUser.is_premium,
         added_to_attachment_menu=TestUser.added_to_attachment_menu,
     )
+    user.set_bot(bot)
+    return user
 
 
 class TestUser:
@@ -78,6 +79,7 @@ class TestUser:
 
     def test_de_json(self, json_dict, bot):
         user = User.de_json(json_dict, bot)
+        assert user.api_kwargs == {}
 
         assert user.id == self.id_
         assert user.is_bot == self.is_bot
@@ -95,6 +97,7 @@ class TestUser:
         del json_dict["username"]
 
         user = User.de_json(json_dict, bot)
+        assert user.api_kwargs == {}
 
         assert user.id == self.id_
         assert user.is_bot == self.is_bot
@@ -113,6 +116,7 @@ class TestUser:
         del json_dict["last_name"]
 
         user = User.de_json(json_dict, bot)
+        assert user.api_kwargs == {}
 
         assert user.id == self.id_
         assert user.is_bot == self.is_bot

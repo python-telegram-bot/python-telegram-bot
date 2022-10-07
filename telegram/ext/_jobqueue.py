@@ -663,7 +663,6 @@ class Job:
         user_id (:obj:`int`, optional): User id of the user that this job is associated with.
 
             .. versionadded:: 20.0
-
     Attributes:
         callback (:term:`coroutine function`): The callback function that should be executed by the
             new job.

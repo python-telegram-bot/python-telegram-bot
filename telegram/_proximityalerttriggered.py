@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Proximity Alert."""
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -49,7 +49,10 @@ class ProximityAlertTriggered(TelegramObject):
 
     __slots__ = ("traveler", "distance", "watcher")
 
-    def __init__(self, traveler: User, watcher: User, distance: int, **_kwargs: Any):
+    def __init__(
+        self, traveler: User, watcher: User, distance: int, *, api_kwargs: JSONDict = None
+    ):
+        super().__init__(api_kwargs=api_kwargs)
         self.traveler = traveler
         self.watcher = watcher
         self.distance = distance
@@ -67,4 +70,4 @@ class ProximityAlertTriggered(TelegramObject):
         data["traveler"] = User.de_json(data.get("traveler"), bot)
         data["watcher"] = User.de_json(data.get("watcher"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)

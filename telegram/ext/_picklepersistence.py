@@ -54,7 +54,7 @@ def _reconstruct_to(cls: Type[TelegramObj], kwargs: dict) -> TelegramObj:
     """
     obj = cls.__new__(cls)
     obj.__setstate__(kwargs)
-    return obj  # type: ignore[return-value]
+    return obj
 
 
 def _custom_reduction(cls: TelegramObj) -> Tuple[Callable, Tuple[Type[TelegramObj], dict]]:
@@ -161,7 +161,6 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             wait between two consecutive runs of updating the persistence. Defaults to 60 seconds.
 
             .. versionadded:: 20.0
-
     Attributes:
         filepath (:obj:`str` | :obj:`pathlib.Path`): The filepath for storing the pickle files.
             When :attr:`single_file` is :obj:`False` this will be used as a prefix.

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 # pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, ClassVar, List, Optional, Tuple, Union
 
 from telegram import constants
 from telegram._files.location import Location
@@ -79,7 +79,6 @@ class CallbackQuery(TelegramObject):
             inline mode, that originated the query.
         game_short_name (:obj:`str`, optional): Short name of a Game to be returned, serves as
             the unique identifier for the game
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
@@ -96,7 +95,7 @@ class CallbackQuery(TelegramObject):
         inline_message_id (:obj:`str`): Optional. Identifier of the message sent via the bot in
                 inline mode, that originated the query.
         game_short_name (:obj:`str`): Optional. Short name of a Game to be returned.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
 
     """
 
@@ -112,16 +111,17 @@ class CallbackQuery(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=invalid-name
+        id: str,
         from_user: User,
         chat_instance: str,
         message: Message = None,
         data: str = None,
         inline_message_id: str = None,
         game_short_name: str = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.id = id  # pylint: disable=invalid-name
         self.from_user = from_user
@@ -131,8 +131,6 @@ class CallbackQuery(TelegramObject):
         self.data = data
         self.inline_message_id = inline_message_id
         self.game_short_name = game_short_name
-
-        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 
@@ -144,10 +142,10 @@ class CallbackQuery(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["message"] = Message.de_json(data.get("message"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     async def answer(
         self,
