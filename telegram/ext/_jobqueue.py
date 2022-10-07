@@ -714,7 +714,7 @@ class Job:
         self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
     @property
-    def job(self) -> APSJob:
+    def job(self) -> "APSJob":
         """:class:`apscheduler.job.Job`: The APS Job this job is a wrapper for.
 
         .. versionchanged:: 20.0
