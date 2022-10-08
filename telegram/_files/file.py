@@ -160,9 +160,7 @@ class File(TelegramObject):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
 
         Returns:
-            :class:`pathlib.Path`: Returns the Path object the file was downloaded to
-            or, if the bot is running with :attr:`local_mode=True<telegram.Bot.local_mode>`,
-            the file path to the local file.
+            :class:`pathlib.Path`: Returns the Path object the file was downloaded to.
 
         """
         local_file = is_local_file(self.file_path)
