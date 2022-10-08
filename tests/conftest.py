@@ -159,6 +159,13 @@ async def bot(bot_info):
 
 
 @pytest.fixture(scope="session")
+async def cdc_bot(bot_info):
+    """Makes an ExtBot instance with the given bot_info that uses arbitrary callback_data"""
+    async with make_bot(bot_info, arbitrary_callback_data=True) as _bot:
+        yield _bot
+
+
+@pytest.fixture(scope="session")
 async def raw_bot(bot_info):
     """Makes an regular Bot instance with the given bot_info"""
     async with DictBot(
@@ -281,15 +288,16 @@ def make_message(text, **kwargs):
     bot = kwargs.pop("bot", None)
     if bot is None:
         bot = make_bot(get_bot())
-    return Message(
+    message = Message(
         message_id=1,
         from_user=kwargs.pop("user", User(id=1, first_name="", is_bot=False)),
         date=kwargs.pop("date", DATE),
         chat=kwargs.pop("chat", Chat(id=1, type="")),
         text=text,
-        bot=bot,
         **kwargs,
     )
+    message.set_bot(bot)
+    return message
 
 
 def make_command_message(text, **kwargs):

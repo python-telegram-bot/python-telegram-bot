@@ -42,6 +42,7 @@ class TestGameHighScore:
     def test_de_json(self, bot):
         json_dict = {"position": self.position, "user": self.user.to_dict(), "score": self.score}
         highscore = GameHighScore.de_json(json_dict, bot)
+        assert highscore.api_kwargs == {}
 
         assert highscore.position == self.position
         assert highscore.user == self.user

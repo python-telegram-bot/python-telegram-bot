@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, ClassVar, List, Optional, Tuple, Union
 
 from telegram import constants
 from telegram._chatlocation import ChatLocation
@@ -73,6 +73,11 @@ class Chat(TelegramObject):
           ``api_kwargs``. Use a named argument for those,
           and notice that some positional arguments changed position as a result.
 
+    .. versionchanged:: 20.0
+        Removed the attribute ``all_members_are_administrators``. As long as Telegram provides
+        this field for backwards compatibility, it is available through
+        :attr:`~telegram.TelegramObject.api_kwargs`.
+
     Args:
         id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
             and some programming languages may have difficulty/silent defects in interpreting it.
@@ -114,7 +119,7 @@ class Chat(TelegramObject):
             be forwarded to other chats. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.9
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         sticker_set_name (:obj:`str`, optional): For supergroups, name of group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`, optional): :obj:`True`, if the bot can change group the
@@ -139,9 +144,6 @@ class Chat(TelegramObject):
             in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
-
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
         type (:obj:`str`): Type of chat.
@@ -220,7 +222,6 @@ class Chat(TelegramObject):
         "title",
         "photo",
         "linked_chat_id",
-        "all_members_are_administrators",
         "message_auto_delete_time",
         "has_protected_content",
         "has_private_forwards",
@@ -245,13 +246,12 @@ class Chat(TelegramObject):
 
     def __init__(
         self,
-        id: int,  # pylint: disable=invalid-name
+        id: int,
         type: str,
         title: str = None,
         username: str = None,
         first_name: str = None,
         last_name: str = None,
-        bot: "Bot" = None,
         photo: ChatPhoto = None,
         description: str = None,
         invite_link: str = None,
@@ -269,8 +269,10 @@ class Chat(TelegramObject):
         join_to_send_messages: bool = None,
         join_by_request: bool = None,
         has_restricted_voice_and_video_messages: bool = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.id = id  # pylint: disable=invalid-name
         self.type = enum.get_member(constants.ChatType, type, type)
@@ -279,8 +281,6 @@ class Chat(TelegramObject):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
-        # TODO: Remove (also from tests), when Telegram drops this completely
-        self.all_members_are_administrators = _kwargs.get("all_members_are_administrators")
         self.photo = photo
         self.bio = bio
         self.has_private_forwards = has_private_forwards
@@ -301,7 +301,6 @@ class Chat(TelegramObject):
         self.join_by_request = join_by_request
         self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
 
-        self.set_bot(bot)
         self._id_attrs = (self.id,)
 
     @property
@@ -346,7 +345,15 @@ class Chat(TelegramObject):
         data["permissions"] = ChatPermissions.de_json(data.get("permissions"), bot)
         data["location"] = ChatLocation.de_json(data.get("location"), bot)
 
-        return cls(bot=bot, **data)
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if "all_members_are_administrators" in data:
+            api_kwargs["all_members_are_administrators"] = data.pop(
+                "all_members_are_administrators"
+            )
+
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
     async def leave(
         self,

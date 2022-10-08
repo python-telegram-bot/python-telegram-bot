@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram OrderInfo."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._telegramobject import TelegramObject
@@ -40,7 +40,6 @@ class OrderInfo(TelegramObject):
         phone_number (:obj:`str`, optional): User's phone number.
         email (:obj:`str`, optional): User email.
         shipping_address (:class:`telegram.ShippingAddress`, optional): User shipping address.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         name (:obj:`str`): Optional. User name.
@@ -58,8 +57,10 @@ class OrderInfo(TelegramObject):
         phone_number: str = None,
         email: str = None,
         shipping_address: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.name = name
         self.phone_number = phone_number
         self.email = email
@@ -77,4 +78,4 @@ class OrderInfo(TelegramObject):
 
         data["shipping_address"] = ShippingAddress.de_json(data.get("shipping_address"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

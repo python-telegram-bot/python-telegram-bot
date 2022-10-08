@@ -429,6 +429,7 @@ class TestPhoto:
             "file_size": self.file_size,
         }
         json_photo = PhotoSize.de_json(json_dict, bot)
+        assert json_photo.api_kwargs == {}
 
         assert json_photo.file_id == photo.file_id
         assert json_photo.file_unique_id == photo.file_unique_id

@@ -115,6 +115,7 @@ class TestChatPhoto:
             "big_file_unique_id": self.chatphoto_big_file_unique_id,
         }
         chat_photo = ChatPhoto.de_json(json_dict, bot)
+        assert chat_photo.api_kwargs == {}
         assert chat_photo.small_file_id == self.chatphoto_small_file_id
         assert chat_photo.big_file_id == self.chatphoto_big_file_id
         assert chat_photo.small_file_unique_id == self.chatphoto_small_file_unique_id

@@ -17,20 +17,42 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime
+import inspect
 import pickle
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
-from telegram import Chat, Message, PhotoSize, TelegramObject, User
+from telegram import Bot, Chat, Message, PhotoSize, TelegramObject, User
+
+
+def all_subclasses(cls):
+    # Gets all subclasses of the specified object, recursively. from
+    # https://stackoverflow.com/a/3862957/9706202
+    # also includes the class itself
+    return (
+        set(cls.__subclasses__())
+        .union([s for c in cls.__subclasses__() for s in all_subclasses(c)])
+        .union({cls})
+    )
+
+
+TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
 
 
 class TestTelegramObject:
     class Sub(TelegramObject):
         def __init__(self, private, normal, b):
+            super().__init__()
             self._private = private
             self.normal = normal
             self._bot = b
+
+    class ChangingTO(TelegramObject):
+        # Don't use in any tests, this is just for testing the pickle behaviour and the
+        # class is altered during the test procedure
+        pass
 
     def test_to_json(self, monkeypatch):
         # to_json simply takes whatever comes from to_dict, therefore we only need to test it once
@@ -53,16 +75,68 @@ class TestTelegramObject:
         with pytest.raises(TypeError):
             telegram_object.to_json()
 
+    def test_de_json_api_kwargs(self, bot):
+        to = TelegramObject.de_json(data={"foo": "bar"}, bot=bot)
+        assert to.api_kwargs == {"foo": "bar"}
+        assert to.get_bot() is bot
+
+    @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
+    def test_subclasses_have_api_kwargs(self, cls):
+        """Checks that all subclasses of TelegramObject have an api_kwargs argument that is
+        kw-only. Also, tries to check that this argument is passed to super - by checking that
+        the `__init__` contains `api_kwargs=api_kwargs`
+        """
+        if issubclass(cls, Bot):
+            # Bot doesn't have api_kwargs, because it's not defined by TG
+            return
+
+        # only relevant for subclasses that have their own init
+        if inspect.getsourcefile(cls.__init__) != inspect.getsourcefile(cls):
+            return
+
+        # Ignore classes in the test directory
+        source_file = Path(inspect.getsourcefile(cls))
+        parents = source_file.parents
+        is_test_file = Path(__file__).parent.resolve() in parents
+        if is_test_file:
+            return
+
+        # check the signature first
+        signature = inspect.signature(cls)
+        assert signature.parameters.get("api_kwargs").kind == inspect.Parameter.KEYWORD_ONLY
+
+        # Now check for `api_kwargs=api_kwargs` in the source code of `__init__`
+        if cls is TelegramObject:
+            # TelegramObject doesn't have a super class
+            return
+        assert "api_kwargs=api_kwargs" in inspect.getsource(
+            cls.__init__
+        ), f"{cls.__name__} doesn't seem to pass `api_kwargs` to `super().__init__`"
+
+    def test_de_json_arbitrary_exceptions(self, bot):
+        class SubClass(TelegramObject):
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
+                raise TypeError("This is a test")
+
+        with pytest.raises(TypeError, match="This is a test"):
+            SubClass.de_json({}, bot)
+
     def test_to_dict_private_attribute(self):
         class TelegramObjectSubclass(TelegramObject):
             __slots__ = ("a", "_b")  # Added slots so that the attrs are converted to dict
 
             def __init__(self):
+                super().__init__()
                 self.a = 1
                 self._b = 2
 
         subclass_instance = TelegramObjectSubclass()
         assert subclass_instance.to_dict() == {"a": 1}
+
+    def test_to_dict_api_kwargs(self):
+        to = TelegramObject(api_kwargs={"foo": "bar"})
+        assert to.to_dict() == {"foo": "bar"}
 
     def test_slot_behaviour(self, mro_slots):
         inst = TelegramObject()
@@ -128,8 +202,10 @@ class TestTelegramObject:
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)
         date = datetime.datetime.now()
-        photo = PhotoSize("file_id", "unique", 21, 21, bot=bot)
-        msg = Message(1, date, chat, from_user=user, text="foobar", bot=bot, photo=[photo])
+        photo = PhotoSize("file_id", "unique", 21, 21)
+        photo.set_bot(bot)
+        msg = Message(1, date, chat, from_user=user, text="foobar", photo=[photo])
+        msg.set_bot(bot)
 
         # Test pickling of TGObjects, we choose Message since it's contains the most subclasses.
         assert msg.get_bot()
@@ -143,14 +219,31 @@ class TestTelegramObject:
         assert unpickled.date == date
         assert unpickled.photo[0] == photo
 
+    def test_pickle_apply_api_kwargs(self, bot):
+        """Makes sure that when a class gets new attributes, the api_kwargs are moved to the
+        new attributes on unpickling."""
+        obj = self.ChangingTO(api_kwargs={"foo": "bar"})
+        pickled = pickle.dumps(obj)
+
+        self.ChangingTO.foo = None
+        obj = pickle.loads(pickled)
+
+        assert obj.foo == "bar"
+        assert obj.api_kwargs == {}
+
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
         user = User(3, "first_name", False)
         date = datetime.datetime.now()
-        photo = PhotoSize("file_id", "unique", 21, 21, bot=bot)
-        msg = Message(1, date, chat, from_user=user, text="foobar", bot=bot, photo=[photo])
+        photo = PhotoSize("file_id", "unique", 21, 21)
+        photo.set_bot(bot)
+        msg = Message(1, date, chat, from_user=user, text="foobar", photo=[photo])
+        msg.set_bot(bot)
 
         new_msg = deepcopy(msg)
+
+        assert new_msg == msg
+        assert new_msg is not msg
 
         # The same bot should be present when deepcopying.
         assert new_msg.get_bot() == bot and new_msg.get_bot() is bot

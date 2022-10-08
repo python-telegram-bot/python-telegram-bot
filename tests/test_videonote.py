@@ -160,6 +160,7 @@ class TestVideoNote:
             "file_size": self.file_size,
         }
         json_video_note = VideoNote.de_json(json_dict, bot)
+        assert json_video_note.api_kwargs == {}
 
         assert json_video_note.file_id == self.videonote_file_id
         assert json_video_note.file_unique_id == self.videonote_file_unique_id

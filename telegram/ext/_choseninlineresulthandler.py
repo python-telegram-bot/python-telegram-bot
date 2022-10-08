@@ -59,7 +59,6 @@ class ChosenInlineResultHandler(BaseHandler[Update, CCT]):
             :attr:`telegram.ext.CallbackContext.matches`.
 
             .. versionadded:: 13.6
-
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the return value of the callback should be

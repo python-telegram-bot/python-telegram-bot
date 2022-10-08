@@ -289,6 +289,7 @@ class TestDocument:
             "file_size": self.file_size,
         }
         test_document = Document.de_json(json_dict, bot)
+        assert test_document.api_kwargs == {}
 
         assert test_document.file_id == self.document_file_id
         assert test_document.file_unique_id == self.document_file_unique_id

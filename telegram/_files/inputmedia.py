@@ -80,7 +80,10 @@ class InputMedia(TelegramObject):
         caption: str = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.type = media_type
         self.media = media
         self.caption = caption
@@ -170,6 +173,8 @@ class InputMediaAnimation(InputMedia):
         duration: int = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         if isinstance(media, Animation):
             width = media.width if width is None else width
@@ -181,7 +186,14 @@ class InputMediaAnimation(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        super().__init__(InputMediaType.ANIMATION, media, caption, caption_entities, parse_mode)
+        super().__init__(
+            InputMediaType.ANIMATION,
+            media,
+            caption,
+            caption_entities,
+            parse_mode,
+            api_kwargs=api_kwargs,
+        )
         self.thumb = self._parse_thumb_input(thumb)
         self.width = width
         self.height = height
@@ -232,11 +244,20 @@ class InputMediaPhoto(InputMedia):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
         media = parse_file_input(media, PhotoSize, filename=filename, attach=True, local_mode=True)
-        super().__init__(InputMediaType.PHOTO, media, caption, caption_entities, parse_mode)
+        super().__init__(
+            InputMediaType.PHOTO,
+            media,
+            caption,
+            caption_entities,
+            parse_mode,
+            api_kwargs=api_kwargs,
+        )
 
 
 class InputMediaVideo(InputMedia):
@@ -312,6 +333,8 @@ class InputMediaVideo(InputMedia):
         thumb: FileInput = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
+        *,
+        api_kwargs: JSONDict = None,
     ):
 
         if isinstance(media, Video):
@@ -324,7 +347,14 @@ class InputMediaVideo(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        super().__init__(InputMediaType.VIDEO, media, caption, caption_entities, parse_mode)
+        super().__init__(
+            InputMediaType.VIDEO,
+            media,
+            caption,
+            caption_entities,
+            parse_mode,
+            api_kwargs=api_kwargs,
+        )
         self.width = width
         self.height = height
         self.duration = duration
@@ -399,6 +429,8 @@ class InputMediaAudio(InputMedia):
         title: str = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         if isinstance(media, Audio):
             duration = media.duration if duration is None else duration
@@ -410,7 +442,14 @@ class InputMediaAudio(InputMedia):
             # things to work in local mode.
             media = parse_file_input(media, filename=filename, attach=True, local_mode=True)
 
-        super().__init__(InputMediaType.AUDIO, media, caption, caption_entities, parse_mode)
+        super().__init__(
+            InputMediaType.AUDIO,
+            media,
+            caption,
+            caption_entities,
+            parse_mode,
+            api_kwargs=api_kwargs,
+        )
         self.thumb = self._parse_thumb_input(thumb)
         self.duration = duration
         self.title = title
@@ -475,10 +514,19 @@ class InputMediaDocument(InputMedia):
         disable_content_type_detection: bool = None,
         caption_entities: Union[List[MessageEntity], Tuple[MessageEntity, ...]] = None,
         filename: str = None,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
         media = parse_file_input(media, Document, filename=filename, attach=True, local_mode=True)
-        super().__init__(InputMediaType.DOCUMENT, media, caption, caption_entities, parse_mode)
+        super().__init__(
+            InputMediaType.DOCUMENT,
+            media,
+            caption,
+            caption_entities,
+            parse_mode,
+            api_kwargs=api_kwargs,
+        )
         self.thumb = self._parse_thumb_input(thumb)
         self.disable_content_type_detection = disable_content_type_detection

@@ -31,7 +31,6 @@ from telegram import (
 @pytest.fixture(scope="class")
 def inline_query_result_voice():
     return InlineQueryResultVoice(
-        type=TestInlineQueryResultVoice.type_,
         id=TestInlineQueryResultVoice.id_,
         voice_url=TestInlineQueryResultVoice.voice_url,
         title=TestInlineQueryResultVoice.title,

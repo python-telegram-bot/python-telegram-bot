@@ -48,6 +48,7 @@ class TestProximityAlertTriggered:
             "distance": self.distance,
         }
         proximity_alert_triggered = ProximityAlertTriggered.de_json(json_dict, bot)
+        assert proximity_alert_triggered.api_kwargs == {}
 
         assert proximity_alert_triggered.traveler == self.traveler
         assert proximity_alert_triggered.traveler.first_name == self.traveler.first_name

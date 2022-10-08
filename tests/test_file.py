@@ -30,13 +30,14 @@ from tests.conftest import data_file
 
 @pytest.fixture(scope="class")
 def file(bot):
-    return File(
+    file = File(
         TestFile.file_id,
         TestFile.file_unique_id,
         file_path=TestFile.file_path,
         file_size=TestFile.file_size,
-        bot=bot,
     )
+    file.set_bot(bot)
+    return file
 
 
 @pytest.fixture(scope="class")
@@ -54,13 +55,14 @@ def encrypted_file(bot):
 
 @pytest.fixture(scope="class")
 def local_file(bot):
-    return File(
+    file = File(
         TestFile.file_id,
         TestFile.file_unique_id,
         file_path=str(data_file("local_file.txt")),
         file_size=TestFile.file_size,
-        bot=bot,
     )
+    file.set_bot(bot)
+    return file
 
 
 class TestFile:
@@ -85,6 +87,7 @@ class TestFile:
             "file_size": self.file_size,
         }
         new_file = File.de_json(json_dict, bot)
+        assert new_file.api_kwargs == {}
 
         assert new_file.file_id == self.file_id
         assert new_file.file_unique_id == self.file_unique_id

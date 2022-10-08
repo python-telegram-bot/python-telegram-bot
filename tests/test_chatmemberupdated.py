@@ -102,6 +102,7 @@ class TestChatMemberUpdated:
         }
 
         chat_member_updated = ChatMemberUpdated.de_json(json_dict, bot)
+        assert chat_member_updated.api_kwargs == {}
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user
@@ -124,6 +125,7 @@ class TestChatMemberUpdated:
         }
 
         chat_member_updated = ChatMemberUpdated.de_json(json_dict, bot)
+        assert chat_member_updated.api_kwargs == {}
 
         assert chat_member_updated.chat == chat
         assert chat_member_updated.from_user == user
@@ -227,7 +229,7 @@ class TestChatMemberUpdated:
         [
             name
             for name, param in inspect.signature(ChatMember).parameters.items()
-            if name != "self" and param.default != inspect.Parameter.empty
+            if name not in ["self", "api_kwargs"] and param.default != inspect.Parameter.empty
         ],
     )
     def test_difference_optionals(self, optional_attribute, user, chat):

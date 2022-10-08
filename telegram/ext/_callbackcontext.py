@@ -79,7 +79,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             to provide :attr:`user_data`.
 
             .. versionadded:: 20.0
-
     Attributes:
         coroutine (:term:`coroutine function`): Optional. Only present in error handlers if the
             error was caused by a coroutine run with :meth:`Application.create_task` or a handler
@@ -235,7 +234,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 callback data.
         """
         if isinstance(self.bot, ExtBot):
-            if not self.bot.arbitrary_callback_data:
+            if self.bot.callback_data_cache is None:
                 raise RuntimeError(
                     "This telegram.ext.ExtBot instance does not use arbitrary callback data."
                 )

@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
-from typing import Any
-
 from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._utils.types import JSONDict
 
 
 class InputLocationMessageContent(InputMessageContent):
@@ -44,7 +43,6 @@ class InputLocationMessageContent(InputMessageContent):
         proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance for
             proximity alerts about approaching another chat member, in meters. Must be between 1
             and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -72,8 +70,10 @@ class InputLocationMessageContent(InputMessageContent):
         horizontal_accuracy: float = None,
         heading: int = None,
         proximity_alert_radius: int = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.latitude = latitude
         self.longitude = longitude

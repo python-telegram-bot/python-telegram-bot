@@ -62,6 +62,7 @@ class TestVenue:
             "google_place_type": TestVenue.google_place_type,
         }
         venue = Venue.de_json(json_dict, bot)
+        assert venue.api_kwargs == {}
 
         assert venue.location == self.location
         assert venue.title == self.title

@@ -124,6 +124,11 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     .. versionadded:: 13.6
 
+    .. versionchanged:: 20.0
+        Removed the attribute ``arbitrary_callback_data``. You can instead use
+        :attr:`bot.callback_data_cache.maxsize <telegram.ext.CallbackDataCache.maxsize>` to
+        access the size of the cache.
+
     Args:
         defaults (:class:`telegram.ext.Defaults`, optional): An object containing default values to
             be used if not set explicitly in the bot methods.
@@ -137,16 +142,9 @@ class ExtBot(Bot, Generic[RLARGS]):
 
             .. versionadded:: 20.0
 
-    Attributes:
-        arbitrary_callback_data (:obj:`bool` | :obj:`int`): Whether this bot instance
-            allows to use arbitrary objects as callback data for
-            :class:`telegram.InlineKeyboardButton`.
-        callback_data_cache (:class:`telegram.ext.CallbackDataCache`): The cache for objects passed
-            as callback data for :class:`telegram.InlineKeyboardButton`.
-
     """
 
-    __slots__ = ("arbitrary_callback_data", "callback_data_cache", "_defaults", "_rate_limiter")
+    __slots__ = ("_callback_data_cache", "_defaults", "_rate_limiter")
 
     # using object() would be a tiny bit safer, but a string plays better with the typing setup
     __RL_KEY = uuid4().hex
@@ -210,15 +208,30 @@ class ExtBot(Bot, Generic[RLARGS]):
         )
         self._defaults = defaults
         self._rate_limiter = rate_limiter
+        self._callback_data_cache: Optional[CallbackDataCache] = None
 
         # set up callback_data
+        if arbitrary_callback_data is False:
+            return
+
         if not isinstance(arbitrary_callback_data, bool):
             maxsize = cast(int, arbitrary_callback_data)
-            self.arbitrary_callback_data = True
         else:
             maxsize = 1024
-            self.arbitrary_callback_data = arbitrary_callback_data
-        self.callback_data_cache: CallbackDataCache = CallbackDataCache(bot=self, maxsize=maxsize)
+
+        self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
+
+    @property
+    def callback_data_cache(self) -> Optional[CallbackDataCache]:
+        """:class:`telegram.ext.CallbackDataCache`: Optional. The cache for
+        objects passed as callback data for :class:`telegram.InlineKeyboardButton`.
+
+        .. versionchanged:: 20.0
+           * This property is now read-only.
+           * This property is now optional and can be :obj:`None` if
+             :paramref:`~telegram.ext.ExtBot.arbitrary_callback_data` is set to :obj:`False`.
+        """
+        return self._callback_data_cache
 
     async def initialize(self) -> None:
         """See :meth:`telegram.Bot.initialize`. Also initializes the
@@ -366,7 +379,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     def _replace_keyboard(self, reply_markup: Optional[ReplyMarkup]) -> Optional[ReplyMarkup]:
         # If the reply_markup is an inline keyboard and we allow arbitrary callback data, let the
         # CallbackDataCache build a new keyboard with the data replaced. Otherwise return the input
-        if isinstance(reply_markup, InlineKeyboardMarkup) and self.arbitrary_callback_data:
+        if isinstance(reply_markup, InlineKeyboardMarkup) and self.callback_data_cache is not None:
             return self.callback_data_cache.process_keyboard(reply_markup)
 
         return reply_markup
@@ -405,7 +418,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             self._insert_callback_data(update.effective_message)
 
     def _insert_callback_data(self, obj: HandledTypes) -> HandledTypes:
-        if not self.arbitrary_callback_data:
+        if self.callback_data_cache is None:
             return obj
 
         if isinstance(obj, CallbackQuery):
@@ -514,7 +527,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         )
 
         # Process arbitrary callback
-        if not self.arbitrary_callback_data:
+        if self.callback_data_cache is None:
             return effective_results, next_offset
         results = []
         for result in effective_results:

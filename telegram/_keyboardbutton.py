@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram KeyboardButton."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._keyboardbuttonpolltype import KeyboardButtonPollType
 from telegram._telegramobject import TelegramObject
@@ -67,7 +67,6 @@ class KeyboardButton(TelegramObject):
             Available in private chats only.
 
             .. versionadded:: 20.0
-
     Attributes:
         text (:obj:`str`): Text of the button.
         request_contact (:obj:`bool`): Optional. The user's phone number will be sent.
@@ -88,8 +87,10 @@ class KeyboardButton(TelegramObject):
         request_location: bool = None,
         request_poll: KeyboardButtonPollType = None,
         web_app: WebAppInfo = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.text = text
         # Optionals
@@ -117,4 +118,4 @@ class KeyboardButton(TelegramObject):
         data["request_poll"] = KeyboardButtonPollType.de_json(data.get("request_poll"), bot)
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

@@ -18,13 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultVideo."""
 
-from typing import TYPE_CHECKING, Any, List, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import ODVInput
+from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -67,7 +67,6 @@ class InlineQueryResultVideo(InlineQueryResult):
             message to be sent instead of the video. This field is required if
             InlineQueryResultVideo is used to send an HTML-page as a result
             (e.g., a YouTube video).
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VIDEO`.
@@ -130,11 +129,12 @@ class InlineQueryResultVideo(InlineQueryResult):
         input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
 
         # Required
-        super().__init__(InlineQueryResultType.VIDEO, id)
+        super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
         self.video_url = video_url
         self.mime_type = mime_type
         self.thumb_url = thumb_url

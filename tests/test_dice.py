@@ -39,6 +39,7 @@ class TestDice:
     def test_de_json(self, bot, emoji):
         json_dict = {"value": self.value, "emoji": emoji}
         dice = Dice.de_json(json_dict, bot)
+        assert dice.api_kwargs == {}
 
         assert dice.value == self.value
         assert dice.emoji == emoji
