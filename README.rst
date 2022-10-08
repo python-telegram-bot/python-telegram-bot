@@ -142,6 +142,8 @@ PTB can be installed with optional dependencies:
 * ``pip install python-telegram-bot[callback-data]`` installs the `cachetools~=5.2.0 <https://cachetools.readthedocs.io/en/latest/>`_ library. Use this, if you want to use `arbitrary callback_data <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_.
 * ``pip install python-telegram-bot[job-queue]`` installs the `APScheduler~=3.9.1 <https://apscheduler.readthedocs.io/en/3.x/>`_ library and enforces `pytz>=2018.6 <https://pypi.org/project/pytz/>`_, where ``pytz`` is a dependency of ``APScheduler``. Use this, if you want to use the ``telegram.ext.JobQueue``.
 
+To install multiple optional dependencies, separate them by commas, e.g. ``pip install python-telegram-bot[socks,webhooks]``.
+
 Additionally, two shortcuts are provided:
 
 * ``pip install python-telegram-bot[all]`` installs all optional dependencies.

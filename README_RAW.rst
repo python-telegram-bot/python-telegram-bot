@@ -139,6 +139,8 @@ PTB can be installed with optional dependencies:
 * ``pip install python-telegram-bot-raw[passport]`` installs the `cryptography>=3.0 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
 * ``pip install python-telegram-bot-raw[socks]`` installs ``httpx[socks]``. Use this, if you want to work behind a Socks5 server.
 
+To install multiple optional dependencies, separate them by commas, e.g. ``pip install python-telegram-bot-raw[passport,socks]``.
+
 Additionally, the shortcut ``pip install python-telegram-bot-raw[all]`` installs all optional dependencies.
 
 Quick Start
