@@ -3,6 +3,7 @@
 
 from setuptools import setup
 
-from setup import get_setup_kwargs
+from setup import avoid_common_setup_errors, get_setup_kwargs
 
+avoid_common_setup_errors(raw=True)
 setup(**get_setup_kwargs(raw=True))

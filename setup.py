@@ -5,6 +5,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+from pkg_resources import DistributionNotFound, get_distribution
 from setuptools import find_packages, setup
 
 
@@ -116,6 +117,55 @@ def get_setup_kwargs(raw=False):
     return kwargs
 
 
+def avoid_common_setup_errors(raw=False):
+    # This runs before the setup, trying to catch common setup errors
+
+    # check if ptb package exists
+    # import telegram (DOUBLE CHECK with telegram.py or telegram folder)
+    # if yes, check if ModuleNotFoundError == httpx
+    try:
+        get_distribution("telegram")
+        print(
+            """
+            =============================DEBUG ASSISTANCE==========================
+            You can not use python-telegram-bot and telegram. Please run 
+            pip uninstall telegram and try again.
+            =============================DEBUG ASSISTANCE==========================
+            """
+        )
+        raise Exception("BuildError")
+    except DistributionNotFound:
+        pass
+    try:
+        get_distribution(f'python-telegram-bot{"" if raw else "-raw"}')
+        print(
+            f"""
+            =============================DEBUG ASSISTANCE==========================
+            You can not use python-telegram-bot and python-telegram-bot-raw. Please 
+            run pip uninstall python-telegram-bot{"" if raw else "-raw"} and try again.
+            =============================DEBUG ASSISTANCE==========================
+            """
+        )
+        raise Exception("BuildError")
+    except DistributionNotFound:
+        pass
+    try:
+        # if the telegram import works here, something locally overrides telegram
+        import telegram
+
+        print(
+            """
+            =============================DEBUG ASSISTANCE==========================
+            The python-telegram-bot library uses the telegram namespace. You 
+            probably have a local file or folder called telegram. Please rename it
+            and try again.
+            =============================DEBUG ASSISTANCE==========================
+            """
+        )
+    except ModuleNotFoundError:
+        pass
+
+
 def main():
     # If we're building, build ptb-raw as well
     if set(sys.argv[1:]) in [{"bdist_wheel"}, {"sdist"}, {"sdist", "bdist_wheel"}]:
@@ -123,6 +173,7 @@ def main():
         args.extend(sys.argv[1:])
         subprocess.run(args, check=True, capture_output=True)
 
+    avoid_common_setup_errors(raw=False)
     setup(**get_setup_kwargs(raw=False))
 
 
