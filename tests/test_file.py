@@ -46,9 +46,8 @@ def encrypted_file(bot):
         "Oq3G4sX+bKZthoyms1YlPqvWou9esb+z0Bi/KqQUG8s=",
         "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
     )
-    ef = File(
-        TestFile.file_id, TestFile.file_unique_id, bot, TestFile.file_size, TestFile.file_path
-    )
+    ef = File(TestFile.file_id, TestFile.file_unique_id, TestFile.file_size, TestFile.file_path)
+    ef.set_bot(bot)
     ef.set_credentials(fc)
     return ef
 
