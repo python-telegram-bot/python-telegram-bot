@@ -291,7 +291,7 @@ class TelegramObject:
                 (if found) in the attributes to a dictionary. Else, preserves it as an object
                 itself. Defaults to :obj:`True`.
 
-            .. versionadded:: 20.0
+                .. versionadded:: 20.0
 
         Returns:
             :obj:`dict`
