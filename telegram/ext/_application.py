@@ -677,7 +677,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         secret_token: str = None,
     ) -> None:
         """Convenience method that takes care of initializing and starting the app,
-        polling updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
+        listening for updates from Telegram using :meth:`telegram.ext.Updater.start_webhook` and
         a graceful shutdown of the app on exit.
 
         The app will shut down when :exc:`KeyboardInterrupt` or :exc:`SystemExit` is raised.
