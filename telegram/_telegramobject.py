@@ -161,8 +161,8 @@ class TelegramObject:
 
         Args:
             include_private (:obj:`bool`): Whether the result should include private variables.
-            recursive (:obj:`bool`): If :obj:`True`, will convert any TelegramObjects (if found) in
-                the attributes to a dictionary. Else, preserves it as an object itself.
+            recursive (:obj:`bool`): If :obj:`True`, will convert any ``TelegramObjects`` (if
+                found) in the attributes to a dictionary. Else, preserves it as an object itself.
             remove_bot (:obj:`bool`): Whether the bot should be included in the result.
 
         Returns:
@@ -170,11 +170,13 @@ class TelegramObject:
         """
         data = {}
 
-        # __dict__ has attrs from superclasses, so no need to recompute/duplicate
+        # __dict__ has attrs from superclasses, so no need to loop through them
         if hasattr(self, "__dict__"):
+            org_data = self.__dict__
             data.update(self.__dict__)  # important when class has no __slots__.
+        else:
+            org_data = {}
 
-        org_data = tuple(data)  # make a copy of the keys to avoid changing length during iteration
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class

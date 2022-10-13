@@ -146,7 +146,9 @@ class TestTelegramObject:
                 super().__init__()
                 self.recursive = "recursive"
 
-        class SubClass(TelegramObject):  # doesn't have `__slots__`, so has `__dict__` instead.
+        class SubClass(TelegramObject):
+            """This class doesn't have `__slots__`, so has `__dict__` instead."""
+
             def __init__(self):
                 super().__init__()
                 self.subclass = Recursive()
