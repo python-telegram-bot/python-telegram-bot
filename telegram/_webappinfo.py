@@ -35,12 +35,12 @@ class WebAppInfo(TelegramObject):
     .. versionadded:: 20.0
 
     Args:
-        url (:obj:`str`): HTTPS URL of a Web App to be opened with additional data as specified
+        url (:obj:`str`): An HTTPS URL of a Web App to be opened with additional data as specified
             in `Initializing Web Apps \
             <https://core.telegram.org/bots/webapps#initializing-web-apps>`_.
 
     Attributes:
-        url (:obj:`str`): HTTPS URL of a Web App to be opened with additional data as specified
+        url (:obj:`str`): An HTTPS URL of a Web App to be opened with additional data as specified
             in `Initializing Web Apps \
             <https://core.telegram.org/bots/webapps#initializing-web-apps>`_.
     """
