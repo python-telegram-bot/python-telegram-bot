@@ -20,9 +20,8 @@
 deletion.
 """
 
-from typing import Any
-
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class MessageAutoDeleteTimerChanged(TelegramObject):
@@ -36,7 +35,6 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
     Args:
         message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the
             chat.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         message_auto_delete_time (:obj:`int`): New auto-delete time for messages in the
@@ -49,8 +47,10 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
     def __init__(
         self,
         message_auto_delete_time: int,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.message_auto_delete_time = message_auto_delete_time
 
         self._id_attrs = (self.message_auto_delete_time,)

@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChosenInlineResult."""
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
@@ -52,7 +52,6 @@ class ChosenInlineResult(TelegramObject):
             only if there is an inline keyboard attached to the message. Will be also received in
             callback queries and can be used to edit the message.
         query (:obj:`str`): The query that was used to obtain the result.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         result_id (:obj:`str`): The unique identifier for the result that was chosen.
@@ -72,8 +71,11 @@ class ChosenInlineResult(TelegramObject):
         query: str,
         location: Location = None,
         inline_message_id: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.result_id = result_id
         self.from_user = from_user
@@ -93,8 +95,8 @@ class ChosenInlineResult(TelegramObject):
             return None
 
         # Required
-        data["from_user"] = User.de_json(data.pop("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         # Optionals
         data["location"] = Location.de_json(data.get("location"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

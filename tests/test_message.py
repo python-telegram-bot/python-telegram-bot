@@ -61,13 +61,14 @@ from tests.test_passport import RAW_PASSPORT_DATA
 
 @pytest.fixture(scope="class")
 def message(bot):
-    return Message(
+    message = Message(
         message_id=TestMessage.id_,
         date=TestMessage.date,
         chat=TestMessage.chat,
         from_user=TestMessage.from_user,
-        bot=bot,
     )
+    message.set_bot(bot)
+    return message
 
 
 @pytest.fixture(
@@ -83,7 +84,7 @@ def message(bot):
         {"edit_date": datetime.utcnow()},
         {
             "text": "a text message",
-            "enitites": [MessageEntity("bold", 10, 4), MessageEntity("italic", 16, 7)],
+            "entities": [MessageEntity("bold", 10, 4), MessageEntity("italic", 16, 7)],
         },
         {
             "caption": "A message caption",
@@ -164,7 +165,6 @@ def message(bot):
                 ]
             },
         },
-        {"quote": True},
         {"dice": Dice(4, "🎲")},
         {"via_bot": User(9, "A_Bot", True)},
         {
@@ -231,7 +231,6 @@ def message(bot):
         "passport_data",
         "poll",
         "reply_markup",
-        "default_quote",
         "dice",
         "via_bot",
         "proximity_alert_triggered",
@@ -247,14 +246,15 @@ def message(bot):
     ],
 )
 def message_params(bot, request):
-    return Message(
+    message = Message(
         message_id=TestMessage.id_,
         from_user=TestMessage.from_user,
         date=TestMessage.date,
         chat=TestMessage.chat,
-        bot=bot,
         **request.param,
     )
+    message.set_bot(bot)
+    return message
 
 
 class TestMessage:
@@ -325,6 +325,7 @@ class TestMessage:
 
     def test_all_possibilities_de_json_and_to_dict(self, bot, message_params):
         new = Message.de_json(message_params.to_dict(), bot)
+        assert new.api_kwargs == {}
         assert new.to_dict() == message_params.to_dict()
 
         # Checking that none of the attributes are dicts is a best effort approach to ensure that

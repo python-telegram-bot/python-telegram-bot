@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LabeledPrice."""
 
-from typing import Any
-
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class LabeledPrice(TelegramObject):
@@ -39,7 +38,6 @@ class LabeledPrice(TelegramObject):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         label (:obj:`str`): Portion label.
@@ -49,7 +47,8 @@ class LabeledPrice(TelegramObject):
 
     __slots__ = ("label", "amount")
 
-    def __init__(self, label: str, amount: int, **_kwargs: Any):
+    def __init__(self, label: str, amount: int, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         self.label = label
         self.amount = amount
 

@@ -26,13 +26,11 @@ from tests.conftest import check_defaults_handling, check_shortcut_call, check_s
 
 @pytest.fixture(scope="class")
 def chat(bot):
-    return Chat(
+    chat = Chat(
         TestChat.id_,
         title=TestChat.title,
         type=TestChat.type_,
         username=TestChat.username,
-        all_members_are_administrators=TestChat.all_members_are_administrators,
-        bot=bot,
         sticker_set_name=TestChat.sticker_set_name,
         can_set_sticker_set=TestChat.can_set_sticker_set,
         permissions=TestChat.permissions,
@@ -46,6 +44,8 @@ def chat(bot):
         join_by_request=True,
         has_restricted_voice_and_video_messages=True,
     )
+    chat.set_bot(bot)
+    return chat
 
 
 class TestChat:
@@ -104,7 +104,6 @@ class TestChat:
         assert chat.title == self.title
         assert chat.type == self.type_
         assert chat.username == self.username
-        assert chat.all_members_are_administrators == self.all_members_are_administrators
         assert chat.sticker_set_name == self.sticker_set_name
         assert chat.can_set_sticker_set == self.can_set_sticker_set
         assert chat.permissions == self.permissions
@@ -121,6 +120,9 @@ class TestChat:
             chat.has_restricted_voice_and_video_messages
             == self.has_restricted_voice_and_video_messages
         )
+        assert chat.api_kwargs == {
+            "all_members_are_administrators": self.all_members_are_administrators
+        }
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -130,7 +132,6 @@ class TestChat:
         assert chat_dict["title"] == chat.title
         assert chat_dict["type"] == chat.type
         assert chat_dict["username"] == chat.username
-        assert chat_dict["all_members_are_administrators"] == chat.all_members_are_administrators
         assert chat_dict["permissions"] == chat.permissions.to_dict()
         assert chat_dict["slow_mode_delay"] == chat.slow_mode_delay
         assert chat_dict["bio"] == chat.bio

@@ -52,6 +52,7 @@ class TestMessageEntity:
     def test_de_json(self, bot):
         json_dict = {"type": self.type_, "offset": self.offset, "length": self.length}
         entity = MessageEntity.de_json(json_dict, bot)
+        assert entity.api_kwargs == {}
 
         assert entity.type == self.type_
         assert entity.offset == self.offset

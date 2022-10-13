@@ -70,6 +70,7 @@ class TestChatInviteLink:
         }
 
         invite_link = ChatInviteLink.de_json(json_dict, bot)
+        assert invite_link.api_kwargs == {}
 
         assert invite_link.invite_link == self.link
         assert invite_link.creator == creator
@@ -91,6 +92,7 @@ class TestChatInviteLink:
         }
 
         invite_link = ChatInviteLink.de_json(json_dict, bot)
+        assert invite_link.api_kwargs == {}
 
         assert invite_link.invite_link == self.link
         assert invite_link.creator == creator

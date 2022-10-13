@@ -74,6 +74,7 @@ class TestCallbackDataCache:
         assert cdc.bot is bot
 
     def test_init_and_access__persistent_data(self, bot):
+        """This also tests CDC.load_persistent_data."""
         keyboard_data = _KeyboardData("123", 456, {"button": 678})
         persistent_data = ([keyboard_data.to_tuple()], {"id": "123"})
         cdc = CallbackDataCache(bot, persistent_data=persistent_data)

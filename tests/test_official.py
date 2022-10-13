@@ -32,14 +32,12 @@ IGNORED_OBJECTS = ("ResponseParameters", "CallbackGame")
 IGNORED_PARAMETERS = {
     "self",
     "args",
-    "_kwargs",
     "read_timeout",
     "write_timeout",
     "connect_timeout",
     "pool_timeout",
     "bot",
     "api_kwargs",
-    "kwargs",
 }
 
 ignored_param_requirements = {  # Ignore these since there's convenience params in them (eg. Venue)

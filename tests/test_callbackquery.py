@@ -31,8 +31,8 @@ def callback_query(bot, request):
         TestCallbackQuery.chat_instance,
         data=TestCallbackQuery.data,
         game_short_name=TestCallbackQuery.game_short_name,
-        bot=bot,
     )
+    cbq.set_bot(bot)
     if request.param == "message":
         cbq.message = TestCallbackQuery.message
         cbq.message.set_bot(bot)
@@ -90,6 +90,7 @@ class TestCallbackQuery:
             "game_short_name": self.game_short_name,
         }
         callback_query = CallbackQuery.de_json(json_dict, bot)
+        assert callback_query.api_kwargs == {}
 
         assert callback_query.id == self.id_
         assert callback_query.from_user == self.from_user

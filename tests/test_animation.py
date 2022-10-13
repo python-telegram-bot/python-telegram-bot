@@ -298,6 +298,7 @@ class TestAnimation:
             "file_size": self.file_size,
         }
         animation = Animation.de_json(json_dict, bot)
+        assert animation.api_kwargs == {}
         assert animation.file_id == self.animation_file_id
         assert animation.file_unique_id == self.animation_file_unique_id
         assert animation.file_name == self.file_name

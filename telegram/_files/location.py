@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Location."""
 
-from typing import Any
-
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class Location(TelegramObject):
@@ -40,7 +39,6 @@ class Location(TelegramObject):
             1-:tg-const:`telegram.constants.LocationLimit.HEADING`. For active live locations only.
         proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts about
             approaching another chat member, in meters. For sent live locations only.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         longitude (:obj:`float`): Longitude as defined by sender.
@@ -73,8 +71,10 @@ class Location(TelegramObject):
         live_period: int = None,
         heading: int = None,
         proximity_alert_radius: int = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.longitude = longitude
         self.latitude = latitude

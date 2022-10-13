@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram MessageEntity."""
 
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
+from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -62,7 +62,6 @@ class MessageEntity(TelegramObject):
             information about the sticker.
 
             .. versionadded:: 20.0
-
     Attributes:
         type (:obj:`str`): Type of the entity.
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
@@ -87,8 +86,10 @@ class MessageEntity(TelegramObject):
         user: User = None,
         language: str = None,
         custom_emoji_id: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.type = enum.get_member(constants.MessageEntityType, type, type)
         self.offset = offset
@@ -111,7 +112,7 @@ class MessageEntity(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     MENTION: ClassVar[str] = constants.MessageEntityType.MENTION
     """:const:`telegram.constants.MessageEntityType.MENTION`"""

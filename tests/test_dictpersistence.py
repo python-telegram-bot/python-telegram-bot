@@ -24,11 +24,10 @@ from telegram.ext import DictPersistence
 
 
 @pytest.fixture(autouse=True)
-def reset_callback_data_cache(bot):
+def reset_callback_data_cache(cdc_bot):
     yield
-    bot.callback_data_cache.clear_callback_data()
-    bot.callback_data_cache.clear_callback_queries()
-    bot.arbitrary_callback_data = False
+    cdc_bot.callback_data_cache.clear_callback_data()
+    cdc_bot.callback_data_cache.clear_callback_queries()
 
 
 @pytest.fixture(scope="function")

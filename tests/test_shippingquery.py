@@ -25,17 +25,18 @@ from tests.conftest import check_defaults_handling, check_shortcut_call, check_s
 
 @pytest.fixture(scope="class")
 def shipping_query(bot):
-    return ShippingQuery(
+    sq = ShippingQuery(
         TestShippingQuery.id_,
         TestShippingQuery.from_user,
         TestShippingQuery.invoice_payload,
         TestShippingQuery.shipping_address,
-        bot=bot,
     )
+    sq.set_bot(bot)
+    return sq
 
 
 class TestShippingQuery:
-    id_ = 5
+    id_ = "5"
     invoice_payload = "invoice_payload"
     from_user = User(0, "", False)
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
@@ -54,6 +55,7 @@ class TestShippingQuery:
             "shipping_address": TestShippingQuery.shipping_address.to_dict(),
         }
         shipping_query = ShippingQuery.de_json(json_dict, bot)
+        assert shipping_query.api_kwargs == {}
 
         assert shipping_query.id == self.id_
         assert shipping_query.invoice_payload == self.invoice_payload

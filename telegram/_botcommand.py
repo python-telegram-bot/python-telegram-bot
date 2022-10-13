@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
-from typing import Any
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class BotCommand(TelegramObject):
@@ -42,7 +42,8 @@ class BotCommand(TelegramObject):
 
     __slots__ = ("description", "command")
 
-    def __init__(self, command: str, description: str, **_kwargs: Any):
+    def __init__(self, command: str, description: str, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         self.command = command
         self.description = description
 

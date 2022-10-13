@@ -60,6 +60,7 @@ class TestSuccessfulPayment:
             "provider_payment_charge_id": self.provider_payment_charge_id,
         }
         successful_payment = SuccessfulPayment.de_json(json_dict, bot)
+        assert successful_payment.api_kwargs == {}
 
         assert successful_payment.invoice_payload == self.invoice_payload
         assert successful_payment.shipping_option_id == self.shipping_option_id

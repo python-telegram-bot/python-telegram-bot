@@ -113,11 +113,10 @@ class CallbackDataCache:
 
     Attributes:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
-        maxsize (:obj:`int`): maximum size of the cache.
 
     """
 
-    __slots__ = ("bot", "maxsize", "_keyboard_data", "_callback_queries", "logger")
+    __slots__ = ("bot", "_maxsize", "_keyboard_data", "_callback_queries", "logger")
 
     def __init__(
         self,
@@ -128,18 +127,43 @@ class CallbackDataCache:
         self.logger = logging.getLogger(__name__)
 
         self.bot = bot
-        self.maxsize = maxsize
+        self._maxsize = maxsize
         self._keyboard_data: MutableMapping[str, _KeyboardData] = LRUCache(maxsize=maxsize)
         self._callback_queries: MutableMapping[str, str] = LRUCache(maxsize=maxsize)
 
         if persistent_data:
-            keyboard_data, callback_queries = persistent_data
-            for key, value in callback_queries.items():
-                self._callback_queries[key] = value
-            for uuid, access_time, data in keyboard_data:
-                self._keyboard_data[uuid] = _KeyboardData(
-                    keyboard_uuid=uuid, access_time=access_time, button_data=data
-                )
+            self.load_persistence_data(persistent_data)
+
+    def load_persistence_data(self, persistent_data: CDCData) -> None:
+        """Loads data into the cache.
+
+        Warning:
+            This method is not intended to be called by users directly.
+
+        .. versionadded:: 20.0
+
+        Args:
+            persistent_data (Tuple[List[Tuple[:obj:`str`, :obj:`float`, \
+            Dict[:obj:`str`, :class:`object`]]], Dict[:obj:`str`, :obj:`str`]], optional): \
+            Data to load, as returned by \
+            :meth:`telegram.ext.BasePersistence.get_callback_data`.
+        """
+        keyboard_data, callback_queries = persistent_data
+        for key, value in callback_queries.items():
+            self._callback_queries[key] = value
+        for uuid, access_time, data in keyboard_data:
+            self._keyboard_data[uuid] = _KeyboardData(
+                keyboard_uuid=uuid, access_time=access_time, button_data=data
+            )
+
+    @property
+    def maxsize(self) -> int:
+        """:obj:`int`: The maximum size of the cache.
+
+        .. versionchanged:: 20.0
+           This property is now read-only.
+        """
+        return self._maxsize
 
     @property
     def persistence_data(self) -> CDCData:

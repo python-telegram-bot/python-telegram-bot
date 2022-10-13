@@ -18,12 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Voice."""
 
-from typing import TYPE_CHECKING, Any
-
 from telegram._files._basemedium import _BaseMedium
-
-if TYPE_CHECKING:
-    from telegram import Bot
+from telegram._utils.types import JSONDict
 
 
 class Voice(_BaseMedium):
@@ -41,8 +37,6 @@ class Voice(_BaseMedium):
         duration (:obj:`int`, optional): Duration of the audio in seconds as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size in bytes.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file.
@@ -52,7 +46,6 @@ class Voice(_BaseMedium):
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
         mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 
@@ -65,14 +58,14 @@ class Voice(_BaseMedium):
         duration: int,
         mime_type: str = None,
         file_size: int = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(
             file_id=file_id,
             file_unique_id=file_unique_id,
             file_size=file_size,
-            bot=bot,
+            api_kwargs=api_kwargs,
         )
         # Required
         self.duration = duration

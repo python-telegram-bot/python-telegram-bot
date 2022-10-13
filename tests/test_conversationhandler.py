@@ -517,8 +517,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
@@ -568,8 +568,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -607,8 +607,8 @@ class TestConversationHandler:
             from_user=user1,
             text="/eat",
             entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/eat"))],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -659,8 +659,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             try:
@@ -692,8 +692,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -738,8 +738,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         # First check that updates without user won't be handled
         message.from_user = None
@@ -796,10 +796,12 @@ class TestConversationHandler:
 
         # User one, starts the state machine.
         message = (
-            Message(0, None, self.group, from_user=user1, text="msg w/ inlinekeyboard", bot=bot)
+            Message(0, None, self.group, from_user=user1, text="msg w/ inlinekeyboard")
             if not inline
             else None
         )
+        if message:
+            message.set_bot(bot)
         inline_message_id = "42" if inline else None
 
         async with app:
@@ -809,18 +811,18 @@ class TestConversationHandler:
                 None,
                 message=message,
                 data="1",
-                bot=bot,
                 inline_message_id=inline_message_id,
             )
+            cbq_1.set_bot(bot)
             cbq_2 = CallbackQuery(
                 0,
                 user1,
                 None,
                 message=message,
                 data="2",
-                bot=bot,
                 inline_message_id=inline_message_id,
             )
+            cbq_2.set_bot(bot)
             await app.process_update(Update(update_id=0, callback_query=cbq_1))
 
             # Make sure that we're in the correct state
@@ -858,8 +860,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert handler.check_update(Update(update_id=0, message=message))
@@ -884,8 +886,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # give the task a chance to finish
@@ -903,7 +905,8 @@ class TestConversationHandler:
         app.add_handler(handler)
 
         # User starts the state machine and a callback function returns None
-        message = Message(0, None, self.group, from_user=user1, text="/start", bot=bot)
+        message = Message(0, None, self.group, from_user=user1, text="/start")
+        message.set_bot(bot)
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # Check that the same message is accepted again, i.e. the conversation immediately
@@ -929,8 +932,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # Give the task a chance to finish
@@ -945,7 +948,8 @@ class TestConversationHandler:
         handler = ConversationHandler(
             entry_points=[CommandHandler("start", self.start_end)], states={}, fallbacks=[]
         )
-        cbq = CallbackQuery(0, user1, None, None, bot=bot)
+        cbq = CallbackQuery(0, user1, None, None)
+        cbq.set_bot(bot)
         update = Update(0, callback_query=cbq)
         assert not handler.check_update(update)
 
@@ -953,7 +957,8 @@ class TestConversationHandler:
         handler = ConversationHandler(
             entry_points=[MessageHandler(filters.ALL, self.start_end)], states={}, fallbacks=[]
         )
-        message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, "Misses Test"), bot=bot)
+        message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, "Misses Test"))
+        message.set_bot(bot)
 
         update = Update(0, channel_post=message)
         assert not handler.check_update(update)
@@ -965,12 +970,18 @@ class TestConversationHandler:
         handler = ConversationHandler(
             entry_points=[CommandHandler("start", self.start_end)], states={}, fallbacks=[]
         )
-        message = Message(0, None, self.group, from_user=user1, text="ignore", bot=bot)
-        callback_query = CallbackQuery(0, user1, None, message=message, data="data", bot=bot)
-        chosen_inline_result = ChosenInlineResult(0, user1, "query", bot=bot)
-        inline_query = InlineQuery(0, user1, "query", 0, bot=bot)
-        pre_checkout_query = PreCheckoutQuery(0, user1, "USD", 100, [], bot=bot)
-        shipping_query = ShippingQuery(0, user1, [], None, bot=bot)
+        message = Message(0, None, self.group, from_user=user1, text="ignore")
+        message.set_bot(bot)
+        callback_query = CallbackQuery(0, user1, None, message=message, data="data")
+        callback_query.set_bot(bot)
+        chosen_inline_result = ChosenInlineResult(0, user1, "query")
+        chosen_inline_result.set_bot(bot)
+        inline_query = InlineQuery(0, user1, "query", offset="")
+        inline_query.set_bot(bot)
+        pre_checkout_query = PreCheckoutQuery(0, user1, "USD", 100, [])
+        pre_checkout_query.set_bot(bot)
+        shipping_query = ShippingQuery(0, user1, [], None)
+        shipping_query.set_bot(bot)
         assert not handler.check_update(Update(0, callback_query=callback_query))
         assert not handler.check_update(Update(0, chosen_inline_result=chosen_inline_result))
         assert not handler.check_update(Update(0, inline_query=inline_query))
@@ -1002,8 +1013,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -1040,8 +1051,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         async with app:
             await app.start()
@@ -1088,8 +1099,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         # start the conversation
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -1136,8 +1147,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         # start the conversation
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -1172,8 +1183,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        start_message.set_bot(bot)
         brew_message = Message(
             0,
             None,
@@ -1183,8 +1194,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/brew"))
             ],
-            bot=bot,
         )
+        brew_message.set_bot(bot)
         pour_coffee_message = Message(
             0,
             None,
@@ -1194,8 +1205,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/pourCoffee"))
             ],
-            bot=bot,
         )
+        pour_coffee_message.set_bot(bot)
         async with app:
             await app.start()
 
@@ -1242,8 +1253,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         async with app:
             # start the conversation
             await app.process_update(Update(update_id=0, message=message))
@@ -1287,8 +1298,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         brew_message = Message(
             0,
             None,
@@ -1298,8 +1309,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/brew"))
             ],
-            bot=bot,
         )
+        brew_message.set_bot(bot)
 
         async with app:
             await app.start()
@@ -1335,8 +1346,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         update = Update(update_id=0, message=message)
 
         async def timeout_callback(u, c):
@@ -1394,8 +1405,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         async with app:
             await app.start()
@@ -1445,8 +1456,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         async with app:
             await app.start()
@@ -1505,8 +1516,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         async with app:
             await app.start()
@@ -1578,8 +1589,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
         async with app:
             await app.start()
 
@@ -1660,8 +1671,8 @@ class TestConversationHandler:
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
-            bot=bot,
         )
+        message.set_bot(bot)
 
         async with app:
             await app.start()
@@ -1706,11 +1717,11 @@ class TestConversationHandler:
             self.group,
             from_user=user1,
             text="/start",
-            bot=bot,
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
         )
+        message.set_bot(bot)
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
@@ -1833,12 +1844,12 @@ class TestConversationHandler:
             None,
             self.group,
             text="/start",
-            bot=bot,
             from_user=user1,
             entities=[
                 MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
             ],
         )
+        message.set_bot(bot)
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
@@ -2094,8 +2105,10 @@ class TestConversationHandler:
         app.add_handler(conv_handler)
 
         async with app:
-            start_message = make_command_message("/start", bot=bot)
-            fallback_message = make_command_message("/fallback", bot=bot)
+            start_message = make_command_message("/start")
+            start_message.set_bot(bot)
+            fallback_message = make_command_message("/fallback")
+            fallback_message.set_bot(bot)
 
             # This loop makes sure that we test all of entry points, states handler & fallbacks
             for message in [start_message, start_message, fallback_message]:

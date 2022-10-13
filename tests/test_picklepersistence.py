@@ -41,11 +41,10 @@ def change_directory(tmp_path: Path):
 
 
 @pytest.fixture(autouse=True)
-def reset_callback_data_cache(bot):
+def reset_callback_data_cache(cdc_bot):
     yield
-    bot.callback_data_cache.clear_callback_data()
-    bot.callback_data_cache.clear_callback_queries()
-    bot.arbitrary_callback_data = False
+    cdc_bot.callback_data_cache.clear_callback_data()
+    cdc_bot.callback_data_cache.clear_callback_queries()
 
 
 @pytest.fixture(scope="function")
@@ -227,7 +226,8 @@ def pickle_files_wo_callback_data(user_data, chat_data, bot_data, conversations)
 def update(bot):
     user = User(id=321, first_name="test_user", is_bot=False)
     chat = Chat(id=123, type="group")
-    message = Message(1, datetime.datetime.now(), chat, from_user=user, text="Hi there", bot=bot)
+    message = Message(1, datetime.datetime.now(), chat, from_user=user, text="Hi there")
+    message.set_bot(bot)
     return Update(0, message=message)
 
 
@@ -237,6 +237,7 @@ class TestPicklePersistence:
 
     class DictSub(TelegramObject):  # Used for testing our custom (Un)Pickler.
         def __init__(self, private, normal, b):
+            super().__init__()
             self._private = private
             self.normal = normal
             self._bot = b
@@ -245,6 +246,7 @@ class TestPicklePersistence:
         __slots__ = ("new_var", "_private")
 
         def __init__(self, new_var, private):
+            super().__init__()
             self.new_var = new_var
             self._private = private
 
@@ -850,10 +852,14 @@ class TestPicklePersistence:
         assert conversations_test["name1"] == conversation1
 
     async def test_custom_pickler_unpickler_simple(
-        self, pickle_persistence, update, good_pickle_files, bot, recwarn
+        self, pickle_persistence, good_pickle_files, cdc_bot, recwarn
     ):
+        bot = cdc_bot
+        update = Update(1)
+        update.set_bot(bot)
+
         pickle_persistence.set_bot(bot)  # assign the current bot to the persistence
-        data_with_bot = {"current_bot": update.message}
+        data_with_bot = {"current_bot": update}
         await pickle_persistence.update_chat_data(
             12345, data_with_bot
         )  # also calls BotPickler.dumps()
@@ -877,7 +883,9 @@ class TestPicklePersistence:
         assert not len(recwarn)
         data_with_bot = {}
         async with make_bot(token=bot.token) as other_bot:
-            data_with_bot["unknown_bot_in_user"] = User(1, "Dev", False, bot=other_bot)
+            user = User(1, "Dev", False)
+            user.set_bot(other_bot)
+            data_with_bot["unknown_bot_in_user"] = user
         await pickle_persistence.update_chat_data(12345, data_with_bot)
         assert len(recwarn) == 1
         assert recwarn[-1].category is PTBUserWarning
@@ -887,8 +895,10 @@ class TestPicklePersistence:
         assert (await pp.get_chat_data())[12345]["unknown_bot_in_user"]._bot is None
 
     async def test_custom_pickler_unpickler_with_custom_objects(
-        self, bot, pickle_persistence, good_pickle_files
+        self, cdc_bot, pickle_persistence, good_pickle_files
     ):
+        bot = cdc_bot
+
         dict_s = self.DictSub("private", "normal", bot)
         slot_s = self.SlotsSub("new_var", "private_var")
         regular = self.NormalClass(12)

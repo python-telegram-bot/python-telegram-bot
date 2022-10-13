@@ -57,6 +57,7 @@ class TestGame:
             "photo": [self.photo[0].to_dict()],
         }
         game = Game.de_json(json_dict, bot)
+        assert game.api_kwargs == {}
 
         assert game.title == self.title
         assert game.description == self.description
@@ -72,6 +73,7 @@ class TestGame:
             "animation": self.animation.to_dict(),
         }
         game = Game.de_json(json_dict, bot)
+        assert game.api_kwargs == {}
 
         assert game.title == self.title
         assert game.description == self.description
