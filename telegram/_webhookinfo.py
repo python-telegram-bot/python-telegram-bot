@@ -76,7 +76,7 @@ class WebhookInfo(TelegramObject):
             connections to the webhook for update delivery.
         allowed_updates (List[:obj:`str`]): Optional. A list of update types the bot is subscribed
             to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
-        last_synchronization_error_date (:obj:`int`, optional): Unix time of the most recent error
+        last_synchronization_error_date (:obj:`int`): Optional. Unix time of the most recent error
             that happened when trying to synchronize available updates with Telegram datacenters.
 
             .. versionadded:: 20.0
