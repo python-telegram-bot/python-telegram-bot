@@ -37,7 +37,7 @@ class WebhookInfo(TelegramObject):
     considered equal, if their :attr:`url`, :attr:`has_custom_certificate`,
     :attr:`pending_update_count`, :attr:`ip_address`, :attr:`last_error_date`,
     :attr:`last_error_message`, :attr:`max_connections`, :attr:`allowed_updates` and
-    :attr:`last_synchronization_error_date` attributes are equal.
+    :attr:`last_synchronization_error_date` are equal.
 
     .. versionchanged:: 20.0
        :attr:`last_synchronization_error_date` is considered as well when comparing objects of
