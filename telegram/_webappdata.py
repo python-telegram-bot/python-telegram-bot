@@ -45,8 +45,7 @@ class WebAppData(TelegramObject):
             button, from which the Web App was opened.
 
             Warning:
-                Be aware that a bad client can send
-            arbitrary data in this field.
+                Be aware that a bad client can send arbitrary data in this field.
     """
 
     __slots__ = ("data", "button_text")
