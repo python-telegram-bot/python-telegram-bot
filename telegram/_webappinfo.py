@@ -28,7 +28,7 @@ class WebAppInfo(TelegramObject):
     This object contains information about a `Web App <https://core.telegram.org/bots/webapps>`_.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`url` attributes are equal.
+    considered equal, if their :attr:`url` are equal.
 
     .. seealso:: :any:`Webappbot Example <examples.webappbot>`
 

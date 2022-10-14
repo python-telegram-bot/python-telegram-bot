@@ -27,7 +27,7 @@ class WebAppData(TelegramObject):
     """Contains data sent from a `Web App <https://core.telegram.org/bots/webapps>`_ to the bot.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`data` and :attr:`button_text` attributes are equal.
+    considered equal, if their :attr:`data` and :attr:`button_text` are equal.
 
     .. seealso:: :any:`Webappbot Example <examples.webappbot>`
 
