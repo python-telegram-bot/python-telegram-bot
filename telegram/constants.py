@@ -340,7 +340,8 @@ class FileSizeLimit(IntEnum):
        API server.
     """
     FILESIZE_DOWNLOAD_LOCAL = sys.maxsize
-    """obj:`int`: Bots can download files without a size limit when using a local bot API server"""
+    """:obj:`int`: Bots can download files without a size limit when using a local bot API server.
+    """
     PHOTOSIZE_UPLOAD = int(10e6)  # (10MB)
     """:obj:`int`: Bots can upload photo files of up to 10MB in size."""
 
