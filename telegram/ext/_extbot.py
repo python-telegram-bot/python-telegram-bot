@@ -2256,7 +2256,6 @@ class ExtBot(Bot, Generic[RLARGS]):
             List[:class:`telegram.Message`]: On success, instance representing the message posted.
 
         """
-
         return await super().send_media_group(
             chat_id=chat_id,
             media=media,
