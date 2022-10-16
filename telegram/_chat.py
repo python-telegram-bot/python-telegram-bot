@@ -1129,6 +1129,9 @@ class Chat(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        group_caption: Optional[str] = None,
+        group_caption_parse_mode: Optional[str] = None,
+        group_caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> List["Message"]:
         """Shortcut for::
 
@@ -1152,6 +1155,9 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            group_caption=group_caption,
+            group_caption_parse_mode=group_caption_parse_mode,
+            group_caption_entities=group_caption_entities,
         )
 
     async def send_chat_action(

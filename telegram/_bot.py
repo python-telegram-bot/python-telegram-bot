@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot."""
 import asyncio
+import copy
 import functools
 import logging
 import pickle
@@ -1998,8 +1999,21 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        group_caption: Optional[str] = None,
+        # Notes on group_caption_parse_mode:
+        # 1. To be fully consistent with media items it would be called
+        # `group_parse_mode`, but that is ambiguous.
+        # 2. Typing ODVInput[str] = DEFAULT_NONE will make tests for shortcuts fail
+        # (check_defaults_handling) despite it being used for parse mode for individual captions.
+        group_caption_parse_mode: Optional[str] = None,
+        group_caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
+
+        Note:
+            If you supply a :paramref:`group_caption` (along with either
+            :paramref:`group_parse_mode` or :paramref:`group_caption_entities`),
+            then items in :paramref:`media` must have no captions, and vice verca.
 
         .. seealso:: :attr:`telegram.Message.reply_media_group`,
             :attr:`telegram.Chat.send_media_group`,
@@ -2037,6 +2051,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            group_caption (:obj:`str`, optional): Text of the caption
+                that will be shown for the whole media group.
+                Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            group_caption_parse_mode (:obj:`str` | :obj:`None`, optional):
+                Parse mode of the caption that will be shown for the whole media group.
+                Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            group_caption_entities (List[:class:`telegram.MessageEntity`], optional):
+                List of special entities that appear in the group caption.
 
         Returns:
             List[:class:`telegram.Message`]: An array of the sent Messages.
@@ -2044,9 +2066,25 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Raises:
             :class:`telegram.error.TelegramError`
         """
+        if group_caption and any(item.caption for item in media):
+            raise ValueError("You can only supply either group caption or images with captions.")
+
+        # First object could be mutated if group caption has to be applied to it,
+        # so it's best to copy media to avoid side effects.
+        # Shallow copy of every media item should be enough.
+        copied_media = [copy.copy(item) for item in media]
+
+        if group_caption:
+            # Apply group caption to the first media item.
+            # This will lead to the group being shown with this caption.
+            first_item = copied_media[0]
+            first_item.caption = group_caption
+            first_item.parse_mode = group_caption_parse_mode
+            first_item.caption_entities = group_caption_entities
+
         data: JSONDict = {
             "chat_id": chat_id,
-            "media": media,
+            "media": copied_media,
             "disable_notification": disable_notification,
             "allow_sending_without_reply": allow_sending_without_reply,
             "protect_content": protect_content,
