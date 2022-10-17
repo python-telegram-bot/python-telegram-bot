@@ -660,10 +660,11 @@ class Message(TelegramObject):
     def effective_attachment(
         self,
     ) -> Union[
+        Animation,
+        Audio,
         Contact,
         Dice,
         Document,
-        Animation,
         Game,
         Invoice,
         Location,
