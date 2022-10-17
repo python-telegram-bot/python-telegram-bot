@@ -170,10 +170,6 @@ class TelegramObject:
         """
         data = {}
 
-        # __dict__ has attrs from superclasses, so no need to loop through them
-        if hasattr(self, "__dict__"):
-            data.update(self.__dict__)  # important when class has no __slots__.
-
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
