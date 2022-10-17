@@ -32,6 +32,7 @@ jobs:
           python -W ignore -m pip install -r requirements.txt
           python -W ignore -m pip install -r requirements-opts.txt
           python -W ignore -m pip install -r requirements-dev.txt
+          python -W ignore -m pip install pytest-xdist[psutil]
 
       - name: Test with pytest
         # We run 4 different suites here
@@ -41,7 +42,6 @@ jobs:
         # 4. Test everything else
         # The first & second one are achieved by mocking the corresponding import
         # See test_helpers.py & test_no_passport.py for details
-        # `--dist loadfile` distributes each test file to a different worker
         run: |
           pytest -v --cov -k test_no_passport.py
           no_passport_exit=$?
@@ -54,6 +54,8 @@ jobs:
           no_rate_limiter_exit=$?
           export TEST_RATE_LIMITER='true'
           pip install -r requirements-opts.txt
+          # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
+          # worker
           pytest -v --cov --cov-append -n auto --dist loadfile
           full_exit=$?
           special_exit=$(( no_pytz_exit > no_passport_exit ? no_pytz_exit : no_passport_exit ))
