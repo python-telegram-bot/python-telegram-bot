@@ -335,11 +335,11 @@ class FileSizeLimit(IntEnum):
     """:obj:`int`: Bots can download files of up to 20MB in size."""
     FILESIZE_UPLOAD = int(50e6)  # (50MB)
     """:obj:`int`: Bots can upload non-photo files of up to 50MB in size."""
-    FILESIZE_UPLOAD_LOCAL = int(2e9)  # (2000MB)
+    FILESIZE_UPLOAD_LOCAL_MODE = int(2e9)  # (2000MB)
     """:obj:`int`: Bots can upload non-photo files of up to 2000MB in size when using a local bot
        API server.
     """
-    FILESIZE_DOWNLOAD_LOCAL = sys.maxsize
+    FILESIZE_DOWNLOAD_LOCAL_MODE = sys.maxsize
     """:obj:`int`: Bots can download files without a size limit when using a local bot API server.
     """
     PHOTOSIZE_UPLOAD = int(10e6)  # (10MB)
