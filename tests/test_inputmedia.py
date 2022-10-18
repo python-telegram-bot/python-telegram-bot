@@ -471,7 +471,6 @@ class TestSendMediaGroup:
         group_caption_entities,
     ):
         # clear media_group of all_captions
-
         for item in media_group:
             item.caption = None
             item.parse_mode = None
@@ -487,13 +486,20 @@ class TestSendMediaGroup:
         assert isinstance(messages, list)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
-        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+
+        first_message, other_messages = messages[0], messages[1:]
+        assert all(mes.media_group_id == first_message.media_group_id for mes in messages)
 
         # Make sure first message got the caption, which will lead
         # to Telegram displaying its caption as group caption
-        first_message = messages[0]
         assert first_message.caption
         assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+
+        # Check that other messages have no captions
+        assert all(mes.caption is None for mes in other_messages)
+        assert not any(mes.caption_entities for mes in other_messages)
+        # .parse_mode must be completely absent
+        assert not any(getattr(mes, "parse_mode", None) for mes in other_messages)
 
     @flaky(3, 1)
     async def test_send_media_group_all_args(self, bot, chat_id, media_group):
