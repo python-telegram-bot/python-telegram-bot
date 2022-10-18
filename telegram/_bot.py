@@ -2051,14 +2051,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
-            group_caption (:obj:`str`, optional): Text of the caption
-                that will be shown for the whole media group.
+            group_caption (:obj:`str`, optional): Caption that will be added to the
+                first element of :paramref:`media`, so that it will be used as caption for the
+                whole media group.
                 Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             group_caption_parse_mode (:obj:`str` | :obj:`None`, optional):
-                Parse mode of the caption that will be shown for the whole media group.
+                Parse mode for :paramref:`group_caption`.
                 Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             group_caption_entities (List[:class:`telegram.MessageEntity`], optional):
-                List of special entities that appear in the group caption.
+                List of special entities for :paramref:`group_caption`.
 
         Returns:
             List[:class:`telegram.Message`]: An array of the sent Messages.
