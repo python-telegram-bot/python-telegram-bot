@@ -443,7 +443,6 @@ class TestSendMediaGroup:
             mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)] for mes in messages
         )
 
-    @flaky(3, 1)
     async def test_send_media_group_throws_error_with_group_caption_and_individual_captions(
         self, bot, chat_id, media_group
     ):
