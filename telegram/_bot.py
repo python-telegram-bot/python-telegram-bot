@@ -2080,22 +2080,23 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         ):
             raise ValueError("You can only supply either group caption or media with captions.")
 
-        # First object could be mutated if group caption has to be applied to it,
-        # so it's best to copy media to avoid side effects.
-        # Shallow copy of every media item should be enough.
-        copied_media = [copy.copy(item) for item in media]
-
+        changed_media = None
         if group_caption:
             # Apply group caption to the first media item.
             # This will lead to the group being shown with this caption.
-            first_item = copied_media[0]
-            first_item.caption = group_caption
-            first_item.parse_mode = group_caption_parse_mode
-            first_item.caption_entities = group_caption_entities
+            # Copy first item to avoid mutation of original object
+            item_to_get_caption = copy.copy(media[0])
+            item_to_get_caption.caption = group_caption
+            item_to_get_caption.parse_mode = group_caption_parse_mode
+            item_to_get_caption.caption_entities = group_caption_entities
+
+            # copy the list (just the references) to avoid mutating the original list
+            changed_media = media[:]
+            changed_media[0] = item_to_get_caption
 
         data: JSONDict = {
             "chat_id": chat_id,
-            "media": copied_media,
+            "media": changed_media if group_caption else media,
             "disable_notification": disable_notification,
             "allow_sending_without_reply": allow_sending_without_reply,
             "protect_content": protect_content,
