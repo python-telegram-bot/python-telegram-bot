@@ -447,7 +447,7 @@ class TestSendMediaGroup:
         self, bot, chat_id, media_group
     ):
         with pytest.raises(
-            ValueError, match="You can only supply either group caption or images with captions."
+            ValueError, match="You can only supply either group caption or media with captions."
         ):
             await bot.send_media_group(chat_id, media_group, group_caption="foo")
 

@@ -2012,7 +2012,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Note:
             If you supply a :paramref:`group_caption` (along with either
-            :paramref:`group_parse_mode` or :paramref:`group_caption_entities`),
+            :paramref:`group_caption_parse_mode` or :paramref:`group_caption_entities`),
             then items in :paramref:`media` must have no captions, and vice verca.
 
         .. seealso:: :attr:`telegram.Message.reply_media_group`,
@@ -2066,8 +2066,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        if group_caption and any(item.caption for item in media):
-            raise ValueError("You can only supply either group caption or images with captions.")
+        if group_caption and any(
+            [
+                any(item.caption for item in media),
+                any(item.caption_entities for item in media),
+                any(item.parse_mode is DEFAULT_NONE for item in media),
+            ]
+        ):
+            raise ValueError("You can only supply either group caption or media with captions.")
 
         # First object could be mutated if group caption has to be applied to it,
         # so it's best to copy media to avoid side effects.
