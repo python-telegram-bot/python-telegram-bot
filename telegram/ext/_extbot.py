@@ -2246,16 +2246,6 @@ class ExtBot(Bot, Generic[RLARGS]):
         group_caption_parse_mode: Optional[str] = None,
         group_caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> List[Message]:
-        """Shortcut for::
-
-             await bot.send_media_group(update.effective_chat.id, *args, **kwargs)
-
-        For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
-
-        Returns:
-            List[:class:`telegram.Message`]: On success, instance representing the message posted.
-
-        """
         return await super().send_media_group(
             chat_id=chat_id,
             media=media,
