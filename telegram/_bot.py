@@ -2073,7 +2073,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             [
                 any(item.caption for item in media),
                 any(item.caption_entities for item in media),
-                any(item.parse_mode is DEFAULT_NONE for item in media),
+                any(item.parse_mode for item in media),
             ]
         ):
             raise ValueError("You can only supply either group caption or media with captions.")
