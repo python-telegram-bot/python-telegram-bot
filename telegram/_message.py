@@ -719,9 +719,9 @@ class Message(TelegramObject):
 
         return self._effective_attachment  # type: ignore[return-value]
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         # Required
         data["date"] = to_timestamp(self.date)
