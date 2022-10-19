@@ -470,6 +470,9 @@ class TestSendMediaGroup:
         parse_mode,
         caption_entities,
     ):
+        # prepare a copy to check later on if calling the method has caused side effects
+        copied_media_group = media_group.copy()
+
         # clear media_group of all_captions
         for item in media_group:
             item.caption = None
@@ -483,6 +486,13 @@ class TestSendMediaGroup:
             parse_mode=parse_mode,
             caption_entities=caption_entities,
         )
+
+        # Check that the method had no side effects:
+        # original group was not changed and 1st item still points to the same object
+        # (1st item must be copied within the method before adding the caption)
+        assert media_group == copied_media_group
+        assert media_group[0] is copied_media_group[0]
+
         assert isinstance(messages, list)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
