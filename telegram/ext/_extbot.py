@@ -2242,9 +2242,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-        group_caption: Optional[str] = None,
-        group_caption_parse_mode: Optional[str] = None,
-        group_caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        caption: Optional[str] = None,
+        parse_mode: Optional[str] = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> List[Message]:
         return await super().send_media_group(
             chat_id=chat_id,
@@ -2258,9 +2258,9 @@ class ExtBot(Bot, Generic[RLARGS]):
             connect_timeout=connect_timeout,
             pool_timeout=pool_timeout,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
-            group_caption=group_caption,
-            group_caption_parse_mode=group_caption_parse_mode,
-            group_caption_entities=group_caption_entities,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
         )
 
     async def send_message(

@@ -449,10 +449,10 @@ class TestSendMediaGroup:
         with pytest.raises(
             ValueError, match="You can only supply either group caption or media with captions."
         ):
-            await bot.send_media_group(chat_id, media_group, group_caption="foo")
+            await bot.send_media_group(chat_id, media_group, caption="foo")
 
     @pytest.mark.parametrize(
-        "group_caption, group_caption_parse_mode, group_caption_entities",
+        "caption, parse_mode, caption_entities",
         [
             # same combinations of caption options as in media_group fixture
             ("*photo* 1", "Markdown", None),
@@ -466,9 +466,9 @@ class TestSendMediaGroup:
         bot,
         chat_id,
         media_group,
-        group_caption,
-        group_caption_parse_mode,
-        group_caption_entities,
+        caption,
+        parse_mode,
+        caption_entities,
     ):
         # clear media_group of all_captions
         for item in media_group:
@@ -479,9 +479,9 @@ class TestSendMediaGroup:
         messages = await bot.send_media_group(
             chat_id,
             media_group,
-            group_caption=group_caption,
-            group_caption_parse_mode=group_caption_parse_mode,
-            group_caption_entities=group_caption_entities,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
         )
         assert isinstance(messages, list)
         assert len(messages) == 3

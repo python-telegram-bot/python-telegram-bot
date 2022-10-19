@@ -120,7 +120,7 @@ def check_method(h4):
         ignored |= {"current_offset"}  # Added for ease of use
     elif name == "sendMediaGroup":
         # Added for ease of use
-        ignored |= {"group_caption", "group_caption_parse_mode", "group_caption_entities"}
+        ignored |= {"caption", "parse_mode", "caption_entities"}
 
     assert (sig.parameters.keys() ^ checked) - ignored == set()
 
