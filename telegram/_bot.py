@@ -2078,7 +2078,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         ):
             raise ValueError("You can only supply either group caption or media with captions.")
 
-        changed_media = None
         if caption:
             # Apply group caption to the first media item.
             # This will lead to the group being shown with this caption.
@@ -2089,12 +2088,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             item_to_get_caption.caption_entities = caption_entities
 
             # copy the list (just the references) to avoid mutating the original list
-            changed_media = media[:]
-            changed_media[0] = item_to_get_caption
+            media = media.copy()
+            media[0] = item_to_get_caption
 
         data: JSONDict = {
             "chat_id": chat_id,
-            "media": changed_media if caption else media,
+            "media": media,
             "disable_notification": disable_notification,
             "allow_sending_without_reply": allow_sending_without_reply,
             "protect_content": protect_content,
