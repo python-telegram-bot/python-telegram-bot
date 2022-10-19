@@ -498,8 +498,6 @@ class TestSendMediaGroup:
         # Check that other messages have no captions
         assert all(mes.caption is None for mes in other_messages)
         assert not any(mes.caption_entities for mes in other_messages)
-        # .parse_mode must be completely absent
-        assert not any(getattr(mes, "parse_mode", None) for mes in other_messages)
 
     @flaky(3, 1)
     async def test_send_media_group_all_args(self, bot, chat_id, media_group):
