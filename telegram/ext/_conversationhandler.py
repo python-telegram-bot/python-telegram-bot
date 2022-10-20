@@ -221,9 +221,12 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             that are in the state :attr:`ConversationHandler.TIMEOUT`.
 
             Note:
-                 Using :paramref:`conversation_timeout` with nested conversations is currently not
-                 supported. You can still try to use it, but it will likely behave differently
-                 from what you expect.
+                * This feature relies on the :attr:`telegram.ext.Application.job_queue` being set
+                  and hence requires that the dependencies that :class:`telegram.ext.JobQueue`
+                  relies on are installed.
+                * Using :paramref:`conversation_timeout` with nested conversations is currently
+                  not supported. You can still try to use it, but it will likely behave
+                  differently from what you expect.
 
         name (:obj:`str`, optional): The name for this conversation handler. Required for
             persistence.
