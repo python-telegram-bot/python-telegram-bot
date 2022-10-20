@@ -53,8 +53,8 @@ class TelegramObject:
           :meth:`set_bot` and :meth:`get_bot` instead.
         * Removed the possibility to pass arbitrary keyword arguments for several subclasses.
         * ``str(telegram_object)`` and ``repr(telegram_object)`` now both return a string of the
-         form ``ClassName(attr_1=value_1, attr_2=value_2, ...)``, where attributes with the
-         value :obj:`None` are omitted.
+          form ``ClassName(attr_1=value_1, attr_2=value_2, ...)``, where attributes with the
+          value :obj:`None` are omitted.
 
     Arguments:
         api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|
