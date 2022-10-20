@@ -65,6 +65,7 @@ jobs:
           
           # test without pytz & jobqueue
           pytest -v --cov --cov-append -k test_jobqueue.py
+          pytest -v --cov --cov-append -k test_applicationbuilder.py
           status=$(( $? > status ? $? : status))
           
           # Test without ratelimiter
