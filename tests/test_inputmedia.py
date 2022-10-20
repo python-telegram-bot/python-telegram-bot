@@ -430,6 +430,22 @@ def media_group(photo, thumb):  # noqa: F811
     ]
 
 
+@pytest.fixture(scope="function")  # noqa: F811
+def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
+    return [
+        InputMediaPhoto(photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
+        InputMediaPhoto(photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
+    ]
+
+
+@pytest.fixture(scope="function")  # noqa: F811
+def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
+    return [
+        InputMediaPhoto(photo, parse_mode="Markdown"),
+        InputMediaPhoto(thumb, parse_mode="HTML"),
+    ]
+
+
 class TestSendMediaGroup:
     @flaky(3, 1)
     async def test_send_media_group_photo(self, bot, chat_id, media_group):
@@ -444,12 +460,23 @@ class TestSendMediaGroup:
         )
 
     async def test_send_media_group_throws_error_with_group_caption_and_individual_captions(
-        self, bot, chat_id, media_group
+        self,
+        bot,
+        chat_id,
+        media_group,
+        media_group_no_caption_only_caption_entities,
+        media_group_no_caption_only_parse_mode,
     ):
-        with pytest.raises(
-            ValueError, match="You can only supply either group caption or media with captions."
+        for group in (
+            media_group,
+            media_group_no_caption_only_caption_entities,
+            media_group_no_caption_only_parse_mode,
         ):
-            await bot.send_media_group(chat_id, media_group, caption="foo")
+            with pytest.raises(
+                ValueError,
+                match="You can only supply either group caption or media with captions.",
+            ):
+                await bot.send_media_group(chat_id, group, caption="foo")
 
     @pytest.mark.parametrize(
         "caption, parse_mode, caption_entities",
