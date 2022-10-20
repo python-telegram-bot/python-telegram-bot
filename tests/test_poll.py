@@ -41,6 +41,7 @@ class TestPollOption:
     def test_de_json(self):
         json_dict = {"text": self.text, "voter_count": self.voter_count}
         poll_option = PollOption.de_json(json_dict, None)
+        assert poll_option.api_kwargs == {}
 
         assert poll_option.text == self.text
         assert poll_option.voter_count == self.voter_count
@@ -91,6 +92,7 @@ class TestPollAnswer:
             "option_ids": self.option_ids,
         }
         poll_answer = PollAnswer.de_json(json_dict, None)
+        assert poll_answer.api_kwargs == {}
 
         assert poll_answer.poll_id == self.poll_id
         assert poll_answer.user == self.user
@@ -175,6 +177,7 @@ class TestPoll:
             "close_date": to_timestamp(self.close_date),
         }
         poll = Poll.de_json(json_dict, bot)
+        assert poll.api_kwargs == {}
 
         assert poll.id == self.id_
         assert poll.question == self.question

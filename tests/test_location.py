@@ -59,6 +59,7 @@ class TestLocation:
             "proximity_alert_radius": TestLocation.proximity_alert_radius,
         }
         location = Location.de_json(json_dict, bot)
+        assert location.api_kwargs == {}
 
         assert location.latitude == self.latitude
         assert location.longitude == self.longitude

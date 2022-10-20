@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram EncryptedPassportElement."""
 from base64 import b64decode
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
@@ -75,8 +75,6 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",
@@ -110,7 +108,6 @@ class EncryptedPassportElement(TelegramObject):
             requested for "passport", "driver_license", "identity_card", "internal_passport",
             "utility_bill", "bank_statement", "rental_agreement", "passport_registration" and
             "temporary_registration" types.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     """
 
@@ -139,10 +136,12 @@ class EncryptedPassportElement(TelegramObject):
         reverse_side: PassportFile = None,
         selfie: PassportFile = None,
         translation: List[PassportFile] = None,
-        bot: "Bot" = None,
         credentials: "Credentials" = None,  # pylint: disable=unused-argument
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.type = type
         # Optionals
@@ -167,8 +166,6 @@ class EncryptedPassportElement(TelegramObject):
             self.selfie,
         )
 
-        self.set_bot(bot)
-
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["EncryptedPassportElement"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
@@ -183,7 +180,7 @@ class EncryptedPassportElement(TelegramObject):
         data["selfie"] = PassportFile.de_json(data.get("selfie"), bot)
         data["translation"] = PassportFile.de_list(data.get("translation"), bot) or None
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     @classmethod
     def de_json_decrypted(
@@ -246,11 +243,11 @@ class EncryptedPassportElement(TelegramObject):
                 or None
             )
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         if self.files:
             data["files"] = [p.to_dict() for p in self.files]

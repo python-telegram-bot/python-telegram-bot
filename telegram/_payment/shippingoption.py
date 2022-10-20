@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
 
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, List
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -39,7 +39,6 @@ class ShippingOption(TelegramObject):
         id (:obj:`str`): Shipping option identifier.
         title (:obj:`str`): Option title.
         prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         id (:obj:`str`): Shipping option identifier.
@@ -52,20 +51,23 @@ class ShippingOption(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin, invalid-name
+        id: str,  # pylint: disable=redefined-builtin
         title: str,
         prices: List["LabeledPrice"],
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         self.id = id  # pylint: disable=invalid-name
         self.title = title
         self.prices = prices
 
         self._id_attrs = (self.id,)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["prices"] = [p.to_dict() for p in self.prices]
 

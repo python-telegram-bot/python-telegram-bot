@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ForceReply."""
 
-from typing import Any
-
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class ForceReply(TelegramObject):
@@ -51,8 +50,6 @@ class ForceReply(TelegramObject):
 
             .. versionadded:: 13.7
 
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         force_reply (:obj:`True`): Shows reply interface to the user, as if they manually selected
             the bots message and tapped 'Reply'.
@@ -70,8 +67,10 @@ class ForceReply(TelegramObject):
         self,
         selective: bool = None,
         input_field_placeholder: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.force_reply = True
         self.selective = selective
         self.input_field_placeholder = input_field_placeholder

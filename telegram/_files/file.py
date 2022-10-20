@@ -21,16 +21,16 @@ import shutil
 import urllib.parse as urllib_parse
 from base64 import b64decode
 from pathlib import Path
-from typing import IO, TYPE_CHECKING, Any, Optional, Union
+from typing import IO, TYPE_CHECKING, Optional, Union
 
 from telegram._passport.credentials import decrypt
 from telegram._telegramobject import TelegramObject
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import is_local_file
-from telegram._utils.types import FilePathInput, ODVInput
+from telegram._utils.types import FilePathInput, JSONDict, ODVInput
 
 if TYPE_CHECKING:
-    from telegram import Bot, FileCredentials
+    from telegram import FileCredentials
 
 
 class File(TelegramObject):
@@ -56,8 +56,6 @@ class File(TelegramObject):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): Optional. File size in bytes, if known.
         file_path (:obj:`str`, optional): File path. Use :attr:`download` to get the file.
-        bot (:obj:`telegram.Bot`, optional): Bot to use with shortcut method.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file.
@@ -81,18 +79,20 @@ class File(TelegramObject):
         self,
         file_id: str,
         file_unique_id: str,
-        bot: "Bot" = None,
         file_size: int = None,
         file_path: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.file_id = str(file_id)
         self.file_unique_id = str(file_unique_id)
         # Optionals
         self.file_size = file_size
         self.file_path = file_path
-        self.set_bot(bot)
+
         self._credentials: Optional["FileCredentials"] = None
 
         self._id_attrs = (self.file_unique_id,)

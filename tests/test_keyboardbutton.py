@@ -72,6 +72,7 @@ class TestKeyboardButton:
         }
 
         inline_keyboard_button = KeyboardButton.de_json(json_dict, None)
+        assert inline_keyboard_button.api_kwargs == {}
         assert inline_keyboard_button.text == self.text
         assert inline_keyboard_button.request_location == self.request_location
         assert inline_keyboard_button.request_contact == self.request_contact

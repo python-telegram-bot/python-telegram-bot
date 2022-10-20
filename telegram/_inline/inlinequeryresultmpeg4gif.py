@@ -18,13 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultMpeg4Gif."""
 
-from typing import TYPE_CHECKING, Any, List, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import ODVInput
+from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -61,7 +61,6 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the video animation.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.MPEG4GIF`.
@@ -120,11 +119,12 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         thumb_mime_type: str = None,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
 
         # Required
-        super().__init__(InlineQueryResultType.MPEG4GIF, id)
+        super().__init__(InlineQueryResultType.MPEG4GIF, id, api_kwargs=api_kwargs)
         self.mpeg4_url = mpeg4_url
         self.thumb_url = thumb_url
 

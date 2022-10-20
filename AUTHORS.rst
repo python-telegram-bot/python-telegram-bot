@@ -72,6 +72,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `macrojames <https://github.com/macrojames>`_
 - `Matheus Lemos <https://github.com/mlemosf>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
+- `miles <https://github.com/miles170>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `naveenvhegde <https://github.com/naveenvhegde>`_
 - `neurrone <https://github.com/neurrone>`_

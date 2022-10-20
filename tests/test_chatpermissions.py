@@ -64,6 +64,7 @@ class TestChatPermissions:
             "can_pin_messages": self.can_pin_messages,
         }
         permissions = ChatPermissions.de_json(json_dict, bot)
+        assert permissions.api_kwargs == {}
 
         assert permissions.can_send_messages == self.can_send_messages
         assert permissions.can_send_media_messages == self.can_send_media_messages

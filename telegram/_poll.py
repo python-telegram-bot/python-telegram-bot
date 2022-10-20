@@ -20,7 +20,7 @@
 
 import datetime
 import sys
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Optional
+from typing import TYPE_CHECKING, ClassVar, Dict, List, Optional
 
 from telegram import constants
 from telegram._messageentity import MessageEntity
@@ -53,7 +53,8 @@ class PollOption(TelegramObject):
 
     __slots__ = ("voter_count", "text")
 
-    def __init__(self, text: str, voter_count: int, **_kwargs: Any):
+    def __init__(self, text: str, voter_count: int, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         self.text = text
         self.voter_count = voter_count
 
@@ -85,7 +86,10 @@ class PollAnswer(TelegramObject):
 
     __slots__ = ("option_ids", "user", "poll_id")
 
-    def __init__(self, poll_id: str, user: User, option_ids: List[int], **_kwargs: Any):
+    def __init__(
+        self, poll_id: str, user: User, option_ids: List[int], *, api_kwargs: JSONDict = None
+    ):
+        super().__init__(api_kwargs=api_kwargs)
         self.poll_id = poll_id
         self.user = user
         self.option_ids = option_ids
@@ -102,7 +106,7 @@ class PollAnswer(TelegramObject):
 
         data["user"] = User.de_json(data.get("user"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
 
 class Poll(TelegramObject):
@@ -177,7 +181,7 @@ class Poll(TelegramObject):
 
     def __init__(
         self,
-        id: str,  # pylint: disable=redefined-builtin, invalid-name
+        id: str,  # pylint: disable=redefined-builtin
         question: str,
         options: List[PollOption],
         total_voter_count: int,
@@ -190,8 +194,10 @@ class Poll(TelegramObject):
         explanation_entities: List[MessageEntity] = None,
         open_period: int = None,
         close_date: datetime.datetime = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.id = id  # pylint: disable=invalid-name
         self.question = question
         self.options = options
@@ -220,11 +226,11 @@ class Poll(TelegramObject):
         data["explanation_entities"] = MessageEntity.de_list(data.get("explanation_entities"), bot)
         data["close_date"] = from_timestamp(data.get("close_date"))
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["options"] = [x.to_dict() for x in self.options]
         if self.explanation_entities:

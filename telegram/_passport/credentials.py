@@ -19,7 +19,7 @@
 # pylint: disable=missing-module-docstring,  redefined-builtin
 import json
 from base64 import b64decode
-from typing import TYPE_CHECKING, Any, List, Optional, no_type_check
+from typing import TYPE_CHECKING, List, Optional, no_type_check
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 
 
 @no_type_check
-def decrypt(secret, hash, data):
+def decrypt(secret, hash, data):  # skipcq: PYL-W0622
     """
     Decrypt per telegram docs at https://core.telegram.org/passport.
 
@@ -95,7 +95,7 @@ def decrypt(secret, hash, data):
 
 
 @no_type_check
-def decrypt_json(secret, hash, data):
+def decrypt_json(secret, hash, data):  # skipcq: PYL-W0622
     """Decrypts data using secret and hash and then decodes utf-8 string and loads json"""
     return json.loads(decrypt(secret, hash, data).decode("utf-8"))
 
@@ -118,7 +118,6 @@ class EncryptedCredentials(TelegramObject):
             authentication or base64 encrypted data.
         hash (:obj:`str`): Base64-encoded data hash for data authentication.
         secret (:obj:`str`): Decrypted or encrypted secret used for decryption.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         data (:class:`telegram.Credentials` or :obj:`str`): Decrypted data with unique user's
@@ -137,7 +136,15 @@ class EncryptedCredentials(TelegramObject):
         "_decrypted_data",
     )
 
-    def __init__(self, data: str, hash: str, secret: str, bot: "Bot" = None, **_kwargs: Any):
+    def __init__(
+        self,
+        data: str,
+        hash: str,  # skipcq: PYL-W0622
+        secret: str,
+        *,
+        api_kwargs: JSONDict = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.data = data
         self.hash = hash
@@ -145,7 +152,6 @@ class EncryptedCredentials(TelegramObject):
 
         self._id_attrs = (self.data, self.hash, self.secret)
 
-        self.set_bot(bot)
         self._decrypted_secret: Optional[str] = None
         self._decrypted_data: Optional["Credentials"] = None
 
@@ -208,12 +214,17 @@ class Credentials(TelegramObject):
 
     __slots__ = ("nonce", "secure_data")
 
-    def __init__(self, secure_data: "SecureData", nonce: str, bot: "Bot" = None, **_kwargs: Any):
+    def __init__(
+        self,
+        secure_data: "SecureData",
+        nonce: str,
+        *,
+        api_kwargs: JSONDict = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.secure_data = secure_data
         self.nonce = nonce
-
-        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["Credentials"]:
@@ -225,7 +236,7 @@ class Credentials(TelegramObject):
 
         data["secure_data"] = SecureData.de_json(data.get("secure_data"), bot=bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
 
 class SecureData(TelegramObject):
@@ -283,9 +294,11 @@ class SecureData(TelegramObject):
         rental_agreement: "SecureValue" = None,
         passport_registration: "SecureValue" = None,
         temporary_registration: "SecureValue" = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Optionals
         self.temporary_registration = temporary_registration
         self.passport_registration = passport_registration
@@ -298,8 +311,6 @@ class SecureData(TelegramObject):
         self.internal_passport = internal_passport
         self.passport = passport
         self.personal_details = personal_details
-
-        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SecureData"]:
@@ -325,7 +336,7 @@ class SecureData(TelegramObject):
         data["passport"] = SecureValue.de_json(data.get("passport"), bot=bot)
         data["personal_details"] = SecureValue.de_json(data.get("personal_details"), bot=bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
 
 class SecureValue(TelegramObject):
@@ -365,17 +376,16 @@ class SecureValue(TelegramObject):
         selfie: "FileCredentials" = None,
         files: List["FileCredentials"] = None,
         translation: List["FileCredentials"] = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.data = data
         self.front_side = front_side
         self.reverse_side = reverse_side
         self.selfie = selfie
         self.files = files
         self.translation = translation
-
-        self.set_bot(bot)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["SecureValue"]:
@@ -392,11 +402,11 @@ class SecureValue(TelegramObject):
         data["files"] = FileCredentials.de_list(data.get("files"), bot=bot)
         data["translation"] = FileCredentials.de_list(data.get("translation"), bot=bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["files"] = [p.to_dict() for p in self.files]  # type: ignore[union-attr]
         data["translation"] = [p.to_dict() for p in self.translation]  # type: ignore[union-attr]
@@ -409,15 +419,16 @@ class _CredentialsBase(TelegramObject):
 
     __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
-    def __init__(self, hash: str, secret: str, bot: "Bot" = None, **_kwargs: Any):
+    def __init__(
+        self, hash: str, secret: str, *, api_kwargs: JSONDict = None
+    ):  # skipcq: PYL-W0622
+        super().__init__(api_kwargs=api_kwargs)
         self.hash = hash
         self.secret = secret
 
         # Aliases just to be sure
         self.file_hash = self.hash
         self.data_hash = self.hash
-
-        self.set_bot(bot)
 
 
 class DataCredentials(_CredentialsBase):
@@ -436,12 +447,12 @@ class DataCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, data_hash: str, secret: str, **_kwargs: Any):
-        super().__init__(data_hash, secret, **_kwargs)
+    def __init__(self, data_hash: str, secret: str, *, api_kwargs: JSONDict = None):
+        super().__init__(hash=data_hash, secret=secret, api_kwargs=api_kwargs)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         del data["file_hash"]
         del data["hash"]
@@ -465,12 +476,12 @@ class FileCredentials(_CredentialsBase):
 
     __slots__ = ()
 
-    def __init__(self, file_hash: str, secret: str, **_kwargs: Any):
-        super().__init__(file_hash, secret, **_kwargs)
+    def __init__(self, file_hash: str, secret: str, *, api_kwargs: JSONDict = None):
+        super().__init__(hash=file_hash, secret=secret, api_kwargs=api_kwargs)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         del data["data_hash"]
         del data["hash"]

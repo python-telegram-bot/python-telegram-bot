@@ -18,13 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultPhoto."""
 
-from typing import TYPE_CHECKING, Any, List, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import ODVInput
+from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -59,7 +59,6 @@ class InlineQueryResultPhoto(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the photo.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.PHOTO`.
@@ -115,10 +114,11 @@ class InlineQueryResultPhoto(InlineQueryResult):
         input_message_content: "InputMessageContent" = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         # Required
-        super().__init__(InlineQueryResultType.PHOTO, id)
+        super().__init__(InlineQueryResultType.PHOTO, id, api_kwargs=api_kwargs)
         self.photo_url = photo_url
         self.thumb_url = thumb_url
 

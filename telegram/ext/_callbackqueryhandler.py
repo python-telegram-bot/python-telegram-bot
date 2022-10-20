@@ -130,6 +130,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             :obj:`bool`
 
         """
+        # pylint: disable=too-many-return-statements
         if isinstance(update, Update) and update.callback_query:
             callback_data = update.callback_query.data
             if self.pattern:
@@ -139,6 +140,8 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
                     return isinstance(callback_data, self.pattern)
                 if callable(self.pattern):
                     return self.pattern(callback_data)
+                if not isinstance(callback_data, str):
+                    return False
                 match = re.match(self.pattern, callback_data)
                 if match:
                     return match

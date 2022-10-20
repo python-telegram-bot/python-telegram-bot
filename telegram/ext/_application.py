@@ -54,7 +54,6 @@ from telegram._utils.types import DVInput, ODVInput
 from telegram._utils.warnings import warn
 from telegram.error import TelegramError
 from telegram.ext._basepersistence import BasePersistence
-from telegram.ext._callbackdatacache import CallbackDataCache
 from telegram.ext._contexttypes import ContextTypes
 from telegram.ext._extbot import ExtBot
 from telegram.ext._handler import BaseHandler
@@ -440,10 +439,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                     raise ValueError("callback_data must be a tuple of length 2")
                 # Mypy doesn't know that persistence.set_bot (see above) already checks that
                 # self.bot is an instance of ExtBot if callback_data should be stored ...
-                self.bot.callback_data_cache = CallbackDataCache(  # type: ignore[attr-defined]
-                    self.bot,  # type: ignore[arg-type]
-                    self.bot.callback_data_cache.maxsize,  # type: ignore[attr-defined]
-                    persistent_data=persistent_data,
+                self.bot.callback_data_cache.load_persistence_data(  # type: ignore[attr-defined]
+                    persistent_data
                 )
 
     @staticmethod

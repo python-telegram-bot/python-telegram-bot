@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import Any, List, Sequence, Union
+from typing import List, Sequence, Union
 
 from telegram._keyboardbutton import KeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -62,8 +62,6 @@ class ReplyKeyboardMarkup(TelegramObject):
 
             .. versionadded:: 13.7
 
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         keyboard (List[List[:class:`telegram.KeyboardButton` | :obj:`str`]]): Array of button rows.
         resize_keyboard (:obj:`bool`): Optional. Requests clients to resize the keyboard.
@@ -92,8 +90,10 @@ class ReplyKeyboardMarkup(TelegramObject):
         one_time_keyboard: bool = None,
         selective: bool = None,
         input_field_placeholder: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(keyboard):
             raise ValueError(
                 "The parameter `keyboard` should be a list of list of "
@@ -119,9 +119,9 @@ class ReplyKeyboardMarkup(TelegramObject):
 
         self._id_attrs = (self.keyboard,)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["keyboard"] = []
         for row in self.keyboard:
@@ -169,7 +169,6 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
         """
         return cls(
             [[button]],
@@ -177,7 +176,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
-            **kwargs,
+            **kwargs,  # type: ignore[arg-type]
         )
 
     @classmethod
@@ -221,7 +220,6 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
         return cls(
@@ -230,7 +228,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
-            **kwargs,
+            **kwargs,  # type: ignore[arg-type]
         )
 
     @classmethod
@@ -274,7 +272,6 @@ class ReplyKeyboardMarkup(TelegramObject):
                 field when the reply is active.
 
                 .. versionadded:: 13.7
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
         button_grid = [[button] for button in button_column]
@@ -284,7 +281,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             one_time_keyboard=one_time_keyboard,
             selective=selective,
             input_field_placeholder=input_field_placeholder,
-            **kwargs,
+            **kwargs,  # type: ignore[arg-type]
         )
 
     def __hash__(self) -> int:

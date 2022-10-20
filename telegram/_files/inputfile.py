@@ -20,10 +20,10 @@
 
 import logging
 import mimetypes
-from pathlib import Path
 from typing import IO, Optional, Union
 from uuid import uuid4
 
+from telegram._utils.files import load_file
 from telegram._utils.types import FieldTuple
 
 _DEFAULT_MIME_TYPE = "application/octet-stream"
@@ -75,15 +75,10 @@ class InputFile:
         elif isinstance(obj, str):
             self.input_file_content = obj.encode("utf-8")
         else:
-            self.input_file_content = obj.read()
-        self.attach_name: Optional[str] = "attached" + uuid4().hex if attach else None
+            reported_filename, self.input_file_content = load_file(obj)
+            filename = filename or reported_filename
 
-        if (
-            not filename
-            and hasattr(obj, "name")
-            and not isinstance(obj.name, int)  # type: ignore[union-attr]
-        ):
-            filename = Path(obj.name).name  # type: ignore[union-attr]
+        self.attach_name: Optional[str] = "attached" + uuid4().hex if attach else None
 
         if filename:
             self.mimetype = mimetypes.guess_type(filename, strict=False)[0] or _DEFAULT_MIME_TYPE

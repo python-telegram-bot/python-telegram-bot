@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents an invite link for a chat."""
 import datetime
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -65,7 +65,6 @@ class ChatInviteLink(TelegramObject):
             created using this link.
 
             .. versionadded:: 13.8
-
     Attributes:
         invite_link (:obj:`str`): The invite link. If the link was created by another chat
             administrator, then the second part of the link will be replaced with ``'…'``.
@@ -113,8 +112,10 @@ class ChatInviteLink(TelegramObject):
         member_limit: int = None,
         name: str = None,
         pending_join_request_count: int = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.invite_link = invite_link
         self.creator = creator
@@ -148,11 +149,11 @@ class ChatInviteLink(TelegramObject):
         data["creator"] = User.de_json(data.get("creator"), bot)
         data["expire_date"] = from_timestamp(data.get("expire_date", None))
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["expire_date"] = to_timestamp(self.expire_date)
 

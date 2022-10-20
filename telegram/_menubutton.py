@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram menu buttons."""
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, Optional, Type
+from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
@@ -54,7 +54,10 @@ class MenuButton(TelegramObject):
 
     __slots__ = ("type",)
 
-    def __init__(self, type: str, **_kwargs: Any):  # pylint: disable=redefined-builtin
+    def __init__(
+        self, type: str, *, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
+    ):  # pylint: disable=redefined-builtin
+        super().__init__(api_kwargs=api_kwargs)
         self.type = type
 
         self._id_attrs = (self.type,)
@@ -74,7 +77,10 @@ class MenuButton(TelegramObject):
         """
         data = cls._parse_data(data)
 
-        if not data:
+        if data is None:
+            return None
+
+        if not data and cls is MenuButton:
             return None
 
         _class_mapping: Dict[str, Type["MenuButton"]] = {
@@ -83,9 +89,10 @@ class MenuButton(TelegramObject):
             cls.DEFAULT: MenuButtonDefault,
         }
 
-        if cls is MenuButton and data["type"] in _class_mapping:
-            return _class_mapping[data["type"]].de_json(data, bot=bot)
-        return cls(**data, bot=bot)
+        if cls is MenuButton and data.get("type") in _class_mapping:
+            return _class_mapping[data.pop("type")].de_json(data, bot=bot)
+        out = super().de_json(data=data, bot=bot)
+        return out
 
     COMMANDS: ClassVar[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""
@@ -99,15 +106,14 @@ class MenuButtonCommands(MenuButton):
     """Represents a menu button, which opens the bot's list of commands.
 
     .. versionadded:: 20.0
-
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.COMMANDS`.
     """
 
     __slots__ = ()
 
-    def __init__(self, **_kwargs: Any):
-        super().__init__(type=constants.MenuButtonType.COMMANDS)
+    def __init__(self, *, api_kwargs: JSONDict = None):
+        super().__init__(type=constants.MenuButtonType.COMMANDS, api_kwargs=api_kwargs)
 
 
 class MenuButtonWebApp(MenuButton):
@@ -136,8 +142,8 @@ class MenuButtonWebApp(MenuButton):
 
     __slots__ = ("text", "web_app")
 
-    def __init__(self, text: str, web_app: WebAppInfo, **_kwargs: Any):
-        super().__init__(type=constants.MenuButtonType.WEB_APP)
+    def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: JSONDict = None):
+        super().__init__(type=constants.MenuButtonType.WEB_APP, api_kwargs=api_kwargs)
         self.text = text
         self.web_app = web_app
 
@@ -153,11 +159,11 @@ class MenuButtonWebApp(MenuButton):
 
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
         data["web_app"] = self.web_app.to_dict()
         return data
 
@@ -166,12 +172,11 @@ class MenuButtonDefault(MenuButton):
     """Describes that no specific value for the menu button was set.
 
     .. versionadded:: 20.0
-
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.MenuButtonType.DEFAULT`.
     """
 
     __slots__ = ()
 
-    def __init__(self, **_kwargs: Any):
-        super().__init__(type=constants.MenuButtonType.DEFAULT)
+    def __init__(self, *, api_kwargs: JSONDict = None):
+        super().__init__(type=constants.MenuButtonType.DEFAULT, api_kwargs=api_kwargs)

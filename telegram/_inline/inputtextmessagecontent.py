@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
 
-from typing import Any, List, Tuple, Union
+from typing import List, Tuple, Union
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
@@ -47,7 +47,6 @@ class InputTextMessageContent(InputMessageContent):
             :paramref:`parse_mode`.
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent,
@@ -72,8 +71,10 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.message_text = message_text
         # Optionals
@@ -83,9 +84,9 @@ class InputTextMessageContent(InputMessageContent):
 
         self._id_attrs = (self.message_text,)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         if self.entities:
             data["entities"] = [ce.to_dict() for ce in self.entities]

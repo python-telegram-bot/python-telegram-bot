@@ -21,7 +21,7 @@
 import datetime
 import sys
 from html import escape
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._dice import Dice
@@ -247,7 +247,6 @@ class Message(TelegramObject):
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -368,7 +367,6 @@ class Message(TelegramObject):
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
         by this function. Instead, the supplied replacement for the emoji will be used.
@@ -487,7 +485,6 @@ class Message(TelegramObject):
         poll: Poll = None,
         forward_sender_name: str = None,
         reply_markup: InlineKeyboardMarkup = None,
-        bot: "Bot" = None,
         dice: Dice = None,
         via_bot: User = None,
         proximity_alert_triggered: ProximityAlertTriggered = None,
@@ -500,8 +497,11 @@ class Message(TelegramObject):
         is_automatic_forward: bool = None,
         has_protected_content: bool = None,
         web_app_data: WebAppData = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.message_id = message_id
         # Optionals
@@ -563,7 +563,6 @@ class Message(TelegramObject):
         self.video_chat_participants_invited = video_chat_participants_invited
         self.reply_markup = reply_markup
         self.web_app_data = web_app_data
-        self.set_bot(bot)
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -605,7 +604,7 @@ class Message(TelegramObject):
         if not data:
             return None
 
-        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["sender_chat"] = Chat.de_json(data.get("sender_chat"), bot)
         data["date"] = from_timestamp(data["date"])
         data["chat"] = Chat.de_json(data.get("chat"), bot)
@@ -655,16 +654,17 @@ class Message(TelegramObject):
         )
         data["web_app_data"] = WebAppData.de_json(data.get("web_app_data"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
     @property
     def effective_attachment(
         self,
     ) -> Union[
+        Animation,
+        Audio,
         Contact,
         Dice,
         Document,
-        Animation,
         Game,
         Invoice,
         Location,
@@ -719,9 +719,9 @@ class Message(TelegramObject):
 
         return self._effective_attachment  # type: ignore[return-value]
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         # Required
         data["date"] = to_timestamp(self.date)

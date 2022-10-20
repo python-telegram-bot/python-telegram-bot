@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -42,7 +42,6 @@ class InlineKeyboardMarkup(TelegramObject):
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
             each represented by a list of InlineKeyboardButton objects.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
@@ -52,7 +51,13 @@ class InlineKeyboardMarkup(TelegramObject):
 
     __slots__ = ("inline_keyboard",)
 
-    def __init__(self, inline_keyboard: List[List[InlineKeyboardButton]], **_kwargs: Any):
+    def __init__(
+        self,
+        inline_keyboard: List[List[InlineKeyboardButton]],
+        *,
+        api_kwargs: JSONDict = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(inline_keyboard):
             raise ValueError(
                 "The parameter `inline_keyboard` should be a list of "
@@ -63,9 +68,9 @@ class InlineKeyboardMarkup(TelegramObject):
 
         self._id_attrs = (self.inline_keyboard,)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["inline_keyboard"] = []
         for inline_keyboard in self.inline_keyboard:
@@ -76,8 +81,6 @@ class InlineKeyboardMarkup(TelegramObject):
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineKeyboardMarkup"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
         if not data:
             return None
 
@@ -102,10 +105,9 @@ class InlineKeyboardMarkup(TelegramObject):
 
         Args:
             button (:class:`telegram.InlineKeyboardButton`): The button to use in the markup
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
-        return cls([[button]], **kwargs)
+        return cls([[button]], **kwargs)  # type: ignore[arg-type]
 
     @classmethod
     def from_row(
@@ -120,10 +122,9 @@ class InlineKeyboardMarkup(TelegramObject):
         Args:
             button_row (List[:class:`telegram.InlineKeyboardButton`]): The button to use in the
                 markup
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
-        return cls([button_row], **kwargs)
+        return cls([button_row], **kwargs)  # type: ignore[arg-type]
 
     @classmethod
     def from_column(
@@ -138,11 +139,10 @@ class InlineKeyboardMarkup(TelegramObject):
         Args:
             button_column (List[:class:`telegram.InlineKeyboardButton`]): The button to use in the
                 markup
-            **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
         """
         button_grid = [[button] for button in button_column]
-        return cls(button_grid, **kwargs)
+        return cls(button_grid, **kwargs)  # type: ignore[arg-type]
 
     def __hash__(self) -> int:
         return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))

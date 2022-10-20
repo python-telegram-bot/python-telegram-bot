@@ -75,7 +75,6 @@ class DefaultValue(Generic[DVType]):
 
     Args:
         value (:class:`object`): The value of the default argument
-
     Attributes:
         value (:class:`object`): The value of the default argument
 

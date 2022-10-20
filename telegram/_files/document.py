@@ -18,13 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Document."""
 
-from typing import TYPE_CHECKING, Any
-
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.photosize import PhotoSize
-
-if TYPE_CHECKING:
-    from telegram import Bot
+from telegram._utils.types import JSONDict
 
 
 class Document(_BaseThumbedMedium):
@@ -43,8 +39,6 @@ class Document(_BaseThumbedMedium):
         file_name (:obj:`str`, optional): Original filename as defined by sender.
         mime_type (:obj:`str`, optional): MIME type of the file as defined by sender.
         file_size (:obj:`int`, optional): File size in bytes.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): File identifier.
@@ -55,7 +49,7 @@ class Document(_BaseThumbedMedium):
         file_name (:obj:`str`): Original filename.
         mime_type (:obj:`str`): Optional. MIME type of the file.
         file_size (:obj:`int`): Optional. File size in bytes.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -69,15 +63,15 @@ class Document(_BaseThumbedMedium):
         file_name: str = None,
         mime_type: str = None,
         file_size: int = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(
             file_id=file_id,
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
-            bot=bot,
+            api_kwargs=api_kwargs,
         )
         # Optional
         self.mime_type = mime_type

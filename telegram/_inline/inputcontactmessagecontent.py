@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputContactMessageContent."""
 
-from typing import Any
-
 from telegram._inline.inputmessagecontent import InputMessageContent
+from telegram._utils.types import JSONDict
 
 
 class InputContactMessageContent(InputMessageContent):
@@ -35,7 +34,6 @@ class InputContactMessageContent(InputMessageContent):
         last_name (:obj:`str`, optional): Contact's last name.
         vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
             0-2048 bytes.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         phone_number (:obj:`str`): Contact's phone number.
@@ -54,8 +52,11 @@ class InputContactMessageContent(InputMessageContent):
         first_name: str,
         last_name: str = None,
         vcard: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         # Required
         self.phone_number = phone_number
         self.first_name = first_name

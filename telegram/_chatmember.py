@@ -83,7 +83,14 @@ class ChatMember(TelegramObject):
     RESTRICTED: ClassVar[str] = constants.ChatMemberStatus.RESTRICTED
     """:const:`telegram.constants.ChatMemberStatus.RESTRICTED`"""
 
-    def __init__(self, user: User, status: str, **_kwargs: object):
+    def __init__(
+        self,
+        user: User,
+        status: str,
+        *,
+        api_kwargs: JSONDict = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required by all subclasses
         self.user = user
         self.status = status
@@ -98,9 +105,6 @@ class ChatMember(TelegramObject):
         if not data:
             return None
 
-        data["user"] = User.de_json(data.get("user"), bot)
-        data["until_date"] = from_timestamp(data.get("until_date", None))
-
         _class_mapping: Dict[str, Type["ChatMember"]] = {
             cls.OWNER: ChatMemberOwner,
             cls.ADMINISTRATOR: ChatMemberAdministrator,
@@ -110,13 +114,18 @@ class ChatMember(TelegramObject):
             cls.BANNED: ChatMemberBanned,
         }
 
-        if cls is ChatMember:
-            return _class_mapping.get(data["status"], cls)(**data, bot=bot)
-        return cls(**data)
+        if cls is ChatMember and data.get("status") in _class_mapping:
+            return _class_mapping[data.pop("status")].de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+        data["user"] = User.de_json(data.get("user"), bot)
+        if "until_date" in data:
+            data["until_date"] = from_timestamp(data["until_date"])
+
+        return super().de_json(data=data, bot=bot)
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         if data.get("until_date", False):
             data["until_date"] = to_timestamp(data["until_date"])
@@ -154,9 +163,10 @@ class ChatMemberOwner(ChatMember):
         user: User,
         is_anonymous: bool,
         custom_title: str = None,
-        **_kwargs: object,
+        *,
+        api_kwargs: JSONDict = None,
     ):
-        super().__init__(status=ChatMember.OWNER, user=user)
+        super().__init__(status=ChatMember.OWNER, user=user, api_kwargs=api_kwargs)
         self.is_anonymous = is_anonymous
         self.custom_title = custom_title
 
@@ -167,9 +177,10 @@ class ChatMemberAdministrator(ChatMember):
 
     .. versionadded:: 13.7
     .. versionchanged:: 20.0
-       Argument and attribute ``can_manage_voice_chats`` were renamed to
-       :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
-       Bot API 6.0.
+
+       * Argument and attribute ``can_manage_voice_chats`` were renamed to
+         :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
+         Bot API 6.0.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -276,9 +287,10 @@ class ChatMemberAdministrator(ChatMember):
         can_edit_messages: bool = None,
         can_pin_messages: bool = None,
         custom_title: str = None,
-        **_kwargs: object,
+        *,
+        api_kwargs: JSONDict = None,
     ):
-        super().__init__(status=ChatMember.ADMINISTRATOR, user=user)
+        super().__init__(status=ChatMember.ADMINISTRATOR, user=user, api_kwargs=api_kwargs)
         self.can_be_edited = can_be_edited
         self.is_anonymous = is_anonymous
         self.can_manage_chat = can_manage_chat
@@ -313,8 +325,13 @@ class ChatMemberMember(ChatMember):
 
     __slots__ = ()
 
-    def __init__(self, user: User, **_kwargs: object):
-        super().__init__(status=ChatMember.MEMBER, user=user)
+    def __init__(
+        self,
+        user: User,
+        *,
+        api_kwargs: JSONDict = None,
+    ):
+        super().__init__(status=ChatMember.MEMBER, user=user, api_kwargs=api_kwargs)
 
 
 class ChatMemberRestricted(ChatMember):
@@ -400,9 +417,10 @@ class ChatMemberRestricted(ChatMember):
         can_send_other_messages: bool,
         can_add_web_page_previews: bool,
         until_date: datetime.datetime,
-        **_kwargs: object,
+        *,
+        api_kwargs: JSONDict = None,
     ):
-        super().__init__(status=ChatMember.RESTRICTED, user=user)
+        super().__init__(status=ChatMember.RESTRICTED, user=user, api_kwargs=api_kwargs)
         self.is_member = is_member
         self.can_change_info = can_change_info
         self.can_invite_users = can_invite_users
@@ -433,8 +451,13 @@ class ChatMemberLeft(ChatMember):
 
     __slots__ = ()
 
-    def __init__(self, user: User, **_kwargs: object):
-        super().__init__(status=ChatMember.LEFT, user=user)
+    def __init__(
+        self,
+        user: User,
+        *,
+        api_kwargs: JSONDict = None,
+    ):
+        super().__init__(status=ChatMember.LEFT, user=user, api_kwargs=api_kwargs)
 
 
 class ChatMemberBanned(ChatMember):
@@ -460,6 +483,12 @@ class ChatMemberBanned(ChatMember):
 
     __slots__ = ("until_date",)
 
-    def __init__(self, user: User, until_date: datetime.datetime, **_kwargs: object):
-        super().__init__(status=ChatMember.BANNED, user=user)
+    def __init__(
+        self,
+        user: User,
+        until_date: datetime.datetime,
+        *,
+        api_kwargs: JSONDict = None,
+    ):
+        super().__init__(status=ChatMember.BANNED, user=user, api_kwargs=api_kwargs)
         self.until_date = until_date

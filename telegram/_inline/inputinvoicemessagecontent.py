@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that represents a Telegram InputInvoiceMessageContent."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._payment.labeledprice import LabeledPrice
@@ -89,7 +89,6 @@ class InputInvoiceMessageContent(InputMessageContent):
             should be sent to provider.
         is_flexible (:obj:`bool`, optional): Pass :obj:`True`, if the final price depends on the
             shipping method.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
@@ -179,8 +178,10 @@ class InputInvoiceMessageContent(InputMessageContent):
         send_phone_number_to_provider: bool = None,
         send_email_to_provider: bool = None,
         is_flexible: bool = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.title = title
         self.description = description
@@ -227,9 +228,9 @@ class InputInvoiceMessageContent(InputMessageContent):
             )
         )
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["prices"] = [price.to_dict() for price in self.prices]
 
@@ -247,4 +248,4 @@ class InputInvoiceMessageContent(InputMessageContent):
 
         data["prices"] = LabeledPrice.de_list(data.get("prices"), bot)
 
-        return cls(**data, bot=bot)
+        return super().de_json(data=data, bot=bot)

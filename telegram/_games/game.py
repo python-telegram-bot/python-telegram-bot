@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram Game."""
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
@@ -88,8 +88,10 @@ class Game(TelegramObject):
         text: str = None,
         text_entities: List[MessageEntity] = None,
         animation: Animation = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.title = title
         self.description = description
@@ -113,11 +115,11 @@ class Game(TelegramObject):
         data["text_entities"] = MessageEntity.de_list(data.get("text_entities"), bot)
         data["animation"] = Animation.de_json(data.get("animation"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["photo"] = [p.to_dict() for p in self.photo]
         if self.text_entities:

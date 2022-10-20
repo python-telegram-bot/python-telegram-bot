@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Update."""
 
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
+from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from telegram import constants
 from telegram._callbackquery import CallbackQuery
@@ -94,8 +94,6 @@ class Update(TelegramObject):
             receive these updates.
 
             .. versionadded:: 13.8
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         update_id (:obj:`int`): The update's unique identifier.
         message (:class:`telegram.Message`): Optional. New incoming message.
@@ -236,8 +234,10 @@ class Update(TelegramObject):
         my_chat_member: ChatMemberUpdated = None,
         chat_member: ChatMemberUpdated = None,
         chat_join_request: ChatJoinRequest = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.update_id = update_id
         # Optionals
@@ -421,4 +421,4 @@ class Update(TelegramObject):
         data["chat_member"] = ChatMemberUpdated.de_json(data.get("chat_member"), bot)
         data["chat_join_request"] = ChatJoinRequest.de_json(data.get("chat_join_request"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)

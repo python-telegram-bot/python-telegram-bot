@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
@@ -42,14 +42,12 @@ class PassportData(TelegramObject):
         data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
             about documents and other Telegram Passport elements that was shared with the bot.
         credentials (:class:`telegram.EncryptedCredentials`)): Encrypted credentials.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
             about documents and other Telegram Passport elements that was shared with the bot.
         credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
 
     """
 
@@ -59,13 +57,14 @@ class PassportData(TelegramObject):
         self,
         data: List[EncryptedPassportElement],
         credentials: EncryptedCredentials,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
+
         self.data = data
         self.credentials = credentials
 
-        self.set_bot(bot)
         self._decrypted_data: Optional[List[EncryptedPassportElement]] = None
         self._id_attrs = tuple([x.type for x in data] + [credentials.hash])
 
@@ -80,11 +79,11 @@ class PassportData(TelegramObject):
         data["data"] = EncryptedPassportElement.de_list(data.get("data"), bot)
         data["credentials"] = EncryptedCredentials.de_json(data.get("credentials"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["data"] = [e.to_dict() for e in self.data]
 

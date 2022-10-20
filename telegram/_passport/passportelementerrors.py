@@ -19,9 +19,8 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram PassportElementError."""
 
-from typing import Any
-
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class PassportElementError(TelegramObject):
@@ -36,7 +35,6 @@ class PassportElementError(TelegramObject):
     Args:
         source (:obj:`str`): Error source.
         type (:obj:`str`): The section of the user's Telegram Passport which has the error.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         source (:obj:`str`): Error source.
@@ -47,7 +45,8 @@ class PassportElementError(TelegramObject):
 
     __slots__ = ("message", "source", "type")
 
-    def __init__(self, source: str, type: str, message: str, **_kwargs: Any):
+    def __init__(self, source: str, type: str, message: str, *, api_kwargs: JSONDict = None):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.source = str(source)
         self.type = str(type)
@@ -72,7 +71,6 @@ class PassportElementErrorDataField(PassportElementError):
         field_name (:obj:`str`): Name of the data field which has the error.
         data_hash (:obj:`str`): Base64-encoded data hash.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
@@ -86,9 +84,17 @@ class PassportElementErrorDataField(PassportElementError):
 
     __slots__ = ("data_hash", "field_name")
 
-    def __init__(self, type: str, field_name: str, data_hash: str, message: str, **_kwargs: Any):
+    def __init__(
+        self,
+        type: str,
+        field_name: str,
+        data_hash: str,
+        message: str,
+        *,
+        api_kwargs: JSONDict = None,
+    ):
         # Required
-        super().__init__("data", type, message)
+        super().__init__("data", type, message, api_kwargs=api_kwargs)
         self.field_name = field_name
         self.data_hash = data_hash
 
@@ -110,7 +116,6 @@ class PassportElementErrorFile(PassportElementError):
             ``"passport_registration"``, ``"temporary_registration"``.
         file_hash (:obj:`str`): Base64-encoded file hash.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -123,9 +128,9 @@ class PassportElementErrorFile(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("file", type, message)
+        super().__init__("file", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -146,7 +151,6 @@ class PassportElementErrorFiles(PassportElementError):
             ``"passport_registration"``, ``"temporary_registration"``.
         file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -159,9 +163,9 @@ class PassportElementErrorFiles(PassportElementError):
 
     __slots__ = ("file_hashes",)
 
-    def __init__(self, type: str, file_hashes: str, message: str, **_kwargs: Any):
+    def __init__(self, type: str, file_hashes: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("files", type, message)
+        super().__init__("files", type, message, api_kwargs=api_kwargs)
         self.file_hashes = file_hashes
 
         self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
@@ -182,7 +186,6 @@ class PassportElementErrorFrontSide(PassportElementError):
         file_hash (:obj:`str`): Base64-encoded hash of the file with the front side of the
             document.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -195,9 +198,9 @@ class PassportElementErrorFrontSide(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("front_side", type, message)
+        super().__init__("front_side", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -218,7 +221,6 @@ class PassportElementErrorReverseSide(PassportElementError):
         file_hash (:obj:`str`): Base64-encoded hash of the file with the reverse side of the
             document.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -231,9 +233,9 @@ class PassportElementErrorReverseSide(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("reverse_side", type, message)
+        super().__init__("reverse_side", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -253,7 +255,6 @@ class PassportElementErrorSelfie(PassportElementError):
             ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
         file_hash (:obj:`str`): Base64-encoded hash of the file with the selfie.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
@@ -265,9 +266,9 @@ class PassportElementErrorSelfie(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("selfie", type, message)
+        super().__init__("selfie", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -289,7 +290,6 @@ class PassportElementErrorTranslationFile(PassportElementError):
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
         file_hash (:obj:`str`): Base64-encoded hash of the file.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
@@ -303,9 +303,9 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
     __slots__ = ("file_hash",)
 
-    def __init__(self, type: str, file_hash: str, message: str, **_kwargs: Any):
+    def __init__(self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("translation_file", type, message)
+        super().__init__("translation_file", type, message, api_kwargs=api_kwargs)
         self.file_hash = file_hash
 
         self._id_attrs = (self.source, self.type, self.file_hash, self.message)
@@ -327,7 +327,6 @@ class PassportElementErrorTranslationFiles(PassportElementError):
             ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
         file_hashes (List[:obj:`str`]): List of base64-encoded file hashes.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
@@ -341,9 +340,9 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
     __slots__ = ("file_hashes",)
 
-    def __init__(self, type: str, file_hashes: str, message: str, **_kwargs: Any):
+    def __init__(self, type: str, file_hashes: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("translation_files", type, message)
+        super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
         self.file_hashes = file_hashes
 
         self._id_attrs = (self.source, self.type, self.message) + tuple(file_hashes)
@@ -362,7 +361,6 @@ class PassportElementErrorUnspecified(PassportElementError):
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
         element_hash (:obj:`str`): Base64-encoded element hash.
         message (:obj:`str`): Error message.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
@@ -373,9 +371,9 @@ class PassportElementErrorUnspecified(PassportElementError):
 
     __slots__ = ("element_hash",)
 
-    def __init__(self, type: str, element_hash: str, message: str, **_kwargs: Any):
+    def __init__(self, type: str, element_hash: str, message: str, *, api_kwargs: JSONDict = None):
         # Required
-        super().__init__("unspecified", type, message)
+        super().__init__("unspecified", type, message, api_kwargs=api_kwargs)
         self.element_hash = element_hash
 
         self._id_attrs = (self.source, self.type, self.element_hash, self.message)

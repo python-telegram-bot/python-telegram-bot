@@ -19,7 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram User."""
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._menubutton import MenuButton
@@ -33,7 +33,6 @@ if TYPE_CHECKING:
     from telegram import (
         Animation,
         Audio,
-        Bot,
         Contact,
         Document,
         InlineKeyboardMarkup,
@@ -63,7 +62,6 @@ class User(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     .. versionchanged:: 20.0
-
         The following are now keyword-only arguments in Bot methods:
         ``location``, ``filename``, ``venue``, ``contact``,
         ``{read, write, connect, pool}_timeout`` ``api_kwargs``. Use a named argument for those,
@@ -82,7 +80,7 @@ class User(TelegramObject):
             disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
         supports_inline_queries (:obj:`str`, optional): :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         is_premium (:obj:`bool`, optional): :obj:`True`, if this user is a Telegram Premium user.
 
             .. versionadded:: 20.0
@@ -90,7 +88,6 @@ class User(TelegramObject):
             the bot to the attachment menu.
 
             .. versionadded:: 20.0
-
     Attributes:
         id (:obj:`int`): Unique identifier for this user or bot.
         is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
@@ -104,7 +101,6 @@ class User(TelegramObject):
             disabled for the bot. Returned only in :attr:`telegram.Bot.get_me` requests.
         supports_inline_queries (:obj:`str`): Optional. :obj:`True`, if the bot supports inline
             queries. Returned only in :attr:`telegram.Bot.get_me` requests.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
         is_premium (:obj:`bool`): Optional. :obj:`True`, if this user is a Telegram
             Premium user.
 
@@ -131,7 +127,7 @@ class User(TelegramObject):
 
     def __init__(
         self,
-        id: int,  # pylint: disable=invalid-name
+        id: int,
         first_name: str,
         is_bot: bool,
         last_name: str = None,
@@ -140,11 +136,12 @@ class User(TelegramObject):
         can_join_groups: bool = None,
         can_read_all_group_messages: bool = None,
         supports_inline_queries: bool = None,
-        bot: "Bot" = None,
         is_premium: bool = None,
         added_to_attachment_menu: bool = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.id = id  # pylint: disable=invalid-name
         self.first_name = first_name
@@ -158,7 +155,6 @@ class User(TelegramObject):
         self.supports_inline_queries = supports_inline_queries
         self.is_premium = is_premium
         self.added_to_attachment_menu = added_to_attachment_menu
-        self.set_bot(bot)
 
         self._id_attrs = (self.id,)
 

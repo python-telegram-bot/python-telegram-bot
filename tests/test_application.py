@@ -646,9 +646,9 @@ class TestApplication:
                 entities=[
                     MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
                 ],
-                bot=bot,
             ),
         )
+        update.message.set_bot(bot)
 
         async with app:
             # If ApplicationHandlerStop raised handlers in other groups should not be called.
@@ -736,9 +736,9 @@ class TestApplication:
                 entities=[
                     MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/start"))
                 ],
-                bot=bot,
             ),
         )
+        update.message.set_bot(bot)
 
         async with app:
             # If an unhandled exception was caught, no further handlers from the same group should

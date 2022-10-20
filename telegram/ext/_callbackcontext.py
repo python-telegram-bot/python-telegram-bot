@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=no-self-use
 """This module contains the CallbackContext class."""
 from typing import TYPE_CHECKING, Coroutine, Dict, Generic, List, Match, NoReturn, Optional, Type
 
@@ -80,7 +79,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             to provide :attr:`user_data`.
 
             .. versionadded:: 20.0
-
     Attributes:
         coroutine (:term:`coroutine function`): Optional. Only present in error handlers if the
             error was caused by a coroutine run with :meth:`Application.create_task` or a handler
@@ -236,7 +234,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
                 callback data.
         """
         if isinstance(self.bot, ExtBot):
-            if not self.bot.arbitrary_callback_data:
+            if self.bot.callback_data_cache is None:
                 raise RuntimeError(
                     "This telegram.ext.ExtBot instance does not use arbitrary callback data."
                 )

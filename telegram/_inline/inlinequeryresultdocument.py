@@ -18,13 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultDocument"""
 
-from typing import TYPE_CHECKING, Any, List, Tuple, Union
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import ODVInput
+from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
@@ -61,7 +61,6 @@ class InlineQueryResultDocument(InlineQueryResult):
         thumb_url (:obj:`str`, optional): URL of the thumbnail (JPEG only) for the file.
         thumb_width (:obj:`int`, optional): Thumbnail width.
         thumb_height (:obj:`int`, optional): Thumbnail height.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.DOCUMENT`.
@@ -120,10 +119,11 @@ class InlineQueryResultDocument(InlineQueryResult):
         thumb_height: int = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         # Required
-        super().__init__(InlineQueryResultType.DOCUMENT, id)
+        super().__init__(InlineQueryResultType.DOCUMENT, id, api_kwargs=api_kwargs)
         self.document_url = document_url
         self.title = title
         self.mime_type = mime_type

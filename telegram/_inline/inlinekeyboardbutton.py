@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from telegram._games.callbackgame import CallbackGame
 from telegram._loginurl import LoginUrl
@@ -115,7 +115,6 @@ class InlineKeyboardButton(TelegramObject):
         pay (:obj:`bool`, optional): Specify :obj:`True`, to send a Pay button. This type of button
             must always be the `first` button in the first row and can only be used in invoice
             messages.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         text (:obj:`str`): Label text on the button.
@@ -174,8 +173,10 @@ class InlineKeyboardButton(TelegramObject):
         pay: bool = None,
         login_url: LoginUrl = None,
         web_app: WebAppInfo = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.text = text
 
@@ -216,7 +217,7 @@ class InlineKeyboardButton(TelegramObject):
         data["web_app"] = WebAppInfo.de_json(data.get("web_app"), bot)
         data["callback_game"] = CallbackGame.de_json(data.get("callback_game"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
     def update_callback_data(self, callback_data: Union[str, object]) -> None:
         """

@@ -45,7 +45,6 @@ class _BaseThumbedMedium(_BaseMedium):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): File size.
         thumb (:class:`telegram.PhotoSize`, optional): Thumbnail as defined by sender.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Attributes:
         file_id (:obj:`str`): File identifier.
@@ -54,7 +53,7 @@ class _BaseThumbedMedium(_BaseMedium):
             Can't be used to download or reuse the file.
         file_size (:obj:`int`): Optional. File size.
         thumb (:class:`telegram.PhotoSize`): Optional. Thumbnail as defined by sender.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
 
     """
 
@@ -66,10 +65,14 @@ class _BaseThumbedMedium(_BaseMedium):
         file_unique_id: str,
         file_size: int = None,
         thumb: PhotoSize = None,
-        bot: "Bot" = None,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(
-            file_id=file_id, file_unique_id=file_unique_id, file_size=file_size, bot=bot
+            file_id=file_id,
+            file_unique_id=file_unique_id,
+            file_size=file_size,
+            api_kwargs=api_kwargs,
         )
         self.thumb = thumb
 
@@ -83,6 +86,8 @@ class _BaseThumbedMedium(_BaseMedium):
         if not data:
             return None
 
-        data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
+        # In case this wasn't already done by the subclass
+        if not isinstance(data.get("thumb"), PhotoSize):
+            data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)

@@ -304,6 +304,8 @@
       - The first name of the bot
     * - :attr:`~telegram.Bot.last_name`
       - The last name of the bot
+    * - :attr:`~telegram.Bot.local_mode`
+      - Whether the bot is running in local mode
     * - :attr:`~telegram.Bot.username`
       - The username of the bot, without leading ``@``
     * - :attr:`~telegram.Bot.link`

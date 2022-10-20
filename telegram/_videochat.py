@@ -42,9 +42,6 @@ class VideoChatStarted(TelegramObject):
 
     __slots__ = ()
 
-    def __init__(self, **_kwargs: object):  # skipcq: PTC-W0049
-        pass
-
 
 class VideoChatEnded(TelegramObject):
     """
@@ -61,7 +58,6 @@ class VideoChatEnded(TelegramObject):
 
     Args:
         duration (:obj:`int`): Voice chat duration in seconds.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         duration (:obj:`int`): Voice chat duration in seconds.
@@ -70,7 +66,13 @@ class VideoChatEnded(TelegramObject):
 
     __slots__ = ("duration",)
 
-    def __init__(self, duration: int, **_kwargs: object) -> None:
+    def __init__(
+        self,
+        duration: int,
+        *,
+        api_kwargs: JSONDict = None,
+    ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
         self.duration = duration
         self._id_attrs = (self.duration,)
 
@@ -88,7 +90,6 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     Args:
         users (List[:class:`telegram.User`]): New members that were invited to the video chat.
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         users (List[:class:`telegram.User`]): New members that were invited to the video chat.
@@ -97,7 +98,13 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     __slots__ = ("users",)
 
-    def __init__(self, users: List[User], **_kwargs: object) -> None:
+    def __init__(
+        self,
+        users: List[User],
+        *,
+        api_kwargs: JSONDict = None,
+    ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
         self.users = users
         self._id_attrs = (self.users,)
 
@@ -112,11 +119,11 @@ class VideoChatParticipantsInvited(TelegramObject):
             return None
 
         data["users"] = User.de_list(data.get("users", []), bot)
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         if self.users is not None:
             data["users"] = [u.to_dict() for u in self.users]
@@ -138,8 +145,6 @@ class VideoChatScheduled(TelegramObject):
     Args:
         start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the video
             chat is supposed to be started by a chat administrator
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
-
     Attributes:
         start_date (:obj:`datetime.datetime`): Point in time (Unix timestamp) when the video
             chat is supposed to be started by a chat administrator
@@ -148,7 +153,13 @@ class VideoChatScheduled(TelegramObject):
 
     __slots__ = ("start_date",)
 
-    def __init__(self, start_date: dtm.datetime, **_kwargs: object) -> None:
+    def __init__(
+        self,
+        start_date: dtm.datetime,
+        *,
+        api_kwargs: JSONDict = None,
+    ) -> None:
+        super().__init__(api_kwargs=api_kwargs)
         self.start_date = start_date
 
         self._id_attrs = (self.start_date,)
@@ -163,11 +174,11 @@ class VideoChatScheduled(TelegramObject):
 
         data["start_date"] = from_timestamp(data["start_date"])
 
-        return cls(**data, bot=bot)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         # Required
         data["start_date"] = to_timestamp(self.start_date)

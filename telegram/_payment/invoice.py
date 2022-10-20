@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Invoice."""
 
-from typing import Any, ClassVar
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class Invoice(TelegramObject):
@@ -43,7 +44,6 @@ class Invoice(TelegramObject):
             `currencies.json <https://core.telegram.org/bots/payments/currencies.json>`_,
             it shows the number of digits past the decimal point for each currency
             (2 for the majority of currencies).
-        **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         title (:obj:`str`): Product name.
@@ -69,8 +69,10 @@ class Invoice(TelegramObject):
         start_parameter: str,
         currency: str,
         total_amount: int,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.title = title
         self.description = description
         self.start_parameter = start_parameter

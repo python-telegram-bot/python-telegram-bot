@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatJoinRequest."""
 import datetime
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
@@ -53,7 +53,6 @@ class ChatJoinRequest(TelegramObject):
         bio (:obj:`str`, optional): Bio of the user.
         invite_link (:class:`telegram.ChatInviteLink`, optional): Chat invite link that was used
             by the user to send the join request.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Attributes:
         chat (:class:`telegram.Chat`): Chat to which the request was sent.
@@ -74,9 +73,10 @@ class ChatJoinRequest(TelegramObject):
         date: datetime.datetime,
         bio: str = None,
         invite_link: ChatInviteLink = None,
-        bot: "Bot" = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.chat = chat
         self.from_user = from_user
@@ -86,7 +86,6 @@ class ChatJoinRequest(TelegramObject):
         self.bio = bio
         self.invite_link = invite_link
 
-        self.set_bot(bot)
         self._id_attrs = (self.chat, self.from_user, self.date)
 
     @classmethod
@@ -98,15 +97,15 @@ class ChatJoinRequest(TelegramObject):
             return None
 
         data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["date"] = from_timestamp(data.get("date", None))
         data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["date"] = to_timestamp(self.date)
 

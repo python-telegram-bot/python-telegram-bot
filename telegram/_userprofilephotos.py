@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram UserProfilePhotos."""
 
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
@@ -47,7 +47,10 @@ class UserProfilePhotos(TelegramObject):
 
     __slots__ = ("photos", "total_count")
 
-    def __init__(self, total_count: int, photos: List[List[PhotoSize]], **_kwargs: Any):
+    def __init__(
+        self, total_count: int, photos: List[List[PhotoSize]], *, api_kwargs: JSONDict = None
+    ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.total_count = total_count
         self.photos = photos
@@ -64,11 +67,11 @@ class UserProfilePhotos(TelegramObject):
 
         data["photos"] = [PhotoSize.de_list(photo, bot) for photo in data["photos"]]
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["photos"] = []
         for photo in self.photos:

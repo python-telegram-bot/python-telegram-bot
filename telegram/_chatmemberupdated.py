@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatMemberUpdated."""
 import datetime
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
 
 from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
@@ -83,8 +83,10 @@ class ChatMemberUpdated(TelegramObject):
         old_chat_member: ChatMember,
         new_chat_member: ChatMember,
         invite_link: ChatInviteLink = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.chat = chat
         self.from_user = from_user
@@ -112,17 +114,17 @@ class ChatMemberUpdated(TelegramObject):
             return None
 
         data["chat"] = Chat.de_json(data.get("chat"), bot)
-        data["from_user"] = User.de_json(data.get("from"), bot)
+        data["from_user"] = User.de_json(data.pop("from", None), bot)
         data["date"] = from_timestamp(data.get("date"))
         data["old_chat_member"] = ChatMember.de_json(data.get("old_chat_member"), bot)
         data["new_chat_member"] = ChatMember.de_json(data.get("new_chat_member"), bot)
         data["invite_link"] = ChatInviteLink.de_json(data.get("invite_link"), bot)
 
-        return cls(**data)
+        return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         # Required
         data["date"] = to_timestamp(self.date)

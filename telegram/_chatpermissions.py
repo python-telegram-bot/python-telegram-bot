@@ -18,9 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPermission."""
 
-from typing import Any
-
 from telegram._telegramobject import TelegramObject
+from telegram._utils.types import JSONDict
 
 
 class ChatPermissions(TelegramObject):
@@ -99,8 +98,10 @@ class ChatPermissions(TelegramObject):
         can_change_info: bool = None,
         can_invite_users: bool = None,
         can_pin_messages: bool = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         # Required
         self.can_send_messages = can_send_messages
         self.can_send_media_messages = can_send_media_messages

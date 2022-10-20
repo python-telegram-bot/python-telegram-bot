@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
 
-from typing import TYPE_CHECKING, Any, ClassVar, List, Optional
+from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
@@ -67,16 +67,15 @@ class Sticker(_BaseThumbedMedium):
         mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the
             position where the mask should be placed.
         file_size (:obj:`int`, optional): File size in bytes.
-        bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
+
         premium_animation (:class:`telegram.File`, optional): For premium regular stickers,
             premium animation for the sticker.
 
             .. versionadded:: 20.0
-        custom_emoji (:obj:`str`, optional): For custom emoji stickers, unique identifier of the
+        custom_emoji_id (:obj:`str`, optional): For custom emoji stickers, unique identifier of the
             custom emoji.
 
             .. versionadded:: 20.0
-        _kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
         file_id (:obj:`str`): Identifier for this file.
@@ -101,12 +100,12 @@ class Sticker(_BaseThumbedMedium):
         mask_position (:class:`telegram.MaskPosition`): Optional. For mask stickers, the position
             where the mask should be placed.
         file_size (:obj:`int`): Optional. File size in bytes.
-        bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
+
         premium_animation (:class:`telegram.File`): Optional. For premium regular stickers,
             premium animation for the sticker.
 
             .. versionadded:: 20.0
-        custom_emoji (:obj:`str`): Optional. For custom emoji stickers, unique identifier of the
+        custom_emoji_id (:obj:`str`): Optional. For custom emoji stickers, unique identifier of the
             custom emoji.
 
             .. versionadded:: 20.0
@@ -139,17 +138,17 @@ class Sticker(_BaseThumbedMedium):
         file_size: int = None,
         set_name: str = None,
         mask_position: "MaskPosition" = None,
-        bot: "Bot" = None,
         premium_animation: "File" = None,
         custom_emoji_id: str = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(
             file_id=file_id,
             file_unique_id=file_unique_id,
             file_size=file_size,
             thumb=thumb,
-            bot=bot,
+            api_kwargs=api_kwargs,
         )
         # Required
         self.width = width
@@ -183,7 +182,7 @@ class Sticker(_BaseThumbedMedium):
         data["mask_position"] = MaskPosition.de_json(data.get("mask_position"), bot)
         data["premium_animation"] = File.de_json(data.get("premium_animation"), bot)
 
-        return cls(bot=bot, **data)
+        return super().de_json(data=data, bot=bot)
 
 
 class StickerSet(TelegramObject):
@@ -251,8 +250,10 @@ class StickerSet(TelegramObject):
         is_video: bool,
         sticker_type: str,
         thumb: PhotoSize = None,
-        **_kwargs: Any,
+        *,
+        api_kwargs: JSONDict = None,
     ):
+        super().__init__(api_kwargs=api_kwargs)
         self.name = name
         self.title = title
         self.is_animated = is_animated
@@ -273,11 +274,17 @@ class StickerSet(TelegramObject):
         data["thumb"] = PhotoSize.de_json(data.get("thumb"), bot)
         data["stickers"] = Sticker.de_list(data.get("stickers"), bot)
 
-        return cls(bot=bot, **data)
+        api_kwargs = {}
+        # This is a deprecated field that TG still returns for backwards compatibility
+        # Let's filter it out to speed up the de-json process
+        if "contains_masks" in data:
+            api_kwargs["contains_masks"] = data.pop("contains_masks")
 
-    def to_dict(self) -> JSONDict:
+        return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
+
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["stickers"] = [s.to_dict() for s in data.get("stickers")]  # type: ignore[union-attr]
 
@@ -324,20 +331,19 @@ class MaskPosition(TelegramObject):
     CHIN: ClassVar[str] = constants.MaskPosition.CHIN
     """:const:`telegram.constants.MaskPosition.CHIN`"""
 
-    def __init__(self, point: str, x_shift: float, y_shift: float, scale: float, **_kwargs: Any):
+    def __init__(
+        self,
+        point: str,
+        x_shift: float,
+        y_shift: float,
+        scale: float,
+        *,
+        api_kwargs: JSONDict = None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
         self.point = point
         self.x_shift = x_shift
         self.y_shift = y_shift
         self.scale = scale
 
         self._id_attrs = (self.point, self.x_shift, self.y_shift, self.scale)
-
-    @classmethod
-    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MaskPosition"]:
-        """See :meth:`telegram.TelegramObject.de_json`."""
-        data = cls._parse_data(data)
-
-        if data is None:
-            return None
-
-        return cls(**data)

@@ -24,13 +24,14 @@ from tests.conftest import check_defaults_handling, check_shortcut_call, check_s
 
 @pytest.fixture(scope="class")
 def passport_file(bot):
-    return PassportFile(
+    pf = PassportFile(
         file_id=TestPassportFile.file_id,
         file_unique_id=TestPassportFile.file_unique_id,
         file_size=TestPassportFile.file_size,
         file_date=TestPassportFile.file_date,
-        bot=bot,
     )
+    pf.set_bot(bot)
+    return pf
 
 
 class TestPassportFile:
