@@ -279,6 +279,8 @@ class TestBot:
                     print(record)
                     if record.getMessage().startswith("Task was destroyed but it is pending"):
                         caplog.records.pop(idx)
+                    if record.getMessage().startswith("Task exception was never retrieved"):
+                        caplog.records.pop(idx)
             assert len(caplog.records) == 3
             assert caplog.records[0].getMessage().startswith("Entering: get_me")
             assert caplog.records[-1].getMessage().startswith("Exiting: get_me")
