@@ -497,14 +497,16 @@ class TestSendMediaGroup:
         parse_mode,
         caption_entities,
     ):
+        from telegram._utils.defaultvalue import DEFAULT_NONE
+
         # prepare a copy to check later on if calling the method has caused side effects
         copied_media_group = media_group.copy()
 
         # clear media_group of all_captions
         for item in media_group:
             item.caption = None
-            item.parse_mode = None
             item.caption_entities = None
+            item.parse_mode = DEFAULT_NONE  # parse_mode must not be explicitly set to anything
 
         messages = await bot.send_media_group(
             chat_id,
