@@ -431,6 +431,11 @@ def media_group(photo, thumb):  # noqa: F811
 
 
 @pytest.fixture(scope="function")  # noqa: F811
+def media_group_no_caption_args(photo, thumb):  # noqa: F811
+    return [InputMediaPhoto(photo), InputMediaPhoto(thumb), InputMediaPhoto(photo)]
+
+
+@pytest.fixture(scope="function")  # noqa: F811
 def media_group_no_caption_only_caption_entities(photo, thumb):  # noqa: F811
     return [
         InputMediaPhoto(photo, caption_entities=[MessageEntity(MessageEntity.BOLD, 0, 5)]),
@@ -492,25 +497,17 @@ class TestSendMediaGroup:
         self,
         bot,
         chat_id,
-        media_group,
+        media_group_no_caption_args,
         caption,
         parse_mode,
         caption_entities,
     ):
-        from telegram._utils.defaultvalue import DEFAULT_NONE
-
         # prepare a copy to check later on if calling the method has caused side effects
-        copied_media_group = media_group.copy()
-
-        # clear media_group of all_captions
-        for item in media_group:
-            item.caption = None
-            item.caption_entities = None
-            item.parse_mode = DEFAULT_NONE  # parse_mode must not be explicitly set to anything
+        copied_media_group = media_group_no_caption_args.copy()
 
         messages = await bot.send_media_group(
             chat_id,
-            media_group,
+            media_group_no_caption_args,
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
@@ -519,8 +516,8 @@ class TestSendMediaGroup:
         # Check that the method had no side effects:
         # original group was not changed and 1st item still points to the same object
         # (1st item must be copied within the method before adding the caption)
-        assert media_group == copied_media_group
-        assert media_group[0] is copied_media_group[0]
+        assert media_group_no_caption_args == copied_media_group
+        assert media_group_no_caption_args[0] is copied_media_group[0]
 
         assert isinstance(messages, list)
         assert len(messages) == 3
