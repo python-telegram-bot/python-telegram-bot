@@ -681,7 +681,7 @@ class TestSendMediaGroup:
         self, chat_id, media_group_no_caption_args, default_bot
     ):
         messages = await default_bot.send_media_group(
-            chat_id, media_group_no_caption_args, caption="*photo* 1"
+            chat_id, media_group_no_caption_args, caption="<b>photo</b> 1"
         )
 
         first_message, other_messages = messages[0], messages[1:]
