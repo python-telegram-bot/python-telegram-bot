@@ -712,7 +712,7 @@ async def check_defaults_handling(
         data = request_data.parameters
 
         # Check regular arguments that need defaults
-        for arg in (dkw for dkw in kwargs_need_default if dkw != "timeout"):
+        for arg in (dkw for dkw in kwargs_need_default if dkw not in ("timeout", "parse_mode")):
             # 'None' should not be passed along to Telegram
             if df_value in [None, DEFAULT_NONE]:
                 if arg in data:

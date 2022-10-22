@@ -2243,7 +2243,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
         caption: Optional[str] = None,
-        parse_mode: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> List[Message]:
         return await super().send_media_group(

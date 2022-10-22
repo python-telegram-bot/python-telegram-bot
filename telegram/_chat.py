@@ -1130,7 +1130,7 @@ class Chat(TelegramObject):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         caption: Optional[str] = None,
-        parse_mode: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> List["Message"]:
         """Shortcut for::

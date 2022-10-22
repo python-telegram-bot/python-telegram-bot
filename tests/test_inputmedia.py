@@ -676,6 +676,51 @@ class TestSendMediaGroup:
         assert not all(msg.has_protected_content for msg in unprotected)
 
     @flaky(3, 1)
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True)
+    async def test_send_media_group_default_parse_mode(
+        self, chat_id, media_group_no_caption_args, default_bot
+    ):
+        messages = await default_bot.send_media_group(
+            chat_id, media_group_no_caption_args, caption="*photo* 1"
+        )
+
+        first_message, other_messages = messages[0], messages[1:]
+        assert all(mes.media_group_id == first_message.media_group_id for mes in messages)
+
+        # Make sure first message got the caption, which will lead
+        # to Telegram displaying its caption as group caption
+        assert first_message.caption == "photo 1"
+        assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+
+        # Check that other messages have no captions
+        assert all(mes.caption is None for mes in other_messages)
+        assert not any(mes.caption_entities for mes in other_messages)
+
+    @flaky(3, 1)
+    @pytest.mark.parametrize("default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True)
+    async def test_send_media_group_default_parse_mode_overridden(
+        self, chat_id, media_group_no_caption_args, default_bot
+    ):
+        messages = await default_bot.send_media_group(
+            chat_id,
+            media_group_no_caption_args,
+            caption="*photo* 1",
+            parse_mode=ParseMode.MARKDOWN_V2,
+        )
+
+        first_message, other_messages = messages[0], messages[1:]
+        assert all(mes.media_group_id == first_message.media_group_id for mes in messages)
+
+        # Make sure first message got the caption, which will lead
+        # to Telegram displaying its caption as group caption
+        assert first_message.caption == "photo 1"
+        assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+
+        # Check that other messages have no captions
+        assert all(mes.caption is None for mes in other_messages)
+        assert not any(mes.caption_entities for mes in other_messages)
+
+    @flaky(3, 1)
     async def test_edit_message_media(self, bot, chat_id, media_group):
         messages = await bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id

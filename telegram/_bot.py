@@ -2000,10 +2000,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         caption: Optional[str] = None,
-        # Note on parse_mode:
-        # Typing ODVInput[str] = DEFAULT_NONE will make tests for shortcuts fail
-        # (check_defaults_handling) despite it being used for parse mode for individual captions.
-        parse_mode: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
@@ -2057,7 +2054,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 Parse mode for :paramref:`caption`.
                 See the constants in :class:`telegram.constants.ParseMode` for the
                 available modes.
-                Defaults to :obj:`None`.
             caption_entities (List[:class:`telegram.MessageEntity`], optional):
                 List of special entities for :paramref:`caption`,
                 which can be specified instead of :paramref:`parse_mode`.
@@ -2085,7 +2081,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             # Copy first item to avoid mutation of original object
             item_to_get_caption = copy.copy(media[0])
             item_to_get_caption.caption = caption
-            item_to_get_caption.parse_mode = parse_mode
+            if parse_mode is not DEFAULT_NONE:
+                item_to_get_caption.parse_mode = parse_mode
             item_to_get_caption.caption_entities = caption_entities
 
             # copy the list (just the references) to avoid mutating the original list
