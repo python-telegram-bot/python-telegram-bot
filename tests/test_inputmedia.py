@@ -519,6 +519,8 @@ class TestSendMediaGroup:
         assert media_group_no_caption_args == copied_media_group
         assert media_group_no_caption_args[0] is copied_media_group[0]
 
+        assert not any(item.parse_mode for item in media_group_no_caption_args)
+
         assert isinstance(messages, list)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
@@ -680,45 +682,32 @@ class TestSendMediaGroup:
     async def test_send_media_group_default_parse_mode(
         self, chat_id, media_group_no_caption_args, default_bot
     ):
-        messages = await default_bot.send_media_group(
+        default = await default_bot.send_media_group(
             chat_id, media_group_no_caption_args, caption="<b>photo</b> 1"
         )
 
-        first_message, other_messages = messages[0], messages[1:]
-        assert all(mes.media_group_id == first_message.media_group_id for mes in messages)
+        # make sure no parse_mode was set as a side effect
+        assert not any(item.parse_mode for item in media_group_no_caption_args)
 
-        # Make sure first message got the caption, which will lead
-        # to Telegram displaying its caption as group caption
-        assert first_message.caption == "photo 1"
-        assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
-
-        # Check that other messages have no captions
-        assert all(mes.caption is None for mes in other_messages)
-        assert not any(mes.caption_entities for mes in other_messages)
-
-    @flaky(3, 1)
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True)
-    async def test_send_media_group_default_parse_mode_overridden(
-        self, chat_id, media_group_no_caption_args, default_bot
-    ):
-        messages = await default_bot.send_media_group(
+        overridden = await default_bot.send_media_group(
             chat_id,
-            media_group_no_caption_args,
+            media_group_no_caption_args.copy(),
             caption="*photo* 1",
             parse_mode=ParseMode.MARKDOWN_V2,
         )
 
-        first_message, other_messages = messages[0], messages[1:]
-        assert all(mes.media_group_id == first_message.media_group_id for mes in messages)
+        for mes_group in (default, overridden):
+            first_message, other_messages = mes_group[0], mes_group[1:]
+            assert all(mes.media_group_id == first_message.media_group_id for mes in mes_group)
 
-        # Make sure first message got the caption, which will lead
-        # to Telegram displaying its caption as group caption
-        assert first_message.caption == "photo 1"
-        assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+            # Make sure first message got the caption, which will lead
+            # to Telegram displaying its caption as group caption
+            assert first_message.caption == "photo 1"
+            assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
 
-        # Check that other messages have no captions
-        assert all(mes.caption is None for mes in other_messages)
-        assert not any(mes.caption_entities for mes in other_messages)
+            # Check that other messages have no captions
+            assert all(mes.caption is None for mes in other_messages)
+            assert not any(mes.caption_entities for mes in other_messages)
 
     @flaky(3, 1)
     async def test_edit_message_media(self, bot, chat_id, media_group):

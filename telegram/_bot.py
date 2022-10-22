@@ -2076,18 +2076,20 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             raise ValueError("You can only supply either group caption or media with captions.")
 
         if caption:
-            # Apply group caption to the first media item.
+            # Create copies of objects in media and apply group caption to the first item.
             # This will lead to the group being shown with this caption.
-            # Copy first item to avoid mutation of original object
-            item_to_get_caption = copy.copy(media[0])
+
+            # Only copying of first item should be enough, but the behaviour of Defaults is such
+            # that a bot with a default parse mode will automatically set `parse_mode` for
+            # each item to default parse mode of the bot.
+            # This will throw ValueError at subsequent calls with same media items.
+            media = [copy.copy(item) for item in media]
+
+            item_to_get_caption = media[0]
             item_to_get_caption.caption = caption
             if parse_mode is not DEFAULT_NONE:
                 item_to_get_caption.parse_mode = parse_mode
             item_to_get_caption.caption_entities = caption_entities
-
-            # copy the list (just the references) to avoid mutating the original list
-            media = media.copy()
-            media[0] = item_to_get_caption
 
         data: JSONDict = {
             "chat_id": chat_id,
