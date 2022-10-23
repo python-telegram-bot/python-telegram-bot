@@ -689,23 +689,36 @@ class TestSendMediaGroup:
         # make sure no parse_mode was set as a side effect
         assert not any(item.parse_mode for item in media_group_no_caption_args)
 
-        overridden = await default_bot.send_media_group(
+        overridden_markdown_v2 = await default_bot.send_media_group(
             chat_id,
             media_group_no_caption_args.copy(),
             caption="*photo* 1",
             parse_mode=ParseMode.MARKDOWN_V2,
         )
 
-        for mes_group in (default, overridden):
-            first_message, other_messages = mes_group[0], mes_group[1:]
-            assert all(mes.media_group_id == first_message.media_group_id for mes in mes_group)
+        overridden_none = await default_bot.send_media_group(
+            chat_id,
+            media_group_no_caption_args.copy(),
+            caption="<b>photo</b> 1",
+            parse_mode=None,
+        )
 
-            # Make sure first message got the caption, which will lead
-            # to Telegram displaying its caption as group caption
+        # Make sure first message got the caption, which will lead to Telegram
+        # displaying its caption as group caption
+        assert overridden_none[0].caption == "<b>photo</b> 1"
+        assert not overridden_none[0].caption_entities
+        # First messages in these two groups have to have caption "photo 1"
+        # because of parse mode (default or explicit)
+        for mes_group in (default, overridden_markdown_v2):
+            first_message = mes_group[0]
             assert first_message.caption == "photo 1"
             assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
 
-            # Check that other messages have no captions
+        # This check is valid for all 3 groups of messages
+        for mes_group in (default, overridden_markdown_v2, overridden_none):
+            first_message, other_messages = mes_group[0], mes_group[1:]
+            assert all(mes.media_group_id == first_message.media_group_id for mes in mes_group)
+            # Check that messages from 2nd message onwards have no captions
             assert all(mes.caption is None for mes in other_messages)
             assert not any(mes.caption_entities for mes in other_messages)
 
