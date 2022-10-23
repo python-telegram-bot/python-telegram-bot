@@ -146,19 +146,27 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
             instance to pass onto handler callbacks.
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
-            the chat.
+            the chat. For each integer chat id, the corresponding value of this mapping is
+            available as :attr:`telegram.ext.CallbackContext.chat_data` in handler callbacks for
+            updates from that chat.
 
             .. versionchanged:: 20.0
-                :attr:`chat_data` is now read-only
+                :attr:`chat_data` is now read-only. Note that the values of the mapping are still
+                mutable, i.e. editing ``context.chat_data`` within a handler callback is possible
+                (and encouraged), but editing the mapping ``application.chat_data`` itself is not.
 
             .. tip::
                Manually modifying :attr:`chat_data` is almost never needed and unadvisable.
 
         user_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
-            the user.
+            the user. For each integer user id, the corresponding value of this mapping is
+            available as :attr:`telegram.ext.CallbackContext.user_data` in handler callbacks for
+            updates from that user.
 
             .. versionchanged:: 20.0
-               :attr:`user_data` is now read-only
+                :attr:`user_data` is now read-only. Note that the values of the mapping are still
+                mutable, i.e. editing ``context.user_data`` within a handler callback is possible
+                (and encouraged), but editing the mapping ``application.user_data`` itself is not.
 
             .. tip::
                Manually modifying :attr:`user_data` is almost never needed and unadvisable.
