@@ -156,7 +156,7 @@ class Chat(TelegramObject):
             available.
         first_name (:obj:`str`): Optional. First name of the other party in a private chat.
         last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
-        photo (:class:`telegram.ChatPhoto`): Optional. Chat photo. 
+        photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
             Returned only in :meth:`telegram.Bot.get_chat`.
         bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
@@ -185,7 +185,7 @@ class Chat(TelegramObject):
             be forwarded to other chats. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.9
-        sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set. 
+        sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
             Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
             sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
