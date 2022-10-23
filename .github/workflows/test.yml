@@ -14,22 +14,10 @@ jobs:
   pytest:
     name: pytest
     runs-on: ${{matrix.os}}
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11.0-rc.2']
         os: [ubuntu-latest, windows-latest, macos-latest]
-        experimental: [false]
-        include:
-          - python-version: 3.11.0-rc.2
-            os: ubuntu-latest
-            experimental: true
-          - python-version: 3.11.0-rc.2
-            os: windows-latest
-            experimental: true
-          - python-version: 3.11.0-rc.2
-            os: macos-latest
-            experimental: true
       fail-fast: False
     steps:
       - uses: actions/checkout@v3
@@ -44,6 +32,7 @@ jobs:
           python -W ignore -m pip install -r requirements.txt
           python -W ignore -m pip install -r requirements-opts.txt
           python -W ignore -m pip install -r requirements-dev.txt
+          python -W ignore -m pip install pytest-xdist[psutil]
 
       - name: Test with pytest
         # We run 4 different suites here
@@ -65,7 +54,9 @@ jobs:
           no_rate_limiter_exit=$?
           export TEST_RATE_LIMITER='true'
           pip install -r requirements-opts.txt
-          pytest -v --cov --cov-append
+          # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU
+          # worker
+          pytest -v --cov --cov-append -n auto --dist loadfile
           full_exit=$?
           special_exit=$(( no_pytz_exit > no_passport_exit ? no_pytz_exit : no_passport_exit ))
           special_exit=$(( special_exit > no_rate_limiter_exit ? special_exit : no_rate_limiter_exit ))

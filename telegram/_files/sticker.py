@@ -282,9 +282,9 @@ class StickerSet(TelegramObject):
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["stickers"] = [s.to_dict() for s in data.get("stickers")]  # type: ignore[union-attr]
 
