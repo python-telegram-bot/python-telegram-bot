@@ -90,9 +90,9 @@ class InputMedia(TelegramObject):
         self.caption_entities = caption_entities
         self.parse_mode = parse_mode
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         if self.caption_entities:
             data["caption_entities"] = [ce.to_dict() for ce in self.caption_entities]

@@ -228,9 +228,9 @@ class InputInvoiceMessageContent(InputMessageContent):
             )
         )
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["prices"] = [price.to_dict() for price in self.prices]
 
