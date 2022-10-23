@@ -31,8 +31,8 @@ from telegram.ext import Defaults
 from tests.conftest import env_var_2_bool
 
 ABSOLUTE_TIME_SPECS = [
-    dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))),
-    dtm.datetime.utcnow(),
+    dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))).replace(second=0, microsecond=0),
+    dtm.datetime.utcnow().replace(second=0, microsecond=0),
 ]
 DELTA_TIME_SPECS = [dtm.timedelta(hours=3, seconds=42, milliseconds=2), 30, 7.5]
 TIME_OF_DAY_TIME_SPECS = [
