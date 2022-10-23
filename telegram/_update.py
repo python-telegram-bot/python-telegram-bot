@@ -46,6 +46,9 @@ class Update(TelegramObject):
     Note:
         At most one of the optional parameters can be present in any given update.
 
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+
     Args:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if

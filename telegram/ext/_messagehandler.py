@@ -40,6 +40,9 @@ class MessageHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+
     Args:
         filters (:class:`telegram.ext.filters.BaseFilter`): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in

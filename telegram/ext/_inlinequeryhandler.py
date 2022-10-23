@@ -46,7 +46,10 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
           chats and may not be set for inline queries coming from third-party clients. These
           updates won't be handled, if :attr:`chat_types` is passed.
 
-    .. seealso:: :any:`Inlinebot Example <examples.inlinebot>`
+    .. seealso:: :any:`Inlinebot Example <examples.inlinebot>`,
+        `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

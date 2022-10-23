@@ -59,6 +59,9 @@ class Updater(AbstractAsyncContextManager):
         finally:
             await updater.shutdown()
 
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+
     .. versionchanged:: 20.0
 
         * Removed argument and attribute ``user_sig_handler``

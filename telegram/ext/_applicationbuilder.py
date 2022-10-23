@@ -112,6 +112,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
           use :class:`telegram.ext.ExtBot` for the bot.
 
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
     """
 

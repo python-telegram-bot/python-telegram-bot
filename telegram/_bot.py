@@ -2620,7 +2620,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :paramref:`telegram.InlineQuery.answer.auto_pagination` set to :obj:`True`, which will
             take care of passing the correct value.
 
-        .. seealso:: :attr:`telegram.InlineQuery.answer`
+        .. seealso:: :attr:`telegram.InlineQuery.answer`, `Your First Bot <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.

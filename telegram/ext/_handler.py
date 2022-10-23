@@ -54,6 +54,9 @@ class BaseHandler(Generic[UT, CCT], ABC):
            also used for the mentioned method arguments. That way, a type checker can check whether
            this handler fits the definition of the :class:`~Application`.
 
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+
     .. versionchanged:: 20.0
 
         * The attribute ``run_async`` is now :paramref:`block`.

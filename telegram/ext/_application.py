@@ -133,6 +133,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         finally:
             await application.shutdown()
 
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+
     .. versionchanged:: 20.0
 
         * Initialization is now done through the :class:`telegram.ext.ApplicationBuilder`.
@@ -594,7 +597,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`
+            :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`,
+            `Your First Bot <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -1051,6 +1056,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             to be loaded into memory while the application is already processing updates, which
             might lead to race conditions and undesired behavior. In particular, current
             conversation states may be overridden by the loaded data.
+
+        .. seealso:: `Your First Bot <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
 
         Args:
             handler (:class:`telegram.ext.BaseHandler`): A BaseHandler instance.
