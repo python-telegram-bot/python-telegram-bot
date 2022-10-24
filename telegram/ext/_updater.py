@@ -60,7 +60,9 @@ class Updater(AbstractAsyncContextManager):
             await updater.shutdown()
 
     .. seealso:: `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+        `Architecture Overview <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
 
     .. versionchanged:: 20.0
 
