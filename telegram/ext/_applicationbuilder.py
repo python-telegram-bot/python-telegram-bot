@@ -114,7 +114,7 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
     .. seealso:: `Your First Bot <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
-        `Builder Pattern <https://github.com/\
+        `Builder Pattern for Application <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
