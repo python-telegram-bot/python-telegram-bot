@@ -326,6 +326,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
     def concurrent_updates(self) -> int:
         """:obj:`int`: The number of concurrent updates that will be processed in parallel. A
         value of ``0`` indicates updates are *not* being processed concurrently.
+
+        .. seealso:: `Concurrency <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
         """
         return self._concurrent_updates
 
@@ -857,6 +860,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             * If the application is currently running, tasks created by this method will be
               awaited with :meth:`stop`.
 
+        .. seealso:: `Concurrency <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
         Args:
             coroutine (:term:`coroutine function`): The coroutine to run as task.
             update (:obj:`object`, optional): If set, will be passed to :meth:`process_error`
@@ -973,6 +979,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         """Processes a single update and marks the update to be updated by the persistence later.
         Exceptions raised by handler callbacks will be processed by :meth:`process_update`.
 
+        .. seealso:: `Concurrency <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
         .. versionchanged:: 20.0
             Persistence is now updated in an interval set by
             :attr:`telegram.ext.BasePersistence.update_interval`.
@@ -1058,8 +1067,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             conversation states may be overridden by the loaded data.
 
         .. seealso:: `Your First Bot <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,`
-            Architecture Overview <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+            `Architecture Overview <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
             `Builder Pattern <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
