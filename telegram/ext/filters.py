@@ -1528,6 +1528,9 @@ class Regex(MessageFilter):
         With a :attr:`telegram.Message.text` of `x`, will only ever return the matches for the
         first filter, since the second one is never evaluated.
 
+    .. seealso:: `Types of Handlers <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
+
     Args:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
     """

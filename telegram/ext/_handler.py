@@ -55,7 +55,9 @@ class BaseHandler(Generic[UT, CCT], ABC):
            this handler fits the definition of the :class:`~Application`.
 
     .. seealso:: `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+        `Types of Handlers <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
 
     .. versionchanged:: 20.0
 
