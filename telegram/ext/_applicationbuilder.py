@@ -113,7 +113,9 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
           use :class:`telegram.ext.ExtBot` for the bot.
 
     .. seealso:: `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+        `Builder Pattern <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
 
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
     """

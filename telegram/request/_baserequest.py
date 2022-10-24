@@ -74,7 +74,9 @@ class BaseRequest(
         custom logic to encode the keys of :attr:`telegram.request.RequestData.parameters`.
 
     .. seealso:: `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
+        `Builder Pattern <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
 
     .. versionadded:: 20.0
     """

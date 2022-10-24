@@ -1058,7 +1058,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             conversation states may be overridden by the loaded data.
 
         .. seealso:: `Your First Bot <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,`
+            Architecture Overview <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
+            `Builder Pattern <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
 
         Args:
             handler (:class:`telegram.ext.BaseHandler`): A BaseHandler instance.
