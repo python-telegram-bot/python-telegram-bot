@@ -56,7 +56,12 @@ def _lstrip_str(in_s: str, lstr: str) -> str:
 
 
 class TelegramError(Exception):
-    """Base class for Telegram errors."""
+    """
+    Base class for Telegram errors.
+
+    .. seealso:: `Exceptions, Warnings and Logging <https://github.com/\
+    python-telegram-bot/python-telegram-bot/wiki/Exceptions%2C-Warnings-and-Logging>`_
+    """
 
     __slots__ = ("message",)
 

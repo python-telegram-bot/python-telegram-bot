@@ -1435,7 +1435,9 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         Note:
             Attempts to add the same callback multiple times will be ignored.
 
-        .. seealso:: :any:`Errorhandler Example <examples.errorhandlerbot>`
+        .. seealso:: :any:`Errorhandler Example <examples.errorhandlerbot>`,
+            `Exceptions, Warnings and Logging <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Exceptions%2C-Warnings-and-Logging>`_
 
         Args:
             callback (:term:`coroutine function`): The callback function for this error handler.
