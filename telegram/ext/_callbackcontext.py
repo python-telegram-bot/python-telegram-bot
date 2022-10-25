@@ -244,7 +244,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             Will *not* raise exceptions in case the data is not found in the cache.
             *Will* raise :exc:`KeyError` in case the callback query can not be found in the cache.
 
-        .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot/
+        .. seealso:: `Arbitrary callback_data <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
 
         Args:

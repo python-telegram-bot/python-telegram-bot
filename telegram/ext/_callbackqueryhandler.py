@@ -84,7 +84,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
             If :attr:`telegram.CallbackQuery.data` is :obj:`None`, the
             :class:`telegram.CallbackQuery` update will not be handled.
 
-            .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot/
+            .. seealso:: `Arbitrary callback_data <https://github.com/\
                 python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
 
             .. versionchanged:: 13.6

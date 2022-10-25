@@ -719,8 +719,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         cached in memory. If not called, only strings can be used as callback data and no data will
         be stored in memory.
 
-        .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot\
-            /python-telegram-bot/wiki/Arbitrary-callback_data>`_,
+        .. seealso:: `Arbitrary callback_data <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_,
             :any:`examples.arbitrarycallbackdatabot`
 
         Args:
