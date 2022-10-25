@@ -11,6 +11,7 @@ Classes in this package
 -----------------------
 
 .. toctree::
+    :titlesonly:
 
     telegram.bot
     telegram.at-tree.rst
