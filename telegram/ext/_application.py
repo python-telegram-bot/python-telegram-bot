@@ -600,7 +600,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`,
+            :meth:`telegram.ext.Updater.start_polling`, :meth:`telegram.ext.Updater.stop`,
+            :meth:`run_webhook`,
             `Your First Bot <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
 
