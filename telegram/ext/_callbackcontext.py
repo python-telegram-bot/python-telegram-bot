@@ -68,7 +68,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`,
         `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+        `Job Queue <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
 
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this
@@ -143,6 +145,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     def bot_data(self) -> BD:
         """:obj:`ContextTypes.bot_data`: Optional. An object that can be used to keep any data in.
         For each update it will be the same :attr:`ContextTypes.bot_data`. Defaults to :obj:`dict`.
+
+        .. seealso:: `Storing Bot, User and Chat Related Data <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
+            chat-related-data>`_,
         """
         return self.application.bot_data
 
@@ -164,6 +170,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             <https://github.com/python-telegram-bot/python-telegram-bot/wiki/
             Storing-bot,-user-and-chat-related-data#chat-migration>`_.
 
+        .. seealso:: `Storing Bot, User and Chat Related Data <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
+            chat-related-data>`_,
+
         .. versionchanged:: 20.0
             The chat data is now also present in error handlers if the error is caused by a job.
         """
@@ -182,6 +192,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         """:obj:`ContextTypes.user_data`: Optional. An object that can be used to keep any data in.
         For each update from the same user it will be the same :obj:`ContextTypes.user_data`.
         Defaults to :obj:`dict`.
+
+        .. seealso:: `Storing Bot, User and Chat Related Data <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and\
+            -chat-related-data>`_,
 
         .. versionchanged:: 20.0
             The user data is now also present in error handlers if the error is caused by a job.
@@ -370,6 +384,8 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
             :class:`telegram.ext.Application`.
 
+        .. seealso:: `Job Queue <https://github.com/python-telegram-bot/
+            python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
         """
         return self._application.job_queue
 

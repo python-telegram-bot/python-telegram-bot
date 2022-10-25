@@ -144,7 +144,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :attr:`telegram.ext.CallbackContext.bot`,
         :attr:`telegram.ext.Updater.bot`,
         `Builder Pattern <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_,
+        `Making Your Bot Persistent <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_
+
 
     .. versionadded:: 13.2
         Objects of this class are comparable in terms of equality. Two objects of this class are

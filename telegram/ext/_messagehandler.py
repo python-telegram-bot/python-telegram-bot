@@ -43,7 +43,9 @@ class MessageHandler(BaseHandler[Update, CCT]):
     .. seealso:: `Your First Bot <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
         `Types of Handlers <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
+        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_,
+        `Advanced Filters <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
 
     Args:
         filters (:class:`telegram.ext.filters.BaseFilter`): A filter inheriting from

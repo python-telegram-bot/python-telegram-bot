@@ -609,6 +609,9 @@ class Job:
         This class should not be instantiated manually.
         Use the methods of :class:`telegram.ext.JobQueue` to schedule jobs.
 
+    .. seealso:: `Job Queue <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+
     .. versionchanged:: 20.0
 
        * Removed argument and attribute ``job_queue``.

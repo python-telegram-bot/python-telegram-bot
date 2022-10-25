@@ -234,6 +234,9 @@ class MessageFilter(BaseFilter):
 
     Please see :class:`BaseFilter` for details on how to create custom filters.
 
+    .. seealso:: `Advanced Filters <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
+
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
         data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should

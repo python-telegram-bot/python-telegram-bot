@@ -35,6 +35,10 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
 
     .. seealso:: `Architecture Overview <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
+        `Storing Bot, User and Chat Related Data <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-chat-related-data>`_,
+        `Job Queue <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_,
         :any:`ContextTypes Example <examples.contexttypesbot>`
 
     .. versionadded:: 13.6

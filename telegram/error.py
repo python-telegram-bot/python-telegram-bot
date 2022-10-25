@@ -142,6 +142,10 @@ class ChatMigrated(TelegramError):
     """
     Raised when the requested group chat migrated to supergroup and has a new chat id.
 
+    .. seealso:: `Storing Bot, User and Chat Related Data <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
+        chat-related-data>`_,
+
     Args:
         new_chat_id (:obj:`int`): The new chat id of the group.
 

@@ -1071,7 +1071,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             `Architecture Overview <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
             `Builder Pattern <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+            python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_,
+            `Storing Bot, User and Chat Related Data <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
+            chat-related-data>`_,
 
         Args:
             handler (:class:`telegram.ext.BaseHandler`): A BaseHandler instance.
@@ -1227,6 +1230,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             :meth:`process_update` or :meth:`telegram.ext.Job.run` may re-create the old entry due
             to the asynchronous nature of these features. Please make sure that your program can
             avoid or handle such situations.
+
+        .. seealso:: `Storing Bot, User and Chat Related Data <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
+            chat-related-data>`_,
 
         Args:
             message (:class:`telegram.Message`, optional): A message with either
