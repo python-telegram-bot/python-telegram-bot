@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import copy
 import datetime as dtm
 import inspect
 import logging
@@ -992,7 +993,7 @@ class TestBot:
         assert web_app_msg.inline_message_id == "321"
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
-    async def test_answer_inline_query(self, monkeypatch, bot):
+    async def test_answer_inline_query(self, monkeypatch, bot, raw_bot):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters == {
@@ -1010,6 +1011,98 @@ class TestBot:
                         "type": "article",
                         "input_message_content": {"message_text": "second"},
                     },
+                    {
+                        "title": "test_result",
+                        "id": "123",
+                        "type": "document",
+                        "document_url": "https://raw.githubusercontent.com/python-telegram-bot"
+                        "/logos/master/logo/png/ptb-logo_240.png",
+                        "mime_type": "image/png",
+                        "caption": "ptb_logo",
+                    },
+                ],
+                "next_offset": "42",
+                "switch_pm_parameter": "start_pm",
+                "inline_query_id": 1234,
+                "is_personal": True,
+                "switch_pm_text": "switch pm",
+            }
+
+        results = [
+            InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
+            InlineQueryResultArticle("12", "second", InputTextMessageContent("second")),
+            InlineQueryResultDocument(
+                id="123",
+                document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
+                "logo/png/ptb-logo_240.png",
+                title="test_result",
+                mime_type="image/png",
+                caption="ptb_logo",
+            ),
+        ]
+
+        copied_results = copy.copy(results)
+        ext_bot = bot
+        for bot in (ext_bot, raw_bot):
+            # We need to test 1) below both the bot and raw_bot and setting this up with
+            # pytest.parametrize appears to be difficult ...
+            monkeypatch.setattr(bot.request, "post", make_assertion)
+            assert await bot.answer_inline_query(
+                1234,
+                results=results,
+                cache_time=300,
+                is_personal=True,
+                next_offset="42",
+                switch_pm_text="switch pm",
+                switch_pm_parameter="start_pm",
+            )
+
+            # 1)
+            # make sure that the results were not edited in-place
+            assert results == copied_results
+            for idx, result in enumerate(results):
+                if hasattr(result, "parse_mode"):
+                    print(type(result.parse_mode), type(copied_results[idx].parse_mode))
+                    assert result.parse_mode == copied_results[idx].parse_mode
+                if hasattr(result, "input_message_content"):
+                    assert getattr(result.input_message_content, "parse_mode", None) == getattr(
+                        copied_results[idx].input_message_content, "parse_mode", None
+                    )
+                    assert getattr(
+                        result.input_message_content, "disable_web_page_preview", None
+                    ) == getattr(
+                        copied_results[idx].input_message_content, "disable_web_page_preview", None
+                    )
+
+            monkeypatch.delattr(bot.request, "post")
+
+    async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters == {
+                "cache_time": 300,
+                "results": [
+                    {
+                        "title": "first",
+                        "id": "11",
+                        "type": "article",
+                        "input_message_content": {"message_text": "first"},
+                    },
+                    {
+                        "title": "second",
+                        "id": "12",
+                        "type": "article",
+                        "input_message_content": {"message_text": "second"},
+                    },
+                    {
+                        "title": "test_result",
+                        "id": "123",
+                        "type": "document",
+                        "document_url": "https://raw.githubusercontent.com/"
+                        "python-telegram-bot/logos/master/logo/png/"
+                        "ptb-logo_240.png",
+                        "mime_type": "image/png",
+                        "caption": "ptb_logo",
+                    },
                 ],
                 "next_offset": "42",
                 "switch_pm_parameter": "start_pm",
@@ -1022,44 +1115,6 @@ class TestBot:
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
             InlineQueryResultArticle("12", "second", InputTextMessageContent("second")),
-        ]
-
-        assert await bot.answer_inline_query(
-            1234,
-            results=results,
-            cache_time=300,
-            is_personal=True,
-            next_offset="42",
-            switch_pm_text="switch pm",
-            switch_pm_parameter="start_pm",
-        )
-        monkeypatch.delattr(bot.request, "post")
-
-    async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.parameters == {
-                "cache_time": 300,
-                "results": [
-                    {
-                        "title": "test_result",
-                        "id": "123",
-                        "type": "document",
-                        "document_url": "https://raw.githubusercontent.com/"
-                        "python-telegram-bot/logos/master/logo/png/"
-                        "ptb-logo_240.png",
-                        "mime_type": "image/png",
-                        "caption": "ptb_logo",
-                    }
-                ],
-                "next_offset": "42",
-                "switch_pm_parameter": "start_pm",
-                "inline_query_id": 1234,
-                "is_personal": True,
-                "switch_pm_text": "switch pm",
-            }
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        results = [
             InlineQueryResultDocument(
                 id="123",
                 document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
@@ -1067,9 +1122,10 @@ class TestBot:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-            )
+            ),
         ]
 
+        copied_results = copy.copy(results)
         assert await bot.answer_inline_query(
             1234,
             results=results,
@@ -1079,6 +1135,21 @@ class TestBot:
             switch_pm_text="switch pm",
             switch_pm_parameter="start_pm",
         )
+        # make sure that the results were not edited in-place
+        assert results == copied_results
+        for idx, result in enumerate(results):
+            if hasattr(result, "parse_mode"):
+                print(type(result.parse_mode), type(copied_results[idx].parse_mode))
+                assert result.parse_mode == copied_results[idx].parse_mode
+            if hasattr(result, "input_message_content"):
+                assert getattr(result.input_message_content, "parse_mode", None) == getattr(
+                    copied_results[idx].input_message_content, "parse_mode", None
+                )
+                assert getattr(
+                    result.input_message_content, "disable_web_page_preview", None
+                ) == getattr(
+                    copied_results[idx].input_message_content, "disable_web_page_preview", None
+                )
 
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
@@ -1086,6 +1157,24 @@ class TestBot:
             return request_data.parameters == {
                 "cache_time": 300,
                 "results": [
+                    {
+                        "title": "first",
+                        "id": "11",
+                        "type": "article",
+                        "input_message_content": {
+                            "message_text": "first",
+                            "parse_mode": "Markdown",
+                        },
+                    },
+                    {
+                        "title": "second",
+                        "id": "12",
+                        "type": "article",
+                        "input_message_content": {
+                            "message_text": "second",
+                            "parse_mode": "Markdown",
+                        },
+                    },
                     {
                         "title": "test_result",
                         "id": "123",
@@ -1096,7 +1185,7 @@ class TestBot:
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "parse_mode": "Markdown",
-                    }
+                    },
                 ],
                 "next_offset": "42",
                 "switch_pm_parameter": "start_pm",
@@ -1107,6 +1196,8 @@ class TestBot:
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         results = [
+            InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
+            InlineQueryResultArticle("12", "second", InputTextMessageContent("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
@@ -1114,9 +1205,10 @@ class TestBot:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-            )
+            ),
         ]
 
+        copied_results = copy.copy(results)
         assert await default_bot.answer_inline_query(
             1234,
             results=results,
@@ -1126,6 +1218,21 @@ class TestBot:
             switch_pm_text="switch pm",
             switch_pm_parameter="start_pm",
         )
+        # make sure that the results were not edited in-place
+        assert results == copied_results
+        for idx, result in enumerate(results):
+            if hasattr(result, "parse_mode"):
+                print(type(result.parse_mode), type(copied_results[idx].parse_mode))
+                assert result.parse_mode == copied_results[idx].parse_mode
+            if hasattr(result, "input_message_content"):
+                assert getattr(result.input_message_content, "parse_mode", None) == getattr(
+                    copied_results[idx].input_message_content, "parse_mode", None
+                )
+                assert getattr(
+                    result.input_message_content, "disable_web_page_preview", None
+                ) == getattr(
+                    copied_results[idx].input_message_content, "disable_web_page_preview", None
+                )
 
     async def test_answer_inline_query_current_offset_error(self, bot, inline_results):
         with pytest.raises(ValueError, match=("`current_offset` and `next_offset`")):

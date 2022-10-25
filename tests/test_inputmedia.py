@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import copy
+
 import pytest
 from flaky import flaky
 
@@ -444,24 +446,39 @@ class TestSendMediaGroup:
         )
 
     @flaky(3, 1)
-    async def test_send_media_group_all_args(self, bot, chat_id, media_group):
-        m1 = await bot.send_message(chat_id, text="test")
-        messages = await bot.send_media_group(
-            chat_id,
-            media_group,
-            disable_notification=True,
-            reply_to_message_id=m1.message_id,
-            protect_content=True,
-        )
-        assert isinstance(messages, list)
-        assert len(messages) == 3
-        assert all(isinstance(mes, Message) for mes in messages)
-        assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
-        assert all(mes.caption == f"photo {idx+1}" for idx, mes in enumerate(messages))
-        assert all(
-            mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)] for mes in messages
-        )
-        assert all(mes.has_protected_content for mes in messages)
+    async def test_send_media_group_all_args(self, bot, raw_bot, chat_id, media_group):
+        ext_bot = bot
+        for bot in (ext_bot, raw_bot):
+            # We need to test 1) below both the bot and raw_bot and setting this up with
+            # pytest.parametrize appears to be difficult ...
+
+            m1 = await bot.send_message(chat_id, text="test")
+            copied_media_group = copy.copy(media_group)
+            messages = await bot.send_media_group(
+                chat_id,
+                media_group,
+                disable_notification=True,
+                reply_to_message_id=m1.message_id,
+                protect_content=True,
+            )
+
+            # 1)
+            # make sure that the media_group was not modified
+            assert media_group == copied_media_group
+            assert all(
+                a.parse_mode == b.parse_mode for a, b in zip(media_group, copied_media_group)
+            )
+
+            assert isinstance(messages, list)
+            assert len(messages) == 3
+            assert all(isinstance(mes, Message) for mes in messages)
+            assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
+            assert all(mes.caption == f"photo {idx+1}" for idx, mes in enumerate(messages))
+            assert all(
+                mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+                for mes in messages
+            )
+            assert all(mes.has_protected_content for mes in messages)
 
     @flaky(3, 1)
     async def test_send_media_group_custom_filename(
@@ -584,14 +601,23 @@ class TestSendMediaGroup:
         assert not all(msg.has_protected_content for msg in unprotected)
 
     @flaky(3, 1)
-    async def test_edit_message_media(self, bot, chat_id, media_group):
-        messages = await bot.send_media_group(chat_id, media_group)
-        cid = messages[-1].chat.id
-        mid = messages[-1].message_id
-        new_message = await bot.edit_message_media(
-            chat_id=cid, message_id=mid, media=media_group[0]
-        )
-        assert isinstance(new_message, Message)
+    async def test_edit_message_media(self, bot, raw_bot, chat_id, media_group):
+        ext_bot = bot
+        for bot in (ext_bot, raw_bot):
+            # We need to test 1) below both the bot and raw_bot and setting this up with
+            # pytest.parametrize appears to be difficult ...
+            messages = await bot.send_media_group(chat_id, media_group)
+            cid = messages[-1].chat.id
+            mid = messages[-1].message_id
+            copied_media = copy.copy(media_group[0])
+            new_message = await bot.edit_message_media(
+                chat_id=cid, message_id=mid, media=media_group[0]
+            )
+            assert isinstance(new_message, Message)
+
+            # 1)
+            # make sure that the media was not modified
+            assert media_group[0].parse_mode == copied_media.parse_mode
 
     @flaky(3, 1)
     async def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
@@ -666,32 +692,44 @@ class TestSendMediaGroup:
 
         message = await default_bot.send_photo(chat_id, photo)
 
+        media = build_media(parse_mode=ParseMode.HTML, med_type=media_type)
+        copied_media = copy.copy(media)
         message = await default_bot.edit_message_media(
-            build_media(parse_mode=ParseMode.HTML, med_type=media_type),
+            media,
             message.chat_id,
             message.message_id,
         )
         assert message.caption == test_caption
         assert message.caption_entities == test_entities
+        # make sure that the media was not modified
+        assert media.parse_mode == copied_media.parse_mode
 
         # Remove caption to avoid "Message not changed"
         await message.edit_caption()
 
+        media = build_media(parse_mode=ParseMode.MARKDOWN_V2, med_type=media_type)
+        copied_media = copy.copy(media)
         message = await default_bot.edit_message_media(
-            build_media(parse_mode=ParseMode.MARKDOWN_V2, med_type=media_type),
+            media,
             message.chat_id,
             message.message_id,
         )
         assert message.caption == test_caption
         assert message.caption_entities == test_entities
+        # make sure that the media was not modified
+        assert media.parse_mode == copied_media.parse_mode
 
         # Remove caption to avoid "Message not changed"
         await message.edit_caption()
 
+        media = build_media(parse_mode=None, med_type=media_type)
+        copied_media = copy.copy(media)
         message = await default_bot.edit_message_media(
-            build_media(parse_mode=None, med_type=media_type),
+            media,
             message.chat_id,
             message.message_id,
         )
         assert message.caption == markdown_caption
         assert message.caption_entities == []
+        # make sure that the media was not modified
+        assert media.parse_mode == copied_media.parse_mode
