@@ -716,7 +716,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_webhook`, :meth:`run_polling`
+            :meth:`telegram.ext.Updater.start_webhook`, :meth:`run_polling`,
+            `Webhooks <https://github.com/python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Defaults to

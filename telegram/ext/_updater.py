@@ -185,6 +185,9 @@ class Updater(AbstractAsyncContextManager):
     ) -> asyncio.Queue:
         """Starts polling updates from Telegram.
 
+        .. seealso:: `Webhooks <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_
+
         .. versionchanged:: 20.0
             Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates`.
 
@@ -384,6 +387,9 @@ class Updater(AbstractAsyncContextManager):
         ``http://listen:port/url_path``, so SSL can be handled by another
         application. Else, the webhook will be started on
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as required.
+
+        .. seealso:: `Webhooks <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_
 
         .. versionchanged:: 13.4
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
