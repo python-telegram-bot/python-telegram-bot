@@ -47,8 +47,6 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
           updates won't be handled, if :attr:`chat_types` is passed.
 
     .. seealso:: :any:`Inlinebot Example <examples.inlinebot>`,
-        `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
         `Types of Handlers <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
 

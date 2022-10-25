@@ -103,8 +103,6 @@ class Message(TelegramObject):
         from_user (:class:`telegram.User`, optional): Sender of the message; empty for messages
             sent to channels. For backward compatibility, this will contain a fake sender user in
             non-channel chats, if the message was sent on behalf of a chat.
-
-            .. seealso:: :any:`Conversationbot Example <examples.conversationbot>`
         sender_chat (:class:`telegram.Chat`, optional): Sender of the message, sent on behalf of a
             chat. For example, the channel itself for channel posts, the supergroup itself for
             messages from anonymous group administrators, the linked channel for messages
@@ -254,8 +252,6 @@ class Message(TelegramObject):
         from_user (:class:`telegram.User`): Optional. Sender of the message; empty for messages
             sent to channels. For backward compatibility, this will contain a fake sender user in
             non-channel chats, if the message was sent on behalf of a chat.
-
-            .. seealso:: :any:`Conversationbot Example <examples.conversationbot>`
         sender_chat (:class:`telegram.Chat`): Optional. Sender of the message, sent on behalf of a
             chat. For example, the channel itself for channel posts, the supergroup itself for
             messages from anonymous group administrators, the linked channel for messages
@@ -820,9 +816,6 @@ class Message(TelegramObject):
              await bot.send_message(update.effective_message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_message`.
-
-        .. seealso:: :any:`Conversationbot Example <examples.conversationbot>`,
-        :any:`Conversationbot Example 2 <examples.conversationbot2>`
 
         Keyword Args:
             quote (:obj:`bool`, optional): If set to :obj:`True`, the message is sent as an actual

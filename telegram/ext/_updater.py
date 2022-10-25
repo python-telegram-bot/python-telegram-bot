@@ -59,9 +59,7 @@ class Updater(AbstractAsyncContextManager):
         finally:
             await updater.shutdown()
 
-    .. seealso:: `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
-        `Architecture Overview <https://github.com/\
+    .. seealso:: `Architecture Overview <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
         `Builder Pattern <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
@@ -184,9 +182,6 @@ class Updater(AbstractAsyncContextManager):
         error_callback: Callable[[TelegramError], None] = None,
     ) -> asyncio.Queue:
         """Starts polling updates from Telegram.
-
-        .. seealso:: `Webhooks <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_
 
         .. versionchanged:: 20.0
             Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates`.

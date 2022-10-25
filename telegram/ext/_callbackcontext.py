@@ -67,8 +67,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     4. The type of :attr:`bot_data` (if :attr:`bot_data` is not :obj:`None`).
 
     .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`,
-        `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
         `Job Queue <https://github.com/python-telegram-bot/
         python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
 
@@ -95,9 +93,6 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
             is handled by :class:`telegram.ext.CommandHandler`, :class:`telegram.ext.PrefixHandler`
             or :class:`telegram.ext.StringCommandHandler`. It contains a list of the words in the
             text after the command, using any whitespace string as a delimiter.
-
-            .. seealso:: `Your First Bot <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
         error (:exc:`Exception`): Optional. The error that was raised. Only present when passed
             to an error handler registered with :attr:`telegram.ext.Application.add_error_handler`.
         job (:class:`telegram.ext.Job`): Optional. The job which originated this callback.

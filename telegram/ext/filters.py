@@ -1532,9 +1532,7 @@ class Regex(MessageFilter):
         first filter, since the second one is never evaluated.
 
     .. seealso:: `Types of Handlers <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_,
-        :any:`Conversationbot Example <examples.conversationbot>`,
-        :any:`Conversationbot Example 2 <examples.conversationbot2>`
+        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
 
     Args:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.

@@ -604,10 +604,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
             :meth:`telegram.ext.Updater.start_polling`, :meth:`telegram.ext.Updater.stop`,
-            :meth:`run_webhook`,
-            `Your First Bot <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
-            :any:`Echobot Example <examples.echobot>`
+            :meth:`run_webhook`
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -1078,13 +1075,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         .. seealso:: `Your First Bot <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
             `Architecture Overview <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-            `Builder Pattern <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_,
-            `Storing Bot, User and Chat Related Data <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
-            chat-related-data>`_,
-            :any:`Echobot Example <examples.echobot>`
+            python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
 
         Args:
             handler (:class:`telegram.ext.BaseHandler`): A BaseHandler instance.
