@@ -592,9 +592,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
         and :meth:`telegram.ext.Updater.shutdown`.
 
+        .. include:: inclusions/application_run_tip.rst
+
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_polling`, :meth:`run_webhook`
+            :meth:`telegram.ext.Updater.start_polling`, :meth:`telegram.ext.Updater.stop`,
+            :meth:`run_webhook`
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -705,9 +708,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
         and :meth:`telegram.ext.Updater.shutdown`.
 
+        .. include:: inclusions/application_run_tip.rst
+
         .. seealso::
             :meth:`initialize`, :meth:`start`, :meth:`stop`, :meth:`shutdown`
-            :meth:`telegram.ext.Updater.start_webhook`, :meth:`run_polling`
+            :meth:`telegram.ext.Updater.start_webhook`, :meth:`telegram.ext.Updater.stop`,
+            :meth:`run_polling`
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
