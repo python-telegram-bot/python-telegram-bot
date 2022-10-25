@@ -134,7 +134,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             await application.shutdown()
 
     .. seealso:: `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+        :any:`Echobot Example <examples.echobot>`
 
     .. versionchanged:: 20.0
 
@@ -605,7 +606,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             :meth:`telegram.ext.Updater.start_polling`, :meth:`telegram.ext.Updater.stop`,
             :meth:`run_webhook`,
             `Your First Bot <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+            :any:`Echobot Example <examples.echobot>`
 
         Args:
             poll_interval (:obj:`float`, optional): Time to wait between polling updates from
@@ -1082,6 +1084,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             `Storing Bot, User and Chat Related Data <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Storing-bot%2C-user-and-\
             chat-related-data>`_,
+            :any:`Echobot Example <examples.echobot>`
 
         Args:
             handler (:class:`telegram.ext.BaseHandler`): A BaseHandler instance.

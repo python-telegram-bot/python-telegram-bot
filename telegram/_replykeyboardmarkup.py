@@ -36,6 +36,9 @@ class ReplyKeyboardMarkup(TelegramObject):
         A user requests to change the bot's language, bot replies to the request with a keyboard
         to select the new language. Other users in the group don't see the keyboard.
 
+    .. seealso:: :any:`Conversationbot Example <examples.conversationbot>`,
+        :any:`Conversationbot Example 2 <examples.conversationbot2>`
+
     Args:
         keyboard (List[List[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of button rows,
             each represented by an Array of :class:`telegram.KeyboardButton` objects.

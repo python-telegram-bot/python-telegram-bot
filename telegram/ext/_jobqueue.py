@@ -46,7 +46,9 @@ class JobQueue:
         `Architecture Overview <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
         `Job Queue <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_,
+        :any:`Timerbot Example <examples.timerbot>`
+
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
 
