@@ -90,6 +90,9 @@ class InlineKeyboardButton(TelegramObject):
             Tip:
                 The value entered here will be available in :attr:`telegram.CallbackQuery.data`.
 
+            .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot/
+                python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
+
         web_app (:obj:`telegram.WebAppInfo`, optional): Description of the `Web App
             <https://core.telegram.org/bots/webapps>`_  that will be launched when the user presses
             the button. The Web App will be able to send an arbitrary message on behalf of the user

@@ -38,6 +38,9 @@ class InvalidCallbackData(TelegramError):
     """
     Raised when the received callback data has been tempered with or deleted from cache.
 
+    .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot/
+        python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
+
     .. versionadded:: 13.6
 
     Args:

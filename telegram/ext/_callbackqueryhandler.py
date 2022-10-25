@@ -56,8 +56,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     .. seealso:: `Types of Handlers <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
-
+        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_,
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -84,6 +83,9 @@ class CallbackQueryHandler(BaseHandler[Update, CCT]):
 
             If :attr:`telegram.CallbackQuery.data` is :obj:`None`, the
             :class:`telegram.CallbackQuery` update will not be handled.
+
+            .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot/
+                python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
 
             .. versionchanged:: 13.6
                Added support for arbitrary callback data.

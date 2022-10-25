@@ -134,9 +134,11 @@ class ExtBot(Bot, Generic[RLARGS]):
             be used if not set explicitly in the bot methods.
         arbitrary_callback_data (:obj:`bool` | :obj:`int`, optional): Whether to
             allow arbitrary objects as callback data for :class:`telegram.InlineKeyboardButton`.
-            Pass an integer to specify the maximum number of objects cached in memory. For more
-            details, please see our `wiki <https://github.com/python-telegram-bot\
-                /python-telegram-bot/wiki/Arbitrary-callback_data>`_. Defaults to :obj:`False`.
+            Pass an integer to specify the maximum number of objects cached in memory.
+            Defaults to :obj:`False`.
+
+            .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot/
+                python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
         rate_limiter (:class:`telegram.ext.BaseRateLimiter`, optional): A rate limiter to use for
             limiting the number of requests made by the bot per time interval.
 
