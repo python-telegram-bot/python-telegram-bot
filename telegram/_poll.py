@@ -155,8 +155,7 @@ class Poll(TelegramObject):
             Available only for closed polls in the quiz mode, which were sent (not
             forwarded), by the bot or to a private chat with the bot.
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
-            answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most
-            2 line feeds after entities parsing.
+            answer or taps on the lamp icon in a quiz-style poll, 0-200 characters.
         explanation_entities (List[:class:`telegram.MessageEntity`]): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
             This list is empty if the message does not contain explanation entities.
