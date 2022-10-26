@@ -131,7 +131,8 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         :attr:`~BasePersistence.bot` will be inserted back when loading the data.
 
     .. seealso:: `Making Your Bot Persistent <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_
+        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_,
+        :any:`Persistent Conversation Bot Example <examples.persistentconversationbot>`
 
     .. versionchanged:: 20.0
 

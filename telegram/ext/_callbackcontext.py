@@ -68,7 +68,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`,
         `Job Queue <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_,
+        :any:`Context Types Bot Example <examples.contexttypesbot>`,
+        :any:`Custom Webhook Bot Example <examples.customwebhookbot>`
 
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this

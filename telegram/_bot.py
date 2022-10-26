@@ -145,6 +145,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :attr:`telegram.ext.Updater.bot`,
         `Builder Pattern <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_,
+        :any:`Raw API Bot Example <examples.rawapibot>`
 
     .. versionadded:: 13.2
         Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -3530,6 +3531,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
             If you're having any trouble setting up webhooks, please check out this `guide to
             Webhooks`_.
+
+        .. seealso:: :any:`Custom Webhook Bot Example <examples.customwebhookbot>`
 
         Args:
             url (:obj:`str`): HTTPS url to send updates to. Use an empty string to remove webhook

@@ -107,6 +107,9 @@ class Update(TelegramObject):
         chosen_inline_result (:class:`telegram.ChosenInlineResult`): Optional. The result of an
             inline query that was chosen by a user.
         callback_query (:class:`telegram.CallbackQuery`): Optional. New incoming callback query.
+
+            .. seealso:: :any:`Arbitrary Callback Data Bot Example
+                <examples.arbitrarycallbackdatabot>`
         shipping_query (:class:`telegram.ShippingQuery`): Optional. New incoming shipping query.
         pre_checkout_query (:class:`telegram.PreCheckoutQuery`): Optional. New incoming
             pre-checkout query.

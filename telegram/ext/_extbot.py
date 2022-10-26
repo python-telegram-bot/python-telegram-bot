@@ -228,6 +228,9 @@ class ExtBot(Bot, Generic[RLARGS]):
         """:class:`telegram.ext.CallbackDataCache`: Optional. The cache for
         objects passed as callback data for :class:`telegram.InlineKeyboardButton`.
 
+        .. seealso:: :any:`Arbitrary Callback Data Bot Example
+            <examples.arbitrarycallbackdatabot>`
+
         .. versionchanged:: 20.0
            * This property is now read-only.
            * This property is now optional and can be :obj:`None` if

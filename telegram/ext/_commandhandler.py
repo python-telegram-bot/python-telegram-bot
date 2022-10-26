@@ -57,6 +57,9 @@ class CommandHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    .. seealso:: :any:`Timer Bot Example <examples.timerbot>`,
+        :any:`Error Handler Bot Example <examples.errorhandlerbot>`
+
     .. versionchanged:: 20.0
 
         * Renamed the attribute ``command`` to :attr:`commands`, which now is always a
