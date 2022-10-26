@@ -163,15 +163,10 @@ class Poll(TelegramObject):
 
             .. versionchanged:: 20.0
                This attribute is now always a (possibly empty) list and never :obj:`None`.
-        open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
-            after creation, 5-600. Can't be used together with :paramref:`close_date`.
-        close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
-            timestamp) when the poll will be automatically closed. Must be at least 5 and no
-            more than 600 seconds in the future. Can't be used together with
-            :paramref:`open_period`.
-            For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
-            bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
-            used.
+        open_period (:obj:`int`): Optional. Amount of time in seconds the poll will be active
+            after creation.
+        close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
+            automatically closed.
 
     """
 
