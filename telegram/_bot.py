@@ -5951,9 +5951,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 :tg-const:`telegram.Poll.REGULAR`, defaults to :tg-const:`telegram.Poll.REGULAR`.
             allows_multiple_answers (:obj:`bool`, optional): :obj:`True`, if the poll allows
                 multiple answers, ignored for polls in quiz mode, defaults to :obj:`False`.
-            correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer
-                option. Available only for closed polls in the quiz mode, which were sent (not 
-                forwarded), by the bot or to a private chat with the bot.
+            correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
+                option, required for polls in quiz mode.
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
                 answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most
                 2 line feeds after entities parsing.
