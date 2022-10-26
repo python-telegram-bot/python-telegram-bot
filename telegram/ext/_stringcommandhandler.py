@@ -57,6 +57,9 @@ class StringCommandHandler(BaseHandler[str, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
     Attributes:
         command (:obj:`str`): The command this handler should listen for.
         callback (:term:`coroutine function`): The callback function for this handler.

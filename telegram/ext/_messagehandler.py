@@ -64,6 +64,9 @@ class MessageHandler(BaseHandler[Update, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
     Attributes:
         filters (:class:`telegram.ext.filters.BaseFilter`): Only allow updates with these Filters.
             See :mod:`telegram.ext.filters` for a full list of all available filters.

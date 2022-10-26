@@ -56,6 +56,9 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
         chat_member_types (:obj:`int`, optional): Specifies if this handler should handle

@@ -105,6 +105,9 @@ class PrefixHandler(BaseHandler[Update, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
     Attributes:
         commands (FrozenSet[:obj:`str`]): The commands that this handler will listen for, i.e. the
             combinations of :paramref:`prefix` and :paramref:`command`.
