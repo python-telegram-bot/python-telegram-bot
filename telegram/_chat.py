@@ -65,8 +65,6 @@ class Chat(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
-    .. seealso:: :any:`Chat Member Bot Example <examples.chatmemberbot>`
-
     .. versionchanged:: 20.0
 
         * Removed the deprecated methods ``kick_member`` and ``get_members_count``.
