@@ -126,13 +126,18 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer option.
-            Available only for polls in the quiz mode, which are closed, or was sent (not
-            forwarded) by the bot or to the private chat with the bot.
+        correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer option.
+            Available only for closed polls in the quiz mode, which were sent (not
+            forwarded), by the bot or to a private chat with the bot.
         explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
-            answer or taps on the lamp icon in a quiz-style poll, 0-200 characters.
-        explanation_entities (List[:class:`telegram.MessageEntity`], optional): Special entities
+            answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most
+            2 line feeds after entities parsing.
+        explanation_entities (List[:class:`telegram.MessageEntity`]): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
+            This list is empty if the message does not contain explanation entities.
+
+            .. versionchanged:: 20.0
+               This attribute is now always a (possibly empty) list and never :obj:`None`.
         open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
             after creation.
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the
@@ -147,19 +152,27 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`): Optional. Identifier of the correct answer option.
-        explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
-            answer or taps on the lamp icon in a quiz-style poll.
+        correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer option.
+            Available only for closed polls in the quiz mode, which were sent (not
+            forwarded), by the bot or to a private chat with the bot.
+        explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
+            answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most
+            2 line feeds after entities parsing.
         explanation_entities (List[:class:`telegram.MessageEntity`]): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
             This list is empty if the message does not contain explanation entities.
 
             .. versionchanged:: 20.0
                This attribute is now always a (possibly empty) list and never :obj:`None`.
-        open_period (:obj:`int`): Optional. Amount of time in seconds the poll will be active
-            after creation.
-        close_date (:obj:`datetime.datetime`): Optional. Point in time when the poll will be
-            automatically closed.
+        open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
+            after creation, 5-600. Can't be used together with :paramref:`close_date`.
+        close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
+            timestamp) when the poll will be automatically closed. Must be at least 5 and no
+            more than 600 seconds in the future. Can't be used together with
+            :paramref:`open_period`.
+            For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
+            bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
+            used.
 
     """
 
