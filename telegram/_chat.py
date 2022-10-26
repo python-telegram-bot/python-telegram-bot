@@ -375,21 +375,19 @@ class Chat(TelegramObject):
             :obj:`str`: The inline mention for the chat as markdown (version 1).
 
         """
-        full_name = self.full_name
         if self.type == self.PRIVATE:
             if name:
                 return helpers_mention_markdown(self.id, name)
-            if full_name:
-                return helpers_mention_markdown(self.id, full_name)
-            raise TypeError("Can not create a link to a private chat without first name")
+            if self.full_name:
+                return helpers_mention_markdown(self.id, self.full_name)
+            raise TypeError("Can not create a mention to a private chat without first name")
         if self.username:
-            tg_link = f"https://t.me/{self.username}"
             if name:
-                return f"[{name}]({tg_link})"
-            if full_name:
-                return f"[{full_name}]({tg_link})"
-            raise TypeError("Can not create a link to a public chat without first name")
-        raise TypeError("Can not create a link to a private group chat")
+                return f"[{name}]({self.link})"
+            if self.full_name:
+                return f"[{self.full_name}]({self.link})"
+            raise TypeError("Can not create a mention to a public chat without first name")
+        raise TypeError("Can not create a mention to a private group chat")
 
     def mention_markdown_v2(self, name: str = None) -> str:
         """
@@ -402,21 +400,19 @@ class Chat(TelegramObject):
             :obj:`str`: The inline mention for the chat as markdown (version 2).
 
         """
-        full_name = self.full_name
         if self.type == self.PRIVATE:
             if name:
                 return helpers_mention_markdown(self.id, name, version=2)
-            if full_name:
-                return helpers_mention_markdown(self.id, full_name, version=2)
-            raise TypeError("Can not create a link to a private chat without first name")
+            if self.full_name:
+                return helpers_mention_markdown(self.id, self.full_name, version=2)
+            raise TypeError("Can not create a mention to a private chat without first name")
         if self.username:
-            tg_link = f"https://t.me/{self.username}"
             if name:
-                return f"[{escape_markdown(name, version=2)}]({tg_link})"
-            if full_name:
-                return f"[{escape_markdown(full_name, version=2)}]({tg_link})"
-            raise TypeError("Can not create a link to a public chat without first name")
-        raise TypeError("Can not create a link to a private group chat")
+                return f"[{escape_markdown(name, version=2)}]({self.link})"
+            if self.full_name:
+                return f"[{escape_markdown(self.full_name, version=2)}]({self.link})"
+            raise TypeError("Can not create a mention to a public chat without first name")
+        raise TypeError("Can not create a mention to a private group chat")
 
     def mention_html(self, name: str = None) -> str:
         """
@@ -429,21 +425,19 @@ class Chat(TelegramObject):
             :obj:`str`: The inline mention for the chat as HTML.
 
         """
-        full_name = self.full_name
         if self.type == self.PRIVATE:
             if name:
                 return helpers_mention_html(self.id, name)
-            if full_name:
-                return helpers_mention_html(self.id, full_name)
-            raise TypeError("Can not create a link to a private chat without first name")
+            if self.full_name:
+                return helpers_mention_html(self.id, self.full_name)
+            raise TypeError("Can not create a mention to a private chat without first name")
         if self.username:
-            tg_link = f"https://t.me/{self.username}"
             if name:
-                return f'<a href="{tg_link}">{escape(name)}</a>'
-            if full_name:
-                return f'<a href="{tg_link}">{escape(full_name)}</a>'
-            raise TypeError("Can not create a link to a public chat without first name")
-        raise TypeError("Can not create a link to a private group chat")
+                return f'<a href="{self.link}">{escape(name)}</a>'
+            if self.full_name:
+                return f'<a href="{self.link}">{escape(self.full_name)}</a>'
+            raise TypeError("Can not create a mention to a public chat without first name")
+        raise TypeError("Can not create a mention to a private group chat")
 
     async def leave(
         self,

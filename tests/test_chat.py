@@ -882,7 +882,7 @@ class TestChat:
         assert await chat.decline_join_request(user_id=42)
 
     def test_mention_html(self):
-        with pytest.raises(TypeError, match="Can not create a link to a private group chat"):
+        with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
             chat = Chat(id=1, type="foo")
             chat.mention_html()
 
@@ -893,7 +893,7 @@ class TestChat:
         assert chat.mention_html("the_name*\u2022") == expected.format(chat.id, "the_name*\u2022")
         assert chat.mention_html() == expected.format(chat.id, chat.full_name)
         with pytest.raises(
-            TypeError, match="Can not create a link to a private chat without first name"
+            TypeError, match="Can not create a mention to a private chat without first name"
         ):
             chat = Chat(id=1, type=Chat.PRIVATE, last_name="last\u2022name")
             chat.mention_html()
@@ -911,13 +911,13 @@ class TestChat:
         )
         assert chat.mention_html() == expected.format(chat.username, chat.full_name)
         with pytest.raises(
-            TypeError, match="Can not create a link to a public chat without first name"
+            TypeError, match="Can not create a mention to a public chat without first name"
         ):
             chat = Chat(id=1, type="foo", username="user\u2022name")
             chat.mention_html()
 
     def test_mention_markdown(self):
-        with pytest.raises(TypeError, match="Can not create a link to a private group chat"):
+        with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
             chat = Chat(id=1, type="foo")
             chat.mention_markdown()
 
@@ -930,7 +930,7 @@ class TestChat:
         )
         assert chat.mention_markdown() == expected.format(chat.full_name, chat.id)
         with pytest.raises(
-            TypeError, match="Can not create a link to a private chat without first name"
+            TypeError, match="Can not create a mention to a private chat without first name"
         ):
             chat = Chat(id=1, type=Chat.PRIVATE, last_name="last\u2022name")
             chat.mention_markdown()
@@ -948,13 +948,13 @@ class TestChat:
         )
         assert chat.mention_markdown() == expected.format(chat.full_name, chat.username)
         with pytest.raises(
-            TypeError, match="Can not create a link to a public chat without first name"
+            TypeError, match="Can not create a mention to a public chat without first name"
         ):
             chat = Chat(id=1, type="foo", username="user\u2022name")
             chat.mention_markdown()
 
     def test_mention_markdown_v2(self):
-        with pytest.raises(TypeError, match="Can not create a link to a private group chat"):
+        with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
             chat = Chat(id=1, type="foo")
             chat.mention_markdown_v2()
 
@@ -967,7 +967,7 @@ class TestChat:
             escape_markdown(chat.full_name, version=2), chat.id
         )
         with pytest.raises(
-            TypeError, match="Can not create a link to a private chat without first name"
+            TypeError, match="Can not create a mention to a private chat without first name"
         ):
             chat = Chat(id=1, type=Chat.PRIVATE, last_name="last_name")
             chat.mention_markdown_v2()
@@ -987,7 +987,7 @@ class TestChat:
             escape_markdown(chat.full_name, version=2), chat.username
         )
         with pytest.raises(
-            TypeError, match="Can not create a link to a public chat without first name"
+            TypeError, match="Can not create a mention to a public chat without first name"
         ):
             chat = Chat(id=1, type="foo", username="user{name")
             chat.mention_markdown_v2()
