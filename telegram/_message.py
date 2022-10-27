@@ -215,6 +215,8 @@ class Message(TelegramObject):
             of the post author if present.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
+        forward_sender_name (:obj:`str`, optional): Sender's name for messages forwarded from
+            users who disallow adding a link to their account in forwarded messages.
         passport_data (:class:`telegram.PassportData`, optional): Telegram Passport data.
         poll (:class:`telegram.Poll`, optional): Message is a native poll,
             information about the poll.
@@ -267,6 +269,8 @@ class Message(TelegramObject):
             or from anonymous administrators, information about the original sender chat.
         forward_from_message_id (:obj:`int`): Optional. For forwarded channel posts, identifier of
             the original message in the channel.
+        forward_sender_name (:obj:`str`): Optional. Sender's name for messages forwarded from
+            users who disallow adding a link to their account in forwarded messages.
         forward_date (:class:`datetime.datetime`): Optional. For forwarded messages, date the
             original message was sent in Unix time. Converted to :class:`datetime.datetime`.
         is_automatic_forward (:obj:`bool`): Optional. :obj:`True`, if the message is a channel
@@ -360,10 +364,10 @@ class Message(TelegramObject):
             has logged in.
         forward_signature (:obj:`str`): Optional. For messages forwarded from channels, signature
             of the post author if present.
-        forward_sender_name (:obj:`str`): Optional. Sender's name for messages forwarded from
-            users who disallow adding a link to their account in forwarded messages.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
+        forward_sender_name (:obj:`str`): Optional. Sender's name for messages forwarded from
+            users who disallow adding a link to their account in forwarded messages.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
