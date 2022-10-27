@@ -161,9 +161,6 @@ class BaseFilter:
     will be the class name. If you want to overwrite this assign a better name to the :attr:`name`
     class variable.
 
-    .. seealso:: `Your First Bot <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
-
     .. versionadded:: 20.0
         Added the arguments :attr:`name` and :attr:`data_filter`.
 

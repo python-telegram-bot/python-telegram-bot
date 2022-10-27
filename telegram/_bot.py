@@ -143,6 +143,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     .. seealso:: :attr:`telegram.ext.Application.bot`,
         :attr:`telegram.ext.CallbackContext.bot`,
         :attr:`telegram.ext.Updater.bot`,
+        `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
         `Builder Pattern <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_,
         :any:`Raw API Bot Example <examples.rawapibot>`
@@ -2623,8 +2625,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :paramref:`telegram.InlineQuery.answer.auto_pagination` set to :obj:`True`, which will
             take care of passing the correct value.
 
-        .. seealso:: :attr:`telegram.InlineQuery.answer`, `Your First Bot <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+        .. seealso:: :attr:`telegram.InlineQuery.answer`
 
         Args:
             inline_query_id (:obj:`str`): Unique identifier for the answered query.

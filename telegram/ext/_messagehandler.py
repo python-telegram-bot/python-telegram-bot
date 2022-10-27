@@ -40,9 +40,6 @@ class MessageHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. seealso:: `Advanced Filters <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
-
     Args:
         filters (:class:`telegram.ext.filters.BaseFilter`): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
@@ -52,6 +49,9 @@ class MessageHandler(BaseHandler[Update, CCT]):
             :attr:`telegram.Update.channel_post` and :attr:`telegram.Update.edited_channel_post`.
             If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
             argument.
+
+            .. seealso:: `Advanced Filters <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::

@@ -135,6 +135,8 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
     .. seealso:: `Your First Bot <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+        `Architecture Overview <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
         :any:`Echobot Example <examples.echobot>`
 
     .. versionchanged:: 20.0
@@ -1071,11 +1073,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             to be loaded into memory while the application is already processing updates, which
             might lead to race conditions and undesired behavior. In particular, current
             conversation states may be overridden by the loaded data.
-
-        .. seealso:: `Your First Bot <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
-            `Architecture Overview <https://github.com/\
-            python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
 
         Args:
             handler (:class:`telegram.ext.BaseHandler`): A BaseHandler instance.
