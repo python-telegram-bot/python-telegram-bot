@@ -361,18 +361,22 @@ class Chat(TelegramObject):
 
     def mention_markdown(self, name: str = None) -> str:
         """
-        .. versionadded:: 20.0
-
         Note:
             :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
             Telegram for backward compatibility. You should use :meth:`mention_markdown_v2`
             instead.
+
+        .. versionadded:: 20.0
 
         Args:
             name (:obj:`str`): The name used as a link for the chat. Defaults to :attr:`full_name`.
 
         Returns:
             :obj:`str`: The inline mention for the chat as markdown (version 1).
+
+        Raises:
+            :exc:`TypeError`: If chat is a private group or neither :paramref:`name` nor :attr:`first_name`
+                is set.
 
         """
         if self.type == self.PRIVATE:
@@ -399,6 +403,10 @@ class Chat(TelegramObject):
         Returns:
             :obj:`str`: The inline mention for the chat as markdown (version 2).
 
+        Raises:
+            :exc:`TypeError`: If chat is a private group or neither :paramref:`name` nor :attr:`first_name`
+                is set.
+
         """
         if self.type == self.PRIVATE:
             if name:
@@ -423,6 +431,10 @@ class Chat(TelegramObject):
 
         Returns:
             :obj:`str`: The inline mention for the chat as HTML.
+
+        Raises:
+            :exc:`TypeError`: If chat is a private group or neither :paramref:`name` nor :attr:`first_name`
+                is set.
 
         """
         if self.type == self.PRIVATE:
