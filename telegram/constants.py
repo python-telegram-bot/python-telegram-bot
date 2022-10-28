@@ -654,6 +654,8 @@ class MessageLimit(IntEnum):
     """:obj:`int`: Maximum number of characters for a text message."""
     CAPTION_LENGTH = 1024
     """:obj:`int`: Maximum number of characters for a message caption."""
+    DEEP_LINK_LENGTH = 64
+    """:obj:`int`: Maximum number of characters for a deep link."""
     # constants above this line are tested
     MESSAGE_ENTITIES = 100
     """:obj:`int`: Maximum number of entities that can be displayed in a message. Further entities
