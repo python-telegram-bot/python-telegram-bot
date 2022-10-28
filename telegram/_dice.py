@@ -61,7 +61,8 @@ class Dice(TelegramObject):
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     Attributes:
-        value (:obj:`int`): Value of the dice.
+        value (:obj:`int`): Value of the dice. 1-6 for dice, darts and bowling balls, 1-5 for
+            basketball and football/soccer ball, 1-64 for slot machine.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     """
