@@ -47,6 +47,7 @@ from telegram import (
     InlineQueryResultVoice,
     InputFile,
     InputMedia,
+    InputMessageContent,
     InputTextMessageContent,
     LabeledPrice,
     MenuButton,
@@ -64,7 +65,7 @@ from telegram import (
     WebAppInfo,
 )
 from telegram._utils.datetime import from_timestamp, to_timestamp
-from telegram._utils.defaultvalue import DefaultValue
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram.constants import ChatAction, InlineQueryLimit, MenuButtonType, ParseMode
 from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
@@ -165,6 +166,27 @@ def bot_methods(ext_bot=True):
     return pytest.mark.parametrize(
         argnames="bot_class, bot_method_name,bot_method", argvalues=arg_values, ids=ids
     )
+
+
+class InputMessageContentDWPP(InputMessageContent):
+    """
+    This is here to cover the case of InputMediaContent classes in testing answer_ilq that have
+    `disable_web_page_preview` but not `parse_mode`. Unlikely to ever happen, but better be save
+    than sorry …
+    """
+
+    __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")
+
+    def __init__(
+        self,
+        message_text: str,
+        disable_web_page_preview=DEFAULT_NONE,
+        *,
+        api_kwargs=None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.message_text = message_text
+        self.disable_web_page_preview = disable_web_page_preview
 
 
 class TestBot:
@@ -1030,7 +1052,7 @@ class TestBot:
 
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputTextMessageContent("second")),
+            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
@@ -1114,7 +1136,7 @@ class TestBot:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputTextMessageContent("second")),
+            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
@@ -1151,7 +1173,11 @@ class TestBot:
                     copied_results[idx].input_message_content, "disable_web_page_preview", None
                 )
 
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        indirect=True,
+    )
     async def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters == {
@@ -1164,6 +1190,7 @@ class TestBot:
                         "input_message_content": {
                             "message_text": "first",
                             "parse_mode": "Markdown",
+                            "disable_web_page_preview": True,
                         },
                     },
                     {
@@ -1172,7 +1199,7 @@ class TestBot:
                         "type": "article",
                         "input_message_content": {
                             "message_text": "second",
-                            "parse_mode": "Markdown",
+                            "disable_web_page_preview": True,
                         },
                     },
                     {
@@ -1197,7 +1224,7 @@ class TestBot:
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputTextMessageContent("second")),
+            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
