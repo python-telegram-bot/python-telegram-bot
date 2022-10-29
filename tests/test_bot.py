@@ -1041,6 +1041,7 @@ class TestBot:
                         "/logos/master/logo/png/ptb-logo_240.png",
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
+                        "input_message_content": {"message_text": "imc"},
                     },
                 ],
                 "next_offset": "42",
@@ -1060,6 +1061,7 @@ class TestBot:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
+                input_message_content=InputMessageContentDWPP("imc"),
             ),
         ]
 
@@ -1123,6 +1125,7 @@ class TestBot:
                         "ptb-logo_240.png",
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
+                        "input_message_content": {"message_text": "imc"},
                     },
                 ],
                 "next_offset": "42",
@@ -1143,6 +1146,7 @@ class TestBot:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
+                input_message_content=InputMessageContentDWPP("imc"),
             ),
         ]
 
@@ -1210,6 +1214,11 @@ class TestBot:
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "parse_mode": "Markdown",
+                        "input_message_content": {
+                            "message_text": "imc",
+                            "disable_web_page_preview": True,
+                            "parse_mode": "Markdown",
+                        },
                     },
                 ],
                 "next_offset": "42",
@@ -1230,6 +1239,7 @@ class TestBot:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
+                input_message_content=InputTextMessageContent("imc"),
             ),
         ]
 
