@@ -301,6 +301,8 @@ class TestTelegramObject:
                         "command_2", "description_2"
                     )
                 }
+                self.empty_tuple_attrs = ()
+                self.empty_str_attribute = ""
                 # Should not be included in string representation
                 self.none_attr = None
 
@@ -325,4 +327,4 @@ class TestTelegramObject:
             "description='description'))"
         )
         assert str(TGO(api_kwargs={"foo": "bar"})) == expected_with_api_kwargs
-        assert str(TGO(api_kwargs={"foo": "bar"})) == expected_with_api_kwargs
+        assert repr(TGO(api_kwargs={"foo": "bar"})) == expected_with_api_kwargs
