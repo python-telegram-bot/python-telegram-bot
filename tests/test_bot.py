@@ -1084,7 +1084,6 @@ class TestBot:
             assert results == copied_results
             for idx, result in enumerate(results):
                 if hasattr(result, "parse_mode"):
-                    print(type(result.parse_mode), type(copied_results[idx].parse_mode))
                     assert result.parse_mode == copied_results[idx].parse_mode
                 if hasattr(result, "input_message_content"):
                     assert getattr(result.input_message_content, "parse_mode", None) == getattr(
@@ -1161,7 +1160,6 @@ class TestBot:
         assert results == copied_results
         for idx, result in enumerate(results):
             if hasattr(result, "parse_mode"):
-                print(type(result.parse_mode), type(copied_results[idx].parse_mode))
                 assert result.parse_mode == copied_results[idx].parse_mode
             if hasattr(result, "input_message_content"):
                 assert getattr(result.input_message_content, "parse_mode", None) == getattr(
@@ -1249,7 +1247,6 @@ class TestBot:
         assert results == copied_results
         for idx, result in enumerate(results):
             if hasattr(result, "parse_mode"):
-                print(type(result.parse_mode), type(copied_results[idx].parse_mode))
                 assert result.parse_mode == copied_results[idx].parse_mode
             if hasattr(result, "input_message_content"):
                 assert getattr(result.input_message_content, "parse_mode", None) == getattr(
