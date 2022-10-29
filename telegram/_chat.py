@@ -383,9 +383,7 @@ class Chat(TelegramObject):
         if self.username:
             if name:
                 return f"[{escape_markdown(name, version=2)}]({self.link})"
-            if self.full_name:
-                return f"[{escape_markdown(self.full_name, version=2)}]({self.link})"
-            raise TypeError("Can not create a mention to a public chat without first name")
+            return f"[{escape_markdown(self.username, version=2)}]({self.link})"
         raise TypeError("Can not create a mention to a private group chat")
 
     def mention_html(self, name: str = None) -> str:
@@ -412,9 +410,7 @@ class Chat(TelegramObject):
         if self.username:
             if name:
                 return f'<a href="{self.link}">{escape(name)}</a>'
-            if self.full_name:
-                return f'<a href="{self.link}">{escape(self.full_name)}</a>'
-            raise TypeError("Can not create a mention to a public chat without first name")
+            return f'<a href="{self.link}">{escape(self.username)}</a>'
         raise TypeError("Can not create a mention to a private group chat")
 
     async def leave(

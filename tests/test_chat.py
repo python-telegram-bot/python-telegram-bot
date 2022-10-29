@@ -909,12 +909,7 @@ class TestChat:
         assert chat.mention_html("the_name*\u2022") == expected.format(
             chat.username, "the_name*\u2022"
         )
-        assert chat.mention_html() == expected.format(chat.username, chat.full_name)
-        with pytest.raises(
-            TypeError, match="Can not create a mention to a public chat without first name"
-        ):
-            chat = Chat(id=1, type="foo", username="user\u2022name")
-            chat.mention_html()
+        assert chat.mention_html() == expected.format(chat.username, chat.username)
 
     def test_mention_markdown_v2(self):
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
@@ -947,13 +942,8 @@ class TestChat:
             "the\\{name\\>\u2022", chat.username
         )
         assert chat.mention_markdown_v2() == expected.format(
-            escape_markdown(chat.full_name, version=2), chat.username
+            escape_markdown(chat.username, version=2), chat.username
         )
-        with pytest.raises(
-            TypeError, match="Can not create a mention to a public chat without first name"
-        ):
-            chat = Chat(id=1, type="foo", username="user{name")
-            chat.mention_markdown_v2()
 
     def test_equality(self):
         a = Chat(self.id_, self.title, self.type_)
