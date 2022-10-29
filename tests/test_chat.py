@@ -916,43 +916,6 @@ class TestChat:
             chat = Chat(id=1, type="foo", username="user\u2022name")
             chat.mention_html()
 
-    def test_mention_markdown(self):
-        with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
-            chat = Chat(id=1, type="foo")
-            chat.mention_markdown()
-
-        expected = "[{}](tg://user?id={})"
-        chat = Chat(
-            id=1, type=Chat.PRIVATE, first_name="first\u2022name", last_name="last\u2022name"
-        )
-        assert chat.mention_markdown("the_name*\u2022") == expected.format(
-            "the_name*\u2022", chat.id
-        )
-        assert chat.mention_markdown() == expected.format(chat.full_name, chat.id)
-        with pytest.raises(
-            TypeError, match="Can not create a mention to a private chat without first name"
-        ):
-            chat = Chat(id=1, type=Chat.PRIVATE, last_name="last\u2022name")
-            chat.mention_markdown()
-
-        expected = "[{}](https://t.me/{})"
-        chat = Chat(
-            id=1,
-            type="foo",
-            first_name="first\u2022name",
-            last_name="last\u2022name",
-            username="user\u2022name",
-        )
-        assert chat.mention_markdown("the_name*\u2022") == expected.format(
-            "the_name*\u2022", chat.username
-        )
-        assert chat.mention_markdown() == expected.format(chat.full_name, chat.username)
-        with pytest.raises(
-            TypeError, match="Can not create a mention to a public chat without first name"
-        ):
-            chat = Chat(id=1, type="foo", username="user\u2022name")
-            chat.mention_markdown()
-
     def test_mention_markdown_v2(self):
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
             chat = Chat(id=1, type="foo")
