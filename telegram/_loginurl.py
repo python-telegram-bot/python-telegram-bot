@@ -69,7 +69,7 @@ class LoginUrl(TelegramObject):
         bot_username (:obj:`str`): Optional. Username of a bot, which will be used for user
             authorization. See
             `Setting up a bot <https://core.telegram.org/widgets/login#setting-up-a-bot>`_
-            for more details. If not specified, the current
+            for more details. If it was not specified, the current
             bot's username will be assumed. The url's domain must be the same as the domain linked
             with the bot. See
             `Linking your domain to the bot
