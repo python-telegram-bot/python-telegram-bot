@@ -21,7 +21,7 @@ import inspect
 import json
 from copy import deepcopy
 from itertools import chain
-from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, Sized, Tuple, Type, TypeVar, Union
 
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -52,6 +52,9 @@ class TelegramObject:
         * Removed argument and attribute ``bot`` for several subclasses. Use
           :meth:`set_bot` and :meth:`get_bot` instead.
         * Removed the possibility to pass arbitrary keyword arguments for several subclasses.
+        * String representations objects of this type was overhauled. See :meth:`__repr__` for
+          details. As this class doesn't implement :meth:`object.__str__`, the default
+          implementation will be used, which is equivalent to :meth:`__repr__`.
 
     Arguments:
         api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|
@@ -100,8 +103,40 @@ class TelegramObject:
             if getattr(self, key, True) is None:
                 setattr(self, key, self.api_kwargs.pop(key))
 
-    def __str__(self) -> str:
-        return str(self.to_dict())
+    def __repr__(self) -> str:
+        """Gives a string representation of this object in the form
+        ``ClassName(attr_1=value_1, attr_2=value_2, ...)``, where attributes are omitted if they
+        have the value :obj:`None` or empty instances of :class:`collections.abc.Sized` (e.g.
+        :class:`list`, :class:`dict`, :class:`set`, :class:`str`, etc.).
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        # * `__repr__` goal is to be unambiguous
+        # * `__str__` goal is to be readable
+        # * `str()` calls `__repr__`, if `__str__` is not defined
+        # In our case "unambiguous" and "readable" largely coincide, so we can use the same logic.
+        as_dict = self._get_attrs(recursive=False, include_private=False)
+
+        if not self.api_kwargs:
+            # Drop api_kwargs from the representation, if empty
+            as_dict.pop("api_kwargs", None)
+
+        contents = ", ".join(
+            f"{k}={as_dict[k]!r}"
+            for k in sorted(as_dict.keys())
+            if (
+                as_dict[k] is not None
+                and not (
+                    isinstance(as_dict[k], Sized)
+                    and len(as_dict[k]) == 0  # type: ignore[arg-type]
+                )
+            )
+        )
+        return f"{self.__class__.__name__}({contents})"
 
     def __getitem__(self, item: str) -> object:
         if item == "from":
