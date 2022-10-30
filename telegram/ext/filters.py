@@ -546,7 +546,8 @@ class CaptionEntity(MessageFilter):
 
 class CaptionRegex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of :paramref:`pattern` in the message caption.
+    Filters updates by searching for an occurrence of :paramref:`~CaptionRegex.pattern` in the
+    message caption.
 
     This filter works similarly to :class:`Regex`, with the only exception being that
     it applies to the message caption instead of the text.
@@ -1501,7 +1502,8 @@ POLL = _Poll(name="filters.POLL")
 
 class Regex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of :paramref:`pattern` in the message text.
+    Filters updates by searching for an occurrence of :paramref:`~Regex.pattern` in the message
+    text.
     The :func:`re.search` function is used to determine whether an update should be filtered.
 
     Refer to the documentation of the :obj:`re` module for more information.

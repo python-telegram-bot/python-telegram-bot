@@ -115,7 +115,7 @@ def main() -> None:
     application = Application.builder().token("TOKEN").build()
 
     # More info on what deep linking actually is (read this first if it's unclear to you):
-    # https://core.telegram.org/bots#deep-linking
+    # https://core.telegram.org/bots/features#deep-linking
 
     # Register a deep-linking handler
     application.add_handler(
