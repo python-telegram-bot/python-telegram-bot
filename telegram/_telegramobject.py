@@ -402,8 +402,8 @@ class TelegramObject:
 
     def __eq__(self, other: object) -> bool:
         """Compares this object with :paramref:`other` in terms of equality.
-        If this object and :paramref:`object` are `not` objects of the same class,
-        this comparison will fall back to Pythons default implementation of :meth:`object.__eq__`.
+        If this object and :paramref:`other` are `not` objects of the same class,
+        this comparison will fall back to Python's default implementation of :meth:`object.__eq__`.
         Otherwise, both objects may be compared in terms of equality, if the corresponding
         subclass of :class:`TelegramObject` has defined a set of attributes to compare and
         the objects are considered to be equal, if all of these attributes are equal.
