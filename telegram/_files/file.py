@@ -133,7 +133,8 @@ class File(TelegramObject):
             If :paramref:`custom_path` isn't provided and :attr:`file_path` is the path of a
               local file (which is the case when a Bot API Server is running in local mode), this
               method will just return the path.
-            If, however, :attr:`telegram.PassportFile.get_file` is the source of this object,
+            The only exception to this are encrypted files (e.g. a passort files).
+            For these, a file with the prefix `decrypted_` will be created in the same directory as the original file in order …
               `decrypted_` will be prepended to the file, in order to decrypt the file without
               changing the existing one in-place.
 
