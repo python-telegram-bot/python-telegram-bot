@@ -233,5 +233,5 @@ class InlineKeyboardButton(TelegramObject):
         """
         self._unfreeze()
         self.callback_data = callback_data
-        self._freeze()
         self._set_id_attrs()
+        self._freeze()

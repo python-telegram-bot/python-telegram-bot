@@ -437,15 +437,12 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             if persistent_data is not None:
                 if not isinstance(persistent_data, tuple) or len(persistent_data) != 2:
                     raise ValueError("callback_data must be a tuple of length 2")
-                self.bot._unfreeze()  # pylint: disable=protected-access
 
                 # Mypy doesn't know that persistence.set_bot (see above) already checks that
                 # self.bot is an instance of ExtBot if callback_data should be stored ...
                 self.bot.callback_data_cache.load_persistence_data(  # type: ignore[attr-defined]
                     persistent_data
                 )
-
-                self.bot._freeze()  # pylint: disable=protected-access
 
     @staticmethod
     def builder() -> "InitApplicationBuilder":
