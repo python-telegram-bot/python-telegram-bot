@@ -6363,8 +6363,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     ) -> bool:
         """
         Use this method to change the list of the bot's commands. See the
-        `Telegram docs <https://core.telegram.org/bots#commands>`_ for more details about bot
-        commands.
+        `Telegram docs <https://core.telegram.org/bots/features#commands>`_ for more details about
+        bot commands.
 
         Args:
             commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list

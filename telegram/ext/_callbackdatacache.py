@@ -103,7 +103,7 @@ class CallbackDataCache:
         python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
         `Arbitrary callback_data <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_,
-        `Arbitrary Callback Data Example <examples.arbitrarycallbackdatabot.html>`_
+        :any:`Arbitrary Callback Data Example <examples.arbitrarycallbackdatabot>`
 
     .. versionadded:: 13.6
 
