@@ -56,13 +56,15 @@ class Dice(TelegramObject):
         However, this behaviour is undocumented and might be changed by Telegram.
 
     Args:
-        value (:obj:`int`): Value of the dice. 1-6 for dice, darts and bowling balls, 1-5 for
-            basketball and football/soccer ball, 1-64 for slot machine.
+        value (:obj:`int`): Value of dice. telegram.constants.DiceValueRange.DICE for dice, darts and
+            bowling balls, telegram.constants.DiceValueRange.BASKETBALL for basketball and football/soccer ball,
+            telegram.constants.DiceValueRange.SLOT_MACHINE for slot machine.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     Attributes:
-        value (:obj:`int`): Value of the dice. 1-6 for dice, darts and bowling balls, 1-5 for
-            basketball and football/soccer ball, 1-64 for slot machine.
+        value (:obj:`int`): Value of dice. telegram.constants.DiceValueRange.DICE for dice, darts and
+            bowling balls, telegram.constants.DiceValueRange.BASKETBALL for basketball and football/soccer ball,
+            telegram.constants.DiceValueRange.SLOT_MACHINE for slot machine.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     """

@@ -322,6 +322,24 @@ class DiceEmoji(StringEnum):
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎳``."""
 
 
+class DiceValueRange(IntEnum):
+    """This enum contains the values for :class:`telegram.Dice`/
+    :meth:`telegram.Bot.send_dice`. The
+    enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    DICE = range(1,7)
+    """:obj:`int`: A :class:`telegram.Dice` with the value  1-6."""
+    BASKETBALL = range(1,5)
+    """:obj:`int`: A :class:`telegram.Dice` with the value  1-5."""
+    SLOT_MACHINE = range(1,65)
+    """:obj:`int`: A :class:`telegram.Dice` with the value  1-64."""
+
+
 class FileSizeLimit(IntEnum):
     """This enum contains limitations regarding the upload and download of files. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
