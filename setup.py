@@ -119,10 +119,6 @@ def get_setup_kwargs(raw=False):
 
 def avoid_common_setup_errors(raw=False):
     # This runs before the setup, trying to catch common setup errors
-
-    # check if ptb package exists
-    # import telegram (DOUBLE CHECK with telegram.py or telegram folder)
-    # if yes, check if ModuleNotFoundError == httpx
     try:
         get_distribution("telegram")
         print(
