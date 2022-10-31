@@ -59,6 +59,11 @@ class Updater(AbstractAsyncContextManager):
         finally:
             await updater.shutdown()
 
+    .. seealso:: `Architecture Overview <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
+        `Builder Pattern <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+
     .. versionchanged:: 20.0
 
         * Removed argument and attribute ``user_sig_handler``
@@ -377,6 +382,9 @@ class Updater(AbstractAsyncContextManager):
         ``http://listen:port/url_path``, so SSL can be handled by another
         application. Else, the webhook will be started on
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as required.
+
+        .. seealso:: `Webhooks <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_
 
         .. versionchanged:: 13.4
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass

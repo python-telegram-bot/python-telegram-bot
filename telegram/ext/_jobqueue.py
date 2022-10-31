@@ -42,9 +42,12 @@ class JobQueue:
 
     .. seealso:: :attr:`telegram.ext.Application.job_queue`,
         :attr:`telegram.ext.CallbackContext.job_queue`,
-        :any:`Timerbot Example <examples.timerbot>`,
+        `Architecture Overview <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
         `Job Queue <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_,
+        :any:`Timerbot Example <examples.timerbot>`
+
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
 
@@ -606,6 +609,9 @@ class Job:
     Warning:
         This class should not be instantiated manually.
         Use the methods of :class:`telegram.ext.JobQueue` to schedule jobs.
+
+    .. seealso:: `Job Queue <https://github.com/python-telegram-bot/
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
 
     .. versionchanged:: 20.0
 

@@ -231,6 +231,9 @@ class MessageFilter(BaseFilter):
 
     Please see :class:`BaseFilter` for details on how to create custom filters.
 
+    .. seealso:: `Advanced Filters <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
+
     Attributes:
         name (:obj:`str`): Name for this filter. Defaults to the type of filter.
         data_filter (:obj:`bool`): Whether this filter is a data filter. A data filter should
@@ -546,7 +549,8 @@ class CaptionEntity(MessageFilter):
 
 class CaptionRegex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of :paramref:`pattern` in the message caption.
+    Filters updates by searching for an occurrence of :paramref:`~CaptionRegex.pattern` in the
+    message caption.
 
     This filter works similarly to :class:`Regex`, with the only exception being that
     it applies to the message caption instead of the text.
@@ -1501,7 +1505,8 @@ POLL = _Poll(name="filters.POLL")
 
 class Regex(MessageFilter):
     """
-    Filters updates by searching for an occurrence of :paramref:`pattern` in the message text.
+    Filters updates by searching for an occurrence of :paramref:`~Regex.pattern` in the message
+    text.
     The :func:`re.search` function is used to determine whether an update should be filtered.
 
     Refer to the documentation of the :obj:`re` module for more information.
@@ -1524,6 +1529,9 @@ class Regex(MessageFilter):
 
         With a :attr:`telegram.Message.text` of `x`, will only ever return the matches for the
         first filter, since the second one is never evaluated.
+
+    .. seealso:: `Types of Handlers <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
 
     Args:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.

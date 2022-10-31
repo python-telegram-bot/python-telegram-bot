@@ -54,6 +54,9 @@ class BaseHandler(Generic[UT, CCT], ABC):
            also used for the mentioned method arguments. That way, a type checker can check whether
            this handler fits the definition of the :class:`~Application`.
 
+    .. seealso:: `Types of Handlers <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Types-of-Handlers>`_
+
     .. versionchanged:: 20.0
 
         * The attribute ``run_async`` is now :paramref:`block`.
@@ -71,6 +74,9 @@ class BaseHandler(Generic[UT, CCT], ABC):
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
