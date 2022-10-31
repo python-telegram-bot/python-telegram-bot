@@ -24,7 +24,7 @@ from pathlib import Path
 
 import pytest
 
-from telegram import Bot, Chat, Message, PhotoSize, TelegramObject, User
+from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
 
 
 def all_subclasses(cls):
@@ -284,3 +284,47 @@ class TestTelegramObject:
         assert d._private == s._private  # Can't test for identity since two equal strings is True
         assert d._bot == s._bot and d._bot is s._bot
         assert d.normal == s.normal
+
+    def test_string_representation(self):
+        class TGO(TelegramObject):
+            def __init__(self, api_kwargs=None):
+                super().__init__(api_kwargs=api_kwargs)
+                self.string_attr = "string"
+                self.int_attr = 42
+                self.to_attr = BotCommand("command", "description")
+                self.list_attr = [
+                    BotCommand("command_1", "description_1"),
+                    BotCommand("command_2", "description_2"),
+                ]
+                self.dict_attr = {
+                    BotCommand("command_1", "description_1"): BotCommand(
+                        "command_2", "description_2"
+                    )
+                }
+                self.empty_tuple_attrs = ()
+                self.empty_str_attribute = ""
+                # Should not be included in string representation
+                self.none_attr = None
+
+        expected_without_api_kwargs = (
+            "TGO(dict_attr={BotCommand(command='command_1', description='description_1'): "
+            "BotCommand(command='command_2', description='description_2')}, int_attr=42, "
+            "list_attr=[BotCommand(command='command_1', description='description_1'), "
+            "BotCommand(command='command_2', description='description_2')], "
+            "string_attr='string', to_attr=BotCommand(command='command', "
+            "description='description'))"
+        )
+        assert str(TGO()) == expected_without_api_kwargs
+        assert repr(TGO()) == expected_without_api_kwargs
+
+        expected_with_api_kwargs = (
+            "TGO(api_kwargs={'foo': 'bar'}, dict_attr={BotCommand(command='command_1', "
+            "description='description_1'): BotCommand(command='command_2', "
+            "description='description_2')}, int_attr=42, "
+            "list_attr=[BotCommand(command='command_1', description='description_1'), "
+            "BotCommand(command='command_2', description='description_2')], "
+            "string_attr='string', to_attr=BotCommand(command='command', "
+            "description='description'))"
+        )
+        assert str(TGO(api_kwargs={"foo": "bar"})) == expected_with_api_kwargs
+        assert repr(TGO(api_kwargs={"foo": "bar"})) == expected_with_api_kwargs
