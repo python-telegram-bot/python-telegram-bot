@@ -27,7 +27,6 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pytest
-import pytz
 from httpx import AsyncClient, Response
 
 from telegram import (
@@ -83,6 +82,11 @@ def env_var_2_bool(env_var: object) -> bool:
     if not isinstance(env_var, str):
         return False
     return env_var.lower().strip() == "true"
+
+
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+if TEST_WITH_OPT_DEPS:
+    import pytz
 
 
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be
@@ -266,7 +270,7 @@ def make_bot(bot_info=None, **kwargs):
     kwargs.pop("token", None)
     _bot = DictExtBot(
         token=token,
-        private_key=private_key,
+        private_key=private_key if TEST_WITH_OPT_DEPS else None,
         request=TestHttpxRequest(8),
         get_updates_request=TestHttpxRequest(1),
         **kwargs,
@@ -391,9 +395,25 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
+class BasicTimezone(datetime.tzinfo):
+    def __init__(self, offset, name):
+        self.offset = offset
+        self.name = name
+
+    def utcoffset(self, dt):
+        return self.offset
+
+    def dst(self, dt):
+        return datetime.timedelta(0)
+
+
 @pytest.fixture(params=["Europe/Berlin", "Asia/Singapore", "UTC"])
 def tzinfo(request):
-    return pytz.timezone(request.param)
+    if TEST_WITH_OPT_DEPS:
+        return pytz.timezone(request.param)
+    else:
+        hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
+        return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
 
 
 @pytest.fixture()

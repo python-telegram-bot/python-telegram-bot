@@ -20,7 +20,6 @@ import datetime
 import inspect
 
 import pytest
-import pytz
 
 from telegram import (
     Chat,
@@ -32,7 +31,7 @@ from telegram import (
     ChatMemberUpdated,
     User,
 )
-from telegram._utils.datetime import to_timestamp
+from telegram._utils.datetime import UTC, to_timestamp
 
 
 @pytest.fixture(scope="class")
@@ -69,7 +68,7 @@ def new_chat_member(user):
 
 @pytest.fixture(scope="class")
 def time():
-    return datetime.datetime.now(tz=pytz.utc)
+    return datetime.datetime.now(tz=UTC)
 
 
 @pytest.fixture(scope="class")

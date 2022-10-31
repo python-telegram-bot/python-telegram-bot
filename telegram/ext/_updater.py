@@ -28,7 +28,13 @@ from typing import TYPE_CHECKING, Callable, Coroutine, List, Optional, Type, Typ
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
-from telegram.ext._utils.webhookhandler import WebhookAppClass, WebhookServer
+
+try:
+    from telegram.ext._utils.webhookhandler import WebhookAppClass, WebhookServer
+
+    WEBHOOKS_AVAILABLE = True
+except ImportError:
+    WEBHOOKS_AVAILABLE = False
 
 if TYPE_CHECKING:
     from telegram import Bot
@@ -378,12 +384,22 @@ class Updater(AbstractAsyncContextManager):
         application. Else, the webhook will be started on
         ``https://listen:port/url_path``. Also calls :meth:`telegram.Bot.set_webhook` as required.
 
+        Important:
+            If you want to use this method, you must install PTB with the optional requirement
+            ``webhooks``, i.e.
+
+            .. code-block:: bash
+
+               pip install python-telegram-bot[webhooks]
+
         .. versionchanged:: 13.4
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass
             ``webhook_url`` instead of calling ``updater.bot.set_webhook(webhook_url)`` manually.
         .. versionchanged:: 20.0
-            Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates` and removed
-            the deprecated argument ``force_event_loop``.
+            * Removed the ``clean`` argument in favor of :paramref:`drop_pending_updates` and
+              removed the deprecated argument ``force_event_loop``.
+            * To use this method, PTB must be installed via
+              ``pip install python-telegram-bot[webhooks]``.
 
         Args:
             listen (:obj:`str`, optional): IP-Address to listen on. Defaults to
@@ -433,6 +449,12 @@ class Updater(AbstractAsyncContextManager):
         Raises:
             :exc:`RuntimeError`: If the updater is already running or was not initialized.
         """
+        if not WEBHOOKS_AVAILABLE:
+            raise RuntimeError(
+                "To use `start_webhook`, PTB must be installed via `pip install "
+                "python-telegram-bot[webhooks]`."
+            )
+
         async with self.__lock:
             if self.running:
                 raise RuntimeError("This Updater is already running!")
