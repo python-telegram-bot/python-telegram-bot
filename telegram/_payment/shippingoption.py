@@ -67,9 +67,9 @@ class ShippingOption(TelegramObject):
 
         self._freeze()
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["prices"] = [p.to_dict() for p in self.prices]
 

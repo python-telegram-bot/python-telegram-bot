@@ -17,16 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import copy
 import datetime as dtm
 import inspect
 import logging
 import pickle
 import socket
+import sys
 import time
 from collections import defaultdict
 
 import pytest
-import pytz
 from flaky import flaky
 
 from telegram import (
@@ -46,6 +47,7 @@ from telegram import (
     InlineQueryResultVoice,
     InputFile,
     InputMedia,
+    InputMessageContent,
     InputTextMessageContent,
     LabeledPrice,
     MenuButton,
@@ -62,8 +64,8 @@ from telegram import (
     User,
     WebAppInfo,
 )
-from telegram._utils.datetime import from_timestamp, to_timestamp
-from telegram._utils.defaultvalue import DefaultValue
+from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
+from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram.constants import ChatAction, InlineQueryLimit, MenuButtonType, ParseMode
 from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
@@ -166,10 +168,44 @@ def bot_methods(ext_bot=True):
     )
 
 
+class InputMessageContentDWPP(InputMessageContent):
+    """
+    This is here to cover the case of InputMediaContent classes in testing answer_ilq that have
+    `disable_web_page_preview` but not `parse_mode`. Unlikely to ever happen, but better be save
+    than sorry …
+    """
+
+    __slots__ = ("disable_web_page_preview", "parse_mode", "entities", "message_text")
+
+    def __init__(
+        self,
+        message_text: str,
+        disable_web_page_preview=DEFAULT_NONE,
+        *,
+        api_kwargs=None,
+    ):
+        super().__init__(api_kwargs=api_kwargs)
+        self.message_text = message_text
+        self.disable_web_page_preview = disable_web_page_preview
+
+
 class TestBot:
     """
     Most are executed on tg.ext.ExtBot, as that class only extends the functionality of tg.bot
+
+    Behavior for init of ExtBot with missing optional dependency cachetools (for CallbackDataCache)
+    is tested in `test_callbackdatacache`
     """
+
+    @staticmethod
+    def localize(dt, tzinfo):
+        try:
+            return tzinfo.localize(dt)
+        except AttributeError:
+            # We get here if tzinfo is not a pytz timezone but a datetime.timezone class
+            # This test class should never be run in if pytz is not installed, we intentionally
+            # fail if this branch is ever reached.
+            sys.exit(1)
 
     test_flag = None
 
@@ -278,6 +314,8 @@ class TestBot:
                 for idx, record in enumerate(caplog.records):
                     print(record)
                     if record.getMessage().startswith("Task was destroyed but it is pending"):
+                        caplog.records.pop(idx)
+                    if record.getMessage().startswith("Task exception was never retrieved"):
                         caplog.records.pop(idx)
             assert len(caplog.records) == 3
             assert caplog.records[0].getMessage().startswith("Entering: get_me")
@@ -990,7 +1028,7 @@ class TestBot:
         assert web_app_msg.inline_message_id == "321"
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
-    async def test_answer_inline_query(self, monkeypatch, bot):
+    async def test_answer_inline_query(self, monkeypatch, bot, raw_bot):
         # For now just test that our internals pass the correct data
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters == {
@@ -1008,6 +1046,100 @@ class TestBot:
                         "type": "article",
                         "input_message_content": {"message_text": "second"},
                     },
+                    {
+                        "title": "test_result",
+                        "id": "123",
+                        "type": "document",
+                        "document_url": "https://raw.githubusercontent.com/python-telegram-bot"
+                        "/logos/master/logo/png/ptb-logo_240.png",
+                        "mime_type": "image/png",
+                        "caption": "ptb_logo",
+                        "input_message_content": {"message_text": "imc"},
+                    },
+                ],
+                "next_offset": "42",
+                "switch_pm_parameter": "start_pm",
+                "inline_query_id": 1234,
+                "is_personal": True,
+                "switch_pm_text": "switch pm",
+            }
+
+        results = [
+            InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
+            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
+            InlineQueryResultDocument(
+                id="123",
+                document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
+                "logo/png/ptb-logo_240.png",
+                title="test_result",
+                mime_type="image/png",
+                caption="ptb_logo",
+                input_message_content=InputMessageContentDWPP("imc"),
+            ),
+        ]
+
+        copied_results = copy.copy(results)
+        ext_bot = bot
+        for bot in (ext_bot, raw_bot):
+            # We need to test 1) below both the bot and raw_bot and setting this up with
+            # pytest.parametrize appears to be difficult ...
+            monkeypatch.setattr(bot.request, "post", make_assertion)
+            assert await bot.answer_inline_query(
+                1234,
+                results=results,
+                cache_time=300,
+                is_personal=True,
+                next_offset="42",
+                switch_pm_text="switch pm",
+                switch_pm_parameter="start_pm",
+            )
+
+            # 1)
+            # make sure that the results were not edited in-place
+            assert results == copied_results
+            for idx, result in enumerate(results):
+                if hasattr(result, "parse_mode"):
+                    assert result.parse_mode == copied_results[idx].parse_mode
+                if hasattr(result, "input_message_content"):
+                    assert getattr(result.input_message_content, "parse_mode", None) == getattr(
+                        copied_results[idx].input_message_content, "parse_mode", None
+                    )
+                    assert getattr(
+                        result.input_message_content, "disable_web_page_preview", None
+                    ) == getattr(
+                        copied_results[idx].input_message_content, "disable_web_page_preview", None
+                    )
+
+            monkeypatch.delattr(bot.request, "post")
+
+    async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            return request_data.parameters == {
+                "cache_time": 300,
+                "results": [
+                    {
+                        "title": "first",
+                        "id": "11",
+                        "type": "article",
+                        "input_message_content": {"message_text": "first"},
+                    },
+                    {
+                        "title": "second",
+                        "id": "12",
+                        "type": "article",
+                        "input_message_content": {"message_text": "second"},
+                    },
+                    {
+                        "title": "test_result",
+                        "id": "123",
+                        "type": "document",
+                        "document_url": "https://raw.githubusercontent.com/"
+                        "python-telegram-bot/logos/master/logo/png/"
+                        "ptb-logo_240.png",
+                        "mime_type": "image/png",
+                        "caption": "ptb_logo",
+                        "input_message_content": {"message_text": "imc"},
+                    },
                 ],
                 "next_offset": "42",
                 "switch_pm_parameter": "start_pm",
@@ -1019,45 +1151,7 @@ class TestBot:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         results = [
             InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
-            InlineQueryResultArticle("12", "second", InputTextMessageContent("second")),
-        ]
-
-        assert await bot.answer_inline_query(
-            1234,
-            results=results,
-            cache_time=300,
-            is_personal=True,
-            next_offset="42",
-            switch_pm_text="switch pm",
-            switch_pm_parameter="start_pm",
-        )
-        monkeypatch.delattr(bot.request, "post")
-
-    async def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
-        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
-            return request_data.parameters == {
-                "cache_time": 300,
-                "results": [
-                    {
-                        "title": "test_result",
-                        "id": "123",
-                        "type": "document",
-                        "document_url": "https://raw.githubusercontent.com/"
-                        "python-telegram-bot/logos/master/logo/png/"
-                        "ptb-logo_240.png",
-                        "mime_type": "image/png",
-                        "caption": "ptb_logo",
-                    }
-                ],
-                "next_offset": "42",
-                "switch_pm_parameter": "start_pm",
-                "inline_query_id": 1234,
-                "is_personal": True,
-                "switch_pm_text": "switch pm",
-            }
-
-        monkeypatch.setattr(bot.request, "post", make_assertion)
-        results = [
+            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
@@ -1065,9 +1159,11 @@ class TestBot:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-            )
+                input_message_content=InputMessageContentDWPP("imc"),
+            ),
         ]
 
+        copied_results = copy.copy(results)
         assert await bot.answer_inline_query(
             1234,
             results=results,
@@ -1077,13 +1173,50 @@ class TestBot:
             switch_pm_text="switch pm",
             switch_pm_parameter="start_pm",
         )
+        # make sure that the results were not edited in-place
+        assert results == copied_results
+        for idx, result in enumerate(results):
+            if hasattr(result, "parse_mode"):
+                assert result.parse_mode == copied_results[idx].parse_mode
+            if hasattr(result, "input_message_content"):
+                assert getattr(result.input_message_content, "parse_mode", None) == getattr(
+                    copied_results[idx].input_message_content, "parse_mode", None
+                )
+                assert getattr(
+                    result.input_message_content, "disable_web_page_preview", None
+                ) == getattr(
+                    copied_results[idx].input_message_content, "disable_web_page_preview", None
+                )
 
-    @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        indirect=True,
+    )
     async def test_answer_inline_query_default_parse_mode(self, monkeypatch, default_bot):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return request_data.parameters == {
                 "cache_time": 300,
                 "results": [
+                    {
+                        "title": "first",
+                        "id": "11",
+                        "type": "article",
+                        "input_message_content": {
+                            "message_text": "first",
+                            "parse_mode": "Markdown",
+                            "disable_web_page_preview": True,
+                        },
+                    },
+                    {
+                        "title": "second",
+                        "id": "12",
+                        "type": "article",
+                        "input_message_content": {
+                            "message_text": "second",
+                            "disable_web_page_preview": True,
+                        },
+                    },
                     {
                         "title": "test_result",
                         "id": "123",
@@ -1094,7 +1227,12 @@ class TestBot:
                         "mime_type": "image/png",
                         "caption": "ptb_logo",
                         "parse_mode": "Markdown",
-                    }
+                        "input_message_content": {
+                            "message_text": "imc",
+                            "disable_web_page_preview": True,
+                            "parse_mode": "Markdown",
+                        },
+                    },
                 ],
                 "next_offset": "42",
                 "switch_pm_parameter": "start_pm",
@@ -1105,6 +1243,8 @@ class TestBot:
 
         monkeypatch.setattr(default_bot.request, "post", make_assertion)
         results = [
+            InlineQueryResultArticle("11", "first", InputTextMessageContent("first")),
+            InlineQueryResultArticle("12", "second", InputMessageContentDWPP("second")),
             InlineQueryResultDocument(
                 id="123",
                 document_url="https://raw.githubusercontent.com/python-telegram-bot/logos/master/"
@@ -1112,9 +1252,11 @@ class TestBot:
                 title="test_result",
                 mime_type="image/png",
                 caption="ptb_logo",
-            )
+                input_message_content=InputTextMessageContent("imc"),
+            ),
         ]
 
+        copied_results = copy.copy(results)
         assert await default_bot.answer_inline_query(
             1234,
             results=results,
@@ -1124,6 +1266,20 @@ class TestBot:
             switch_pm_text="switch pm",
             switch_pm_parameter="start_pm",
         )
+        # make sure that the results were not edited in-place
+        assert results == copied_results
+        for idx, result in enumerate(results):
+            if hasattr(result, "parse_mode"):
+                assert result.parse_mode == copied_results[idx].parse_mode
+            if hasattr(result, "input_message_content"):
+                assert getattr(result.input_message_content, "parse_mode", None) == getattr(
+                    copied_results[idx].input_message_content, "parse_mode", None
+                )
+                assert getattr(
+                    result.input_message_content, "disable_web_page_preview", None
+                ) == getattr(
+                    copied_results[idx].input_message_content, "disable_web_page_preview", None
+                )
 
     async def test_answer_inline_query_current_offset_error(self, bot, inline_results):
         with pytest.raises(ValueError, match=("`current_offset` and `next_offset`")):
@@ -2067,7 +2223,7 @@ class TestBot:
         add_seconds = dtm.timedelta(0, 70)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = pytz.UTC.localize(time_in_future)
+        aware_time_in_future = self.localize(time_in_future, UTC)
 
         invite_link = await bot.create_chat_invite_link(
             channel_id, expire_date=expire_time, member_limit=10
@@ -2080,7 +2236,7 @@ class TestBot:
         add_seconds = dtm.timedelta(0, 80)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
-        aware_time_in_future = pytz.UTC.localize(time_in_future)
+        aware_time_in_future = self.localize(time_in_future, UTC)
 
         edited_invite_link = await bot.edit_chat_invite_link(
             channel_id,

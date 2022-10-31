@@ -25,7 +25,7 @@ from types import MappingProxyType
 
 import pytest
 
-from telegram import Bot, Chat, Message, PhotoSize, TelegramObject, User
+from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
 
 
 def all_subclasses(cls):
@@ -147,6 +147,30 @@ class TestTelegramObject:
     def test_to_dict_api_kwargs(self):
         to = TelegramObject(api_kwargs={"foo": "bar"})
         assert to.to_dict() == {"foo": "bar"}
+
+    def test_to_dict_recursion(self):
+        class Recursive(TelegramObject):
+            __slots__ = ("recursive",)
+
+            def __init__(self):
+                super().__init__()
+                self.recursive = "recursive"
+
+        class SubClass(TelegramObject):
+            """This class doesn't have `__slots__`, so has `__dict__` instead."""
+
+            def __init__(self):
+                super().__init__()
+                self.subclass = Recursive()
+
+        to = SubClass()
+        to_dict_no_recurse = to.to_dict(recursive=False)
+        assert to_dict_no_recurse
+        assert isinstance(to_dict_no_recurse["subclass"], Recursive)
+        to_dict_recurse = to.to_dict(recursive=True)
+        assert to_dict_recurse
+        assert isinstance(to_dict_recurse["subclass"], dict)
+        assert to_dict_recurse["subclass"]["recursive"] == "recursive"
 
     def test_slot_behaviour(self, mro_slots):
         inst = TelegramObject()
@@ -284,6 +308,50 @@ class TestTelegramObject:
         assert d._private == s._private  # Can't test for identity since two equal strings is True
         assert d._bot == s._bot and d._bot is s._bot
         assert d.normal == s.normal
+
+    def test_string_representation(self):
+        class TGO(TelegramObject):
+            def __init__(self, api_kwargs=None):
+                super().__init__(api_kwargs=api_kwargs)
+                self.string_attr = "string"
+                self.int_attr = 42
+                self.to_attr = BotCommand("command", "description")
+                self.list_attr = [
+                    BotCommand("command_1", "description_1"),
+                    BotCommand("command_2", "description_2"),
+                ]
+                self.dict_attr = {
+                    BotCommand("command_1", "description_1"): BotCommand(
+                        "command_2", "description_2"
+                    )
+                }
+                self.empty_tuple_attrs = ()
+                self.empty_str_attribute = ""
+                # Should not be included in string representation
+                self.none_attr = None
+
+        expected_without_api_kwargs = (
+            "TGO(dict_attr={BotCommand(command='command_1', description='description_1'): "
+            "BotCommand(command='command_2', description='description_2')}, int_attr=42, "
+            "list_attr=[BotCommand(command='command_1', description='description_1'), "
+            "BotCommand(command='command_2', description='description_2')], "
+            "string_attr='string', to_attr=BotCommand(command='command', "
+            "description='description'))"
+        )
+        assert str(TGO()) == expected_without_api_kwargs
+        assert repr(TGO()) == expected_without_api_kwargs
+
+        expected_with_api_kwargs = (
+            "TGO(api_kwargs={'foo': 'bar'}, dict_attr={BotCommand(command='command_1', "
+            "description='description_1'): BotCommand(command='command_2', "
+            "description='description_2')}, int_attr=42, "
+            "list_attr=[BotCommand(command='command_1', description='description_1'), "
+            "BotCommand(command='command_2', description='description_2')], "
+            "string_attr='string', to_attr=BotCommand(command='command', "
+            "description='description'))"
+        )
+        assert str(TGO(api_kwargs={"foo": "bar"})) == expected_with_api_kwargs
+        assert repr(TGO(api_kwargs={"foo": "bar"})) == expected_with_api_kwargs
 
     @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
     def test_subclasses_are_frozen(self, cls):

@@ -19,16 +19,15 @@
 import datetime
 
 import pytest
-import pytz
 
 from telegram import Bot, Chat, ChatInviteLink, ChatJoinRequest, User
-from telegram._utils.datetime import to_timestamp
+from telegram._utils.datetime import UTC, to_timestamp
 from tests.conftest import check_defaults_handling, check_shortcut_call, check_shortcut_signature
 
 
 @pytest.fixture(scope="class")
 def time():
-    return datetime.datetime.now(tz=pytz.utc)
+    return datetime.datetime.now(tz=UTC)
 
 
 @pytest.fixture(scope="class")

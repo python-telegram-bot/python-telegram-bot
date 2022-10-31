@@ -412,9 +412,9 @@ class SecureValue(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         data["files"] = [p.to_dict() for p in self.files]  # type: ignore[union-attr]
         data["translation"] = [p.to_dict() for p in self.translation]  # type: ignore[union-attr]
@@ -462,9 +462,9 @@ class DataCredentials(_CredentialsBase):
         super().__init__(hash=data_hash, secret=secret, api_kwargs=api_kwargs)
         self._freeze()
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         del data["file_hash"]
         del data["hash"]
@@ -492,9 +492,9 @@ class FileCredentials(_CredentialsBase):
         super().__init__(hash=file_hash, secret=secret, api_kwargs=api_kwargs)
         self._freeze()
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         del data["data_hash"]
         del data["hash"]

@@ -120,22 +120,28 @@ Dependencies & Their Versions
 
 ``python-telegram-bot`` tries to use as few 3rd party dependencies as possible.
 However, for some features using a 3rd party library is more sane than implementing the functionality again.
-The dependencies are:
+As these features are *optional*, the corresponding 3rd party dependencies are not installed by default.
+Instead, they are listed as optional dependencies.
+This allows to avoid unnecessary dependency conflicts for users who don't need the optional features.
 
-* `httpx ~= 0.23.0 <https://www.python-httpx.org>`_ for ``telegram.request.HTTPXRequest``, the default networking backend
+The only required dependency is `httpx ~= 0.23.0 <https://www.python-httpx.org>`_ for ``telegram.request.HTTPXRequest``, the default networking backend.
 
 ``python-telegram-bot`` is most useful when used along with additional libraries.
-To minimize dependency conflicts, we try to be liberal in terms of version requirements on the dependencies.
+To minimize dependency conflicts, we try to be liberal in terms of version requirements on the (optional) dependencies.
 On the other hand, we have to ensure stability of ``python-telegram-bot``, which is why we do apply version bounds.
 If you encounter dependency conflicts due to these bounds, feel free to reach out.
 
 Optional Dependencies
----------------------
+#####################
 
-``python-telegram-bot-raw`` can be installed with optional dependencies:
+PTB can be installed with optional dependencies:
 
-* ``pip install python-telegram-bot[passport]`` installs the `cryptography <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
-* ``pip install python-telegram-bot[socks]`` installs the `PySocks <https://pypi.org/project/PySocks/>`_ library. Use this, if you want to work behind a Socks5 server.
+* ``pip install python-telegram-bot-raw[passport]`` installs the `cryptography>=3.0 <https://cryptography.io/en/stable>`_ library. Use this, if you want to use Telegram Passport related functionality.
+* ``pip install python-telegram-bot-raw[socks]`` installs ``httpx[socks]``. Use this, if you want to work behind a Socks5 server.
+
+To install multiple optional dependencies, separate them by commas, e.g. ``pip install python-telegram-bot-raw[passport,socks]``.
+
+Additionally, the shortcut ``pip install python-telegram-bot-raw[all]`` installs all optional dependencies.
 
 Quick Start
 ===========

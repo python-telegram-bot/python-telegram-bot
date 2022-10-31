@@ -23,6 +23,7 @@ import functools
 import logging
 import pickle
 from contextlib import AbstractAsyncContextManager
+from copy import copy
 from datetime import datetime
 from types import TracebackType
 from typing import (
@@ -348,14 +349,21 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         for key, val in data.items():
             # 1)
             if isinstance(val, InputMedia):
+                # Copy object as not to edit it in-place
+                val = copy(val)
                 val._unfreeze()  # pylint: disable=protected-access
                 val.parse_mode = DefaultValue.get_value(val.parse_mode)
                 val._freeze()  # pylint: disable=protected-access
+                data[key] = val
             elif key == "media" and isinstance(val, list):
-                for media in val:
+                # Copy objects as not to edit them in-place
+                copy_list = [copy(media) for media in val]
+                for media in copy_list:
                     media._unfreeze()  # pylint: disable=protected-access
                     media.parse_mode = DefaultValue.get_value(media.parse_mode)
                     media._freeze()  # pylint: disable=protected-access
+
+                data[key] = copy_list
             # 2)
             else:
                 data[key] = DefaultValue.get_value(val)
@@ -2858,23 +2866,38 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         return effective_results, next_offset
 
     @no_type_check  # mypy doesn't play too well with hasattr
-    def _insert_defaults_for_ilq_results(self, res: "InlineQueryResult") -> None:
+    def _insert_defaults_for_ilq_results(self, res: "InlineQueryResult") -> "InlineQueryResult":
         """The reason why this method exists is similar to the description of _insert_defaults
         The reason why we do this in rather than in _insert_defaults is because converting
         DEFAULT_NONE to NONE *before* calling to_dict() makes it way easier to drop None entries
         from the json data.
+
+        Must return the correct object instead of editing in-place!
         """
+        # Copy the objects that need modification to avoid modifying the original object
+        copied = False
         if hasattr(res, "parse_mode"):
+            res = copy(res)
+            copied = True
             res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, "input_message_content") and res.input_message_content:
             if hasattr(res.input_message_content, "parse_mode"):
+                if not copied:
+                    res = copy(res)
+                    copied = True
+                res.input_message_content = copy(res.input_message_content)
                 res.input_message_content.parse_mode = DefaultValue.get_value(
                     res.input_message_content.parse_mode
                 )
             if hasattr(res.input_message_content, "disable_web_page_preview"):
+                if not copied:
+                    res = copy(res)
+                res.input_message_content = copy(res.input_message_content)
                 res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
                     res.input_message_content.disable_web_page_preview
                 )
+
+        return res
 
     @_log
     async def answer_inline_query(
@@ -2974,8 +2997,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         )
 
         # Apply defaults
-        for result in effective_results:
-            self._insert_defaults_for_ilq_results(result)
+        effective_results = [
+            self._insert_defaults_for_ilq_results(result) for result in effective_results
+        ]
 
         data: JSONDict = {"inline_query_id": inline_query_id, "results": effective_results}
 
@@ -8211,7 +8235,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:  # skipcq: PYL-W0613
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
 
