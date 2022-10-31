@@ -2,6 +2,25 @@
 # package_name==version # req-1, req-2, req-3!ext
 # `pip install ptb-raw[req-1/2]` will install `package_name`
 # `pip install ptb[req-1/2/3]` will also install `package_name`
+
+# Make sure to install those as additional_dependencies in the
+# pre-commit hooks for pylint & mypy
+# Also update the readme accordingly
+
+# When dependencies release new versions and tests succeed, we should try to expand the allowed
+# versions and only increase the lower bound if necessary
+
 httpx[socks] # socks
 cryptography!=3.4,!=3.4.1,!=3.4.2,!=3.4.3,>=3.0 # passport
 aiolimiter~=1.0.0 # rate-limiter!ext
+
+# tornado is rather stable, but let's not allow the next mayor release without prior testing
+tornado~=6.2 # webhooks!ext
+
+# Cachetools and APS don't have a strict stability policy.
+# Let's be cautious for now.
+cachetools~=5.2.0 # callback-data!ext
+APScheduler~=3.9.1 # job-queue!ext
+
+# pytz is required by APS and just needs the lower bound due to #2120
+pytz>=2018.6 # job-queue!ext

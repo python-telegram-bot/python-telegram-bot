@@ -134,10 +134,12 @@ def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
 
 def create_deep_linked_url(bot_username: str, payload: str = None, group: bool = False) -> str:
     """
-    Creates a deep-linked URL for this :paramref:`bot_username` with the specified
-    :paramref:`payload`. See  https://core.telegram.org/bots#deep-linking to learn more.
+    Creates a deep-linked URL for this :paramref:`~create_deep_linked_url.bot_username` with the
+    specified :paramref:`~create_deep_linked_url.payload`. See
+    https://core.telegram.org/bots/features#deep-linking to learn more.
 
-    The :paramref:`payload` may consist of the following characters: ``A-Z, a-z, 0-9, _, -``
+    The :paramref:`~create_deep_linked_url.payload` may consist of the following characters:
+    ``A-Z, a-z, 0-9, _, -``
 
     Note:
         Works well in conjunction with

@@ -22,10 +22,15 @@ import datetime
 import weakref
 from typing import TYPE_CHECKING, Optional, Tuple, Union, cast, overload
 
-import pytz
-from apscheduler.executors.asyncio import AsyncIOExecutor
-from apscheduler.job import Job as APSJob
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+try:
+    import pytz
+    from apscheduler.executors.asyncio import AsyncIOExecutor
+    from apscheduler.job import Job as APSJob
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+    APS_AVAILABLE = True
+except ImportError:
+    APS_AVAILABLE = False
 
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -40,11 +45,24 @@ class JobQueue:
     """This class allows you to periodically perform tasks with the bot. It is a convenience
     wrapper for the APScheduler library.
 
+    Important:
+        If you want to use this class, you must install PTB with the optional requirement
+        ``job-queue``, i.e.
+
+        .. code-block:: bash
+
+           pip install python-telegram-bot[job-queue]
+
     .. seealso:: :attr:`telegram.ext.Application.job_queue`,
         :attr:`telegram.ext.CallbackContext.job_queue`,
         `Timerbot Example <examples.timerbot.html>`_,
         `Job Queue <https://github.com/python-telegram-bot/
         python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
+
+    .. versionchanged:: 20.0
+        To use this class, PTB must be installed via
+        ``pip install python-telegram-bot[job-queue]``.
+
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.
 
@@ -58,6 +76,12 @@ class JobQueue:
     _CRON_MAPPING = ("sun", "mon", "tue", "wed", "thu", "fri", "sat")
 
     def __init__(self) -> None:
+        if not APS_AVAILABLE:
+            raise RuntimeError(
+                "To use `JobQueue`, PTB must be installed via `pip install "
+                "python-telegram-bot[job-queue]`."
+            )
+
         self._application: "Optional[weakref.ReferenceType[Application]]" = None
         self._executor = AsyncIOExecutor()
         self.scheduler = AsyncIOScheduler(timezone=pytz.utc, executors={"default": self._executor})
@@ -599,6 +623,14 @@ class Job:
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :class:`id <apscheduler.job.Job>` is equal.
 
+    Important:
+        If you want to use this class, you must install PTB with the optional requirement
+        ``job-queue``, i.e.
+
+        .. code-block:: bash
+
+           pip install python-telegram-bot[job-queue]
+
     Note:
         All attributes and instance methods of :attr:`job` are also directly available as
         attributes/methods of the corresponding :class:`telegram.ext.Job` object.
@@ -612,6 +644,8 @@ class Job:
        * Removed argument and attribute ``job_queue``.
        * Renamed ``Job.context`` to :attr:`Job.data`.
        * Removed argument ``job``
+       * To use this class, PTB must be installed via
+         ``pip install python-telegram-bot[job-queue]``.
 
     Args:
         callback (:term:`coroutine function`): The callback function that should be executed by the
@@ -661,6 +695,11 @@ class Job:
         chat_id: int = None,
         user_id: int = None,
     ):
+        if not APS_AVAILABLE:
+            raise RuntimeError(
+                "To use `Job`, PTB must be installed via `pip install "
+                "python-telegram-bot[job-queue]`."
+            )
 
         self.callback = callback
         self.data = data
@@ -671,10 +710,10 @@ class Job:
         self._removed = False
         self._enabled = False
 
-        self._job = cast(APSJob, None)  # skipcq: PTC-W0052
+        self._job = cast("APSJob", None)  # skipcq: PTC-W0052
 
     @property
-    def job(self) -> APSJob:
+    def job(self) -> "APSJob":
         """:class:`apscheduler.job.Job`: The APS Job this job is a wrapper for.
 
         .. versionchanged:: 20.0
@@ -747,7 +786,7 @@ class Job:
         return self.job.next_run_time
 
     @classmethod
-    def _from_aps_job(cls, job: APSJob) -> "Job":
+    def _from_aps_job(cls, job: "APSJob") -> "Job":
         return job.func.__self__
 
     def __getattr__(self, item: str) -> object:

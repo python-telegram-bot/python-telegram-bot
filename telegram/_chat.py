@@ -19,6 +19,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Chat."""
 from datetime import datetime
+from html import escape
 from typing import TYPE_CHECKING, ClassVar, List, Optional, Tuple, Union
 
 from telegram import constants
@@ -30,6 +31,9 @@ from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
+from telegram.helpers import escape_markdown
+from telegram.helpers import mention_html as helpers_mention_html
+from telegram.helpers import mention_markdown as helpers_mention_markdown
 
 if TYPE_CHECKING:
     from telegram import (
@@ -354,6 +358,107 @@ class Chat(TelegramObject):
             )
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
+
+    def mention_markdown(self, name: str = None) -> str:
+        """
+        Note:
+            :tg-const:`telegram.constants.ParseMode.MARKDOWN` is a legacy mode, retained by
+            Telegram for backward compatibility. You should use :meth:`mention_markdown_v2`
+            instead.
+
+        .. versionadded:: 20.0
+
+        Args:
+            name (:obj:`str`): The name used as a link for the chat. Defaults to :attr:`full_name`.
+
+        Returns:
+            :obj:`str`: The inline mention for the chat as markdown (version 1).
+
+        Raises:
+            :exc:`TypeError`: If the chat is a private chat and neither the :paramref:`name`
+                nor the :attr:`first_name` is set, then throw an :exc:`TypeError`.
+                If the chat is a public chat and neither the :paramref:`name` nor the :attr:`title`
+                is set, then throw an :exc:`TypeError`. If chat is a private group chat, then
+                throw an :exc:`TypeError`.
+
+        """
+        if self.type == self.PRIVATE:
+            if name:
+                return helpers_mention_markdown(self.id, name)
+            if self.full_name:
+                return helpers_mention_markdown(self.id, self.full_name)
+            raise TypeError("Can not create a mention to a private chat without first name")
+        if self.username:
+            if name:
+                return f"[{name}]({self.link})"
+            if self.title:
+                return f"[{self.title}]({self.link})"
+            raise TypeError("Can not create a mention to a public chat without title")
+        raise TypeError("Can not create a mention to a private group chat")
+
+    def mention_markdown_v2(self, name: str = None) -> str:
+        """
+        .. versionadded:: 20.0
+
+        Args:
+            name (:obj:`str`): The name used as a link for the chat. Defaults to :attr:`full_name`.
+
+        Returns:
+            :obj:`str`: The inline mention for the chat as markdown (version 2).
+
+        Raises:
+            :exc:`TypeError`: If the chat is a private chat and neither the :paramref:`name`
+                nor the :attr:`first_name` is set, then throw an :exc:`TypeError`.
+                If the chat is a public chat and neither the :paramref:`name` nor the :attr:`title`
+                is set, then throw an :exc:`TypeError`. If chat is a private group chat, then
+                throw an :exc:`TypeError`.
+
+        """
+        if self.type == self.PRIVATE:
+            if name:
+                return helpers_mention_markdown(self.id, name, version=2)
+            if self.full_name:
+                return helpers_mention_markdown(self.id, self.full_name, version=2)
+            raise TypeError("Can not create a mention to a private chat without first name")
+        if self.username:
+            if name:
+                return f"[{escape_markdown(name, version=2)}]({self.link})"
+            if self.title:
+                return f"[{escape_markdown(self.title, version=2)}]({self.link})"
+            raise TypeError("Can not create a mention to a public chat without title")
+        raise TypeError("Can not create a mention to a private group chat")
+
+    def mention_html(self, name: str = None) -> str:
+        """
+        .. versionadded:: 20.0
+
+        Args:
+            name (:obj:`str`): The name used as a link for the chat. Defaults to :attr:`full_name`.
+
+        Returns:
+            :obj:`str`: The inline mention for the chat as HTML.
+
+        Raises:
+            :exc:`TypeError`: If the chat is a private chat and neither the :paramref:`name`
+                nor the :attr:`first_name` is set, then throw an :exc:`TypeError`.
+                If the chat is a public chat and neither the :paramref:`name` nor the :attr:`title`
+                is set, then throw an :exc:`TypeError`. If chat is a private group chat, then
+                throw an :exc:`TypeError`.
+
+        """
+        if self.type == self.PRIVATE:
+            if name:
+                return helpers_mention_html(self.id, name)
+            if self.full_name:
+                return helpers_mention_html(self.id, self.full_name)
+            raise TypeError("Can not create a mention to a private chat without first name")
+        if self.username:
+            if name:
+                return f'<a href="{self.link}">{escape(name)}</a>'
+            if self.title:
+                return f'<a href="{self.link}">{escape(self.title)}</a>'
+            raise TypeError("Can not create a mention to a public chat without title")
+        raise TypeError("Can not create a mention to a private group chat")
 
     async def leave(
         self,

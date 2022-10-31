@@ -121,9 +121,9 @@ class VideoChatParticipantsInvited(TelegramObject):
         data["users"] = User.de_list(data.get("users", []), bot)
         return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         if self.users is not None:
             data["users"] = [u.to_dict() for u in self.users]
@@ -176,9 +176,9 @@ class VideoChatScheduled(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict()
+        data = super().to_dict(recursive=recursive)
 
         # Required
         data["start_date"] = to_timestamp(self.start_date)

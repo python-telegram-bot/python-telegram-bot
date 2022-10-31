@@ -20,7 +20,8 @@
 import inspect
 import json
 from copy import deepcopy
-from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple, Type, TypeVar, Union
+from itertools import chain
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, Sized, Tuple, Type, TypeVar, Union
 
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
@@ -51,6 +52,9 @@ class TelegramObject:
         * Removed argument and attribute ``bot`` for several subclasses. Use
           :meth:`set_bot` and :meth:`get_bot` instead.
         * Removed the possibility to pass arbitrary keyword arguments for several subclasses.
+        * String representations objects of this type was overhauled. See :meth:`__repr__` for
+          details. As this class doesn't implement :meth:`object.__str__`, the default
+          implementation will be used, which is equivalent to :meth:`__repr__`.
 
     Arguments:
         api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|
@@ -99,8 +103,40 @@ class TelegramObject:
             if getattr(self, key, True) is None:
                 setattr(self, key, self.api_kwargs.pop(key))
 
-    def __str__(self) -> str:
-        return str(self.to_dict())
+    def __repr__(self) -> str:
+        """Gives a string representation of this object in the form
+        ``ClassName(attr_1=value_1, attr_2=value_2, ...)``, where attributes are omitted if they
+        have the value :obj:`None` or empty instances of :class:`collections.abc.Sized` (e.g.
+        :class:`list`, :class:`dict`, :class:`set`, :class:`str`, etc.).
+
+        As this class doesn't implement :meth:`object.__str__`, the default implementation
+        will be used, which is equivalent to :meth:`__repr__`.
+
+        Returns:
+            :obj:`str`
+        """
+        # * `__repr__` goal is to be unambiguous
+        # * `__str__` goal is to be readable
+        # * `str()` calls `__repr__`, if `__str__` is not defined
+        # In our case "unambiguous" and "readable" largely coincide, so we can use the same logic.
+        as_dict = self._get_attrs(recursive=False, include_private=False)
+
+        if not self.api_kwargs:
+            # Drop api_kwargs from the representation, if empty
+            as_dict.pop("api_kwargs", None)
+
+        contents = ", ".join(
+            f"{k}={as_dict[k]!r}"
+            for k in sorted(as_dict.keys())
+            if (
+                as_dict[k] is not None
+                and not (
+                    isinstance(as_dict[k], Sized)
+                    and len(as_dict[k]) == 0  # type: ignore[arg-type]
+                )
+            )
+        )
+        return f"{self.__class__.__name__}({contents})"
 
     def __getitem__(self, item: str) -> object:
         if item == "from":
@@ -160,8 +196,8 @@ class TelegramObject:
 
         Args:
             include_private (:obj:`bool`): Whether the result should include private variables.
-            recursive (:obj:`bool`): If :obj:`True`, will convert any TelegramObjects (if found) in
-                the attributes to a dictionary. Else, preserves it as an object itself.
+            recursive (:obj:`bool`): If :obj:`True`, will convert any ``TelegramObjects`` (if
+                found) in the attributes to a dictionary. Else, preserves it as an object itself.
             remove_bot (:obj:`bool`): Whether the bot should be included in the result.
 
         Returns:
@@ -169,28 +205,23 @@ class TelegramObject:
         """
         data = {}
 
-        if not recursive:
-            try:
-                # __dict__ has attrs from superclasses, so no need to put in the for loop below
-                data.update(self.__dict__)
-            except AttributeError:
-                pass
         # We want to get all attributes for the class, using self.__slots__ only includes the
         # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
         # and then get their attributes. The `[:-1]` slice excludes the `object` class
-        for cls in self.__class__.__mro__[:-1]:
-            for key in cls.__slots__:  # type: ignore[attr-defined]
-                if not include_private and key.startswith("_"):
-                    continue
+        all_slots = (s for c in self.__class__.__mro__[:-1] for s in c.__slots__)  # type: ignore
+        # chain the class's slots with the user defined subclass __dict__ (class has no slots)
+        for key in chain(self.__dict__, all_slots) if hasattr(self, "__dict__") else all_slots:
+            if not include_private and key.startswith("_"):
+                continue
 
-                value = getattr(self, key, None)
-                if value is not None:
-                    if recursive and hasattr(value, "to_dict"):
-                        data[key] = value.to_dict()  # pylint: disable=no-member
-                    else:
-                        data[key] = value
-                elif not recursive:
+            value = getattr(self, key, None)
+            if value is not None:
+                if recursive and hasattr(value, "to_dict"):
+                    data[key] = value.to_dict(recursive=True)  # pylint: disable=no-member
+                else:
                     data[key] = value
+            elif not recursive:
+                data[key] = value
 
         if recursive and data.get("from_user"):
             data["from"] = data.pop("from_user", None)
@@ -279,16 +310,23 @@ class TelegramObject:
         """
         return json.dumps(self.to_dict())
 
-    def to_dict(self) -> JSONDict:
+    def to_dict(self, recursive: bool = True) -> JSONDict:
         """Gives representation of object as :obj:`dict`.
 
         .. versionchanged:: 20.0
             Now includes all entries of :attr:`api_kwargs`.
 
+        Args:
+            recursive (:obj:`bool`, optional): If :obj:`True`, will convert any TelegramObjects
+                (if found) in the attributes to a dictionary. Else, preserves it as an object
+                itself. Defaults to :obj:`True`.
+
+                .. versionadded:: 20.0
+
         Returns:
             :obj:`dict`
         """
-        out = self._get_attrs(recursive=True)
+        out = self._get_attrs(recursive=recursive)
         out.update(out.pop("api_kwargs", {}))  # type: ignore[call-overload]
         return out
 

@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class Defaults, which allows passing default values to Application."""
+import datetime
 from typing import Any, Dict, NoReturn, Optional
 
-import pytz
+from telegram._utils.datetime import UTC
 
 
 class Defaults:
@@ -42,10 +43,12 @@ class Defaults:
         quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
             to the message. If ``reply_to_message_id`` is passed, this parameter will
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
-        tzinfo (:obj:`tzinfo`, optional): A timezone to be used for all date(time) inputs
-            appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
-            somewhere, it will be assumed to be in :paramref:`tzinfo`. Must be a timezone provided
-            by the ``pytz`` module. Defaults to UTC.
+        tzinfo (:class:`datetime.tzinfo`, optional): A timezone to be used for all date(time)
+            inputs appearing throughout PTB, i.e. if a timezone naive date(time) object is passed
+            somewhere, it will be assumed to be in :paramref:`tzinfo`. If the
+            :class:`telegram.ext.JobQueue` is used, this must be a timezone provided
+            by the ``pytz`` module. Defaults to ``pytz.utc``, if available, and
+            :attr:`datetime.timezone.utc` otherwise.
         block (:obj:`bool`, optional): Default setting for the :paramref:`BaseHandler.block`
             parameter
             of handlers and error handlers registered through :meth:`Application.add_handler` and
@@ -74,7 +77,7 @@ class Defaults:
         disable_notification: bool = None,
         disable_web_page_preview: bool = None,
         quote: bool = None,
-        tzinfo: pytz.BaseTzInfo = pytz.utc,
+        tzinfo: datetime.tzinfo = UTC,
         block: bool = True,
         allow_sending_without_reply: bool = None,
         protect_content: bool = None,
@@ -182,7 +185,7 @@ class Defaults:
         raise AttributeError("You can not assign a new value to quote after initialization.")
 
     @property
-    def tzinfo(self) -> pytz.BaseTzInfo:
+    def tzinfo(self) -> datetime.tzinfo:
         """:obj:`tzinfo`: A timezone to be used for all date(time) objects appearing
         throughout PTB.
         """
