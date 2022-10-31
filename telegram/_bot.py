@@ -2879,23 +2879,29 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if hasattr(res, "parse_mode"):
             res = copy(res)
             copied = True
+            res._unfreeze()  # pylint: disable=protected-access
             res.parse_mode = DefaultValue.get_value(res.parse_mode)
+            res._freeze()  # pylint: disable=protected-access
         if hasattr(res, "input_message_content") and res.input_message_content:
             if hasattr(res.input_message_content, "parse_mode"):
                 if not copied:
                     res = copy(res)
                     copied = True
                 res.input_message_content = copy(res.input_message_content)
+                res.input_message_content._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content.parse_mode = DefaultValue.get_value(
                     res.input_message_content.parse_mode
                 )
+                res.input_message_content._freeze()  # pylint: disable=protected-access
             if hasattr(res.input_message_content, "disable_web_page_preview"):
                 if not copied:
                     res = copy(res)
                 res.input_message_content = copy(res.input_message_content)
+                res.input_message_content._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
                     res.input_message_content.disable_web_page_preview
                 )
+                res.input_message_content._freeze()  # pylint: disable=protected-access
 
         return res
 

@@ -572,6 +572,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             res._unfreeze()  # pylint: disable=protected-access
             copied = True
             res.parse_mode = self.defaults.parse_mode if self.defaults else None
+            res._freeze()  # pylint: disable=protected-access
         if hasattr(res, "input_message_content") and res.input_message_content:
             if (
                 hasattr(res.input_message_content, "parse_mode")
@@ -580,20 +581,22 @@ class ExtBot(Bot, Generic[RLARGS]):
                 if not copied:
                     res = copy(res)
                     copied = True
+                res.input_message_content._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content.parse_mode = (
                     self.defaults.parse_mode if self.defaults else None
                 )
+                res.input_message_content._freeze()  # pylint: disable=protected-access
             if (
                 hasattr(res.input_message_content, "disable_web_page_preview")
                 and res.input_message_content.disable_web_page_preview is DEFAULT_NONE
             ):
                 if not copied:
                     res = copy(res)
+                res.input_message_content._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content.disable_web_page_preview = (
                     self.defaults.disable_web_page_preview if self.defaults else None
                 )
-
-        res._freeze()  # pylint: disable=protected-access
+                res.input_message_content._freeze()  # pylint: disable=protected-access
 
         return res
 
