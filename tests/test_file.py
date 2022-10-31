@@ -42,11 +42,32 @@ def file(bot):
 
 @pytest.fixture(scope="class")
 def encrypted_file(bot):
+    # check https://github.com/python-telegram-bot/python-telegram-bot/wiki/\
+    # PTB-test-writing-knowledge-base#how-to-generate-encrypted-passport-files
+    # if you want to know the source of these values
     fc = FileCredentials(
         "Oq3G4sX+bKZthoyms1YlPqvWou9esb+z0Bi/KqQUG8s=",
         "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
     )
     ef = File(TestFile.file_id, TestFile.file_unique_id, TestFile.file_size, TestFile.file_path)
+    ef.set_bot(bot)
+    ef.set_credentials(fc)
+    return ef
+
+
+@pytest.fixture(scope="class")
+def encrypted_local_file(bot):
+    # check encrypted_file() for the source of the fc values
+    fc = FileCredentials(
+        "Oq3G4sX+bKZthoyms1YlPqvWou9esb+z0Bi/KqQUG8s=",
+        "Pt7fKPgYWKA/7a8E64Ea1X8C+Wf7Ky1tF4ANBl63vl4=",
+    )
+    ef = File(
+        TestFile.file_id,
+        TestFile.file_unique_id,
+        TestFile.file_size,
+        file_path=str(data_file("image_encrypted.jpg")),
+    )
     ef.set_bot(bot)
     ef.set_credentials(fc)
     return ef
@@ -235,6 +256,68 @@ class TestFile:
             await encrypted_file.download_to_object(out=custom_fobj)
             custom_fobj.seek(0)
             assert custom_fobj.read() == data_file("image_decrypted.jpg").read_bytes()
+
+    async def test_download_local_file_encrypted(self, encrypted_local_file):
+        out_file = await encrypted_local_file.download_to_drive()
+        try:
+            assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
+        finally:
+            out_file.unlink()
+
+    @pytest.mark.parametrize(
+        "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]
+    )
+    async def test_download_custom_path_local_file_encrypted(
+        self, encrypted_local_file, custom_path_type
+    ):
+        file_handle, custom_path = mkstemp()
+        custom_path = Path(custom_path)
+        try:
+            out_file = await encrypted_local_file.download_to_drive(custom_path_type(custom_path))
+            assert out_file == custom_path
+            assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
+        finally:
+            os.close(file_handle)
+            custom_path.unlink()
+
+    async def test_download_file_obj_local_file_encrypted(self, monkeypatch, encrypted_local_file):
+        async def test(*args, **kwargs):
+            return data_file("image_encrypted.jpg").read_bytes()
+
+        monkeypatch.setattr(encrypted_local_file.get_bot().request, "retrieve", test)
+        with TemporaryFile() as custom_fobj:
+            await encrypted_local_file.download_to_object(out=custom_fobj)
+            custom_fobj.seek(0)
+            assert custom_fobj.read() == data_file("image_decrypted.jpg").read_bytes()
+
+    async def test_download_bytearray_encrypted(self, monkeypatch, encrypted_file):
+        async def test(*args, **kwargs):
+            return data_file("image_encrypted.jpg").read_bytes()
+
+        monkeypatch.setattr(encrypted_file.get_bot().request, "retrieve", test)
+
+        # Check that a download to a newly allocated bytearray works.
+        buf = await encrypted_file.download_as_bytearray()
+        assert buf == bytearray(data_file("image_decrypted.jpg").read_bytes())
+
+        # Check that a download to a given bytearray works (extends the bytearray).
+        buf2 = buf[:]
+        buf3 = await encrypted_file.download_as_bytearray(buf=buf2)
+        assert buf3 is buf2
+        assert buf2[len(buf) :] == buf
+        assert buf2[: len(buf)] == buf
+
+    async def test_download_bytearray_local_file_encrypted(self, encrypted_local_file):
+        # Check that a download to a newly allocated bytearray works.
+        buf = await encrypted_local_file.download_as_bytearray()
+        assert buf == bytearray(data_file("image_decrypted.jpg").read_bytes())
+
+        # Check that a download to a given bytearray works (extends the bytearray).
+        buf2 = buf[:]
+        buf3 = await encrypted_local_file.download_as_bytearray(buf=buf2)
+        assert buf3 is buf2
+        assert buf2[len(buf) :] == buf
+        assert buf2[: len(buf)] == buf
 
     def test_equality(self, bot):
         a = File(self.file_id, self.file_unique_id, bot)

@@ -133,6 +133,10 @@ class File(TelegramObject):
             If :paramref:`custom_path` isn't provided and :attr:`file_path` is the path of a
               local file (which is the case when a Bot API Server is running in local mode), this
               method will just return the path.
+            If, however, :attr:`telegram.PassportFile.get_file` is the source of this object,
+              `decrypted_` will be prepended to the file, in order to decrypt the file without
+              changing the existing one in-place.
+
 
         .. versionchanged:: 20.0
 
@@ -165,6 +169,17 @@ class File(TelegramObject):
         """
         local_file = is_local_file(self.file_path)
         url = None if local_file else self._get_encoded_url()
+
+        # if _credentials exists we want to decrypt the file
+        if local_file and self._credentials:
+            file_to_decrypt = Path(self.file_path)
+            buf = self._prepare_decrypt(file_to_decrypt.read_bytes())
+            if custom_path is not None:
+                path = Path(custom_path)
+            else:
+                path = Path(str(file_to_decrypt.parent) + "/decrypted_" + file_to_decrypt.name)
+            path.write_bytes(buf)
+            return path
 
         if custom_path is not None and local_file:
             shutil.copyfile(self.file_path, str(custom_path))
@@ -228,6 +243,8 @@ class File(TelegramObject):
         path = Path(self.file_path) if local_file else None
         if local_file:
             buf = path.read_bytes()
+            if self._credentials:
+                buf = self._prepare_decrypt(buf)
         else:
             buf = await self.get_bot().request.retrieve(
                 url,
@@ -254,9 +271,19 @@ class File(TelegramObject):
         if buf is None:
             buf = bytearray()
         if is_local_file(self.file_path):
-            buf.extend(Path(self.file_path).read_bytes())
+            if self._credentials:
+                buf.extend(self._prepare_decrypt(Path(self.file_path).read_bytes()))
+            else:
+                buf.extend(Path(self.file_path).read_bytes())
         else:
-            buf.extend(await self.get_bot().request.retrieve(self._get_encoded_url()))
+            if self._credentials:
+                buf.extend(
+                    self._prepare_decrypt(
+                        await self.get_bot().request.retrieve(self._get_encoded_url())
+                    )
+                )
+            else:
+                buf.extend(await self.get_bot().request.retrieve(self._get_encoded_url()))
         return buf
 
     def set_credentials(self, credentials: "FileCredentials") -> None:
