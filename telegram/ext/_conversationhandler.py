@@ -220,7 +220,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             handled by *ALL* the handler's whose :meth:`check_update` method returns :obj:`True`
             that are in the state :attr:`ConversationHandler.TIMEOUT`.
 
-            Note:
+            Caution:
                 * This feature relies on the :attr:`telegram.ext.Application.job_queue` being set
                   and hence requires that the dependencies that :class:`telegram.ext.JobQueue`
                   relies on are installed.
