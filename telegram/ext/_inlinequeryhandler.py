@@ -48,6 +48,7 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
 
     .. seealso:: :any:`Inlinebot Example <examples.inlinebot>`
 
+
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
@@ -63,6 +64,9 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
         chat_types (List[:obj:`str`], optional): List of allowed chat types. If passed, will only
             handle inline queries with the appropriate :attr:`telegram.InlineQuery.chat_type`.
 

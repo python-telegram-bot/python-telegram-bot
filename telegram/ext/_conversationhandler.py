@@ -245,6 +245,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             2. the value passed to this parameter (if any)
             3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
 
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
             .. versionchanged:: 20.0
                 No longer overrides the handlers settings. Resolution order was changed.
 

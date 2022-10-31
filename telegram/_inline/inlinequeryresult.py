@@ -33,6 +33,8 @@ class InlineQueryResult(TelegramObject):
         All URLs passed in inline query results will be available to end users and therefore must
         be assumed to be *public*.
 
+    .. seealso:: :any:`Inline Bot Example <examples.inlinebot>`
+
     Args:
         type (:obj:`str`): Type of the result.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.

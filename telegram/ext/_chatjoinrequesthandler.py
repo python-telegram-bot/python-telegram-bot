@@ -66,6 +66,9 @@ class ChatJoinRequestHandler(BaseHandler[Update, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
         block (:obj:`bool`): Determines whether the callback will run in a blocking way..
