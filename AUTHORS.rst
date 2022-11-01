@@ -28,6 +28,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `Balduro <https://github.com/Balduro>`_
 - `Bibo-Joshi <https://github.com/Bibo-Joshi>`_
+- `Biruk Alamirew <https://github.com/BAcode-X>`_
 - `bimmlerd <https://github.com/bimmlerd>`_
 - `cyc8 <https://github.com/cyc8>`_ 
 - `d-qoi <https://github.com/d-qoi>`_
