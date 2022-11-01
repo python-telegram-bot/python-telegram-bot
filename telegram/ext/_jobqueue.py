@@ -41,7 +41,7 @@ class JobQueue:
     wrapper for the APScheduler library.
 
     Examples:
-        :any:`Timerbot <examples.timerbot>`
+        :any:`Timer Bot <examples.timerbot>`
 
     .. seealso:: :attr:`telegram.ext.Application.job_queue`,
         :attr:`telegram.ext.CallbackContext.job_queue`,

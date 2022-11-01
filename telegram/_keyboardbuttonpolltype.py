@@ -30,7 +30,7 @@ class KeyboardButtonPollType(TelegramObject):
     considered equal, if their :attr:`type` is equal.
 
     Examples:
-        :any:`Pollbot <examples.pollbot>`
+        :any:`Poll Bot <examples.pollbot>`
 
     Attributes:
         type (:obj:`str`): Optional. If :tg-const:`telegram.Poll.QUIZ` is passed, the user will be

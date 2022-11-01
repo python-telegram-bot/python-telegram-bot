@@ -33,7 +33,7 @@ class PollAnswerHandler(BaseHandler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Examples:
-        :any:`Pollbot <examples.pollbot>`
+        :any:`Poll Bot <examples.pollbot>`
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

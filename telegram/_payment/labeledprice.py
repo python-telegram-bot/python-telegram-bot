@@ -29,7 +29,7 @@ class LabeledPrice(TelegramObject):
     considered equal, if their :attr:`label` and :attr:`amount` are equal.
 
     Examples:
-        :any:`Paymentbot <examples.paymentbot>`
+        :any:`Payment Bot <examples.paymentbot>`
 
     Args:
         label (:obj:`str`): Portion label.

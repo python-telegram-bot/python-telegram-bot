@@ -134,7 +134,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             await application.shutdown()
 
     Examples:
-        :any:`Echobot <examples.echobot>`
+        :any:`Echo Bot <examples.echobot>`
 
     .. seealso:: `Your First Bot <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,

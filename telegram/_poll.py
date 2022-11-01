@@ -117,7 +117,7 @@ class Poll(TelegramObject):
     considered equal, if their :attr:`id` is equal.
 
     Examples:
-        :any:`Pollbot <examples.pollbot>`
+        :any:`Poll Bot <examples.pollbot>`
 
     Args:
         id (:obj:`str`): Unique poll identifier.
