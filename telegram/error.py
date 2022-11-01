@@ -90,7 +90,7 @@ class Forbidden(TelegramError):
     """Raised when the bot has not enough rights to perform the requested action.
 
     Examples:
-        :any:`Raw API Bot Example <examples.rawapibot>`
+        :any:`Raw API Bot <examples.rawapibot>`
 
     .. versionchanged:: 20.0
         This class was previously named ``Unauthorized``.
@@ -118,7 +118,7 @@ class NetworkError(TelegramError):
     """Base class for exceptions due to networking errors.
 
     Examples:
-        :any:`Raw API Bot Example <examples.rawapibot>`
+        :any:`Raw API Bot <examples.rawapibot>`
     """
 
     __slots__ = ()

@@ -32,7 +32,7 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Examples:
-        :any:`Paymentbot Example <examples.paymentbot>`
+        :any:`Paymentbot <examples.paymentbot>`
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

@@ -34,7 +34,7 @@ class InlineQueryResult(TelegramObject):
         be assumed to be *public*.
 
     Examples:
-        :any:`Inline Bot Example <examples.inlinebot>`
+        :any:`Inline Bot <examples.inlinebot>`
 
     Args:
         type (:obj:`str`): Type of the result.

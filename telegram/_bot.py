@@ -142,7 +142,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
           raise :exc:`pickle.PicklingError`.
 
     Examples:
-        :any:`Raw API Bot Example <examples.rawapibot>`
+        :any:`Raw API Bot <examples.rawapibot>`
 
     .. seealso:: :attr:`telegram.ext.Application.bot`,
         :attr:`telegram.ext.CallbackContext.bot`,
@@ -3559,7 +3559,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             Webhooks`_.
 
         Examples:
-            :any:`Custom Webhook Bot Example <examples.customwebhookbot>`
+            :any:`Custom Webhook Bot <examples.customwebhookbot>`
 
         Args:
             url (:obj:`str`): HTTPS url to send updates to. Use an empty string to remove webhook

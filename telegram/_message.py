@@ -367,7 +367,7 @@ class Message(TelegramObject):
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
 
             Examples:
-                :any:`Passport Bot Example <examples.passportbot>`
+                :any:`Passport Bot <examples.passportbot>`
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
         dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.

@@ -36,7 +36,7 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Examples:
-        :any:`Chat Member Bot Example <examples.chatmemberbot>`
+        :any:`Chat Member Bot <examples.chatmemberbot>`
 
     .. versionadded:: 13.4
 

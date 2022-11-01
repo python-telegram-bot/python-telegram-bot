@@ -30,7 +30,7 @@ class WebAppInfo(TelegramObject):
     considered equal, if their :attr:`url` are equal.
 
     Examples:
-        :any:`Webappbot Example <examples.webappbot>`
+        :any:`Webappbot <examples.webappbot>`
 
     .. versionadded:: 20.0
 

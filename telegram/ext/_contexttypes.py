@@ -34,7 +34,7 @@ class ContextTypes(Generic[CCT, UD, CD, BD]):
     interface.
 
     Examples:
-        :any:`ContextTypes Example <examples.contexttypesbot>`
+        :any:`ContextTypes Bot <examples.contexttypesbot>`
 
     .. seealso:: `Architecture Overview <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,

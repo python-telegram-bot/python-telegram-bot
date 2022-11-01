@@ -29,7 +29,7 @@ class WebAppData(TelegramObject):
     considered equal, if their :attr:`data` and :attr:`button_text` are equal.
 
     Examples:
-        :any:`Webappbot Example <examples.webappbot>`
+        :any:`Webappbot <examples.webappbot>`
 
     .. versionadded:: 20.0
 

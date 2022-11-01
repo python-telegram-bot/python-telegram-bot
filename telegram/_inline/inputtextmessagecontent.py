@@ -34,7 +34,7 @@ class InputTextMessageContent(InputMessageContent):
     considered equal, if their :attr:`message_text` is equal.
 
     Examples:
-        :any:`Inline Example <examples.inlinebot>`
+        :any:`Inline Bot <examples.inlinebot>`
 
     Args:
         message_text (:obj:`str`): Text of the message to be sent,

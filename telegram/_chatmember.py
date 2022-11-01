@@ -45,7 +45,7 @@ class ChatMember(TelegramObject):
     considered equal, if their :attr:`user` and :attr:`status` are equal.
 
     Examples:
-         :any:`Chat Member Bot Example <examples.chatmemberbot>`
+         :any:`Chat Member Bot <examples.chatmemberbot>`
 
     .. versionchanged:: 20.0
 

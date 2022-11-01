@@ -33,7 +33,7 @@ class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
     Examples:
-        :any:`Inline Example <examples.inlinebot>`
+        :any:`Inline Bot <examples.inlinebot>`
 
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.

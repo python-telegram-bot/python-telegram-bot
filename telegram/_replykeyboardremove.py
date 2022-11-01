@@ -37,8 +37,8 @@ class ReplyKeyboardRemove(TelegramObject):
         * Example usage: A user votes in a poll, bot returns confirmation message in reply to
           the vote and removes the keyboard for that user, while still showing the keyboard with
           poll options to users who haven't voted yet.
-        * :any:`Conversationbot Example <examples.conversationbot>`
-        * :any:`Conversationbot Example 2 <examples.conversationbot2>`
+        * :any:`Conversation Bot <examples.conversationbot>`
+        * :any:`Conversation Bot 2 <examples.conversationbot2>`
 
     Args:
         selective (:obj:`bool`, optional): Use this parameter if you want to remove the keyboard

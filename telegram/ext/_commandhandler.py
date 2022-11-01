@@ -58,8 +58,8 @@ class CommandHandler(BaseHandler[Update, CCT]):
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
     Examples:
-        * :any:`Timer Bot Example <examples.timerbot>`
-        * :any:`Error Handler Bot Example <examples.errorhandlerbot>`
+        * :any:`Timer Bot <examples.timerbot>`
+        * :any:`Error Handler Bot <examples.errorhandlerbot>`
 
     .. versionchanged:: 20.0
 
