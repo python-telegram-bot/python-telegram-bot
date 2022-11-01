@@ -37,8 +37,8 @@ class InlineKeyboardMarkup(TelegramObject):
     considered equal, if their size of :attr:`inline_keyboard` and all the buttons are equal.
 
     Examples:
-        * :any:`Inline Keyboard Example 1 <examples.inlinekeyboard>`
-        * :any:`Inline Keyboard Example 2 <examples.inlinekeyboard2>`
+        * :any:`Inline Keyboard 1 <examples.inlinekeyboard>`
+        * :any:`Inline Keyboard 2 <examples.inlinekeyboard2>`
 
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
