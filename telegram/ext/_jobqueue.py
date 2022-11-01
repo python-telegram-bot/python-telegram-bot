@@ -40,13 +40,15 @@ class JobQueue:
     """This class allows you to periodically perform tasks with the bot. It is a convenience
     wrapper for the APScheduler library.
 
+    Examples:
+        :any:`Timerbot Example <examples.timerbot>`
+
     .. seealso:: :attr:`telegram.ext.Application.job_queue`,
         :attr:`telegram.ext.CallbackContext.job_queue`,
         `Architecture Overview <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
         `Job Queue <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_,
-        :any:`Timerbot Example <examples.timerbot>`
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
 
     Attributes:
         scheduler (:class:`apscheduler.schedulers.asyncio.AsyncIOScheduler`): The scheduler.

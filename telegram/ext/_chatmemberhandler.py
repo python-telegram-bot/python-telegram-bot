@@ -35,7 +35,8 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. seealso:: :any:`Chat Member Bot Example <examples.chatmemberbot>`
+    Examples:
+        :any:`Chat Member Bot Example <examples.chatmemberbot>`
 
     .. versionadded:: 13.4
 

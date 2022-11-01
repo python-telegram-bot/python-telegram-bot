@@ -44,7 +44,8 @@ class ChatMemberUpdated(TelegramObject):
     Note:
         In Python :keyword:`from` is a reserved word use :paramref:`from_user` instead.
 
-    .. seealso:: :any:`Chat Member Bot Example <examples.chatmemberbot>`
+    Examples:
+        :any:`Chat Member Bot Example <examples.chatmemberbot>`
 
     Args:
         chat (:class:`telegram.Chat`): Chat the user belongs to.

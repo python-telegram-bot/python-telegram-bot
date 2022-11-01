@@ -31,7 +31,8 @@ class ShippingQueryHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. seealso:: :any:`Paymentbot Example <examples.paymentbot>`
+    Examples:
+        :any:`Paymentbot Example <examples.paymentbot>`
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be

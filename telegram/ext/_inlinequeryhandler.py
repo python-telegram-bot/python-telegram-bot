@@ -46,7 +46,8 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
           chats and may not be set for inline queries coming from third-party clients. These
           updates won't be handled, if :attr:`chat_types` is passed.
 
-    .. seealso:: :any:`Inlinebot Example <examples.inlinebot>`
+    Examples:
+        :any:`Inlinebot Example <examples.inlinebot>`
 
 
     Args:

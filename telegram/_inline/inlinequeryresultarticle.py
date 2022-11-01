@@ -32,7 +32,8 @@ if TYPE_CHECKING:
 class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
-    .. seealso:: :any:`Inline Example <examples.inlinebot>`
+    Examples:
+        :any:`Inline Example <examples.inlinebot>`
 
     Args:
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.

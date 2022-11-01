@@ -150,9 +150,8 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
         ``CommandHandler("start", callback, filters=filters.Regex('payload'))``
 
     Examples:
-        ``create_deep_linked_url(bot.get_me().username, "some-params")``
-
-    .. seealso:: :any:`Deeplinking Example <examples.deeplinking>`
+        * ``create_deep_linked_url(bot.get_me().username, "some-params")``
+        * :any:`Deeplinking Example <examples.deeplinking>`
 
     Args:
         bot_username (:obj:`str`): The username to link to.
