@@ -70,7 +70,6 @@ class File(TelegramObject):
         file_size (:obj:`str`): Optional. File size in bytes.
         file_path (:obj:`str`): Optional. File path. Use e.g. :meth:`download_to_memory` to get
             the file.
-
     """
 
     __slots__ = (
@@ -133,10 +132,11 @@ class File(TelegramObject):
             If :paramref:`custom_path` isn't provided and :attr:`file_path` is the path of a
               local file (which is the case when a Bot API Server is running in local mode), this
               method will just return the path.
-            The only exception to this are encrypted files (e.g. a passort files).
-            For these, a file with the prefix `decrypted_` will be created in the same directory as the original file in order …
-              `decrypted_` will be prepended to the file, in order to decrypt the file without
-              changing the existing one in-place.
+
+            The only exception to this are encrypted files (e.g. a passport file). For these, a
+              file with the prefix `decrypted_` will be created in the same directory as the
+              original file in order to decrypt the file without changing the existing one
+              in-place.
 
 
         .. versionchanged:: 20.0
