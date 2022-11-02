@@ -1460,7 +1460,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             Attempts to add the same callback multiple times will be ignored.
 
         Examples:
-            :any:`Errorhandler Bot <examples.errorhandlerbot>`,
+            :any:`Errorhandler Bot <examples.errorhandlerbot>`
 
         .. seealso:: `Exceptions, Warnings and Logging <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Exceptions%2C-Warnings-and-Logging>`_
