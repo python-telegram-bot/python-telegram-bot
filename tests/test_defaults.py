@@ -17,12 +17,17 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import datetime as dtm
 import inspect
+import os
 
 import pytest
 
 from telegram import User
 from telegram.ext import Defaults
+from tests.conftest import env_var_2_bool
+
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 class TestDefault:
@@ -31,6 +36,13 @@ class TestDefault:
         for attr in a.__slots__:
             assert getattr(a, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(a)) == len(set(mro_slots(a))), "duplicate slot"
+
+    def test_utc(self):
+        defaults = Defaults()
+        if not TEST_WITH_OPT_DEPS:
+            assert defaults.tzinfo is dtm.timezone.utc
+        else:
+            assert defaults.tzinfo is not dtm.timezone.utc
 
     def test_data_assignment(self):
         defaults = Defaults()

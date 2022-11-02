@@ -23,7 +23,13 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Dict, MutableMapping, Optional, Tuple, Union, cast
 from uuid import uuid4
 
-from cachetools import LRUCache
+try:
+    from cachetools import LRUCache
+
+    CACHE_TOOLS_AVAILABLE = True
+except ImportError:
+    CACHE_TOOLS_AVAILABLE = False
+
 
 from telegram import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message, User
 from telegram._utils.datetime import to_float_timestamp
@@ -100,6 +106,14 @@ class CallbackDataCache:
     sent via inline mode.
     If necessary, will drop the least recently used items.
 
+    Important:
+        If you want to use this class, you must install PTB with the optional requirement
+        ``callback-data``, i.e.
+
+        .. code-block:: bash
+
+           pip install python-telegram-bot[callback-data]
+
     Examples:
         :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
 
@@ -110,6 +124,10 @@ class CallbackDataCache:
         python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
 
     .. versionadded:: 13.6
+
+    .. versionchanged:: 20.0
+        To use this class, PTB must be installed via
+        ``pip install python-telegram-bot[callback-data]``.
 
     Args:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
@@ -134,6 +152,12 @@ class CallbackDataCache:
         maxsize: int = 1024,
         persistent_data: CDCData = None,
     ):
+        if not CACHE_TOOLS_AVAILABLE:
+            raise RuntimeError(
+                "To use `CallbackDataCache`, PTB must be installed via `pip install "
+                "python-telegram-bot[callback-data]`."
+            )
+
         self.logger = logging.getLogger(__name__)
 
         self.bot = bot

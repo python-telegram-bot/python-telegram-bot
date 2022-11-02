@@ -20,6 +20,7 @@
 implementations for BaseRequest and we want to test HTTPXRequest anyway."""
 import asyncio
 import json
+import os
 from collections import defaultdict
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -42,6 +43,8 @@ from telegram.error import (
     TimedOut,
 )
 from telegram.request._httpxrequest import HTTPXRequest
+
+from .conftest import env_var_2_bool
 
 # We only need the first fixture, but it uses the others, so pytest needs us to import them as well
 from .test_requestdata import (  # noqa: F401
@@ -70,12 +73,36 @@ async def httpx_request():
         yield rq
 
 
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+
+
+@pytest.mark.skipif(
+    TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
+)
+class TestNoSocks:
+    async def test_init(self, bot):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[socks\]"):
+            HTTPXRequest(proxy_url="socks5://foo")
+
+
 class TestRequest:
     test_flag = None
 
     @pytest.fixture(autouse=True)
     def reset(self):
         self.test_flag = None
+
+    async def test_init_import_errors(self, bot, monkeypatch):
+        """Makes sure that import errors are forwarded - related to TestNoSocks above"""
+
+        def __init__(self, *args, **kwargs):
+            raise ImportError("Other Error Message")
+
+        monkeypatch.setattr(httpx.AsyncClient, "__init__", __init__)
+
+        # Make sure that other exceptions are forwarded
+        with pytest.raises(ImportError, match=r"Other Error Message"):
+            HTTPXRequest(proxy_url="socks5://foo")
 
     def test_slot_behaviour(self, mro_slots):
         inst = HTTPXRequest()
