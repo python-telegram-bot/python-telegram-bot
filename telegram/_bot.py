@@ -19,11 +19,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot."""
 import asyncio
+import copy
 import functools
 import logging
 import pickle
 from contextlib import AbstractAsyncContextManager
-from copy import copy
 from datetime import datetime
 from types import TracebackType
 from typing import (
@@ -348,12 +348,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             # 1)
             if isinstance(val, InputMedia):
                 # Copy object as not to edit it in-place
-                val = copy(val)
+                val = copy.copy(val)
                 val.parse_mode = DefaultValue.get_value(val.parse_mode)
                 data[key] = val
             elif key == "media" and isinstance(val, list):
                 # Copy objects as not to edit them in-place
-                copy_list = [copy(media) for media in val]
+                copy_list = [copy.copy(media) for media in val]
                 for media in copy_list:
                     media.parse_mode = DefaultValue.get_value(media.parse_mode)
                 data[key] = copy_list
@@ -2005,8 +2005,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
+        caption: Optional[str] = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
     ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
+
+        Note:
+            If you supply a :paramref:`caption` (along with either
+            :paramref:`parse_mode` or :paramref:`caption_entities`),
+            then items in :paramref:`media` must have no captions, and vice verca.
 
         .. seealso:: :attr:`telegram.Message.reply_media_group`,
             :attr:`telegram.Chat.send_media_group`,
@@ -2044,6 +2052,18 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            caption (:obj:`str`, optional): Caption that will be added to the
+                first element of :paramref:`media`, so that it will be used as caption for the
+                whole media group.
+                Defaults to :obj:`None`.
+            parse_mode (:obj:`str` | :obj:`None`, optional):
+                Parse mode for :paramref:`caption`.
+                See the constants in :class:`telegram.constants.ParseMode` for the
+                available modes.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional):
+                List of special entities for :paramref:`caption`,
+                which can be specified instead of :paramref:`parse_mode`.
+                Defaults to :obj:`None`.
 
         Returns:
             List[:class:`telegram.Message`]: An array of the sent Messages.
@@ -2051,6 +2071,29 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Raises:
             :class:`telegram.error.TelegramError`
         """
+        if caption and any(
+            [
+                any(item.caption for item in media),
+                any(item.caption_entities for item in media),
+                # if parse_mode was set explicitly, even to None, error must be raised
+                any(item.parse_mode is not DEFAULT_NONE for item in media),
+            ]
+        ):
+            raise ValueError("You can only supply either group caption or media with captions.")
+
+        if caption:
+            # Copy first item (to avoid mutation of original object), apply group caption to it.
+            # This will lead to the group being shown with this caption.
+            item_to_get_caption = copy.copy(media[0])
+            item_to_get_caption.caption = caption
+            if parse_mode is not DEFAULT_NONE:
+                item_to_get_caption.parse_mode = parse_mode
+            item_to_get_caption.caption_entities = caption_entities
+
+            # copy the list (just the references) to avoid mutating the original list
+            media = media[:]
+            media[0] = item_to_get_caption
+
         data: JSONDict = {
             "chat_id": chat_id,
             "media": media,
@@ -2870,22 +2913,22 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         # Copy the objects that need modification to avoid modifying the original object
         copied = False
         if hasattr(res, "parse_mode"):
-            res = copy(res)
+            res = copy.copy(res)
             copied = True
             res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, "input_message_content") and res.input_message_content:
             if hasattr(res.input_message_content, "parse_mode"):
                 if not copied:
-                    res = copy(res)
+                    res = copy.copy(res)
                     copied = True
-                res.input_message_content = copy(res.input_message_content)
+                res.input_message_content = copy.copy(res.input_message_content)
                 res.input_message_content.parse_mode = DefaultValue.get_value(
                     res.input_message_content.parse_mode
                 )
             if hasattr(res.input_message_content, "disable_web_page_preview"):
                 if not copied:
-                    res = copy(res)
-                res.input_message_content = copy(res.input_message_content)
+                    res = copy.copy(res)
+                res.input_message_content = copy.copy(res.input_message_content)
                 res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
                     res.input_message_content.disable_web_page_preview
                 )

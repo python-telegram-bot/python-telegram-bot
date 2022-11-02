@@ -719,6 +719,10 @@ async def check_defaults_handling(
         if isinstance(value.default, DefaultValue) and not kwarg.endswith("_timeout")
     ]
 
+    if method.__name__.endswith("_media_group"):
+        # the parse_mode is applied to the first media item, and we test this elsewhere
+        kwargs_need_default.remove("parse_mode")
+
     defaults_no_custom_defaults = Defaults()
     kwargs = {kwarg: "custom_default" for kwarg in inspect.signature(Defaults).parameters.keys()}
     kwargs["tzinfo"] = pytz.timezone("America/New_York")
@@ -732,7 +736,7 @@ async def check_defaults_handling(
         data = request_data.parameters
 
         # Check regular arguments that need defaults
-        for arg in (dkw for dkw in kwargs_need_default if dkw != "timeout"):
+        for arg in kwargs_need_default:
             # 'None' should not be passed along to Telegram
             if df_value in [None, DEFAULT_NONE]:
                 if arg in data:
