@@ -1878,14 +1878,20 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 first element of :paramref:`media`, so that it will be used as caption for the
                 whole media group.
                 Defaults to :obj:`None`.
+
+                .. versionadded:: 20.0
             parse_mode (:obj:`str` | :obj:`None`, optional):
                 Parse mode for :paramref:`caption`.
                 See the constants in :class:`telegram.constants.ParseMode` for the
                 available modes.
+
+                .. versionadded:: 20.0
             caption_entities (List[:class:`telegram.MessageEntity`], optional):
                 List of special entities for :paramref:`caption`,
                 which can be specified instead of :paramref:`parse_mode`.
                 Defaults to :obj:`None`.
+
+                .. versionadded:: 20.0
 
         Returns:
             List[:class:`telegram.Message`]: An array of the sent Messages.
