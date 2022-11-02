@@ -39,11 +39,11 @@ from telegram.ext import AIORateLimiter, BaseRateLimiter, Defaults, ExtBot
 from telegram.request import BaseRequest, RequestData
 from tests.conftest import env_var_2_bool
 
-TEST_RATE_LIMITER = env_var_2_bool(os.getenv("TEST_RATE_LIMITER", True))
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 @pytest.mark.skipif(
-    TEST_RATE_LIMITER, reason="Only relevant if the optional dependency is not installed"
+    TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
 )
 class TestNoRateLimiter:
     def test_init(self):
@@ -143,7 +143,7 @@ class TestBaseRateLimiter:
 
 
 @pytest.mark.skipif(
-    not TEST_RATE_LIMITER, reason="Only relevant if the optional dependency is installed"
+    not TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is installed"
 )
 @pytest.mark.skipif(
     os.getenv("GITHUB_ACTIONS", False) and platform.system() == "Darwin",

@@ -717,6 +717,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
         and :meth:`telegram.ext.Updater.shutdown`.
 
+        Important:
+            If you want to use this method, you must install PTB with the optional requirement
+            ``webhooks``, i.e.
+
+            .. code-block:: bash
+
+               pip install python-telegram-bot[webhooks]
+
         .. include:: inclusions/application_run_tip.rst
 
         .. seealso::

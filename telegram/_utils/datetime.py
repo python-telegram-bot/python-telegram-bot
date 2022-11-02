@@ -31,7 +31,8 @@ import datetime as dtm
 import time
 from typing import Optional, Union
 
-# in PTB-Raw we don't have pytz, so we make a little workaround here
+# pytz is only available if it was installed as dependency of APScheduler, so we make a little
+# workaround here
 DTM_UTC = dtm.timezone.utc
 try:
     import pytz
@@ -82,9 +83,9 @@ def to_float_timestamp(
             a :obj:`datetime.datetime` object), :paramref:`reference_timestamp` is not relevant
             and so its value should be :obj:`None`. If this is not the case, a :exc:`ValueError`
             will be raised.
-        tzinfo (:obj:`pytz.BaseTzInfo`, optional): If :paramref:`time_object` is a naive object
+        tzinfo (:class:`datetime.tzinfo`, optional): If :paramref:`time_object` is a naive object
             from the :mod:`datetime` module, it will be interpreted as this timezone. Defaults to
-            ``pytz.utc``.
+            ``pytz.utc``, if available, and :attr:`datetime.timezone.utc` otherwise.
 
             Note:
                 Only to be used by ``telegram.ext``.

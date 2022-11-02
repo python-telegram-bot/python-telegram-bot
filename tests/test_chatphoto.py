@@ -86,7 +86,7 @@ class TestChatPhoto:
         assert new_file.file_unique_id == chat_photo.small_file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download(jpg_file)
+        await new_file.download_to_memory(jpg_file)
 
         assert jpg_file.is_file()
 
@@ -95,7 +95,7 @@ class TestChatPhoto:
         assert new_file.file_unique_id == chat_photo.big_file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download(jpg_file)
+        await new_file.download_to_memory(jpg_file)
 
         assert jpg_file.is_file()
 
