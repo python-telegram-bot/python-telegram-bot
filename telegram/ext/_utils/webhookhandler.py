@@ -25,6 +25,8 @@ from ssl import SSLContext
 from types import TracebackType
 from typing import TYPE_CHECKING, Optional, Type
 
+# Instead of checking for ImportError here, we do that in `updater.py`, where we import from
+# this module. Doing it here would be tricky, as the classes below subclass tornado classes
 import tornado.web
 from tornado.httpserver import HTTPServer
 

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
+import os
 from dataclasses import dataclass
 
 import httpx
@@ -37,7 +38,9 @@ from telegram.ext import (
 from telegram.ext._applicationbuilder import _BOT_CHECKS
 from telegram.request import HTTPXRequest
 
-from .conftest import PRIVATE_KEY, data_file
+from .conftest import PRIVATE_KEY, data_file, env_var_2_bool
+
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 @pytest.fixture(scope="function")
@@ -45,11 +48,29 @@ def builder():
     return ApplicationBuilder()
 
 
+@pytest.mark.skipif(TEST_WITH_OPT_DEPS, reason="Optional dependencies are installed")
+class TestApplicationBuilderNoOptDeps:
+    def test_init(self, builder):
+        builder.token("token")
+        app = builder.build()
+        assert app.job_queue is None
+
+
+@pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
 class TestApplicationBuilder:
     def test_slot_behaviour(self, builder, mro_slots):
         for attr in builder.__slots__:
             assert getattr(builder, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(builder)) == len(set(mro_slots(builder))), "duplicate slot"
+
+    def test_job_queue_init_exception(self, monkeypatch):
+        def init_raises_runtime_error(*args, **kwargs):
+            raise RuntimeError("RuntimeError")
+
+        monkeypatch.setattr(JobQueue, "__init__", init_raises_runtime_error)
+
+        with pytest.raises(RuntimeError, match="RuntimeError"):
+            ApplicationBuilder()
 
     def test_build_without_token(self, builder):
         with pytest.raises(RuntimeError, match="No bot token was set."):

@@ -21,7 +21,7 @@ try:
 except ImportError:
     __version_info__ = (0, 0, 0, 0, 0)  # type: ignore[assignment]
 
-if __version_info__ < (20, 0, 0, "alpha", 1):
+if __version_info__ < (20, 0, 0, "beta", 0):
     raise RuntimeError(
         f"This example is not compatible with your current PTB version {TG_VER}. To view the "
         f"{TG_VER} version of this example, "
@@ -77,25 +77,25 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             for file in data.files:
                 actual_file = await file.get_file()
                 print(actual_file)
-                await actual_file.download()
+                await actual_file.download_to_memory()
         if (
             data.type in ("passport", "driver_license", "identity_card", "internal_passport")
             and data.front_side
         ):
             front_file = await data.front_side.get_file()
             print(data.type, front_file)
-            await front_file.download()
+            await front_file.download_to_memory()
         if data.type in ("driver_license" and "identity_card") and data.reverse_side:
             reverse_file = await data.reverse_side.get_file()
             print(data.type, reverse_file)
-            await reverse_file.download()
+            await reverse_file.download_to_memory()
         if (
             data.type in ("passport", "driver_license", "identity_card", "internal_passport")
             and data.selfie
         ):
             selfie_file = await data.selfie.get_file()
             print(data.type, selfie_file)
-            await selfie_file.download()
+            await selfie_file.download_to_memory()
         if data.translation and data.type in (
             "passport",
             "driver_license",
@@ -111,7 +111,7 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             for file in data.translation:
                 actual_file = await file.get_file()
                 print(actual_file)
-                await actual_file.download()
+                await actual_file.download_to_memory()
 
 
 def main() -> None:
