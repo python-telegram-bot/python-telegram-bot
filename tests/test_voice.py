@@ -121,7 +121,7 @@ class TestVoice:
         assert new_file.file_unique_id == voice.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download("telegram.ogg")
+        await new_file.download_to_memory("telegram.ogg")
 
         assert path.is_file()
 

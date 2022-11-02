@@ -3100,10 +3100,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Use this method to get basic info about a file and prepare it for downloading. For the
         moment, bots can download files of up to
         :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD` in size. The file can then
-        be downloaded
-        with :meth:`telegram.File.download`. It is guaranteed that the link will be
-        valid for at least 1 hour. When the link expires, a new one can be requested by
-        calling get_file again.
+        be e.g. downloaded with :meth:`telegram.File.download_to_memory`. It is guaranteed that
+        the link will be valid for at least 1 hour. When the link expires, a new one can be
+        requested by calling get_file again.
 
         Note:
              This function may not preserve the original file name and MIME type.

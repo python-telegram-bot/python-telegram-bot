@@ -145,7 +145,7 @@ class TestInputFile:
         message = await bot.send_document(chat_id, data_file("text_file.txt").read_bytes())
         out = BytesIO()
 
-        assert await (await message.document.get_file()).download(out=out)
+        await (await message.document.get_file()).download_to_object(out=out)
         out.seek(0)
 
         assert out.read().decode("utf-8") == "PTB Rocks! ⅞"
@@ -158,7 +158,7 @@ class TestInputFile:
         )
         out = BytesIO()
 
-        assert await (await message.document.get_file()).download(out=out)
+        await (await message.document.get_file()).download_to_object(out=out)
         out.seek(0)
 
         assert out.read().decode("utf-8") == "PTB Rocks! ⅞"
