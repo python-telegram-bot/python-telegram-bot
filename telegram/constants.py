@@ -498,11 +498,20 @@ class LocationLimit(IntEnum):
     HORIZONTAL_ACCURACY = 1500
     """:obj:`int`: Maximum radius of uncertainty for the location, measured in meters."""
 
-    HEADING = 360
+    MIN_HEADING = 1
+    """:obj:`int`: Minimum value allowed for the direction in which the user is moving,
+    in degrees.
+    """
+    MAX_HEADING = 360
     """:obj:`int`: Maximum value allowed for the direction in which the user is moving,
     in degrees.
     """
-    PROXIMITY_ALERT_RADIUS = 100000
+
+    MIN_PROXIMITY_ALERT_RADIUS = 1
+    """:obj:`int`: Minimum distance for proximity alerts about approaching another chat member, in
+    meters.
+    """
+    MAX_PROXIMITY_ALERT_RADIUS = 100000
     """:obj:`int`: Maximum distance for proximity alerts about approaching another chat member, in
     meters.
     """

@@ -2160,11 +2160,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
                 updated, should be between 60 and 86400.
             heading (:obj:`int`, optional): For live locations, a direction in which the user is
-                moving, in degrees. Must be between 1 and
-                :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+                moving, in degrees. Must be between
+                :tg-const:`telegram.constants.LocationLimit.MIN_HEADING` and
+                :tg-const:`telegram.constants.LocationLimit.MAX_HEADING` if specified.
             proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
                 for proximity alerts about approaching another chat member, in meters. Must be
-                between 1 and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+                between :tg-const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
+                and :tg-const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
+                if specified.
             disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
@@ -2290,10 +2293,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 location, measured in meters;
                 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
             heading (:obj:`int`, optional): Direction in which the user is moving, in degrees. Must
-                be between 1 and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+                be between :tg-const:`telegram.constants.LocationLimit.MIN_HEADING`
+                and :tg-const:`telegram.constants.LocationLimit.MAX_HEADING` if specified.
             proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts
-                about approaching another chat member, in meters. Must be between 1 and
-                :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+                about approaching another chat member, in meters. Must be between
+                :tg-const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
+                and :tg-const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
+                if specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard.
 
