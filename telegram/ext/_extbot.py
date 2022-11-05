@@ -118,8 +118,10 @@ class ExtBot(Bot, Generic[RLARGS]):
         * The method :meth:`~telegram.Bot.get_updates` is the only method that does not have the
           additional argument, as this method will never be rate limited.
 
-    .. seealso:: :any:`Arbitrary Callback Example <examples.arbitrarycallbackdatabot>`,
-        `Arbitrary callback_data <https://github.com/\
+    Examples:
+        :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
+
+    .. seealso:: `Arbitrary callback_data <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
 
     .. versionadded:: 13.6
@@ -228,8 +230,8 @@ class ExtBot(Bot, Generic[RLARGS]):
         """:class:`telegram.ext.CallbackDataCache`: Optional. The cache for
         objects passed as callback data for :class:`telegram.InlineKeyboardButton`.
 
-        .. seealso:: :any:`Arbitrary Callback Data Bot Example
-            <examples.arbitrarycallbackdatabot>`
+        Examples:
+            :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
 
         .. versionchanged:: 20.0
            * This property is now read-only.

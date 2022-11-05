@@ -53,14 +53,14 @@ class JobQueue:
 
            pip install python-telegram-bot[job-queue]
 
+    Examples:
+        :any:`Timer Bot <examples.timerbot>`
+
     .. seealso:: :attr:`telegram.ext.Application.job_queue`,
         :attr:`telegram.ext.CallbackContext.job_queue`,
         `Architecture Overview <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
         `Job Queue <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_,
-        :any:`Timerbot Example <examples.timerbot>`
-
         python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
 
     .. versionchanged:: 20.0

@@ -366,7 +366,8 @@ class Message(TelegramObject):
             channels, or the custom title of an anonymous group administrator.
         passport_data (:class:`telegram.PassportData`): Optional. Telegram Passport data.
 
-            .. seealso:: :any:`Passport Bot Example <examples.passportbot>`
+            Examples:
+                :any:`Passport Bot <examples.passportbot>`
         poll (:class:`telegram.Poll`): Optional. Message is a native poll,
             information about the poll.
         dice (:class:`telegram.Dice`): Optional. Message is a dice with random value.

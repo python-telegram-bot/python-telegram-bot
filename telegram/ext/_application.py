@@ -133,11 +133,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         finally:
             await application.shutdown()
 
+    Examples:
+        :any:`Echo Bot <examples.echobot>`
+
     .. seealso:: `Your First Bot <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
         `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        :any:`Echobot Example <examples.echobot>`
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
 
     .. versionchanged:: 20.0
 
@@ -1457,8 +1459,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         Note:
             Attempts to add the same callback multiple times will be ignored.
 
-        .. seealso:: :any:`Errorhandler Example <examples.errorhandlerbot>`,
-            `Exceptions, Warnings and Logging <https://github.com/\
+        Examples:
+            :any:`Errorhandler Bot <examples.errorhandlerbot>`
+
+        .. seealso:: `Exceptions, Warnings and Logging <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Exceptions%2C-Warnings-and-Logging>`_
 
         Args:

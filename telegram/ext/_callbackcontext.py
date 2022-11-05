@@ -66,11 +66,13 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     3. The type of :attr:`chat_data` (if :attr:`chat_data` is not :obj:`None`).
     4. The type of :attr:`bot_data` (if :attr:`bot_data` is not :obj:`None`).
 
+    Examples:
+        * :any:`Context Types Bot <examples.contexttypesbot>`
+        * :any:`Custom Webhook Bot <examples.customwebhookbot>`
+
     .. seealso:: :attr:`telegram.ext.ContextTypes.DEFAULT_TYPE`,
         `Job Queue <https://github.com/python-telegram-bot/
-        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_,
-        :any:`Context Types Bot Example <examples.contexttypesbot>`,
-        :any:`Custom Webhook Bot Example <examples.customwebhookbot>`
+        python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
 
     Args:
         application (:class:`telegram.ext.Application`): The application associated with this
