@@ -782,12 +782,12 @@ class NumberOfUpdatesLimit(IntEnum):
     __slots__ = ()
 
     MIN_LIMIT = 1
-    """:obj:`int`: Minimum value allowed for the ``limit`` parameter of
-    :meth:`telegram.Bot.get_updates`.
+    """:obj:`int`: Minimum value allowed for the :paramref:`~telegram.Bot.get_updates.limit`
+    parameter of :meth:`telegram.Bot.get_updates`.
     """
     MAX_LIMIT = 100
-    """:obj:`int`: Maximum value allowed for the ``limit`` parameter of
-    :meth:`telegram.Bot.get_updates`.
+    """:obj:`int`: Maximum value allowed for the :paramref:`~telegram.Bot.get_updates.limit`
+    parameter of :meth:`telegram.Bot.get_updates`.
     """
 
 
@@ -937,18 +937,22 @@ class WebhookLimit(IntEnum):
     __slots__ = ()
 
     MIN_CONNECTIONS_LIMIT = 1
-    """:obj:`int`: Minimum value allowed for the ``max_connections`` parameter of
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.set_webhook.max_connections` parameter of
     :meth:`telegram.Bot.set_webhook`.
     """
     MAX_CONNECTIONS_LIMIT = 100
-    """:obj:`int`: Maximum value allowed for the ``max_connections`` parameter of
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.set_webhook.max_connections` parameter of
     :meth:`telegram.Bot.set_webhook`.
     """
     MIN_SECRET_TOKEN_LENGTH = 1
-    """:obj:`int`: Minimum length of the secret token (``secret_token`` parameter of
+    """:obj:`int`: Minimum length of the secret token
+    (:paramref:`~telegram.Bot.set_webhook.secret_token` parameter of
     :meth:`telegram.Bot.set_webhook`).
     """
     MAX_SECRET_TOKEN_LENGTH = 256
-    """:obj:`int`: Maximum length of the secret token (``secret_token`` parameter of
+    """:obj:`int`: Maximum length of the secret token
+    (:paramref:`~telegram.Bot.set_webhook.secret_token` parameter of
     :meth:`telegram.Bot.set_webhook`).
     """
