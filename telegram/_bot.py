@@ -3090,7 +3090,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             offset (:obj:`int`, optional): Sequential number of the first photo to be returned.
                 By default, all photos are returned.
             limit (:obj:`int`, optional): Limits the number of photos to be retrieved. Values
-                between 1-100 are accepted. Defaults to ``100``.
+                between :tg-const:`telegram.constants.UserProfilePhotosLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.UserProfilePhotosLimit.MAX_LIMIT` are accepted.
+                Defaults to ``100``.
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to

@@ -65,6 +65,7 @@ __all__ = [
     "StickerType",
     "WebhookLimit",
     "UpdateType",
+    "UserProfilePhotosLimit",
 ]
 
 import sys
@@ -957,6 +958,27 @@ class InvoiceLimit(IntEnum):
     """:obj:`int`: Minimum amount of bytes for the internal payload."""
     MAX_PAYLOAD_LENGTH = 128
     """:obj:`int`: Maximum amount of bytes for the internal payload."""
+
+
+class UserProfilePhotosLimit(IntEnum):
+    """This enum contains limitations for :paramref:`telegram.Bot.get_user_profile_photos.limit`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.Bot.get_user_profile_photos.limit` parameter of
+    :meth:`telegram.Bot.get_user_profile_photos`.
+    """
+    MAX_LIMIT = 100
+    """:obj:`int`: Maximum value allowed for
+    :paramref:`~telegram.Bot.get_user_profile_photos.limit` parameter of
+    :meth:`telegram.Bot.get_user_profile_photos`.
+    """
 
 
 class WebhookLimit(IntEnum):
