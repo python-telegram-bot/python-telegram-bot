@@ -507,6 +507,15 @@ class LocationLimit(IntEnum):
     in degrees.
     """
 
+    MIN_LIVE_PERIOD = 60
+    """:obj:`int`: Minimum value allowed for period in seconds for which the location
+    will be updated.
+    """
+    MAX_LIVE_PERIOD = 86400
+    """:obj:`int`: Maximum value allowed for period in seconds for which the location
+    will be updated.
+    """
+
     MIN_PROXIMITY_ALERT_RADIUS = 1
     """:obj:`int`: Minimum distance for proximity alerts about approaching another chat member, in
     meters.
