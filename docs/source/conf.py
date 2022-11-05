@@ -406,7 +406,7 @@ def find_insert_pos(lines: List[str]) -> int:
         if value.startswith(":returns:"):
             return idx
     else:
-        raise ValueError("Could not find the correct position to insert the keyword args.")
+        return False
 
 
 def is_write_timeout_20(obj: object) -> int:
@@ -449,6 +449,11 @@ def autodoc_process_docstring(
         and check_timeout_and_api_kwargs_presence(obj)
     ):
         insert_index = find_insert_pos(lines)
+        if not insert_index:
+            raise ValueError(
+                f"Couldn't find the correct position to insert the keyword args for {obj}."
+            )
+
         long_write_timeout = is_write_timeout_20(obj)
         get_updates_sub = 1 if (method_name == "get_updates") else 0
         # The below can be done in 1 line with itertools.chain, but this must be modified in-place

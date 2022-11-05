@@ -671,29 +671,22 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_message`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             text (:obj:`str`): Text of the message to be sent. Max
                 :tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
                 parsing.
-            parse_mode (:obj:`str`): Send Markdown or HTML, if you want Telegram apps to show bold,
-                italic, fixed-width text or inline URLs in your bot's message. See the constants in
-                :class:`telegram.constants.ParseMode` for the available modes.
+            parse_mode (:obj:`str`): |parse_mode|
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
             disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in
                 this message.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of sent messages from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -762,8 +755,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :meth:`telegram.CallbackQuery.delete_message`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             message_id (:obj:`int`): Identifier of the message to delete.
 
         Returns:
@@ -815,15 +807,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.Chat.forward_from`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
-            message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            message_id (:obj:`int`): Message identifier in the chat specified in
+                :paramref:`from_chat_id`.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
 
@@ -880,8 +870,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_photo`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             photo (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.PhotoSize`): Photo to send.
                 |fileinput|
@@ -896,23 +885,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             caption (:obj:`str`, optional): Photo caption (may also be used when resending photos
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
-            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
-                show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-                entities that appear in message text, which can be specified instead of
-                :paramref:`parse_mode`.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -998,8 +978,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_audio`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             audio (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Audio`): Audio file to send.
                 |fileinput|
@@ -1014,26 +993,17 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             caption (:obj:`str`, optional): Audio caption,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
-            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
-                show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-                entities that appear in message text, which can be specified instead of
-                :paramref:`parse_mode`.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
             duration (:obj:`int`, optional): Duration of sent audio in seconds.
             performer (:obj:`str`, optional): Performer.
             title (:obj:`str`, optional): Track name.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1131,8 +1101,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_document`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             document (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Document`): File to send.
                 |fileinput|
@@ -1152,23 +1121,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 characters after entities parsing.
             disable_content_type_detection (:obj:`bool`, optional): Disables automatic server-side
                 content type detection for files uploaded using multipart/form-data.
-            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
-                show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-                entities that appear in message text, which can be specified instead of
-                :paramref:`parse_mode`.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1250,8 +1210,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_sticker`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Sticker`): Sticker to send.
                 |fileinput|
@@ -1263,17 +1222,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1345,8 +1299,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_video`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             video (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Video`): Video file to send.
                 |fileinput|
@@ -1364,25 +1317,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             caption (:obj:`str`, optional): Video caption (may also be used when resending videos
                 by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
                 characters after entities parsing.
-            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
-                show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-                entities that appear in message text, which can be specified instead of
-                :paramref:`parse_mode`.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
             supports_streaming (:obj:`bool`, optional): Pass :obj:`True`, if the uploaded video is
                 suitable for streaming.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1482,8 +1426,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_video_note`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             video_note (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.VideoNote`): Video note to send.
                 Pass a file_id as String to send a video note that exists on the Telegram
@@ -1501,17 +1444,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             duration (:obj:`int`, optional): Duration of sent video in seconds.
             length (:obj:`int`, optional): Video width and height, i.e. diameter of the video
                 message.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1608,8 +1546,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_animation`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             animation (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Animation`): Animation to send.
                 |fileinput|
@@ -1634,23 +1571,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 animations by file_id),
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
-            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
-                show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-                entities that appear in message text, which can be specified instead of
-                :paramref:`parse_mode`.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1741,8 +1669,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_voice`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             voice (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | \
                 :class:`telegram.Voice`): Voice file to send.
                 |fileinput|
@@ -1757,24 +1684,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             caption (:obj:`str`, optional): Voice message caption,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
-            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
-                show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-                entities that appear in message text, which can be specified instead of
-                :paramref:`parse_mode`.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
             duration (:obj:`int`, optional): Duration of the voice message in seconds.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -1847,31 +1765,25 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """Use this method to send a group of photos or videos as an album.
 
         Note:
-            If you supply a :paramref:`caption` (along with either
-            :paramref:`parse_mode` or :paramref:`caption_entities`),
-            then items in :paramref:`media` must have no captions, and vice verca.
+            If you supply a :paramref:`caption` (along with either :paramref:`parse_mode` or
+            :paramref:`caption_entities`), then items in :paramref:`media` must have no captions,
+            and vice versa.
 
         .. seealso:: :attr:`telegram.Message.reply_media_group`,
             :attr:`telegram.Chat.send_media_group`,
             :attr:`telegram.User.send_media_group`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             media (List[:class:`telegram.InputMediaAudio`, :class:`telegram.InputMediaDocument`, \
                 :class:`telegram.InputMediaPhoto`, :class:`telegram.InputMediaVideo`]): An array
                 describing messages to be sent, must include 2–10 items.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
 
         Keyword Args:
             caption (:obj:`str`, optional): Caption that will be added to the
@@ -1978,8 +1890,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_location`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             horizontal_accuracy (:obj:`int`, optional): The radius of uncertainty for the location,
@@ -1993,17 +1904,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
                 for proximity alerts about approaching another chat member, in meters. Must be
                 between 1 and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                    original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -2092,8 +1998,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
-                specified. Unique identifier for the target chat or username of the target channel
-                (in the format ``@channelusername``).
+                specified. |chat_id_channel|
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -2181,8 +2086,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
-                is not specified. Unique identifier for the target chat or username of the target
-                channel (in the format ``@channelusername``).
+                is not specified. |chat_id_channel|
             message_id (:obj:`int`, optional): Required if :paramref:`inline_message_id` is not
                 specified. Identifier of the sent message with live location to stop.
             inline_message_id (:obj:`str`, optional): Required if :paramref:`chat_id` and
@@ -2253,8 +2157,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_venue`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             latitude (:obj:`float`, optional): Latitude of venue.
             longitude (:obj:`float`, optional): Longitude of venue.
             title (:obj:`str`, optional): Name of the venue.
@@ -2267,17 +2170,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             google_place_type (:obj:`str`, optional): Google Places type of the venue. (See
                 `supported types \
                 <https://developers.google.com/maps/documentation/places/web-service/supported_types>`_.)
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
 
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -2380,24 +2279,19 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_contact`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             phone_number (:obj:`str`, optional): Contact's phone number.
             first_name (:obj:`str`, optional): Contact's first name.
             last_name (:obj:`str`, optional): Contact's last name.
             vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
                 0-2048 bytes.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
 
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -2483,17 +2377,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat.
             game_short_name (:obj:`str`): Short name of the game, serves as the unique identifier
                 for the game. Set up your games via `@BotFather <https://t.me/BotFather>`_.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard. If empty, one "Play game_title" button will be
                 shown. If not empty, the first button must launch the game.
@@ -2544,8 +2433,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.send_chat_action`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             action(:obj:`str`): Type of action to broadcast. Choose one, depending on what the user
                 is about to receive. For convenience look at the constants in
                 :class:`telegram.constants.ChatAction`.
@@ -3029,8 +2917,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.unban_member`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup or channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             user_id (:obj:`int`): Unique identifier of the target user.
             only_if_banned (:obj:`bool`, optional): Do nothing if the user is not banned.
 
@@ -3079,8 +2966,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. versionadded:: 13.9
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup or channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             sender_chat_id (:obj:`int`): Unique identifier of the target sender chat.
 
         Returns:
@@ -3206,8 +3092,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
-                is not specified. Unique identifier for the target chat or username of the target
-                channel (in the format ``@channelusername``)
+                is not specified. |chat_id_channel|
             message_id (:obj:`int`, optional): Required if :paramref:`inline_message_id` is not
                 specified. Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if :paramref:`chat_id` and
@@ -3215,9 +3100,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             text (:obj:`str`): New text of the message,
                 1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
                 parsing.
-            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
-                show bold, italic, fixed-width text or inline URLs in your bot's message. See the
-                constants in :class:`telegram.constants.ParseMode` for the available modes.
+            parse_mode (:obj:`str`, optional): |parse_mode|
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of
                 :paramref:`parse_mode`.
@@ -3288,8 +3171,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
-                specified. Unique identifier for the target chat or username of the target channel
-                (in the format ``@channelusername``)
+                specified. |chat_id_channel|
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -3297,12 +3179,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             caption (:obj:`str`, optional): New caption of the message,
                 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
                 entities parsing.
-            parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to
-                show bold, italic, fixed-width text or inline URLs in the media caption. See the
-                constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-                entities that appear in message text, which can be specified instead of
-                :paramref:`parse_mode`.
+            parse_mode (:obj:`str`, optional): |parse_mode|
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard.
 
@@ -3370,8 +3248,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             media (:class:`telegram.InputMedia`): An object for a new media content
                 of the message.
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
-                specified. Unique identifier for the target chat or username of the target channel
-                (in the format ``@channelusername``).
+                specified. |chat_id_channel|
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -3432,8 +3309,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
-                specified. Unique identifier for the target chat or username of the target channel
-                (in the format ``@channelusername``).
+                specified. |chat_id_channel|
             message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
                 Identifier of the message to edit.
             inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
@@ -3737,8 +3613,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.leave`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup or channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -3777,8 +3652,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         one-on-one conversations, current username of a user, group or channel, etc.).
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup or channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
             :class:`telegram.Chat`
@@ -3818,8 +3692,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.get_administrators`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup or channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
             List[:class:`telegram.ChatMember`]: On success, returns a list of ``ChatMember``
@@ -3861,8 +3734,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. versionadded:: 13.7
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup or channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
             :obj:`int`: Number of members in the chat.
@@ -3900,8 +3772,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.get_member`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup or channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             user_id (:obj:`int`): Unique identifier of the target user.
 
         Returns:
@@ -3941,8 +3812,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         in :meth:`get_chat` requests to check if the bot can use this method.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup (in the format @supergroupusername).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             sticker_set_name (:obj:`str`): Name of the sticker set to be set as the group
                 sticker set.
 
@@ -3978,8 +3848,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :meth:`get_chat` requests to check if the bot can use this method.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup (in the format @supergroupusername).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
 
         Returns:
              :obj:`bool`: On success, :obj:`True` is returned.
@@ -4206,8 +4075,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             As of Bot API 5.2, the parameter :paramref:`start_parameter` is optional.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             title (:obj:`str`): Product name. :tg-const:`telegram.Invoice.MIN_TITLE_LENGTH`-
                 :tg-const:`telegram.Invoice.MAX_TITLE_LENGTH` characters.
             description (:obj:`str`): Product description.
@@ -4272,17 +4140,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 address should be sent to provider.
             is_flexible (:obj:`bool`, optional): Pass :obj:`True`, if the final price depends on
                 the shipping method.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for an
                 inline keyboard. If empty, one 'Pay total price' button will be
                 shown. If not empty, the first button must be a Pay button.
@@ -4536,8 +4399,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.Chat.restrict_member`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target supergroup (in the format @supergroupusername).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             user_id (:obj:`int`): Unique identifier of the target user.
             until_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when restrictions
                 will be lifted for the user, unix time. If user is restricted for more than 366
@@ -4611,8 +4473,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
            :paramref:`can_manage_video_chats` in accordance to Bot API 6.0.
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             user_id (:obj:`int`): Unique identifier of the target user.
             is_anonymous (:obj:`bool`, optional): Pass :obj:`True`, if the administrator's presence
                 in the chat is hidden.
@@ -4711,8 +4572,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.set_permissions`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
-                the target supergroup (in the format `@supergroupusername`).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             permissions (:class:`telegram.ChatPermissions`): New default chat permissions.
 
         Returns:
@@ -4754,8 +4614,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.set_administrator_custom_title`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username of
-                the target supergroup (in the format `@supergroupusername`).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             user_id (:obj:`int`): Unique identifier of the target administrator.
             custom_title (:obj:`str`): New custom title for the administrator; 0-16 characters,
                 emoji are not allowed.
@@ -4807,8 +4666,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.export_invite_link`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
             :obj:`str`: New invite link on success.
@@ -4854,8 +4712,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. versionadded:: 13.4
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             expire_date (:obj:`int` | :obj:`datetime.datetime`, optional): Date when the link will
                 expire. Integer input will be interpreted as Unix timestamp.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
@@ -4938,8 +4795,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. versionadded:: 13.4
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to edit.
 
                 .. versionchanged:: 20.0
@@ -5018,8 +4874,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. versionadded:: 13.4
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             invite_link (:obj:`str` | :obj:`telegram.ChatInviteLink`): The invite link to revoke.
 
                 .. versionchanged:: 20.0
@@ -5070,8 +4925,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. versionadded:: 13.8
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             user_id (:obj:`int`): Unique identifier of the target user.
 
         Returns:
@@ -5117,8 +4971,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. versionadded:: 13.8
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             user_id (:obj:`int`): Unique identifier of the target user.
 
         Returns:
@@ -5161,8 +5014,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.set_photo`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             photo (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path`): New chat photo.
                 |uploadinput|
 
@@ -5211,8 +5063,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.delete_photo`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5253,8 +5104,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.set_title`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             title (:obj:`str`): New chat title, 1-255 characters.
 
         Returns:
@@ -5296,8 +5146,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.set_description`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             description (:obj:`str`, optional): New chat description, 0-255 characters.
 
         Returns:
@@ -5345,8 +5194,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.pin_message`, :attr:`telegram.User.pin_message`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             message_id (:obj:`int`): Identifier of a message to pin.
             disable_notification (:obj:`bool`, optional): Pass :obj:`True`, if it is not necessary
                 to send a notification to all chat members about the new pinned message.
@@ -5397,8 +5245,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. seealso:: :attr:`telegram.Chat.unpin_message`, :attr:`telegram.User.unpin_message`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             message_id (:obj:`int`, optional): Identifier of a message to unpin. If not specified,
                 the most recent pinned message (by sending date) will be unpinned.
 
@@ -5446,8 +5293,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.User.unpin_all_messages`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6018,8 +5864,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :attr:`telegram.User.send_poll`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             question (:obj:`str`): Poll question, 1-:tg-const:`telegram.Poll.MAX_QUESTION_LENGTH`
                 characters.
             options (List[:obj:`str`]): List of answer options,
@@ -6053,17 +5898,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 used.
             is_closed (:obj:`bool`, optional): Pass :obj:`True`, if the poll needs to be
                 immediately closed. This can be useful for poll preview.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -6136,8 +5976,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. seealso:: :attr:`telegram.Message.stop_poll`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             message_id (:obj:`int`): Identifier of the original message with the poll.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 message inline keyboard.
@@ -6189,12 +6028,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :attr:`telegram.User.send_dice`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
@@ -6211,10 +6047,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
                 .. versionchanged:: 13.4
                    Added the :tg-const:`telegram.constants.DiceEmoji.BOWLING` emoji..
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
 
@@ -6610,8 +6444,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :attr:`telegram.User.copy_message`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             from_chat_id (:obj:`int` | :obj:`str`): Unique identifier for the chat where the
                 original message was sent (or channel username in the format ``@channelusername``).
             message_id (:obj:`int`): Message identifier in the chat specified in from_chat_id.
@@ -6620,20 +6453,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 entities parsing. If not specified, the original caption is kept.
             parse_mode (:obj:`str`, optional): Mode for parsing entities in the new caption. See
                 the constants in :class:`telegram.constants.ParseMode` for the available modes.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-                entities that appear in the new caption, which can be specified instead
-                of parse_mode.
-            disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-                receive a notification with no sound.
-            protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-                forwarding and saving.
+            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+            disable_notification (:obj:`bool`, optional): |disable_notification|
+            protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-
-            reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
-                original message.
-            allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-                should be sent even if the specified replied-to message is not found.
+            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
+            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             reply_markup (:class:`InlineKeyboardMarkup` | :class:`ReplyKeyboardMarkup` | \
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
