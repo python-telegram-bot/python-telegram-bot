@@ -487,8 +487,8 @@ class InlineQueryResultType(StringEnum):
 
 class LocationLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.Location`/
-    :meth:`telegram.Bot.send_location`. The enum members of this enumeration are instances
-    of :class:`int` and can be treated as such.
+    :meth:`telegram.Bot.edit_message_live_location`/:meth:`telegram.Bot.send_location`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
     """
@@ -496,41 +496,66 @@ class LocationLimit(IntEnum):
     __slots__ = ()
 
     HORIZONTAL_ACCURACY = 1500
-    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Location.horizontal_accuracy`
-    parameter of :class:`telegram.Location` and
-    :paramref:`~telegram.Bot.send_location.horizontal_accuracy`
-    parameter of :meth:`telegram.Bot.send_location`.
+    """:obj:`int`: Maximum value allowed for:
+
+    * :paramref:`~telegram.Location.horizontal_accuracy` parameter of :class:`telegram.Location`
+    * :paramref:`~telegram.Bot.edit_message_live_location.horizontal_accuracy` parameter of
+      :meth:`telegram.Bot.edit_message_live_location`
+    * :paramref:`~telegram.Bot.send_location.horizontal_accuracy` parameter of
+      :meth:`telegram.Bot.send_location`
     """
 
     MIN_HEADING = 1
-    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.Location.heading` parameter of
-    :class:`telegram.Location` and :paramref:`~telegram.Bot.send_location.heading` parameter of
-    :meth:`telegram.Bot.send_location`.
+    """:obj:`int`: Minimum value allowed for:
+
+    * :paramref:`~telegram.Location.heading` parameter of :class:`telegram.Location`
+    * :paramref:`~telegram.Bot.edit_message_live_location.heading` parameter of
+      :meth:`telegram.Bot.edit_message_live_location`
+    * :paramref:`~telegram.Bot.send_location.heading` parameter of
+      :meth:`telegram.Bot.send_location`
     """
     MAX_HEADING = 360
-    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Location.heading` parameter of
-    :class:`telegram.Location` and :paramref:`~telegram.Bot.send_location.heading` parameter of
-    :meth:`telegram.Bot.send_location`.
+    """:obj:`int`: Maximum value allowed for:
+
+    * :paramref:`~telegram.Location.heading` parameter of :class:`telegram.Location`
+    * :paramref:`~telegram.Bot.edit_message_live_location.heading` parameter of
+      :meth:`telegram.Bot.edit_message_live_location`
+    * :paramref:`~telegram.Bot.send_location.heading` parameter of
+      :meth:`telegram.Bot.send_location`
     """
 
     MIN_LIVE_PERIOD = 60
-    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.Bot.send_location.live_period`
-    parameter of :meth:`telegram.Bot.send_location`.
+    """:obj:`int`: Minimum value allowed for:
+
+    * :paramref:`~telegram.Bot.edit_message_live_location.live_period` parameter of
+      :meth:`telegram.Bot.edit_message_live_location`
+    * :paramref:`~telegram.Bot.send_location.live_period` parameter of
+      :meth:`telegram.Bot.send_location`
     """
     MAX_LIVE_PERIOD = 86400
-    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Bot.send_location.live_period`
-    parameter of :meth:`telegram.Bot.send_location`.
+    """:obj:`int`: Maximum value allowed for:
+
+    * :paramref:`~telegram.Bot.edit_message_live_location.live_period` parameter of
+      :meth:`telegram.Bot.edit_message_live_location`
+    * :paramref:`~telegram.Bot.send_location.live_period` parameter of
+      :meth:`telegram.Bot.send_location`
     """
 
     MIN_PROXIMITY_ALERT_RADIUS = 1
-    """:obj:`int`: Minimum value allowed
-    for :paramref:`~telegram.Bot.send_location.proximity_alert_radius` parameter of
-    :meth:`telegram.Bot.send_location`.
+    """:obj:`int`: Minimum value allowed for:
+
+    * :paramref:`~telegram.Bot.edit_message_live_location.proximity_alert_radius` parameter of
+      :meth:`telegram.Bot.edit_message_live_location`
+    * :paramref:`~telegram.Bot.send_location.proximity_alert_radius` parameter of
+      :meth:`telegram.Bot.send_location`
     """
     MAX_PROXIMITY_ALERT_RADIUS = 100000
-    """:obj:`int`: Maximum value allowed
-    for :paramref:`~telegram.Bot.send_location.proximity_alert_radius` parameter of
-    :meth:`telegram.Bot.send_location`.
+    """:obj:`int`: Maximum value allowed for:
+
+    * :paramref:`~telegram.Bot.edit_message_live_location.proximity_alert_radius` parameter of
+      :meth:`telegram.Bot.edit_message_live_location`
+    * :paramref:`~telegram.Bot.send_location.proximity_alert_radius` parameter of
+      :meth:`telegram.Bot.send_location`
     """
 
 
