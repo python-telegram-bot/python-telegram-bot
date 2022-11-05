@@ -36,7 +36,9 @@ class Location(TelegramObject):
         live_period (:obj:`int`, optional): Time relative to the message sending date, during which
             the location can be updated, in seconds. For active live locations only.
         heading (:obj:`int`, optional): The direction in which user is moving, in degrees;
-            1-:tg-const:`telegram.constants.LocationLimit.HEADING`. For active live locations only.
+            :tg-const:`telegram.constants.LocationLimit.MIN_HEADING`-
+            :tg-const:`telegram.constants.LocationLimit.MAX_HEADING`.
+            For active live locations only.
         proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts about
             approaching another chat member, in meters. For sent live locations only.
 

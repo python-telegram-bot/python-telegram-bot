@@ -496,33 +496,41 @@ class LocationLimit(IntEnum):
     __slots__ = ()
 
     HORIZONTAL_ACCURACY = 1500
-    """:obj:`int`: Maximum radius of uncertainty for the location, measured in meters."""
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Location.horizontal_accuracy`
+    parameter of :class:`telegram.Location` and
+    :paramref:`~telegram.Bot.send_location.horizontal_accuracy`
+    parameter of :meth:`telegram.Bot.send_location`.
+    """
 
     MIN_HEADING = 1
-    """:obj:`int`: Minimum value allowed for the direction in which the user is moving,
-    in degrees.
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.Location.heading` parameter of
+    :class:`telegram.Location` and :paramref:`~telegram.Bot.send_location.heading` parameter of
+    :meth:`telegram.Bot.send_location`.
     """
     MAX_HEADING = 360
-    """:obj:`int`: Maximum value allowed for the direction in which the user is moving,
-    in degrees.
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Location.heading` parameter of
+    :class:`telegram.Location` and :paramref:`~telegram.Bot.send_location.heading` parameter of
+    :meth:`telegram.Bot.send_location`.
     """
 
     MIN_LIVE_PERIOD = 60
-    """:obj:`int`: Minimum value allowed for period in seconds for which the location
-    will be updated.
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.Bot.send_location.live_period`
+    parameter of :meth:`telegram.Bot.send_location`.
     """
     MAX_LIVE_PERIOD = 86400
-    """:obj:`int`: Maximum value allowed for period in seconds for which the location
-    will be updated.
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Bot.send_location.live_period`
+    parameter of :meth:`telegram.Bot.send_location`.
     """
 
     MIN_PROXIMITY_ALERT_RADIUS = 1
-    """:obj:`int`: Minimum distance for proximity alerts about approaching another chat member, in
-    meters.
+    """:obj:`int`: Minimum value allowed
+    for :paramref:`~telegram.Bot.send_location.proximity_alert_radius` parameter of
+    :meth:`telegram.Bot.send_location`.
     """
     MAX_PROXIMITY_ALERT_RADIUS = 100000
-    """:obj:`int`: Maximum distance for proximity alerts about approaching another chat member, in
-    meters.
+    """:obj:`int`: Maximum value allowed
+    for :paramref:`~telegram.Bot.send_location.proximity_alert_radius` parameter of
+    :meth:`telegram.Bot.send_location`.
     """
 
 
