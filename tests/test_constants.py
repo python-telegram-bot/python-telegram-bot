@@ -131,7 +131,7 @@ class TestConstants:
         assert good_msg.caption == good_caption
 
         bad_caption = good_caption + "Z"
-        match = "Media_caption_too_long"
+        match = "Message caption is too long"
         with pytest.raises(BadRequest, match=match), data_file("telegram.png").open("rb") as f:
             await bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
 
