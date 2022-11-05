@@ -4087,9 +4087,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
-                connections to the webhook for update delivery, 1-100. Defaults to ``40``. Use
-                lower values to limit the load on your bot's server, and higher values to increase
-                your bot's throughput.
+                connections to the webhook for update delivery,
+                :tg-const:`telegram.constants.WebhookLimit.MIN_CONNECTIONS_LIMIT`-
+                :tg-const:`telegram.constants.WebhookLimit.MAX_CONNECTIONS_LIMIT`.
+                Defaults to ``40``. Use lower values to limit the load on your bot's server,
+                and higher values to increase your bot's throughput.
             allowed_updates (List[:obj:`str`], optional): A list the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
