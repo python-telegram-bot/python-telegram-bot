@@ -57,6 +57,11 @@ class TestConstants:
             actual == expected
         ), f"Members {expected - actual} were not listed in constants.__all__"
 
+    def test_message_attachment_type(self):
+        assert all(
+            getattr(constants.MessageType, x.name, False) for x in constants.MessageAttachmentType
+        ), "All MessageAttachmentType members should be in MessageType"
+
     def test_to_json(self):
         assert json.dumps(StrEnumTest.FOO) == json.dumps("foo")
         assert json.dumps(IntEnumTest.FOO) == json.dumps(1)
