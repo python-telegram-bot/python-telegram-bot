@@ -148,6 +148,23 @@ class Chat(TelegramObject):
             in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        is_forum (:obj:`bool`, optional): :obj:`True`, if the supergroup chat is a forum
+            (has `topics <https://telegram.org/blog/topics-in-groups-collectible-usernames\
+            #topics-in-groups>`_ enabled).
+
+            .. versionadded:: 20.0
+        active_usernames (List[:obj:`str`], optional):  If set, the list of all `active chat
+            usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
+            #collectible-usernames>`_; for private chats, supergroups and channels. Returned
+            only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 20.0
+        emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji
+            status of the other party in a private chat. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 20.0
+
     Attributes:
         id (:obj:`int`): Unique identifier for this chat.
         type (:obj:`str`): Type of chat.
@@ -205,6 +222,21 @@ class Chat(TelegramObject):
             in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
+        is_forum (:obj:`bool`): Optional. :obj:`True`, if the supergroup chat is a forum
+            (has `topics <https://core.telegram.org/bots#commands>`_ enabled).
+
+            .. versionadded:: 20.0
+        active_usernames (List[:obj:`str`]): Optional. If set, the list of all `active chat
+            usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
+            #collectible-usernames>`_; for private chats, supergroups and channels. Returned
+            only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 20.0
+        emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
+            status of the other party in a private chat. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 20.0
 
     """
 
@@ -232,6 +264,9 @@ class Chat(TelegramObject):
         "join_to_send_messages",
         "join_by_request",
         "has_restricted_voice_and_video_messages",
+        "is_forum",
+        "active_usernames",
+        "emoji_status_custom_emoji_id"
     )
 
     SENDER: ClassVar[str] = constants.ChatType.SENDER
@@ -273,6 +308,9 @@ class Chat(TelegramObject):
         join_to_send_messages: bool = None,
         join_by_request: bool = None,
         has_restricted_voice_and_video_messages: bool = None,
+        is_forum: bool = None,
+        active_usernames: List[str] = None,
+        emoji_status_custom_emoji_id: str = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -304,6 +342,9 @@ class Chat(TelegramObject):
         self.join_to_send_messages = join_to_send_messages
         self.join_by_request = join_by_request
         self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
+        self.is_forum = is_forum
+        self.active_usernames = active_usernames
+        self.emoji_status_custom_emoji_id = emoji_status_custom_emoji_id
 
         self._id_attrs = (self.id,)
 

@@ -44,6 +44,9 @@ def chat(bot):
         join_to_send_messages=True,
         join_by_request=True,
         has_restricted_voice_and_video_messages=True,
+        is_forum=True,
+        active_usernames=TestChat.active_usernames,
+        emoji_status_custom_emoji_id=TestChat.emoji_status_custom_emoji_id,
     )
     chat.set_bot(bot)
     return chat
@@ -71,6 +74,9 @@ class TestChat:
     join_to_send_messages = True
     join_by_request = True
     has_restricted_voice_and_video_messages = True
+    is_forum = True
+    active_usernames = ["These", "Are", "Usernames!"]
+    emoji_status_custom_emoji_id = "VeryUniqueCustomEmojiID"
 
     def test_slot_behaviour(self, chat, mro_slots):
         for attr in chat.__slots__:
@@ -98,6 +104,9 @@ class TestChat:
             "has_restricted_voice_and_video_messages": (
                 self.has_restricted_voice_and_video_messages
             ),
+            "is_forum": self.is_forum,
+            "active_usernames": self.active_usernames,
+            "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id
         }
         chat = Chat.de_json(json_dict, bot)
 
@@ -124,6 +133,9 @@ class TestChat:
         assert chat.api_kwargs == {
             "all_members_are_administrators": self.all_members_are_administrators
         }
+        assert chat.is_forum == self.is_forum
+        assert chat.active_usernames == self.active_usernames
+        assert chat.emoji_status_custom_emoji_id == self.emoji_status_custom_emoji_id
 
     def test_to_dict(self, chat):
         chat_dict = chat.to_dict()
@@ -146,6 +158,9 @@ class TestChat:
             chat_dict["has_restricted_voice_and_video_messages"]
             == chat.has_restricted_voice_and_video_messages
         )
+        assert chat_dict["is_forum"] == chat.is_forum
+        assert chat_dict["active_usernames"] == chat.active_usernames
+        assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
 
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")
