@@ -33,7 +33,7 @@ class ChatPermissions(TelegramObject):
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
         permissions that are set, but also sets all the others to :obj:`False`. However, since not
-        documented, this behaviour may change unbeknown to PTB.
+        documented, this behavior may change unbeknown to PTB.
 
     Args:
         can_send_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to send text
@@ -54,8 +54,8 @@ class ChatPermissions(TelegramObject):
             users to the chat.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
             messages. Ignored in public supergroups.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed to
-            manage topics; groups and supergroups only.
+        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only
 
             .. versionadded:: 20.0
 
@@ -78,8 +78,8 @@ class ChatPermissions(TelegramObject):
             new users to the chat.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages. Ignored in public supergroups.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed to
-            manage topics; groups and supergroups only.
+        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only
 
             .. versionadded:: 20.0
 

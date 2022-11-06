@@ -62,8 +62,10 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed to
-            manage topics; groups and supergroups only.
+        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only.
+
+            .. versionadded:: 20.0
 
     Attributes:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -91,8 +93,8 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed to
-            manage topics; groups and supergroups only.
+        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only.
 
             .. versionadded:: 20.0
     """
