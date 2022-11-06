@@ -5332,6 +5332,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
         can_manage_video_chats: bool = None,
+        can_manage_topics: bool = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -5386,6 +5387,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 add new administrators with a subset of his own privileges or demote administrators
                 that he has promoted, directly or indirectly (promoted by administrators that were
                 appointed by him).
+            can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the administrator can
+                manage topics; groups and supergroups only.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -5434,6 +5439,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data["can_manage_chat"] = can_manage_chat
         if can_manage_video_chats is not None:
             data["can_manage_video_chats"] = can_manage_video_chats
+        if can_manage_topics is not None:
+            data["can_manage_topics"] = can_manage_topics
 
         result = await self._post(
             "promoteChatMember",

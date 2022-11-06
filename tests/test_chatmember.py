@@ -60,6 +60,7 @@ class CMDefaults:
     is_member: bool = True
     can_manage_chat: bool = True
     can_manage_video_chats: bool = True
+    can_manage_topics: bool = True
 
 
 def chat_member_owner():
@@ -81,6 +82,7 @@ def chat_member_administrator():
         CMDefaults.can_post_messages,
         CMDefaults.can_edit_messages,
         CMDefaults.can_pin_messages,
+        CMDefaults.can_manage_topics,
         CMDefaults.custom_title,
     )
 
@@ -96,6 +98,7 @@ def chat_member_restricted():
         CMDefaults.can_change_info,
         CMDefaults.can_invite_users,
         CMDefaults.can_pin_messages,
+        CMDefaults.can_manage_topics,
         CMDefaults.can_send_messages,
         CMDefaults.can_send_media_messages,
         CMDefaults.can_send_polls,
