@@ -909,6 +909,7 @@ class ChatLimits(IntEnum):
 
     .. versionadded:: 20.0
     """
+
     __slots__ = ()
 
     MIN_TITLE_LENGTH = 1

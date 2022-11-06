@@ -266,7 +266,7 @@ class Chat(TelegramObject):
         "has_restricted_voice_and_video_messages",
         "is_forum",
         "active_usernames",
-        "emoji_status_custom_emoji_id"
+        "emoji_status_custom_emoji_id",
     )
 
     SENDER: ClassVar[str] = constants.ChatType.SENDER
