@@ -259,6 +259,25 @@
 .. raw:: html
 
    <details>
+   <summary>Forum topic management</summary>
+
+.. list-table::
+    :align: left
+    :widths: 1 4
+
+    * - :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
+      - Used to get custom emojis to use as topic icons
+    * - :meth:`~telegram.Bot.edit_forum_topic`
+      - Used to edit a topic
+
+.. raw:: html
+
+   </details>
+   <br>
+
+.. raw:: html
+
+   <details>
    <summary>Miscellaneous</summary>
 
 .. list-table::

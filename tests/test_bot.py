@@ -60,7 +60,6 @@ from telegram import (
     PollOption,
     SentWebAppMessage,
     ShippingOption,
-    Sticker,
     Update,
     User,
     WebAppInfo,
@@ -2436,6 +2435,9 @@ class TestBot:
     # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers
     # are tested in the test_sticker module.
 
+    # get_forum_topic_icon_stickers, edit_forum_topic, etc...
+    # are tested in the test_forum module.
+
     async def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
         # Use BaseException that's not a subclass of Exception such that
         # OkException should not be caught anywhere
@@ -2778,27 +2780,6 @@ class TestBot:
             assert len(message.caption_entities) == 1
         else:
             assert len(message.caption_entities) == 0
-
-    async def test_get_forum_topic_icon_stickers(self, bot):
-        # we expect the first to stay as it is. This might change in the future.
-        # If we have to fix this test too often maybe just checking it is set to "something"
-        # is enough.
-        emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
-        print(emoji_sticker_list[0].emoji)
-        assert emoji_sticker_list[0].emoji == "📰"
-        assert emoji_sticker_list[0].height == 512
-        assert emoji_sticker_list[0].width == 512
-        assert emoji_sticker_list[0].is_animated
-        assert not emoji_sticker_list[0].is_video
-        assert emoji_sticker_list[0].set_name == "Topics"
-        assert emoji_sticker_list[0].type == Sticker.CUSTOM_EMOJI
-        assert emoji_sticker_list[0].custom_emoji_id == "5420143492263320958"
-        assert emoji_sticker_list[0].thumb.width == 128
-        assert emoji_sticker_list[0].thumb.height == 128
-        assert emoji_sticker_list[0].thumb.file_size == 4036
-        assert emoji_sticker_list[0].thumb.file_unique_id == "AQADfh0AAso3OEty"
-        assert emoji_sticker_list[0].file_size == 57126
-        assert emoji_sticker_list[0].file_unique_id == "AgADfh0AAso3OEs"
 
     async def test_replace_callback_data_send_message(self, cdc_bot, chat_id):
         bot = cdc_bot
