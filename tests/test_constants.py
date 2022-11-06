@@ -57,6 +57,11 @@ class TestConstants:
             actual == expected
         ), f"Members {expected - actual} were not listed in constants.__all__"
 
+    def test_message_attachment_type(self):
+        assert all(
+            getattr(constants.MessageType, x.name, False) for x in constants.MessageAttachmentType
+        ), "All MessageAttachmentType members should be in MessageType"
+
     def test_to_json(self):
         assert json.dumps(StrEnumTest.FOO) == json.dumps("foo")
         assert json.dumps(IntEnumTest.FOO) == json.dumps(1)
@@ -126,7 +131,7 @@ class TestConstants:
         assert good_msg.caption == good_caption
 
         bad_caption = good_caption + "Z"
-        match = "Media_caption_too_long"
+        match = "Message caption is too long"
         with pytest.raises(BadRequest, match=match), data_file("telegram.png").open("rb") as f:
             await bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
 
