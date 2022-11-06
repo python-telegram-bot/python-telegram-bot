@@ -8270,6 +8270,55 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             api_kwargs=api_kwargs,
         )
 
+    @_log
+    async def get_forum_topic_icon_stickers(
+        self,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> List[Sticker]:
+        """Use this method to get custom emoji stickers, which can be used as a forum topic
+         icon by any user. Requires no parameters.
+
+
+        .. versionadded:: 20.0
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            List[:class:`telegram.Sticker`]
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        result = await self._post(
+            "getForumTopicIconStickers",
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+        return Sticker.de_list(result, self)  # type: ignore[return-value, arg-type]
+
     def to_dict(self, recursive: bool = True) -> JSONDict:  # skipcq: PYL-W0613
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {"id": self.id, "username": self.username, "first_name": self.first_name}
@@ -8462,3 +8511,5 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`set_my_default_administrator_rights`"""
     createInvoiceLink = create_invoice_link
     """Alias for :meth:`create_invoice_link`"""
+    getForumTopicIconStickers = get_forum_topic_icon_stickers
+    """Alias for :meth:`get_forum_topic_icon_stickers`"""
