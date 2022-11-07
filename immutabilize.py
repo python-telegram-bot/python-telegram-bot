@@ -14,7 +14,7 @@ for name, cls in classes:
     params_to_change = set()
     for param in params.values():
         if "List" in str(param.annotation):
-            print("  Converting list-type parameter", param.name, "to Collection")
+            print("  Converting list-type parameter", param.name, "to Sequence")
             params_to_change.add(param.name)
 
     if not params_to_change:
@@ -42,11 +42,11 @@ for name, cls in classes:
         if class_start_line + i == init_start_line:
             break
 
-    # In the "Args:" block replace "List[" by "Collection["
+    # In the "Args:" block replace "List[" by "Sequence["
     for i in range(args_start_line + 1, attributes_start_line):
         for param in params_to_change:
             class_source_lines[i] = class_source_lines[i].replace(
-                f"{param} (List[", f"{param} (Collection["
+                f"{param} (List[", f"{param} (Sequence["
             )
 
     # In the "Attributes:" block replace "List[" by "Tuple["
@@ -59,7 +59,7 @@ for name, cls in classes:
     # Adjust type annotations in the __init__ and converts to tuples before assigning to
     # attributes
     for param in params_to_change:
-        init_source = init_source.replace(param + ": List", param + ": Collection")
+        init_source = init_source.replace(param + ": List", param + ": Sequence")
         init_source = re.sub(
             rf"self\.{param} = ([^ ]*)\n", rf"self.{param} = tuple(\1)\n", init_source
         )
