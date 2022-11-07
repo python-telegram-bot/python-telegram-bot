@@ -21,3 +21,7 @@
 .. |toapikwargsarg| replace:: Arbitrary keyword arguments. Can be used to store data for which there are no dedicated attributes. |toapikwargsbase|
 
 .. |toapikwargsattr| replace:: Optional. Arbitrary keyword arguments. Used to store data for which there are no dedicated attributes. |toapikwargsbase|
+
+.. |squenceclassargs| replace:: Accepts any :class:`collections.abc.Sequence` as input instead of just a list. The input is converted to a tuple.
+
+.. |tupleclassattrs| replace:: This attribute is now an immutable tuple.

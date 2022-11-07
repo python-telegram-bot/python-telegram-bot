@@ -44,17 +44,49 @@ for name, cls in classes:
 
     # In the "Args:" block replace "List[" by "Sequence["
     for i in range(args_start_line + 1, attributes_start_line):
+        whitespaces = -1
         for param in params_to_change:
+            if f"{param} (List[" not in class_source_lines[i]:
+                continue
+
             class_source_lines[i] = class_source_lines[i].replace(
                 f"{param} (List[", f"{param} (Sequence["
             )
+            whitespaces = re.match(r" +", class_source_lines[i]).end() + 4
+            j = i + 1
+            while class_source_lines[j] and (
+                re.match(r"\s+", class_source_lines[j]).end() >= whitespaces
+            ):
+                j = j + 1
 
-    # In the "Attributes:" block replace "List[" by "Tuple["
+            class_source_lines[
+                j - 1
+            ] += f"\n\n{whitespaces * ' '}.. versionchanged:: 20.0\n{whitespaces * ' '}    |squenceclassargs|"
+            if class_source_lines[j]:
+                class_source_lines[j - 1] += "\n"
+
+    # In the "Attributes:" block replace "List[" by "Sequence["
     for i in range(attributes_start_line + 1, class_length):
+        whitespaces = -1
         for param in params_to_change:
+            if f"{param} (List[" not in class_source_lines[i]:
+                continue
+
             class_source_lines[i] = class_source_lines[i].replace(
-                f"{param} (List[", f"{param} (Tuple["
+                f"{param} (List[", f"{param} (Sequence["
             )
+            whitespaces = re.match(r" +", class_source_lines[i]).end() + 4
+            j = i + 1
+            while class_source_lines[j] and (
+                re.match(r"\s+", class_source_lines[j]).end() >= whitespaces
+            ):
+                j = j + 1
+
+            class_source_lines[
+                j - 1
+            ] += f"\n\n{whitespaces * ' '}.. versionchanged:: 20.0\n{whitespaces * ' '}    |tupleclassattrs|"
+            if class_source_lines[j]:
+                class_source_lines[j - 1] += "\n"
 
     # Adjust type annotations in the __init__ and converts to tuples before assigning to
     # attributes
