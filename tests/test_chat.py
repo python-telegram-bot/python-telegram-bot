@@ -106,7 +106,7 @@ class TestChat:
             ),
             "is_forum": self.is_forum,
             "active_usernames": self.active_usernames,
-            "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id
+            "emoji_status_custom_emoji_id": self.emoji_status_custom_emoji_id,
         }
         chat = Chat.de_json(json_dict, bot)
 
