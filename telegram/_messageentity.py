@@ -80,7 +80,7 @@ class MessageEntity(TelegramObject):
         user (:class:`telegram.User`): Optional. The mentioned user.
         language (:obj:`str`): Optional. For :attr:`PRE` only, The programming language of
             the entity text.
-        custom_emoji_id (:obj:`str`): Optional.For :attr:`CUSTOM_EMOJI` only, unique identifier
+        custom_emoji_id (:obj:`str`): Optional. For :attr:`CUSTOM_EMOJI` only, unique identifier
             of the custom emoji. Use :meth:`telegram.Bot.get_custom_emoji_stickers` to get full
             information about the sticker.
 
