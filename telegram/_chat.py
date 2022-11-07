@@ -149,8 +149,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
         is_forum (:obj:`bool`, optional): :obj:`True`, if the supergroup chat is a forum
-            (has `topics <https://telegram.org/blog/topics-in-groups-collectible-usernames\
-            #topics-in-groups>`_ enabled).
+            (has topics_ enabled).
 
             .. versionadded:: 20.0
         active_usernames (List[:obj:`str`], optional):  If set, the list of all `active chat
@@ -223,7 +222,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
         is_forum (:obj:`bool`): Optional. :obj:`True`, if the supergroup chat is a forum
-            (has `topics <https://core.telegram.org/bots#commands>`_ enabled).
+            (has topics_ enabled).
 
             .. versionadded:: 20.0
         active_usernames (List[:obj:`str`]): Optional. If set, the list of all `active chat
@@ -238,6 +237,7 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
 
+    .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     """
 
     __slots__ = (
