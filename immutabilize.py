@@ -1,13 +1,42 @@
 # Loops through all TG classes and converts list-type attributes to tuples.
+import importlib
 import inspect
+import os
 import re
+import types
 from pathlib import Path
+from importlib import reload
 
 import telegram
 
+
+def reload_package(package):
+    assert hasattr(package, "__package__")
+    fn = package.__file__
+    fn_dir = os.path.dirname(fn) + os.sep
+    module_visit = {fn}
+    del fn
+
+    def reload_recursive_ex(module):
+        importlib.reload(module)
+
+        for module_child in vars(module).values():
+            if isinstance(module_child, types.ModuleType):
+                fn_child = getattr(module_child, "__file__", None)
+                if (fn_child is not None) and fn_child.startswith(fn_dir):
+                    if fn_child not in module_visit:
+                        # print("reloading:", fn_child, "from", module)
+                        module_visit.add(fn_child)
+                        reload_recursive_ex(module_child)
+
+    return reload_recursive_ex(package)
+
+
 # loop through all classes in the `telegram` module
 classes = inspect.getmembers(telegram, inspect.isclass)
-for name, cls in classes:
+for name, _ in classes:
+    cls = getattr(telegram, name)
+
     print("Processing class", name)
     # first adjust the __init__ of the class
     params = inspect.signature(cls.__init__).parameters
@@ -112,6 +141,14 @@ for name, cls in classes:
         : init_start_line - class_start_line - 1
     ]
 
+    i = 0
+    while file_contents[i].startswith("#"):
+        i += 1
+    file_contents[i] += "\nfrom typing import Sequence"
+
     file_contents = "\n".join(file_contents) + "\n"
 
     class_source_file.write_text(file_contents, encoding="utf-8")
+
+    # so that the changes are reflected in the module
+    reload_package(telegram)
