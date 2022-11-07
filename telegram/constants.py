@@ -39,6 +39,7 @@ __all__ = [
     "ChatAction",
     "ChatID",
     "ChatInviteLinkLimit",
+    "ChatLimit",
     "ChatMemberStatus",
     "ChatType",
     "CustomEmojiStickerLimit",
@@ -903,7 +904,7 @@ class WebhookLimit(IntEnum):
     """:obj:`int`: Maximum length of the secret token."""
 
 
-class ChatLimits(IntEnum):
+class ChatLimit(IntEnum):
     """This enum contains limitations for :paramref:`telegram.Bot.set_chat_title.title`. The
     enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
