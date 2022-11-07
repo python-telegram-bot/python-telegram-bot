@@ -72,7 +72,7 @@ class MessageEntity(TelegramObject):
             :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
 
             .. versionadded:: 20.0
-                added inline custom emoji
+                Added inline custom emoji
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
         url (:obj:`str`): Optional. For :attr:`TEXT_LINK` only, url that will be opened after
