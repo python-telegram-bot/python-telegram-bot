@@ -247,6 +247,13 @@ class Message(TelegramObject):
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
+        is_topic_message (:obj:`bool`, optional): True, if the message is sent to a forum topic.
+
+            .. versionadded:: 20.0
+        message_thread_id (:obj:`int`, optional): Unique identifier of a message thread to which
+            the message belongs; for supergroups only.
+
+            .. versionadded:: 20.0
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -367,6 +374,13 @@ class Message(TelegramObject):
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
+        is_topic_message (:obj:`bool`, optional): True, if the message is sent to a forum topic.
+
+            .. versionadded:: 20.0
+        message_thread_id (:obj:`int`, optional): Unique identifier of a message thread to which
+            the message belongs; for supergroups only.
+
+            .. versionadded:: 20.0
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
         by this function. Instead, the supplied replacement for the emoji will be used.
@@ -434,6 +448,8 @@ class Message(TelegramObject):
         "is_automatic_forward",
         "has_protected_content",
         "web_app_data",
+        "is_topic_message",
+        "message_thread_id",
     )
 
     def __init__(
@@ -497,6 +513,8 @@ class Message(TelegramObject):
         is_automatic_forward: bool = None,
         has_protected_content: bool = None,
         web_app_data: WebAppData = None,
+        is_topic_message: bool = None,
+        message_thread_id: int = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -563,6 +581,8 @@ class Message(TelegramObject):
         self.video_chat_participants_invited = video_chat_participants_invited
         self.reply_markup = reply_markup
         self.web_app_data = web_app_data
+        self.is_topic_message = is_topic_message
+        self.message_thread_id = message_thread_id
 
         self._effective_attachment = DEFAULT_NONE
 
