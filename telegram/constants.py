@@ -62,6 +62,7 @@ __all__ = [
     "PollType",
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerType",
+    "TopicLimit",
     "WebhookLimit",
     "UpdateType",
 ]
