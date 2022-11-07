@@ -112,7 +112,7 @@ class ChatAdministratorRights(TelegramObject):
         "can_post_messages",
         "can_edit_messages",
         "can_pin_messages",
-        "can_manage_topics"
+        "can_manage_topics",
     )
 
     def __init__(
@@ -160,7 +160,7 @@ class ChatAdministratorRights(TelegramObject):
             self.can_post_messages,
             self.can_edit_messages,
             self.can_pin_messages,
-            self.can_manage_topics
+            self.can_manage_topics,
         )
 
     @classmethod
@@ -182,5 +182,6 @@ class ChatAdministratorRights(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(False, False, False, False, False, False,
-            False, False, False, False, False, False)
+        return cls(
+            False, False, False, False, False, False, False, False, False, False, False, False
+        )

@@ -95,7 +95,7 @@ class ChatPermissions(TelegramObject):
         "can_change_info",
         "can_pin_messages",
         "can_add_web_page_previews",
-        "can_manage_topics"
+        "can_manage_topics",
     )
 
     def __init__(
