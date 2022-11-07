@@ -2495,6 +2495,31 @@ class TestBot:
         assert message.entities == entities
 
     @flaky(3, 1)
+    async def test_send_message_to_topic(self, bot, forum_group_id):
+        test_string = "Topics are forever"
+
+        result = await bot._post(
+            "createForumTopic",
+            {"chat_id": forum_group_id, "name": "Is just a yellow lemon tree"},
+        )
+
+        message_thread_id = result["message_thread_id"]
+
+        message = await bot.send_message(
+            chat_id=forum_group_id, text=test_string, message_thread_id=message_thread_id
+        )
+
+        assert message.text == test_string
+        assert message.is_topic_message is True
+        assert message.message_thread_id == message_thread_id
+
+        result = await bot._post(
+            "deleteForumTopic",
+            {"chat_id": forum_group_id, "message_thread_id": message_thread_id},
+        )
+        assert result is True
+
+    @flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_message_default_parse_mode(self, default_bot, chat_id):
         test_string = "Italic Bold Code"
