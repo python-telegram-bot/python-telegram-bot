@@ -988,7 +988,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 thread (topic) of the forum; for forum supergroups only.
 
                 .. versionadded:: 20.0
-
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
