@@ -982,10 +982,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 receive a notification with no sound.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
                 forwarding and saving.
+
+                .. versionadded:: 13.10
             message_thread_id (:obj:`int`, optional): Unique identifier for the target message
                 thread (topic) of the forum; for forum supergroups only.
 
-                .. versionadded:: 13.10
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
