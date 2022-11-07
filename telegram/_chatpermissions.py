@@ -28,7 +28,8 @@ class ChatPermissions(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`can_send_messages`, :attr:`can_send_media_messages`,
     :attr:`can_send_polls`, :attr:`can_send_other_messages`, :attr:`can_add_web_page_previews`,
-    :attr:`can_change_info`, :attr:`can_invite_users` and :attr:`can_pin_messages`, :attr:`can_manage_topics` are equal.
+    :attr:`can_change_info`, :attr:`can_invite_users` and :attr:`can_pin_messages`,
+    :attr:`can_manage_topics` are equal.
 
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
@@ -78,7 +79,7 @@ class ChatPermissions(TelegramObject):
             new users to the chat.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages. Ignored in public supergroups.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+        can_manage_topics (:obj: `bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only
 
             .. versionadded:: 20.0

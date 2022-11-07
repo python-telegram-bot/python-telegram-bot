@@ -29,7 +29,8 @@ class ChatAdministratorRights(TelegramObject):
     considered equal, if their :attr:`is_anonymous`, :attr:`can_manage_chat`,
     :attr:`can_delete_messages`, :attr:`can_manage_video_chats`, :attr:`can_restrict_members`,
     :attr:`can_promote_members`, :attr:`can_change_info`, :attr:`can_invite_users`,
-    :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages`, :attr:`can_manage_topics` are equal.
+    :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages`,
+    :attr:`can_manage_topics` are equal.
 
     .. seealso: :meth:`Bot.set_my_default_administrator_rights`,
         :meth:`Bot.get_my_default_administrator_rights`
@@ -181,4 +182,5 @@ class ChatAdministratorRights(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(False, False, False, False, False, False, False, False, False, False, False, False)
+        return cls(False, False, False, False, False, False,
+            False, False, False, False, False, False)

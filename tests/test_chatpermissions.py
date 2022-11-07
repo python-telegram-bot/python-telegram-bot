@@ -99,6 +99,7 @@ class TestChatPermissions:
         assert permissions_dict["can_invite_users"] == chat_permissions.can_invite_users
         assert permissions_dict["can_pin_messages"] == chat_permissions.can_pin_messages
         assert permissions_dict["can_manage_topics"] == chat_permissions.can_manage_topics
+
     def test_equality(self):
         a = ChatPermissions(
             can_send_messages=True,
