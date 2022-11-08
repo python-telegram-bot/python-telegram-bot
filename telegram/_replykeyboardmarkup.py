@@ -58,7 +58,10 @@ class ReplyKeyboardMarkup(TelegramObject):
             Defaults to :obj:`False`.
 
         input_field_placeholder (:obj:`str`, optional): The placeholder to be shown in the input
-            field when the keyboard is active; 1-64 characters.
+            field when the keyboard is active;
+            :tg-const:`telegram.constants.ReplyKeyboardMarkupLimit.MIN_INPUT_FIELD_PLACEHOLDER`-
+            :tg-const:`telegram.constants.ReplyKeyboardMarkupLimit.MAX_INPUT_FIELD_PLACEHOLDER`
+            characters.
 
             .. versionadded:: 13.7
 

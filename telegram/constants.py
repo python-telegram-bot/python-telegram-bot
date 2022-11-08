@@ -61,6 +61,7 @@ __all__ = [
     "ParseMode",
     "PollLimit",
     "PollType",
+    "ReplyKeyboardMarkupLimit",
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerType",
     "WebhookLimit",
@@ -850,6 +851,27 @@ class PollingLimit(IntEnum):
     MAX_LIMIT = 100
     """:obj:`int`: Maximum value allowed for the :paramref:`~telegram.Bot.get_updates.limit`
     parameter of :meth:`telegram.Bot.get_updates`.
+    """
+
+
+class ReplyKeyboardMarkupLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.ReplyKeyboardMarkup`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_INPUT_FIELD_PLACEHOLDER = 1
+    """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.ReplyKeyboardMarkup.input_field_placeholder` parameter of
+    :class:`telegram.ReplyKeyboardMarkup`
+    """
+    MAX_INPUT_FIELD_PLACEHOLDER = 64
+    """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.ReplyKeyboardMarkup.input_field_placeholder` parameter of
+    :class:`telegram.ReplyKeyboardMarkup`
     """
 
 
