@@ -1,41 +1,29 @@
 # Loops through all TG classes and converts list-type attributes to tuples.
-import importlib
 import inspect
-import os
+import pickle
 import re
-import types
 from pathlib import Path
-from importlib import reload
+
+import isort
 
 import telegram
 
+changed_files = set()
+processed_classes = set()
 
-def reload_package(package):
-    assert hasattr(package, "__package__")
-    fn = package.__file__
-    fn_dir = os.path.dirname(fn) + os.sep
-    module_visit = {fn}
-    del fn
+try:
+    processed_classes = pickle.load(open("processed_classes.pickle", "rb"))
+except Exception:
+    print("Could not load pickle file")
+    processed_classes = set()
 
-    def reload_recursive_ex(module):
-        importlib.reload(module)
-
-        for module_child in vars(module).values():
-            if isinstance(module_child, types.ModuleType):
-                fn_child = getattr(module_child, "__file__", None)
-                if (fn_child is not None) and fn_child.startswith(fn_dir):
-                    if fn_child not in module_visit:
-                        # print("reloading:", fn_child, "from", module)
-                        module_visit.add(fn_child)
-                        reload_recursive_ex(module_child)
-
-    return reload_recursive_ex(package)
-
+unprocessed_classes = set()
 
 # loop through all classes in the `telegram` module
 classes = inspect.getmembers(telegram, inspect.isclass)
-for name, _ in classes:
-    cls = getattr(telegram, name)
+for name, cls in classes:
+    if cls in processed_classes:
+        continue
 
     print("Processing class", name)
     # first adjust the __init__ of the class
@@ -50,6 +38,12 @@ for name, _ in classes:
         continue
 
     class_source_file = Path(inspect.getfile(cls))
+    if class_source_file not in changed_files:
+        changed_files.add(class_source_file)
+        processed_classes.add(cls)
+    else:
+        unprocessed_classes.add(cls)
+        continue
 
     _, class_start_line = inspect.getsourcelines(cls)
     class_source = inspect.getsource(cls)
@@ -88,9 +82,10 @@ for name, _ in classes:
             ):
                 j = j + 1
 
-            class_source_lines[
-                j - 1
-            ] += f"\n\n{whitespaces * ' '}.. versionchanged:: 20.0\n{whitespaces * ' '}    |squenceclassargs|"
+            class_source_lines[j - 1] += (
+                f"\n\n{whitespaces * ' '}.. versionchanged:: 20.0\n{whitespaces * ' '}"
+                "    |squenceclassargs| "
+            )
             if class_source_lines[j]:
                 class_source_lines[j - 1] += "\n"
 
@@ -111,9 +106,10 @@ for name, _ in classes:
             ):
                 j = j + 1
 
-            class_source_lines[
-                j - 1
-            ] += f"\n\n{whitespaces * ' '}.. versionchanged:: 20.0\n{whitespaces * ' '}    |tupleclassattrs|"
+            class_source_lines[j - 1] += (
+                f"\n\n{whitespaces * ' '}.. versionchanged:: 20.0\n{whitespaces * ' '}"
+                "    |tupleclassattrs|"
+            )
             if class_source_lines[j]:
                 class_source_lines[j - 1] += "\n"
 
@@ -148,7 +144,16 @@ for name, _ in classes:
 
     file_contents = "\n".join(file_contents) + "\n"
 
+    # Sort imports
+    file_contents = isort.code(file_contents)
+
     class_source_file.write_text(file_contents, encoding="utf-8")
 
-    # so that the changes are reflected in the module
-    reload_package(telegram)
+if unprocessed_classes:
+    print(
+        "Rerun the script to finish the conversion. I can't handle files that contain multiple "
+        "classes. The following classes were not processed:"
+        f"{', '.join([cls.__name__ for cls in unprocessed_classes])}"
+    )
+
+pickle.dump(processed_classes, open("processed_classes.pickle", "wb"))
