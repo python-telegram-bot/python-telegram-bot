@@ -17,9 +17,8 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to Telegram video chats."""
-
 import datetime as dtm
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
@@ -91,10 +90,16 @@ class VideoChatParticipantsInvited(TelegramObject):
         This class was renamed from ``VoiceChatParticipantsInvited`` in accordance to Bot API 6.0.
 
     Args:
-        users (List[:class:`telegram.User`]): New members that were invited to the video chat.
+        users (Sequence[:class:`telegram.User`]): New members that were invited to the video chat.
+
+            .. versionchanged:: 20.0
+                |squenceclassargs|
 
     Attributes:
-        users (List[:class:`telegram.User`]): New members that were invited to the video chat.
+        users (Sequence[:class:`telegram.User`]): New members that were invited to the video chat.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
 
     """
 
@@ -102,12 +107,12 @@ class VideoChatParticipantsInvited(TelegramObject):
 
     def __init__(
         self,
-        users: List[User],
+        users: Sequence[User],
         *,
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.users = users
+        self.users = tuple(users)
         self._id_attrs = (self.users,)
 
         self._freeze()

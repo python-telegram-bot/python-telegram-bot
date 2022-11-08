@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Contains information about Telegram Passport data shared with the bot by the user."""
-
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Sequence
 
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
@@ -39,13 +38,21 @@ class PassportData(TelegramObject):
         attribute :attr:`telegram.Credentials.nonce`.
 
     Args:
-        data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
+        data (Sequence[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
             about documents and other Telegram Passport elements that was shared with the bot.
+
+            .. versionchanged:: 20.0
+                |squenceclassargs|
+
         credentials (:class:`telegram.EncryptedCredentials`)): Encrypted credentials.
 
     Attributes:
-        data (List[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
+        data (Sequence[:class:`telegram.EncryptedPassportElement`]): Array with encrypted information
             about documents and other Telegram Passport elements that was shared with the bot.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials.
 
 
@@ -55,14 +62,14 @@ class PassportData(TelegramObject):
 
     def __init__(
         self,
-        data: List[EncryptedPassportElement],
+        data: Sequence[EncryptedPassportElement],
         credentials: EncryptedCredentials,
         *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.data = data
+        self.data = tuple(data)
         self.credentials = credentials
 
         self._decrypted_data: Optional[List[EncryptedPassportElement]] = None

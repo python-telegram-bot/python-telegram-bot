@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represent stickers."""
-
-from typing import TYPE_CHECKING, ClassVar, List, Optional
+from typing import TYPE_CHECKING, ClassVar, Optional, Sequence
 
 from telegram import constants
 from telegram._files._basethumbedmedium import _BaseThumbedMedium
@@ -209,7 +208,11 @@ class StickerSet(TelegramObject):
         is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
 
             .. versionadded:: 13.11
-        stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+        stickers (Sequence[:class:`telegram.Sticker`]): List of all set stickers.
+
+            .. versionchanged:: 20.0
+                |squenceclassargs|
+
         sticker_type (:obj:`str`): Type of stickers in the set, currently one of
             :attr:`telegram.Sticker.REGULAR`, :attr:`telegram.Sticker.MASK`,
             :attr:`telegram.Sticker.CUSTOM_EMOJI`.
@@ -225,7 +228,11 @@ class StickerSet(TelegramObject):
         is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
 
             .. versionadded:: 13.11
-        stickers (List[:class:`telegram.Sticker`]): List of all set stickers.
+        stickers (Sequence[:class:`telegram.Sticker`]): List of all set stickers.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         sticker_type (:obj:`str`): Type of stickers in the set.
 
             .. versionadded:: 20.0
@@ -249,7 +256,7 @@ class StickerSet(TelegramObject):
         name: str,
         title: str,
         is_animated: bool,
-        stickers: List[Sticker],
+        stickers: Sequence[Sticker],
         is_video: bool,
         sticker_type: str,
         thumb: PhotoSize = None,
@@ -261,7 +268,7 @@ class StickerSet(TelegramObject):
         self.title = title
         self.is_animated = is_animated
         self.is_video = is_video
-        self.stickers = stickers
+        self.stickers = tuple(stickers)
         self.sticker_type = sticker_type
         # Optional
         self.thumb = thumb

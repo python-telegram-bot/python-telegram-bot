@@ -19,7 +19,7 @@
 # pylint: disable=missing-module-docstring,  redefined-builtin
 import json
 from base64 import b64decode
-from typing import TYPE_CHECKING, List, Optional, no_type_check
+from typing import TYPE_CHECKING, Optional, Sequence, no_type_check
 
 try:
     from cryptography.hazmat.backends import default_backend
@@ -362,13 +362,20 @@ class SecureValue(TelegramObject):
         selfie (:class:`telegram.FileCredentials`, optional): Credentials for encrypted selfie
             of the user with a document. Can be available for "passport", "driver_license",
             "identity_card" and "internal_passport".
-        translation (List[:class:`telegram.FileCredentials`], optional): Credentials for an
+        translation (Sequence[:class:`telegram.FileCredentials`], optional): Credentials for an
             encrypted translation of the document. Available for "passport", "driver_license",
             "identity_card", "internal_passport", "utility_bill", "bank_statement",
             "rental_agreement", "passport_registration" and "temporary_registration".
-        files (List[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
+        files (Sequence[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
             files. Available for "utility_bill", "bank_statement", "rental_agreement",
             "passport_registration" and "temporary_registration" types.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
 
     """
 
@@ -380,8 +387,8 @@ class SecureValue(TelegramObject):
         front_side: "FileCredentials" = None,
         reverse_side: "FileCredentials" = None,
         selfie: "FileCredentials" = None,
-        files: List["FileCredentials"] = None,
-        translation: List["FileCredentials"] = None,
+        files: Sequence["FileCredentials"] = None,
+        translation: Sequence["FileCredentials"] = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -390,8 +397,8 @@ class SecureValue(TelegramObject):
         self.front_side = front_side
         self.reverse_side = reverse_side
         self.selfie = selfie
-        self.files = files
-        self.translation = translation
+        self.files = tuple(files) if files else None
+        self.translation = tuple(translation) if translation else None
 
         self._freeze()
 

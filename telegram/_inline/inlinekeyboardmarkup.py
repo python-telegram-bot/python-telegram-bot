@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
-
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Sequence
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -40,12 +39,18 @@ class InlineKeyboardMarkup(TelegramObject):
         `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_
 
     Args:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
+        inline_keyboard (Sequence[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
             each represented by a list of InlineKeyboardButton objects.
 
+            .. versionchanged:: 20.0
+                |squenceclassargs|
+
     Attributes:
-        inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
+        inline_keyboard (Sequence[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
             each represented by a list of InlineKeyboardButton objects.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
 
     """
 
@@ -53,7 +58,7 @@ class InlineKeyboardMarkup(TelegramObject):
 
     def __init__(
         self,
-        inline_keyboard: List[List[InlineKeyboardButton]],
+        inline_keyboard: Sequence[List[InlineKeyboardButton]],
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -64,7 +69,7 @@ class InlineKeyboardMarkup(TelegramObject):
                 "list of InlineKeyboardButtons"
             )
         # Required
-        self.inline_keyboard = inline_keyboard
+        self.inline_keyboard = tuple(inline_keyboard)
 
         self._id_attrs = (self.inline_keyboard,)
 

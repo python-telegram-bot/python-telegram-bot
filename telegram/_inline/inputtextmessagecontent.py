@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputTextMessageContent."""
-
-from typing import List, Tuple, Union
+from typing import Sequence
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
@@ -42,9 +41,13 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
             in :class:`telegram.constants.ParseMode` for the available modes.
-        entities (List[:class:`telegram.MessageEntity`], optional): List of special
+        entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special
             entities that appear in the caption, which can be specified instead of
             :paramref:`parse_mode`.
+
+            .. versionchanged:: 20.0
+                |squenceclassargs|
+
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
 
@@ -55,9 +58,13 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
             in :class:`telegram.constants.ParseMode` for the available modes.
-        entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
+        entities (Sequence[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption, which can be specified instead of
             :paramref:`parse_mode`.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
+
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
@@ -70,7 +77,7 @@ class InputTextMessageContent(InputMessageContent):
         message_text: str,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
-        entities: Union[Tuple[MessageEntity, ...], List[MessageEntity]] = None,
+        entities: Sequence[MessageEntity] = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -79,7 +86,7 @@ class InputTextMessageContent(InputMessageContent):
         self.message_text = message_text
         # Optionals
         self.parse_mode = parse_mode
-        self.entities = entities
+        self.entities = tuple(entities) if entities else None
         self.disable_web_page_preview = disable_web_page_preview
 
         self._id_attrs = (self.message_text,)

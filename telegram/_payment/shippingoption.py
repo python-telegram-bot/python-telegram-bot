@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
-
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Sequence
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -38,12 +37,18 @@ class ShippingOption(TelegramObject):
     Args:
         id (:obj:`str`): Shipping option identifier.
         title (:obj:`str`): Option title.
-        prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
+        prices (Sequence[:class:`telegram.LabeledPrice`]): List of price portions.
+
+            .. versionchanged:: 20.0
+                |squenceclassargs|
 
     Attributes:
         id (:obj:`str`): Shipping option identifier.
         title (:obj:`str`): Option title.
-        prices (List[:class:`telegram.LabeledPrice`]): List of price portions.
+        prices (Sequence[:class:`telegram.LabeledPrice`]): List of price portions.
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
 
     """
 
@@ -53,7 +58,7 @@ class ShippingOption(TelegramObject):
         self,
         id: str,  # pylint: disable=redefined-builtin
         title: str,
-        prices: List["LabeledPrice"],
+        prices: Sequence["LabeledPrice"],
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -61,7 +66,7 @@ class ShippingOption(TelegramObject):
 
         self.id = id  # pylint: disable=invalid-name
         self.title = title
-        self.prices = prices
+        self.prices = tuple(prices)
 
         self._id_attrs = (self.id,)
 
