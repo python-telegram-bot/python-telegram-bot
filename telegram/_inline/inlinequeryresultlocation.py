@@ -42,14 +42,19 @@ class InlineQueryResultLocation(InlineQueryResult):
         title (:obj:`str`): Location title.
         horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
             measured in meters; 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
-        live_period (:obj:`int`, optional): Period in seconds for which the location can be
-            updated, should be between 60 and 86400.
+        live_period (:obj:`int`, optional): Period in seconds for which the location will be
+            updated, should be between
+            :tg-const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD` and
+            :tg-const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`.
         heading (:obj:`int`, optional): For live locations, a direction in which the user is
-            moving, in degrees. Must be between 1 and
-            :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
-        proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance for
-            proximity alerts about approaching another chat member, in meters. Must be between 1
-            and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+            moving, in degrees. Must be between
+            :tg-const:`telegram.constants.LocationLimit.MIN_HEADING` and
+            :tg-const:`telegram.constants.LocationLimit.MAX_HEADING` if specified.
+        proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
+            for proximity alerts about approaching another chat member, in meters. Must be
+            between :tg-const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
+            and :tg-const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
+            if specified.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the

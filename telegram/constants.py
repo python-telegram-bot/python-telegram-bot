@@ -500,6 +500,10 @@ class LocationLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for:
 
     * :paramref:`~telegram.Location.horizontal_accuracy` parameter of :class:`telegram.Location`
+    * :paramref:`~telegram.InlineQueryResultLocation.horizontal_accuracy` parameter of
+      :class:`telegram.InlineQueryResultLocation`
+    * :paramref:`~telegram.InputLocationMessageContent.horizontal_accuracy` parameter of
+      :class:`telegram.InputLocationMessageContent`
     * :paramref:`~telegram.Bot.edit_message_live_location.horizontal_accuracy` parameter of
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.horizontal_accuracy` parameter of
@@ -510,6 +514,10 @@ class LocationLimit(IntEnum):
     """:obj:`int`: Minimum value allowed for:
 
     * :paramref:`~telegram.Location.heading` parameter of :class:`telegram.Location`
+    * :paramref:`~telegram.InlineQueryResultLocation.heading` parameter of
+      :class:`telegram.InlineQueryResultLocation`
+    * :paramref:`~telegram.InputLocationMessageContent.heading` parameter of
+      :class:`telegram.InputLocationMessageContent`
     * :paramref:`~telegram.Bot.edit_message_live_location.heading` parameter of
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.heading` parameter of
@@ -519,6 +527,10 @@ class LocationLimit(IntEnum):
     """:obj:`int`: Maximum value allowed for:
 
     * :paramref:`~telegram.Location.heading` parameter of :class:`telegram.Location`
+    * :paramref:`~telegram.InlineQueryResultLocation.heading` parameter of
+      :class:`telegram.InlineQueryResultLocation`
+    * :paramref:`~telegram.InputLocationMessageContent.heading` parameter of
+      :class:`telegram.InputLocationMessageContent`
     * :paramref:`~telegram.Bot.edit_message_live_location.heading` parameter of
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.heading` parameter of
@@ -528,6 +540,10 @@ class LocationLimit(IntEnum):
     MIN_LIVE_PERIOD = 60
     """:obj:`int`: Minimum value allowed for:
 
+    * :paramref:`~telegram.InlineQueryResultLocation.live_period` parameter of
+      :class:`telegram.InlineQueryResultLocation`
+    * :paramref:`~telegram.InputLocationMessageContent.live_period` parameter of
+      :class:`telegram.InputLocationMessageContent`
     * :paramref:`~telegram.Bot.edit_message_live_location.live_period` parameter of
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.live_period` parameter of
@@ -536,6 +552,10 @@ class LocationLimit(IntEnum):
     MAX_LIVE_PERIOD = 86400
     """:obj:`int`: Maximum value allowed for:
 
+    * :paramref:`~telegram.InlineQueryResultLocation.live_period` parameter of
+      :class:`telegram.InlineQueryResultLocation`
+    * :paramref:`~telegram.InputLocationMessageContent.live_period` parameter of
+      :class:`telegram.InputLocationMessageContent`
     * :paramref:`~telegram.Bot.edit_message_live_location.live_period` parameter of
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.live_period` parameter of
@@ -545,6 +565,10 @@ class LocationLimit(IntEnum):
     MIN_PROXIMITY_ALERT_RADIUS = 1
     """:obj:`int`: Minimum value allowed for:
 
+    * :paramref:`~telegram.InlineQueryResultLocation.proximity_alert_radius` parameter of
+      :class:`telegram.InlineQueryResultLocation`
+    * :paramref:`~telegram.InputLocationMessageContent.proximity_alert_radius` parameter of
+      :class:`telegram.InputLocationMessageContent`
     * :paramref:`~telegram.Bot.edit_message_live_location.proximity_alert_radius` parameter of
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.proximity_alert_radius` parameter of
@@ -553,6 +577,10 @@ class LocationLimit(IntEnum):
     MAX_PROXIMITY_ALERT_RADIUS = 100000
     """:obj:`int`: Maximum value allowed for:
 
+    * :paramref:`~telegram.InlineQueryResultLocation.proximity_alert_radius` parameter of
+      :class:`telegram.InlineQueryResultLocation`
+    * :paramref:`~telegram.InputLocationMessageContent.proximity_alert_radius` parameter of
+      :class:`telegram.InputLocationMessageContent`
     * :paramref:`~telegram.Bot.edit_message_live_location.proximity_alert_radius` parameter of
       :meth:`telegram.Bot.edit_message_live_location`
     * :paramref:`~telegram.Bot.send_location.proximity_alert_radius` parameter of
