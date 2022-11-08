@@ -28,11 +28,12 @@ for name, cls in classes:
     print("Processing class", name)
     # first adjust the __init__ of the class
     params = inspect.signature(cls.__init__).parameters
-    params_to_change = set()
+    params_to_change = dict()
     for param in params.values():
         if "List" in str(param.annotation):
             print("  Converting list-type parameter", param.name, "to Sequence")
-            params_to_change.add(param.name)
+            params_to_change[param.name] = param.default
+            print("  ", param.name, "default value:", repr(param.default))
 
     if not params_to_change:
         continue
@@ -84,7 +85,7 @@ for name, cls in classes:
 
             class_source_lines[j - 1] += (
                 f"\n\n{whitespaces * ' '}.. versionchanged:: 20.0\n{whitespaces * ' '}"
-                "    |squenceclassargs| "
+                "    |squenceclassargs|"
             )
             if class_source_lines[j]:
                 class_source_lines[j - 1] += "\n"
@@ -115,7 +116,7 @@ for name, cls in classes:
 
     # Adjust type annotations in the __init__ and converts to tuples before assigning to
     # attributes
-    for param in params_to_change:
+    for param, default_value in params_to_change.items():
         init_source = init_source.replace(param + ": List", param + ": Sequence")
         init_source = re.sub(
             rf"{param}: Union\[List\[(\w+)\], Tuple\[\w+, \.\.\.\]\]",
@@ -123,8 +124,20 @@ for name, cls in classes:
             init_source,
         )
         init_source = re.sub(
-            rf"self\.{param} = ([^ ]*)\n", rf"self.{param} = tuple(\1)\n", init_source
+            rf"{param}: Union\[Tuple\[\w+, \.\.\.\], List\[(\w+)\]\]",
+            rf"{param}: Sequence[\1]",
+            init_source,
         )
+        if default_value is None:
+            init_source = re.sub(
+                rf"self\.{param} = (\S*)\n",
+                rf"self.{param} = tuple(\1) if \1 else None\n",
+                init_source,
+            )
+        else:
+            init_source = re.sub(
+                rf"self\.{param} = (\S*)\n", rf"self.{param} = tuple(\1)\n", init_source
+            )
         init_source = re.sub(
             rf"self\.{param} = (.*) or \[\]\n",
             rf"self.{param} = tuple(\1) if \1 else ()\n",
