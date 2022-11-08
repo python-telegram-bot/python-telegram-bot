@@ -2496,6 +2496,7 @@ class TestBot:
 
     @flaky(3, 1)
     async def test_send_message_to_topic(self, bot, forum_group_id):
+        # TODO rework when new methods and attributes become available
         test_string = "Topics are forever"
 
         result = await bot._post(
