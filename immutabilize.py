@@ -118,6 +118,11 @@ for name, cls in classes:
     for param in params_to_change:
         init_source = init_source.replace(param + ": List", param + ": Sequence")
         init_source = re.sub(
+            rf"{param}: Union\[List\[(\w+)\], Tuple\[\w+, \.\.\.\]\]",
+            rf"{param}: Sequence[\1]",
+            init_source,
+        )
+        init_source = re.sub(
             rf"self\.{param} = ([^ ]*)\n", rf"self.{param} = tuple(\1)\n", init_source
         )
         init_source = re.sub(
