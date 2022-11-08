@@ -57,7 +57,7 @@ __all__ = [
     "MessageEntityType",
     "MessageLimit",
     "MessageType",
-    "NumberOfUpdatesLimit",
+    "PollingLimit",
     "ParseMode",
     "PollLimit",
     "PollType",
@@ -806,7 +806,7 @@ class MessageType(StringEnum):
     """:obj:`str`: Messages with :attr:`telegram.Message.video_chat_participants_invited`."""
 
 
-class NumberOfUpdatesLimit(IntEnum):
+class PollingLimit(IntEnum):
     """This enum contains limitations for :paramref:`telegram.Bot.get_updates.limit`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 

@@ -3976,8 +3976,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 can be specified to retrieve updates starting from -offset update from the end of
                 the updates queue. All previous updates will forgotten.
             limit (:obj:`int`, optional): Limits the number of updates to be retrieved. Values
-                between :tg-const:`telegram.constants.NumberOfUpdatesLimit.MIN_LIMIT`-
-                :tg-const:`telegram.constants.NumberOfUpdatesLimit.MAX_LIMIT` are accepted.
+                between :tg-const:`telegram.constants.PollingLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.PollingLimit.MAX_LIMIT` are accepted.
                 Defaults to ``100``.
             timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to ``0``,
                 i.e. usual short polling. Should be positive, short polling should be used for
