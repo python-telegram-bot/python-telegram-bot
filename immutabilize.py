@@ -126,7 +126,9 @@ for name, cls in classes:
             rf"self\.{param} = ([^ ]*)\n", rf"self.{param} = tuple(\1)\n", init_source
         )
         init_source = re.sub(
-            rf"self\.{param} = (.*) or \[\]\n", rf"self.{param} = tuple(\1 or ())\n", init_source
+            rf"self\.{param} = (.*) or \[\]\n",
+            rf"self.{param} = tuple(\1) if \1 else ()\n",
+            init_source,
         )
 
     file_contents = class_source_file.read_text(encoding="utf-8")
