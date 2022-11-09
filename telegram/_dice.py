@@ -34,23 +34,23 @@ class Dice(TelegramObject):
     considered equal, if their :attr:`value` and :attr:`emoji` are equal.
 
     Note:
-        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.DARTS`, a value of 6 currently
+        If :attr:`emoji` is :tg-const:`telegram.Dice.DARTS`, a value of 6 currently
         represents a bullseye, while a value of 1 indicates that the dartboard was missed.
         However, this behaviour is undocumented and might be changed by Telegram.
 
-        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.BASKETBALL`, a value of 4 or 5
+        If :attr:`emoji` is :tg-const:`telegram.Dice.BASKETBALL`, a value of 4 or 5
         currently score a basket, while a value of 1 to 3 indicates that the basket was missed.
         However, this behaviour is undocumented and might be changed by Telegram.
 
-        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.FOOTBALL`, a value of 4 to 5
+        If :attr:`emoji` is :tg-const:`telegram.Dice.FOOTBALL`, a value of 4 to 5
         currently scores a goal, while a value of 1 to 3 indicates that the goal was missed.
         However, this behaviour is undocumented and might be changed by Telegram.
 
-        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.BOWLING`, a value of 6 knocks
+        If :attr:`emoji` is :tg-const:`telegram.Dice.BOWLING`, a value of 6 knocks
         all the pins, while a value of 1 means all the pins were missed.
         However, this behaviour is undocumented and might be changed by Telegram.
 
-        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.SLOT_MACHINE`, each value
+        If :attr:`emoji` is :tg-const:`telegram.Dice.SLOT_MACHINE`, each value
         corresponds to a unique combination of symbols, which
         can be found at our `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki\
         /Code-snippets#map-a-slot-machine-dice-value-to-the-corresponding-symbols>`_.
@@ -58,18 +58,18 @@ class Dice(TelegramObject):
 
     Args:
         value (:obj:`int`): Value of the dice.
-            :tg-const:`telegram.constants.DiceLimit.MIN_VALUE`-
-            :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_DICE_DARTS_BOWLING` for
-            :tg-const:`telegram.constants.DiceEmoji.DICE`,
-            :tg-const:`telegram.constants.DiceEmoji.DARTS` and
-            :tg-const:`telegram.constants.DiceEmoji.BOWLING` base emoji,
-            :tg-const:`telegram.constants.DiceLimit.MIN_VALUE`-
-            :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_BASKETBALL_FOOTBALL` for
-            :tg-const:`telegram.constants.DiceEmoji.BASKETBALL` and
-            :tg-const:`telegram.constants.DiceEmoji.FOOTBALL` base emoji,
-            :tg-const:`telegram.constants.DiceLimit.MIN_VALUE`-
-            :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_SLOT_MACHINE`
-            for :tg-const:`telegram.constants.DiceEmoji.SLOT_MACHINE` base emoji.
+            :tg-const:`telegram.Dice.MIN_VALUE`-
+            :tg-const:`telegram.Dice.MAX_VALUE_DICE_DARTS_BOWLING` for
+            :tg-const:`telegram.Dice.DICE`,
+            :tg-const:`telegram.Dice.DARTS` and
+            :tg-const:`telegram.Dice.BOWLING` base emoji,
+            :tg-const:`telegram.Dice.MIN_VALUE`-
+            :tg-const:`telegram.Dice.MAX_VALUE_BASKETBALL_FOOTBALL` for
+            :tg-const:`telegram.Dice.BASKETBALL` and
+            :tg-const:`telegram.Dice.FOOTBALL` base emoji,
+            :tg-const:`telegram.Dice.MIN_VALUE`-
+            :tg-const:`telegram.Dice.MAX_VALUE_SLOT_MACHINE`
+            for :tg-const:`telegram.Dice.SLOT_MACHINE` base emoji.
         emoji (:obj:`str`): Emoji on which the dice throw animation is based.
 
     Attributes:
@@ -105,3 +105,17 @@ class Dice(TelegramObject):
     """
     ALL_EMOJI: ClassVar[List[str]] = list(constants.DiceEmoji)
     """List[:obj:`str`]: A list of all available dice emoji."""
+
+    MIN_VALUE: ClassVar[int] = constants.DiceLimit.MIN_VALUE
+    """:const:`telegram.constants.DiceLimit.MIN_VALUE`"""
+
+    MAX_VALUE_DICE_DARTS_BOWLING: ClassVar[int] = constants.DiceLimit.MAX_VALUE_DICE_DARTS_BOWLING
+    """:const:`telegram.constants.DiceLimit.MAX_VALUE_DICE_DARTS_BOWLING`"""
+
+    MAX_VALUE_BASKETBALL_FOOTBALL: ClassVar[
+        int
+    ] = constants.DiceLimit.MAX_VALUE_BASKETBALL_FOOTBALL
+    """:const:`telegram.constants.DiceLimit.MAX_VALUE_BASKETBALL_FOOTBALL`"""
+
+    MAX_VALUE_SLOT_MACHINE: ClassVar[int] = constants.DiceLimit.MAX_VALUE_SLOT_MACHINE
+    """:const:`telegram.constants.DiceLimit.MAX_VALUE_SLOT_MACHINE`"""
