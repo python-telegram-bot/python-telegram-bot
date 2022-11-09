@@ -43,6 +43,7 @@ __all__ = [
     "ChatType",
     "CustomEmojiStickerLimit",
     "DiceEmoji",
+    "DiceLimit",
     "FileSizeLimit",
     "FloodLimit",
     "InlineKeyboardMarkupLimit",
@@ -323,6 +324,41 @@ class DiceEmoji(StringEnum):
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎰``."""
     BOWLING = "🎳"
     """:obj:`str`: A :class:`telegram.Dice` with the emoji ``🎳``."""
+
+
+class DiceLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.Dice`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_VALUE = 1
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.Dice.value` parameter of
+    :class:`telegram.Dice` (any emoji).
+    """
+
+    MAX_VALUE_DICE_DARTS_BOWLING = 6
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Dice.value` parameter of
+    :class:`telegram.Dice` if :paramref:`~telegram.Dice.emoji` is
+    :tg-const:`telegram.constants.DiceEmoji.DICE`, :tg-const:`telegram.constants.DiceEmoji.DARTS`
+    or :tg-const:`telegram.constants.DiceEmoji.BOWLING`.
+    """
+
+    MAX_VALUE_BASKETBALL_FOOTBALL = 5
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Dice.value` parameter of
+    :class:`telegram.Dice` if :paramref:`~telegram.Dice.emoji` is
+    :tg-const:`telegram.constants.DiceEmoji.BASKETBALL` or
+    :tg-const:`telegram.constants.DiceEmoji.FOOTBALL`.
+    """
+
+    MAX_VALUE_SLOT_MACHINE = 64
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Dice.value` parameter of
+    :class:`telegram.Dice` if :paramref:`~telegram.Dice.emoji` is
+    :tg-const:`telegram.constants.DiceEmoji.SLOT_MACHINE`.
+    """
 
 
 class FileSizeLimit(IntEnum):
