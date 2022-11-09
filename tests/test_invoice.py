@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
-from flaky import flaky
 
 from telegram import Invoice, LabeledPrice
 from telegram.error import BadRequest
@@ -81,7 +80,7 @@ class TestInvoice:
         assert invoice_dict["currency"] == invoice.currency
         assert invoice_dict["total_amount"] == invoice.total_amount
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_required_args_only(self, bot, chat_id, provider_token):
         message = await bot.send_invoice(
             chat_id=chat_id,
@@ -274,7 +273,7 @@ class TestInvoice:
             start_parameter=self.start_parameter,
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -327,7 +326,7 @@ class TestInvoice:
                     reply_to_message_id=reply_to_message.message_id,
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_invoice_default_protect_content(
         self, chat_id, default_bot, provider_token
