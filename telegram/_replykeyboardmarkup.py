@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import List, Sequence, Union
+from typing import ClassVar, List, Sequence, Union
 
+from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.markup import check_keyboard_type
@@ -59,8 +60,8 @@ class ReplyKeyboardMarkup(TelegramObject):
 
         input_field_placeholder (:obj:`str`, optional): The placeholder to be shown in the input
             field when the keyboard is active;
-            :tg-const:`telegram.constants.ReplyKeyboardMarkupLimit.MIN_INPUT_FIELD_PLACEHOLDER`-
-            :tg-const:`telegram.constants.ReplyKeyboardMarkupLimit.MAX_INPUT_FIELD_PLACEHOLDER`
+            :tg-const:`telegram.ReplyKeyboardMarkup.MIN_INPUT_FIELD_PLACEHOLDER`-
+            :tg-const:`telegram.ReplyKeyboardMarkup.MAX_INPUT_FIELD_PLACEHOLDER`
             characters.
 
             .. versionadded:: 13.7
@@ -296,3 +297,12 @@ class ReplyKeyboardMarkup(TelegramObject):
                 self.selective,
             )
         )
+
+    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[
+        int
+    ] = constants.ReplyKeyboardMarkupLimit.MIN_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyKeyboardMarkupLimit.MIN_INPUT_FIELD_PLACEHOLDER`"""
+    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[
+        int
+    ] = constants.ReplyKeyboardMarkupLimit.MAX_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyKeyboardMarkupLimit.MAX_INPUT_FIELD_PLACEHOLDER`"""

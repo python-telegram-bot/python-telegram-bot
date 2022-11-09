@@ -905,7 +905,7 @@ class ReplyKeyboardMarkupLimit(IntEnum):
     :class:`telegram.ReplyKeyboardMarkup`
     """
     MAX_INPUT_FIELD_PLACEHOLDER = 64
-    """:obj:`int`: Minimum value allowed for
+    """:obj:`int`: Maximum value allowed for
     :paramref:`~telegram.ReplyKeyboardMarkup.input_field_placeholder` parameter of
     :class:`telegram.ReplyKeyboardMarkup`
     """
