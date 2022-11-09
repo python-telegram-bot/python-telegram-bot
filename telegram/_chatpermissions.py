@@ -31,6 +31,8 @@ class ChatPermissions(TelegramObject):
     :attr:`can_change_info`, :attr:`can_invite_users` and :attr:`can_pin_messages`,
     :attr:`can_manage_topics` are equal.
 
+    .. versionchanged:: 20.0
+
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
         permissions that are set, but also sets all the others to :obj:`False`. However, since not

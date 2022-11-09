@@ -32,6 +32,8 @@ class ChatAdministratorRights(TelegramObject):
     :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages`,
     :attr:`can_manage_topics` are equal.
 
+    .. versionchanged:: 20.0
+
     .. seealso: :meth:`Bot.set_my_default_administrator_rights`,
         :meth:`Bot.get_my_default_administrator_rights`
 
