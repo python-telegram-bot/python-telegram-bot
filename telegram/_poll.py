@@ -75,8 +75,8 @@ class PollAnswer(TelegramObject):
     Args:
         poll_id (:obj:`str`): Unique poll identifier.
         user (:class:`telegram.User`): The user, who changed the answer to the poll.
-        option_ids (Sequence[:obj:`int`]): 0-based identifiers of answer options, chosen by the user.
-            May be empty if the user retracted their vote.
+        option_ids (Sequence[:obj:`int`]): 0-based identifiers of answer options, chosen by the
+            user. May be empty if the user retracted their vote.
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
@@ -144,8 +144,9 @@ class Poll(TelegramObject):
             forwarded) by the bot or to the private chat with the bot.
         explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll, 0-200 characters.
-        explanation_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special entities
-            like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
+        explanation_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
+            entities like usernames, URLs, bot commands, etc. that appear in the
+            :attr:`explanation`.
 
             .. versionchanged:: 20.0
                 |squenceclassargs|

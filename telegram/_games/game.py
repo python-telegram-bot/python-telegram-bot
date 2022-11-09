@@ -41,8 +41,8 @@ class Game(TelegramObject):
     Args:
         title (:obj:`str`): Title of the game.
         description (:obj:`str`): Description of the game.
-        photo (Sequence[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game message
-            in chats.
+        photo (Sequence[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game
+            message in chats.
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
@@ -64,8 +64,8 @@ class Game(TelegramObject):
     Attributes:
         title (:obj:`str`): Title of the game.
         description (:obj:`str`): Description of the game.
-        photo (Sequence[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game message
-            in chats.
+        photo (Sequence[:class:`telegram.PhotoSize`]): Photo that will be displayed in the game
+            message in chats.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|

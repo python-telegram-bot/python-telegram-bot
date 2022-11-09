@@ -2092,10 +2092,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             # Copy first item (to avoid mutation of original object), apply group caption to it.
             # This will lead to the group being shown with this caption.
             item_to_get_caption = copy.copy(media[0])
+            item_to_get_caption._unfreeze()  # pylint: disable=protected-access
             item_to_get_caption.caption = caption
             if parse_mode is not DEFAULT_NONE:
                 item_to_get_caption.parse_mode = parse_mode
-            item_to_get_caption.caption_entities = caption_entities
+            item_to_get_caption.caption_entities = (
+                tuple(caption_entities) if caption_entities else None
+            )
+            item_to_get_caption._freeze()  # pylint: disable=protected-access
 
             # copy the list (just the references) to avoid mutating the original list
             media = media[:]

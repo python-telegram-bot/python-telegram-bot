@@ -54,8 +54,9 @@ class WebhookInfo(TelegramObject):
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
             connections to the webhook for update delivery.
-        allowed_updates (Sequence[:obj:`str`], optional): A list of update types the bot is subscribed
-            to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
+        allowed_updates (Sequence[:obj:`str`], optional): A list of update types the bot is
+            subscribed to. Defaults to all update types, except
+            :attr:`telegram.Update.chat_member`.
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
@@ -73,8 +74,9 @@ class WebhookInfo(TelegramObject):
         last_error_message (:obj:`str`): Optional. Error message in human-readable format.
         max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
             connections.
-        allowed_updates (Sequence[:obj:`str`]): Optional. A list of update types the bot is subscribed
-            to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
+        allowed_updates (Sequence[:obj:`str`]): Optional. A list of update types the bot is
+            subscribed to. Defaults to all update types, except
+            :attr:`telegram.Update.chat_member`.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|

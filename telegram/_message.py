@@ -174,9 +174,9 @@ class Message(TelegramObject):
             the file.
         video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
             about the video message.
-        new_chat_members (Sequence[:class:`telegram.User`], optional): New members that were added to
-            the group or supergroup and information about them (the bot itself may be one of these
-            members).
+        new_chat_members (Sequence[:class:`telegram.User`], optional): New members that were added
+            to the group or supergroup and information about them (the bot itself may be one of
+            these members).
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
@@ -193,8 +193,8 @@ class Message(TelegramObject):
         left_chat_member (:class:`telegram.User`, optional): A member was removed from the group,
             information about them (this member may be the bot itself).
         new_chat_title (:obj:`str`, optional): A chat title was changed to this value.
-        new_chat_photo (Sequence[:class:`telegram.PhotoSize`], optional): A chat photo was changed to
-            this value.
+        new_chat_photo (Sequence[:class:`telegram.PhotoSize`], optional): A chat photo was changed
+            to this value.
 
             .. versionchanged:: 20.0
                 |squenceclassargs|

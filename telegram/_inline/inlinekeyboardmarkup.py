@@ -39,15 +39,15 @@ class InlineKeyboardMarkup(TelegramObject):
         `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_
 
     Args:
-        inline_keyboard (Sequence[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
-            each represented by a list of InlineKeyboardButton objects.
+        inline_keyboard (Sequence[List[:class:`telegram.InlineKeyboardButton`]]): List of button
+            rows, each represented by a list of InlineKeyboardButton objects.
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
 
     Attributes:
-        inline_keyboard (Sequence[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
-            each represented by a list of InlineKeyboardButton objects.
+        inline_keyboard (Sequence[List[:class:`telegram.InlineKeyboardButton`]]): List of button
+            rows, each represented by a list of InlineKeyboardButton objects.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
