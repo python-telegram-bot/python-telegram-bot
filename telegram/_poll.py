@@ -27,7 +27,7 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -227,17 +227,6 @@ class Poll(TelegramObject):
         data["close_date"] = from_timestamp(data.get("close_date"))
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["options"] = [x.to_dict() for x in self.options]
-        if self.explanation_entities:
-            data["explanation_entities"] = [e.to_dict() for e in self.explanation_entities]
-        data["close_date"] = to_timestamp(data.get("close_date"))
-
-        return data
 
     def parse_explanation_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.

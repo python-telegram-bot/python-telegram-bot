@@ -47,7 +47,7 @@ from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram._videochat import (
@@ -718,30 +718,6 @@ class Message(TelegramObject):
             self._effective_attachment = None
 
         return self._effective_attachment  # type: ignore[return-value]
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        # Required
-        data["date"] = to_timestamp(self.date)
-        # Optionals
-        if self.forward_date:
-            data["forward_date"] = to_timestamp(self.forward_date)
-        if self.edit_date:
-            data["edit_date"] = to_timestamp(self.edit_date)
-        if self.photo:
-            data["photo"] = [p.to_dict() for p in self.photo]
-        if self.entities:
-            data["entities"] = [e.to_dict() for e in self.entities]
-        if self.caption_entities:
-            data["caption_entities"] = [e.to_dict() for e in self.caption_entities]
-        if self.new_chat_photo:
-            data["new_chat_photo"] = [p.to_dict() for p in self.new_chat_photo]
-        if self.new_chat_members:
-            data["new_chat_members"] = [u.to_dict() for u in self.new_chat_members]
-
-        return data
 
     def _quote(self, quote: Optional[bool], reply_to_message_id: Optional[int]) -> Optional[int]:
         """Modify kwargs for replying with or without quoting."""

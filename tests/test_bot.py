@@ -1715,7 +1715,7 @@ class TestBot:
                         message=Message(
                             1,
                             from_user=User(1, "", False),
-                            date=None,
+                            date=dtm.datetime.utcnow(),
                             chat=Chat(1, ""),
                             text="Webhook",
                         ),
@@ -2998,7 +2998,10 @@ class TestBot:
         )
 
         message = Message(
-            1, None, None, reply_markup=bot.callback_data_cache.process_keyboard(reply_markup)
+            1,
+            dtm.datetime.utcnow(),
+            None,
+            reply_markup=bot.callback_data_cache.process_keyboard(reply_markup),
         )
         # We do to_dict -> de_json to make sure those aren't the same objects
         message.pinned_message = Message.de_json(message.to_dict(), bot)
@@ -3009,7 +3012,7 @@ class TestBot:
                 **{
                     message_type: Message(
                         1,
-                        None,
+                        dtm.datetime.utcnow(),
                         None,
                         pinned_message=message,
                         reply_to_message=Message.de_json(message.to_dict(), bot),
@@ -3076,7 +3079,7 @@ class TestBot:
         reply_markup = bot.callback_data_cache.process_keyboard(reply_markup)
         message = Message(
             1,
-            None,
+            dtm.datetime.utcnow(),
             None,
             reply_markup=reply_markup,
             via_bot=bot.bot if self_sender else User(1, "first", False),

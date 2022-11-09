@@ -282,14 +282,6 @@ class StickerSet(TelegramObject):
 
         return super()._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["stickers"] = [s.to_dict() for s in data.get("stickers")]  # type: ignore[union-attr]
-
-        return data
-
 
 class MaskPosition(TelegramObject):
     """This object describes the position on faces where a mask should be placed by default.
