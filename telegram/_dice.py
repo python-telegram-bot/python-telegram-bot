@@ -34,23 +34,24 @@ class Dice(TelegramObject):
     considered equal, if their :attr:`value` and :attr:`emoji` are equal.
 
     Note:
-        If :attr:`emoji` is "🎯", a value of 6 currently represents a bullseye, while a value of 1
-        indicates that the dartboard was missed. However, this behaviour is undocumented and might
-        be changed by Telegram.
+        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.DARTS`, a value of 6 currently
+        represents a bullseye, while a value of 1 indicates that the dartboard was missed.
+        However, this behaviour is undocumented and might be changed by Telegram.
 
-        If :attr:`emoji` is "🏀", a value of 4 or 5 currently score a basket, while a value of 1 to
-        3 indicates that the basket was missed. However, this behaviour is undocumented and might
-        be changed by Telegram.
+        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.BASKETBALL`, a value of 4 or 5
+        currently score a basket, while a value of 1 to 3 indicates that the basket was missed.
+        However, this behaviour is undocumented and might be changed by Telegram.
 
-        If :attr:`emoji` is "⚽", a value of 4 to 5 currently scores a goal, while a value of 1 to
-        3 indicates that the goal was missed. However, this behaviour is undocumented and might
-        be changed by Telegram.
+        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.FOOTBALL`, a value of 4 to 5
+        currently scores a goal, while a value of 1 to 3 indicates that the goal was missed.
+        However, this behaviour is undocumented and might be changed by Telegram.
 
-        If :attr:`emoji` is "🎳", a value of 6 knocks all the pins, while a value of 1 means all
-        the pins were missed. However, this behaviour is undocumented and might be changed by
-        Telegram.
+        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.BOWLING`, a value of 6 knocks
+        all the pins, while a value of 1 means all the pins were missed.
+        However, this behaviour is undocumented and might be changed by Telegram.
 
-        If :attr:`emoji` is "🎰", each value corresponds to a unique combination of symbols, which
+        If :attr:`emoji` is :tg-const:`telegram.constants.DiceEmoji.SLOT_MACHINE`, each value
+        corresponds to a unique combination of symbols, which
         can be found at our `wiki <https://github.com/python-telegram-bot/python-telegram-bot/wiki\
         /Code-snippets#map-a-slot-machine-dice-value-to-the-corresponding-symbols>`_.
         However, this behaviour is undocumented and might be changed by Telegram.
