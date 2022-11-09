@@ -20,7 +20,6 @@ import os
 from pathlib import Path
 
 import pytest
-from flaky import flaky
 
 from telegram import Bot, InputFile, PhotoSize, VideoNote, Voice
 from telegram.error import BadRequest, TelegramError
@@ -83,7 +82,7 @@ class TestVideoNote:
         assert video_note.duration == self.duration
         assert video_note.file_size == self.file_size
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_all_args(self, bot, chat_id, video_note_file, video_note, thumb_file):
         message = await bot.send_video_note(
             chat_id,
@@ -109,7 +108,7 @@ class TestVideoNote:
         assert message.video_note.thumb.height == self.thumb_height
         assert message.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_video_note_custom_filename(
         self, bot, chat_id, video_note_file, monkeypatch
     ):
@@ -120,7 +119,7 @@ class TestVideoNote:
 
         assert await bot.send_video_note(chat_id, video_note_file, filename="custom_filename")
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_and_download(self, bot, video_note):
         path = Path("telegram2.mp4")
         if path.is_file():
@@ -137,7 +136,7 @@ class TestVideoNote:
 
         assert path.is_file()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_resend(self, bot, chat_id, video_note):
         message = await bot.send_video_note(chat_id, video_note.file_id)
 
@@ -204,7 +203,7 @@ class TestVideoNote:
         finally:
             bot._local_mode = False
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -238,7 +237,7 @@ class TestVideoNote:
                     chat_id, video_note, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_video_note_default_protect_content(self, chat_id, default_bot, video_note):
         protected = await default_bot.send_video_note(chat_id, video_note)
@@ -246,12 +245,12 @@ class TestVideoNote:
         unprotected = await default_bot.send_video_note(chat_id, video_note, protect_content=False)
         assert not unprotected.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_video_note(chat_id, open(os.devnull, "rb"))
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_video_note(chat_id, "")
