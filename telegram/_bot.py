@@ -7389,22 +7389,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 keyboard, instructions to remove reply keyboard or to force a reply from the user
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
                 Currently, must be one of :class:`telegram.constants.DiceEmoji`. Dice can have
-                values :tg-const:`telegram.constants.DiceLimit.MIN_VALUE`-
-                :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_BOWLING` for
-                :tg-const:`telegram.constants.DiceEmoji.DICE`,
-                :tg-const:`telegram.constants.DiceEmoji.DARTS` and
-                :tg-const:`telegram.constants.DiceEmoji.BOWLING`, values
-                :tg-const:`telegram.constants.DiceLimit.MIN_VALUE`-
-                :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_BASKETBALL` for
-                :tg-const:`telegram.constants.DiceEmoji.BASKETBALL` and
-                :tg-const:`telegram.constants.DiceEmoji.FOOTBALL`, and values
-                :tg-const:`telegram.constants.DiceLimit.MIN_VALUE`-
-                :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_SLOT_MACHINE`
-                for :tg-const:`telegram.constants.DiceEmoji.SLOT_MACHINE`. Defaults to
-                :tg-const:`telegram.constants.DiceEmoji.DICE`.
+                values
+                :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_BOWLING`
+                for :tg-const:`telegram.Dice.DICE`, :tg-const:`telegram.Dice.DARTS` and
+                :tg-const:`telegram.Dice.BOWLING`, values
+                :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_BASKETBALL`
+                for :tg-const:`telegram.Dice.BASKETBALL` and :tg-const:`telegram.Dice.FOOTBALL`,
+                and values :tg-const:`telegram.Dice.MIN_VALUE`-
+                :tg-const:`telegram.Dice.MAX_VALUE_SLOT_MACHINE`
+                for :tg-const:`telegram.Dice.SLOT_MACHINE`. Defaults to
+                :tg-const:`telegram.Dice.DICE`.
 
                 .. versionchanged:: 13.4
-                   Added the :tg-const:`telegram.constants.DiceEmoji.BOWLING` emoji..
+                   Added the :tg-const:`telegram.Dice.BOWLING` emoji.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
                 should be sent even if the specified replied-to message is not found.
             protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
