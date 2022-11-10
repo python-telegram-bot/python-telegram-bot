@@ -7390,12 +7390,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
                 Currently, must be one of :class:`telegram.constants.DiceEmoji`. Dice can have
                 values :tg-const:`telegram.constants.DiceLimit.MIN_VALUE`-
-                :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_DICE_DARTS_BOWLING` for
+                :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_BOWLING` for
                 :tg-const:`telegram.constants.DiceEmoji.DICE`,
                 :tg-const:`telegram.constants.DiceEmoji.DARTS` and
                 :tg-const:`telegram.constants.DiceEmoji.BOWLING`, values
                 :tg-const:`telegram.constants.DiceLimit.MIN_VALUE`-
-                :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_BASKETBALL_FOOTBALL` for
+                :tg-const:`telegram.constants.DiceLimit.MAX_VALUE_BASKETBALL` for
                 :tg-const:`telegram.constants.DiceEmoji.BASKETBALL` and
                 :tg-const:`telegram.constants.DiceEmoji.FOOTBALL`, and values
                 :tg-const:`telegram.constants.DiceLimit.MIN_VALUE`-

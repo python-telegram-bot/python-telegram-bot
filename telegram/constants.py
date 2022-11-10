@@ -340,20 +340,31 @@ class DiceLimit(IntEnum):
     :class:`telegram.Dice` (any emoji).
     """
 
-    MAX_VALUE_DICE_DARTS_BOWLING = 6
+    MAX_VALUE_BASKETBALL = 5
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Dice.value` parameter of
     :class:`telegram.Dice` if :paramref:`~telegram.Dice.emoji` is
-    :tg-const:`telegram.constants.DiceEmoji.DICE`, :tg-const:`telegram.constants.DiceEmoji.DARTS`
-    or :tg-const:`telegram.constants.DiceEmoji.BOWLING`.
+    :tg-const:`telegram.constants.DiceEmoji.BASKETBALL`.
     """
-
-    MAX_VALUE_BASKETBALL_FOOTBALL = 5
+    MAX_VALUE_BOWLING = 6
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Dice.value` parameter of
     :class:`telegram.Dice` if :paramref:`~telegram.Dice.emoji` is
-    :tg-const:`telegram.constants.DiceEmoji.BASKETBALL` or
+    :tg-const:`telegram.constants.DiceEmoji.BOWLING`.
+    """
+    MAX_VALUE_DARTS = 6
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Dice.value` parameter of
+    :class:`telegram.Dice` if :paramref:`~telegram.Dice.emoji` is
+    :tg-const:`telegram.constants.DiceEmoji.DARTS`.
+    """
+    MAX_VALUE_DICE = 6
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Dice.value` parameter of
+    :class:`telegram.Dice` if :paramref:`~telegram.Dice.emoji` is
+    :tg-const:`telegram.constants.DiceEmoji.DICE`.
+    """
+    MAX_VALUE_FOOTBALL = 5
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Dice.value` parameter of
+    :class:`telegram.Dice` if :paramref:`~telegram.Dice.emoji` is
     :tg-const:`telegram.constants.DiceEmoji.FOOTBALL`.
     """
-
     MAX_VALUE_SLOT_MACHINE = 64
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Dice.value` parameter of
     :class:`telegram.Dice` if :paramref:`~telegram.Dice.emoji` is
