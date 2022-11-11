@@ -125,8 +125,8 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,
-        application: "Application",
+        update: Update,  # skipcq: BAN-B301
+        application: "Application",  # skipcq: BAN-B301
         check_result: Optional[Union[bool, Match]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.inline_query.query)`` to
