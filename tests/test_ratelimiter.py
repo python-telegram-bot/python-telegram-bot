@@ -30,7 +30,6 @@ from datetime import datetime
 from http import HTTPStatus
 
 import pytest
-from flaky import flaky
 
 from telegram import BotCommand, Chat, Message, User
 from telegram.constants import ParseMode
@@ -149,7 +148,7 @@ class TestBaseRateLimiter:
     os.getenv("GITHUB_ACTIONS", False) and platform.system() == "Darwin",
     reason="The timings are apparently rather inaccurate on MacOS.",
 )
-@flaky(10, 1)  # Timings aren't quite perfect
+@pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
 class TestAIORateLimiter:
     count = 0
     call_times = []

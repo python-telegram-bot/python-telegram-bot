@@ -20,7 +20,6 @@ import os
 from pathlib import Path
 
 import pytest
-from flaky import flaky
 
 from telegram import Animation, Bot, InputFile, MessageEntity, PhotoSize, Voice
 from telegram.error import BadRequest, TelegramError
@@ -81,7 +80,7 @@ class TestAnimation:
         assert animation.file_name.startswith("game.gif") == self.file_name.startswith("game.gif")
         assert isinstance(animation.thumb, PhotoSize)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_all_args(self, bot, chat_id, animation_file, animation, thumb_file):
         message = await bot.send_animation(
             chat_id,
@@ -108,7 +107,7 @@ class TestAnimation:
         assert message.animation.thumb.height == self.height
         assert message.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_animation_custom_filename(self, bot, chat_id, animation_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return list(request_data.multipart_data.values())[0][0] == "custom_filename"
@@ -118,7 +117,7 @@ class TestAnimation:
         assert await bot.send_animation(chat_id, animation_file, filename="custom_filename")
         monkeypatch.delattr(bot.request, "post")
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_and_download(self, bot, animation):
         path = Path("game.gif")
         if path.is_file():
@@ -133,7 +132,7 @@ class TestAnimation:
 
         assert new_filepath.is_file()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_animation_url_file(self, bot, chat_id, animation):
         message = await bot.send_animation(
             chat_id=chat_id, animation=self.animation_file_url, caption=self.caption
@@ -153,7 +152,7 @@ class TestAnimation:
         ) == animation.file_name.startswith("game.gif")
         assert message.animation.mime_type == animation.mime_type
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_animation_caption_entities(self, bot, chat_id, animation):
         test_string = "Italic Bold Code"
         entities = [
@@ -168,7 +167,7 @@ class TestAnimation:
         assert message.caption == test_string
         assert message.caption_entities == entities
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_animation_default_parse_mode_1(self, default_bot, chat_id, animation_file):
         test_string = "Italic Bold Code"
@@ -180,7 +179,7 @@ class TestAnimation:
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_animation_default_parse_mode_2(self, default_bot, chat_id, animation_file):
         test_markdown_string = "_Italic_ *Bold* `Code`"
@@ -191,7 +190,7 @@ class TestAnimation:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_animation_default_parse_mode_3(self, default_bot, chat_id, animation_file):
         test_markdown_string = "_Italic_ *Bold* `Code`"
@@ -227,7 +226,7 @@ class TestAnimation:
         finally:
             bot._local_mode = False
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -261,7 +260,7 @@ class TestAnimation:
                     chat_id, animation, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_animation_default_protect_content(self, default_bot, chat_id, animation):
         animation_protected = await default_bot.send_animation(chat_id, animation)
@@ -271,7 +270,7 @@ class TestAnimation:
         )
         assert not ani_unprotected.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_resend(self, bot, chat_id, animation):
         message = await bot.send_animation(chat_id, animation.file_id)
 
@@ -319,14 +318,14 @@ class TestAnimation:
         assert animation_dict["mime_type"] == animation.mime_type
         assert animation_dict["file_size"] == animation.file_size
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file(self, bot, chat_id):
         animation_file = open(os.devnull, "rb")
 
         with pytest.raises(TelegramError):
             await bot.send_animation(chat_id=chat_id, animation=animation_file)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_animation(chat_id=chat_id, animation="")

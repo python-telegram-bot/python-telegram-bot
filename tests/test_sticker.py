@@ -21,7 +21,6 @@ import os
 from pathlib import Path
 
 import pytest
-from flaky import flaky
 
 from telegram import Audio, Bot, File, InputFile, MaskPosition, PhotoSize, Sticker, StickerSet
 from telegram.error import BadRequest, TelegramError
@@ -126,7 +125,7 @@ class TestSticker:
         # we need to be a premium TG user to send a premium sticker, so the below is not tested
         # assert sticker.premium_animation == self.premium_animation
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_all_args(self, bot, chat_id, sticker_file, sticker):
         message = await bot.send_sticker(
             chat_id, sticker=sticker_file, disable_notification=False, protect_content=True
@@ -156,7 +155,7 @@ class TestSticker:
         assert message.sticker.thumb.height == sticker.thumb.height
         assert message.sticker.thumb.file_size == sticker.thumb.file_size
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_and_download(self, bot, sticker):
         path = Path("telegram.webp")
         if path.is_file():
@@ -173,20 +172,20 @@ class TestSticker:
 
         assert path.is_file()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_resend(self, bot, chat_id, sticker):
         message = await bot.send_sticker(chat_id=chat_id, sticker=sticker.file_id)
 
         assert message.sticker == sticker
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_on_server_emoji(self, bot, chat_id):
         server_file_id = "CAADAQADHAADyIsGAAFZfq1bphjqlgI"
         message = await bot.send_sticker(chat_id=chat_id, sticker=server_file_id)
         sticker = message.sticker
         assert sticker.emoji == self.emoji
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_from_url(self, bot, chat_id):
         message = await bot.send_sticker(chat_id=chat_id, sticker=self.sticker_file_url)
         sticker = message.sticker
@@ -274,7 +273,7 @@ class TestSticker:
         finally:
             bot._local_mode = False
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -308,7 +307,7 @@ class TestSticker:
                     chat_id, sticker, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_sticker_default_protect_content(self, chat_id, sticker, default_bot):
         protected = await default_bot.send_sticker(chat_id, sticker)
@@ -330,12 +329,12 @@ class TestSticker:
         assert sticker_dict["thumb"] == sticker.thumb.to_dict()
         assert sticker_dict["type"] == sticker.type
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_sticker(chat_id, open(os.devnull, "rb"))
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_sticker(chat_id, "")
@@ -344,7 +343,7 @@ class TestSticker:
         with pytest.raises(TypeError):
             await bot.send_sticker(chat_id)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_premium_animation(self, bot):
         # testing animation sucks a bit since we can't create a premium sticker. What we can do is
         # get a sticker set which includes a premium sticker and check that specific one.
@@ -362,7 +361,7 @@ class TestSticker:
         }
         assert premium_sticker.premium_animation.to_dict() == premium_sticker_dict
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_custom_emoji(self, bot):
         # testing custom emoji stickers is as much of an annoyance as the premium animation, see
         # in test_premium_animation
@@ -553,7 +552,7 @@ class TestStickerSet:
                     )
                     assert v
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_bot_methods_1_png(self, bot, chat_id, sticker_file):
         with data_file("telegram_sticker.png").open("rb") as f:
             # chat_id was hardcoded as 95205500 but it stopped working for some reason
@@ -571,7 +570,7 @@ class TestStickerSet:
             mask_position=MaskPosition(MaskPosition.EYES, -1, 1, 2),
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_bot_methods_1_tgs(self, bot, chat_id):
         assert await bot.add_sticker_to_set(
             chat_id,
@@ -580,7 +579,7 @@ class TestStickerSet:
             emojis="😄",
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_bot_methods_1_webm(self, bot, chat_id):
         with data_file("telegram_video_sticker.webm").open("rb") as f:
             assert await bot.add_sticker_to_set(
@@ -599,28 +598,28 @@ class TestStickerSet:
         assert sticker_set_dict["thumb"] == sticker_set.thumb.to_dict()
         assert sticker_set_dict["sticker_type"] == sticker_set.sticker_type
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_bot_methods_2_png(self, bot, sticker_set):
         file_id = sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_bot_methods_2_tgs(self, bot, animated_sticker_set):
         file_id = animated_sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_bot_methods_2_webm(self, bot, video_sticker_set):
         file_id = video_sticker_set.stickers[0].file_id
         assert await bot.set_sticker_position_in_set(file_id, 1)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_bot_methods_3_png(self, bot, chat_id, sticker_set_thumb_file):
         assert await bot.set_sticker_set_thumb(
             f"test_by_{bot.username}", chat_id, sticker_set_thumb_file
         )
 
-    @flaky(10, 1)
+    @pytest.mark.flaky(10, 1)
     async def test_bot_methods_3_tgs(
         self, bot, chat_id, animated_sticker_file, animated_sticker_set
     ):
@@ -639,19 +638,19 @@ class TestStickerSet:
     def test_bot_methods_3_webm(self, bot, chat_id, video_sticker_file, video_sticker_set):
         pass
 
-    @flaky(10, 1)
+    @pytest.mark.flaky(10, 1)
     async def test_bot_methods_4_png(self, bot, sticker_set):
         await asyncio.sleep(1)
         file_id = sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
-    @flaky(10, 1)
+    @pytest.mark.flaky(10, 1)
     async def test_bot_methods_4_tgs(self, bot, animated_sticker_set):
         await asyncio.sleep(1)
         file_id = animated_sticker_set.stickers[-1].file_id
         assert await bot.delete_sticker_from_set(file_id)
 
-    @flaky(10, 1)
+    @pytest.mark.flaky(10, 1)
     async def test_bot_methods_4_webm(self, bot, video_sticker_set):
         await asyncio.sleep(1)
         file_id = video_sticker_set.stickers[-1].file_id

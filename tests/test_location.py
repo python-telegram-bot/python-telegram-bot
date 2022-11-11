@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
-from flaky import flaky
 
 from telegram import Location
 from telegram.error import BadRequest
@@ -68,7 +67,7 @@ class TestLocation:
         assert location.heading == self.heading
         assert location.proximity_alert_radius == self.proximity_alert_radius
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.xfail
     async def test_send_live_location(self, bot, chat_id):
         message = await bot.send_location(
@@ -151,7 +150,7 @@ class TestLocation:
         monkeypatch.setattr(bot.request, "post", make_assertion)
         assert await bot.send_location(location=location, chat_id=chat_id)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -185,7 +184,7 @@ class TestLocation:
                     chat_id, location=location, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_location_default_protect_content(self, chat_id, default_bot, location):
         protected = await default_bot.send_location(chat_id, location=location)
