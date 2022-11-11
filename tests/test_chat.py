@@ -46,6 +46,7 @@ def chat(bot):
         has_restricted_voice_and_video_messages=True,
     )
     chat.set_bot(bot)
+    chat._unfreeze()
     return chat
 
 
