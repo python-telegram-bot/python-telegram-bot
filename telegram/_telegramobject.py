@@ -217,7 +217,7 @@ class TelegramObject:
             value = getattr(self, key, None)
             if value is not None:
                 if recursive and hasattr(value, "to_dict"):
-                    data[key] = value.to_dict(recursive=True)  # pylint: disable=no-member
+                    data[key] = value.to_dict(recursive=True)
                 else:
                     data[key] = value
             elif not recursive:
