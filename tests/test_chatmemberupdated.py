@@ -227,17 +227,18 @@ class TestChatMemberUpdated:
         # This gives the names of all optional arguments of ChatMember
         [
             name
-            for name, param in inspect.signature(ChatMember).parameters.items()
+            for name, param in inspect.signature(ChatMemberAdministrator).parameters.items()
             if name not in ["self", "api_kwargs"] and param.default != inspect.Parameter.empty
         ],
     )
     def test_difference_optionals(self, optional_attribute, user, chat):
-        # we use datetimes here, because we need that for `until_date` and it doesn't matter for
-        # the other attributes
-        old_value = datetime.datetime(2020, 1, 1)
-        new_value = datetime.datetime(2021, 1, 1)
-        old_chat_member = ChatMember(user, "status", **{optional_attribute: old_value})
-        new_chat_member = ChatMember(user, "status", **{optional_attribute: new_value})
+        # We test with ChatMemberAdministrator, since that's currently the only interesting class
+        # with optional arguments
+        old_value = "old_value"
+        new_value = "new_value"
+        trues = tuple(True for _ in range(9))
+        old_chat_member = ChatMemberAdministrator(user, *trues, **{optional_attribute: old_value})
+        new_chat_member = ChatMemberAdministrator(user, *trues, **{optional_attribute: new_value})
         chat_member_updated = ChatMemberUpdated(
             chat, user, datetime.datetime.utcnow(), old_chat_member, new_chat_member
         )

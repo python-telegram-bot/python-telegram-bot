@@ -25,7 +25,6 @@ import platform
 import time
 
 import pytest
-from flaky import flaky
 
 from telegram.ext import ApplicationBuilder, CallbackContext, ContextTypes, Job, JobQueue
 from tests.conftest import env_var_2_bool
@@ -75,7 +74,7 @@ class TestNoJobQueue:
     os.getenv("GITHUB_ACTIONS", False) and platform.system() in ["Windows", "Darwin"],
     reason="On Windows & MacOS precise timings are not accurate.",
 )
-@flaky(10, 1)  # Timings aren't quite perfect
+@pytest.mark.flaky(10, 1)  # Timings aren't quite perfect
 class TestJobQueue:
     result = 0
     job_time = 0

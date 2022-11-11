@@ -27,7 +27,6 @@ from pathlib import Path
 from typing import NamedTuple
 
 import pytest
-from flaky import flaky
 
 from telegram import Bot, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Update, User
 from telegram.ext import (
@@ -573,7 +572,7 @@ class TestBasePersistence:
         with pytest.raises(ValueError, match="when handler is unnamed"):
             papp.add_handler(build_conversation_handler(name=None, persistent=True))
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "papp",
         [

@@ -19,7 +19,6 @@
 import copy
 
 import pytest
-from flaky import flaky
 
 from telegram import (
     InputFile,
@@ -454,7 +453,7 @@ def media_group_no_caption_only_parse_mode(photo, thumb):  # noqa: F811
 
 
 class TestSendMediaGroup:
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_media_group_photo(self, bot, chat_id, media_group):
         messages = await bot.send_media_group(chat_id, media_group)
         assert isinstance(messages, list)
@@ -494,7 +493,7 @@ class TestSendMediaGroup:
             ("photo 1", None, [MessageEntity(MessageEntity.BOLD, 0, 5)]),
         ],
     )
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_media_group_with_group_caption(
         self,
         bot,
@@ -539,7 +538,7 @@ class TestSendMediaGroup:
         assert all(mes.caption is None for mes in other_messages)
         assert not any(mes.caption_entities for mes in other_messages)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_media_group_all_args(self, bot, raw_bot, chat_id, media_group):
         ext_bot = bot
         for bot in (ext_bot, raw_bot):
@@ -574,7 +573,7 @@ class TestSendMediaGroup:
             )
             assert all(mes.has_protected_content for mes in messages)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_media_group_custom_filename(
         self,
         bot,
@@ -620,7 +619,7 @@ class TestSendMediaGroup:
         with pytest.raises(Exception, match="Test was successful"):
             await bot.send_media_group(chat_id, [input_video, input_video])
 
-    @flaky(3, 1)  # noqa: F811
+    @pytest.mark.flaky(3, 1)  # noqa: F811
     async def test_send_media_group_new_files(
         self,
         bot,
@@ -648,7 +647,7 @@ class TestSendMediaGroup:
         assert all(isinstance(mes, Message) for mes in messages)
         assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -682,7 +681,7 @@ class TestSendMediaGroup:
                     chat_id, media_group, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_media_group_default_protect_content(
         self, chat_id, media_group, default_bot
@@ -694,7 +693,7 @@ class TestSendMediaGroup:
         )
         assert not all(msg.has_protected_content for msg in unprotected)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True)
     async def test_send_media_group_default_parse_mode(
         self, chat_id, media_group_no_caption_args, default_bot
@@ -739,7 +738,7 @@ class TestSendMediaGroup:
             assert all(mes.caption is None for mes in other_messages)
             assert not any(mes.caption_entities for mes in other_messages)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_edit_message_media(self, bot, raw_bot, chat_id, media_group):
         ext_bot = bot
         for bot in (ext_bot, raw_bot):
@@ -758,7 +757,7 @@ class TestSendMediaGroup:
             # make sure that the media was not modified
             assert media_group[0].parse_mode == copied_media.parse_mode
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_edit_message_media_new_file(self, bot, chat_id, media_group, thumb_file):
         messages = await bot.send_media_group(chat_id, media_group)
         cid = messages[-1].chat.id
@@ -785,7 +784,7 @@ class TestSendMediaGroup:
         with pytest.raises(Exception, match="Test was successful"):
             await bot.edit_message_media(chat_id=chat_id, message_id=123, media=input_video)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot", [{"parse_mode": ParseMode.HTML}], indirect=True, ids=["HTML-Bot"]
     )
