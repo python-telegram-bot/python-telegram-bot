@@ -66,6 +66,7 @@ def message(bot):
         date=TestMessage.date,
         chat=TestMessage.chat,
         from_user=TestMessage.from_user,
+        message_thread_id=42,
     )
     message.set_bot(bot)
     return message
@@ -1684,6 +1685,18 @@ class TestMessage:
             assert message._quote(None, None)
         finally:
             message.get_bot()._defaults = None
+
+    async def test_edit_forum_topic(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+                and kwargs["name"] == "New Name"
+                and kwargs["icon_custom_emoji_id"] == "12345"
+            )
+
+        monkeypatch.setattr(message.get_bot(), "edit_forum_topic", make_assertion)
+        assert await message.edit_forum_topic(name="New Name", icon_custom_emoji_id="12345")
 
     def test_equality(self):
         id_ = 1

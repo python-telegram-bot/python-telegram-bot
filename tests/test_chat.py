@@ -896,6 +896,20 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), "decline_chat_join_request", make_assertion)
         assert await chat.decline_join_request(user_id=42)
 
+    async def test_edit_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["message_thread_id"] == 42
+                and kwargs["name"] == "New Name"
+                and kwargs["icon_custom_emoji_id"] == "12345"
+            )
+
+        monkeypatch.setattr(chat.get_bot(), "edit_forum_topic", make_assertion)
+        assert await chat.edit_forum_topic(
+            message_thread_id=42, name="New Name", icon_custom_emoji_id="12345"
+        )
+
     def test_mention_html(self):
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):
             chat = Chat(id=1, type="foo")
