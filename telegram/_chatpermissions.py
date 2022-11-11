@@ -32,6 +32,8 @@ class ChatPermissions(TelegramObject):
     :attr:`can_manage_topics` are equal.
 
     .. versionchanged:: 20.0
+        :attr:`can_manage_topics` is considered as well when comparing objects of
+        this type in terms of equality.
 
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
