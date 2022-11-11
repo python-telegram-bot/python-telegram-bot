@@ -146,6 +146,7 @@ class TestInlineQueryHandler:
             update = Update(
                 update_id=0, inline_query=InlineQuery(id="id", from_user=None, query="", offset="")
             )
+            update.inline_query._unfreeze()
             assert not handler.check_update(update)
             update.inline_query.query = "not_a_match"
             assert not handler.check_update(update)

@@ -462,7 +462,7 @@ class TestSendMediaGroup:
         assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
         assert all(mes.caption == f"photo {idx+1}" for idx, mes in enumerate(messages))
         assert all(
-            mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)] for mes in messages
+            mes.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),) for mes in messages
         )
 
     async def test_send_media_group_throws_error_with_group_caption_and_individual_captions(
@@ -568,7 +568,7 @@ class TestSendMediaGroup:
             assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
             assert all(mes.caption == f"photo {idx+1}" for idx, mes in enumerate(messages))
             assert all(
-                mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+                mes.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),)
                 for mes in messages
             )
             assert all(mes.has_protected_content for mes in messages)

@@ -721,6 +721,7 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
+        update.message.document._unfreeze()
         assert filters.Document.FileExtension("jpg").check_update(update)
         assert not filters.Document.FileExtension("jpeg").check_update(update)
         assert not filters.Document.FileExtension("file.jpg").check_update(update)
@@ -744,6 +745,7 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
+        update.message.document._unfreeze()
         assert not filters.Document.FileExtension(".jpg").check_update(update)
         assert not filters.Document.FileExtension("e.jpg").check_update(update)
         assert not filters.Document.FileExtension("file.jpg").check_update(update)
@@ -773,6 +775,7 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
+        update.message.document._unfreeze()
         assert not filters.Document.FileExtension(None).check_update(update)
 
         update.message.document.file_name = "file"
@@ -792,6 +795,7 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
+        update.message.document._unfreeze()
         assert filters.Document.FileExtension("JPG").check_update(update)
         assert filters.Document.FileExtension("jpG").check_update(update)
 
@@ -839,6 +843,7 @@ class TestFilters:
     def test_filters_sticker(self, update):
         assert not filters.Sticker.ALL.check_update(update)
         update.message.sticker = Sticker("1", "uniq", 1, 2, False, False, Sticker.REGULAR)
+        update.message.sticker._unfreeze()
         assert filters.Sticker.ALL.check_update(update)
         assert filters.Sticker.STATIC.check_update(update)
         assert not filters.Sticker.VIDEO.check_update(update)

@@ -82,7 +82,7 @@ class TestInputInvoiceMessageContent:
         assert input_invoice_message_content.payload == self.payload
         assert input_invoice_message_content.provider_token == self.provider_token
         assert input_invoice_message_content.currency == self.currency
-        assert input_invoice_message_content.prices == self.prices
+        assert input_invoice_message_content.prices == tuple(self.prices)
         assert input_invoice_message_content.max_tip_amount == self.max_tip_amount
         assert input_invoice_message_content.suggested_tip_amounts == [
             int(amount) for amount in self.suggested_tip_amounts
@@ -217,7 +217,7 @@ class TestInputInvoiceMessageContent:
         assert input_invoice_message_content.payload == self.payload
         assert input_invoice_message_content.provider_token == self.provider_token
         assert input_invoice_message_content.currency == self.currency
-        assert input_invoice_message_content.prices == self.prices
+        assert input_invoice_message_content.prices == tuple(self.prices)
         assert input_invoice_message_content.max_tip_amount == self.max_tip_amount
         assert input_invoice_message_content.suggested_tip_amounts == [
             int(amount) for amount in self.suggested_tip_amounts

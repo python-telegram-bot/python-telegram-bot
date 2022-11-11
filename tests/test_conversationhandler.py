@@ -814,7 +814,6 @@ class TestConversationHandler:
         if message:
             message.set_bot(bot)
             message._unfreeze()
-            message.entities[0]._unfreeze()
         inline_message_id = "42" if inline else None
 
         async with app:

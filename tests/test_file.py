@@ -36,6 +36,7 @@ def file(bot):
         file_size=TestFile.file_size,
     )
     file.set_bot(bot)
+    file._unfreeze()
     return file
 
 
