@@ -302,7 +302,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         @functools.wraps(func)
         async def decorator(*args, **kwargs):  # type: ignore[no-untyped-def]
             logger.debug("Entering: %s", func.__name__)
-            result = await func(*args, **kwargs)
+            result = await func(*args, **kwargs)  # skipcq: PYL-E1102
             logger.debug(result)
             logger.debug("Exiting: %s", func.__name__)
             return result

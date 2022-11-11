@@ -22,7 +22,6 @@ import logging
 from warnings import filterwarnings
 
 import pytest
-from flaky import flaky
 
 from telegram import (
     Bot,
@@ -1379,7 +1378,7 @@ class TestConversationHandler:
 
             await app.stop()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_conversation_timeout_keeps_extending(self, app, bot, user1):
         handler = ConversationHandler(
             entry_points=self.entry_points,

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
-from flaky import flaky
 
 from telegram import ReplyKeyboardRemove
 
@@ -37,7 +36,7 @@ class TestReplyKeyboardRemove:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_message_with_reply_keyboard_remove(
         self, bot, chat_id, reply_keyboard_remove
     ):

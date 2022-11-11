@@ -96,8 +96,8 @@ class StringCommandHandler(BaseHandler[str, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: str,
-        application: "Application",
+        update: str,  # skipcq: BAN-B301
+        application: "Application",  # skipcq: BAN-B301
         check_result: Optional[List[str]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single

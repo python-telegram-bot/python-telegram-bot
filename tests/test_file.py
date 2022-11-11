@@ -21,7 +21,6 @@ from pathlib import Path
 from tempfile import TemporaryFile, mkstemp
 
 import pytest
-from flaky import flaky
 
 from telegram import File, FileCredentials, Voice
 from telegram.error import TelegramError
@@ -123,7 +122,7 @@ class TestFile:
         assert file_dict["file_path"] == file.file_path
         assert file_dict["file_size"] == file.file_size
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_get_empty_file_id(self, bot):
         with pytest.raises(TelegramError):
             await bot.get_file(file_id="")

@@ -19,7 +19,6 @@
 import json
 
 import pytest
-from flaky import flaky
 
 from telegram import constants
 from telegram._utils.enum import IntEnum, StringEnum
@@ -111,7 +110,7 @@ class TestConstants:
 
         assert hash(IntEnumTest.FOO) == hash(1)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_max_message_length(self, bot, chat_id):
         await bot.send_message(chat_id=chat_id, text="a" * constants.MessageLimit.TEXT_LENGTH)
 
@@ -123,7 +122,7 @@ class TestConstants:
                 chat_id=chat_id, text="a" * (constants.MessageLimit.TEXT_LENGTH + 1)
             )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_max_caption_length(self, bot, chat_id):
         good_caption = "a" * constants.MessageLimit.CAPTION_LENGTH
         with data_file("telegram.png").open("rb") as f:
