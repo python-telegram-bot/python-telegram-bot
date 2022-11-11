@@ -59,8 +59,9 @@ class ChatPermissions(TelegramObject):
             users to the chat.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
             messages. Ignored in public supergroups.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; supergroups only
+        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to create forum topics. If omitted defaults to the value of
+            :attr:`can_pin_messages`.
 
             .. versionadded:: 20.0
 
@@ -83,8 +84,9 @@ class ChatPermissions(TelegramObject):
             new users to the chat.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages. Ignored in public supergroups.
-        can_manage_topics (:obj: `bool`): Optional. :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; supergroups only
+        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to create forum topics. If omitted defaults to the value of
+            :attr:`can_pin_messages`.
 
             .. versionadded:: 20.0
 

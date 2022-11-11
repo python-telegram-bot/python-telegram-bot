@@ -98,12 +98,12 @@ def chat_member_restricted():
         CMDefaults.can_change_info,
         CMDefaults.can_invite_users,
         CMDefaults.can_pin_messages,
-        CMDefaults.can_manage_topics,
         CMDefaults.can_send_messages,
         CMDefaults.can_send_media_messages,
         CMDefaults.can_send_polls,
         CMDefaults.can_send_other_messages,
         CMDefaults.can_add_web_page_previews,
+        CMDefaults.can_manage_topics,
         CMDefaults.until_date,
     )
 

@@ -181,6 +181,8 @@ class ChatMemberAdministrator(ChatMember):
        * Argument and attribute ``can_manage_voice_chats`` were renamed to
          :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
          Bot API 6.0.
+       * The argument :paramref:`can_manage_topics` was added, which changes the position of the
+         optional argument :paramref:`custom_title`.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -215,7 +217,7 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
             .. versionadded:: 20.0
@@ -256,7 +258,7 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+        can_manage_topics (:obj:`bool`) Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only
 
             .. versionadded:: 20.0
@@ -351,6 +353,9 @@ class ChatMemberRestricted(ChatMember):
     in the chat. Supergroups only.
 
     .. versionadded:: 13.7
+    .. versionchanged:: 20.0
+       The argument :paramref:`can_manage_topics` was added, which changes the position of the
+       optional argument :paramref:`until_date`.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -372,7 +377,7 @@ class ChatMemberRestricted(ChatMember):
             to send animations, games, stickers and use inline bots.
         can_add_web_page_previews (:obj:`bool`): :obj:`True`, if the user is
            allowed to add web page previews to their messages.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only
 
             .. versionadded:: 20.0
@@ -401,7 +406,7 @@ class ChatMemberRestricted(ChatMember):
             to send animations, games, stickers and use inline bots.
         can_add_web_page_previews (:obj:`bool`): :obj:`True`, if the user is
            allowed to add web page previews to their messages.
-        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+        can_manage_topics (:obj:`bool`) Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only
 
             .. versionadded:: 20.0

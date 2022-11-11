@@ -5489,8 +5489,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 add new administrators with a subset of his own privileges or demote administrators
                 that he has promoted, directly or indirectly (promoted by administrators that were
                 appointed by him).
-            can_manage_topics (:obj: `bool`, optional): Pass :obj:`True`, if the administrator is
-                allowed to create, rename, close, and reopen forum topics, supergroups only.
+            can_manage_topics (:obj:`bool`, optional): Pass :obj:`True`, if the administrator is
+                allowed to create, rename, close, and reopen forum topics; supergroups only.
 
                 .. versionadded:: 20.0
 
