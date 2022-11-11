@@ -39,6 +39,7 @@ __all__ = [
     "ChatAction",
     "ChatID",
     "ChatInviteLinkLimit",
+    "ChatLimit",
     "ChatMemberStatus",
     "ChatType",
     "CustomEmojiStickerLimit",
@@ -904,6 +905,21 @@ class WebhookLimit(IntEnum):
     """:obj:`int`: Maximum length of the secret token."""
 
 
+class ChatLimit(IntEnum):
+    """This enum contains limitations for :paramref:`telegram.Bot.set_chat_title.title`. The
+    enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_TITLE_LENGTH = 1
+    """:obj:`int`: Minimum length of a new chat title."""
+    MAX_TITLE_LENGTH = 128
+    """:obj:`int`: Maximum length of a new chat title."""
+
+
 class TopicLimit(IntEnum):
     """This enum contains limitations for :paramref:`telegram.Bot.edit_forum_topic.name`. The
     enum members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -917,3 +933,4 @@ class TopicLimit(IntEnum):
     """:obj:`int`: Minimum length of the topic name."""
     MAX_NAME_LENGTH = 128
     """:obj:`int`: Maximum length of the topic name."""
+

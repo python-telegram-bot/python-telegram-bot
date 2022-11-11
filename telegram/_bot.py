@@ -433,6 +433,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -451,6 +452,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         if reply_markup is not None:
             data["reply_markup"] = reply_markup
+
+        if message_thread_id is not None:
+            data["message_thread_id"] = message_thread_id
 
         result = await self._post(
             endpoint,
@@ -669,6 +673,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         reply_to_message_id: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -709,6 +714,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -751,6 +760,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -775,6 +785,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         limitations:
 
         - A message can only be deleted if it was sent less than 48 hours ago.
+        - Service messages about a supergroup, channel, or forum topic creation can't be deleted.
         - A dice message in a private chat can only be deleted if it was sent more than 24
           hours ago.
         - Bots can delete outgoing messages in private chats, groups, and supergroups.
@@ -836,6 +847,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         message_id: int,
         disable_notification: DVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -869,6 +881,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -905,6 +921,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data,
             disable_notification=disable_notification,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -925,6 +942,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -967,7 +985,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
 
+                .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -1024,6 +1045,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1048,6 +1070,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1101,6 +1124,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1175,6 +1202,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1197,6 +1225,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1249,6 +1278,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1317,6 +1350,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1334,6 +1368,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -1367,6 +1402,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1408,6 +1447,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1433,6 +1473,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1491,6 +1532,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1566,6 +1611,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1586,6 +1632,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         thumb: FileInput = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1633,6 +1680,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1699,6 +1750,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1723,6 +1775,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1785,6 +1838,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1849,6 +1906,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1870,6 +1928,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         filename: str = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -1922,6 +1981,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1981,6 +2044,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1999,6 +2063,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         reply_to_message_id: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = 20,
@@ -2032,6 +2097,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -2105,6 +2174,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if reply_to_message_id:
             data["reply_to_message_id"] = reply_to_message_id
 
+        if message_thread_id:
+            data["message_thread_id"] = message_thread_id
+
         result = await self._post(
             "sendMediaGroup",
             data,
@@ -2132,6 +2204,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         location: Location = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2171,6 +2244,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                     original message.
@@ -2238,6 +2315,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2447,6 +2525,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         venue: Venue = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2489,6 +2568,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -2571,6 +2654,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2591,6 +2675,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         vcard: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         contact: Contact = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2623,6 +2708,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -2694,6 +2783,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2711,6 +2801,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         reply_markup: InlineKeyboardMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -2733,6 +2824,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -2775,6 +2870,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -4845,6 +4941,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -4938,6 +5035,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -5018,6 +5119,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -6171,7 +6273,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@channelusername``).
-            title (:obj:`str`): New chat title, 1-255 characters.
+            title (:obj:`str`): New chat title,
+                tg-const:`telegram.constants.ChatLimits.MIN_TITLE_LENGTH`-
+                tg-const:`telegram.constants.ChatLimits.MAX_TITLE_LENGTH` characters.
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -7146,6 +7250,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7201,6 +7306,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -7268,6 +7377,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -7349,6 +7459,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         emoji: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7391,6 +7502,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
         Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
@@ -7427,6 +7542,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             reply_markup=reply_markup,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -7897,6 +8013,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -7933,6 +8050,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
+                thread (topic) of the forum; for forum supergroups only.
+
+                .. versionadded:: 20.0
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -7983,6 +8104,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             data["reply_to_message_id"] = reply_to_message_id
         if reply_markup:
             data["reply_markup"] = reply_markup
+        if message_thread_id:
+            data["message_thread_id"] = message_thread_id
 
         result = await self._post(
             "copyMessage",
