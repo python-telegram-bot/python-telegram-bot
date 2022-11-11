@@ -76,7 +76,7 @@ class TestInlineQueryResultDocument:
         assert inline_query_result_document.title == self.title
         assert inline_query_result_document.caption == self.caption
         assert inline_query_result_document.parse_mode == self.parse_mode
-        assert inline_query_result_document.caption_entities == self.caption_entities
+        assert inline_query_result_document.caption_entities == tuple(self.caption_entities)
         assert inline_query_result_document.mime_type == self.mime_type
         assert inline_query_result_document.description == self.description
         assert inline_query_result_document.thumb_url == self.thumb_url

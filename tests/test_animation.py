@@ -166,7 +166,7 @@ class TestAnimation:
         )
 
         assert message.caption == test_string
-        assert message.caption_entities == entities
+        assert message.caption_entities == tuple(entities)
 
     @flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)

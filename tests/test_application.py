@@ -470,7 +470,7 @@ class TestApplication:
             u = make_message_update(message="test")
             await app.process_update(u)
             self.received = None
-            u.message.text = "something"
+            u = make_message_update(message="something")
             await app.process_update(u)
 
     def test_add_handler_errors(self, app):
@@ -540,7 +540,7 @@ class TestApplication:
         app.add_handler(msg_handler_set_count, 1)
         app.add_handlers((msg_handler_inc_count, msg_handler_inc_count), 1)
 
-        photo_update = make_message_update(message=Message(2, None, None, photo=True))
+        photo_update = make_message_update(message=Message(2, None, None, photo=(True,)))
 
         async with app:
             await app.start()

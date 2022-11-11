@@ -66,7 +66,7 @@ class TestInlineQueryResultCachedVoice:
         assert inline_query_result_cached_voice.title == self.title
         assert inline_query_result_cached_voice.caption == self.caption
         assert inline_query_result_cached_voice.parse_mode == self.parse_mode
-        assert inline_query_result_cached_voice.caption_entities == self.caption_entities
+        assert inline_query_result_cached_voice.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_cached_voice.input_message_content.to_dict()
             == self.input_message_content.to_dict()

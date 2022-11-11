@@ -64,7 +64,7 @@ class TestInlineQueryResultCachedAudio:
         assert inline_query_result_cached_audio.audio_file_id == self.audio_file_id
         assert inline_query_result_cached_audio.caption == self.caption
         assert inline_query_result_cached_audio.parse_mode == self.parse_mode
-        assert inline_query_result_cached_audio.caption_entities == self.caption_entities
+        assert inline_query_result_cached_audio.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_cached_audio.input_message_content.to_dict()
             == self.input_message_content.to_dict()

@@ -371,7 +371,9 @@ class CallbackDataCache:
 
             # Get the cached callback data for the CallbackQuery
             keyboard_uuid, button_data = self.__get_keyboard_uuid_and_button_data(data)
+            callback_query._unfreeze()  # pylint: disable=protected-access
             callback_query.data = button_data  # type: ignore[assignment]
+            callback_query._freeze()  # pylint: disable=protected-access
 
             # Map the callback queries ID to the keyboards UUID for later use
             if not mapped and not isinstance(button_data, InvalidCallbackData):

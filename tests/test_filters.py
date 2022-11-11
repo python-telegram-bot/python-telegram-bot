@@ -611,6 +611,7 @@ class TestFilters:
         update.message.document = Document(
             "file_id", "unique_id", mime_type="application/vnd.android.package-archive"
         )
+        update.message.document._unfreeze()
         assert filters.Document.APK.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.DOC.check_update(update)

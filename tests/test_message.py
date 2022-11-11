@@ -68,6 +68,7 @@ def message(bot):
         from_user=TestMessage.from_user,
     )
     message.set_bot(bot)
+    message._unfreeze()
     return message
 
 

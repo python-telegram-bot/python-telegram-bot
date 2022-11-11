@@ -81,7 +81,7 @@ class TestInlineQueryResultGif:
         assert inline_query_result_gif.title == self.title
         assert inline_query_result_gif.caption == self.caption
         assert inline_query_result_gif.parse_mode == self.parse_mode
-        assert inline_query_result_gif.caption_entities == self.caption_entities
+        assert inline_query_result_gif.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_gif.input_message_content.to_dict()
             == self.input_message_content.to_dict()

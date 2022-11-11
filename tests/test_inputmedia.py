@@ -143,7 +143,7 @@ class TestInputMediaVideo:
         assert input_media_video.height == self.height
         assert input_media_video.duration == self.duration
         assert input_media_video.parse_mode == self.parse_mode
-        assert input_media_video.caption_entities == self.caption_entities
+        assert input_media_video.caption_entities == tuple(self.caption_entities)
         assert input_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_media_video.thumb, InputFile)
 
@@ -204,7 +204,7 @@ class TestInputMediaPhoto:
         assert input_media_photo.media == self.media
         assert input_media_photo.caption == self.caption
         assert input_media_photo.parse_mode == self.parse_mode
-        assert input_media_photo.caption_entities == self.caption_entities
+        assert input_media_photo.caption_entities == tuple(self.caption_entities)
 
     def test_to_dict(self, input_media_photo):
         input_media_photo_dict = input_media_photo.to_dict()
@@ -256,7 +256,7 @@ class TestInputMediaAnimation:
         assert input_media_animation.media == self.media
         assert input_media_animation.caption == self.caption
         assert input_media_animation.parse_mode == self.parse_mode
-        assert input_media_animation.caption_entities == self.caption_entities
+        assert input_media_animation.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_animation.thumb, InputFile)
 
     def test_to_dict(self, input_media_animation):
@@ -318,7 +318,7 @@ class TestInputMediaAudio:
         assert input_media_audio.performer == self.performer
         assert input_media_audio.title == self.title
         assert input_media_audio.parse_mode == self.parse_mode
-        assert input_media_audio.caption_entities == self.caption_entities
+        assert input_media_audio.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_audio.thumb, InputFile)
 
     def test_to_dict(self, input_media_audio):
@@ -378,7 +378,7 @@ class TestInputMediaDocument:
         assert input_media_document.media == self.media
         assert input_media_document.caption == self.caption
         assert input_media_document.parse_mode == self.parse_mode
-        assert input_media_document.caption_entities == self.caption_entities
+        assert input_media_document.caption_entities == tuple(self.caption_entities)
         assert (
             input_media_document.disable_content_type_detection
             == self.disable_content_type_detection
@@ -533,7 +533,7 @@ class TestSendMediaGroup:
         # Make sure first message got the caption, which will lead
         # to Telegram displaying its caption as group caption
         assert first_message.caption
-        assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+        assert first_message.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),)
 
         # Check that other messages have no captions
         assert all(mes.caption is None for mes in other_messages)
@@ -839,7 +839,7 @@ class TestSendMediaGroup:
             message.message_id,
         )
         assert message.caption == test_caption
-        assert message.caption_entities == test_entities
+        assert message.caption_entities == tuple(test_entities)
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode
 
@@ -854,7 +854,7 @@ class TestSendMediaGroup:
             message.message_id,
         )
         assert message.caption == test_caption
-        assert message.caption_entities == test_entities
+        assert message.caption_entities == tuple(test_entities)
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode
 
@@ -869,6 +869,6 @@ class TestSendMediaGroup:
             message.message_id,
         )
         assert message.caption == markdown_caption
-        assert message.caption_entities == []
+        assert message.caption_entities == ()
         # make sure that the media was not modified
         assert media.parse_mode == copied_media.parse_mode

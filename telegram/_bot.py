@@ -2934,6 +2934,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 if not copied:
                     res = copy.copy(res)
                     copied = True
+
+                res._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content = copy.copy(res.input_message_content)
                 res.input_message_content._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content.parse_mode = DefaultValue.get_value(
@@ -2943,12 +2945,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             if hasattr(res.input_message_content, "disable_web_page_preview"):
                 if not copied:
                     res = copy.copy(res)
+
+                res._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content = copy.copy(res.input_message_content)
                 res.input_message_content._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
                     res.input_message_content.disable_web_page_preview
                 )
                 res.input_message_content._freeze()  # pylint: disable=protected-access
+
+            res._freeze()  # pylint: disable=protected-access
 
         return res
 

@@ -73,7 +73,7 @@ class TestInlineQueryResultAudio:
         assert inline_query_result_audio.audio_duration == self.audio_duration
         assert inline_query_result_audio.caption == self.caption
         assert inline_query_result_audio.parse_mode == self.parse_mode
-        assert inline_query_result_audio.caption_entities == self.caption_entities
+        assert inline_query_result_audio.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_audio.input_message_content.to_dict()
             == self.input_message_content.to_dict()

@@ -26,7 +26,9 @@ from telegram.constants import PollType
 
 @pytest.fixture(scope="class")
 def poll_option():
-    return PollOption(text=TestPollOption.text, voter_count=TestPollOption.voter_count)
+    out = PollOption(text=TestPollOption.text, voter_count=TestPollOption.voter_count)
+    out._unfreeze()
+    return out
 
 
 class TestPollOption:
@@ -96,7 +98,7 @@ class TestPollAnswer:
 
         assert poll_answer.poll_id == self.poll_id
         assert poll_answer.user == self.user
-        assert poll_answer.option_ids == self.option_ids
+        assert poll_answer.option_ids == tuple(self.option_ids)
 
     def test_to_dict(self, poll_answer):
         poll_answer_dict = poll_answer.to_dict()
@@ -128,7 +130,7 @@ class TestPollAnswer:
 
 @pytest.fixture(scope="class")
 def poll():
-    return Poll(
+    poll = Poll(
         TestPoll.id_,
         TestPoll.question,
         TestPoll.options,
@@ -142,6 +144,8 @@ def poll():
         open_period=TestPoll.open_period,
         close_date=TestPoll.close_date,
     )
+    poll._unfreeze()
+    return poll
 
 
 class TestPoll:
@@ -181,7 +185,7 @@ class TestPoll:
 
         assert poll.id == self.id_
         assert poll.question == self.question
-        assert poll.options == self.options
+        assert poll.options == tuple(self.options)
         assert poll.options[0].text == self.options[0].text
         assert poll.options[0].voter_count == self.options[0].voter_count
         assert poll.options[1].text == self.options[1].text

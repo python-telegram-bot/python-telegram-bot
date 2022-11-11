@@ -506,7 +506,7 @@ class TestStickerSet:
         assert sticker_set.title == self.title
         assert sticker_set.is_animated == self.is_animated
         assert sticker_set.is_video == self.is_video
-        assert sticker_set.stickers == self.stickers
+        assert sticker_set.stickers == tuple(self.stickers)
         assert sticker_set.thumb == sticker.thumb
         assert sticker_set.sticker_type == self.sticker_type
         assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks}

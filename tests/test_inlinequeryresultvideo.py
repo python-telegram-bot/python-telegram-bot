@@ -84,7 +84,7 @@ class TestInlineQueryResultVideo:
         assert inline_query_result_video.description == self.description
         assert inline_query_result_video.caption == self.caption
         assert inline_query_result_video.parse_mode == self.parse_mode
-        assert inline_query_result_video.caption_entities == self.caption_entities
+        assert inline_query_result_video.caption_entities == tuple(self.caption_entities)
         assert (
             inline_query_result_video.input_message_content.to_dict()
             == self.input_message_content.to_dict()

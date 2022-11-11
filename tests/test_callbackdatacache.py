@@ -185,6 +185,7 @@ class TestCallbackDataCache:
 
         chat = Chat(1, "private")
         effective_message = Message(message_id=1, date=datetime.now(), chat=chat, reply_markup=out)
+        effective_message._unfreeze()
         effective_message.reply_to_message = deepcopy(effective_message)
         effective_message.pinned_message = deepcopy(effective_message)
         cq_id = uuid4().hex

@@ -66,7 +66,9 @@ class TestInlineQueryResultCachedMpeg4Gif:
         assert inline_query_result_cached_mpeg4_gif.title == self.title
         assert inline_query_result_cached_mpeg4_gif.caption == self.caption
         assert inline_query_result_cached_mpeg4_gif.parse_mode == self.parse_mode
-        assert inline_query_result_cached_mpeg4_gif.caption_entities == self.caption_entities
+        assert inline_query_result_cached_mpeg4_gif.caption_entities == tuple(
+            self.caption_entities
+        )
         assert (
             inline_query_result_cached_mpeg4_gif.input_message_content.to_dict()
             == self.input_message_content.to_dict()

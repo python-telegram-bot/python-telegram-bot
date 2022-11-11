@@ -48,7 +48,7 @@ class TestInputTextMessageContent:
         assert input_text_message_content.parse_mode == self.parse_mode
         assert input_text_message_content.message_text == self.message_text
         assert input_text_message_content.disable_web_page_preview == self.disable_web_page_preview
-        assert input_text_message_content.entities == self.entities
+        assert input_text_message_content.entities == tuple(self.entities)
 
     def test_to_dict(self, input_text_message_content):
         input_text_message_content_dict = input_text_message_content.to_dict()

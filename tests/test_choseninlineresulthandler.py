@@ -68,10 +68,13 @@ def false_update(request):
 
 @pytest.fixture(scope="class")
 def chosen_inline_result():
-    return Update(
+    out = Update(
         1,
         chosen_inline_result=ChosenInlineResult("result_id", User(1, "test_user", False), "query"),
     )
+    out._unfreeze()
+    out.chosen_inline_result._unfreeze()
+    return out
 
 
 class TestChosenInlineResultHandler:

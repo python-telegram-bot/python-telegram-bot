@@ -69,7 +69,7 @@ class TestInlineQueryResultCachedDocument:
         assert inline_query_result_cached_document.title == self.title
         assert inline_query_result_cached_document.caption == self.caption
         assert inline_query_result_cached_document.parse_mode == self.parse_mode
-        assert inline_query_result_cached_document.caption_entities == self.caption_entities
+        assert inline_query_result_cached_document.caption_entities == tuple(self.caption_entities)
         assert inline_query_result_cached_document.description == self.description
         assert (
             inline_query_result_cached_document.input_message_content.to_dict()

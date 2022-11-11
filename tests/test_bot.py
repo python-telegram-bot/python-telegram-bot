@@ -95,13 +95,14 @@ async def message(bot, chat_id):
     to_reply_to = await bot.send_message(
         chat_id, "Text", disable_web_page_preview=True, disable_notification=True
     )
-    return await bot.send_message(
+    out = await bot.send_message(
         chat_id,
         "Text",
         reply_to_message_id=to_reply_to.message_id,
         disable_web_page_preview=True,
         disable_notification=True,
     )
+    out._unfreeze()
 
 
 @pytest.fixture(scope="class")
@@ -749,7 +750,7 @@ class TestBot:
         assert message_quiz.poll.type == Poll.QUIZ
         assert message_quiz.poll.is_closed
         assert message_quiz.poll.explanation == "Here is a link"
-        assert message_quiz.poll.explanation_entities == explanation_entities
+        assert message_quiz.poll.explanation_entities == tuple(explanation_entities)
 
     @flaky(3, 1)
     @pytest.mark.parametrize(
@@ -837,7 +838,7 @@ class TestBot:
         )
 
         assert message.poll.explanation == test_string
-        assert message.poll.explanation_entities == entities
+        assert message.poll.explanation_entities == tuple(entities)
 
     @flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -1548,7 +1549,7 @@ class TestBot:
         )
 
         assert message.text == test_string
-        assert message.entities == entities
+        assert message.entities == tuple(entities)
 
     @flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -1621,7 +1622,7 @@ class TestBot:
         )
 
         assert message.caption == test_string
-        assert message.caption_entities == entities
+        assert message.caption_entities == tuple(entities)
 
     # edit_message_media is tested in test_inputmedia
 
@@ -1764,7 +1765,7 @@ class TestBot:
         live_info = await bot.get_webhook_info()
         assert live_info.url == url
         assert live_info.max_connections == max_connections
-        assert live_info.allowed_updates == allowed_updates
+        assert live_info.allowed_updates == tuple(allowed_updates)
         assert live_info.ip_address == ip
         assert live_info.has_custom_certificate == use_ip
 
@@ -2492,7 +2493,7 @@ class TestBot:
         ]
         message = await bot.send_message(chat_id=chat_id, text=test_string, entities=entities)
         assert message.text == test_string
-        assert message.entities == entities
+        assert message.entities == tuple(entities)
 
     @flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
@@ -3000,6 +3001,7 @@ class TestBot:
         message = Message(
             1, None, None, reply_markup=bot.callback_data_cache.process_keyboard(reply_markup)
         )
+        message._unfreeze()
         # We do to_dict -> de_json to make sure those aren't the same objects
         message.pinned_message = Message.de_json(message.to_dict(), bot)
 
