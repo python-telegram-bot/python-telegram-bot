@@ -28,12 +28,17 @@ class ChatPermissions(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`can_send_messages`, :attr:`can_send_media_messages`,
     :attr:`can_send_polls`, :attr:`can_send_other_messages`, :attr:`can_add_web_page_previews`,
-    :attr:`can_change_info`, :attr:`can_invite_users` and :attr:`can_pin_messages` are equal.
+    :attr:`can_change_info`, :attr:`can_invite_users` and :attr:`can_pin_messages`,
+    :attr:`can_manage_topics` are equal.
+
+    .. versionchanged:: 20.0
+        :attr:`can_manage_topics` is considered as well when comparing objects of
+        this type in terms of equality.
 
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
         permissions that are set, but also sets all the others to :obj:`False`. However, since not
-        documented, this behaviour may change unbeknown to PTB.
+        documented, this behavior may change unbeknown to PTB.
 
     Args:
         can_send_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to send text
@@ -54,6 +59,10 @@ class ChatPermissions(TelegramObject):
             users to the chat.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
             messages. Ignored in public supergroups.
+        can_manage_topics (:obj: `bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only
+
+            .. versionadded:: 20.0
 
     Attributes:
         can_send_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to send text
@@ -74,6 +83,10 @@ class ChatPermissions(TelegramObject):
             new users to the chat.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages. Ignored in public supergroups.
+        can_manage_topics (:obj: `bool`): Optional. :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only
+
+            .. versionadded:: 20.0
 
     """
 
@@ -86,6 +99,7 @@ class ChatPermissions(TelegramObject):
         "can_change_info",
         "can_pin_messages",
         "can_add_web_page_previews",
+        "can_manage_topics",
     )
 
     def __init__(
@@ -98,6 +112,7 @@ class ChatPermissions(TelegramObject):
         can_change_info: bool = None,
         can_invite_users: bool = None,
         can_pin_messages: bool = None,
+        can_manage_topics: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -111,6 +126,7 @@ class ChatPermissions(TelegramObject):
         self.can_change_info = can_change_info
         self.can_invite_users = can_invite_users
         self.can_pin_messages = can_pin_messages
+        self.can_manage_topics = can_manage_topics
 
         self._id_attrs = (
             self.can_send_messages,
@@ -121,6 +137,7 @@ class ChatPermissions(TelegramObject):
             self.can_change_info,
             self.can_invite_users,
             self.can_pin_messages,
+            self.can_manage_topics,
         )
 
     @classmethod
@@ -133,7 +150,7 @@ class ChatPermissions(TelegramObject):
         .. versionadded:: 20.0
 
         """
-        return cls(True, True, True, True, True, True, True, True)
+        return cls(True, True, True, True, True, True, True, True, True)
 
     @classmethod
     def no_permissions(cls) -> "ChatPermissions":
@@ -143,4 +160,4 @@ class ChatPermissions(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(False, False, False, False, False, False, False, False)
+        return cls(False, False, False, False, False, False, False, False, False)
