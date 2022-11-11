@@ -19,7 +19,6 @@
 import json
 
 import pytest
-from flaky import flaky
 
 from telegram import constants
 from telegram._utils.enum import IntEnum, StringEnum
@@ -56,6 +55,11 @@ class TestConstants:
         assert (
             actual == expected
         ), f"Members {expected - actual} were not listed in constants.__all__"
+
+    def test_message_attachment_type(self):
+        assert all(
+            getattr(constants.MessageType, x.name, False) for x in constants.MessageAttachmentType
+        ), "All MessageAttachmentType members should be in MessageType"
 
     def test_to_json(self):
         assert json.dumps(StrEnumTest.FOO) == json.dumps("foo")
@@ -106,7 +110,7 @@ class TestConstants:
 
         assert hash(IntEnumTest.FOO) == hash(1)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_max_message_length(self, bot, chat_id):
         await bot.send_message(chat_id=chat_id, text="a" * constants.MessageLimit.TEXT_LENGTH)
 
@@ -118,7 +122,7 @@ class TestConstants:
                 chat_id=chat_id, text="a" * (constants.MessageLimit.TEXT_LENGTH + 1)
             )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_max_caption_length(self, bot, chat_id):
         good_caption = "a" * constants.MessageLimit.CAPTION_LENGTH
         with data_file("telegram.png").open("rb") as f:
@@ -126,7 +130,7 @@ class TestConstants:
         assert good_msg.caption == good_caption
 
         bad_caption = good_caption + "Z"
-        match = "Media_caption_too_long"
+        match = "Message caption is too long"
         with pytest.raises(BadRequest, match=match), data_file("telegram.png").open("rb") as f:
             await bot.send_photo(photo=f, caption=bad_caption, chat_id=chat_id)
 

@@ -27,12 +27,12 @@ from pathlib import Path
 def test_public_submodules_dunder_all():
     modules_to_search = list(Path("telegram").rglob("*.py"))
 
+    if not modules_to_search:
+        raise AssertionError("No modules found to search through, please modify this test.")
+
     for mod_path in modules_to_search:
         path = str(mod_path)
         folder = mod_path.parent
-
-        if "vendor" in path:  # skip anything vendor related
-            continue
 
         if mod_path.name == "__init__.py" and "_" not in path[:-11]:  # init of public submodules
             mod = load_module(mod_path)

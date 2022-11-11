@@ -20,7 +20,6 @@ import os
 from pathlib import Path
 
 import pytest
-from flaky import flaky
 
 from telegram import Audio, Bot, InputFile, MessageEntity, Voice
 from telegram.error import BadRequest, TelegramError
@@ -76,7 +75,7 @@ class TestVoice:
         assert voice.mime_type == self.mime_type
         assert voice.file_size == self.file_size
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_all_args(self, bot, chat_id, voice_file, voice):
         message = await bot.send_voice(
             chat_id,
@@ -99,7 +98,7 @@ class TestVoice:
         assert message.caption == self.caption.replace("*", "")
         assert message.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_voice_custom_filename(self, bot, chat_id, voice_file, monkeypatch):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             return list(request_data.multipart_data.values())[0][0] == "custom_filename"
@@ -108,7 +107,7 @@ class TestVoice:
 
         assert await bot.send_voice(chat_id, voice_file, filename="custom_filename")
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_and_download(self, bot, voice):
         path = Path("telegram.ogg")
         if path.is_file():
@@ -125,7 +124,7 @@ class TestVoice:
 
         assert path.is_file()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_ogg_url_file(self, bot, chat_id, voice):
         message = await bot.sendVoice(chat_id, self.voice_file_url, duration=self.duration)
 
@@ -138,7 +137,7 @@ class TestVoice:
         assert message.voice.mime_type == voice.mime_type
         assert message.voice.file_size == voice.file_size
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_resend(self, bot, chat_id, voice):
         message = await bot.sendVoice(chat_id, voice.file_id)
 
@@ -152,7 +151,7 @@ class TestVoice:
         message = await bot.send_voice(chat_id, voice=voice)
         assert message
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_voice_caption_entities(self, bot, chat_id, voice_file):
         test_string = "Italic Bold Code"
         entities = [
@@ -167,7 +166,7 @@ class TestVoice:
         assert message.caption == test_string
         assert message.caption_entities == entities
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_voice_default_parse_mode_1(self, default_bot, chat_id, voice):
         test_string = "Italic Bold Code"
@@ -177,7 +176,7 @@ class TestVoice:
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_voice_default_parse_mode_2(self, default_bot, chat_id, voice):
         test_markdown_string = "_Italic_ *Bold* `Code`"
@@ -188,7 +187,7 @@ class TestVoice:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_voice_default_parse_mode_3(self, default_bot, chat_id, voice):
         test_markdown_string = "_Italic_ *Bold* `Code`"
@@ -199,7 +198,7 @@ class TestVoice:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_voice_default_protect_content(self, chat_id, default_bot, voice):
         protected = await default_bot.send_voice(chat_id, voice)
@@ -229,7 +228,7 @@ class TestVoice:
         finally:
             bot._local_mode = False
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -290,12 +289,12 @@ class TestVoice:
         assert voice_dict["mime_type"] == voice.mime_type
         assert voice_dict["file_size"] == voice.file_size
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.sendVoice(chat_id, open(os.devnull, "rb"))
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.sendVoice(chat_id, "")
