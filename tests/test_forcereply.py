@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
 import pytest
-from flaky import flaky
 
 from telegram import ForceReply, ReplyKeyboardRemove
 
@@ -41,7 +40,7 @@ class TestForceReply:
             assert getattr(force_reply, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(force_reply)) == len(set(mro_slots(force_reply))), "duplicate slot"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_message_with_force_reply(self, bot, chat_id, force_reply):
         message = await bot.send_message(chat_id, "text", reply_markup=force_reply)
 

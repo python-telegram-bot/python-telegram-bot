@@ -21,7 +21,6 @@ import os
 from pathlib import Path
 
 import pytest
-from flaky import flaky
 
 from telegram import Bot, ChatPhoto, Voice
 from telegram.error import TelegramError
@@ -64,7 +63,7 @@ class TestChatPhoto:
             assert getattr(chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(chat_photo)) == len(set(mro_slots(chat_photo))), "duplicate slot"
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_all_args(
         self, bot, super_group_id, chatphoto_file, chat_photo, thumb_file
     ):
@@ -75,7 +74,7 @@ class TestChatPhoto:
             func, "Type of file mismatch", "Telegram did not accept the file."
         )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_and_download(self, bot, chat_photo):
         jpg_file = Path("telegram.jpg")
         if jpg_file.is_file():
@@ -130,14 +129,14 @@ class TestChatPhoto:
         assert chat_photo_dict["small_file_unique_id"] == chat_photo.small_file_unique_id
         assert chat_photo_dict["big_file_unique_id"] == chat_photo.big_file_unique_id
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file(self, bot, super_group_id):
         chatphoto_file = open(os.devnull, "rb")
 
         with pytest.raises(TelegramError):
             await bot.set_chat_photo(chat_id=super_group_id, photo=chatphoto_file)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file_id(self, bot, super_group_id):
         with pytest.raises(TelegramError):
             await bot.set_chat_photo(chat_id=super_group_id, photo="")
