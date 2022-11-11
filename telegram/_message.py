@@ -2703,6 +2703,44 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    async def edit_forum_topic(
+        self,
+        name: str,
+        icon_custom_emoji_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.edit_forum_topic(
+                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.edit_forum_topic`.
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().edit_forum_topic(
+            chat_id=self.chat_id,
+            message_thread_id=self.message_thread_id,
+            name=name,
+            icon_custom_emoji_id=icon_custom_emoji_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 

@@ -933,4 +933,3 @@ class TopicLimit(IntEnum):
     """:obj:`int`: Minimum length of the topic name."""
     MAX_NAME_LENGTH = 128
     """:obj:`int`: Maximum length of the topic name."""
-

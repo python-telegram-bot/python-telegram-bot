@@ -2607,6 +2607,42 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    async def edit_forum_topic(
+        self,
+        message_thread_id: int,
+        name: str,
+        icon_custom_emoji_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             await bot.edit_forum_topic(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.edit_forum_topic`.
+
+        .. versionadded:: 20.0
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return await self.get_bot().edit_forum_topic(
+            chat_id=self.id,
+            message_thread_id=message_thread_id,
+            name=name,
+            icon_custom_emoji_id=icon_custom_emoji_id,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
     async def get_menu_button(
         self,
         *,
