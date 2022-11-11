@@ -67,6 +67,10 @@ __all__ = (  # Keep this alphabetically ordered
     "File",
     "FileCredentials",
     "ForceReply",
+    "ForumTopic",
+    "ForumTopicClosed",
+    "ForumTopicCreated",
+    "ForumTopicReopened",
     "Game",
     "GameHighScore",
     "helpers",
@@ -230,6 +234,7 @@ from ._files.video import Video
 from ._files.videonote import VideoNote
 from ._files.voice import Voice
 from ._forcereply import ForceReply
+from ._forumtopic import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore

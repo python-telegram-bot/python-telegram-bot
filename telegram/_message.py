@@ -36,6 +36,7 @@ from telegram._files.venue import Venue
 from telegram._files.video import Video
 from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
+from telegram._forumtopic import ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
 from telegram._games.game import Game
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
@@ -254,6 +255,18 @@ class Message(TelegramObject):
             the message belongs; for supergroups only.
 
             .. versionadded:: 20.0
+        forum_topic_created (:class:`telegram.TopicForumCreated`, optional): Service message:
+            forum topic created
+
+            .. versionadded:: 20.0
+        forum_topic_closed (:class:`telegram.TopicForumClosed`, optional): Service message:
+            forum topic closed
+
+            .. versionadded:: 20.0
+        forum_topic_reopened (:class:`telegram.TopicForumReopened`, optional): Service message:
+            forum topic reopened
+
+            .. versionadded:: 20.0
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -381,6 +394,18 @@ class Message(TelegramObject):
             the message belongs; for supergroups only.
 
             .. versionadded:: 20.0
+        forum_topic_created (:class:`telegram.TopicForumCreated`, optional): Service message:
+            forum topic created
+
+            .. versionadded:: 20.0
+        forum_topic_closed (:class:`telegram.TopicForumClosed`, optional): Service message:
+            forum topic closed
+
+            .. versionadded:: 20.0
+        forum_topic_reopened (:class:`telegram.TopicForumReopened`, optional): Service message:
+            forum topic reopened
+
+            .. versionadded:: 20.0
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
         by this function. Instead, the supplied replacement for the emoji will be used.
@@ -450,6 +475,9 @@ class Message(TelegramObject):
         "web_app_data",
         "is_topic_message",
         "message_thread_id",
+        "forum_topic_created",
+        "forum_topic_closed",
+        "forum_topic_reopened",
     )
 
     def __init__(
@@ -515,6 +543,9 @@ class Message(TelegramObject):
         web_app_data: WebAppData = None,
         is_topic_message: bool = None,
         message_thread_id: int = None,
+        forum_topic_created: ForumTopicCreated = None,
+        forum_topic_closed: ForumTopicClosed = None,
+        forum_topic_reopened: ForumTopicReopened = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -583,6 +614,9 @@ class Message(TelegramObject):
         self.web_app_data = web_app_data
         self.is_topic_message = is_topic_message
         self.message_thread_id = message_thread_id
+        self.forum_topic_created = forum_topic_created
+        self.forum_topic_closed = forum_topic_closed
+        self.forum_topic_reopened = forum_topic_reopened
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -673,6 +707,9 @@ class Message(TelegramObject):
             data.get("video_chat_participants_invited"), bot
         )
         data["web_app_data"] = WebAppData.de_json(data.get("web_app_data"), bot)
+        data["forum_topic_created"] = ForumTopicCreated.de_json(
+            data.get("forum_topic_created"), bot
+        )
 
         return super().de_json(data=data, bot=bot)
 

@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
-from flaky import flaky
 
 from telegram import Sticker
+
+TEST_TOPIC_NAME = "Sad bot true: real stories"
 
 
 @pytest.fixture
@@ -27,7 +28,7 @@ async def topic(bot, forum_group_id):
     # TODO rework with methods and attributes instead of dict keys
     result = await bot._post(
         "createForumTopic",
-        {"chat_id": forum_group_id, "name": "Is just a yellow lemon tree"},
+        {"chat_id": forum_group_id, "name": TEST_TOPIC_NAME},
     )
 
     yield result
@@ -41,6 +42,7 @@ async def topic(bot, forum_group_id):
 
 class TestForum:
     async def test_get_forum_topic_icon_stickers(self, bot):
+        # TODO this fails
         # we expect the first to stay as it is. This might change in the future.
         # If we have to fix this test too often maybe just checking it is set to "something"
         # is enough.
@@ -63,6 +65,7 @@ class TestForum:
 
     # we sadly do not have access to a test group right now so we only test params right now
     async def test_edit_forum_topic_all_params(self, monkeypatch, bot, chat_id):
+        # TODO this fails
         async def make_assertion(_, data, *args, **kwargs):
             assert data["chat_id"] == chat_id
             assert data["message_thread_id"] == 1234
@@ -78,11 +81,20 @@ class TestForum:
         )
         monkeypatch.delattr(bot, "_post")
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
+    async def test_forum_topic_created(self, bot, forum_group_id, topic):
+        data = await bot.get_updates()
+
+        last_message = data[-1].message
+        assert last_message.forum_topic_created.name == TEST_TOPIC_NAME
+
+    # TODO not sure whether to test _closed and _reopened since the classes are empty
+
+    @pytest.mark.flaky(3, 1)
     async def test_send_message_to_topic(self, bot, forum_group_id, topic):
         test_string = "Topics are forever"
 
-        # TODO attribute instead of dict key
+        # TODO attribute instead of dict key when the method is implemented
         message_thread_id = topic["message_thread_id"]
 
         message = await bot.send_message(
