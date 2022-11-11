@@ -16,9 +16,27 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import pytest
 from flaky import flaky
 
 from telegram import Sticker
+
+
+@pytest.fixture
+async def topic(bot, forum_group_id):
+    # TODO rework with methods and attributes instead of dict keys
+    result = await bot._post(
+        "createForumTopic",
+        {"chat_id": forum_group_id, "name": "Is just a yellow lemon tree"},
+    )
+
+    yield result
+
+    result = await bot._post(
+        "deleteForumTopic",
+        {"chat_id": forum_group_id, "message_thread_id": result["message_thread_id"]},
+    )
+    assert result is True, "Topic was not deleted"
 
 
 class TestForum:
@@ -61,15 +79,11 @@ class TestForum:
         monkeypatch.delattr(bot, "_post")
 
     @flaky(3, 1)
-    async def test_send_message_to_topic(self, bot, forum_group_id):
+    async def test_send_message_to_topic(self, bot, forum_group_id, topic):
         test_string = "Topics are forever"
 
-        result = await bot._post(
-            "createForumTopic",
-            {"chat_id": forum_group_id, "name": "Is just a yellow lemon tree"},
-        )
-
-        message_thread_id = result["message_thread_id"]
+        # TODO attribute instead of dict key
+        message_thread_id = topic["message_thread_id"]
 
         message = await bot.send_message(
             chat_id=forum_group_id, text=test_string, message_thread_id=message_thread_id
@@ -78,9 +92,3 @@ class TestForum:
         assert message.text == test_string
         assert message.is_topic_message is True
         assert message.message_thread_id == message_thread_id
-
-        result = await bot._post(
-            "deleteForumTopic",
-            {"chat_id": forum_group_id, "message_thread_id": message_thread_id},
-        )
-        assert result is True
