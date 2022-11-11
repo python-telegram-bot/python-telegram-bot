@@ -1099,12 +1099,12 @@ class WebhookLimit(IntEnum):
     :meth:`telegram.Bot.set_webhook`.
     """
     MIN_SECRET_TOKEN_LENGTH = 1
-    """:obj:`int`: Minimum length of the secret token
-    (:paramref:`~telegram.Bot.set_webhook.secret_token` parameter of
-    :meth:`telegram.Bot.set_webhook`).
+    """:obj:`int`: Minimum length of the secret token for the
+    :paramref:`~telegram.Bot.set_webhook.secret_token` parameter of
+    :meth:`telegram.Bot.set_webhook`.
     """
     MAX_SECRET_TOKEN_LENGTH = 256
-    """:obj:`int`: Maximum length of the secret token
-    (:paramref:`~telegram.Bot.set_webhook.secret_token` parameter of
-    :meth:`telegram.Bot.set_webhook`).
+    """:obj:`int`: Maximum length of the secret token for the
+    :paramref:`~telegram.Bot.set_webhook.secret_token` parameter of
+    :meth:`telegram.Bot.set_webhook`.
     """
