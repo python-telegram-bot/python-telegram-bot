@@ -2825,7 +2825,7 @@ class Message(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-            await bot.edit_forum_topic(
+            await bot.reopen_forum_topic(
                 chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
                 **kwargs
              )
@@ -2882,7 +2882,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    async def unpin_all_forum_topic_message(
+    async def unpin_all_forum_topic_messages(
         self,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
