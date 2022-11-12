@@ -18,10 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import ForumTopicClosed, ForumTopicCreated, ForumTopicReopened, Sticker
+from telegram import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened, Sticker
 
 TEST_TOPIC_ICON_COLOR = 0x6FB9F0
 TEST_TOPIC_NAME = "Sad bot true: real stories"
+# TODO replace with something meaningful when getForumTopicIconStickers is implemented?
+TEST_TOPIC_EMOJI_ID = "some_id"
 
 
 @pytest.fixture
@@ -42,6 +44,92 @@ async def topic(bot, forum_group_id):
 
 
 class TestForumTopic:
+    def test_slot_behaviour(self, forum_group_id, mro_slots):
+        topic = ForumTopic(
+            message_thread_id=forum_group_id,
+            name=TEST_TOPIC_NAME,
+            icon_color=TEST_TOPIC_ICON_COLOR,
+            icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
+        )
+        for attr in topic.__slots__:
+            assert getattr(topic, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(topic)) == len(set(mro_slots(topic))), "duplicate slot"
+
+    def test_expected_values(self, forum_group_id):
+        topic = ForumTopic(
+            message_thread_id=forum_group_id,
+            name=TEST_TOPIC_NAME,
+            icon_color=TEST_TOPIC_ICON_COLOR,
+        )
+        assert topic.message_thread_id == forum_group_id
+        assert topic.icon_color == TEST_TOPIC_ICON_COLOR
+        assert topic.name == TEST_TOPIC_NAME
+        assert topic.icon_custom_emoji_id is None
+
+    def test_de_json(self, bot, forum_group_id):
+        assert ForumTopic.de_json({}, bot=bot) is None
+
+        json_dict = {
+            "message_thread_id": forum_group_id,
+            "name": TEST_TOPIC_NAME,
+            "icon_color": TEST_TOPIC_ICON_COLOR,
+            "icon_custom_emoji_id": TEST_TOPIC_EMOJI_ID,
+        }
+        topic = ForumTopic.de_json(json_dict, bot)
+        assert topic.api_kwargs == {}
+
+        assert topic.message_thread_id == forum_group_id
+        assert topic.icon_color == TEST_TOPIC_ICON_COLOR
+        assert topic.name == TEST_TOPIC_NAME
+        assert topic.icon_custom_emoji_id == TEST_TOPIC_EMOJI_ID
+
+    def test_to_dict(self, forum_group_id):
+        action = ForumTopic(
+            message_thread_id=forum_group_id,
+            name=TEST_TOPIC_NAME,
+            icon_color=TEST_TOPIC_ICON_COLOR,
+            icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
+        )
+        action_dict = action.to_dict()
+
+        assert isinstance(action_dict, dict)
+        assert action_dict["message_thread_id"] == forum_group_id
+        assert action_dict["name"] == TEST_TOPIC_NAME
+        assert action_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
+        assert action_dict["icon_custom_emoji_id"] == TEST_TOPIC_EMOJI_ID
+
+    def test_equality(self, forum_group_id):
+        a = ForumTopic(
+            message_thread_id=forum_group_id,
+            name=TEST_TOPIC_NAME,
+            icon_color=TEST_TOPIC_ICON_COLOR,
+        )
+        b = ForumTopic(
+            message_thread_id=forum_group_id,
+            name=TEST_TOPIC_NAME,
+            icon_color=0xFFD67E,
+            icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
+        )
+        c = ForumTopic(
+            message_thread_id=forum_group_id,
+            name=f"{TEST_TOPIC_NAME}!",
+            icon_color=TEST_TOPIC_ICON_COLOR,
+        )
+        d = ForumTopic(
+            message_thread_id=forum_group_id + 1,
+            name=TEST_TOPIC_NAME,
+            icon_color=TEST_TOPIC_ICON_COLOR,
+        )
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
     async def test_get_forum_topic_icon_stickers(self, bot):
         # TODO this fails
         # we expect the first to stay as it is. This might change in the future.
@@ -131,7 +219,9 @@ class TestForumTopicCreated:
     def test_equality(self):
         a = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
         b = ForumTopicCreated(
-            name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR, icon_custom_emoji_id="some_id"
+            name=TEST_TOPIC_NAME,
+            icon_color=TEST_TOPIC_ICON_COLOR,
+            icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
         )
         c = ForumTopicCreated(name=f"{TEST_TOPIC_NAME}!", icon_color=TEST_TOPIC_ICON_COLOR)
         d = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=0xFFD67E)
