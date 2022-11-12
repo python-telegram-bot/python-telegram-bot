@@ -8406,7 +8406,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """Use this method to get custom emoji stickers, which can be used as a forum topic
          icon by any user. Requires no parameters.
 
-
         .. versionadded:: 20.0
 
         Keyword Args:
@@ -8466,14 +8465,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target channel (in the format ``@supergroupusername``).
             name (:obj:`str`): New topic name,
-                tg-const:`telegram.constants.TopicLimit.MIN_TITLE_LENGTH`-
-                tg-const:`telegram.constants.TopicLimit.MAX_TITLE_LENGTH` characters.
+                :tg-const:`telegram.constants.TopicLimit.MIN_NAME_LENGTH`-
+                :tg-const:`telegram.constants.TopicLimit.MAX_NAME_LENGTH` characters.
             icon_color (:obj:`int`): Color of the topic icon in RGB format. Currently,
-                must be one of 0x6FB9F0, 0xFFD67E, 0xCB86DB, 0x8EEE98, 0xFF93B2, or 0xFB6F5F.
+                must be one of :attr:`telegram.constants.ForumIconColor.BLUE`,
+                :attr:`telegram.constants.ForumIconColor.YELLOW`,
+                :attr:`telegram.constants.ForumIconColor.PURPLE`,
+                :attr:`telegram.constants.ForumIconColor.GREEN`,
+                :attr:`telegram.constants.ForumIconColor.PINK`, or
+                :attr:`telegram.constants.ForumIconColor.RED`.
             icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
-                the topic icon. Use :meth:`telegram.Bot.get_forum_topic_icon_stickers` to get all
+                the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
                 allowed custom emoji identifiers.
 
         Keyword Args:
@@ -8539,14 +8543,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target channel (in the format ``@supergroupusername``).
             message_thread_id (:obj:`int`): Unique identifier for the target message thread of
                 the forum topic.
             name (:obj:`str`): New topic name,
-                tg-const:`telegram.constants.TopicLimit.MIN_TITLE_LENGTH`-
-                tg-const:`telegram.constants.TopicLimit.MAX_TITLE_LENGTH` characters.
+                :tg-const:`telegram.constants.TopicLimit.MIN_NAME_LENGTH`-
+                :tg-const:`telegram.constants.TopicLimit.MAX_NAME_LENGTH` characters.
             icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
-                the topic icon. Use :meth:`telegram.Bot.get_forum_topic_icon_stickers` to get all
+                the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
                 allowed custom emoji identifiers.
 
         Keyword Args:
@@ -8611,7 +8615,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target channel (in the format ``@supergroupusername``).
             message_thread_id (:obj:`int`): Unique identifier for the target message thread of
                 the forum topic.
 
@@ -8675,7 +8679,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target channel (in the format ``@supergroupusername``).
             message_thread_id (:obj:`int`): Unique identifier for the target message thread of
                 the forum topic.
 
@@ -8739,7 +8743,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target channel (in the format ``@supergroupusername``).
             message_thread_id (:obj:`int`): Unique identifier for the target message thread of
                 the forum topic.
 
@@ -8803,7 +8807,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@channelusername``).
+                of the target channel (in the format ``@supergroupusername``).
             message_thread_id (:obj:`int`): Unique identifier for the target message thread of
                 the forum topic.
 

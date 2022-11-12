@@ -46,6 +46,7 @@ __all__ = [
     "DiceEmoji",
     "FileSizeLimit",
     "FloodLimit",
+    "ForumIconColor",
     "InlineKeyboardMarkupLimit",
     "InlineQueryLimit",
     "InlineQueryResultType",
@@ -369,6 +370,66 @@ class FloodLimit(IntEnum):
     MESSAGES_PER_MINUTE_PER_GROUP = 20
     """:obj:`int`: The number of messages that can roughly be sent to a particular group within one
     minute.
+    """
+
+
+class ForumIconColor(IntEnum):
+    """This enum contains the available colors for use in
+    :meth:`~telegram.Bot.create_forum_topic`. The enum members of this enumeration are instances of
+    :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    BLUE = 0x6FB9F0
+    """:obj:`int`: An icon with a color which corresponds to blue.
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#6FB9F0;"></div>
+
+    """
+    YELLOW = 0xFFD67E
+    """:obj:`int`: An icon with a color which corresponds to yellow.
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#FFD67E;"></div>
+
+    """
+    PURPLE = 0xCB86DB
+    """:obj:`int`: An icon with a color which corresponds to purple.
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#CB86DB;"></div>
+
+    """
+    GREEN = 0x8EEE98
+    """:obj:`int`: An icon with a color which corresponds to green.
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#8EEE98;"></div>
+
+    """
+    PINK = 0xFF93B2
+    """:obj:`int`: An icon with a color which corresponds to pink.
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#FF93B2;"></div>
+
+    """
+    RED = 0xFB6F5F
+    """:obj:`int`: An icon with a color which corresponds to red.
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#FB6F5F;"></div>
+
     """
 
 
