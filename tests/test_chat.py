@@ -896,6 +896,20 @@ class TestChat:
         monkeypatch.setattr(chat.get_bot(), "decline_chat_join_request", make_assertion)
         assert await chat.decline_join_request(user_id=42)
 
+    async def test_create_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == chat.id
+                and kwargs["name"] == "New Name"
+                and kwargs["icon_color"] == 0x6FB9F0
+                and kwargs["icon_custom_emoji_id"] == "12345"
+            )
+
+        monkeypatch.setattr(chat.get_bot(), "create_forum_topic", make_assertion)
+        assert await chat.create_forum_topic(
+            name="New Name", icon_color=0x6FB9F0, icon_custom_emoji_id="12345"
+        )
+
     async def test_edit_forum_topic(self, monkeypatch, chat):
         async def make_assertion(*_, **kwargs):
             return (
@@ -909,6 +923,34 @@ class TestChat:
         assert await chat.edit_forum_topic(
             message_thread_id=42, name="New Name", icon_custom_emoji_id="12345"
         )
+
+    async def test_close_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_thread_id"] == 42
+
+        monkeypatch.setattr(chat.get_bot(), "close_forum_topic", make_assertion)
+        assert await chat.close_forum_topic(message_thread_id=42)
+
+    async def test_reopen_close_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_thread_id"] == 42
+
+        monkeypatch.setattr(chat.get_bot(), "reopen_forum_topic", make_assertion)
+        assert await chat.reopen_forum_topic(message_thread_id=42)
+
+    async def test_delete_forum_topic(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_thread_id"] == 42
+
+        monkeypatch.setattr(chat.get_bot(), "delete_forum_topic", make_assertion)
+        assert await chat.delete_forum_topic(message_thread_id=42)
+
+    async def test_unpin_all_forum_topic_messages(self, monkeypatch, chat):
+        async def make_assertion(*_, **kwargs):
+            return kwargs["chat_id"] == chat.id and kwargs["message_thread_id"] == 42
+
+        monkeypatch.setattr(chat.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
+        assert await chat.unpin_all_forum_topic_messages(message_thread_id=42)
 
     def test_mention_html(self):
         with pytest.raises(TypeError, match="Can not create a mention to a private group chat"):

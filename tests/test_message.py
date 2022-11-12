@@ -1686,6 +1686,20 @@ class TestMessage:
         finally:
             message.get_bot()._defaults = None
 
+    async def test_create_forum_topic(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["name"] == "New Name"
+                and kwargs["icon_color"] == 0x6FB9F0
+                and kwargs["icon_custom_emoji_id"] == "12345"
+            )
+
+        monkeypatch.setattr(message.get_bot(), "create_forum_topic", make_assertion)
+        assert await message.create_forum_topic(
+            name="New Name", icon_color=0x6FB9F0, icon_custom_emoji_id="12345"
+        )
+
     async def test_edit_forum_topic(self, monkeypatch, message):
         async def make_assertion(*_, **kwargs):
             return (
@@ -1697,6 +1711,46 @@ class TestMessage:
 
         monkeypatch.setattr(message.get_bot(), "edit_forum_topic", make_assertion)
         assert await message.edit_forum_topic(name="New Name", icon_custom_emoji_id="12345")
+
+    async def test_close_forum_topic(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+            )
+
+        monkeypatch.setattr(message.get_bot(), "close_forum_topic", make_assertion)
+        assert await message.close_forum_topic()
+
+    async def test_reopen_forum_topic(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+            )
+
+        monkeypatch.setattr(message.get_bot(), "reopen_forum_topic", make_assertion)
+        assert await message.reopen_forum_topic()
+
+    async def test_delete_forum_topic(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+            )
+
+        monkeypatch.setattr(message.get_bot(), "delete_forum_topic", make_assertion)
+        assert await message.delete_forum_topic()
+
+    async def test_unpin_all_forum_topic_messages(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+            )
+
+        monkeypatch.setattr(message.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
+        assert await message.unpin_all_forum_topic_messages()
 
     def test_equality(self):
         id_ = 1

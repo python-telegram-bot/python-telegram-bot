@@ -8443,6 +8443,78 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         return Sticker.de_list(result, self)  # type: ignore[return-value, arg-type]
 
     @_log
+    async def create_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        name: str,
+        icon_color: int,
+        icon_custom_emoji_id: str,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to create a topic in a forum supergroup chat. The bot must be
+        an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+
+        .. seealso:: :meth:`telegram.Message.create_forum_topic`,
+            :meth:`telegram.Chat.create_forum_topic`,
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format ``@channelusername``).
+            name (:obj:`str`): New topic name,
+                tg-const:`telegram.constants.TopicLimit.MIN_TITLE_LENGTH`-
+                tg-const:`telegram.constants.TopicLimit.MAX_TITLE_LENGTH` characters.
+            icon_color (:obj:`int`): Color of the topic icon in RGB format. Currently,
+                must be one of 0x6FB9F0, 0xFFD67E, 0xCB86DB, 0x8EEE98, 0xFF93B2, or 0xFB6F5F.
+            icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
+                the topic icon. Use :meth:`telegram.Bot.get_forum_topic_icon_stickers` to get all
+                allowed custom emoji identifiers.
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :class:`telegram.ForumTopic` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "name": name,
+            "icon_color": icon_color,
+            "icon_custom_emoji_id": icon_custom_emoji_id,
+        }
+        return await self._post(  # type: ignore[return-value]
+            "createForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
     async def edit_forum_topic(
         self,
         chat_id: Union[str, int],
@@ -8462,7 +8534,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
         unless it is the creator of the topic.
 
-        .. seealso:: :meth:`telegram.Message.set_chat_menu_button`,
+        .. seealso:: :meth:`telegram.Message.edit_forum_topic`,
             :meth:`telegram.Chat.edit_forum_topic`,
 
         Args:
@@ -8508,6 +8580,262 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         }
         return await self._post(  # type: ignore[return-value]
             "editForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def close_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to close an open topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
+        unless it is the creator of the topic.
+
+        .. seealso:: :meth:`telegram.Message.close_forum_topic`,
+            :meth:`telegram.Chat.close_forum_topic`,
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format ``@channelusername``).
+            message_thread_id (:obj:`int`): Unique identifier for the target message thread of
+                the forum topic.
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_thread_id": message_thread_id,
+        }
+        return await self._post(  # type: ignore[return-value]
+            "closeForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def reopen_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to reopen a closed topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
+        unless it is the creator of the topic.
+
+        .. seealso:: :meth:`telegram.Message.reopen_forum_topic`,
+            :meth:`telegram.Chat.reopen_forum_topic`,
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format ``@channelusername``).
+            message_thread_id (:obj:`int`): Unique identifier for the target message thread of
+                the forum topic.
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_thread_id": message_thread_id,
+        }
+        return await self._post(  # type: ignore[return-value]
+            "reopenForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def delete_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to delete a forum topic along with all its messages in a forum supergroup
+        chat. The bot must be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_delete_messages` administrator rights,
+        unless it is the creator of the topic.
+
+        .. seealso:: :meth:`telegram.Message.delete_forum_topic`,
+            :meth:`telegram.Chat.delete_forum_topic`,
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format ``@channelusername``).
+            message_thread_id (:obj:`int`): Unique identifier for the target message thread of
+                the forum topic.
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_thread_id": message_thread_id,
+        }
+        return await self._post(  # type: ignore[return-value]
+            "deleteForumTopic",
+            data,
+            read_timeout=read_timeout,
+            write_timeout=write_timeout,
+            connect_timeout=connect_timeout,
+            pool_timeout=pool_timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @_log
+    async def unpin_all_forum_topic_messages(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: int,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to clear the list of pinned messages in a forum topic. The bot must
+        be an administrator in the chat for this to work and must have
+        :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` administrator rights
+        in the supergroup, unless it is the creator of the topic.
+
+        .. seealso:: :meth:`telegram.Message.unpin_all_forum_topic_messages`,
+            :meth:`telegram.Chat.unpin_all_forum_topic_messages`,
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
+                of the target channel (in the format ``@channelusername``).
+            message_thread_id (:obj:`int`): Unique identifier for the target message thread of
+                the forum topic.
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_thread_id": message_thread_id,
+        }
+        return await self._post(  # type: ignore[return-value]
+            "unpinAllForumTopicMessages",
             data,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -8710,3 +9038,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
     """Alias for :meth:`create_invoice_link`"""
     getForumTopicIconStickers = get_forum_topic_icon_stickers
     """Alias for :meth:`get_forum_topic_icon_stickers`"""
+    createForumTopic = create_forum_topic
+    """Alias for :meth:`create_forum_topic`"""
+    editForumTopic = edit_forum_topic
+    """Alias for :meth:`edit_forum_topic`"""
+    closeForumTopic = close_forum_topic
+    """Alias for :meth:`close_forum_topic`"""
+    reopenForumTopic = reopen_forum_topic
+    """Alias for :meth:`reopen_forum_topic`"""
+    deleteForumTopic = delete_forum_topic
+    """Alias for :meth:`delete_forum_topic`"""
+    unpinAllForumTopicMessages = unpin_all_forum_topic_messages
+    """Alias for :meth:`unpin_all_forum_topic_messages`"""
