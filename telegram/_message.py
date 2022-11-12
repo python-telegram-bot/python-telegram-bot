@@ -2717,10 +2717,7 @@ class Message(TelegramObject):
     ) -> bool:
         """Shortcut for::
 
-             await bot.create_forum_topic(
-                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
-                **kwargs
-             )
+            await bot.create_forum_topic(chat_id=message.chat_id, *args, **kwargs)
 
         For the documentation of the arguments, please see
         :meth:`telegram.Bot.create_forum_topic`.

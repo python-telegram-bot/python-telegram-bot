@@ -375,8 +375,8 @@ class FloodLimit(IntEnum):
 
 class ForumIconColor(IntEnum):
     """This enum contains the available colors for use in
-    :meth:`~telegram.Bot.create_forum_topic`. The enum members of this enumeration are instances of
-    :class:`int` and can be treated as such.
+    :paramref:`telegram.Bot.create_forum_topic.icon_color`. The enum members of this enumeration
+    are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
     """
