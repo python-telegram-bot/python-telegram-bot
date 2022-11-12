@@ -77,7 +77,6 @@ class ForumTopicCreated(TelegramObject):
     This object represents the content of a service message about a new forum topic created in
     the chat.
 
-    # TODO actually maybe even just a name should be enough?
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`name` and :attr:`icon_color` are equal.
 
