@@ -16,10 +16,15 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains an object that represents a Forum Topic Created service message."""
+"""This module contains objects related to Telegram forum topics."""
+
+from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
+
+if TYPE_CHECKING:
+    from telegram import Bot
 
 
 class ForumTopic(TelegramObject):
@@ -107,6 +112,16 @@ class ForumTopicCreated(TelegramObject):
         self.icon_custom_emoji_id = icon_custom_emoji_id
 
         self._id_attrs = (self.name, self.icon_color)
+
+    @classmethod
+    def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["ForumTopicCreated"]:
+        """See :meth:`telegram.TelegramObject.de_json`."""
+        data = cls._parse_data(data)
+
+        if not data:
+            return None
+
+        return super().de_json(data=data, bot=bot)
 
 
 class ForumTopicClosed(TelegramObject):

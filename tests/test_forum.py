@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
 
-from telegram import Sticker
+from telegram import ForumTopicClosed, ForumTopicCreated, ForumTopicReopened, Sticker
 
+TEST_TOPIC_ICON_COLOR = 0x6FB9F0
 TEST_TOPIC_NAME = "Sad bot true: real stories"
 
 
@@ -40,7 +41,7 @@ async def topic(bot, forum_group_id):
     assert result is True, "Topic was not deleted"
 
 
-class TestForum:
+class TestForumTopic:
     async def test_get_forum_topic_icon_stickers(self, bot):
         # TODO this fails
         # we expect the first to stay as it is. This might change in the future.
@@ -82,15 +83,6 @@ class TestForum:
         monkeypatch.delattr(bot, "_post")
 
     @pytest.mark.flaky(3, 1)
-    async def test_forum_topic_created(self, bot, forum_group_id, topic):
-        data = await bot.get_updates()
-
-        last_message = data[-1].message
-        assert last_message.forum_topic_created.name == TEST_TOPIC_NAME
-
-    # TODO not sure whether to test _closed and _reopened since the classes are empty
-
-    @pytest.mark.flaky(3, 1)
     async def test_send_message_to_topic(self, bot, forum_group_id, topic):
         test_string = "Topics are forever"
 
@@ -104,3 +96,94 @@ class TestForum:
         assert message.text == test_string
         assert message.is_topic_message is True
         assert message.message_thread_id == message_thread_id
+
+
+class TestForumTopicCreated:
+    def test_slot_behaviour(self, mro_slots):
+        action = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
+        for attr in action.__slots__:
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+
+    def test_expected_values(self):
+        action = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
+        assert action.icon_color == TEST_TOPIC_ICON_COLOR
+        assert action.name == TEST_TOPIC_NAME
+
+    def test_de_json(self, bot):
+        assert ForumTopicCreated.de_json({}, bot=bot) is None
+
+        json_dict = {"icon_color": TEST_TOPIC_ICON_COLOR, "name": TEST_TOPIC_NAME}
+        action = ForumTopicCreated.de_json(json_dict, bot)
+        assert action.api_kwargs == {}
+
+        assert action.icon_color == TEST_TOPIC_ICON_COLOR
+        assert action.name == TEST_TOPIC_NAME
+
+    def test_to_dict(self):
+        action = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
+        action_dict = action.to_dict()
+
+        assert isinstance(action_dict, dict)
+        assert action_dict["name"] == TEST_TOPIC_NAME
+        assert action_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
+
+    def test_equality(self):
+        a = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
+        b = ForumTopicCreated(
+            name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR, icon_custom_emoji_id="some_id"
+        )
+        c = ForumTopicCreated(name=f"{TEST_TOPIC_NAME}!", icon_color=TEST_TOPIC_ICON_COLOR)
+        d = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=0xFFD67E)
+
+        assert a == b
+        assert hash(a) == hash(b)
+
+        assert a != c
+        assert hash(a) != hash(c)
+
+        assert a != d
+        assert hash(a) != hash(d)
+
+    @pytest.mark.flaky(3, 1)
+    async def test_create_forum_topic_returns_good_object(self, bot, forum_group_id, topic):
+        data = await bot.get_updates()
+
+        last_message = data[-1].message
+        assert last_message.forum_topic_created.name == TEST_TOPIC_NAME
+
+
+class TestForumTopicClosed:
+    def test_slot_behaviour(self, mro_slots):
+        action = ForumTopicClosed()
+        for attr in action.__slots__:
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+
+    def test_de_json(self):
+        action = ForumTopicClosed.de_json({}, None)
+        assert action.api_kwargs == {}
+        assert isinstance(action, ForumTopicClosed)
+
+    def test_to_dict(self):
+        action = ForumTopicClosed()
+        action_dict = action.to_dict()
+        assert action_dict == {}
+
+
+class TestForumTopicReopened:
+    def test_slot_behaviour(self, mro_slots):
+        action = ForumTopicReopened()
+        for attr in action.__slots__:
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+
+    def test_de_json(self):
+        action = ForumTopicReopened.de_json({}, None)
+        assert action.api_kwargs == {}
+        assert isinstance(action, ForumTopicReopened)
+
+    def test_to_dict(self):
+        action = ForumTopicReopened()
+        action_dict = action.to_dict()
+        assert action_dict == {}
