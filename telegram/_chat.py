@@ -2701,7 +2701,7 @@ class Chat(TelegramObject):
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
         """
-        return await self.get_bot().edit_forum_topic(
+        return await self.get_bot().close_forum_topic(
             chat_id=self.id,
             message_thread_id=message_thread_id,
             read_timeout=read_timeout,
@@ -2733,7 +2733,7 @@ class Chat(TelegramObject):
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
         """
-        return await self.get_bot().edit_forum_topic(
+        return await self.get_bot().reopen_forum_topic(
             chat_id=self.id,
             message_thread_id=message_thread_id,
             read_timeout=read_timeout,
@@ -2798,7 +2798,7 @@ class Chat(TelegramObject):
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
         """
-        return await self.get_bot().edit_forum_topic(
+        return await self.get_bot().unpin_all_forum_topic_messages(
             chat_id=self.id,
             message_thread_id=message_thread_id,
             read_timeout=read_timeout,

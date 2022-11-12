@@ -2872,7 +2872,7 @@ class Message(TelegramObject):
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
         """
-        return await self.get_bot().edit_forum_topic(
+        return await self.get_bot().delete_forum_topic(
             chat_id=self.chat_id,
             message_thread_id=self.message_thread_id,
             read_timeout=read_timeout,
