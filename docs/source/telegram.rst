@@ -46,8 +46,8 @@ Available Types
     telegram.file
     telegram.forcereply
     telegram.forumtopic
-    telegram.forumtopiccreated
     telegram.forumtopicclosed
+    telegram.forumtopiccreated
     telegram.forumtopicreopened
     telegram.inlinekeyboardbutton
     telegram.inlinekeyboardmarkup
