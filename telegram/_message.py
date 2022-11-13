@@ -707,8 +707,12 @@ class Message(TelegramObject):
             data.get("video_chat_participants_invited"), bot
         )
         data["web_app_data"] = WebAppData.de_json(data.get("web_app_data"), bot)
+        data["forum_topic_closed"] = ForumTopicClosed.de_json(data.get("forum_topic_closed"), bot)
         data["forum_topic_created"] = ForumTopicCreated.de_json(
             data.get("forum_topic_created"), bot
+        )
+        data["forum_topic_reopened"] = ForumTopicReopened.de_json(
+            data.get("forum_topic_reopened"), bot
         )
 
         return super().de_json(data=data, bot=bot)
