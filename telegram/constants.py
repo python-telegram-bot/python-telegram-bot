@@ -234,7 +234,10 @@ class ChatInviteLinkLimit(IntEnum):
 
     __slots__ = ()
 
-    MEMBER_LIMIT = 99999
+    MIN_MEMBER_LIMIT = 1
+    """:obj:`int`: Minimum value allowed for the ``member_limit`` parameter of
+    :meth:`telegram.Bot.create_chat_invite_link` and :meth:`telegram.Bot.edit_chat_invite_link`."""
+    MAX_MEMBER_LIMIT = 99999
     """:obj:`int`: Maximum value allowed for the ``member_limit`` parameter of
     :meth:`telegram.Bot.create_chat_invite_link` and :meth:`telegram.Bot.edit_chat_invite_link`."""
     NAME_LENGTH = 32

@@ -5681,7 +5681,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
-                1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
+                :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
+                :tg-const:`telegram.constants.ChatInviteLinkLimit.MAX_MEMBER_LIMIT`.
             name (:obj:`str`, optional): Invite link name;
                 0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
@@ -5785,7 +5786,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
-                1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
+                :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
+                :tg-const:`telegram.constants.ChatInviteLinkLimit.MAX_MEMBER_LIMIT`.
             name (:obj:`str`, optional): Invite link name;
                 0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
