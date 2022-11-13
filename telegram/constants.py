@@ -34,6 +34,7 @@ those classes.
 __all__ = [
     "BOT_API_VERSION",
     "BOT_API_VERSION_INFO",
+    "BotCommandLimit",
     "BotCommandScopeType",
     "CallbackQueryLimit",
     "ChatAction",
@@ -116,6 +117,33 @@ BOT_API_VERSION = str(BOT_API_VERSION_INFO)
 #: List[:obj:`int`]: Ports supported by
 #:  :paramref:`telegram.Bot.set_webhook.url`.
 SUPPORTED_WEBHOOK_PORTS: List[int] = [443, 80, 88, 8443]
+
+
+class BotCommandLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.BotCommand`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_COMMAND = 1
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.BotCommand.command` parameter of
+    :class:`telegram.BotCommand`.
+    """
+    MAX_COMMAND = 32
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.BotCommand.command` parameter of
+    :class:`telegram.BotCommand`.
+    """
+    MIN_DESCRIPTION = 1
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.BotCommand.description`
+    parameter of :class:`telegram.BotCommand`.
+    """
+    MAX_DESCRIPTION = 256
+    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.BotCommand.description`
+    parameter of :class:`telegram.BotCommand`.
+    """
 
 
 class BotCommandScopeType(StringEnum):
