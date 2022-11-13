@@ -298,11 +298,7 @@ class ReplyKeyboardMarkup(TelegramObject):
             )
         )
 
-    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[
-        int
-    ] = constants.ReplyKeyboardMarkupLimit.MIN_INPUT_FIELD_PLACEHOLDER
-    """:const:`telegram.constants.ReplyKeyboardMarkupLimit.MIN_INPUT_FIELD_PLACEHOLDER`"""
-    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[
-        int
-    ] = constants.ReplyKeyboardMarkupLimit.MAX_INPUT_FIELD_PLACEHOLDER
-    """:const:`telegram.constants.ReplyKeyboardMarkupLimit.MAX_INPUT_FIELD_PLACEHOLDER`"""
+    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER`"""
+    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER`"""

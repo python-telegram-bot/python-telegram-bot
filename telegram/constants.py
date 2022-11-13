@@ -63,7 +63,7 @@ __all__ = [
     "ParseMode",
     "PollLimit",
     "PollType",
-    "ReplyKeyboardMarkupLimit",
+    "ReplyLimit",
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerType",
     "WebhookLimit",
@@ -923,8 +923,9 @@ class PollingLimit(IntEnum):
     """
 
 
-class ReplyKeyboardMarkupLimit(IntEnum):
-    """This enum contains limitations for :class:`telegram.ReplyKeyboardMarkup`.
+class ReplyLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.ForceReply`
+    and :class:`telegram.ReplyKeyboardMarkup`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
@@ -934,11 +935,15 @@ class ReplyKeyboardMarkupLimit(IntEnum):
 
     MIN_INPUT_FIELD_PLACEHOLDER = 1
     """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.ForceReply.input_field_placeholder` parameter of
+    :class:`telegram.ForceReply` and
     :paramref:`~telegram.ReplyKeyboardMarkup.input_field_placeholder` parameter of
     :class:`telegram.ReplyKeyboardMarkup`
     """
     MAX_INPUT_FIELD_PLACEHOLDER = 64
     """:obj:`int`: Maximum value allowed for
+    :paramref:`~telegram.ForceReply.input_field_placeholder` parameter of
+    :class:`telegram.ForceReply` and
     :paramref:`~telegram.ReplyKeyboardMarkup.input_field_placeholder` parameter of
     :class:`telegram.ReplyKeyboardMarkup`
     """
