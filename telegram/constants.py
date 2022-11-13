@@ -560,7 +560,8 @@ class InlineQueryResultType(StringEnum):
 
 
 class LocationLimit(IntEnum):
-    """This enum contains limitations for :class:`telegram.Location`/
+    """This enum contains limitations for
+    :class:`telegram.Location`/:class:`telegram.ChatLocation`/
     :meth:`telegram.Bot.edit_message_live_location`/:meth:`telegram.Bot.send_location`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
@@ -568,6 +569,15 @@ class LocationLimit(IntEnum):
     """
 
     __slots__ = ()
+
+    MIN_CHAT_LOCATION_ADDRESS = 1
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.ChatLocation.address` parameter
+    of :class:`telegram.ChatLocation`
+    """
+    MAX_CHAT_LOCATION_ADDRESS = 64
+    """:obj:`int`: Minimum value allowed for :paramref:`~telegram.ChatLocation.address` parameter
+    of :class:`telegram.ChatLocation`
+    """
 
     HORIZONTAL_ACCURACY = 1500
     """:obj:`int`: Maximum value allowed for:
