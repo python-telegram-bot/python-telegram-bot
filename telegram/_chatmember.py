@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, ClassVar, Dict, Optional, Type
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -122,15 +122,6 @@ class ChatMember(TelegramObject):
             data["until_date"] = from_timestamp(data["until_date"])
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        if data.get("until_date", False):
-            data["until_date"] = to_timestamp(data["until_date"])
-
-        return data
 
 
 class ChatMemberOwner(ChatMember):

@@ -117,16 +117,6 @@ class Game(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["photo"] = [p.to_dict() for p in self.photo]
-        if self.text_entities:
-            data["text_entities"] = [x.to_dict() for x in self.text_entities]
-
-        return data
-
     def parse_text_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.
 

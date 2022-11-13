@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
+import datetime
 import inspect
 import json
 from copy import deepcopy
 from itertools import chain
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Sized, Tuple, Type, TypeVar, Union
 
+from telegram._utils.datetime import to_timestamp
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 
@@ -327,6 +329,32 @@ class TelegramObject:
             :obj:`dict`
         """
         out = self._get_attrs(recursive=recursive)
+
+        # Now we should convert TGObjects to dicts inside objects such as sequences, and convert
+        # datetimes to timestamps. This mostly eliminates the need for subclasses to override
+        # `to_dict`
+        for key, value in out.items():
+            if isinstance(value, (tuple, list)) and value:
+                val = []  # empty list to append our converted values to
+                for item in value:
+                    if hasattr(item, "to_dict"):
+                        val.append(item.to_dict(recursive=recursive))
+                    # This branch is useful for e.g. List[List[PhotoSize|KeyboardButton]]
+                    elif isinstance(item, (tuple, list)):
+                        val.append(
+                            [
+                                i.to_dict(recursive=recursive) if hasattr(i, "to_dict") else i
+                                for i in item
+                            ]
+                        )
+                    else:  # if it's not a TGObject, just append it. E.g. [TGObject, 2]
+                        val.append(item)
+                out[key] = val
+
+            elif isinstance(value, datetime.datetime):
+                out[key] = to_timestamp(value)
+
+        # Effectively "unpack" api_kwargs into `out`:
         out.update(out.pop("api_kwargs", {}))  # type: ignore[call-overload]
         return out
 

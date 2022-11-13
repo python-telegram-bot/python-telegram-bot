@@ -83,12 +83,3 @@ class InputTextMessageContent(InputMessageContent):
         self.disable_web_page_preview = disable_web_page_preview
 
         self._id_attrs = (self.message_text,)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        if self.entities:
-            data["entities"] = [ce.to_dict() for ce in self.entities]
-
-        return data

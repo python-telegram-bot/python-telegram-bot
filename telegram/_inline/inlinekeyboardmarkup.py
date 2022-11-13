@@ -68,16 +68,6 @@ class InlineKeyboardMarkup(TelegramObject):
 
         self._id_attrs = (self.inline_keyboard,)
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["inline_keyboard"] = []
-        for inline_keyboard in self.inline_keyboard:
-            data["inline_keyboard"].append([x.to_dict() for x in inline_keyboard])
-
-        return data
-
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineKeyboardMarkup"]:
         """See :meth:`telegram.TelegramObject.de_json`."""
