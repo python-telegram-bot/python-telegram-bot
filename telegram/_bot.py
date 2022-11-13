@@ -5223,7 +5223,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"web_app_query_id": web_app_query_id, "result": result}
+        data: JSONDict = {
+            "web_app_query_id": web_app_query_id,
+            "result": self._insert_defaults_for_ilq_results(result),
+        }
 
         api_result = await self._post(
             "answerWebAppQuery",
