@@ -3688,7 +3688,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if inline_message_id:
             data["inline_message_id"] = inline_message_id
         if entities:
-            data["entities"] = [me.to_dict() for me in entities]
+            data["entities"] = [me.to_dict(recursive=True) for me in entities]
 
         return await self._send_message(
             "editMessageText",
@@ -5108,7 +5108,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {"shipping_query_id": shipping_query_id, "ok": ok}
 
         if shipping_options is not None:
-            data["shipping_options"] = [option.to_dict() for option in shipping_options]
+            data["shipping_options"] = [option.to_dict(True) for option in shipping_options]
         if error_message is not None:
             data["error_message"] = error_message
 

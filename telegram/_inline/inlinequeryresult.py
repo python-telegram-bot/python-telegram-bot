@@ -55,18 +55,3 @@ class InlineQueryResult(TelegramObject):
         self._id_attrs = (self.id,)
 
         self._freeze()
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        # pylint: disable=no-member
-        if (
-            hasattr(self, "caption_entities")
-            and self.caption_entities  # type: ignore[attr-defined]
-        ):
-            data["caption_entities"] = [
-                ce.to_dict() for ce in self.caption_entities  # type: ignore[attr-defined]
-            ]
-
-        return data
