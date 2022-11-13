@@ -255,15 +255,15 @@ class Message(TelegramObject):
             the message belongs; for supergroups only.
 
             .. versionadded:: 20.0
-        forum_topic_created (:class:`telegram.TopicForumCreated`, optional): Service message:
+        forum_topic_created (:class:`telegram.ForumTopicCreated`, optional): Service message:
             forum topic created
 
             .. versionadded:: 20.0
-        forum_topic_closed (:class:`telegram.TopicForumClosed`, optional): Service message:
+        forum_topic_closed (:class:`telegram.ForumTopicClosed`, optional): Service message:
             forum topic closed
 
             .. versionadded:: 20.0
-        forum_topic_reopened (:class:`telegram.TopicForumReopened`, optional): Service message:
+        forum_topic_reopened (:class:`telegram.ForumTopicReopened`, optional): Service message:
             forum topic reopened
 
             .. versionadded:: 20.0
@@ -394,15 +394,15 @@ class Message(TelegramObject):
             the message belongs; for supergroups only.
 
             .. versionadded:: 20.0
-        forum_topic_created (:class:`telegram.TopicForumCreated`, optional): Service message:
+        forum_topic_created (:class:`telegram.ForumTopicCreated`, optional): Service message:
             forum topic created
 
             .. versionadded:: 20.0
-        forum_topic_closed (:class:`telegram.TopicForumClosed`, optional): Service message:
+        forum_topic_closed (:class:`telegram.ForumTopicClosed`, optional): Service message:
             forum topic closed
 
             .. versionadded:: 20.0
-        forum_topic_reopened (:class:`telegram.TopicForumReopened`, optional): Service message:
+        forum_topic_reopened (:class:`telegram.ForumTopicReopened`, optional): Service message:
             forum topic reopened
 
             .. versionadded:: 20.0
