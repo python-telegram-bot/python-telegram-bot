@@ -46,6 +46,7 @@ __all__ = [
     "DiceLimit",
     "FileSizeLimit",
     "FloodLimit",
+    "InlineKeyboardButtonLimit",
     "InlineKeyboardMarkupLimit",
     "InlineQueryLimit",
     "InlineQueryResultType",
@@ -417,6 +418,27 @@ class FloodLimit(IntEnum):
     MESSAGES_PER_MINUTE_PER_GROUP = 20
     """:obj:`int`: The number of messages that can roughly be sent to a particular group within one
     minute.
+    """
+
+
+class InlineKeyboardButtonLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.InlineKeyboardButton`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_CALLBACK_DATA = 1
+    """:obj:`int`: Minimum value allowed for
+    :paramref:`~telegram.InlineKeyboardButton.callback_data` parameter of
+    :class:`telegram.InlineKeyboardButton`
+    """
+    MAX_CALLBACK_DATA = 64
+    """:obj:`int`: Maximum value allowed for
+    :paramref:`~telegram.InlineKeyboardButton.callback_data` parameter of
+    :class:`telegram.InlineKeyboardButton`
     """
 
 
