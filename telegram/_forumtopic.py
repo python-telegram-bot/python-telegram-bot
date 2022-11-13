@@ -43,7 +43,7 @@ class ForumTopic(TelegramObject):
         message_thread_id (:obj:`int`): Unique identifier of the forum topic
         name (:obj:`str`): Name of the topic
         icon_color (:obj:`int`): Color of the topic icon in RGB format
-        icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the custom emoji shown
+        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji shown
             as the topic icon.
     """
 
@@ -86,7 +86,7 @@ class ForumTopicCreated(TelegramObject):
     Attributes:
         name (:obj:`str`): Name of the topic
         icon_color (:obj:`int`): Color of the topic icon in RGB format
-        icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the custom emoji shown
+        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji shown
             as the topic icon.
     """
 

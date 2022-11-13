@@ -387,22 +387,22 @@ class Message(TelegramObject):
             .. versionadded:: 20.0
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        is_topic_message (:obj:`bool`, optional): True, if the message is sent to a forum topic.
+        is_topic_message (:obj:`bool`): Optional. True, if the message is sent to a forum topic.
 
             .. versionadded:: 20.0
-        message_thread_id (:obj:`int`, optional): Unique identifier of a message thread to which
+        message_thread_id (:obj:`int`): Optional. Unique identifier of a message thread to which
             the message belongs; for supergroups only.
 
             .. versionadded:: 20.0
-        forum_topic_created (:class:`telegram.ForumTopicCreated`, optional): Service message:
+        forum_topic_created (:class:`telegram.ForumTopicCreated`): Optional. Service message:
             forum topic created
 
             .. versionadded:: 20.0
-        forum_topic_closed (:class:`telegram.ForumTopicClosed`, optional): Service message:
+        forum_topic_closed (:class:`telegram.ForumTopicClosed`): Optional. Service message:
             forum topic closed
 
             .. versionadded:: 20.0
-        forum_topic_reopened (:class:`telegram.ForumTopicReopened`, optional): Service message:
+        forum_topic_reopened (:class:`telegram.ForumTopicReopened`): Optional. Service message:
             forum topic reopened
 
             .. versionadded:: 20.0
