@@ -27,7 +27,7 @@ TEST_TOPIC_EMOJI_ID = "some_id"
 
 
 @pytest.fixture
-async def topic(bot, forum_group_id):
+async def create_and_delete_topic(bot, forum_group_id):
     # TODO rework with methods and attributes instead of dict keys
     result = await bot._post(
         "createForumTopic",
@@ -43,28 +43,27 @@ async def topic(bot, forum_group_id):
     assert result is True, "Topic was not deleted"
 
 
+@pytest.fixture
+def topic(forum_group_id):
+    return ForumTopic(
+        message_thread_id=forum_group_id,
+        name=TEST_TOPIC_NAME,
+        icon_color=TEST_TOPIC_ICON_COLOR,
+        icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
+    )
+
+
 class TestForumTopic:
-    def test_slot_behaviour(self, forum_group_id, mro_slots):
-        topic = ForumTopic(
-            message_thread_id=forum_group_id,
-            name=TEST_TOPIC_NAME,
-            icon_color=TEST_TOPIC_ICON_COLOR,
-            icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
-        )
+    def test_slot_behaviour(self, mro_slots, topic):
         for attr in topic.__slots__:
             assert getattr(topic, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(topic)) == len(set(mro_slots(topic))), "duplicate slot"
 
-    def test_expected_values(self, forum_group_id):
-        topic = ForumTopic(
-            message_thread_id=forum_group_id,
-            name=TEST_TOPIC_NAME,
-            icon_color=TEST_TOPIC_ICON_COLOR,
-        )
+    def test_expected_values(self, forum_group_id, topic):
         assert topic.message_thread_id == forum_group_id
         assert topic.icon_color == TEST_TOPIC_ICON_COLOR
         assert topic.name == TEST_TOPIC_NAME
-        assert topic.icon_custom_emoji_id is None
+        assert topic.icon_custom_emoji_id == TEST_TOPIC_EMOJI_ID
 
     def test_de_json(self, bot, forum_group_id):
         assert ForumTopic.de_json(None, bot=bot) is None
@@ -83,20 +82,14 @@ class TestForumTopic:
         assert topic.name == TEST_TOPIC_NAME
         assert topic.icon_custom_emoji_id == TEST_TOPIC_EMOJI_ID
 
-    def test_to_dict(self, forum_group_id):
-        action = ForumTopic(
-            message_thread_id=forum_group_id,
-            name=TEST_TOPIC_NAME,
-            icon_color=TEST_TOPIC_ICON_COLOR,
-            icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
-        )
-        action_dict = action.to_dict()
+    def test_to_dict(self, forum_group_id, topic):
+        topic_dict = topic.to_dict()
 
-        assert isinstance(action_dict, dict)
-        assert action_dict["message_thread_id"] == forum_group_id
-        assert action_dict["name"] == TEST_TOPIC_NAME
-        assert action_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
-        assert action_dict["icon_custom_emoji_id"] == TEST_TOPIC_EMOJI_ID
+        assert isinstance(topic_dict, dict)
+        assert topic_dict["message_thread_id"] == forum_group_id
+        assert topic_dict["name"] == TEST_TOPIC_NAME
+        assert topic_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
+        assert topic_dict["icon_custom_emoji_id"] == TEST_TOPIC_EMOJI_ID
 
     def test_equality(self, forum_group_id):
         a = ForumTopic(
@@ -171,11 +164,11 @@ class TestForumTopic:
         monkeypatch.delattr(bot, "_post")
 
     @pytest.mark.flaky(3, 1)
-    async def test_send_message_to_topic(self, bot, forum_group_id, topic):
+    async def test_send_message_to_topic(self, bot, forum_group_id, create_and_delete_topic):
         test_string = "Topics are forever"
 
         # TODO attribute instead of dict key when the method is implemented
-        message_thread_id = topic["message_thread_id"]
+        message_thread_id = create_and_delete_topic["message_thread_id"]
 
         message = await bot.send_message(
             chat_id=forum_group_id, text=test_string, message_thread_id=message_thread_id
@@ -186,17 +179,22 @@ class TestForumTopic:
         assert message.message_thread_id == message_thread_id
 
 
-class TestForumTopicCreated:
-    def test_slot_behaviour(self, mro_slots):
-        action = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+@pytest.fixture
+def topic_created():
+    return ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
 
-    def test_expected_values(self):
-        action = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
-        assert action.icon_color == TEST_TOPIC_ICON_COLOR
-        assert action.name == TEST_TOPIC_NAME
+
+class TestForumTopicCreated:
+    def test_slot_behaviour(self, topic_created, mro_slots):
+        for attr in topic_created.__slots__:
+            assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(topic_created)) == len(
+            set(mro_slots(topic_created))
+        ), "duplicate slot"
+
+    def test_expected_values(self, topic_created):
+        assert topic_created.icon_color == TEST_TOPIC_ICON_COLOR
+        assert topic_created.name == TEST_TOPIC_NAME
 
     def test_de_json(self, bot):
         assert ForumTopicCreated.de_json(None, bot=bot) is None
@@ -208,9 +206,8 @@ class TestForumTopicCreated:
         assert action.icon_color == TEST_TOPIC_ICON_COLOR
         assert action.name == TEST_TOPIC_NAME
 
-    def test_to_dict(self):
-        action = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
-        action_dict = action.to_dict()
+    def test_to_dict(self, topic_created):
+        action_dict = topic_created.to_dict()
 
         assert isinstance(action_dict, dict)
         assert action_dict["name"] == TEST_TOPIC_NAME
@@ -236,7 +233,9 @@ class TestForumTopicCreated:
         assert hash(a) != hash(d)
 
     @pytest.mark.flaky(3, 1)
-    async def test_create_forum_topic_returns_good_object(self, bot, forum_group_id, topic):
+    async def test_create_forum_topic_returns_good_object(
+        self, bot, forum_group_id, create_and_delete_topic
+    ):
         data = await bot.get_updates()
 
         last_message = data[-1].message
