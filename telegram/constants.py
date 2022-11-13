@@ -40,6 +40,7 @@ __all__ = [
     "ChatID",
     "ChatInviteLinkLimit",
     "ChatMemberStatus",
+    "ChatPhotoSize",
     "ChatType",
     "CustomEmojiStickerLimit",
     "DiceEmoji",
@@ -266,6 +267,29 @@ class ChatMemberStatus(StringEnum):
     """:obj:`str`: A :class:`telegram.ChatMember` who is a member of the chat."""
     RESTRICTED = "restricted"
     """:obj:`str`: A :class:`telegram.ChatMember` who was restricted in this chat."""
+
+
+class ChatPhotoSize(IntEnum):
+    """This enum contains limitations for :class:`telegram.ChatPhoto`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    SMALL = 160
+    """:obj:`int`: Width and height of a small chat photo, ID of which is passed in
+    :paramref:`~telegram.ChatPhoto.small_file_id` and
+    :paramref:`~telegram.ChatPhoto.small_file_unique_id` parameters of
+    :class:`telegram.ChatPhoto`.
+    """
+    BIG = 640
+    """:obj:`int`: Width and height of a big chat photo, ID of which is passed in
+    :paramref:`~telegram.ChatPhoto.big_file_id` and
+    :paramref:`~telegram.ChatPhoto.big_file_unique_id` parameters of
+    :class:`telegram.ChatPhoto`.
+    """
 
 
 class ChatType(StringEnum):
