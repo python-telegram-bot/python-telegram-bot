@@ -67,7 +67,7 @@ class TestForumTopic:
         assert topic.icon_custom_emoji_id is None
 
     def test_de_json(self, bot, forum_group_id):
-        assert ForumTopic.de_json({}, bot=bot) is None
+        assert ForumTopic.de_json(None, bot=bot) is None
 
         json_dict = {
             "message_thread_id": forum_group_id,
@@ -199,7 +199,7 @@ class TestForumTopicCreated:
         assert action.name == TEST_TOPIC_NAME
 
     def test_de_json(self, bot):
-        assert ForumTopicCreated.de_json({}, bot=bot) is None
+        assert ForumTopicCreated.de_json(None, bot=bot) is None
 
         json_dict = {"icon_color": TEST_TOPIC_ICON_COLOR, "name": TEST_TOPIC_NAME}
         action = ForumTopicCreated.de_json(json_dict, bot)
