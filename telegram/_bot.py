@@ -1887,7 +1887,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Note:
             To use this method, the file must have the type :mimetype:`audio/ogg` and be no more
-            than ``1MB`` in size. ``1-20MB`` voice notes will be sent as files.
+            than :tg-const:`telegram.constants.FileSizeLimit.VOICE_NOTE_FILE_SIZE` in size.
+            :tg-const:`telegram.constants.FileSizeLimit.VOICE_NOTE_FILE_SIZE`-
+            :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD` voice notes will be
+            sent as files.
 
         .. seealso:: :attr:`telegram.Message.reply_voice`, :attr:`telegram.Chat.send_voice`,
             :attr:`telegram.User.send_voice`

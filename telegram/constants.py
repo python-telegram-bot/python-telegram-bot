@@ -450,6 +450,11 @@ class FileSizeLimit(IntEnum):
     """
     PHOTOSIZE_UPLOAD = int(10e6)  # (10MB)
     """:obj:`int`: Bots can upload photo files of up to 10MB in size."""
+    VOICE_NOTE_FILE_SIZE = int(1e6)  # (1MB)
+    """:obj:`int`: File size limit for the :meth:`~telegram.Bot.send_voice` method of
+    :class:`telegram.Bot`. Bots can send :mimetype:`audio/ogg` files of up to 1MB in size as
+    a voice note. Larger voice notes (up to 20MB) will be sent as files."""
+    # It seems OK to link 20MB limit to FILESIZE_DOWNLOAD rather than creating a new constant
 
 
 class FloodLimit(IntEnum):
