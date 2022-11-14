@@ -31,7 +31,7 @@ class Defaults:
         networking backend directly via :class:`telegram.ext.ApplicationBuilder` instead.
 
     Parameters:
-        parse_mode (:obj:`str`, optional): Send :attr:`~telegram.constants.ParseMode.MARKDOWN` or
+        parse_mode (:obj:`str`, optional): Send :attr:`~telegram.constants.ParseMode.MARKDOWN_V2` or
             :attr:`~telegram.constants.ParseMode.HTML`, if you want Telegram apps to show
             bold, italic, fixed-width text or URLs in your bot's message.
         disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
