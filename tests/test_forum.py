@@ -100,7 +100,7 @@ class TestForumTopic:
         b = ForumTopic(
             message_thread_id=forum_group_id,
             name=TEST_TOPIC_NAME,
-            icon_color=0xFFD67E,
+            icon_color=TEST_TOPIC_ICON_COLOR,
             icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
         )
         c = ForumTopic(
@@ -113,6 +113,11 @@ class TestForumTopic:
             name=TEST_TOPIC_NAME,
             icon_color=TEST_TOPIC_ICON_COLOR,
         )
+        e = ForumTopic(
+            message_thread_id=forum_group_id,
+            name=TEST_TOPIC_NAME,
+            icon_color=0xFFD67E,
+        )
 
         assert a == b
         assert hash(a) == hash(b)
@@ -122,6 +127,9 @@ class TestForumTopic:
 
         assert a != d
         assert hash(a) != hash(d)
+
+        assert a != e
+        assert hash(a) != hash(e)
 
     async def test_get_forum_topic_icon_stickers(self, bot):
         # TODO this fails

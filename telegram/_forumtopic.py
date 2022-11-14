@@ -28,7 +28,8 @@ class ForumTopic(TelegramObject):
     the chat.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
-    considered equal, if their :attr:`message_thread_id` and :attr:`name` are equal.
+    considered equal, if their :attr:`message_thread_id`, :attr:`name` and :attr:`icon_color`
+    are equal.
 
     .. versionadded:: 20.0
 
@@ -64,7 +65,7 @@ class ForumTopic(TelegramObject):
         self.icon_color = icon_color
         self.icon_custom_emoji_id = icon_custom_emoji_id
 
-        self._id_attrs = (self.message_thread_id, self.name)
+        self._id_attrs = (self.message_thread_id, self.name, self.icon_color)
 
 
 class ForumTopicCreated(TelegramObject):
