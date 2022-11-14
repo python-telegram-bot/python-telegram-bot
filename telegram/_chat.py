@@ -835,6 +835,7 @@ class Chat(TelegramObject):
         is_anonymous: bool = None,
         can_manage_chat: bool = None,
         can_manage_video_chats: bool = None,
+        can_manage_topics: bool = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -878,6 +879,7 @@ class Chat(TelegramObject):
             is_anonymous=is_anonymous,
             can_manage_chat=can_manage_chat,
             can_manage_video_chats=can_manage_video_chats,
+            can_manage_topics=can_manage_topics,
         )
 
     async def restrict_member(
