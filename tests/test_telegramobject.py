@@ -238,7 +238,15 @@ class TestTelegramObject:
         date = datetime.datetime.now()
         photo = PhotoSize("file_id", "unique", 21, 21)
         photo.set_bot(bot)
-        msg = Message(1, date, chat, from_user=user, text="foobar", photo=[photo])
+        msg = Message(
+            1,
+            date,
+            chat,
+            from_user=user,
+            text="foobar",
+            photo=[photo],
+            api_kwargs={"api": "kwargs"},
+        )
         msg.set_bot(bot)
 
         # Test pickling of TGObjects, we choose Message since it's contains the most subclasses.
@@ -252,6 +260,8 @@ class TestTelegramObject:
         assert unpickled.from_user == user
         assert unpickled.date == date, f"{unpickled.date} != {date}"
         assert unpickled.photo[0] == photo
+        assert isinstance(unpickled.api_kwargs, MappingProxyType)
+        assert unpickled.api_kwargs == {"api": "kwargs"}
 
     def test_pickle_apply_api_kwargs(self, bot):
         """Makes sure that when a class gets new attributes, the api_kwargs are moved to the

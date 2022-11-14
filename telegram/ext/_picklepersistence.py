@@ -22,6 +22,7 @@ import pickle
 from copy import deepcopy
 from pathlib import Path
 from sys import version_info as py_ver
+from types import MappingProxyType
 from typing import Any, Callable, Dict, Optional, Set, Tuple, Type, TypeVar, cast, overload
 
 from telegram import Bot, TelegramObject
@@ -53,6 +54,9 @@ def _reconstruct_to(cls: Type[TelegramObj], kwargs: dict) -> TelegramObj:
     is changed, since `_custom_reduction` places references to this function into the pickled data.
     """
     obj = cls.__new__(cls)
+    # Converting to MappingProxyType
+    # is necessary, since _custom_reduction converts it to a dict as MPT is not pickable.
+    kwargs["api_kwargs"] = MappingProxyType(kwargs["api_kwargs"])
     obj.__setstate__(kwargs)
     return obj
 
@@ -63,6 +67,9 @@ def _custom_reduction(cls: TelegramObj) -> Tuple[Callable, Tuple[Type[TelegramOb
     works as intended.
     """
     data = cls._get_attrs(include_private=True)  # pylint: disable=protected-access
+    # MappingProxyType is not pickable, so we convert it to a dict and revert in
+    # _reconstruct_to
+    data["api_kwargs"] = dict(data["api_kwargs"])  # type: ignore[arg-type]
     return _reconstruct_to, (cls.__class__, data)
 
 

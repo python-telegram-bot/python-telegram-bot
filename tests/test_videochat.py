@@ -132,7 +132,7 @@ class TestVideoChatParticipantsInvited:
         a = VideoChatParticipantsInvited([user1])
         b = VideoChatParticipantsInvited([user1])
         c = VideoChatParticipantsInvited([user1, user2])
-        d = VideoChatParticipantsInvited(None)
+        d = VideoChatParticipantsInvited([])
         e = VideoChatStarted()
 
         assert a == b

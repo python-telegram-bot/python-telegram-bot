@@ -168,6 +168,9 @@ class TelegramObject:
         if not self.api_kwargs:
             # Drop api_kwargs from the representation, if empty
             as_dict.pop("api_kwargs", None)
+        else:
+            # Otherwise, we want want to skip the "mappingproxy" part of the repr
+            as_dict["api_kwargs"] = dict(self.api_kwargs)
 
         contents = ", ".join(
             f"{k}={as_dict[k]!r}"
