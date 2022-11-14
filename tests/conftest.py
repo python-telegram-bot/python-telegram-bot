@@ -44,6 +44,8 @@ from telegram import (
     ChosenInlineResult,
     File,
     ChatPermissions,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
 )
 from telegram.ext import (
     Dispatcher,
@@ -547,6 +549,12 @@ def check_defaults_handling(
                 # Some special casing
                 if name == 'permissions':
                     kws[name] = ChatPermissions()
+                elif name == 'result':
+                    kws[name] = InlineQueryResultArticle(
+                        id='id',
+                        title='title',
+                        input_message_content=InputTextMessageContent('content'),
+                    )
                 elif name in ['prices', 'media', 'results', 'commands', 'errors']:
                     kws[name] = []
                 elif name == 'ok':
