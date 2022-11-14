@@ -8470,6 +8470,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. seealso:: :meth:`telegram.Message.create_forum_topic`,
             :meth:`telegram.Chat.create_forum_topic`,
 
+        .. versionadded:: 20.0
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@supergroupusername``).
@@ -8515,6 +8517,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "icon_color": icon_color,
             "icon_custom_emoji_id": icon_custom_emoji_id,
         }
+        # TODO: DO ForumTopic.de_json here!
         return await self._post(  # type: ignore[return-value]
             "createForumTopic",
             data,
@@ -8547,6 +8550,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         .. seealso:: :meth:`telegram.Message.edit_forum_topic`,
             :meth:`telegram.Chat.edit_forum_topic`,
+
+        .. versionadded:: 20.0
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -8620,6 +8625,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. seealso:: :meth:`telegram.Message.close_forum_topic`,
             :meth:`telegram.Chat.close_forum_topic`,
 
+        .. versionadded:: 20.0
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@supergroupusername``).
@@ -8683,6 +8690,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         .. seealso:: :meth:`telegram.Message.reopen_forum_topic`,
             :meth:`telegram.Chat.reopen_forum_topic`,
+
+        .. versionadded:: 20.0
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
@@ -8748,6 +8757,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. seealso:: :meth:`telegram.Message.delete_forum_topic`,
             :meth:`telegram.Chat.delete_forum_topic`,
 
+        .. versionadded:: 20.0
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
                 of the target channel (in the format ``@supergroupusername``).
@@ -8811,6 +8822,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         .. seealso:: :meth:`telegram.Message.unpin_all_forum_topic_messages`,
             :meth:`telegram.Chat.unpin_all_forum_topic_messages`,
+
+        .. versionadded:: 20.0
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username

@@ -2703,42 +2703,6 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    async def create_forum_topic(
-        self,
-        name: str,
-        icon_color: int,
-        icon_custom_emoji_id: str,
-        *,
-        read_timeout: ODVInput[float] = DEFAULT_NONE,
-        write_timeout: ODVInput[float] = DEFAULT_NONE,
-        connect_timeout: ODVInput[float] = DEFAULT_NONE,
-        pool_timeout: ODVInput[float] = DEFAULT_NONE,
-        api_kwargs: JSONDict = None,
-    ) -> bool:
-        """Shortcut for::
-
-            await bot.create_forum_topic(chat_id=message.chat_id, *args, **kwargs)
-
-        For the documentation of the arguments, please see
-        :meth:`telegram.Bot.create_forum_topic`.
-
-        .. versionadded:: 20.0
-
-        Returns:
-            :obj:`bool`: On success, :obj:`True` is returned.
-        """
-        return await self.get_bot().create_forum_topic(
-            chat_id=self.chat_id,
-            name=name,
-            icon_color=icon_color,
-            icon_custom_emoji_id=icon_custom_emoji_id,
-            read_timeout=read_timeout,
-            write_timeout=write_timeout,
-            connect_timeout=connect_timeout,
-            pool_timeout=pool_timeout,
-            api_kwargs=api_kwargs,
-        )
-
     async def edit_forum_topic(
         self,
         name: str,
