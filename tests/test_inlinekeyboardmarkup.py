@@ -86,7 +86,7 @@ class TestInlineKeyboardMarkup:
         assert len(inline_keyboard_markup[1]) == 1
 
     def test_expected_values(self, inline_keyboard_markup):
-        assert inline_keyboard_markup.inline_keyboard == self.inline_keyboard
+        assert inline_keyboard_markup.inline_keyboard == tuple(self.inline_keyboard)
 
     def test_wrong_keyboard_inputs(self):
         with pytest.raises(ValueError):
@@ -121,8 +121,10 @@ class TestInlineKeyboardMarkup:
             assert bool("'switch_inline_query': ''" in str(data["reply_markup"]))
             assert bool("'switch_inline_query_current_chat': ''" in str(data["reply_markup"]))
 
+        inline_keyboard_markup.inline_keyboard[0][0]._unfreeze()
         inline_keyboard_markup.inline_keyboard[0][0].callback_data = None
         inline_keyboard_markup.inline_keyboard[0][0].switch_inline_query = ""
+        inline_keyboard_markup.inline_keyboard[0][1]._unfreeze()
         inline_keyboard_markup.inline_keyboard[0][1].callback_data = None
         inline_keyboard_markup.inline_keyboard[0][1].switch_inline_query_current_chat = ""
 

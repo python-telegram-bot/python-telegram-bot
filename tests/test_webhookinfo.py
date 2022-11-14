@@ -62,7 +62,7 @@ class TestWebhookInfo:
         assert webhook_info_dict["pending_update_count"] == self.pending_update_count
         assert webhook_info_dict["last_error_date"] == self.last_error_date
         assert webhook_info_dict["max_connections"] == self.max_connections
-        assert webhook_info_dict["allowed_updates"] == tuple(self.allowed_updates)
+        assert webhook_info_dict["allowed_updates"] == self.allowed_updates
         assert webhook_info_dict["ip_address"] == self.ip_address
         assert (
             webhook_info_dict["last_synchronization_error_date"]

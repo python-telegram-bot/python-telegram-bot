@@ -728,7 +728,7 @@ class TestSendMediaGroup:
         for mes_group in (default, overridden_markdown_v2):
             first_message = mes_group[0]
             assert first_message.caption == "photo 1"
-            assert first_message.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)]
+            assert first_message.caption_entities == (MessageEntity(MessageEntity.BOLD, 0, 5),)
 
         # This check is valid for all 3 groups of messages
         for mes_group in (default, overridden_markdown_v2, overridden_none):

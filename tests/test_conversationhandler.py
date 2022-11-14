@@ -925,7 +925,6 @@ class TestConversationHandler:
         message = Message(0, None, self.group, from_user=user1, text="/start")
         message.set_bot(bot)
         message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # Check that the same message is accepted again, i.e. the conversation immediately
@@ -981,7 +980,6 @@ class TestConversationHandler:
         message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, "Misses Test"))
         message.set_bot(bot)
         message._unfreeze()
-        message.entities[0]._unfreeze()
 
         update = Update(0, channel_post=message)
         assert not handler.check_update(update)
@@ -996,7 +994,6 @@ class TestConversationHandler:
         message = Message(0, None, self.group, from_user=user1, text="ignore")
         message.set_bot(bot)
         message._unfreeze()
-        message.entities[0]._unfreeze()
         callback_query = CallbackQuery(0, user1, None, message=message, data="data")
         callback_query.set_bot(bot)
         chosen_inline_result = ChosenInlineResult(0, user1, "query")

@@ -106,7 +106,7 @@ class TestPollAnswer:
         assert isinstance(poll_answer_dict, dict)
         assert poll_answer_dict["poll_id"] == poll_answer.poll_id
         assert poll_answer_dict["user"] == poll_answer.user.to_dict()
-        assert poll_answer_dict["option_ids"] == poll_answer.option_ids
+        assert poll_answer_dict["option_ids"] == list(poll_answer.option_ids)
 
     def test_equality(self):
         a = PollAnswer(123, self.user, [2])
@@ -196,7 +196,7 @@ class TestPoll:
         assert poll.type == self.type
         assert poll.allows_multiple_answers == self.allows_multiple_answers
         assert poll.explanation == self.explanation
-        assert poll.explanation_entities == self.explanation_entities
+        assert poll.explanation_entities == tuple(self.explanation_entities)
         assert poll.open_period == self.open_period
         assert abs(poll.close_date - self.close_date) < timedelta(seconds=1)
         assert to_timestamp(poll.close_date) == to_timestamp(self.close_date)

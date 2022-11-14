@@ -84,9 +84,9 @@ class TestInputInvoiceMessageContent:
         assert input_invoice_message_content.currency == self.currency
         assert input_invoice_message_content.prices == tuple(self.prices)
         assert input_invoice_message_content.max_tip_amount == self.max_tip_amount
-        assert input_invoice_message_content.suggested_tip_amounts == [
+        assert input_invoice_message_content.suggested_tip_amounts == tuple(
             int(amount) for amount in self.suggested_tip_amounts
-        ]
+        )
         assert input_invoice_message_content.provider_data == self.provider_data
         assert input_invoice_message_content.photo_url == self.photo_url
         assert input_invoice_message_content.photo_size == int(self.photo_size)
@@ -130,9 +130,8 @@ class TestInputInvoiceMessageContent:
             input_invoice_message_content_dict["max_tip_amount"]
             == input_invoice_message_content.max_tip_amount
         )
-        assert (
-            input_invoice_message_content_dict["suggested_tip_amounts"]
-            == input_invoice_message_content.suggested_tip_amounts
+        assert input_invoice_message_content_dict["suggested_tip_amounts"] == list(
+            input_invoice_message_content.suggested_tip_amounts
         )
         assert (
             input_invoice_message_content_dict["provider_data"]
@@ -219,9 +218,9 @@ class TestInputInvoiceMessageContent:
         assert input_invoice_message_content.currency == self.currency
         assert input_invoice_message_content.prices == tuple(self.prices)
         assert input_invoice_message_content.max_tip_amount == self.max_tip_amount
-        assert input_invoice_message_content.suggested_tip_amounts == [
+        assert input_invoice_message_content.suggested_tip_amounts == tuple(
             int(amount) for amount in self.suggested_tip_amounts
-        ]
+        )
         assert input_invoice_message_content.provider_data == self.provider_data
         assert input_invoice_message_content.photo_url == self.photo_url
         assert input_invoice_message_content.photo_size == int(self.photo_size)

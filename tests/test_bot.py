@@ -102,6 +102,7 @@ async def message(bot, chat_id):
         disable_notification=True,
     )
     out._unfreeze()
+    return out
 
 
 @pytest.fixture(scope="class")

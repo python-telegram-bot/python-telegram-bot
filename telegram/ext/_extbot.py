@@ -553,8 +553,10 @@ class ExtBot(Bot, Generic[RLARGS]):
                 # We build a new result in case the user wants to use the same object in
                 # different places
                 new_result = copy(result)
+                new_result._unfreeze()  # pylint: disable=protected-access
                 markup = self._replace_keyboard(result.reply_markup)  # type: ignore[attr-defined]
                 new_result.reply_markup = markup
+                new_result._freeze()  # pylint: disable=protected-access
                 results.append(new_result)
 
         return results, next_offset

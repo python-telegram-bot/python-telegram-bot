@@ -109,7 +109,7 @@ class TestVideoChatParticipantsInvited:
         video_chat_participants = VideoChatParticipantsInvited.de_json(json_data, bot)
         assert video_chat_participants.api_kwargs == {}
 
-        assert isinstance(video_chat_participants.users, list)
+        assert isinstance(video_chat_participants.users, tuple)
         assert video_chat_participants.users[0] == user1
         assert video_chat_participants.users[1] == user2
         assert video_chat_participants.users[0].id == user1.id
@@ -117,9 +117,7 @@ class TestVideoChatParticipantsInvited:
 
     @pytest.mark.parametrize("use_users", (True, False))
     def test_to_dict(self, user1, user2, use_users):
-        video_chat_participants = VideoChatParticipantsInvited(
-            [user1, user2] if use_users else None
-        )
+        video_chat_participants = VideoChatParticipantsInvited([user1, user2] if use_users else ())
         video_chat_dict = video_chat_participants.to_dict()
 
         assert isinstance(video_chat_dict, dict)
@@ -128,7 +126,7 @@ class TestVideoChatParticipantsInvited:
             assert video_chat_dict["users"][0]["id"] == user1.id
             assert video_chat_dict["users"][1]["id"] == user2.id
         else:
-            assert video_chat_dict == {}
+            assert video_chat_dict == {"users": ()}
 
     def test_equality(self, user1, user2):
         a = VideoChatParticipantsInvited([user1])
