@@ -181,6 +181,8 @@ class ChatMemberAdministrator(ChatMember):
        * Argument and attribute ``can_manage_voice_chats`` were renamed to
          :paramref:`can_manage_video_chats` and  :attr:`can_manage_video_chats` in accordance to
          Bot API 6.0.
+       * The argument :paramref:`can_manage_topics` was added, which changes the position of the
+         optional argument :paramref:`custom_title`.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -215,6 +217,10 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only.
+
+            .. versionadded:: 20.0
         custom_title (:obj:`str`, optional): Custom title for this user.
 
     Attributes:
@@ -252,6 +258,10 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`) Optional. :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only
+
+            .. versionadded:: 20.0
         custom_title (:obj:`str`): Optional. Custom title for this user.
     """
 
@@ -268,6 +278,7 @@ class ChatMemberAdministrator(ChatMember):
         "can_post_messages",
         "can_edit_messages",
         "can_pin_messages",
+        "can_manage_topics",
         "custom_title",
     )
 
@@ -286,6 +297,7 @@ class ChatMemberAdministrator(ChatMember):
         can_post_messages: bool = None,
         can_edit_messages: bool = None,
         can_pin_messages: bool = None,
+        can_manage_topics: bool = None,
         custom_title: str = None,
         *,
         api_kwargs: JSONDict = None,
@@ -303,6 +315,7 @@ class ChatMemberAdministrator(ChatMember):
         self.can_post_messages = can_post_messages
         self.can_edit_messages = can_edit_messages
         self.can_pin_messages = can_pin_messages
+        self.can_manage_topics = can_manage_topics
         self.custom_title = custom_title
 
 
@@ -340,6 +353,9 @@ class ChatMemberRestricted(ChatMember):
     in the chat. Supergroups only.
 
     .. versionadded:: 13.7
+    .. versionchanged:: 20.0
+       The argument :paramref:`can_manage_topics` was added, which changes the position of the
+       optional argument :paramref:`until_date`.
 
     Args:
         user (:class:`telegram.User`): Information about the user.
@@ -361,6 +377,10 @@ class ChatMemberRestricted(ChatMember):
             to send animations, games, stickers and use inline bots.
         can_add_web_page_previews (:obj:`bool`): :obj:`True`, if the user is
            allowed to add web page previews to their messages.
+        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only
+
+            .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
@@ -386,6 +406,10 @@ class ChatMemberRestricted(ChatMember):
             to send animations, games, stickers and use inline bots.
         can_add_web_page_previews (:obj:`bool`): :obj:`True`, if the user is
            allowed to add web page previews to their messages.
+        can_manage_topics (:obj:`bool`) Optional. :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only
+
+            .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
            will be lifted for this user.
 
@@ -401,6 +425,7 @@ class ChatMemberRestricted(ChatMember):
         "can_send_polls",
         "can_send_other_messages",
         "can_add_web_page_previews",
+        "can_manage_topics",
         "until_date",
     )
 
@@ -416,6 +441,7 @@ class ChatMemberRestricted(ChatMember):
         can_send_polls: bool,
         can_send_other_messages: bool,
         can_add_web_page_previews: bool,
+        can_manage_topics: bool,
         until_date: datetime.datetime,
         *,
         api_kwargs: JSONDict = None,
@@ -430,6 +456,7 @@ class ChatMemberRestricted(ChatMember):
         self.can_send_polls = can_send_polls
         self.can_send_other_messages = can_send_other_messages
         self.can_add_web_page_previews = can_add_web_page_previews
+        self.can_manage_topics = can_manage_topics
         self.until_date = until_date
 
 

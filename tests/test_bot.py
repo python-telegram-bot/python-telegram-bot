@@ -2128,6 +2128,7 @@ class TestBot:
                 can_promote_members=True,
                 can_manage_chat=True,
                 can_manage_video_chats=True,
+                can_manage_topics=True,
             )
 
         # Test that we pass the correct params to TG
@@ -2147,6 +2148,7 @@ class TestBot:
                 and data.get("can_promote_members") == 9
                 and data.get("can_manage_chat") == 10
                 and data.get("can_manage_video_chats") == 11
+                and data.get("can_manage_topics") == 12
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -2164,6 +2166,7 @@ class TestBot:
             can_promote_members=9,
             can_manage_chat=10,
             can_manage_video_chats=11,
+            can_manage_topics=12,
         )
 
     @pytest.mark.flaky(3, 1)
@@ -2607,6 +2610,7 @@ class TestBot:
         assert my_admin_rights_ch.can_promote_members is my_rights.can_promote_members
         assert my_admin_rights_ch.can_restrict_members is my_rights.can_restrict_members
         assert my_admin_rights_ch.can_pin_messages is None  # Not returned for channels
+        assert my_admin_rights_ch.can_manage_topics is None  # Not returned for channels
 
     @pytest.mark.asyncio
     async def test_get_set_chat_menu_button(self, bot, chat_id):

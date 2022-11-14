@@ -27,7 +27,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-import datetime as dtm
+import datetime as dtm  # skipcq: PYL-W0406
 import time
 from typing import Optional, Union
 

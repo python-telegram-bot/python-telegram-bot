@@ -23,7 +23,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-import enum as _enum
+import enum as _enum  # skipcq: PYL-R0201
 import sys
 from typing import Type, TypeVar, Union
 
