@@ -3,6 +3,7 @@ on:
   pull_request:
     branches:
       - master
+      - api_6.3_update
   push:
     branches:
       - master
