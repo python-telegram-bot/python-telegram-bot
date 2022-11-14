@@ -2200,6 +2200,36 @@ class Bot(TelegramObject):
 
         return effective_results, next_offset
 
+    @no_type_check
+    def _set_ilq_result_defaults(self, res):
+        # pylint: disable=W0212
+        if hasattr(res, 'parse_mode') and res.parse_mode == DEFAULT_NONE:
+            if self.defaults:
+                res.parse_mode = self.defaults.parse_mode
+            else:
+                res.parse_mode = None
+        if hasattr(res, 'input_message_content') and res.input_message_content:
+            if (
+                hasattr(res.input_message_content, 'parse_mode')
+                and res.input_message_content.parse_mode == DEFAULT_NONE
+            ):
+                if self.defaults:
+                    res.input_message_content.parse_mode = DefaultValue.get_value(
+                        self.defaults.parse_mode
+                    )
+                else:
+                    res.input_message_content.parse_mode = None
+            if (
+                hasattr(res.input_message_content, 'disable_web_page_preview')
+                and res.input_message_content.disable_web_page_preview == DEFAULT_NONE
+            ):
+                if self.defaults:
+                    res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
+                        self.defaults.disable_web_page_preview
+                    )
+                else:
+                    res.input_message_content.disable_web_page_preview = None
+
     @log
     def answer_inline_query(
         self,
@@ -2274,43 +2304,13 @@ class Bot(TelegramObject):
 
         """
 
-        @no_type_check
-        def _set_defaults(res):
-            # pylint: disable=W0212
-            if hasattr(res, 'parse_mode') and res.parse_mode == DEFAULT_NONE:
-                if self.defaults:
-                    res.parse_mode = self.defaults.parse_mode
-                else:
-                    res.parse_mode = None
-            if hasattr(res, 'input_message_content') and res.input_message_content:
-                if (
-                    hasattr(res.input_message_content, 'parse_mode')
-                    and res.input_message_content.parse_mode == DEFAULT_NONE
-                ):
-                    if self.defaults:
-                        res.input_message_content.parse_mode = DefaultValue.get_value(
-                            self.defaults.parse_mode
-                        )
-                    else:
-                        res.input_message_content.parse_mode = None
-                if (
-                    hasattr(res.input_message_content, 'disable_web_page_preview')
-                    and res.input_message_content.disable_web_page_preview == DEFAULT_NONE
-                ):
-                    if self.defaults:
-                        res.input_message_content.disable_web_page_preview = (
-                            DefaultValue.get_value(self.defaults.disable_web_page_preview)
-                        )
-                    else:
-                        res.input_message_content.disable_web_page_preview = None
-
         effective_results, next_offset = self._effective_inline_results(
             results=results, next_offset=next_offset, current_offset=current_offset
         )
 
         # Apply defaults
         for result in effective_results:
-            _set_defaults(result)
+            self._set_ilq_result_defaults(result)
 
         results_dicts = [res.to_dict() for res in effective_results]
 
@@ -3939,7 +3939,8 @@ class Bot(TelegramObject):
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        data: JSONDict = {'web_app_query_id': web_app_query_id, 'result': result}
+        self._set_ilq_result_defaults(result)
+        data: JSONDict = {'web_app_query_id': web_app_query_id, 'result': result.to_dict()}
 
         api_result = self._post(
             'answerWebAppQuery',
