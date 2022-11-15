@@ -27,7 +27,7 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -116,7 +116,8 @@ class Poll(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
-    .. seealso:: `Pollbot Example <examples.pollbot.html>`_
+    Examples:
+        :any:`Poll Bot <examples.pollbot>`
 
     Args:
         id (:obj:`str`): Unique poll identifier.
@@ -126,13 +127,17 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer option.
-            Available only for polls in the quiz mode, which are closed, or was sent (not
-            forwarded) by the bot or to the private chat with the bot.
+        correct_option_id (:obj:`int`, optional): A zero based identifier of the correct answer
+            option. Available only for closed polls in the quiz mode, which were sent
+            (not forwarded), by the bot or to a private chat with the bot.
         explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll, 0-200 characters.
         explanation_entities (List[:class:`telegram.MessageEntity`], optional): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
+            This list is empty if the message does not contain explanation entities.
+
+            .. versionchanged:: 20.0
+               This attribute is now always a (possibly empty) list and never :obj:`None`.
         open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
             after creation.
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the
@@ -147,9 +152,11 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`): Optional. Identifier of the correct answer option.
+        correct_option_id (:obj:`int`, optional): A zero based identifier of the correct answer
+            option. Available only for closed polls in the quiz mode, which were sent
+            (not forwarded), by the bot or to a private chat with the bot.
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
-            answer or taps on the lamp icon in a quiz-style poll.
+            answer or taps on the lamp icon in a quiz-style poll, 0-200 characters.
         explanation_entities (List[:class:`telegram.MessageEntity`]): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
             This list is empty if the message does not contain explanation entities.
@@ -227,17 +234,6 @@ class Poll(TelegramObject):
         data["close_date"] = from_timestamp(data.get("close_date"))
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["options"] = [x.to_dict() for x in self.options]
-        if self.explanation_entities:
-            data["explanation_entities"] = [e.to_dict() for e in self.explanation_entities]
-        data["close_date"] = to_timestamp(data.get("close_date"))
-
-        return data
 
     def parse_explanation_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.

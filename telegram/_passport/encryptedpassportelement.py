@@ -244,14 +244,3 @@ class EncryptedPassportElement(TelegramObject):
             )
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        if self.files:
-            data["files"] = [p.to_dict() for p in self.files]
-        if self.translation:
-            data["translation"] = [p.to_dict() for p in self.translation]
-
-        return data

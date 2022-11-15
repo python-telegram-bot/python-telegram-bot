@@ -29,14 +29,16 @@ class ReplyKeyboardRemove(TelegramObject):
     until a new keyboard is sent by a bot. An exception is made for one-time keyboards that are
     hidden immediately after the user presses a button (see :class:`telegram.ReplyKeyboardMarkup`).
 
-    Example:
-        A user votes in a poll, bot returns confirmation message in reply to the vote and removes
-        the keyboard for that user, while still showing the keyboard with poll options to users who
-        haven't voted yet.
-
     Note:
         User will not be able to summon this keyboard; if you want to hide the keyboard from
         sight but keep it accessible, use :attr:`telegram.ReplyKeyboardMarkup.one_time_keyboard`.
+
+    Examples:
+        * Example usage: A user votes in a poll, bot returns confirmation message in reply to
+          the vote and removes the keyboard for that user, while still showing the keyboard with
+          poll options to users who haven't voted yet.
+        * :any:`Conversation Bot <examples.conversationbot>`
+        * :any:`Conversation Bot 2 <examples.conversationbot2>`
 
     Args:
         selective (:obj:`bool`, optional): Use this parameter if you want to remove the keyboard

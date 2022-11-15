@@ -57,6 +57,10 @@ class CommandHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
+    Examples:
+        * :any:`Timer Bot <examples.timerbot>`
+        * :any:`Error Handler Bot <examples.errorhandlerbot>`
+
     .. versionchanged:: 20.0
 
         * Renamed the attribute ``command`` to :attr:`commands`, which now is always a
@@ -82,6 +86,9 @@ class CommandHandler(BaseHandler[Update, CCT]):
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
 
     Raises:
         :exc:`ValueError`: When the command is too long or has illegal chars.
@@ -160,8 +167,8 @@ class CommandHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,
-        application: "Application",
+        update: Update,  # skipcq: BAN-B301
+        application: "Application",  # skipcq: BAN-B301
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single

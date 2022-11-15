@@ -49,6 +49,9 @@ class MessageHandler(BaseHandler[Update, CCT]):
             :attr:`telegram.Update.channel_post` and :attr:`telegram.Update.edited_channel_post`.
             If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
             argument.
+
+            .. seealso:: `Advanced Filters <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
         callback (:term:`coroutine function`): The callback function for this handler. Will be
             called when :meth:`check_update` has determined that an update should be processed by
             this handler. Callback signature::
@@ -60,6 +63,9 @@ class MessageHandler(BaseHandler[Update, CCT]):
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
 
     Attributes:
         filters (:class:`telegram.ext.filters.BaseFilter`): Only allow updates with these Filters.
@@ -100,8 +106,8 @@ class MessageHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,
-        application: "Application",
+        update: Update,  # skipcq: BAN-B301
+        application: "Application",  # skipcq: BAN-B301
         check_result: Optional[Union[bool, Dict[str, object]]],
     ) -> None:
         """Adds possible output of data filters to the :class:`CallbackContext`."""

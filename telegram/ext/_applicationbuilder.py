@@ -112,6 +112,11 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         * Unless a custom :class:`telegram.Bot` instance is set via :meth:`bot`, :meth:`build` will
           use :class:`telegram.ext.ExtBot` for the bot.
 
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
+        `Builder Pattern for Application <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+
     .. _`builder pattern`: https://en.wikipedia.org/wiki/Builder_pattern
     """
 
@@ -729,8 +734,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
 
                pip install python-telegram-bot[callback-data]
 
-        .. seealso:: `Arbitrary callback_data <https://github.com/python-telegram-bot\
-            /python-telegram-bot/wiki/Arbitrary-callback_data>`_,
+        .. seealso:: `Arbitrary callback_data <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_,
             :any:`examples.arbitrarycallbackdatabot`
 
         Args:

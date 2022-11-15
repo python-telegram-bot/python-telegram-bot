@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Base class for Telegram Objects."""
+import datetime
 import inspect
 import json
 from copy import deepcopy
 from itertools import chain
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Sized, Tuple, Type, TypeVar, Union
 
+from telegram._utils.datetime import to_timestamp
 from telegram._utils.types import JSONDict
 from telegram._utils.warnings import warn
 
@@ -35,20 +37,12 @@ Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
 class TelegramObject:
     """Base class for most Telegram objects.
 
-    Objects of this type are subscriptable with strings, where ``telegram_object[attribute_name]``
-    is equivalent to ``telegram_object.attribute_name``. If the object does not have an attribute
-    with the appropriate name, a :exc:`KeyError` will be raised.
-
-    When objects of this type are pickled, the :class:`~telegram.Bot` attribute associated with the
-    object will be removed. However, when copying the object via :func:`copy.deepcopy`, the copy
-    will have the *same* bot instance associated with it, i.e::
-
-        assert telegram_object.get_bot() is copy.deepcopy(telegram_object).get_bot()
+    Objects of this type are subscriptable with strings. See :meth:`__getitem__` for more details.
+    The :mod:`pickle` and :func:`~copy.deepcopy` behavior of objects of this type are defined by
+    :meth:`__getstate__`, :meth:`__setstate__` and :meth:`__deepcopy__`.
 
     .. versionchanged:: 20.0
 
-        * ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
-          special cases like :attr:`Message.from_user` that deviate from the official Bot API.
         * Removed argument and attribute ``bot`` for several subclasses. Use
           :meth:`set_bot` and :meth:`get_bot` instead.
         * Removed the possibility to pass arbitrary keyword arguments for several subclasses.
@@ -106,7 +100,7 @@ class TelegramObject:
     def __repr__(self) -> str:
         """Gives a string representation of this object in the form
         ``ClassName(attr_1=value_1, attr_2=value_2, ...)``, where attributes are omitted if they
-        have the value :obj:`None` or empty instances of :class:`collections.abc.Sized` (e.g.
+        have the value :obj:`None` or are empty instances of :class:`collections.abc.Sized` (e.g.
         :class:`list`, :class:`dict`, :class:`set`, :class:`str`, etc.).
 
         As this class doesn't implement :meth:`object.__str__`, the default implementation
@@ -139,6 +133,30 @@ class TelegramObject:
         return f"{self.__class__.__name__}({contents})"
 
     def __getitem__(self, item: str) -> object:
+        """
+        Objects of this type are subscriptable with strings, where
+        ``telegram_object["attribute_name"]`` is equivalent to ``telegram_object.attribute_name``.
+
+        Tip:
+            This is useful for dynamic attribute lookup, i.e. ``telegram_object[arg]`` where the
+            value of ``arg`` is determined at runtime.
+            In all other cases, it's recommended to use the dot notation instead, i.e.
+            ``telegram_object.attribute_name``.
+
+        .. versionchanged:: 20.0
+
+            ``telegram_object['from']`` will look up the key ``from_user``. This is to account for
+            special cases like :attr:`Message.from_user` that deviate from the official Bot API.
+
+        Args:
+            item (:obj:`str`): The name of the attribute to look up.
+
+        Returns:
+            :obj:`object`
+
+        Raises:
+            :exc:`KeyError`: If the object does not have an attribute with the appropriate name.
+        """
         if item == "from":
             item = "from_user"
         try:
@@ -151,15 +169,28 @@ class TelegramObject:
 
     def __getstate__(self) -> Dict[str, Union[str, object]]:
         """
-        This method is used for pickling. We remove the bot attribute of the object since those
-        are not pickable.
+        Overrides :meth:`object.__getstate__` to customize the pickling process of objects of this
+        type.
+        The returned state does `not` contain the :class:`telegram.Bot` instance set with
+        :meth:`set_bot` (if any), as it can't be pickled.
+
+        Returns:
+            state (Dict[:obj:`str`, :obj:`object`]): The state of the object.
         """
         return self._get_attrs(include_private=True, recursive=False, remove_bot=True)
 
     def __setstate__(self, state: dict) -> None:
         """
-        This method is used for unpickling. The data, which is in the form a dictionary, is
-        converted back into a class. Should be modified in place.
+        Overrides :meth:`object.__setstate__` to customize the unpickling process of objects of
+        this type. Modifies the object in-place.
+        If any data was stored in the :attr:`api_kwargs` of the pickled object, this method checks
+        if the class now has dedicated attributes for those keys and moves the values from
+        :attr:`api_kwargs` to the dedicated attributes.
+        This can happen, if serialized data is loaded with a new version of this library, where
+        the new version was updated to account for updates of the Telegram Bot API.
+
+        Args:
+            state (:obj:`dict`): The data to set as attributes of this object.
         """
         # Make sure that we have a `_bot` attribute. This is necessary, since __getstate__ omits
         # this as Bots are not pickable.
@@ -170,7 +201,20 @@ class TelegramObject:
         self._apply_api_kwargs()
 
     def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
-        """This method deepcopies the object and sets the bot on the newly created copy."""
+        """
+        Customizes how :func:`copy.deepcopy` processes objects of this type.
+        The only difference to the default implementation is that the :class:`telegram.Bot`
+        instance set via :meth:`set_bot` (if any) is not copied, but shared between the original
+        and the copy, i.e.::
+
+            assert telegram_object.get_bot() is copy.deepcopy(telegram_object).get_bot()
+
+        Args:
+            memodict (:obj:`dict`): A dictionary that maps objects to their copies.
+
+        Returns:
+            :obj:`telegram.TelegramObject`: The copied object.
+        """
         bot = self._bot  # Save bot so we can set it after copying
         self.set_bot(None)  # set to None so it is not deepcopied
         cls = self.__class__
@@ -217,7 +261,7 @@ class TelegramObject:
             value = getattr(self, key, None)
             if value is not None:
                 if recursive and hasattr(value, "to_dict"):
-                    data[key] = value.to_dict(recursive=True)  # pylint: disable=no-member
+                    data[key] = value.to_dict(recursive=True)
                 else:
                     data[key] = value
             elif not recursive:
@@ -327,6 +371,32 @@ class TelegramObject:
             :obj:`dict`
         """
         out = self._get_attrs(recursive=recursive)
+
+        # Now we should convert TGObjects to dicts inside objects such as sequences, and convert
+        # datetimes to timestamps. This mostly eliminates the need for subclasses to override
+        # `to_dict`
+        for key, value in out.items():
+            if isinstance(value, (tuple, list)) and value:
+                val = []  # empty list to append our converted values to
+                for item in value:
+                    if hasattr(item, "to_dict"):
+                        val.append(item.to_dict(recursive=recursive))
+                    # This branch is useful for e.g. List[List[PhotoSize|KeyboardButton]]
+                    elif isinstance(item, (tuple, list)):
+                        val.append(
+                            [
+                                i.to_dict(recursive=recursive) if hasattr(i, "to_dict") else i
+                                for i in item
+                            ]
+                        )
+                    else:  # if it's not a TGObject, just append it. E.g. [TGObject, 2]
+                        val.append(item)
+                out[key] = val
+
+            elif isinstance(value, datetime.datetime):
+                out[key] = to_timestamp(value)
+
+        # Effectively "unpack" api_kwargs into `out`:
         out.update(out.pop("api_kwargs", {}))  # type: ignore[call-overload]
         return out
 
@@ -359,6 +429,26 @@ class TelegramObject:
         self._bot = bot
 
     def __eq__(self, other: object) -> bool:
+        """Compares this object with :paramref:`other` in terms of equality.
+        If this object and :paramref:`other` are `not` objects of the same class,
+        this comparison will fall back to Python's default implementation of :meth:`object.__eq__`.
+        Otherwise, both objects may be compared in terms of equality, if the corresponding
+        subclass of :class:`TelegramObject` has defined a set of attributes to compare and
+        the objects are considered to be equal, if all of these attributes are equal.
+        If the subclass has not defined a set of attributes to compare, a warning will be issued.
+
+        Tip:
+            If instances of a class in the :mod:`telegram` module are comparable in terms of
+            equality, the documentation of the class will state the attributes that will be used
+            for this comparison.
+
+        Args:
+            other (:obj:`object`): The object to compare with.
+
+        Returns:
+            :obj:`bool`
+
+        """
         if isinstance(other, self.__class__):
             if not self._id_attrs:
                 warn(
@@ -376,6 +466,12 @@ class TelegramObject:
         return super().__eq__(other)
 
     def __hash__(self) -> int:
+        """Builds a hash value for this object such that the hash of two objects is equal if and
+        only if the objects are equal in terms of :meth:`__eq__`.
+
+        Returns:
+            :obj:`int`
+        """
         if self._id_attrs:
             return hash((self.__class__, self._id_attrs))
         return super().__hash__()

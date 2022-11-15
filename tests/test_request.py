@@ -28,7 +28,6 @@ from typing import Any, Callable, Coroutine, Tuple
 
 import httpx
 import pytest
-from flaky import flaky
 
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import (
@@ -568,7 +567,7 @@ class TestHTTPXRequest:
                     httpx_request.do_request(method="GET", url="URL"),
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_do_request_wait_for_pool(self, monkeypatch, httpx_request):
         """The pool logic is buried rather deeply in httpxcore, so we make actual requests here
         instead of mocking"""

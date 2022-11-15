@@ -51,7 +51,7 @@ else:
 class AIORateLimiter(BaseRateLimiter[int]):
     """
     Implementation of :class:`~telegram.ext.BaseRateLimiter` using the library
-    `aiolimiter <https://aiolimiter.readthedocs.io/>`_.
+    `aiolimiter <https://aiolimiter.readthedocs.io/en/stable>`_.
 
     Important:
         If you want to use this class, you must install PTB with the optional requirement
@@ -89,6 +89,9 @@ class AIORateLimiter(BaseRateLimiter[int]):
         If you would like to handle rate limiting in a more sophisticated, fine-tuned way, we
         welcome you to implement your own subclass of :class:`~telegram.ext.BaseRateLimiter`.
         Feel free to check out the source code of this class for inspiration.
+
+    .. seealso:: `Avoiding Flood Limits <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Avoiding-flood-limits>`_
 
     .. versionadded:: 20.0
 

@@ -20,7 +20,6 @@ import os
 from pathlib import Path
 
 import pytest
-from flaky import flaky
 
 from telegram import Bot, Document, InputFile, MessageEntity, PhotoSize, Voice
 from telegram.error import BadRequest, TelegramError
@@ -79,7 +78,7 @@ class TestDocument:
         assert document.thumb.width == self.thumb_width
         assert document.thumb.height == self.thumb_height
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_all_args(self, bot, chat_id, document_file, document, thumb_file):
         message = await bot.send_document(
             chat_id,
@@ -106,7 +105,7 @@ class TestDocument:
         assert message.document.thumb.height == self.thumb_height
         assert message.has_protected_content
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_get_and_download(self, bot, document):
         path = Path("telegram.png")
         if path.is_file():
@@ -123,7 +122,7 @@ class TestDocument:
 
         assert path.is_file()
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_url_gif_file(self, bot, chat_id):
         message = await bot.send_document(chat_id, self.document_file_url)
 
@@ -139,7 +138,7 @@ class TestDocument:
         assert document.mime_type == "image/gif"
         assert document.file_size == 3878
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_resend(self, bot, chat_id, document):
         message = await bot.send_document(chat_id=chat_id, document=document.file_id)
 
@@ -166,7 +165,7 @@ class TestDocument:
 
         assert message
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_send_document_caption_entities(self, bot, chat_id, document):
         test_string = "Italic Bold Code"
         entities = [
@@ -181,7 +180,7 @@ class TestDocument:
         assert message.caption == test_string
         assert message.caption_entities == entities
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_document_default_parse_mode_1(self, default_bot, chat_id, document):
         test_string = "Italic Bold Code"
@@ -191,7 +190,7 @@ class TestDocument:
         assert message.caption_markdown == test_markdown_string
         assert message.caption == test_string
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_document_default_parse_mode_2(self, default_bot, chat_id, document):
         test_markdown_string = "_Italic_ *Bold* `Code`"
@@ -202,7 +201,7 @@ class TestDocument:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"parse_mode": "Markdown"}], indirect=True)
     async def test_send_document_default_parse_mode_3(self, default_bot, chat_id, document):
         test_markdown_string = "_Italic_ *Bold* `Code`"
@@ -213,7 +212,7 @@ class TestDocument:
         assert message.caption == test_markdown_string
         assert message.caption_markdown == escape_markdown(test_markdown_string)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -247,7 +246,7 @@ class TestDocument:
                     chat_id, document, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_document_default_protect_content(self, chat_id, default_bot, document):
         protected = await default_bot.send_document(chat_id, document)
@@ -308,13 +307,13 @@ class TestDocument:
         assert document_dict["mime_type"] == document.mime_type
         assert document_dict["file_size"] == document.file_size
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file(self, bot, chat_id):
         with open(os.devnull, "rb") as f:
             with pytest.raises(TelegramError):
                 await bot.send_document(chat_id=chat_id, document=f)
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     async def test_error_send_empty_file_id(self, bot, chat_id):
         with pytest.raises(TelegramError):
             await bot.send_document(chat_id=chat_id, document="")

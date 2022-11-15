@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import pytest
-from flaky import flaky
 
 from telegram import Location, Venue
 from telegram.error import BadRequest
@@ -90,7 +89,7 @@ class TestVenue:
         message = await bot.send_venue(chat_id, venue=venue)
         assert message
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
         "default_bot,custom",
         [
@@ -124,7 +123,7 @@ class TestVenue:
                     chat_id, venue=venue, reply_to_message_id=reply_to_message.message_id
                 )
 
-    @flaky(3, 1)
+    @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize("default_bot", [{"protect_content": True}], indirect=True)
     async def test_send_venue_default_protect_content(self, default_bot, chat_id, venue):
         protected = await default_bot.send_venue(chat_id, venue=venue)

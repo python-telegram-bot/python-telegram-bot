@@ -5,7 +5,7 @@ import subprocess
 import sys
 from enum import Enum
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -34,7 +34,7 @@ version = "20.0a4"  # telegram.__version__[:3]
 release = "20.0a4"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "4.5.0"
+needs_sphinx = "5.1.1"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -46,6 +46,7 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx_paramlinks",
     "sphinxcontrib.mermaid",
+    "sphinx_search.extension",
 ]
 
 # Use intersphinx to reference the python builtin library docs
@@ -215,11 +216,9 @@ html_favicon = "ptb-logo_1024.ico"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = [
-    "style_external_link.css",
-    "style_mermaid_diagrams.css",
-]
-html_permalinks_icon = "¶"  # Furo's default permalink icon is `#`` which doesn't look great imo.
+html_css_files = ["style_external_link.css", "style_mermaid_diagrams.css"]
+
+html_permalinks_icon = "¶"  # Furo's default permalink icon is `#` which doesn't look great imo.
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "python-telegram-bot-doc"
@@ -260,6 +259,7 @@ latex_logo = "ptb-logo_1024.png"
 # (source start file, name, description, authors, manual section).
 man_pages = [(master_doc, "python-telegram-bot", "python-telegram-bot Documentation", [author], 1)]
 
+# rtd_sphinx_search_file_type = "un-minified"  # Configuration for furo-sphinx-search
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -378,12 +378,98 @@ line_numbers = {}
 file_root = Path(inspect.getsourcefile(telegram)).parent.parent.resolve()
 import telegram.ext  # Needed for checking if an object is a BaseFilter
 
+keyword_args = [
+    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.read_timeout: Value to pass to :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to {read_timeout}.",
+    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.read_timeout: {read_timeout_type}, optional",
+    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: Value to pass to :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to {write_timeout}.",
+    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.write_timeout: :obj:`float` | :obj:`None`, optional",
+    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: Value to pass to :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
+    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.connect_timeout: :obj:`float` | :obj:`None`, optional",
+    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: Value to pass to :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
+    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.pool_timeout: :obj:`float` | :obj:`None`, optional",
+    ":keyword _sphinx_paramlinks_telegram.Bot.{method}.api_kwargs: Arbitrary keyword arguments to be passed to the Telegram API.",
+    ":kwtype _sphinx_paramlinks_telegram.Bot.{method}.api_kwargs: :obj:`dict`, optional",
+    "",
+]
 
-def autodoc_process_docstring(app: Sphinx, what, name: str, obj: object, options, lines):
-    """We misuse this autodoc hook to get the file names & line numbers because we have access
-    to the actual object here.
+write_timeout_sub = [":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`", "``20``"]
+read_timeout_sub = [
+    ":attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.",
+    "``2``. :paramref:`timeout` will be added to this value",
+]
+read_timeout_type = [":obj:`float` | :obj:`None`", ":obj:`float`"]
+
+
+def find_insert_pos(lines: List[str]) -> int:
+    """Finds the correct position to insert the keyword arguments and returns the index."""
+    for idx, value in reversed(list(enumerate(lines))):  # reversed since :returns: is at the end
+        if value.startswith(":returns:"):
+            return idx
+    else:
+        return False
+
+
+def is_write_timeout_20(obj: object) -> int:
+    """inspects the default value of write_timeout parameter of the bot method."""
+    sig = inspect.signature(obj)
+    return 1 if (sig.parameters["write_timeout"].default == 20) else 0
+
+
+def check_timeout_and_api_kwargs_presence(obj: object) -> int:
+    """Checks if the method has timeout and api_kwargs keyword only parameters."""
+    sig = inspect.signature(obj)
+    params_to_check = (
+        "read_timeout",
+        "write_timeout",
+        "connect_timeout",
+        "pool_timeout",
+        "api_kwargs",
+    )
+    return all(
+        param in sig.parameters and sig.parameters[param].kind == inspect.Parameter.KEYWORD_ONLY
+        for param in params_to_check
+    )
+
+
+def autodoc_process_docstring(
+    app: Sphinx, what, name: str, obj: object, options, lines: List[str]
+):
+    """We do two things:
+    1) Use this method to automatically insert the Keyword Args for the Bot methods.
+
+    2) Misuse this autodoc hook to get the file names & line numbers because we have access
+       to the actual object here.
     """
-    # Ce can't properly handle ordinary attributes.
+    # 1) Insert the Keyword Args for the Bot methods
+    method_name = name.split(".")[-1]
+    if (
+        name.startswith("telegram.Bot.")
+        and what == "method"
+        and method_name.islower()
+        and check_timeout_and_api_kwargs_presence(obj)
+    ):
+        insert_index = find_insert_pos(lines)
+        if not insert_index:
+            raise ValueError(
+                f"Couldn't find the correct position to insert the keyword args for {obj}."
+            )
+
+        long_write_timeout = is_write_timeout_20(obj)
+        get_updates_sub = 1 if (method_name == "get_updates") else 0
+        # The below can be done in 1 line with itertools.chain, but this must be modified in-place
+        for i in range(insert_index, insert_index + len(keyword_args)):
+            lines.insert(
+                i,
+                keyword_args[i - insert_index].format(
+                    method=method_name,
+                    write_timeout=write_timeout_sub[long_write_timeout],
+                    read_timeout=read_timeout_sub[get_updates_sub],
+                    read_timeout_type=read_timeout_type[get_updates_sub],
+                ),
+            )
+
+    # 2) Get the file names & line numbers
+    # We can't properly handle ordinary attributes.
     # In linkcode_resolve we'll resolve to the `__init__` or module instead
     if what == "attribute":
         return

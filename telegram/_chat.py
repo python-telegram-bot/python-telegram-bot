@@ -149,21 +149,28 @@ class Chat(TelegramObject):
 
             .. versionadded:: 20.0
     Attributes:
-        id (:obj:`int`): Unique identifier for this chat.
-        type (:obj:`str`): Type of chat.
+        id (:obj:`int`): Unique identifier for this chat. This number may be greater than 32 bits
+            and some programming languages may have difficulty/silent defects in interpreting it.
+            But it is smaller than 52 bits, so a signed 64-bit integer or double-precision float
+            type are safe for storing this identifier.
+        type (:obj:`str`): Type of chat, can be either :attr:`PRIVATE`, :attr:`GROUP`,
+            :attr:`SUPERGROUP` or :attr:`CHANNEL`.
         title (:obj:`str`): Optional. Title, for supergroups, channels and group chats.
-        username (:obj:`str`): Optional. Username.
+        username (:obj:`str`): Optional. Username, for private chats, supergroups and channels if
+            available.
         first_name (:obj:`str`): Optional. First name of the other party in a private chat.
         last_name (:obj:`str`): Optional. Last name of the other party in a private chat.
         photo (:class:`telegram.ChatPhoto`): Optional. Chat photo.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         bio (:obj:`str`): Optional. Bio of the other party in a private chat. Returned only in
             :meth:`telegram.Bot.get_chat`.
         has_private_forwards (:obj:`bool`): Optional. :obj:`True`, if privacy settings of the other
             party in the private chat allows to use ``tg://user?id=<user_id>`` links only in chats
-            with the user.
+            with the user. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.9
         description (:obj:`str`): Optional. Description, for groups, supergroups and channel chats.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         invite_link (:obj:`str`): Optional. Primary invite link, for groups, supergroups and
             channel. Returned only in :meth:`telegram.Bot.get_chat`.
         pinned_message (:class:`telegram.Message`): Optional. The most recent pinned message
@@ -179,12 +186,13 @@ class Chat(TelegramObject):
 
             .. versionadded:: 13.4
         has_protected_content (:obj:`bool`): Optional. :obj:`True`, if messages from the chat can't
-            be forwarded to other chats.
+            be forwarded to other chats. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.9
         sticker_set_name (:obj:`str`): Optional. For supergroups, name of Group sticker set.
+            Returned only in :meth:`telegram.Bot.get_chat`.
         can_set_sticker_set (:obj:`bool`): Optional. :obj:`True`, if the bot can change group the
-            sticker set.
+            sticker set. Returned only in :meth:`telegram.Bot.get_chat`.
         linked_chat_id (:obj:`int`): Optional. Unique identifier for the linked chat, i.e. the
             discussion group identifier for a channel and vice versa; for supergroups and channel
             chats. Returned only in :meth:`telegram.Bot.get_chat`.
