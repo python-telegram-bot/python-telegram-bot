@@ -408,21 +408,24 @@ class TelegramObject:
     @classmethod
     def de_list(
         cls: Type[Tele_co], data: Optional[List[JSONDict]], bot: "Bot"
-    ) -> List[Optional[Tele_co]]:
-        """Converts JSON data to a list of Telegram objects.
+    ) -> Tuple[Optional[Tele_co], ...]:
+        """Converts a list of JSON objects to a tuple of Telegram objects.
+
+        .. versionchange:: 20.0
+           Returns a tuple instead of a list.
 
         Args:
-            data (Dict[:obj:`str`, ...]): The JSON data.
+            data (List[Dict[:obj:`str`, ...]]): The JSON data.
             bot (:class:`telegram.Bot`): The bot associated with these objects.
 
         Returns:
-            A list of Telegram objects.
+            A tuple of Telegram objects.
 
         """
         if not data:
-            return []
+            return ()
 
-        return [cls.de_json(d, bot) for d in data]
+        return tuple(cls.de_json(d, bot) for d in data)
 
     def to_json(self) -> str:
         """Gives a JSON representation of object.

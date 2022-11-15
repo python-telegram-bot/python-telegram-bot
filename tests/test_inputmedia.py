@@ -456,7 +456,7 @@ class TestSendMediaGroup:
     @pytest.mark.flaky(3, 1)
     async def test_send_media_group_photo(self, bot, chat_id, media_group):
         messages = await bot.send_media_group(chat_id, media_group)
-        assert isinstance(messages, list)
+        assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
         assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
@@ -522,7 +522,7 @@ class TestSendMediaGroup:
 
         assert not any(item.parse_mode for item in media_group_no_caption_args)
 
-        assert isinstance(messages, list)
+        assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
 
@@ -562,7 +562,7 @@ class TestSendMediaGroup:
                 a.parse_mode == b.parse_mode for a, b in zip(media_group, copied_media_group)
             )
 
-            assert isinstance(messages, list)
+            assert isinstance(messages, tuple)
             assert len(messages) == 3
             assert all(isinstance(mes, Message) for mes in messages)
             assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)
@@ -642,7 +642,7 @@ class TestSendMediaGroup:
             func, "Type of file mismatch", "Telegram did not accept the file."
         )
 
-        assert isinstance(messages, list)
+        assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
         assert all(mes.media_group_id == messages[0].media_group_id for mes in messages)

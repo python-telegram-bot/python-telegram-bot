@@ -1829,7 +1829,7 @@ class TestBot:
         await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
         updates = await bot.get_updates(timeout=1)
 
-        assert isinstance(updates, list)
+        assert isinstance(updates, tuple)
         if updates:
             assert isinstance(updates[0], Update)
 
@@ -1861,7 +1861,7 @@ class TestBot:
             monkeypatch.setattr(BaseRequest, "post", post)
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
             assert isinstance(updates[0].callback_query.data, InvalidCallbackData)
 
@@ -1986,7 +1986,7 @@ class TestBot:
     @pytest.mark.flaky(3, 1)
     async def test_get_chat_administrators(self, bot, channel_id):
         admins = await bot.get_chat_administrators(channel_id)
-        assert isinstance(admins, list)
+        assert isinstance(admins, tuple)
 
         for a in admins:
             assert a.status in ("administrator", "creator")
@@ -2738,7 +2738,7 @@ class TestBot:
     async def test_set_and_get_my_commands(self, bot):
         commands = [BotCommand("cmd1", "descr1"), ["cmd2", "descr2"]]
         await bot.set_my_commands([])
-        assert await bot.get_my_commands() == []
+        assert await bot.get_my_commands() == ()
         assert await bot.set_my_commands(commands)
 
         for i, bc in enumerate(await bot.get_my_commands()):
@@ -3160,7 +3160,7 @@ class TestBot:
             await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
 
             effective_message = updates[0][message_type]
@@ -3227,7 +3227,7 @@ class TestBot:
             await bot.delete_webhook()  # make sure there is no webhook set if webhook tests failed
             updates = await bot.get_updates(timeout=1)
 
-            assert isinstance(updates, list)
+            assert isinstance(updates, tuple)
             assert len(updates) == 1
 
             message = updates[0][message_type]

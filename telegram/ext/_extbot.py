@@ -514,7 +514,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List[Update]:
+    ) -> Tuple[Update, ...]:
         updates = await super().get_updates(
             offset=offset,
             limit=limit,
@@ -1449,7 +1449,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> List[ChatMember]:
+    ) -> Tuple[ChatMember, ...]:
         return await super().get_chat_administrators(
             chat_id=chat_id,
             read_timeout=read_timeout,
@@ -1556,7 +1556,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> List[GameHighScore]:
+    ) -> Tuple[GameHighScore, ...]:
         return await super().get_game_high_scores(
             user_id=user_id,
             chat_id=chat_id,
@@ -1598,7 +1598,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> List[BotCommand]:
+    ) -> Tuple[BotCommand, ...]:
         return await super().get_my_commands(
             scope=scope,
             language_code=language_code,
@@ -1659,7 +1659,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> List[Sticker]:
+    ) -> Tuple[Sticker, ...]:
         return await super().get_custom_emoji_stickers(
             custom_emoji_ids=custom_emoji_ids,
             read_timeout=read_timeout,
@@ -2285,7 +2285,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-    ) -> List[Message]:
+    ) -> Tuple[Message, ...]:
         return await super().send_media_group(
             chat_id=chat_id,
             media=media,

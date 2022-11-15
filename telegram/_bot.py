@@ -1770,8 +1770,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         caption: Optional[str] = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
-    ) -> List[Message]:
+    ) -> Tuple[Message, ...]:
         """Use this method to send a group of photos or videos as an album.
+
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
 
         Note:
             If you supply a :paramref:`caption` (along with either :paramref:`parse_mode` or
@@ -1815,7 +1818,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 .. versionadded:: 20.0
 
         Returns:
-            List[:class:`telegram.Message`]: An array of the sent Messages.
+            Tuple[:class:`telegram.Message`]: An array of the sent Messages.
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -3383,8 +3386,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List[Update]:
+    ) -> Tuple[Update, ...]:
         """Use this method to receive incoming updates using long polling.
+
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
 
         Note:
             1. This method will not work if an outgoing webhook is set up.
@@ -3416,7 +3422,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 a short period of time.
 
         Returns:
-            List[:class:`telegram.Update`]
+            Tuple[:class:`telegram.Update`]
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -3711,17 +3717,20 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List[ChatMember]:
+    ) -> Tuple[ChatMember, ...]:
         """
         Use this method to get a list of administrators in a chat.
 
         .. seealso:: :attr:`telegram.Chat.get_administrators`
 
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
+
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
 
         Returns:
-            List[:class:`telegram.ChatMember`]: On success, returns a list of ``ChatMember``
+            Tuple[:class:`telegram.ChatMember`]: On success, returns a list of ``ChatMember``
             objects that contains information about all chat administrators except
             other bots. If the chat is a group or a supergroup and no administrators were
             appointed, only the creator will be returned.
@@ -4001,10 +4010,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List[GameHighScore]:
+    ) -> Tuple[GameHighScore, ...]:
         """
         Use this method to get data for high score tables. Will return the score of the specified
         user and several of their neighbors in a game.
+
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
 
         Note:
             This method will currently return scores for the target user, plus two of their
@@ -4023,7 +4035,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :paramref:`message_id` are not specified. Identifier of the inline message.
 
         Returns:
-            List[:class:`telegram.GameHighScore`]
+            Tuple[:class:`telegram.GameHighScore`]
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -5387,10 +5399,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List[Sticker]:
+    ) -> Tuple[Sticker, ...]:
         # skipcq: FLK-D207
         """
         Use this method to get information about emoji stickers by their identifiers.
+
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
 
         Args:
             custom_emoji_ids (List[:obj:`str`]): List of custom emoji identifiers.
@@ -5398,7 +5413,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Returns:
-            List[:class:`telegram.Sticker`]
+            Tuple[:class:`telegram.Sticker`]
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -6217,10 +6232,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> List[BotCommand]:
+    ) -> Tuple[BotCommand, ...]:
         """
         Use this method to get the current list of the bot's commands for the given scope and user
         language.
+
+        .. versionchanged:: 20.0
+            Returns a tuple instead of a list.
 
         Args:
             scope (:class:`telegram.BotCommandScope`, optional): An object,
@@ -6234,8 +6252,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionadded:: 13.7
 
         Returns:
-            List[:class:`telegram.BotCommand`]: On success, the commands set for the bot. An empty
-            list is returned if commands are not set.
+            Tuple[:class:`telegram.BotCommand`]: On success, the commands set for the bot. An empty
+            tuple is returned if commands are not set.
 
         Raises:
             :class:`telegram.error.TelegramError`
