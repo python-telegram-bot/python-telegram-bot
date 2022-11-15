@@ -5890,11 +5890,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            question (:obj:`str`): Poll question, 1-:tg-const:`telegram.Poll.MAX_QUESTION_LENGTH`
-                characters.
+            question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
+                :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
             options (List[:obj:`str`]): List of answer options,
-                2-:tg-const:`telegram.Poll.MAX_OPTION_NUMBER` strings
-                1-:tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters each.
+                :tg-const:`telegram.Poll.MIN_OPTION_NUMBER`-
+                :tg-const:`telegram.Poll.MAX_OPTION_NUMBER` strings
+                :tg-const:`telegram.Poll.MIN_OPTION_LENGTH`-
+                :tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters each.
             is_anonymous (:obj:`bool`, optional): :obj:`True`, if the poll needs to be anonymous,
                 defaults to :obj:`True`.
             type (:obj:`str`, optional): Poll type, :tg-const:`telegram.Poll.QUIZ` or
@@ -5904,8 +5906,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
-                answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most
-                2 line feeds after entities parsing.
+                answer or taps on the lamp icon in a quiz-style poll,
+                0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters with at most
+                :tg-const:`telegram.Poll.MAX_EXPLANATION_LINE_FEEDS` line feeds after entities
+                parsing.
             explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
                 explanation. See the constants in :class:`telegram.constants.ParseMode` for the
                 available modes.
@@ -5913,11 +5917,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 entities that appear in message text, which can be specified instead of
                 :paramref:`explanation_parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
-                after creation, 5-600. Can't be used together with :paramref:`close_date`.
+                after creation, :tg-const:`telegram.Poll.MIN_OPEN_PERIOD`-
+                :tg-const:`telegram.Poll.MAX_OPEN_PERIOD`. Can't be used together with
+                :paramref:`close_date`.
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
-                timestamp) when the poll will be automatically closed. Must be at least 5 and no
-                more than 600 seconds in the future. Can't be used together with
-                :paramref:`open_period`.
+                timestamp) when the poll will be automatically closed. Must be at least
+                :tg-const:`telegram.Poll.MIN_OPEN_PERIOD` and no more than
+                :tg-const:`telegram.Poll.MAX_OPEN_PERIOD` seconds in the future.
+                Can't be used together with :paramref:`open_period`.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
                 used.

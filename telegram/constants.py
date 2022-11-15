@@ -1075,7 +1075,7 @@ class ParseMode(StringEnum):
 
 
 class PollLimit(IntEnum):
-    """This enum contains limitations for :class:`telegram.Poll`/
+    """This enum contains limitations for :class:`telegram.Poll`/:class:`telegram.PollOption`/
     :meth:`telegram.Bot.send_poll`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
@@ -1084,12 +1084,58 @@ class PollLimit(IntEnum):
 
     __slots__ = ()
 
-    QUESTION_LENGTH = 300
-    """:obj:`str`: Maximum number of characters of the polls question."""
-    OPTION_LENGTH = 100
-    """:obj:`str`: Maximum number of characters for each option for the poll."""
-    OPTION_NUMBER = 10
-    """:obj:`str`: Maximum number of available options for the poll."""
+    MIN_QUESTION_LENGTH = 1
+    """:obj:`int`: Minimum value allowed for the :paramref:`~telegram.Poll.question`
+    parameter of :class:`telegram.Poll` and the :paramref:`~telegram.Bot.send_poll.question`
+    parameter of :meth:`telegram.Bot.send_poll`.
+    """
+    MAX_QUESTION_LENGTH = 300
+    """:obj:`int`: Maximum value allowed for the :paramref:`~telegram.Poll.question`
+    parameter of :class:`telegram.Poll` and the :paramref:`~telegram.Bot.send_poll.question`
+    parameter of :meth:`telegram.Bot.send_poll`.
+    """
+    MIN_OPTION_LENGTH = 1
+    """:obj:`int`: Minimum length of each :obj:`str` passed in a :obj:`list`
+    to the :paramref:`~telegram.Bot.send_poll.options` parameter of
+    :meth:`telegram.Bot.send_poll`.
+    """
+    MAX_OPTION_LENGTH = 100
+    """:obj:`int`: Maximum length of each :obj:`str` passed in a :obj:`list`
+    to the :paramref:`~telegram.Bot.send_poll.options` parameter of
+    :meth:`telegram.Bot.send_poll`.
+    """
+    MIN_OPTION_NUMBER = 2
+    """:obj:`int`: Minimum number of strings passed in a :obj:`list`
+    to the :paramref:`~telegram.Bot.send_poll.options` parameter of
+    :meth:`telegram.Bot.send_poll`.
+    """
+    MAX_OPTION_NUMBER = 10
+    """:obj:`int`: Maximum number of strings passed in a :obj:`list`
+    to the :paramref:`~telegram.Bot.send_poll.options` parameter of
+    :meth:`telegram.Bot.send_poll`.
+    """
+    MAX_EXPLANATION_LENGTH = 200
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Poll.explanation` parameter of :class:`telegram.Poll` and the
+    :paramref:`~telegram.Bot.send_poll.explanation` parameter of :meth:`telegram.Bot.send_poll`.
+    """
+    MAX_EXPLANATION_LINE_FEEDS = 2
+    """:obj:`int`: Maximum number of line feeds in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.send_poll.explanation` parameter of :meth:`telegram.Bot.send_poll`
+    after entities parsing.
+    """
+    MIN_OPEN_PERIOD = 5
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.send_poll.open_period` parameter of :meth:`telegram.Bot.send_poll`.
+    Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
+    :meth:`telegram.Bot.send_poll`.
+    """
+    MAX_OPEN_PERIOD = 600
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.send_poll.open_period` parameter of :meth:`telegram.Bot.send_poll`.
+    Also used in the :paramref:`~telegram.Bot.send_poll.close_date` parameter of
+    :meth:`telegram.Bot.send_poll`.
+    """
 
 
 class PollType(StringEnum):
