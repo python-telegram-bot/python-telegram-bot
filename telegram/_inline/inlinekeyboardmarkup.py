@@ -141,6 +141,3 @@ class InlineKeyboardMarkup(TelegramObject):
         """
         button_grid = [[button] for button in button_column]
         return cls(button_grid, **kwargs)  # type: ignore[arg-type]
-
-    def __hash__(self) -> int:
-        return hash(tuple(tuple(button for button in row) for row in self.inline_keyboard))

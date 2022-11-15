@@ -233,20 +233,6 @@ class InputInvoiceMessageContent(InputMessageContent):
 
         self._freeze()
 
-    def __hash__(self) -> int:
-        # we override this as self.prices is a list and not hashable
-        prices = tuple(self.prices)
-        return hash(
-            (
-                self.title,
-                self.description,
-                self.payload,
-                self.provider_token,
-                self.currency,
-                prices,
-            )
-        )
-
     @classmethod
     def de_json(
         cls, data: Optional[JSONDict], bot: "Bot"

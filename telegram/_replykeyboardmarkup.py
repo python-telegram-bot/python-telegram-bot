@@ -279,13 +279,3 @@ class ReplyKeyboardMarkup(TelegramObject):
             input_field_placeholder=input_field_placeholder,
             **kwargs,  # type: ignore[arg-type]
         )
-
-    def __hash__(self) -> int:
-        return hash(
-            (
-                tuple(tuple(button for button in row) for row in self.keyboard),
-                self.resize_keyboard,
-                self.one_time_keyboard,
-                self.selective,
-            )
-        )

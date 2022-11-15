@@ -400,8 +400,8 @@ class TestBot:
     async def test_equality(self):
         async with make_bot(token=FALLBACKS[0]["token"]) as a, make_bot(
             token=FALLBACKS[0]["token"]
-        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c:
-            d = Update(123456789)
+        ) as b, make_bot(token=FALLBACKS[1]["token"]) as c, Bot(token=FALLBACKS[0]["token"]) as d:
+            e = Update(123456789)
 
             assert a == b
             assert hash(a) == hash(b)
@@ -412,6 +412,9 @@ class TestBot:
 
             assert a != d
             assert hash(a) != hash(d)
+
+            assert a != e
+            assert hash(a) != hash(e)
 
     @pytest.mark.flaky(3, 1)
     async def test_to_dict(self, bot):

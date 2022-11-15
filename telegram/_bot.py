@@ -6785,10 +6785,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         return data
 
     def __eq__(self, other: object) -> bool:
-        return self.bot == other
+        if isinstance(other, self.__class__):
+            return self.bot == other.bot
+        return False
 
     def __hash__(self) -> int:
-        return hash(self.bot)
+        return hash((self.__class__, self.bot))
 
     # camelCase aliases
     getMe = get_me

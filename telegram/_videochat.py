@@ -130,9 +130,6 @@ class VideoChatParticipantsInvited(TelegramObject):
         data["users"] = User.de_list(data.get("users", []), bot)
         return super().de_json(data=data, bot=bot)
 
-    def __hash__(self) -> int:
-        return hash(None) if self.users is None else hash(tuple(self.users))
-
 
 class VideoChatScheduled(TelegramObject):
     """This object represents a service message about a video chat scheduled in the chat.

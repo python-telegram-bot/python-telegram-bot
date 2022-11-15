@@ -195,6 +195,3 @@ class Game(TelegramObject):
             for entity in self.text_entities
             if entity.type in types
         }
-
-    def __hash__(self) -> int:
-        return hash((self.title, self.description, tuple(p for p in self.photo)))
