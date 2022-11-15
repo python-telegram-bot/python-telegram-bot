@@ -2297,7 +2297,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             first_name (:obj:`str`, optional): Contact's first name.
             last_name (:obj:`str`, optional): Contact's last name.
             vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
-                0-2048 bytes.
+                0-:tg-const:`telegram.constants.SendContactLimit.VCARD` bytes.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
