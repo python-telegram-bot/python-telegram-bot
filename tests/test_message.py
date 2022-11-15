@@ -198,6 +198,7 @@ def message(bot):
             ]
         },
         {"web_app_data": WebAppData("some_data", "some_button_text")},
+        {"message_thread_id": 123},
     ],
     ids=[
         "forwarded_user",
@@ -251,6 +252,7 @@ def message(bot):
         "has_protected_content",
         "entities",
         "web_app_data",
+        "message_thread_id",
     ],
 )
 def message_params(bot, request):
@@ -1692,6 +1694,124 @@ class TestMessage:
             assert message._quote(None, None)
         finally:
             message.get_bot()._defaults = None
+
+    async def test_edit_forum_topic(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+                and kwargs["name"] == "New Name"
+                and kwargs["icon_custom_emoji_id"] == "12345"
+            )
+
+        assert check_shortcut_signature(
+            Message.edit_forum_topic, Bot.edit_forum_topic, ["chat_id", "message_thread_id"], []
+        )
+        assert await check_shortcut_call(
+            message.edit_forum_topic,
+            message.get_bot(),
+            "edit_forum_topic",
+            shortcut_kwargs=["chat_id", "message_thread_id"],
+        )
+        assert await check_defaults_handling(message.edit_forum_topic, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "edit_forum_topic", make_assertion)
+        assert await message.edit_forum_topic(name="New Name", icon_custom_emoji_id="12345")
+
+    async def test_close_forum_topic(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+            )
+
+        assert check_shortcut_signature(
+            Message.close_forum_topic, Bot.close_forum_topic, ["chat_id", "message_thread_id"], []
+        )
+        assert await check_shortcut_call(
+            message.close_forum_topic,
+            message.get_bot(),
+            "close_forum_topic",
+            shortcut_kwargs=["chat_id", "message_thread_id"],
+        )
+        assert await check_defaults_handling(message.close_forum_topic, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "close_forum_topic", make_assertion)
+        assert await message.close_forum_topic()
+
+    async def test_reopen_forum_topic(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+            )
+
+        assert check_shortcut_signature(
+            Message.reopen_forum_topic,
+            Bot.reopen_forum_topic,
+            ["chat_id", "message_thread_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.reopen_forum_topic,
+            message.get_bot(),
+            "reopen_forum_topic",
+            shortcut_kwargs=["chat_id", "message_thread_id"],
+        )
+        assert await check_defaults_handling(message.reopen_forum_topic, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "reopen_forum_topic", make_assertion)
+        assert await message.reopen_forum_topic()
+
+    async def test_delete_forum_topic(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+            )
+
+        assert check_shortcut_signature(
+            Message.delete_forum_topic,
+            Bot.delete_forum_topic,
+            ["chat_id", "message_thread_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.delete_forum_topic,
+            message.get_bot(),
+            "delete_forum_topic",
+            shortcut_kwargs=["chat_id", "message_thread_id"],
+        )
+        assert await check_defaults_handling(message.delete_forum_topic, message.get_bot())
+
+        monkeypatch.setattr(message.get_bot(), "delete_forum_topic", make_assertion)
+        assert await message.delete_forum_topic()
+
+    async def test_unpin_all_forum_topic_messages(self, monkeypatch, message):
+        async def make_assertion(*_, **kwargs):
+            return (
+                kwargs["chat_id"] == message.chat_id
+                and kwargs["message_thread_id"] == message.message_thread_id
+            )
+
+        assert check_shortcut_signature(
+            Message.unpin_all_forum_topic_messages,
+            Bot.unpin_all_forum_topic_messages,
+            ["chat_id", "message_thread_id"],
+            [],
+        )
+        assert await check_shortcut_call(
+            message.unpin_all_forum_topic_messages,
+            message.get_bot(),
+            "unpin_all_forum_topic_messages",
+            shortcut_kwargs=["chat_id", "message_thread_id"],
+        )
+        assert await check_defaults_handling(
+            message.unpin_all_forum_topic_messages, message.get_bot()
+        )
+
+        monkeypatch.setattr(message.get_bot(), "unpin_all_forum_topic_messages", make_assertion)
+        assert await message.unpin_all_forum_topic_messages()
 
     def test_equality(self):
         id_ = 1
