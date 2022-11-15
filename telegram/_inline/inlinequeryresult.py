@@ -33,6 +33,9 @@ class InlineQueryResult(TelegramObject):
         All URLs passed in inline query results will be available to end users and therefore must
         be assumed to be *public*.
 
+    Examples:
+        :any:`Inline Bot <examples.inlinebot>`
+
     Args:
         type (:obj:`str`): Type of the result.
         id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
@@ -53,18 +56,3 @@ class InlineQueryResult(TelegramObject):
         self.id = str(id)  # pylint: disable=invalid-name
 
         self._id_attrs = (self.id,)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        # pylint: disable=no-member
-        if (
-            hasattr(self, "caption_entities")
-            and self.caption_entities  # type: ignore[attr-defined]
-        ):
-            data["caption_entities"] = [
-                ce.to_dict() for ce in self.caption_entities  # type: ignore[attr-defined]
-            ]
-
-        return data

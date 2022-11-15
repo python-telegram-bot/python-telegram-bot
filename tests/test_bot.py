@@ -65,7 +65,13 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
-from telegram.constants import ChatAction, InlineQueryLimit, MenuButtonType, ParseMode
+from telegram.constants import (
+    ChatAction,
+    InlineQueryLimit,
+    InlineQueryResultType,
+    MenuButtonType,
+    ParseMode,
+)
 from telegram.error import BadRequest, InvalidToken, NetworkError
 from telegram.ext import ExtBot, InvalidCallbackData
 from telegram.helpers import escape_markdown
@@ -1005,7 +1011,7 @@ class TestBot:
             await bot.send_chat_action(chat_id, "unknown action")
 
     @pytest.mark.asyncio
-    async def test_answer_web_app_query(self, bot, monkeypatch):
+    async def test_answer_web_app_query(self, bot, raw_bot, monkeypatch):
         params = False
 
         # For now just test that our internals pass the correct data
@@ -1014,17 +1020,142 @@ class TestBot:
             nonlocal params
             params = request_data.parameters == {
                 "web_app_query_id": "12345",
-                "result": result.to_dict(),
+                "result": {
+                    "title": "title",
+                    "input_message_content": {
+                        "message_text": "text",
+                    },
+                    "type": InlineQueryResultType.ARTICLE,
+                    "id": "1",
+                },
             }
             web_app_msg = SentWebAppMessage("321").to_dict()
             return web_app_msg
 
-        monkeypatch.setattr(bot.request, "post", make_assertion)
+        # We test different result types more thoroughly for answer_inline_query, so we just
+        # use the one type here
         result = InlineQueryResultArticle("1", "title", InputTextMessageContent("text"))
-        web_app_msg = await bot.answer_web_app_query("12345", result)
+        copied_result = copy.copy(result)
+
+        ext_bot = bot
+        for bot in (ext_bot, raw_bot):
+            # We need to test 1) below both the bot and raw_bot and setting this up with
+            # pytest.parametrize appears to be difficult ...
+            monkeypatch.setattr(bot.request, "post", make_assertion)
+            web_app_msg = await bot.answer_web_app_query("12345", result)
+            assert params, "something went wrong with passing arguments to the request"
+            assert isinstance(web_app_msg, SentWebAppMessage)
+            assert web_app_msg.inline_message_id == "321"
+
+            # 1)
+            # make sure that the results were not edited in-place
+            assert result == copied_result
+            assert (
+                result.input_message_content.parse_mode
+                == copied_result.input_message_content.parse_mode
+            )
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        indirect=True,
+    )
+    @pytest.mark.parametrize(
+        "ilq_result,expected_params",
+        [
+            (
+                InlineQueryResultArticle("1", "title", InputTextMessageContent("text")),
+                {
+                    "web_app_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "parse_mode": "Markdown",
+                            "disable_web_page_preview": True,
+                        },
+                        "type": InlineQueryResultType.ARTICLE,
+                        "id": "1",
+                    },
+                },
+            ),
+            (
+                InlineQueryResultArticle(
+                    "1",
+                    "title",
+                    InputTextMessageContent(
+                        "text", parse_mode="HTML", disable_web_page_preview=False
+                    ),
+                ),
+                {
+                    "web_app_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "parse_mode": "HTML",
+                            "disable_web_page_preview": False,
+                        },
+                        "type": InlineQueryResultType.ARTICLE,
+                        "id": "1",
+                    },
+                },
+            ),
+            (
+                InlineQueryResultArticle(
+                    "1",
+                    "title",
+                    InputTextMessageContent(
+                        "text", parse_mode=None, disable_web_page_preview="False"
+                    ),
+                ),
+                {
+                    "web_app_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "disable_web_page_preview": "False",
+                        },
+                        "type": InlineQueryResultType.ARTICLE,
+                        "id": "1",
+                    },
+                },
+            ),
+        ],
+    )
+    async def test_answer_web_app_query_defaults(
+        self, default_bot, ilq_result, expected_params, monkeypatch
+    ):
+        bot = default_bot
+        params = False
+
+        # For now just test that our internals pass the correct data
+
+        async def make_assertion(url, request_data: RequestData, *args, **kwargs):
+            nonlocal params
+            params = request_data.parameters == expected_params
+            web_app_msg = SentWebAppMessage("321").to_dict()
+            return web_app_msg
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        # We test different result types more thoroughly for answer_inline_query, so we just
+        # use the one type here
+        copied_result = copy.copy(ilq_result)
+
+        web_app_msg = await bot.answer_web_app_query("12345", ilq_result)
         assert params, "something went wrong with passing arguments to the request"
         assert isinstance(web_app_msg, SentWebAppMessage)
         assert web_app_msg.inline_message_id == "321"
+
+        # make sure that the results were not edited in-place
+        assert ilq_result == copied_result
+        assert (
+            ilq_result.input_message_content.parse_mode
+            == copied_result.input_message_content.parse_mode
+        )
 
     # TODO: Needs improvement. We need incoming inline query to test answer.
     async def test_answer_inline_query(self, monkeypatch, bot, raw_bot):
@@ -1714,7 +1845,7 @@ class TestBot:
                         message=Message(
                             1,
                             from_user=User(1, "", False),
-                            date=None,
+                            date=dtm.datetime.utcnow(),
                             chat=Chat(1, ""),
                             text="Webhook",
                         ),
@@ -3027,7 +3158,10 @@ class TestBot:
         )
 
         message = Message(
-            1, None, None, reply_markup=bot.callback_data_cache.process_keyboard(reply_markup)
+            1,
+            dtm.datetime.utcnow(),
+            None,
+            reply_markup=bot.callback_data_cache.process_keyboard(reply_markup),
         )
         # We do to_dict -> de_json to make sure those aren't the same objects
         message.pinned_message = Message.de_json(message.to_dict(), bot)
@@ -3038,7 +3172,7 @@ class TestBot:
                 **{
                     message_type: Message(
                         1,
-                        None,
+                        dtm.datetime.utcnow(),
                         None,
                         pinned_message=message,
                         reply_to_message=Message.de_json(message.to_dict(), bot),
@@ -3105,7 +3239,7 @@ class TestBot:
         reply_markup = bot.callback_data_cache.process_keyboard(reply_markup)
         message = Message(
             1,
-            None,
+            dtm.datetime.utcnow(),
             None,
             reply_markup=reply_markup,
             via_bot=bot.bot if self_sender else User(1, "first", False),

@@ -33,7 +33,8 @@ class ShippingOption(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
-    .. seealso:: `Paymentbot Example <examples.paymentbot.html>`_
+    Examples:
+        :any:`Payment Bot <examples.paymentbot>`
 
     Args:
         id (:obj:`str`): Shipping option identifier.
@@ -64,11 +65,3 @@ class ShippingOption(TelegramObject):
         self.prices = prices
 
         self._id_attrs = (self.id,)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["prices"] = [p.to_dict() for p in self.prices]
-
-        return data

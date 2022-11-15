@@ -62,9 +62,11 @@ class InlineKeyboardButton(TelegramObject):
 
         * After Bot API 6.1, only ``HTTPS`` links will be allowed in :paramref:`login_url`.
 
-    .. seealso:: `Inline Keyboard Example 1 <examples.inlinekeyboard.html>`_,
-        `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_,
-        :class:`telegram.InlineKeyboardMarkup`
+    Examples:
+        * :any:`Inline Keyboard 1 <examples.inlinekeyboard>`
+        * :any:`Inline Keyboard 2 <examples.inlinekeyboard2>`
+
+    .. seealso:: :class:`telegram.InlineKeyboardMarkup`
 
     .. versionchanged:: 20.0
        :attr:`web_app` is considered as well when comparing objects of this type in terms of
@@ -89,6 +91,9 @@ class InlineKeyboardButton(TelegramObject):
 
             Tip:
                 The value entered here will be available in :attr:`telegram.CallbackQuery.data`.
+
+            .. seealso:: `Arbitrary callback_data <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Arbitrary-callback_data>`_
 
         web_app (:obj:`telegram.WebAppInfo`, optional): Description of the `Web App
             <https://core.telegram.org/bots/webapps>`_  that will be launched when the user presses

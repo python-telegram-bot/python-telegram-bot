@@ -2,6 +2,7 @@ telegram.ext package
 ====================
 
 .. toctree::
+    :titlesonly:
 
     telegram.ext.application
     telegram.ext.applicationbuilder

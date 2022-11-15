@@ -36,8 +36,9 @@ class InlineKeyboardMarkup(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their size of :attr:`inline_keyboard` and all the buttons are equal.
 
-    .. seealso:: `Inline Keyboard Example 1 <examples.inlinekeyboard.html>`_,
-        `Inline Keyboard Example 2 <examples.inlinekeyboard2.html>`_
+    Examples:
+        * :any:`Inline Keyboard 1 <examples.inlinekeyboard>`
+        * :any:`Inline Keyboard 2 <examples.inlinekeyboard2>`
 
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
@@ -67,16 +68,6 @@ class InlineKeyboardMarkup(TelegramObject):
         self.inline_keyboard = inline_keyboard
 
         self._id_attrs = (self.inline_keyboard,)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["inline_keyboard"] = []
-        for inline_keyboard in self.inline_keyboard:
-            data["inline_keyboard"].append([x.to_dict() for x in inline_keyboard])
-
-        return data
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["InlineKeyboardMarkup"]:

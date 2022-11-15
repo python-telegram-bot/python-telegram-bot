@@ -724,6 +724,7 @@ class CallbackQuery(TelegramObject):
         allow_sending_without_reply: DVInput[bool] = DEFAULT_NONE,
         reply_markup: ReplyMarkup = None,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
+        message_thread_id: int = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -761,6 +762,7 @@ class CallbackQuery(TelegramObject):
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     MAX_ANSWER_TEXT_LENGTH: ClassVar[

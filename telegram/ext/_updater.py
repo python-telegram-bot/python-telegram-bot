@@ -65,6 +65,11 @@ class Updater(AbstractAsyncContextManager):
         finally:
             await updater.shutdown()
 
+    .. seealso:: `Architecture Overview <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
+        `Builder Pattern <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Builder-Pattern>`_
+
     .. versionchanged:: 20.0
 
         * Removed argument and attribute ``user_sig_handler``
@@ -391,6 +396,9 @@ class Updater(AbstractAsyncContextManager):
             .. code-block:: bash
 
                pip install python-telegram-bot[webhooks]
+
+        .. seealso:: `Webhooks <https://github.com/\
+            python-telegram-bot/python-telegram-bot/wiki/Webhooks>`_
 
         .. versionchanged:: 13.4
             :meth:`start_webhook` now *always* calls :meth:`telegram.Bot.set_webhook`, so pass

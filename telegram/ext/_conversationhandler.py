@@ -185,10 +185,11 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         conversation. For an example on nested :class:`ConversationHandler` s, see
         :any:`examples.nestedconversationbot`.
 
-    .. seealso:: `Conversation Example <examples.conversationbot.html>`_,
-        `Conversation Example 2 <examples.conversationbot2.html>`_,
-        `Nested Conversation Example <examples.nestedconversationbot.html>`_,
-        `Persistent Conversation Example <examples.persistentconversationbot.html>`_
+    Examples:
+        * :any:`Conversation Bot <examples.conversationbot>`
+        * :any:`Conversation Bot 2 <examples.conversationbot2>`
+        * :any:`Nested Conversation Bot <examples.nestedconversationbot>`
+        * :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
 
     Args:
         entry_points (List[:class:`telegram.ext.BaseHandler`]): A list of :obj:`BaseHandler`
@@ -247,6 +248,9 @@ class ConversationHandler(BaseHandler[Update, CCT]):
             1. :attr:`telegram.ext.BaseHandler.block` (if set)
             2. the value passed to this parameter (if any)
             3. :attr:`telegram.ext.Defaults.block` (if defaults are used)
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
 
             .. versionchanged:: 20.0
                 No longer overrides the handlers settings. Resolution order was changed.
