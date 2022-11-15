@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -150,11 +150,3 @@ class ChatInviteLink(TelegramObject):
         data["expire_date"] = from_timestamp(data.get("expire_date", None))
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["expire_date"] = to_timestamp(self.expire_date)
-
-        return data

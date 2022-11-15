@@ -228,14 +228,6 @@ class InputInvoiceMessageContent(InputMessageContent):
             )
         )
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["prices"] = [price.to_dict() for price in self.prices]
-
-        return data
-
     @classmethod
     def de_json(
         cls, data: Optional[JSONDict], bot: "Bot"

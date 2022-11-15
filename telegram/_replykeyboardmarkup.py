@@ -32,9 +32,12 @@ class ReplyKeyboardMarkup(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their size of :attr:`keyboard` and all the buttons are equal.
 
-    Example:
-        A user requests to change the bot's language, bot replies to the request with a keyboard
-        to select the new language. Other users in the group don't see the keyboard.
+    Examples:
+        * Example usage: A user requests to change the bot's language, bot replies to the request
+          with a keyboard to select the new language. Other users in the group don't see
+          the keyboard.
+        * :any:`Conversation Bot <examples.conversationbot>`
+        * :any:`Conversation Bot 2 <examples.conversationbot2>`
 
     Args:
         keyboard (List[List[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of button rows,
@@ -118,15 +121,6 @@ class ReplyKeyboardMarkup(TelegramObject):
         self.input_field_placeholder = input_field_placeholder
 
         self._id_attrs = (self.keyboard,)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["keyboard"] = []
-        for row in self.keyboard:
-            data["keyboard"].append([button.to_dict() for button in row])
-        return data
 
     @classmethod
     def from_button(

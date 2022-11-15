@@ -161,12 +161,6 @@ class MenuButtonWebApp(MenuButton):
 
         return super().de_json(data=data, bot=bot)  # type: ignore[return-value]
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-        data["web_app"] = self.web_app.to_dict()
-        return data
-
 
 class MenuButtonDefault(MenuButton):
     """Describes that no specific value for the menu button was set.

@@ -80,7 +80,11 @@ def message(bot):
             "forward_from_message_id": 101,
             "forward_date": datetime.utcnow(),
         },
-        {"reply_to_message": Message(50, None, None, None)},
+        {
+            "reply_to_message": Message(
+                50, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+            )
+        },
         {"edit_date": datetime.utcnow()},
         {
             "text": "a text message",
@@ -124,7 +128,11 @@ def message(bot):
         {"message_auto_delete_timer_changed": MessageAutoDeleteTimerChanged(42)},
         {"migrate_to_chat_id": -12345},
         {"migrate_from_chat_id": -54321},
-        {"pinned_message": Message(7, None, None, None)},
+        {
+            "pinned_message": Message(
+                7, datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+            )
+        },
         {"invoice": Invoice("my invoice", "invoice", "start", "EUR", 243)},
         {
             "successful_payment": SuccessfulPayment(

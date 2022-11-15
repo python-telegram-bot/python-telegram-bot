@@ -28,7 +28,8 @@ class WebAppData(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`data` and :attr:`button_text` are equal.
 
-    .. seealso:: `Webappbot Example <examples.webappbot.html>`_
+    Examples:
+        :any:`Webapp Bot <examples.webappbot>`
 
     .. versionadded:: 20.0
 
@@ -45,8 +46,7 @@ class WebAppData(TelegramObject):
             button, from which the Web App was opened.
 
             Warning:
-                Be aware that a bad client can send
-            arbitrary data in this field.
+                Be aware that a bad client can send arbitrary data in this field.
     """
 
     __slots__ = ("data", "button_text")
