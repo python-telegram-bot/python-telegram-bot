@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, List, Optional
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.datetime import from_timestamp, to_timestamp
+from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -121,14 +121,6 @@ class VideoChatParticipantsInvited(TelegramObject):
         data["users"] = User.de_list(data.get("users", []), bot)
         return super().de_json(data=data, bot=bot)
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        if self.users is not None:
-            data["users"] = [u.to_dict() for u in self.users]
-        return data
-
     def __hash__(self) -> int:
         return hash(None) if self.users is None else hash(tuple(self.users))
 
@@ -175,12 +167,3 @@ class VideoChatScheduled(TelegramObject):
         data["start_date"] = from_timestamp(data["start_date"])
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        # Required
-        data["start_date"] = to_timestamp(self.start_date)
-
-        return data

@@ -223,6 +223,9 @@ class TestChatMemberTypes:
         assert chat_member_dict["status"] == chat_member_type.status
         assert chat_member_dict["user"] == chat_member_type.user.to_dict()
 
+        for slot in chat_member_type.__slots__:  # additional verification for the optional args
+            assert getattr(chat_member_type, slot) == chat_member_dict[slot]
+
     def test_equality(self, chat_member_type):
         a = ChatMember(status="status", user=CMDefaults.user)
         b = ChatMember(status="status", user=CMDefaults.user)
