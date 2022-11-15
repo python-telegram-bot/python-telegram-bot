@@ -72,6 +72,8 @@ def escape_markdown(text: str, version: int = 1, entity_type: str = None) -> str
 
 def mention_html(user_id: Union[int, str], name: str) -> str:
     """
+    Helper function to create a user mention as HTML tag.
+
     Args:
         user_id (:obj:`int`): The user's id which you want to mention.
         name (:obj:`str`): The name the mention is showing.
@@ -84,6 +86,8 @@ def mention_html(user_id: Union[int, str], name: str) -> str:
 
 def mention_markdown(user_id: Union[int, str], name: str, version: int = 1) -> str:
     """
+    Helper function to create a user mention in Markdown syntax.
+
     Args:
         user_id (:obj:`int`): The user's id which you want to mention.
         name (:obj:`str`): The name the mention is showing.
@@ -110,7 +114,7 @@ def effective_message_type(entity: Union["Message", "Update"]) -> Optional[str]:
 
     Returns:
         :obj:`str` | :obj:`None`: One of :class:`telegram.constants.MessageType` if the entity
-            contains a message that matches one of those types. :obj:`None` otherwise.
+        contains a message that matches one of those types. :obj:`None` otherwise.
 
     """
     # Importing on file-level yields cyclic Import Errors
@@ -146,19 +150,18 @@ def create_deep_linked_url(bot_username: str, payload: str = None, group: bool =
         ``CommandHandler("start", callback, filters=filters.Regex('payload'))``
 
     Examples:
-        ``create_deep_linked_url(bot.get_me().username, "some-params")``
-
-    .. seealso:: `Deeplinking Example <examples.deeplinking.html>`_
+        * ``create_deep_linked_url(bot.get_me().username, "some-params")``
+        * :any:`Deep Linking <examples.deeplinking>`
 
     Args:
-        bot_username (:obj:`str`): The username to link to
-        payload (:obj:`str`, optional): Parameters to encode in the created URL
+        bot_username (:obj:`str`): The username to link to.
+        payload (:obj:`str`, optional): Parameters to encode in the created URL.
         group (:obj:`bool`, optional): If :obj:`True` the user is prompted to select a group to
             add the bot to. If :obj:`False`, opens a one-on-one conversation with the bot.
             Defaults to :obj:`False`.
 
     Returns:
-        :obj:`str`: An URL to start the bot with specific parameters
+        :obj:`str`: An URL to start the bot with specific parameters.
     """
     if bot_username is None or len(bot_username) <= 3:
         raise ValueError("You must provide a valid bot_username.")

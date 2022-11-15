@@ -33,7 +33,8 @@ class InputTextMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_text` is equal.
 
-    .. seealso:: `Inline Example <examples.inlinebot.html>`_
+    Examples:
+        :any:`Inline Bot <examples.inlinebot>`
 
     Args:
         message_text (:obj:`str`): Text of the message to be sent,

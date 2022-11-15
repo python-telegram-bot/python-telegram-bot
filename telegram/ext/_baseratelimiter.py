@@ -37,6 +37,11 @@ class BaseRateLimiter(ABC, Generic[RLARGS]):
     Hint:
         Requests to :meth:`~telegram.Bot.get_updates` are never rate limited.
 
+    .. seealso:: `Architecture Overview <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
+        `Avoiding Flood Limits <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Avoiding-flood-limits>`_
+
     .. versionadded:: 20.0
     """
 

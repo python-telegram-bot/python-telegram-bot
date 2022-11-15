@@ -33,7 +33,8 @@ class ShippingOption(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`id` is equal.
 
-    .. seealso:: `Paymentbot Example <examples.paymentbot.html>`_
+    Examples:
+        :any:`Payment Bot <examples.paymentbot>`
 
     Args:
         id (:obj:`str`): Shipping option identifier.

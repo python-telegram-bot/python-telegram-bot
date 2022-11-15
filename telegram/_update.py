@@ -46,6 +46,9 @@ class Update(TelegramObject):
     Note:
         At most one of the optional parameters can be present in any given update.
 
+    .. seealso:: `Your First Bot <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_
+
     Args:
         update_id (:obj:`int`): The update's unique identifier. Update identifiers start from a
             certain positive number and increase sequentially. This ID becomes especially handy if
@@ -104,6 +107,9 @@ class Update(TelegramObject):
         chosen_inline_result (:class:`telegram.ChosenInlineResult`): Optional. The result of an
             inline query that was chosen by a user.
         callback_query (:class:`telegram.CallbackQuery`): Optional. New incoming callback query.
+
+            Examples:
+                :any:`Arbitrary Callback Data Bot <examples.arbitrarycallbackdatabot>`
         shipping_query (:class:`telegram.ShippingQuery`): Optional. New incoming shipping query.
         pre_checkout_query (:class:`telegram.PreCheckoutQuery`): Optional. New incoming
             pre-checkout query.

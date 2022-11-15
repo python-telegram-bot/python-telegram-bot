@@ -44,7 +44,8 @@ class ChatMember(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`user` and :attr:`status` are equal.
 
-    .. seealso:: `Chat Member Example <examples.chatmemberbot.html>`_
+    Examples:
+         :any:`Chat Member Bot <examples.chatmemberbot>`
 
     .. versionchanged:: 20.0
 

@@ -62,14 +62,17 @@ class WebhookInfo(TelegramObject):
 
             .. versionadded:: 20.0
     Attributes:
-        url (:obj:`str`): Webhook URL.
-        has_custom_certificate (:obj:`bool`): If a custom certificate was provided for webhook.
+        url (:obj:`str`): Webhook URL, may be empty if webhook is not set up.
+        has_custom_certificate (:obj:`bool`): :obj:`True`, if a custom certificate was provided for
+            webhook certificate checks.
         pending_update_count (:obj:`int`): Number of updates awaiting delivery.
         ip_address (:obj:`str`): Optional. Currently used webhook IP address.
-        last_error_date (:obj:`int`): Optional. Unix time for the most recent error that happened.
-        last_error_message (:obj:`str`): Optional. Error message in human-readable format.
+        last_error_date (:obj:`int`): Optional. Unix time for the most recent error that happened
+            when trying to deliver an update via webhook.
+        last_error_message (:obj:`str`): Optional. Error message in human-readable format for the
+            most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
-            connections.
+            connections to the webhook for update delivery.
         allowed_updates (List[:obj:`str`]): Optional. A list of update types the bot is subscribed
             to. Defaults to all update types, except :attr:`telegram.Update.chat_member`.
         last_synchronization_error_date (:obj:`int`): Optional. Unix time of the most recent error

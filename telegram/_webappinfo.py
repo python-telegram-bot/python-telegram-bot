@@ -29,7 +29,8 @@ class WebAppInfo(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`url` are equal.
 
-    .. seealso:: `Webappbot Example <examples.webappbot.html>`_
+    Examples:
+        :any:`Webapp Bot <examples.webappbot>`
 
     .. versionadded:: 20.0
 
