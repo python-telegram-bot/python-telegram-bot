@@ -290,6 +290,10 @@
     :align: left
     :widths: 1 4
 
+    * - :attr:`~telegram.Bot.base_file_url`
+      - Telegram Bot API file URL
+    * - :attr:`~telegram.Bot.base_url`
+      - Telegram Bot API service URL
     * - :attr:`~telegram.Bot.bot`
       - The user instance of the bot as returned by :meth:`~telegram.Bot.get_me`
     * - :attr:`~telegram.Bot.can_join_groups`
@@ -310,8 +314,12 @@
       - The username of the bot, without leading ``@``
     * - :attr:`~telegram.Bot.link`
       - The t.me link of the bot
+    * - :attr:`~telegram.Bot.private_key`
+      - Deserialized private key for decryption of telegram passport data
     * - :attr:`~telegram.Bot.supports_inline_queries`
       - Whether the bot supports inline queries
+    * - :attr:`~telegram.Bot.token`
+      - Bot's unique authentication token
 
 .. raw:: html
 

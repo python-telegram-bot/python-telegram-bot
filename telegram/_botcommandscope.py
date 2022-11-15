@@ -188,12 +188,11 @@ class BotCommandScopeChat(BotCommandScope):
     .. versionadded:: 13.7
 
     Args:
-        chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
-            target supergroup (in the format ``@supergroupusername``)
+        chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
+
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT`.
-        chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
-            target supergroup (in the format ``@supergroupusername``)
+        chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
     """
 
     __slots__ = ("chat_id",)
@@ -219,12 +218,10 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
     .. versionadded:: 13.7
 
     Args:
-        chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
-            target supergroup (in the format ``@supergroupusername``)
+        chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT_ADMINISTRATORS`.
-        chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
-            target supergroup (in the format ``@supergroupusername``)
+        chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
     """
 
     __slots__ = ("chat_id",)
@@ -250,14 +247,12 @@ class BotCommandScopeChatMember(BotCommandScope):
     .. versionadded:: 13.7
 
     Args:
-        chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
-            target supergroup (in the format ``@supergroupusername``)
+        chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
         user_id (:obj:`int`): Unique identifier of the target user.
 
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT_MEMBER`.
-        chat_id (:obj:`str` | :obj:`int`): Unique identifier for the target chat or username of the
-            target supergroup (in the format ``@supergroupusername``)
+        chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
         user_id (:obj:`int`): Unique identifier of the target user.
     """
 

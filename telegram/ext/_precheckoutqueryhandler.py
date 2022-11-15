@@ -31,7 +31,8 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. seealso:: `Paymentbot Example <examples.paymentbot.html>`_
+    Examples:
+        :any:`Payment Bot <examples.paymentbot>`
 
     Args:
         callback (:term:`coroutine function`): The callback function for this handler. Will be
@@ -45,6 +46,9 @@ class PreCheckoutQueryHandler(BaseHandler[Update, CCT]):
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.

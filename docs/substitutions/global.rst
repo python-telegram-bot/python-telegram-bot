@@ -22,6 +22,22 @@
 
 .. |toapikwargsattr| replace:: Optional. Arbitrary keyword arguments. Used to store data for which there are no dedicated attributes. |toapikwargsbase|
 
+.. |chat_id_channel| replace:: Unique identifier for the target chat or username of the target channel (in the format ``@channelusername``).
+
+.. |chat_id_group| replace:: Unique identifier for the target chat or username of the target supergroup (in the format ``@supergroupusername``).
+
+.. |parse_mode| replace:: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message. See the constants in :class:`telegram.constants.ParseMode` for the available modes.
+
+.. |allow_sending_without_reply| replace:: Pass :obj:`True`, if the message should be sent even if the specified replied-to message is not found.
+
+.. |caption_entities| replace:: List of special entities that appear in the caption, which can be specified instead of ``parse_mode``.
+
+.. |protect_content| replace:: Protects the contents of the sent message from forwarding and saving.
+
+.. |disable_notification| replace:: Sends the message silently. Users will receive a notification with no sound.
+
+.. |reply_to_msg_id| replace:: If the message is a reply, ID of the original message.
+
 .. |squenceclassargs| replace:: Accepts any :class:`collections.abc.Sequence` as input instead of just a list. The input is converted to a tuple.
 
 .. |tupleclassattrs| replace:: This attribute is now an immutable tuple.

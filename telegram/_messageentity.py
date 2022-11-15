@@ -63,13 +63,26 @@ class MessageEntity(TelegramObject):
 
             .. versionadded:: 20.0
     Attributes:
-        type (:obj:`str`): Type of the entity.
+        type (:obj:`str`): Type of the entity. Can be :attr:`MENTION` (@username),
+            :attr:`HASHTAG`, :attr:`BOT_COMMAND`,
+            :attr:`URL`, :attr:`EMAIL`, :attr:`PHONE_NUMBER`, :attr:`BOLD` (bold text),
+            :attr:`ITALIC` (italic text), :attr:`STRIKETHROUGH`, :attr:`SPOILER` (spoiler message),
+            :attr:`CODE` (monowidth string), :attr:`PRE` (monowidth block), :attr:`TEXT_LINK` (for
+            clickable text URLs), :attr:`TEXT_MENTION` (for users without usernames),
+            :attr:`CUSTOM_EMOJI` (for inline custom emoji stickers).
+
+            .. versionadded:: 20.0
+                Added inline custom emoji
         offset (:obj:`int`): Offset in UTF-16 code units to the start of the entity.
         length (:obj:`int`): Length of the entity in UTF-16 code units.
-        url (:obj:`str`): Optional. Url that will be opened after user taps on the text.
+        url (:obj:`str`): Optional. For :attr:`TEXT_LINK` only, url that will be opened after
+            user taps on the text.
         user (:class:`telegram.User`): Optional. The mentioned user.
-        language (:obj:`str`): Optional. Programming language of the entity text.
-        custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji.
+        language (:obj:`str`): Optional. For :attr:`PRE` only, The programming language of
+            the entity text.
+        custom_emoji_id (:obj:`str`): Optional. For :attr:`CUSTOM_EMOJI` only, unique identifier
+            of the custom emoji. Use :meth:`telegram.Bot.get_custom_emoji_stickers` to get full
+            information about the sticker.
 
             .. versionadded:: 20.0
 
