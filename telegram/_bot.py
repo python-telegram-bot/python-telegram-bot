@@ -6893,22 +6893,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         .. versionadded:: 20.0
 
-        Keyword Args:
-            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
-
         Returns:
             List[:class:`telegram.Sticker`]
 
@@ -6951,8 +6935,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.0
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@supergroupusername``).
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             name (:obj:`str`): New topic name,
                 :tg-const:`telegram.constants.TopicLimit.MIN_NAME_LENGTH`-
                 :tg-const:`telegram.constants.TopicLimit.MAX_NAME_LENGTH` characters.
@@ -6966,22 +6949,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
                 the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
                 allowed custom emoji identifiers.
-
-        Keyword Args:
-            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
 
         Returns:
             :obj:`bool`: On success, :class:`telegram.ForumTopic` is returned.
@@ -7032,32 +6999,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.0
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@supergroupusername``).
-            message_thread_id (:obj:`int`): Unique identifier for the target message thread of
-                the forum topic.
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
             name (:obj:`str`): New topic name,
                 :tg-const:`telegram.constants.TopicLimit.MIN_NAME_LENGTH`-
                 :tg-const:`telegram.constants.TopicLimit.MAX_NAME_LENGTH` characters.
             icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
                 the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
                 allowed custom emoji identifiers.
-
-        Keyword Args:
-            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -7106,26 +7055,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.0
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@supergroupusername``).
-            message_thread_id (:obj:`int`): Unique identifier for the target message thread of
-                the forum topic.
-
-        Keyword Args:
-            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -7172,26 +7103,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.0
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@supergroupusername``).
-            message_thread_id (:obj:`int`): Unique identifier for the target message thread of
-                the forum topic.
-
-        Keyword Args:
-            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -7238,26 +7151,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.0
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@supergroupusername``).
-            message_thread_id (:obj:`int`): Unique identifier for the target message thread of
-                the forum topic.
-
-        Keyword Args:
-            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -7304,26 +7199,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         .. versionadded:: 20.0
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`): Unique identifier for the target chat or username
-                of the target channel (in the format ``@supergroupusername``).
-            message_thread_id (:obj:`int`): Unique identifier for the target message thread of
-                the forum topic.
-
-        Keyword Args:
-            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
-                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
-                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
-            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
-                Telegram API.
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
