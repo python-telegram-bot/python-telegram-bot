@@ -60,6 +60,9 @@ class StringRegexHandler(BaseHandler[str, CCT]):
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
 
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
+
     Attributes:
         pattern (:obj:`str` | :func:`re.Pattern <re.compile>`): The regex pattern.
         callback (:term:`coroutine function`): The callback function for this handler.

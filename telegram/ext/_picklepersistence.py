@@ -130,6 +130,12 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         :attr:`~BasePersistence.bot` will be replaced by a placeholder before pickling and
         :attr:`~BasePersistence.bot` will be inserted back when loading the data.
 
+    Examples:
+        :any:`Persistent Conversation Bot <examples.persistentconversationbot>`
+
+    .. seealso:: `Making Your Bot Persistent <https://github.com/\
+        python-telegram-bot/python-telegram-bot/wiki/Making-your-bot-persistent>`_
+
     .. versionchanged:: 20.0
 
         * The parameters and attributes ``store_*_data`` were replaced by :attr:`store_data`.

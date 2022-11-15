@@ -35,7 +35,8 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. seealso:: `Chat Member Example <examples.chatmemberbot.html>`_
+    Examples:
+        :any:`Chat Member Bot <examples.chatmemberbot>`
 
     .. versionadded:: 13.4
 
@@ -55,6 +56,9 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         block (:obj:`bool`, optional): Determines whether the return value of the callback should
             be awaited before processing the next handler in
             :meth:`telegram.ext.Application.process_update`. Defaults to :obj:`True`.
+
+            .. seealso:: `Concurrency <https://github.com/\
+                python-telegram-bot/python-telegram-bot/wiki/Concurrency>`_
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.

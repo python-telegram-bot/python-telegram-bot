@@ -238,9 +238,9 @@ class TestTelegramObject:
         with pytest.raises(RuntimeError):
             unpickled.get_bot()  # There should be no bot when we pickle TGObjects
 
-        assert unpickled.chat == chat
+        assert unpickled.chat == chat, f"{unpickled.chat._id_attrs} != {chat._id_attrs}"
         assert unpickled.from_user == user
-        assert unpickled.date == date
+        assert unpickled.date == date, f"{unpickled.date} != {date}"
         assert unpickled.photo[0] == photo
 
     def test_pickle_apply_api_kwargs(self, bot):
