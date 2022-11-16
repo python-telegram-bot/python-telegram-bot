@@ -6916,8 +6916,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[str, int],
         name: str,
-        icon_color: int,  # TODO optional
-        icon_custom_emoji_id: str,  # TODO optional
+        icon_color: int = None,
+        icon_custom_emoji_id: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -6930,8 +6930,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         an administrator in the chat for this to work and must have
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
-        .. seealso:: :meth:`telegram.Message.create_forum_topic`,
-            :meth:`telegram.Chat.create_forum_topic`,
+        .. seealso:: :meth:`telegram.Chat.create_forum_topic`,
 
         .. versionadded:: 20.0
 
@@ -6940,16 +6939,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             name (:obj:`str`): New topic name,
                 :tg-const:`telegram.constants.TopicLimit.MIN_NAME_LENGTH`-
                 :tg-const:`telegram.constants.TopicLimit.MAX_NAME_LENGTH` characters.
-            icon_color (:obj:`int`): Color of the topic icon in RGB format. Currently,
+            icon_color (:obj:`int`, optional): Color of the topic icon in RGB format. Currently,
                 must be one of :attr:`telegram.constants.ForumIconColor.BLUE`,
                 :attr:`telegram.constants.ForumIconColor.YELLOW`,
                 :attr:`telegram.constants.ForumIconColor.PURPLE`,
                 :attr:`telegram.constants.ForumIconColor.GREEN`,
                 :attr:`telegram.constants.ForumIconColor.PINK`, or
                 :attr:`telegram.constants.ForumIconColor.RED`.
-            icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
-                the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
-                allowed custom emoji identifiers.
+            icon_custom_emoji_id (:obj:`str`, optional): New unique identifier of the custom emoji
+                shown as the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
+                to get all allowed custom emoji identifiers.
 
         Returns:
             :class:`telegram.ForumTopic`
