@@ -28,17 +28,18 @@ TEST_TOPIC_EMOJI_ID = "some_id"
 
 @pytest.fixture
 async def create_and_delete_topic(bot, forum_group_id):
-    # TODO rework with methods and attributes instead of dict keys
-    result = await bot._post(
-        "createForumTopic",
-        {"chat_id": forum_group_id, "name": TEST_TOPIC_NAME},
+    result = await bot.create_forum_topic(
+        chat_id=forum_group_id,
+        name=TEST_TOPIC_NAME,
+        icon_color=TEST_TOPIC_ICON_COLOR,
+        icon_custom_emoji_id="foo",  # TODO maybe remove when it becomes optional as it should be
     )
 
+    assert isinstance(result, ForumTopic)
     yield result
 
-    result = await bot._post(
-        "deleteForumTopic",
-        {"chat_id": forum_group_id, "message_thread_id": result["message_thread_id"]},
+    result = await bot.delete_forum_topic(
+        chat_id=forum_group_id, message_thread_id=result.message_thread_id
     )
     assert result is True, "Topic was not deleted"
 
