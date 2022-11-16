@@ -26,11 +26,22 @@ TEST_TOPIC_NAME = "Sad bot true: real stories"
 TEST_TOPIC_EMOJI_ID = "some_id"
 
 
-@pytest.fixture
-async def create_and_delete_topic(bot, forum_group_id):
-    result = await bot.create_forum_topic(chat_id=forum_group_id, name=TEST_TOPIC_NAME)
+@pytest.fixture(scope="module")
+async def emoji_id(bot):
+    emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
+    first_sticker = emoji_sticker_list[0]
+    return first_sticker.custom_emoji_id
 
-    assert isinstance(result, ForumTopic)
+
+@pytest.fixture
+async def create_and_delete_topic(bot, forum_group_id, emoji_id):
+    result = await bot.create_forum_topic(
+        chat_id=forum_group_id,
+        name=TEST_TOPIC_NAME,
+        icon_color=TEST_TOPIC_ICON_COLOR,
+        icon_custom_emoji_id=emoji_id,
+    )
+
     yield result
 
     result = await bot.delete_forum_topic(
@@ -40,7 +51,7 @@ async def create_and_delete_topic(bot, forum_group_id):
 
 
 @pytest.fixture
-def topic(forum_group_id):
+def topic(forum_group_id, emoji_id):
     return ForumTopic(
         message_thread_id=forum_group_id,
         name=TEST_TOPIC_NAME,
@@ -127,6 +138,29 @@ class TestForumTopic:
         assert a != e
         assert hash(a) != hash(e)
 
+    @pytest.mark.flaky(3, 1)
+    async def test_create_forum_topic(self, create_and_delete_topic):
+        result = create_and_delete_topic
+        assert isinstance(result, ForumTopic)
+        assert result.name == TEST_TOPIC_NAME
+        assert result.message_thread_id
+        assert isinstance(result.icon_color, int)
+        assert isinstance(result.icon_custom_emoji_id, str)
+
+    async def test_create_forum_topic_with_only_required_args(self, bot, forum_group_id):
+        result = await bot.create_forum_topic(chat_id=forum_group_id, name=TEST_TOPIC_NAME)
+        assert isinstance(result, ForumTopic)
+        assert result.name == TEST_TOPIC_NAME
+        assert result.message_thread_id
+        assert isinstance(result.icon_color, int)  # color is still there though it was not passed
+        assert result.icon_custom_emoji_id is None
+
+        result = await bot.delete_forum_topic(
+            chat_id=forum_group_id, message_thread_id=result.message_thread_id
+        )
+        assert result is True, "Topic was not deleted"
+
+    @pytest.mark.flaky(3, 1)
     async def test_get_forum_topic_icon_stickers(self, bot):
         emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
         first_sticker = emoji_sticker_list[0]
