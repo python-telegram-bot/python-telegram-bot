@@ -128,30 +128,30 @@ class TestForumTopic:
         assert hash(a) != hash(e)
 
     async def test_get_forum_topic_icon_stickers(self, bot):
-        # TODO this fails
-        # we expect the first to stay as it is. This might change in the future.
-        # If we have to fix this test too often maybe just checking it is set to "something"
-        # is enough.
         emoji_sticker_list = await bot.get_forum_topic_icon_stickers()
-        print(emoji_sticker_list[0].emoji)
-        assert emoji_sticker_list[0].emoji == "📰"
-        assert emoji_sticker_list[0].height == 512
-        assert emoji_sticker_list[0].width == 512
-        assert emoji_sticker_list[0].is_animated
-        assert not emoji_sticker_list[0].is_video
-        assert emoji_sticker_list[0].set_name == "Topics"
-        assert emoji_sticker_list[0].type == Sticker.CUSTOM_EMOJI
-        assert emoji_sticker_list[0].custom_emoji_id == "5420143492263320958"
-        assert emoji_sticker_list[0].thumb.width == 128
-        assert emoji_sticker_list[0].thumb.height == 128
-        assert emoji_sticker_list[0].thumb.file_size == 4036
-        assert emoji_sticker_list[0].thumb.file_unique_id == "AQADfh0AAso3OEty"
-        assert emoji_sticker_list[0].file_size == 57126
-        assert emoji_sticker_list[0].file_unique_id == "AgADfh0AAso3OEs"
+        first_sticker = emoji_sticker_list[0]
+
+        assert first_sticker.emoji == "📰"
+        assert first_sticker.height == 512
+        assert first_sticker.width == 512
+        assert first_sticker.is_animated
+        assert not first_sticker.is_video
+        assert first_sticker.set_name == "Topics"
+        assert first_sticker.type == Sticker.CUSTOM_EMOJI
+        assert first_sticker.thumb.width == 128
+        assert first_sticker.thumb.height == 128
+
+        # The following data of first item returned has changed in the past already,
+        # so check sizes loosely and ID's only by length of string
+        assert first_sticker.thumb.file_size in range(2000, 7000)
+        assert first_sticker.file_size in range(20000, 70000)
+        assert len(first_sticker.custom_emoji_id) == 19
+        assert len(first_sticker.thumb.file_unique_id) == 16
+        assert len(first_sticker.file_unique_id) == 15
 
     # we sadly do not have access to a test group right now so we only test params right now
     async def test_edit_forum_topic_all_params(self, monkeypatch, bot, chat_id):
-        # TODO this fails
+        # TODO this no longer fails but still needs reworking?
         async def make_assertion(_, data, *args, **kwargs):
             assert data["chat_id"] == chat_id
             assert data["message_thread_id"] == 1234
