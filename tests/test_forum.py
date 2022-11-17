@@ -22,8 +22,6 @@ from telegram import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopic
 
 TEST_TOPIC_ICON_COLOR = 0x6FB9F0
 TEST_TOPIC_NAME = "Sad bot true: real stories"
-# TODO replace with something meaningful when getForumTopicIconStickers is implemented?
-TEST_TOPIC_EMOJI_ID = "some_id"
 
 
 @pytest.fixture(scope="module")
@@ -34,7 +32,17 @@ async def emoji_id(bot):
 
 
 @pytest.fixture
-async def create_and_delete_topic(bot, forum_group_id, emoji_id):
+async def forum_topic_object(forum_group_id, emoji_id):
+    return ForumTopic(
+        message_thread_id=forum_group_id,
+        name=TEST_TOPIC_NAME,
+        icon_color=TEST_TOPIC_ICON_COLOR,
+        icon_custom_emoji_id=emoji_id,
+    )
+
+
+@pytest.fixture
+async def real_topic(bot, emoji_id, forum_group_id):
     result = await bot.create_forum_topic(
         chat_id=forum_group_id,
         name=TEST_TOPIC_NAME,
@@ -50,36 +58,28 @@ async def create_and_delete_topic(bot, forum_group_id, emoji_id):
     assert result is True, "Topic was not deleted"
 
 
-@pytest.fixture
-def topic(forum_group_id, emoji_id):
-    return ForumTopic(
-        message_thread_id=forum_group_id,
-        name=TEST_TOPIC_NAME,
-        icon_color=TEST_TOPIC_ICON_COLOR,
-        icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
-    )
-
-
 class TestForumTopic:
-    def test_slot_behaviour(self, mro_slots, topic):
-        for attr in topic.__slots__:
-            assert getattr(topic, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(topic)) == len(set(mro_slots(topic))), "duplicate slot"
+    def test_slot_behaviour(self, mro_slots, forum_topic_object):
+        for attr in forum_topic_object.__slots__:
+            assert getattr(forum_topic_object, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(forum_topic_object)) == len(
+            set(mro_slots(forum_topic_object))
+        ), "duplicate slot"
 
-    def test_expected_values(self, forum_group_id, topic):
-        assert topic.message_thread_id == forum_group_id
-        assert topic.icon_color == TEST_TOPIC_ICON_COLOR
-        assert topic.name == TEST_TOPIC_NAME
-        assert topic.icon_custom_emoji_id == TEST_TOPIC_EMOJI_ID
+    async def test_expected_values(self, emoji_id, forum_group_id, forum_topic_object):
+        assert forum_topic_object.message_thread_id == forum_group_id
+        assert forum_topic_object.icon_color == TEST_TOPIC_ICON_COLOR
+        assert forum_topic_object.name == TEST_TOPIC_NAME
+        assert forum_topic_object.icon_custom_emoji_id == emoji_id
 
-    def test_de_json(self, bot, forum_group_id):
+    def test_de_json(self, bot, emoji_id, forum_group_id):
         assert ForumTopic.de_json(None, bot=bot) is None
 
         json_dict = {
             "message_thread_id": forum_group_id,
             "name": TEST_TOPIC_NAME,
             "icon_color": TEST_TOPIC_ICON_COLOR,
-            "icon_custom_emoji_id": TEST_TOPIC_EMOJI_ID,
+            "icon_custom_emoji_id": emoji_id,
         }
         topic = ForumTopic.de_json(json_dict, bot)
         assert topic.api_kwargs == {}
@@ -87,18 +87,18 @@ class TestForumTopic:
         assert topic.message_thread_id == forum_group_id
         assert topic.icon_color == TEST_TOPIC_ICON_COLOR
         assert topic.name == TEST_TOPIC_NAME
-        assert topic.icon_custom_emoji_id == TEST_TOPIC_EMOJI_ID
+        assert topic.icon_custom_emoji_id == emoji_id
 
-    def test_to_dict(self, forum_group_id, topic):
-        topic_dict = topic.to_dict()
+    def test_to_dict(self, emoji_id, forum_group_id, forum_topic_object):
+        topic_dict = forum_topic_object.to_dict()
 
         assert isinstance(topic_dict, dict)
         assert topic_dict["message_thread_id"] == forum_group_id
         assert topic_dict["name"] == TEST_TOPIC_NAME
         assert topic_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
-        assert topic_dict["icon_custom_emoji_id"] == TEST_TOPIC_EMOJI_ID
+        assert topic_dict["icon_custom_emoji_id"] == emoji_id
 
-    def test_equality(self, forum_group_id):
+    def test_equality(self, emoji_id, forum_group_id):
         a = ForumTopic(
             message_thread_id=forum_group_id,
             name=TEST_TOPIC_NAME,
@@ -108,7 +108,7 @@ class TestForumTopic:
             message_thread_id=forum_group_id,
             name=TEST_TOPIC_NAME,
             icon_color=TEST_TOPIC_ICON_COLOR,
-            icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
+            icon_custom_emoji_id=emoji_id,
         )
         c = ForumTopic(
             message_thread_id=forum_group_id,
@@ -139,8 +139,9 @@ class TestForumTopic:
         assert hash(a) != hash(e)
 
     @pytest.mark.flaky(3, 1)
-    async def test_create_forum_topic(self, create_and_delete_topic):
-        result = create_and_delete_topic
+    async def test_create_forum_topic(self, real_topic):
+        # TODO test with str identifier of a chat too?
+        result = real_topic
         assert isinstance(result, ForumTopic)
         assert result.name == TEST_TOPIC_NAME
         assert result.message_thread_id
@@ -202,11 +203,10 @@ class TestForumTopic:
         monkeypatch.delattr(bot, "_post")
 
     @pytest.mark.flaky(3, 1)
-    async def test_send_message_to_topic(self, bot, forum_group_id, create_and_delete_topic):
+    async def test_send_message_to_topic(self, bot, forum_group_id, real_topic):
         test_string = "Topics are forever"
 
-        # TODO attribute instead of dict key when the method is implemented
-        message_thread_id = create_and_delete_topic["message_thread_id"]
+        message_thread_id = real_topic.message_thread_id
 
         message = await bot.send_message(
             chat_id=forum_group_id, text=test_string, message_thread_id=message_thread_id
@@ -251,12 +251,12 @@ class TestForumTopicCreated:
         assert action_dict["name"] == TEST_TOPIC_NAME
         assert action_dict["icon_color"] == TEST_TOPIC_ICON_COLOR
 
-    def test_equality(self):
+    def test_equality(self, emoji_id):
         a = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=TEST_TOPIC_ICON_COLOR)
         b = ForumTopicCreated(
             name=TEST_TOPIC_NAME,
             icon_color=TEST_TOPIC_ICON_COLOR,
-            icon_custom_emoji_id=TEST_TOPIC_EMOJI_ID,
+            icon_custom_emoji_id=emoji_id,
         )
         c = ForumTopicCreated(name=f"{TEST_TOPIC_NAME}!", icon_color=TEST_TOPIC_ICON_COLOR)
         d = ForumTopicCreated(name=TEST_TOPIC_NAME, icon_color=0xFFD67E)
@@ -271,9 +271,7 @@ class TestForumTopicCreated:
         assert hash(a) != hash(d)
 
     @pytest.mark.flaky(3, 1)
-    async def test_create_forum_topic_returns_good_object(
-        self, bot, forum_group_id, create_and_delete_topic
-    ):
+    async def test_create_forum_topic_returns_good_object(self, bot, forum_group_id, real_topic):
         data = await bot.get_updates()
 
         last_message = data[-1].message
