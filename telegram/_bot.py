@@ -6929,8 +6929,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         an administrator in the chat for this to work and must have
         :paramref:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
 
-        .. seealso:: :meth:`telegram.Message.create_forum_topic`,
-            :meth:`telegram.Chat.create_forum_topic`,
+        .. seealso:: :meth:`telegram.Chat.create_forum_topic`,
 
         .. versionadded:: 20.0
 
