@@ -62,21 +62,21 @@ class InlineQueryResultGif(InlineQueryResult):
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GIF`.
         id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
-        gif_width (:obj:`int`, optional): Width of the GIF.
-        gif_height (:obj:`int`, optional): Height of the GIF.
-        gif_duration (:obj:`int`, optional): Duration of the GIF in seconds.
+        gif_width (:obj:`int`): Optional. Width of the GIF.
+        gif_height (:obj:`int`): Optional. Height of the GIF.
+        gif_duration (:obj:`int`): Optional. Duration of the GIF in seconds.
         thumb_url (:obj:`str`): URL of the static (JPEG or GIF) or animated (MPEG4) thumbnail for
             the result.
-        thumb_mime_type (:obj:`str`, optional): MIME type of the thumbnail.
-        title (:obj:`str`, optional): Title for the result.
-        caption (:obj:`str`, optional): Caption of the GIF file to be sent,
+        thumb_mime_type (:obj:`str`): Optional. MIME type of the thumbnail.
+        title (:obj:`str`): Optional. Title for the result.
+        caption (:obj:`str`): Optional. Caption of the GIF file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
-        parse_mode (:obj:`str`, optional): |parse_mode|
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the GIF animation.
 
     """

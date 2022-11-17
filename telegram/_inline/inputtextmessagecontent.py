@@ -49,9 +49,9 @@ class InputTextMessageContent(InputMessageContent):
         message_text (:obj:`str`): Text of the message to be sent,
             1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
             parsing.
-        parse_mode (:obj:`str`, optional): |parse_mode|
-        entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
-        disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
     """

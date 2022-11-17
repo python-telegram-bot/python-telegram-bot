@@ -62,18 +62,18 @@ class InlineQueryResultPhoto(InlineQueryResult):
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size
             must not exceed 5MB.
         thumb_url (:obj:`str`): URL of the thumbnail for the photo.
-        photo_width (:obj:`int`, optional): Width of the photo.
-        photo_height (:obj:`int`, optional): Height of the photo.
-        title (:obj:`str`, optional): Title for the result.
-        description (:obj:`str`, optional): Short description of the result.
-        caption (:obj:`str`, optional): Caption of the photo to be sent,
+        photo_width (:obj:`int`): Optional. Width of the photo.
+        photo_height (:obj:`int`): Optional. Height of the photo.
+        title (:obj:`str`): Optional. Title for the result.
+        description (:obj:`str`): Optional. Short description of the result.
+        caption (:obj:`str`): Optional. Caption of the photo to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
             entities parsing.
-        parse_mode (:obj:`str`, optional): |parse_mode|
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
-        input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
+        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
             message to be sent instead of the photo.
 
     """
