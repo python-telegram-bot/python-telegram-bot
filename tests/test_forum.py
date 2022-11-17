@@ -189,10 +189,9 @@ class TestForumTopic:
             chat_id=forum_group_id,
             message_thread_id=real_topic.message_thread_id,
             name=f"{TEST_TOPIC_NAME}_EDITED",
-            icon_custom_emoji_id=emoji_id,  # TODO setting same emoji, but maybe change it?
+            icon_custom_emoji_id=emoji_id,
         )
-        assert result is True
-        # TODO check that topic name was changed
+        assert result is True  # no way of checking the edited name, just the boolean result
 
     @pytest.mark.flaky(3, 1)
     async def test_send_message_to_topic(self, bot, forum_group_id, real_topic):
