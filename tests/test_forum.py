@@ -184,23 +184,15 @@ class TestForumTopic:
         assert len(first_sticker.thumb.file_unique_id) == 16
         assert len(first_sticker.file_unique_id) == 15
 
-    # we sadly do not have access to a test group right now so we only test params right now
-    async def test_edit_forum_topic_all_params(self, monkeypatch, bot, chat_id):
-        # TODO this no longer fails but still needs reworking?
-        async def make_assertion(_, data, *args, **kwargs):
-            assert data["chat_id"] == chat_id
-            assert data["message_thread_id"] == 1234
-            assert data["name"] == "name"
-            assert data["icon_custom_emoji_id"] == "icon_custom_emoji_id"
-
-        monkeypatch.setattr(bot, "_post", make_assertion)
-        await bot.edit_forum_topic(
-            chat_id,
-            1234,
-            "name",
-            "icon_custom_emoji_id",
+    async def test_edit_forum_topic(self, emoji_id, forum_group_id, bot, real_topic):
+        result = await bot.edit_forum_topic(
+            chat_id=forum_group_id,
+            message_thread_id=real_topic.message_thread_id,
+            name=f"{TEST_TOPIC_NAME}_EDITED",
+            icon_custom_emoji_id=emoji_id,  # TODO setting same emoji, but maybe change it?
         )
-        monkeypatch.delattr(bot, "_post")
+        assert result is True
+        # TODO check that topic name was changed
 
     @pytest.mark.flaky(3, 1)
     async def test_send_message_to_topic(self, bot, forum_group_id, real_topic):
@@ -269,13 +261,6 @@ class TestForumTopicCreated:
 
         assert a != d
         assert hash(a) != hash(d)
-
-    @pytest.mark.flaky(3, 1)
-    async def test_create_forum_topic_returns_good_object(self, bot, forum_group_id, real_topic):
-        data = await bot.get_updates()
-
-        last_message = data[-1].message
-        assert last_message.forum_topic_created.name == TEST_TOPIC_NAME
 
 
 class TestForumTopicClosed:
