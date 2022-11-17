@@ -53,6 +53,7 @@ from telegram import (
     Contact,
     Document,
     File,
+    ForumTopic,
     GameHighScore,
     InlineKeyboardMarkup,
     InputMedia,
@@ -1858,7 +1859,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         rate_limit_args: RLARGS = None,
-    ) -> bool:
+    ) -> ForumTopic:
         return await super().create_forum_topic(
             chat_id=chat_id,
             name=name,
