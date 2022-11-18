@@ -465,7 +465,7 @@ class TelegramObject:
                 for item in value:
                     if hasattr(item, "to_dict"):
                         val.append(item.to_dict(recursive=recursive))
-                    # This branch is useful for e.g. List[List[PhotoSize|KeyboardButton]]
+                    # This branch is useful for e.g. Tuple[Tuple[PhotoSize|KeyboardButton]]
                     elif isinstance(item, (tuple, list)):
                         val.append(
                             [

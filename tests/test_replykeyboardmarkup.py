@@ -96,7 +96,9 @@ class TestReplyKeyboardMarkup:
         assert len(reply_keyboard_markup[1]) == 1
 
     def test_expected_values(self, reply_keyboard_markup):
-        assert isinstance(reply_keyboard_markup.keyboard, list)
+        assert isinstance(reply_keyboard_markup.keyboard, tuple)
+        for row in reply_keyboard_markup.keyboard:
+            assert isinstance(row, tuple)
         assert isinstance(reply_keyboard_markup.keyboard[0][0], KeyboardButton)
         assert isinstance(reply_keyboard_markup.keyboard[0][1], KeyboardButton)
         assert reply_keyboard_markup.resize_keyboard == self.resize_keyboard
@@ -105,9 +107,12 @@ class TestReplyKeyboardMarkup:
 
     def test_wrong_keyboard_inputs(self):
         with pytest.raises(ValueError):
-            ReplyKeyboardMarkup([["button1"], "Button2"])
+            ReplyKeyboardMarkup([["button1"], 1])
         with pytest.raises(ValueError):
-            ReplyKeyboardMarkup("button")
+            ReplyKeyboardMarkup("strings_are_not_allowed")
+            ReplyKeyboardMarkup(["strings_are_not_allowed"], ["in_the_rows_either"])
+        with pytest.raises(ValueError):
+            ReplyKeyboardMarkup(KeyboardButton("button1"))
 
     def test_to_dict(self, reply_keyboard_markup):
         reply_keyboard_markup_dict = reply_keyboard_markup.to_dict()

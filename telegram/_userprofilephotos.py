@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram UserProfilePhotos."""
-from typing import TYPE_CHECKING, List, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
@@ -35,15 +35,16 @@ class UserProfilePhotos(TelegramObject):
 
     Args:
         total_count (:obj:`int`): Total number of profile pictures the target user has.
-        photos (Sequence[List[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to
-            4 sizes each).
+        photos (Sequence[Sequence[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up
+            to 4 sizes each).
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
 
     Attributes:
         total_count (:obj:`int`): Total number of profile pictures.
-        photos (Sequence[List[:class:`telegram.PhotoSize`]]): Requested profile pictures.
+        photos (Tuple[Tuple[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up
+            to 4 sizes each).
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
@@ -53,12 +54,16 @@ class UserProfilePhotos(TelegramObject):
     __slots__ = ("photos", "total_count")
 
     def __init__(
-        self, total_count: int, photos: Sequence[List[PhotoSize]], *, api_kwargs: JSONDict = None
+        self,
+        total_count: int,
+        photos: Sequence[Sequence[PhotoSize]],
+        *,
+        api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
         self.total_count = total_count
-        self.photos = tuple(photos)
+        self.photos = tuple(tuple(sizes) for sizes in photos)
 
         self._id_attrs = (self.total_count, self.photos)
 

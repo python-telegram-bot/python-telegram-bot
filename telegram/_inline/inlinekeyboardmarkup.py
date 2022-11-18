@@ -40,15 +40,15 @@ class InlineKeyboardMarkup(TelegramObject):
         * :any:`Inline Keyboard 2 <examples.inlinekeyboard2>`
 
     Args:
-        inline_keyboard (Sequence[List[:class:`telegram.InlineKeyboardButton`]]): List of button
-            rows, each represented by a list of InlineKeyboardButton objects.
+        inline_keyboard (Sequence[Sequence[:class:`telegram.InlineKeyboardButton`]]): Sequence of
+            button rows, each represented by a sequence of InlineKeyboardButton objects.
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
 
     Attributes:
-        inline_keyboard (Sequence[List[:class:`telegram.InlineKeyboardButton`]]): List of button
-            rows, each represented by a list of InlineKeyboardButton objects.
+        inline_keyboard (Tuple[Tuple[:class:`telegram.InlineKeyboardButton`]]): Tuple of
+            button rows, each represented by a tuple of InlineKeyboardButton objects.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
@@ -59,18 +59,18 @@ class InlineKeyboardMarkup(TelegramObject):
 
     def __init__(
         self,
-        inline_keyboard: Sequence[List[InlineKeyboardButton]],
+        inline_keyboard: Sequence[Sequence[InlineKeyboardButton]],
         *,
         api_kwargs: JSONDict = None,
     ):
         super().__init__(api_kwargs=api_kwargs)
         if not check_keyboard_type(inline_keyboard):
             raise ValueError(
-                "The parameter `inline_keyboard` should be a list of "
-                "list of InlineKeyboardButtons"
+                "The parameter `keyboard` should be a sequence of sequences of "
+                "strings or KeyboardButtons"
             )
         # Required
-        self.inline_keyboard = tuple(inline_keyboard)
+        self.inline_keyboard = tuple(tuple(row) for row in inline_keyboard)
 
         self._id_attrs = (self.inline_keyboard,)
 

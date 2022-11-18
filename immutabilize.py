@@ -98,7 +98,7 @@ for name, cls in classes:
                 continue
 
             class_source_lines[i] = class_source_lines[i].replace(
-                f"{param} (List[", f"{param} (Sequence["
+                f"{param} (List[", f"{param} (Tuple["
             )
             whitespaces = re.match(r" +", class_source_lines[i]).end() + 4
             j = i + 1
