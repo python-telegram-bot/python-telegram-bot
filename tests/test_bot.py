@@ -868,11 +868,11 @@ class TestBot:
             explanation=explanation_markdown,
         )
         assert message.poll.explanation == explanation
-        assert message.poll.explanation_entities == [
+        assert message.poll.explanation_entities == (
             MessageEntity(MessageEntity.ITALIC, 0, 6),
             MessageEntity(MessageEntity.BOLD, 7, 4),
             MessageEntity(MessageEntity.CODE, 12, 4),
-        ]
+        )
 
         message = await default_bot.send_poll(
             chat_id=super_group_id,
@@ -885,7 +885,7 @@ class TestBot:
             explanation_parse_mode=None,
         )
         assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == []
+        assert message.poll.explanation_entities == ()
 
         message = await default_bot.send_poll(
             chat_id=super_group_id,
@@ -898,7 +898,7 @@ class TestBot:
             explanation_parse_mode="HTML",
         )
         assert message.poll.explanation == explanation_markdown
-        assert message.poll.explanation_entities == []
+        assert message.poll.explanation_entities == ()
 
     @pytest.mark.flaky(3, 1)
     @pytest.mark.parametrize(
