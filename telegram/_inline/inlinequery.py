@@ -72,7 +72,7 @@ class InlineQuery(TelegramObject):
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
         location (:class:`telegram.Location`): Optional. Sender location, only for bots that
             request user location.
-        chat_type (:obj:`str`, optional): Type of the chat, from which the inline query was sent.
+        chat_type (:obj:`str`): Optional. Type of the chat, from which the inline query was sent.
 
             .. versionadded:: 13.5
 
