@@ -224,23 +224,25 @@ class TestForumTopic:
         )
         assert result is True, "Failed to reopen forum topic"
 
-    # async def test_unpin_all_forum_topic_messages(self, bot, forum_group_id, real_topic):
-    #     # THIS TEST TRIGGERS telegram.error.BadRequest: Chat_not_modified.
-    #     message_thread_id = real_topic.message_thread_id
-    #
-    #     message = await bot.send_message(
-    #         chat_id=forum_group_id, text=TEST_MSG_TEXT, message_thread_id=message_thread_id,
-    #     )
-    #
-    #     result = await bot.pin_chat_message(
-    #         chat_id=forum_group_id, message_id=message.message_id
-    #     )
-    #     assert result is True, "Message was not pinned"
-    #
-    #     result = await bot.unpin_all_forum_topic_messages(
-    #         chat_id=forum_group_id, message_thread_id=message_thread_id
-    #     )
-    #     assert result is True, "Failed to unpin all the messages in forum topic"
+    async def test_unpin_all_forum_topic_messages(self, bot, forum_group_id, real_topic):
+        message_thread_id = real_topic.message_thread_id
+
+        msgs = [
+            await (
+                await bot.send_message(
+                    chat_id=forum_group_id, text=TEST_MSG_TEXT, message_thread_id=message_thread_id
+                )
+            ).pin()
+            for _ in range(2)
+        ]
+
+        assert all(msgs) is True, "Message(s) were not pinned"
+
+        # We need 2 or more pinned msgs for this to work, else we get Chat_not_modified error
+        result = await bot.unpin_all_forum_topic_messages(
+            chat_id=forum_group_id, message_thread_id=message_thread_id
+        )
+        assert result is True, "Failed to unpin all the messages in forum topic"
 
 
 @pytest.fixture
