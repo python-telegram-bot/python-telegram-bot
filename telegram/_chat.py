@@ -2620,8 +2620,8 @@ class Chat(TelegramObject):
     async def create_forum_topic(
         self,
         name: str,
-        icon_color: int,
-        icon_custom_emoji_id: str,
+        icon_color: int = None,
+        icon_custom_emoji_id: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,

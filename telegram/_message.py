@@ -36,6 +36,7 @@ from telegram._files.venue import Venue
 from telegram._files.video import Video
 from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
+from telegram._forumtopic import ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
 from telegram._games.game import Game
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._messageautodeletetimerchanged import MessageAutoDeleteTimerChanged
@@ -255,6 +256,18 @@ class Message(TelegramObject):
             the message belongs; for supergroups only.
 
             .. versionadded:: 20.0
+        forum_topic_created (:class:`telegram.ForumTopicCreated`, optional): Service message:
+            forum topic created
+
+            .. versionadded:: 20.0
+        forum_topic_closed (:class:`telegram.ForumTopicClosed`, optional): Service message:
+            forum topic closed
+
+            .. versionadded:: 20.0
+        forum_topic_reopened (:class:`telegram.ForumTopicReopened`, optional): Service message:
+            forum topic reopened
+
+            .. versionadded:: 20.0
 
     Attributes:
         message_id (:obj:`int`): Unique message identifier inside this chat.
@@ -407,11 +420,23 @@ class Message(TelegramObject):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are
             represented as ordinary url buttons.
-        is_topic_message (:obj:`bool`, optional): True, if the message is sent to a forum topic.
+        is_topic_message (:obj:`bool`): Optional. True, if the message is sent to a forum topic.
 
             .. versionadded:: 20.0
-        message_thread_id (:obj:`int`, optional): Unique identifier of a message thread to which
+        message_thread_id (:obj:`int`): Optional. Unique identifier of a message thread to which
             the message belongs; for supergroups only.
+
+            .. versionadded:: 20.0
+        forum_topic_created (:class:`telegram.ForumTopicCreated`): Optional. Service message:
+            forum topic created
+
+            .. versionadded:: 20.0
+        forum_topic_closed (:class:`telegram.ForumTopicClosed`): Optional. Service message:
+            forum topic closed
+
+            .. versionadded:: 20.0
+        forum_topic_reopened (:class:`telegram.ForumTopicReopened`): Optional. Service message:
+            forum topic reopened
 
             .. versionadded:: 20.0
 
@@ -483,6 +508,9 @@ class Message(TelegramObject):
         "web_app_data",
         "is_topic_message",
         "message_thread_id",
+        "forum_topic_created",
+        "forum_topic_closed",
+        "forum_topic_reopened",
     )
 
     def __init__(
@@ -548,6 +576,9 @@ class Message(TelegramObject):
         web_app_data: WebAppData = None,
         is_topic_message: bool = None,
         message_thread_id: int = None,
+        forum_topic_created: ForumTopicCreated = None,
+        forum_topic_closed: ForumTopicClosed = None,
+        forum_topic_reopened: ForumTopicReopened = None,
         *,
         api_kwargs: JSONDict = None,
     ):
@@ -616,6 +647,9 @@ class Message(TelegramObject):
         self.web_app_data = web_app_data
         self.is_topic_message = is_topic_message
         self.message_thread_id = message_thread_id
+        self.forum_topic_created = forum_topic_created
+        self.forum_topic_closed = forum_topic_closed
+        self.forum_topic_reopened = forum_topic_reopened
 
         self._effective_attachment = DEFAULT_NONE
 
@@ -706,6 +740,13 @@ class Message(TelegramObject):
             data.get("video_chat_participants_invited"), bot
         )
         data["web_app_data"] = WebAppData.de_json(data.get("web_app_data"), bot)
+        data["forum_topic_closed"] = ForumTopicClosed.de_json(data.get("forum_topic_closed"), bot)
+        data["forum_topic_created"] = ForumTopicCreated.de_json(
+            data.get("forum_topic_created"), bot
+        )
+        data["forum_topic_reopened"] = ForumTopicReopened.de_json(
+            data.get("forum_topic_reopened"), bot
+        )
 
         return super().de_json(data=data, bot=bot)
 

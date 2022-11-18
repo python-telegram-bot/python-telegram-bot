@@ -74,6 +74,7 @@ from telegram._files.venue import Venue
 from telegram._files.video import Video
 from telegram._files.videonote import VideoNote
 from telegram._files.voice import Voice
+from telegram._forumtopic import ForumTopic
 from telegram._games.gamehighscore import GameHighScore
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._menubutton import MenuButton
@@ -6915,15 +6916,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         self,
         chat_id: Union[str, int],
         name: str,
-        icon_color: int,
-        icon_custom_emoji_id: str,
+        icon_color: int = None,
+        icon_custom_emoji_id: str = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> bool:
+    ) -> ForumTopic:
         """
         Use this method to create a topic in a forum supergroup chat. The bot must be
         an administrator in the chat for this to work and must have
@@ -6938,19 +6939,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             name (:obj:`str`): New topic name,
                 :tg-const:`telegram.constants.TopicLimit.MIN_NAME_LENGTH`-
                 :tg-const:`telegram.constants.TopicLimit.MAX_NAME_LENGTH` characters.
-            icon_color (:obj:`int`): Color of the topic icon in RGB format. Currently,
+            icon_color (:obj:`int`, optional): Color of the topic icon in RGB format. Currently,
                 must be one of :attr:`telegram.constants.ForumIconColor.BLUE`,
                 :attr:`telegram.constants.ForumIconColor.YELLOW`,
                 :attr:`telegram.constants.ForumIconColor.PURPLE`,
                 :attr:`telegram.constants.ForumIconColor.GREEN`,
                 :attr:`telegram.constants.ForumIconColor.PINK`, or
                 :attr:`telegram.constants.ForumIconColor.RED`.
-            icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
-                the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
-                allowed custom emoji identifiers.
+            icon_custom_emoji_id (:obj:`str`, optional): New unique identifier of the custom emoji
+                shown as the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
+                to get all allowed custom emoji identifiers.
 
         Returns:
-            :obj:`bool`: On success, :class:`telegram.ForumTopic` is returned.
+            :class:`telegram.ForumTopic`
 
         Raises:
             :class:`telegram.error.TelegramError`
@@ -6961,8 +6962,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "icon_color": icon_color,
             "icon_custom_emoji_id": icon_custom_emoji_id,
         }
-        # TODO: DO ForumTopic.de_json here!
-        return await self._post(  # type: ignore[return-value]
+        result = await self._post(
             "createForumTopic",
             data,
             read_timeout=read_timeout,
@@ -6971,6 +6971,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             pool_timeout=pool_timeout,
             api_kwargs=api_kwargs,
         )
+        return ForumTopic.de_json(result, self)  # type: ignore[return-value, arg-type]
 
     @_log
     async def edit_forum_topic(

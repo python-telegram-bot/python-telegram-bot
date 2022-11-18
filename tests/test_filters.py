@@ -980,6 +980,21 @@ class TestFilters:
         assert filters.StatusUpdate.WEB_APP_DATA.check_update(update)
         update.message.web_app_data = None
 
+        update.message.forum_topic_created = "topic"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
+        update.message.forum_topic_created = None
+
+        update.message.forum_topic_closed = "topic"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_CLOSED.check_update(update)
+        update.message.forum_topic_closed = None
+
+        update.message.forum_topic_reopened = "topic"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
+        update.message.forum_topic_reopened = None
+
     def test_filters_forwarded(self, update):
         assert not filters.FORWARDED.check_update(update)
         update.message.forward_date = datetime.datetime.utcnow()
