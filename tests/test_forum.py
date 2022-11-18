@@ -160,7 +160,7 @@ class TestForumTopic:
         result = await bot.delete_forum_topic(
             chat_id=forum_group_id, message_thread_id=result.message_thread_id
         )
-        assert result is True, "Topic was not deleted"
+        assert result is True, "Failed to delete forum topic"
 
     @pytest.mark.flaky(3, 1)
     async def test_get_forum_topic_icon_stickers(self, bot):
@@ -192,7 +192,8 @@ class TestForumTopic:
             name=f"{TEST_TOPIC_NAME}_EDITED",
             icon_custom_emoji_id=emoji_id,
         )
-        assert result is True  # no way of checking the edited name, just the boolean result
+        assert result is True, "Failed to edit forum topic"
+        # no way of checking the edited name, just the boolean result
 
     @pytest.mark.flaky(3, 1)
     async def test_send_message_to_topic(self, bot, forum_group_id, real_topic):
@@ -213,7 +214,7 @@ class TestForumTopic:
             chat_id=forum_group_id,
             message_thread_id=message_thread_id,
         )
-        assert result is True
+        assert result is True, "Failed to close forum topic"
         # bot will still be able to send a message to a closed topic, so can't test anything like
         # the inability to post to the topic
 
@@ -221,7 +222,25 @@ class TestForumTopic:
             chat_id=forum_group_id,
             message_thread_id=message_thread_id,
         )
-        assert result is True
+        assert result is True, "Failed to reopen forum topic"
+
+    # async def test_unpin_all_forum_topic_messages(self, bot, forum_group_id, real_topic):
+    #     # THIS TEST TRIGGERS telegram.error.BadRequest: Chat_not_modified.
+    #     message_thread_id = real_topic.message_thread_id
+    #
+    #     message = await bot.send_message(
+    #         chat_id=forum_group_id, text=TEST_MSG_TEXT, message_thread_id=message_thread_id,
+    #     )
+    #
+    #     result = await bot.pin_chat_message(
+    #         chat_id=forum_group_id, message_id=message.message_id
+    #     )
+    #     assert result is True, "Message was not pinned"
+    #
+    #     result = await bot.unpin_all_forum_topic_messages(
+    #         chat_id=forum_group_id, message_thread_id=message_thread_id
+    #     )
+    #     assert result is True, "Failed to unpin all the messages in forum topic"
 
 
 @pytest.fixture
