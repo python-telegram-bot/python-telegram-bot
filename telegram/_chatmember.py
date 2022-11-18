@@ -250,7 +250,7 @@ class ChatMemberAdministrator(ChatMember):
             messages; channels only.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
-        can_manage_topics (:obj:`bool`) Optional. :obj:`True`, if the user is allowed
+        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only
 
             .. versionadded:: 20.0
@@ -369,8 +369,8 @@ class ChatMemberRestricted(ChatMember):
             to send animations, games, stickers and use inline bots.
         can_add_web_page_previews (:obj:`bool`): :obj:`True`, if the user is
            allowed to add web page previews to their messages.
-        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; supergroups only
+        can_manage_topics (:obj:`bool`): :obj:`True`, if the user is allowed to create
+            forum topics.
 
             .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions
@@ -398,8 +398,8 @@ class ChatMemberRestricted(ChatMember):
             to send animations, games, stickers and use inline bots.
         can_add_web_page_previews (:obj:`bool`): :obj:`True`, if the user is
            allowed to add web page previews to their messages.
-        can_manage_topics (:obj:`bool`) Optional. :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; supergroups only
+        can_manage_topics (:obj:`bool`): :obj:`True`, if the user is allowed to create
+            forum topics.
 
             .. versionadded:: 20.0
         until_date (:class:`datetime.datetime`): Date when restrictions

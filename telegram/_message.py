@@ -249,7 +249,8 @@ class Message(TelegramObject):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are
             represented as ordinary url buttons.
-        is_topic_message (:obj:`bool`, optional): True, if the message is sent to a forum topic.
+        is_topic_message (:obj:`bool`, optional): :obj:`True`, if the message is sent to a forum
+            topic.
 
             .. versionadded:: 20.0
         message_thread_id (:obj:`int`, optional): Unique identifier of a message thread to which
@@ -420,7 +421,8 @@ class Message(TelegramObject):
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message. :paramref:`~telegram.InlineKeyboardButton.login_url` buttons are
             represented as ordinary url buttons.
-        is_topic_message (:obj:`bool`): Optional. True, if the message is sent to a forum topic.
+        is_topic_message (:obj:`bool`): Optional. :obj:`True`, if the message is sent to a forum
+            topic.
 
             .. versionadded:: 20.0
         message_thread_id (:obj:`int`): Optional. Unique identifier of a message thread to which

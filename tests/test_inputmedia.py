@@ -46,6 +46,9 @@ from .test_audio import audio, audio_file  # noqa: F401
 from .test_document import document, document_file  # noqa: F401
 
 # noinspection PyUnresolvedReferences
+from .test_forum import emoji_id, real_topic  # noqa: F401
+
+# noinspection PyUnresolvedReferences
 from .test_photo import _photo, photo, photo_file, thumb  # noqa: F401
 
 # noinspection PyUnresolvedReferences
@@ -464,6 +467,19 @@ class TestSendMediaGroup:
         assert all(
             mes.caption_entities == [MessageEntity(MessageEntity.BOLD, 0, 5)] for mes in messages
         )
+
+    async def test_send_media_group_with_message_thread_id(
+        self, bot, real_topic, forum_group_id, media_group  # noqa: F811
+    ):
+        messages = await bot.send_media_group(
+            forum_group_id,
+            media_group,
+            message_thread_id=real_topic.message_thread_id,
+        )
+        assert isinstance(messages, list)
+        assert len(messages) == 3
+        assert all(isinstance(mes, Message) for mes in messages)
+        assert all(i.message_thread_id == real_topic.message_thread_id for i in messages)
 
     async def test_send_media_group_throws_error_with_group_caption_and_individual_captions(
         self,

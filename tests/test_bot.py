@@ -2829,6 +2829,7 @@ class TestBot:
                     data["caption_entities"]
                     == [MessageEntity(MessageEntity.BOLD, 0, 4).to_dict()],
                     data["protect_content"] is True,
+                    data["message_thread_id"] == 1,
                 ]
             ):
                 pytest.fail("I got wrong parameters in post")
@@ -2846,6 +2847,7 @@ class TestBot:
             reply_markup=keyboard.to_json() if json_keyboard else keyboard,
             disable_notification=True,
             protect_content=True,
+            message_thread_id=1,
         )
 
     @pytest.mark.flaky(3, 1)

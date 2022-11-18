@@ -98,10 +98,10 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
-        can_manage_topics (:obj:`bool`) Optional. :obj:`True`, if the user is allowed
+        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to create, rename, close, and reopen forum topics; supergroups only.
 
-                .. versionadded:: 20.0
+            .. versionadded:: 20.0
     """
 
     __slots__ = (

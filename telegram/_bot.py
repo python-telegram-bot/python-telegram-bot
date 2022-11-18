@@ -699,8 +699,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 :class:`ReplyKeyboardRemove` | :class:`ForceReply`, optional):
                 Additional interface options. An object for an inline keyboard, custom reply
                 keyboard, instructions to remove reply keyboard or to force a reply from the user.
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -831,8 +830,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -912,8 +910,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
             reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
@@ -1029,8 +1026,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -1161,8 +1157,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -1267,8 +1262,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -1373,8 +1367,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -1503,8 +1496,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -1639,8 +1631,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -1760,8 +1751,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -1858,8 +1848,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -1993,8 +1982,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -2266,8 +2254,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -2387,8 +2374,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -2485,8 +2471,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -4256,8 +4241,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -4629,7 +4613,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 add new administrators with a subset of his own privileges or demote administrators
                 that he has promoted, directly or indirectly (promoted by administrators that were
                 appointed by him).
-            can_manage_topics (:obj:`bool`, optional): Pass :obj:`True`, if the administrator is
+            can_manage_topics (:obj:`bool`, optional): Pass :obj:`True`, if the user is
                 allowed to create, rename, close, and reopen forum topics; supergroups only.
 
                 .. versionadded:: 20.0
@@ -5234,8 +5218,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             title (:obj:`str`): New chat title,
-                tg-const:`telegram.constants.ChatLimits.MIN_TITLE_LENGTH`-
-                tg-const:`telegram.constants.ChatLimits.MAX_TITLE_LENGTH` characters.
+                :tg-const:`telegram.constants.ChatLimit.MIN_TITLE_LENGTH`-
+                :tg-const:`telegram.constants.ChatLimit.MAX_TITLE_LENGTH` characters.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -6033,8 +6017,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -6189,8 +6172,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -6602,8 +6584,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             protect_content (:obj:`bool`, optional): |protect_content|
 
                 .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): Unique identifier for the target message
-                thread (topic) of the forum; for forum supergroups only.
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
 
                 .. versionadded:: 20.0
 
@@ -6668,7 +6649,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         button.
 
         .. seealso:: :meth:`get_chat_menu_button`, :meth:`telegram.Chat.set_menu_button`,
-            :meth:`telegram.Chat.get_menu_button`, meth:`telegram.User.set_menu_button`,
+            :meth:`telegram.Chat.get_menu_button`, :meth:`telegram.User.set_menu_button`,
             :meth:`telegram.User.get_menu_button`
 
         .. versionadded:: 20.0
@@ -7142,8 +7123,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         """
         Use this method to delete a forum topic along with all its messages in a forum supergroup
         chat. The bot must be an administrator in the chat for this to work and must have
-        :paramref:`~telegram.ChatAdministratorRights.can_delete_messages` administrator rights,
-        unless it is the creator of the topic.
+        :paramref:`~telegram.ChatAdministratorRights.can_delete_messages` administrator rights.
 
         .. seealso:: :meth:`telegram.Message.delete_forum_topic`,
             :meth:`telegram.Chat.delete_forum_topic`,
@@ -7191,7 +7171,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to clear the list of pinned messages in a forum topic. The bot must
         be an administrator in the chat for this to work and must have
         :paramref:`~telegram.ChatAdministratorRights.can_pin_messages` administrator rights
-        in the supergroup, unless it is the creator of the topic.
+        in the supergroup.
 
         .. seealso:: :meth:`telegram.Message.unpin_all_forum_topic_messages`,
             :meth:`telegram.Chat.unpin_all_forum_topic_messages`,

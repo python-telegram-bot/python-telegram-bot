@@ -24,8 +24,7 @@ from telegram._utils.types import JSONDict
 
 class ForumTopic(TelegramObject):
     """
-    This object represents the content of a service message about a new forum topic created in
-    the chat.
+    This object represents a forum topic.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_thread_id`, :attr:`name` and :attr:`icon_color`
