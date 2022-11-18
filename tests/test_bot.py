@@ -769,7 +769,14 @@ class TestBot:
             nonlocal params
             params = data == {
                 'web_app_query_id': '12345',
-                'result': result,
+                'result': {
+                    "title": "title",
+                    "input_message_content": {
+                        "message_text": "text",
+                    },
+                    "type": "article",
+                    "id": "1",
+                },
             }
             web_app_msg = SentWebAppMessage('321').to_dict()
             return web_app_msg
@@ -824,6 +831,96 @@ class TestBot:
             switch_pm_parameter='start_pm',
         )
         monkeypatch.delattr(bot.request, 'post')
+
+    @pytest.mark.parametrize(
+        "default_bot",
+        [{"parse_mode": "Markdown", "disable_web_page_preview": True}],
+        indirect=True,
+    )
+    @pytest.mark.parametrize(
+        "ilq_result,expected_params",
+        [
+            (
+                InlineQueryResultArticle("1", "title", InputTextMessageContent("text")),
+                {
+                    "web_app_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "parse_mode": "Markdown",
+                            "disable_web_page_preview": True,
+                        },
+                        "type": "article",
+                        "id": "1",
+                    },
+                },
+            ),
+            (
+                InlineQueryResultArticle(
+                    "1",
+                    "title",
+                    InputTextMessageContent(
+                        "text", parse_mode="HTML", disable_web_page_preview=False
+                    ),
+                ),
+                {
+                    "web_app_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "parse_mode": "HTML",
+                            "disable_web_page_preview": False,
+                        },
+                        "type": "article",
+                        "id": "1",
+                    },
+                },
+            ),
+            (
+                InlineQueryResultArticle(
+                    "1",
+                    "title",
+                    InputTextMessageContent(
+                        "text", parse_mode=None, disable_web_page_preview="False"
+                    ),
+                ),
+                {
+                    "web_app_query_id": "12345",
+                    "result": {
+                        "title": "title",
+                        "input_message_content": {
+                            "message_text": "text",
+                            "disable_web_page_preview": "False",
+                        },
+                        "type": "article",
+                        "id": "1",
+                    },
+                },
+            ),
+        ],
+    )
+    def test_answer_web_app_query_defaults(
+        self, default_bot, ilq_result, expected_params, monkeypatch
+    ):
+        bot = default_bot
+        params = False
+
+        # For now just test that our internals pass the correct data
+
+        def make_assertion(url, data, *args, **kwargs):
+            nonlocal params
+            params = data == expected_params
+            web_app_msg = SentWebAppMessage("321").to_dict()
+            return web_app_msg
+
+        monkeypatch.setattr(bot.request, "post", make_assertion)
+
+        web_app_msg = bot.answer_web_app_query("12345", ilq_result)
+        assert params, "something went wrong with passing arguments to the request"
+        assert isinstance(web_app_msg, SentWebAppMessage)
+        assert web_app_msg.inline_message_id == "321"
 
     def test_answer_inline_query_no_default_parse_mode(self, monkeypatch, bot):
         def test(url, data, *args, **kwargs):
