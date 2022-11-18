@@ -59,7 +59,7 @@ class InputTextMessageContent(InputMessageContent):
         parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
             bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
             in :class:`telegram.constants.ParseMode` for the available modes.
-        entities (Sequence[:class:`telegram.MessageEntity`]): Optional. List of special
+        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. List of special
             entities that appear in the caption, which can be specified instead of
             :paramref:`parse_mode`.
 

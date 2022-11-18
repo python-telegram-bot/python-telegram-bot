@@ -308,7 +308,7 @@ class Message(TelegramObject):
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
             0-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters.
-        entities (Sequence[:class:`telegram.MessageEntity`]): Optional. For text messages, special
+        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
             This list is empty if the message does not contain entities.
@@ -316,7 +316,7 @@ class Message(TelegramObject):
             .. versionchanged:: 20.0
                 |tupleclassattrs|
 
-        caption_entities (Sequence[:class:`telegram.MessageEntity`]): Optional. For messages with a
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
             caption. See :attr:`Message.parse_caption_entity` and :attr:`parse_caption_entities`
             methods for how to use properly. This list is empty if the message does not contain
@@ -333,7 +333,7 @@ class Message(TelegramObject):
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
         game (:class:`telegram.Game`): Optional. Message is a game, information about the game.
-        photo (Sequence[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
+        photo (Tuple[:class:`telegram.PhotoSize`]): Optional. Message is a photo, available
             sizes of the photo. This list is empty if the message does not contain a photo.
 
             .. versionchanged:: 20.0
@@ -347,7 +347,7 @@ class Message(TelegramObject):
             the file.
         video_note (:class:`telegram.VideoNote`): Optional. Message is a video note, information
             about the video message.
-        new_chat_members (Sequence[:class:`telegram.User`]): Optional. New members that were added
+        new_chat_members (Tuple[:class:`telegram.User`]): Optional. New members that were added
             to the group or supergroup and information about them (the bot itself may be one of
             these members). This list is empty if the message does not contain new chat members.
 
@@ -366,7 +366,7 @@ class Message(TelegramObject):
         left_chat_member (:class:`telegram.User`): Optional. A member was removed from the group,
             information about them (this member may be the bot itself).
         new_chat_title (:obj:`str`): Optional. A chat title was changed to this value.
-        new_chat_photo (Sequence[:class:`telegram.PhotoSize`]): A chat photo was changed to
+        new_chat_photo (Tuple[:class:`telegram.PhotoSize`]): A chat photo was changed to
             this value. This list is empty if the message does not contain a new chat photo.
 
             .. versionchanged:: 20.0

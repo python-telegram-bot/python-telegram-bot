@@ -111,7 +111,7 @@ class InputInvoiceMessageContent(InputMessageContent):
             `@Botfather <https://t.me/Botfather>`_.
         currency (:obj:`str`): Three-letter ISO 4217 currency code, see more on
             `currencies <https://core.telegram.org/bots/payments#supported-currencies>`_
-        prices (Sequence[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
+        prices (Tuple[:class:`telegram.LabeledPrice`]): Price breakdown, a list of
             components.
 
             .. versionchanged:: 20.0
@@ -119,7 +119,7 @@ class InputInvoiceMessageContent(InputMessageContent):
 
         max_tip_amount (:obj:`int`): Optional. The maximum accepted amount for tips in the smallest
             units of the currency (integer, not float/double).
-        suggested_tip_amounts (Sequence[:obj:`int`]): Optional. An array of suggested
+        suggested_tip_amounts (Tuple[:obj:`int`]): Optional. An array of suggested
             amounts of tip in the smallest units of the currency (integer, not float/double).
 
             .. versionchanged:: 20.0

@@ -48,7 +48,7 @@ class PassportData(TelegramObject):
         credentials (:class:`telegram.EncryptedCredentials`)): Encrypted credentials.
 
     Attributes:
-        data (Sequence[:class:`telegram.EncryptedPassportElement`]): Array with encrypted
+        data (Tuple[:class:`telegram.EncryptedPassportElement`]): Array with encrypted
             information about documents and other Telegram Passport elements that was shared with
             the bot.
 

@@ -228,7 +228,7 @@ class StickerSet(TelegramObject):
         is_video (:obj:`bool`): :obj:`True`, if the sticker set contains video stickers.
 
             .. versionadded:: 13.11
-        stickers (Sequence[:class:`telegram.Sticker`]): List of all set stickers.
+        stickers (Tuple[:class:`telegram.Sticker`]): List of all set stickers.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|

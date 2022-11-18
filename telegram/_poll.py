@@ -84,7 +84,7 @@ class PollAnswer(TelegramObject):
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
         user (:class:`telegram.User`): The user, who changed the answer to the poll.
-        option_ids (Sequence[:obj:`int`]): Identifiers of answer options, chosen by the user.
+        option_ids (Tuple[:obj:`int`]): Identifiers of answer options, chosen by the user.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
@@ -161,7 +161,7 @@ class Poll(TelegramObject):
     Attributes:
         id (:obj:`str`): Unique poll identifier.
         question (:obj:`str`): Poll question, 1-300 characters.
-        options (Sequence[:class:`PollOption`]): List of poll options.
+        options (Tuple[:class:`PollOption`]): List of poll options.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
@@ -176,7 +176,7 @@ class Poll(TelegramObject):
             (not forwarded), by the bot or to a private chat with the bot.
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll, 0-200 characters.
-        explanation_entities (Sequence[:class:`telegram.MessageEntity`]): Special entities
+        explanation_entities (Tuple[:class:`telegram.MessageEntity`]): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
             This list is empty if the message does not contain explanation entities.
 
