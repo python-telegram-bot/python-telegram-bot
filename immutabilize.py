@@ -28,7 +28,7 @@ for name, cls in classes:
     print("Processing class", name)
     # first adjust the __init__ of the class
     params = inspect.signature(cls.__init__).parameters
-    params_to_change = dict()
+    params_to_change = {}
     for param in params.values():
         if "List" in str(param.annotation):
             print("  Converting list-type parameter", param.name, "to Sequence")
