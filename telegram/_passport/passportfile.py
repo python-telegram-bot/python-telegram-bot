@@ -121,7 +121,7 @@ class PassportFile(TelegramObject):
         """Variant of :meth:`telegram.TelegramObject.de_list` that also takes into account
         passport credentials.
 
-        .. versionchange:: 20.0
+        .. versionchanged:: 20.0
            Returns a tuple instead of a list.
 
         Args:

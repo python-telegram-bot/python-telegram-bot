@@ -411,7 +411,7 @@ class TelegramObject:
     ) -> Tuple[Optional[Tele_co], ...]:
         """Converts a list of JSON objects to a tuple of Telegram objects.
 
-        .. versionchange:: 20.0
+        .. versionchanged:: 20.0
            Returns a tuple instead of a list.
 
         Args:
