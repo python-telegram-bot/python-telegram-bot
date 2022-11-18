@@ -224,6 +224,7 @@ class TestForumTopic:
         )
         assert result is True, "Failed to reopen forum topic"
 
+    @pytest.mark.xfail(reason="Can fail due to race conditions in GH actions CI")
     async def test_unpin_all_forum_topic_messages(self, bot, forum_group_id, real_topic):
         message_thread_id = real_topic.message_thread_id
 
