@@ -20,6 +20,7 @@ import pytest
 
 from telegram import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened, Sticker
 
+TEST_MSG_TEXT = "Topics are forever"
 TEST_TOPIC_ICON_COLOR = 0x6FB9F0
 TEST_TOPIC_NAME = "Sad bot true: real stories"
 
@@ -195,17 +196,32 @@ class TestForumTopic:
 
     @pytest.mark.flaky(3, 1)
     async def test_send_message_to_topic(self, bot, forum_group_id, real_topic):
-        test_string = "Topics are forever"
-
         message_thread_id = real_topic.message_thread_id
 
         message = await bot.send_message(
-            chat_id=forum_group_id, text=test_string, message_thread_id=message_thread_id
+            chat_id=forum_group_id, text=TEST_MSG_TEXT, message_thread_id=message_thread_id
         )
 
-        assert message.text == test_string
+        assert message.text == TEST_MSG_TEXT
         assert message.is_topic_message is True
         assert message.message_thread_id == message_thread_id
+
+    async def test_close_and_reopen_forum_topic(self, bot, forum_group_id, real_topic):
+        message_thread_id = real_topic.message_thread_id
+
+        result = await bot.close_forum_topic(
+            chat_id=forum_group_id,
+            message_thread_id=message_thread_id,
+        )
+        assert result is True
+        # bot will still be able to send a message to a closed topic, so can't test anything like
+        # the inability to post to the topic
+
+        result = await bot.reopen_forum_topic(
+            chat_id=forum_group_id,
+            message_thread_id=message_thread_id,
+        )
+        assert result is True
 
 
 @pytest.fixture
