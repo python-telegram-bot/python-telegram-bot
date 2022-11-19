@@ -44,7 +44,6 @@ __all__ = [
     "ChatPhotoSize",
     "ChatType",
     "CustomEmojiStickerLimit",
-    "CustomTitleLimit",
     "DiceEmoji",
     "DiceLimit",
     "FileSizeLimit",
@@ -70,6 +69,7 @@ __all__ = [
     "SendContactLimit",
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerType",
+    "TitleLimit",
     "WebhookLimit",
     "UpdateType",
     "UserProfilePhotosLimit",
@@ -357,23 +357,6 @@ class CustomEmojiStickerLimit(IntEnum):
     """:obj:`int`: Maximum amount of custom emoji identifiers which can be specified for the
     :paramref:`~telegram.Bot.get_custom_emoji_stickers.custom_emoji_ids` parameter of
     :meth:`telegram.Bot.get_custom_emoji_stickers`.
-    """
-
-
-class CustomTitleLimit(IntEnum):
-    """This enum contains limitations for
-    :meth:`telegram.Bot.set_chat_administrator_custom_title`. The enum members of this enumeration
-    are instances of :class:`int` and can be treated as such.
-
-    .. versionadded:: 20.0
-    """
-
-    __slots__ = ()
-
-    CUSTOM_TITLE = 16
-    """:obj:`int`: Maximum value allowed for the
-    :paramref:`~telegram.Bot.set_chat_administrator_custom_title.custom_title` parameter of
-    :meth:`telegram.Bot.set_chat_administrator_custom_title`.
     """
 
 
@@ -1209,6 +1192,34 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_member`."""
     CHAT_JOIN_REQUEST = "chat_join_request"
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""
+
+
+class TitleLimit(IntEnum):
+    """This enum contains limitations for
+    :meth:`telegram.Bot.set_chat_administrator_custom_title` and
+    :meth:`telegram.Bot.set_chat_title`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    CHAT_ADMINISTRATOR_CUSTOM_TITLE = 16
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.set_chat_administrator_custom_title.custom_title` parameter of
+    :meth:`telegram.Bot.set_chat_administrator_custom_title`.
+    """
+    MIN_CHAT_TITLE = 1
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.set_chat_title.title` parameter of
+    :meth:`telegram.Bot.set_chat_title`.
+    """
+    MAX_CHAT_TITLE = 128
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.set_chat_title.title` parameter of
+    :meth:`telegram.Bot.set_chat_title`.
+    """
 
 
 class InvoiceLimit(IntEnum):
