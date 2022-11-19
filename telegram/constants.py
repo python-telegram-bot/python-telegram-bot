@@ -44,6 +44,7 @@ __all__ = [
     "ChatPhotoSize",
     "ChatType",
     "CustomEmojiStickerLimit",
+    "CustomTitleLimit",
     "DiceEmoji",
     "DiceLimit",
     "FileSizeLimit",
@@ -356,6 +357,23 @@ class CustomEmojiStickerLimit(IntEnum):
     """:obj:`int`: Maximum amount of custom emoji identifiers which can be specified for the
     :paramref:`~telegram.Bot.get_custom_emoji_stickers.custom_emoji_ids` parameter of
     :meth:`telegram.Bot.get_custom_emoji_stickers`.
+    """
+
+
+class CustomTitleLimit(IntEnum):
+    """This enum contains limitations for
+    :meth:`telegram.Bot.set_chat_administrator_custom_title`. The enum members of this enumeration
+    are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    CUSTOM_TITLE = 16
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.set_chat_administrator_custom_title.custom_title` parameter of
+    :meth:`telegram.Bot.set_chat_administrator_custom_title`.
     """
 
 
