@@ -384,7 +384,7 @@ class ForumIconColor(IntEnum):
     __slots__ = ()
 
     BLUE = 0x6FB9F0
-    """:obj:`int`: An icon with a color which corresponds to blue.
+    """:obj:`int`: An icon with a color which corresponds to blue (``0x6FB9F0``).
 
     .. raw:: html
 
@@ -392,7 +392,7 @@ class ForumIconColor(IntEnum):
 
     """
     YELLOW = 0xFFD67E
-    """:obj:`int`: An icon with a color which corresponds to yellow.
+    """:obj:`int`: An icon with a color which corresponds to yellow (``0xFFD67E``).
 
     .. raw:: html
 
@@ -400,7 +400,7 @@ class ForumIconColor(IntEnum):
 
     """
     PURPLE = 0xCB86DB
-    """:obj:`int`: An icon with a color which corresponds to purple.
+    """:obj:`int`: An icon with a color which corresponds to purple (``0xCB86DB``).
 
     .. raw:: html
 
@@ -408,7 +408,7 @@ class ForumIconColor(IntEnum):
 
     """
     GREEN = 0x8EEE98
-    """:obj:`int`: An icon with a color which corresponds to green.
+    """:obj:`int`: An icon with a color which corresponds to green (``0x8EEE98``).
 
     .. raw:: html
 
@@ -416,7 +416,7 @@ class ForumIconColor(IntEnum):
 
     """
     PINK = 0xFF93B2
-    """:obj:`int`: An icon with a color which corresponds to pink.
+    """:obj:`int`: An icon with a color which corresponds to pink (``0xFF93B2``).
 
     .. raw:: html
 
@@ -424,7 +424,7 @@ class ForumIconColor(IntEnum):
 
     """
     RED = 0xFB6F5F
-    """:obj:`int`: An icon with a color which corresponds to red.
+    """:obj:`int`: An icon with a color which corresponds to red (``0xFB6F5F``).
 
     .. raw:: html
 
