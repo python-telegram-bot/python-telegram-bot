@@ -141,7 +141,6 @@ class TestForumTopic:
 
     @pytest.mark.flaky(3, 1)
     async def test_create_forum_topic(self, real_topic):
-        # TODO test with str identifier of a chat too?
         result = real_topic
         assert isinstance(result, ForumTopic)
         assert result.name == TEST_TOPIC_NAME
