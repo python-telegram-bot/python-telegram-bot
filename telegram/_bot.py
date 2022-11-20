@@ -5218,8 +5218,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             title (:obj:`str`): New chat title,
-                :tg-const:`telegram.constants.ChatLimit.MIN_TITLE_LENGTH`-
-                :tg-const:`telegram.constants.ChatLimit.MAX_TITLE_LENGTH` characters.
+                :tg-const:`telegram.constants.TitleLimit.MIN_CHAT_TITLE_LENGTH`-
+                :tg-const:`telegram.constants.TitleLimit.MAX_CHAT_TITLE_LENGTH` characters.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.

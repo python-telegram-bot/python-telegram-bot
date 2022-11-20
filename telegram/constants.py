@@ -39,7 +39,6 @@ __all__ = [
     "ChatAction",
     "ChatID",
     "ChatInviteLinkLimit",
-    "ChatLimit",
     "ChatMemberStatus",
     "ChatType",
     "CustomEmojiStickerLimit",
@@ -64,6 +63,7 @@ __all__ = [
     "PollType",
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerType",
+    "TitleLimit",
     "TopicLimit",
     "WebhookLimit",
     "UpdateType",
@@ -928,6 +928,34 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""
 
 
+class TitleLimit(IntEnum):
+    """This enum contains limitations for
+    :meth:`telegram.Bot.set_chat_administrator_custom_title` and
+    :meth:`telegram.Bot.set_chat_title`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    CHAT_ADMINISTRATOR_CUSTOM_TITLE_LENGTH = 16
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_administrator_custom_title.custom_title` parameter of
+    :meth:`telegram.Bot.set_chat_administrator_custom_title`.
+    """
+    MIN_CHAT_TITLE_LENGTH = 1
+    """:obj:`int`: Minimum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_title.title` parameter of
+    :meth:`telegram.Bot.set_chat_title`.
+    """
+    MAX_CHAT_TITLE_LENGTH = 128
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_title.title` parameter of
+    :meth:`telegram.Bot.set_chat_title`.
+    """
+
+
 class InvoiceLimit(IntEnum):
     """This enum contains limitations for :meth:`telegram.Bot.create_invoice_link`. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -964,21 +992,6 @@ class WebhookLimit(IntEnum):
     """:obj:`int`: Minimum length of the secret token."""
     MAX_SECRET_TOKEN_LENGTH = 256
     """:obj:`int`: Maximum length of the secret token."""
-
-
-class ChatLimit(IntEnum):
-    """This enum contains limitations for :paramref:`telegram.Bot.set_chat_title.title`. The
-    enum members of this enumeration are instances of :class:`int` and can be treated as such.
-
-    .. versionadded:: 20.0
-    """
-
-    __slots__ = ()
-
-    MIN_TITLE_LENGTH = 1
-    """:obj:`int`: Minimum length of a new chat title."""
-    MAX_TITLE_LENGTH = 128
-    """:obj:`int`: Maximum length of a new chat title."""
 
 
 class TopicLimit(IntEnum):
