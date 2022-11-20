@@ -38,6 +38,7 @@ __all__ = [
     "BotCommandScopeType",
     "CallbackQueryLimit",
     "ChatAction",
+    "ChatDescriptionLimit",
     "ChatID",
     "ChatInviteLinkLimit",
     "ChatMemberStatus",
@@ -219,6 +220,22 @@ class ChatAction(StringEnum):
     """:obj:`str`: Chat action indicating that the bot is uploading a video."""
     UPLOAD_VIDEO_NOTE = "upload_video_note"
     """:obj:`str`: Chat action indicating that the bot is uploading a video note."""
+
+
+class ChatDescriptionLimit(IntEnum):
+    """This enum contains limitations for :meth:`telegram.Bot.set_chat_description`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    DESCRIPTION_LENGTH = 255
+    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_description.description` parameter of
+    :meth:`telegram.Bot.set_chat_description`.
+    """
 
 
 class ChatID(IntEnum):
@@ -1205,18 +1222,18 @@ class TitleLimit(IntEnum):
 
     __slots__ = ()
 
-    CHAT_ADMINISTRATOR_CUSTOM_TITLE = 16
-    """:obj:`int`: Maximum value allowed for the
+    CHAT_ADMINISTRATOR_CUSTOM_TITLE_LENGTH = 16
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
     :paramref:`~telegram.Bot.set_chat_administrator_custom_title.custom_title` parameter of
     :meth:`telegram.Bot.set_chat_administrator_custom_title`.
     """
-    MIN_CHAT_TITLE = 1
-    """:obj:`int`: Minimum value allowed for the
+    MIN_CHAT_TITLE_LENGTH = 1
+    """:obj:`int`: Minimum length of a :obj:`str` passed as the
     :paramref:`~telegram.Bot.set_chat_title.title` parameter of
     :meth:`telegram.Bot.set_chat_title`.
     """
-    MAX_CHAT_TITLE = 128
-    """:obj:`int`: Maximum value allowed for the
+    MAX_CHAT_TITLE_LENGTH = 128
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
     :paramref:`~telegram.Bot.set_chat_title.title` parameter of
     :meth:`telegram.Bot.set_chat_title`.
     """

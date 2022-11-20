@@ -4640,7 +4640,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             user_id (:obj:`int`): Unique identifier of the target administrator.
             custom_title (:obj:`str`): New custom title for the administrator;
-                0-:tg-const:`telegram.constants.TitleLimit.CHAT_ADMINISTRATOR_CUSTOM_TITLE`
+                0-:tg-const:`telegram.constants.TitleLimit.CHAT_ADMINISTRATOR_CUSTOM_TITLE_LENGTH`
                 characters, emoji are not allowed.
 
         Returns:
@@ -5132,8 +5132,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             title (:obj:`str`): New chat title,
-                :tg-const:`telegram.constants.TitleLimit.MIN_CHAT_TITLE`-
-                :tg-const:`telegram.constants.TitleLimit.MAX_CHAT_TITLE` characters.
+                :tg-const:`telegram.constants.TitleLimit.MIN_CHAT_TITLE_LENGTH`-
+                :tg-const:`telegram.constants.TitleLimit.MAX_CHAT_TITLE_LENGTH` characters.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5175,7 +5175,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            description (:obj:`str`, optional): New chat description, 0-255 characters.
+            description (:obj:`str`, optional): New chat description,
+                0-:tg-const:`telegram.constants.ChatDescriptionLimit.DESCRIPTION_LENGTH`
+                characters.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
