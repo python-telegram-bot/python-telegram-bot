@@ -675,8 +675,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             text (:obj:`str`): Text of the message to be sent. Max
-                :tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
-                parsing.
+                :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
+                entities parsing.
             parse_mode (:obj:`str`): |parse_mode|
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of
@@ -3113,8 +3113,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             inline_message_id (:obj:`str`, optional): Required if :paramref:`chat_id` and
                 :paramref:`message_id` are not specified. Identifier of the inline message.
             text (:obj:`str`): New text of the message,
-                1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
-                parsing.
+                :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
+                :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
+                entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of

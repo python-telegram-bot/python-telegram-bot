@@ -295,7 +295,7 @@ class TGConstXRefRole(PyXRefRole):
 
     Example:
 
-        :tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` renders as `4096` but links to the
+        :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` renders as `4096` but links to the
         constant.
     """
 

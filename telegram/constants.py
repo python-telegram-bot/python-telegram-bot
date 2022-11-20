@@ -888,6 +888,7 @@ class MessageEntityType(StringEnum):
 
 class MessageLimit(IntEnum):
     """This enum contains limitations for :class:`telegram.Message`/
+    :class:`telegram.InputTextMessageContent`/
     :meth:`telegram.Bot.send_message` & friends. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
 
@@ -896,11 +897,19 @@ class MessageLimit(IntEnum):
 
     __slots__ = ()
 
-    TEXT_LENGTH = 4096
+    # TODO add links to params?
+    MAX_TEXT_LENGTH = 4096
     """:obj:`int`: Maximum number of characters for a text message."""
     CAPTION_LENGTH = 1024
     """:obj:`int`: Maximum number of characters for a message caption."""
     # constants above this line are tested
+    MIN_TEXT_LENGTH = 1
+    """:obj:`int`: Minimum length of a :obj:`str` passed as the
+    :paramref:`~telegram.InputTextMessageContent.message_text` parameter of
+    :class:`telegram.InputTextMessageContent` and the
+    :paramref:`~telegram.Bot.edit_message_text.text` parameter of
+    :meth:`telegram.Bot.edit_message_text`.
+    """
     DEEP_LINK_LENGTH = 64
     """:obj:`int`: Maximum number of characters for a deep link."""
     MESSAGE_ENTITIES = 100
