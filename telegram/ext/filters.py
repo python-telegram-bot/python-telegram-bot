@@ -1422,6 +1422,20 @@ IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name="filters.IS_AUTOMATIC_FORWARD")
 """
 
 
+class _IsTopicMessage(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.is_topic_message)
+
+
+IS_TOPIC_MESSAGE = _IsTopicMessage(name="filters.IS_TOPIC_MESSAGE")
+"""Messages that contain :attr:`telegram.Message.is_topic_message`.
+
+    .. versionadded:: 20.0
+"""
+
+
 class Language(MessageFilter):
     """Filters messages to only allow those which are from users with a certain language code.
 

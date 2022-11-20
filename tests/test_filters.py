@@ -1779,6 +1779,11 @@ class TestFilters:
         update.message.is_automatic_forward = True
         assert filters.IS_AUTOMATIC_FORWARD.check_update(update)
 
+    def test_filters_is_topic_message(self, update):
+        assert not filters.IS_TOPIC_MESSAGE.check_update(update)
+        update.message.is_topic_message = True
+        assert filters.IS_TOPIC_MESSAGE.check_update(update)
+
     def test_filters_has_protected_content(self, update):
         assert not filters.HAS_PROTECTED_CONTENT.check_update(update)
         update.message.has_protected_content = True
