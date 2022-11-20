@@ -64,7 +64,7 @@ __all__ = [
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerType",
     "ChatLimit",
-    "TopicLimit",
+    "ForumTopicLimit",
     "WebhookLimit",
     "UpdateType",
 ]
@@ -994,7 +994,7 @@ class WebhookLimit(IntEnum):
     """:obj:`int`: Maximum length of the secret token."""
 
 
-class TopicLimit(IntEnum):
+class ForumTopicLimit(IntEnum):
     """This enum contains limitations for :paramref:`telegram.Bot.create_forum_topic.name` and
     :paramref:`telegram.Bot.edit_forum_topic.name`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.

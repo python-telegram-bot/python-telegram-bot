@@ -6918,8 +6918,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             name (:obj:`str`): New topic name,
-                :tg-const:`telegram.constants.TopicLimit.MIN_NAME_LENGTH`-
-                :tg-const:`telegram.constants.TopicLimit.MAX_NAME_LENGTH` characters.
+                :tg-const:`telegram.constants.ForumTopicLimit.MIN_NAME_LENGTH`-
+                :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters.
             icon_color (:obj:`int`, optional): Color of the topic icon in RGB format. Currently,
                 must be one of :attr:`telegram.constants.ForumIconColor.BLUE`,
                 :attr:`telegram.constants.ForumIconColor.YELLOW`,
@@ -6983,8 +6983,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             message_thread_id (:obj:`int`): |message_thread_id|
             name (:obj:`str`): New topic name,
-                :tg-const:`telegram.constants.TopicLimit.MIN_NAME_LENGTH`-
-                :tg-const:`telegram.constants.TopicLimit.MAX_NAME_LENGTH` characters.
+                :tg-const:`telegram.constants.ForumTopicLimit.MIN_NAME_LENGTH`-
+                :tg-const:`telegram.constants.ForumTopicLimit.MAX_NAME_LENGTH` characters.
             icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
                 the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
                 allowed custom emoji identifiers.
