@@ -69,6 +69,7 @@ __all__ = [
     "ReplyLimit",
     "SendContactLimit",
     "SUPPORTED_WEBHOOK_PORTS",
+    "StickerLimit",
     "StickerType",
     "TitleLimit",
     "WebhookLimit",
@@ -1065,6 +1066,29 @@ class SendContactLimit(IntEnum):
     VCARD = 2048
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Bot.send_contact.vcard`
     parameter of :meth:`~telegram.Bot.send_contact`.
+    """
+
+
+class StickerLimit(IntEnum):
+    """This enum contains limitations for :meth:`telegram.Bot.create_new_sticker_set`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_NAME_AND_TITLE = 1
+    """:obj:`int`: Minimum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.create_new_sticker_set.name` parameter or the
+    :paramref:`~telegram.Bot.create_new_sticker_set.title` parameter of
+    :meth:`telegram.Bot.create_new_sticker_set`.
+    """
+    MAX_NAME_AND_TITLE = 64
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.create_new_sticker_set.name` parameter or the
+    :paramref:`~telegram.Bot.create_new_sticker_set.title` parameter of
+    :meth:`telegram.Bot.create_new_sticker_set`.
     """
 
 

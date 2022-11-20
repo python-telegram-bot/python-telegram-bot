@@ -5508,8 +5508,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 (e.g., animals). Can contain only english letters, digits and underscores.
                 Must begin with a letter, can't contain consecutive underscores and
                 must end in "_by_<bot username>". <bot_username> is case insensitive.
-                1-64 characters.
-            title (:obj:`str`): Sticker set title, 1-64 characters.
+                :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
+                :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
+            title (:obj:`str`): Sticker set title,
+                :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
+                :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
