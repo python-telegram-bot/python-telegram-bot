@@ -6292,8 +6292,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list
-                of bot commands to be set as the list of the bot's commands. At most 100 commands
-                can be specified.
+                of bot commands to be set as the list of the bot's commands. At most
+                :tg-const:`telegram.constants.BotCommandLimit.MAX_COMMAND_NUMBER` commands can be
+                specified.
             scope (:class:`telegram.BotCommandScope`, optional): An object,
                 describing scope of users for which the commands are relevant. Defaults to
                 :class:`telegram.BotCommandScopeDefault`.

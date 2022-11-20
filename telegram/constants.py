@@ -123,7 +123,8 @@ SUPPORTED_WEBHOOK_PORTS: List[int] = [443, 80, 88, 8443]
 
 
 class BotCommandLimit(IntEnum):
-    """This enum contains limitations for :class:`telegram.BotCommand`.
+    """This enum contains limitations for :class:`telegram.BotCommand` and
+    :meth:`telegram.Bot.set_my_commands`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
@@ -146,6 +147,11 @@ class BotCommandLimit(IntEnum):
     MAX_DESCRIPTION = 256
     """:obj:`int`: Maximum value allowed for :paramref:`~telegram.BotCommand.description`
     parameter of :class:`telegram.BotCommand`.
+    """
+    MAX_COMMAND_NUMBER = 100
+    """:obj:`int`: Maximum number of bot commands passed in a :obj:`list` to the
+    :paramref:`~telegram.Bot.set_my_commands.commands`
+    parameter of :meth:`telegram.Bot.set_my_commands`.
     """
 
 
