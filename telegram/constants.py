@@ -995,8 +995,9 @@ class WebhookLimit(IntEnum):
 
 
 class TopicLimit(IntEnum):
-    """This enum contains limitations for :paramref:`telegram.Bot.edit_forum_topic.name`. The
-    enum members of this enumeration are instances of :class:`int` and can be treated as such.
+    """This enum contains limitations for :paramref:`telegram.Bot.create_forum_topic.name` and
+    :paramref:`telegram.Bot.edit_forum_topic.name`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
     """
@@ -1004,6 +1005,14 @@ class TopicLimit(IntEnum):
     __slots__ = ()
 
     MIN_NAME_LENGTH = 1
-    """:obj:`int`: Minimum length of the topic name."""
+    """:obj:`int`: Minimum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
+    :meth:`telegram.Bot.create_forum_topic` and :paramref:`~telegram.Bot.edit_forum_topic.name`
+    parameter of :meth:`telegram.Bot.edit_forum_topic`.
+    """
     MAX_NAME_LENGTH = 128
-    """:obj:`int`: Maximum length of the topic name."""
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
+    :meth:`telegram.Bot.create_forum_topic` and :paramref:`~telegram.Bot.edit_forum_topic.name`
+    parameter of :meth:`telegram.Bot.edit_forum_topic`.
+    """
