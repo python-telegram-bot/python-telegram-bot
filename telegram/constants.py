@@ -193,7 +193,7 @@ class CallbackQueryLimit(IntEnum):
     __slots__ = ()
 
     ANSWER_CALLBACK_QUERY_TEXT_LENGTH = 200
-    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.answer_callback_query.text` parameter of
     :meth:`telegram.Bot.answer_callback_query`."""
 
@@ -241,7 +241,7 @@ class ChatDescriptionLimit(IntEnum):
     __slots__ = ()
 
     DESCRIPTION_LENGTH = 255
-    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.set_chat_description.description` parameter of
     :meth:`telegram.Bot.set_chat_description`.
     """
@@ -306,7 +306,7 @@ class ChatInviteLinkLimit(IntEnum):
     :meth:`telegram.Bot.edit_chat_invite_link`.
     """
     NAME_LENGTH = 32
-    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.create_chat_invite_link.name` parameter of
     :meth:`telegram.Bot.create_chat_invite_link` and
     :paramref:`~telegram.Bot.edit_chat_invite_link.name` of
@@ -622,18 +622,18 @@ class InlineQueryLimit(IntEnum):
     """:obj:`int`: Maximum number of results that can be passed to
     :meth:`telegram.Bot.answer_inline_query`."""
     MAX_OFFSET_LENGTH = 64
-    """:obj:`int`: Maximum length (in bytes) of :obj:`str` passed as the
+    """:obj:`int`: Maximum number of bytes in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.answer_inline_query.next_offset` parameter of
     :meth:`telegram.Bot.answer_inline_query`."""
     MAX_QUERY_LENGTH = 256
-    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.InlineQuery.query` parameter of :class:`telegram.InlineQuery`."""
     MIN_SWITCH_PM_TEXT_LENGTH = 1
-    """:obj:`int`: Minimum length of :obj:`str` passed as the
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
     :meth:`telegram.Bot.answer_inline_query`."""
     MAX_SWITCH_PM_TEXT_LENGTH = 64
-    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
     :meth:`telegram.Bot.answer_inline_query`."""
 
@@ -648,12 +648,12 @@ class InlineQueryResultLimit(IntEnum):
     __slots__ = ()
 
     MIN_ID_LENGTH = 1
-    """:obj:`int`: Minimum length of :obj:`str` passed as the
+    """:obj:`int`: Minimum number of bytes in a :obj:`str` passed as the
     :paramref:`~telegram.InlineQueryResult.id` parameter of
     :class:`telegram.InlineQueryResult` and its subclasses
     """
     MAX_ID_LENGTH = 64
-    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    """:obj:`int`: Maximum number of bytes in a :obj:`str` passed as the
     :paramref:`~telegram.InlineQueryResult.id` parameter of
     :class:`telegram.InlineQueryResult` and its subclasses
     """
@@ -992,7 +992,7 @@ class MessageLimit(IntEnum):
     """
     # constants above this line are tested
     MIN_TEXT_LENGTH = 1
-    """:obj:`int`: Minimum length of a :obj:`str` passed as the
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.InputTextMessageContent.message_text` parameter of
     :class:`telegram.InputTextMessageContent` and the
     :paramref:`~telegram.Bot.edit_message_text.text` parameter of
@@ -1153,13 +1153,13 @@ class StickerLimit(IntEnum):
     __slots__ = ()
 
     MIN_NAME_AND_TITLE = 1
-    """:obj:`int`: Minimum length of a :obj:`str` passed as the
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.create_new_sticker_set.name` parameter or the
     :paramref:`~telegram.Bot.create_new_sticker_set.title` parameter of
     :meth:`telegram.Bot.create_new_sticker_set`.
     """
     MAX_NAME_AND_TITLE = 64
-    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.create_new_sticker_set.name` parameter or the
     :paramref:`~telegram.Bot.create_new_sticker_set.title` parameter of
     :meth:`telegram.Bot.create_new_sticker_set`.
@@ -1246,7 +1246,7 @@ class PollLimit(IntEnum):
     :meth:`telegram.Bot.send_poll`.
     """
     MAX_EXPLANATION_LENGTH = 200
-    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Poll.explanation` parameter of :class:`telegram.Poll` and the
     :paramref:`~telegram.Bot.send_poll.explanation` parameter of :meth:`telegram.Bot.send_poll`.
     """
@@ -1336,17 +1336,17 @@ class TitleLimit(IntEnum):
     __slots__ = ()
 
     CHAT_ADMINISTRATOR_CUSTOM_TITLE_LENGTH = 16
-    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.set_chat_administrator_custom_title.custom_title` parameter of
     :meth:`telegram.Bot.set_chat_administrator_custom_title`.
     """
     MIN_CHAT_TITLE_LENGTH = 1
-    """:obj:`int`: Minimum length of a :obj:`str` passed as the
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.set_chat_title.title` parameter of
     :meth:`telegram.Bot.set_chat_title`.
     """
     MAX_CHAT_TITLE_LENGTH = 128
-    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
     :paramref:`~telegram.Bot.set_chat_title.title` parameter of
     :meth:`telegram.Bot.set_chat_title`.
     """
