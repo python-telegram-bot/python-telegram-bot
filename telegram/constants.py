@@ -44,6 +44,7 @@ __all__ = [
     "ChatMemberStatus",
     "ChatPhotoSize",
     "ChatType",
+    "ContactLimit",
     "CustomEmojiStickerLimit",
     "DiceEmoji",
     "DiceLimit",
@@ -68,7 +69,6 @@ __all__ = [
     "PollLimit",
     "PollType",
     "ReplyLimit",
-    "SendContactLimit",
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerLimit",
     "StickerType",
@@ -367,6 +367,27 @@ class ChatType(StringEnum):
     """:obj:`str`: A :class:`telegram.Chat` that is a supergroup."""
     CHANNEL = "channel"
     """:obj:`str`: A :class:`telegram.Chat` that is a channel."""
+
+
+class ContactLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.InlineQueryResultContact`,
+    :class:`telegram.InputContactMessageContent`, and :meth:`telegram.Bot.send_contact`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    VCARD = 2048
+    """:obj:`int`: Maximum value allowed for:
+
+    * :paramref:`~telegram.Bot.send_contact.vcard` parameter of :meth:`~telegram.Bot.send_contact`
+    * :paramref:`~telegram.InlineQueryResultContact.vcard` parameter of
+      :class:`~telegram.InlineQueryResultContact`
+    * :paramref:`~telegram.InputContactMessageContent.vcard` parameter of
+      :class:`~telegram.InputContactMessageContent`
+    """
 
 
 class CustomEmojiStickerLimit(IntEnum):
@@ -1082,21 +1103,6 @@ class ReplyLimit(IntEnum):
     :class:`telegram.ForceReply` and
     :paramref:`~telegram.ReplyKeyboardMarkup.input_field_placeholder` parameter of
     :class:`telegram.ReplyKeyboardMarkup`
-    """
-
-
-class SendContactLimit(IntEnum):
-    """This enum contains limitations for :meth:`telegram.Bot.send_contact`. The enum
-    members of this enumeration are instances of :class:`int` and can be treated as such.
-
-    .. versionadded:: 20.0
-    """
-
-    __slots__ = ()
-
-    VCARD = 2048
-    """:obj:`int`: Maximum value allowed for :paramref:`~telegram.Bot.send_contact.vcard`
-    parameter of :meth:`~telegram.Bot.send_contact`.
     """
 
 
