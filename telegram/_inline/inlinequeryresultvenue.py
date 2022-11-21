@@ -40,7 +40,9 @@ class InlineQueryResultVenue(InlineQueryResult):
       behaviour is undocumented and might be changed by Telegram.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         latitude (:obj:`float`): Latitude of the venue location in degrees.
         longitude (:obj:`float`): Longitude of the venue location in degrees.
         title (:obj:`str`): Title of the venue.
@@ -63,7 +65,9 @@ class InlineQueryResultVenue(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VENUE`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         latitude (:obj:`float`): Latitude of the venue location in degrees.
         longitude (:obj:`float`): Longitude of the venue location in degrees.
         title (:obj:`str`): Title of the venue.

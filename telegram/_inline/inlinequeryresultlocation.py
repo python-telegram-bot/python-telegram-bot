@@ -36,7 +36,9 @@ class InlineQueryResultLocation(InlineQueryResult):
     content instead of the location.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.
@@ -66,7 +68,9 @@ class InlineQueryResultLocation(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.LOCATION`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.

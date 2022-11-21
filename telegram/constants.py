@@ -52,6 +52,7 @@ __all__ = [
     "InlineKeyboardButtonLimit",
     "InlineKeyboardMarkupLimit",
     "InlineQueryLimit",
+    "InlineQueryResultLimit",
     "InlineQueryResultType",
     "InputMediaType",
     "InvoiceLimit",
@@ -598,6 +599,27 @@ class InlineQueryLimit(IntEnum):
     """:obj:`int`: Maximum length of :obj:`str` passed to the
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
     :meth:`telegram.Bot.answer_inline_query`."""
+
+
+class InlineQueryResultLimit(IntEnum):
+    """This enum contains limitations for :class:`telegram.InlineQueryResult` and its subclasses.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_ID_LENGTH = 1
+    """:obj:`int`: Minimum length of :obj:`str` passed as the
+    :paramref:`~telegram.InlineQueryResult.id` parameter of
+    :class:`telegram.InlineQueryResult` and its subclasses
+    """
+    MAX_ID_LENGTH = 64
+    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    :paramref:`~telegram.InlineQueryResult.id` parameter of
+    :class:`telegram.InlineQueryResult` and its subclasses
+    """
 
 
 class InlineQueryResultType(StringEnum):
