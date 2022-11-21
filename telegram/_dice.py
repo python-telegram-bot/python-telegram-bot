@@ -108,22 +108,43 @@ class Dice(TelegramObject):
     """List[:obj:`str`]: A list of all available dice emoji."""
 
     MIN_VALUE: ClassVar[int] = constants.DiceLimit.MIN_VALUE
-    """:const:`telegram.constants.DiceLimit.MIN_VALUE`"""
+    """:const:`telegram.constants.DiceLimit.MIN_VALUE`
+
+    .. versionadded:: 20.0
+    """
 
     MAX_VALUE_BOWLING: ClassVar[int] = constants.DiceLimit.MAX_VALUE_BOWLING
-    """:const:`telegram.constants.DiceLimit.MAX_VALUE_BOWLING`"""
+    """:const:`telegram.constants.DiceLimit.MAX_VALUE_BOWLING`
+
+    .. versionadded:: 20.0
+    """
 
     MAX_VALUE_DARTS: ClassVar[int] = constants.DiceLimit.MAX_VALUE_DARTS
-    """:const:`telegram.constants.DiceLimit.MAX_VALUE_DARTS`"""
+    """:const:`telegram.constants.DiceLimit.MAX_VALUE_DARTS`
+
+    .. versionadded:: 20.0
+    """
 
     MAX_VALUE_DICE: ClassVar[int] = constants.DiceLimit.MAX_VALUE_DICE
-    """:const:`telegram.constants.DiceLimit.MAX_VALUE_DICE`"""
+    """:const:`telegram.constants.DiceLimit.MAX_VALUE_DICE`
+
+    .. versionadded:: 20.0
+    """
 
     MAX_VALUE_BASKETBALL: ClassVar[int] = constants.DiceLimit.MAX_VALUE_BASKETBALL
-    """:const:`telegram.constants.DiceLimit.MAX_VALUE_BASKETBALL`"""
+    """:const:`telegram.constants.DiceLimit.MAX_VALUE_BASKETBALL`
+
+    .. versionadded:: 20.0
+    """
 
     MAX_VALUE_FOOTBALL: ClassVar[int] = constants.DiceLimit.MAX_VALUE_FOOTBALL
-    """:const:`telegram.constants.DiceLimit.MAX_VALUE_FOOTBALL`"""
+    """:const:`telegram.constants.DiceLimit.MAX_VALUE_FOOTBALL`
+
+    .. versionadded:: 20.0
+    """
 
     MAX_VALUE_SLOT_MACHINE: ClassVar[int] = constants.DiceLimit.MAX_VALUE_SLOT_MACHINE
-    """:const:`telegram.constants.DiceLimit.MAX_VALUE_SLOT_MACHINE`"""
+    """:const:`telegram.constants.DiceLimit.MAX_VALUE_SLOT_MACHINE`
+
+    .. versionadded:: 20.0
+    """

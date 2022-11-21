@@ -75,6 +75,12 @@ class ChatLocation(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     MIN_ADDRESS: ClassVar[int] = constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS
-    """:const:`telegram.constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS`"""
+    """:const:`telegram.constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS`
+
+    .. versionadded:: 20.0
+    """
     MAX_ADDRESS: ClassVar[int] = constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS
-    """:const:`telegram.constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS`"""
+    """:const:`telegram.constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS`
+
+    .. versionadded:: 20.0
+    """

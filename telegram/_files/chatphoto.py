@@ -163,6 +163,12 @@ class ChatPhoto(TelegramObject):
         )
 
     SIZE_SMALL: ClassVar[int] = constants.ChatPhotoSize.SMALL
-    """:const:`telegram.constants.ChatPhotoSize.SMALL`"""
+    """:const:`telegram.constants.ChatPhotoSize.SMALL`
+
+    .. versionadded:: 20.0
+    """
     SIZE_BIG: ClassVar[int] = constants.ChatPhotoSize.BIG
-    """:const:`telegram.constants.ChatPhotoSize.BIG`"""
+    """:const:`telegram.constants.ChatPhotoSize.BIG`
+
+    .. versionadded:: 20.0
+    """

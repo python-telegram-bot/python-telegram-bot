@@ -243,6 +243,12 @@ class InlineKeyboardButton(TelegramObject):
         self._set_id_attrs()
 
     MIN_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
-    """:const:`telegram.constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA`"""
+    """:const:`telegram.constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA`
+
+    .. versionadded:: 20.0
+    """
     MAX_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA
-    """:const:`telegram.constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA`"""
+    """:const:`telegram.constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA`
+
+    .. versionadded:: 20.0
+    """

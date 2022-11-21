@@ -56,10 +56,22 @@ class BotCommand(TelegramObject):
         self._id_attrs = (self.command, self.description)
 
     MIN_COMMAND: ClassVar[int] = constants.BotCommandLimit.MIN_COMMAND
-    """:const:`telegram.constants.BotCommandLimit.MIN_COMMAND`"""
+    """:const:`telegram.constants.BotCommandLimit.MIN_COMMAND`
+
+    .. versionadded:: 20.0
+    """
     MAX_COMMAND: ClassVar[int] = constants.BotCommandLimit.MAX_COMMAND
-    """:const:`telegram.constants.BotCommandLimit.MAX_COMMAND`"""
+    """:const:`telegram.constants.BotCommandLimit.MAX_COMMAND`
+
+    .. versionadded:: 20.0
+    """
     MIN_DESCRIPTION: ClassVar[int] = constants.BotCommandLimit.MIN_DESCRIPTION
-    """:const:`telegram.constants.BotCommandLimit.MIN_DESCRIPTION`"""
+    """:const:`telegram.constants.BotCommandLimit.MIN_DESCRIPTION`
+
+    .. versionadded:: 20.0
+    """
     MAX_DESCRIPTION: ClassVar[int] = constants.BotCommandLimit.MAX_DESCRIPTION
-    """:const:`telegram.constants.BotCommandLimit.MAX_DESCRIPTION`"""
+    """:const:`telegram.constants.BotCommandLimit.MAX_DESCRIPTION`
+
+    .. versionadded:: 20.0
+    """

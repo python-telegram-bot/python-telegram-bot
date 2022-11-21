@@ -145,16 +145,37 @@ class InlineQueryResultLocation(InlineQueryResult):
         )
 
     HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
-    """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`"""
+    """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
+
+    .. versionadded:: 20.0
+    """
     MIN_HEADING: ClassVar[int] = constants.LocationLimit.MIN_HEADING
-    """:const:`telegram.constants.LocationLimit.MIN_HEADING`"""
+    """:const:`telegram.constants.LocationLimit.MIN_HEADING`
+
+    .. versionadded:: 20.0
+    """
     MAX_HEADING: ClassVar[int] = constants.LocationLimit.MAX_HEADING
-    """:const:`telegram.constants.LocationLimit.MAX_HEADING`"""
+    """:const:`telegram.constants.LocationLimit.MAX_HEADING`
+
+    .. versionadded:: 20.0
+    """
     MIN_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MIN_LIVE_PERIOD
-    """:const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD`"""
+    """:const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD`
+
+    .. versionadded:: 20.0
+    """
     MAX_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MAX_LIVE_PERIOD
-    """:const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`"""
+    """:const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`
+
+    .. versionadded:: 20.0
+    """
     MIN_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS
-    """:const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`"""
+    """:const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
+
+    .. versionadded:: 20.0
+    """
     MAX_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS
-    """:const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`"""
+    """:const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
+
+    .. versionadded:: 20.0
+    """

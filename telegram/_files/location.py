@@ -94,8 +94,17 @@ class Location(TelegramObject):
         self._id_attrs = (self.longitude, self.latitude)
 
     HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
-    """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`"""
+    """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
+
+    .. versionadded:: 20.0
+    """
     MIN_HEADING: ClassVar[int] = constants.LocationLimit.MIN_HEADING
-    """:const:`telegram.constants.LocationLimit.MIN_HEADING`"""
+    """:const:`telegram.constants.LocationLimit.MIN_HEADING`
+
+    .. versionadded:: 20.0
+    """
     MAX_HEADING: ClassVar[int] = constants.LocationLimit.MAX_HEADING
-    """:const:`telegram.constants.LocationLimit.MAX_HEADING`"""
+    """:const:`telegram.constants.LocationLimit.MAX_HEADING`
+
+    .. versionadded:: 20.0
+    """
