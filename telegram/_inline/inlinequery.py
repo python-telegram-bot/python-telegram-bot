@@ -185,8 +185,18 @@ class InlineQuery(TelegramObject):
 
     .. versionadded:: 13.2
     """
-    MAX_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH
-    """:const:`telegram.constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH`
+    MIN_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH
+    """:const:`telegram.constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH
+    """:const:`telegram.constants.InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_OFFSET_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_OFFSET_LENGTH
+    """:const:`telegram.constants.InlineQueryLimit.MAX_OFFSET_LENGTH`
 
     .. versionadded:: 20.0
     """

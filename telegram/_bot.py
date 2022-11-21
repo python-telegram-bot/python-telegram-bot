@@ -2617,13 +2617,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             next_offset (:obj:`str`, optional): Pass the offset that a client should send in the
                 next query with the same text to receive more results. Pass an empty string if
                 there are no more results or if you don't support pagination. Offset length can't
-                exceed 64 bytes.
+                exceed :tg-const:`telegram.InlineQuery.MAX_OFFSET_LENGTH` bytes.
             switch_pm_text (:obj:`str`, optional): If passed, clients will display a button with
                 specified text that switches the user to a private chat with the bot and sends the
                 bot a start message with the parameter :paramref:`switch_pm_parameter`.
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
                 :guilabel:`/start` message sent to the bot when user presses the switch button.
-                1-:tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
+                :tg-const:`telegram.InlineQuery.MIN_SWITCH_PM_TEXT_LENGTH`-
+                :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
                 only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
 
         Keyword Args:
