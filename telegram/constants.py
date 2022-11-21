@@ -193,7 +193,8 @@ class CallbackQueryLimit(IntEnum):
     __slots__ = ()
 
     ANSWER_CALLBACK_QUERY_TEXT_LENGTH = 200
-    """:obj:`int`: Maximum number of characters for the ``text`` parameter of
+    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    :paramref:`~telegram.Bot.answer_callback_query.text` parameter of
     :meth:`telegram.Bot.answer_callback_query`."""
 
 
@@ -291,14 +292,26 @@ class ChatInviteLinkLimit(IntEnum):
     __slots__ = ()
 
     MIN_MEMBER_LIMIT = 1
-    """:obj:`int`: Minimum value allowed for the ``member_limit`` parameter of
-    :meth:`telegram.Bot.create_chat_invite_link` and :meth:`telegram.Bot.edit_chat_invite_link`."""
+    """:obj:`int`: Minimum value allowed for the
+    :paramref:`~telegram.Bot.create_chat_invite_link.member_limit` parameter of
+    :meth:`telegram.Bot.create_chat_invite_link` and
+    :paramref:`~telegram.Bot.edit_chat_invite_link.member_limit` of
+    :meth:`telegram.Bot.edit_chat_invite_link`.
+    """
     MAX_MEMBER_LIMIT = 99999
-    """:obj:`int`: Maximum value allowed for the ``member_limit`` parameter of
-    :meth:`telegram.Bot.create_chat_invite_link` and :meth:`telegram.Bot.edit_chat_invite_link`."""
+    """:obj:`int`: Maximum value allowed for the
+    :paramref:`~telegram.Bot.create_chat_invite_link.member_limit` parameter of
+    :meth:`telegram.Bot.create_chat_invite_link` and
+    :paramref:`~telegram.Bot.edit_chat_invite_link.member_limit` of
+    :meth:`telegram.Bot.edit_chat_invite_link`.
+    """
     NAME_LENGTH = 32
-    """:obj:`int`: Maximum number of characters allowed for the ``name`` parameter of
-    :meth:`telegram.Bot.create_chat_invite_link` and :meth:`telegram.Bot.edit_chat_invite_link`."""
+    """:obj:`int`: Maximum length of :obj:`str` passed as the
+    :paramref:`~telegram.Bot.create_chat_invite_link.name` parameter of
+    :meth:`telegram.Bot.create_chat_invite_link` and
+    :paramref:`~telegram.Bot.edit_chat_invite_link.name` of
+    :meth:`telegram.Bot.edit_chat_invite_link`.
+    """
 
 
 class ChatMemberStatus(StringEnum):
@@ -609,18 +622,18 @@ class InlineQueryLimit(IntEnum):
     """:obj:`int`: Maximum number of results that can be passed to
     :meth:`telegram.Bot.answer_inline_query`."""
     MAX_OFFSET_LENGTH = 64
-    """:obj:`int`: Maximum length (in bytes) of :obj:`str` passed to the
+    """:obj:`int`: Maximum length (in bytes) of :obj:`str` passed as the
     :paramref:`~telegram.Bot.answer_inline_query.next_offset` parameter of
     :meth:`telegram.Bot.answer_inline_query`."""
     MAX_QUERY_LENGTH = 256
-    """:obj:`int`: Maximum length of :obj:`str` passed to the
+    """:obj:`int`: Maximum length of :obj:`str` passed as the
     :paramref:`~telegram.InlineQuery.query` parameter of :class:`telegram.InlineQuery`."""
     MIN_SWITCH_PM_TEXT_LENGTH = 1
-    """:obj:`int`: Minimum length of :obj:`str` passed to the
+    """:obj:`int`: Minimum length of :obj:`str` passed as the
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
     :meth:`telegram.Bot.answer_inline_query`."""
     MAX_SWITCH_PM_TEXT_LENGTH = 64
-    """:obj:`int`: Maximum length of :obj:`str` passed to the
+    """:obj:`int`: Maximum length of :obj:`str` passed as the
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
     :meth:`telegram.Bot.answer_inline_query`."""
 
@@ -955,9 +968,28 @@ class MessageLimit(IntEnum):
 
     # TODO add links to params?
     MAX_TEXT_LENGTH = 4096
-    """:obj:`int`: Maximum number of characters for a text message."""
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.Game.text` parameter of :class:`telegram.Game`
+    * :paramref:`~telegram.Message.text` parameter of :class:`telegram.Message`
+    * :paramref:`~telegram.InputTextMessageContent.message_text` parameter of
+      :class:`telegram.InputTextMessageContent`
+    * :paramref:`~telegram.Bot.send_message.text` parameter of :meth:`telegram.Bot.send_message`
+    * :paramref:`~telegram.Bot.edit_message_text.text` parameter of
+      :meth:`telegram.Bot.edit_message_text`
+    """
     CAPTION_LENGTH = 1024
-    """:obj:`int`: Maximum number of characters for a message caption."""
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.Message.caption` parameter of :class:`telegram.Message`
+    * :paramref:`~telegram.InputMedia.caption` parameter of :class:`telegram.InputMedia`
+      and its subclasses
+    * ``caption`` parameter of subclasses of :class:`telegram.InlineQueryResult`
+    * ``caption`` parameter of :meth:`telegram.Bot.send_photo`, :meth:`telegram.Bot.send_audio`,
+      :meth:`telegram.Bot.send_document`, :meth:`telegram.Bot.send_video`,
+      :meth:`telegram.Bot.send_animation`, :meth:`telegram.Bot.send_voice`,
+      :meth:`telegram.Bot.edit_message_caption`, :meth:`telegram.Bot.copy_message`
+    """
     # constants above this line are tested
     MIN_TEXT_LENGTH = 1
     """:obj:`int`: Minimum length of a :obj:`str` passed as the
@@ -966,8 +998,10 @@ class MessageLimit(IntEnum):
     :paramref:`~telegram.Bot.edit_message_text.text` parameter of
     :meth:`telegram.Bot.edit_message_text`.
     """
+    # TODO this constant is not used. helpers.py contains 64 as a number
     DEEP_LINK_LENGTH = 64
     """:obj:`int`: Maximum number of characters for a deep link."""
+    # TODO this constant is not used anywhere
     MESSAGE_ENTITIES = 100
     """:obj:`int`: Maximum number of entities that can be displayed in a message. Further entities
     will simply be ignored by Telegram.
@@ -1328,17 +1362,65 @@ class InvoiceLimit(IntEnum):
     __slots__ = ()
 
     MIN_TITLE_LENGTH = 1
-    """:obj:`int`: Minimum number of characters of the invoice title."""
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.InputInvoiceMessageContent.title` parameter of
+      :class:`telegram.InputInvoiceMessageContent`
+    * :paramref:`~telegram.Bot.send_invoice.title` parameter of
+      :meth:`telegram.Bot.send_invoice`.
+    * :paramref:`~telegram.Bot.create_invoice_link.title` parameter of
+      :meth:`telegram.Bot.create_invoice_link`.
+    """
     MAX_TITLE_LENGTH = 32
-    """:obj:`int`: Maximum number of characters of the invoice title."""
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.InputInvoiceMessageContent.title` parameter of
+      :class:`telegram.InputInvoiceMessageContent`
+    * :paramref:`~telegram.Bot.send_invoice.title` parameter of
+      :meth:`telegram.Bot.send_invoice`.
+    * :paramref:`~telegram.Bot.create_invoice_link.title` parameter of
+      :meth:`telegram.Bot.create_invoice_link`.
+    """
     MIN_DESCRIPTION_LENGTH = 1
-    """:obj:`int`: Minimum number of characters of the invoice description."""
+    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.InputInvoiceMessageContent.description` parameter of
+      :class:`telegram.InputInvoiceMessageContent`
+    * :paramref:`~telegram.Bot.send_invoice.description` parameter of
+      :meth:`telegram.Bot.send_invoice`.
+    * :paramref:`~telegram.Bot.create_invoice_link.description` parameter of
+      :meth:`telegram.Bot.create_invoice_link`.
+    """
     MAX_DESCRIPTION_LENGTH = 255
-    """:obj:`int`: Maximum number of characters of the invoice description."""
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.InputInvoiceMessageContent.description` parameter of
+      :class:`telegram.InputInvoiceMessageContent`
+    * :paramref:`~telegram.Bot.send_invoice.description` parameter of
+      :meth:`telegram.Bot.send_invoice`.
+    * :paramref:`~telegram.Bot.create_invoice_link.description` parameter of
+      :meth:`telegram.Bot.create_invoice_link`.
+    """
     MIN_PAYLOAD_LENGTH = 1
-    """:obj:`int`: Minimum amount of bytes for the internal payload."""
+    """:obj:`int`: Minimum amount of bytes in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.InputInvoiceMessageContent.payload` parameter of
+      :class:`telegram.InputInvoiceMessageContent`
+    * :paramref:`~telegram.Bot.send_invoice.payload` parameter of
+      :meth:`telegram.Bot.send_invoice`.
+    * :paramref:`~telegram.Bot.create_invoice_link.payload` parameter of
+      :meth:`telegram.Bot.create_invoice_link`.
+    """
     MAX_PAYLOAD_LENGTH = 128
-    """:obj:`int`: Maximum amount of bytes for the internal payload."""
+    """:obj:`int`: Maximum amount of bytes in a :obj:`str` passed as:
+
+    * :paramref:`~telegram.InputInvoiceMessageContent.payload` parameter of
+      :class:`telegram.InputInvoiceMessageContent`
+    * :paramref:`~telegram.Bot.send_invoice.payload` parameter of
+      :meth:`telegram.Bot.send_invoice`.
+    * :paramref:`~telegram.Bot.create_invoice_link.payload` parameter of
+      :meth:`telegram.Bot.create_invoice_link`.
+    """
 
 
 class UserProfilePhotosLimit(IntEnum):
