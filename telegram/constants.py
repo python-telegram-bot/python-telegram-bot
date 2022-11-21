@@ -612,6 +612,9 @@ class InlineQueryLimit(IntEnum):
     """:obj:`int`: Maximum length (in bytes) of :obj:`str` passed to the
     :paramref:`~telegram.Bot.answer_inline_query.next_offset` parameter of
     :meth:`telegram.Bot.answer_inline_query`."""
+    MAX_QUERY_LENGTH = 256
+    """:obj:`int`: Maximum length of :obj:`str` passed to the
+    :paramref:`~telegram.InlineQuery.query` parameter of :class:`telegram.InlineQuery`."""
     MIN_SWITCH_PM_TEXT_LENGTH = 1
     """:obj:`int`: Minimum length of :obj:`str` passed to the
     :paramref:`~telegram.Bot.answer_inline_query.switch_pm_parameter` parameter of
