@@ -40,6 +40,12 @@ def all_subclasses(cls):
 
 TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
 
+class OldChat(Chat):  # defined here since we can't pickle local objects in methods
+    __slots__ = ("all_members_are_administrators",)
+    def __init__(self, all_members_are_administrators, **kwargs):
+        super().__init__(**kwargs)
+        self.all_members_are_administrators = all_members_are_administrators
+    pass
 
 class TestTelegramObject:
     class Sub(TelegramObject):
@@ -243,7 +249,7 @@ class TestTelegramObject:
         assert unpickled.date == date, f"{unpickled.date} != {date}"
         assert unpickled.photo[0] == photo
 
-    def test_pickle_apply_api_kwargs(self, bot):
+    def test_pickle_apply_api_kwargs(self):
         """Makes sure that when a class gets new attributes, the api_kwargs are moved to the
         new attributes on unpickling."""
         obj = self.ChangingTO(api_kwargs={"foo": "bar"})
@@ -254,6 +260,24 @@ class TestTelegramObject:
 
         assert obj.foo == "bar"
         assert obj.api_kwargs == {}
+
+    def test_pickle_removed_attribute(self):
+        """Test when newer versions of the library remove attributes from classes (which the old
+        pickled versions still have).
+        """
+        # Unfortuantely its difficult to test this when old class doesn't have api_kwargs, the
+        # attempt to do so was commented out.
+        chat = OldChat(all_members_are_administrators=True, id=1, type=Chat.PRIVATE)
+        delattr(chat, "api_kwargs")
+        # delattr(TelegramObject, "api_kwargs")  # emulate old version without api_kwargs
+        assert chat.all_members_are_administrators
+        assert getattr(chat, "api_kwargs", False) is False
+
+        pickled = pickle.dumps(chat)
+        delattr(OldChat, 'all_members_are_administrators')
+        # setattr(TelegramObject, "api_kwargs", {})  # emulate new version with api_kwargs
+        unpickled = pickle.loads(pickled)
+        assert unpickled.api_kwargs == {'all_members_are_administrators': True}
 
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
