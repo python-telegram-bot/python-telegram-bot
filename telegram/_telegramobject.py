@@ -197,7 +197,15 @@ class TelegramObject:
         setattr(self, "_bot", None)
 
         for key, val in state.items():
-            setattr(self, key, val)
+            try:
+                setattr(self, key, val)
+            except AttributeError:  # catch cases when old attributes are removed from new versions
+                setattr(self, "api_kwargs", state.get("api_kwargs", {}))  # assign api_kwargs first
+                if self.api_kwargs is None:  # should never happen, but just in case
+                    print('hit')
+                    setattr(self, "api_kwargs", {})
+                self.api_kwargs[key] = val # add it to api_kwargs as fallback
+
         self._apply_api_kwargs()
 
     def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
