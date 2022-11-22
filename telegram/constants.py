@@ -38,7 +38,6 @@ __all__ = [
     "BotCommandScopeType",
     "CallbackQueryLimit",
     "ChatAction",
-    "ChatDescriptionLimit",
     "ChatID",
     "ChatInviteLinkLimit",
     "ChatLimit",
@@ -233,22 +232,6 @@ class ChatAction(StringEnum):
     """:obj:`str`: Chat action indicating that the bot is uploading a video note."""
 
 
-class ChatDescriptionLimit(IntEnum):
-    """This enum contains limitations for :meth:`telegram.Bot.set_chat_description`.
-    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
-
-    .. versionadded:: 20.0
-    """
-
-    __slots__ = ()
-
-    DESCRIPTION_LENGTH = 255
-    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.set_chat_description.description` parameter of
-    :meth:`telegram.Bot.set_chat_description`.
-    """
-
-
 class ChatID(IntEnum):
     """This enum contains some special chat IDs. The enum
     members of this enumeration are instances of :class:`int` and can be treated as such.
@@ -318,8 +301,8 @@ class ChatInviteLinkLimit(IntEnum):
 
 class ChatLimit(IntEnum):
     """This enum contains limitations for
-    :meth:`telegram.Bot.set_chat_administrator_custom_title` and
-    :meth:`telegram.Bot.set_chat_title`.
+    :meth:`telegram.Bot.set_chat_administrator_custom_title`,
+    :meth:`telegram.Bot.set_chat_description`, and :meth:`telegram.Bot.set_chat_title`.
     The enum members of this enumeration are instances of :class:`int` and can be treated as such.
 
     .. versionadded:: 20.0
@@ -331,6 +314,11 @@ class ChatLimit(IntEnum):
     """:obj:`int`: Maximum length of a :obj:`str` passed as the
     :paramref:`~telegram.Bot.set_chat_administrator_custom_title.custom_title` parameter of
     :meth:`telegram.Bot.set_chat_administrator_custom_title`.
+    """
+    CHAT_DESCRIPTION_LENGTH = 255
+    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_description.description` parameter of
+    :meth:`telegram.Bot.set_chat_description`.
     """
     MIN_CHAT_TITLE_LENGTH = 1
     """:obj:`int`: Minimum length of a :obj:`str` passed as the
