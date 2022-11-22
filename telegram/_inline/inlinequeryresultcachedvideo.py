@@ -39,7 +39,9 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
     of the video.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         video_file_id (:obj:`str`): A valid file identifier for the video file.
         title (:obj:`str`): Title for the result.
         description (:obj:`str`, optional): Short description of the result.
@@ -55,7 +57,9 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VIDEO`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         video_file_id (:obj:`str`): A valid file identifier for the video file.
         title (:obj:`str`): Title for the result.
         description (:obj:`str`): Optional. Short description of the result.

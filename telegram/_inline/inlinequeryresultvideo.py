@@ -43,7 +43,9 @@ class InlineQueryResultVideo(InlineQueryResult):
         replace its content using :attr:`input_message_content`.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (JPEG only) for the video.
@@ -66,7 +68,9 @@ class InlineQueryResultVideo(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VIDEO`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         video_url (:obj:`str`): A valid URL for the embedded video player or video file.
         mime_type (:obj:`str`): Mime type of the content of video url, "text/html" or "video/mp4".
         thumb_url (:obj:`str`): URL of the thumbnail (JPEG only) for the video.

@@ -38,7 +38,8 @@ class InputTextMessageContent(InputMessageContent):
 
     Args:
         message_text (:obj:`str`): Text of the message to be sent,
-            1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
+            :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
+            :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
@@ -47,7 +48,7 @@ class InputTextMessageContent(InputMessageContent):
 
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent,
-            1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
+            1-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
         entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|

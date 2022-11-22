@@ -39,7 +39,9 @@ class InlineQueryResultCachedGif(InlineQueryResult):
     the animation.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         gif_file_id (:obj:`str`): A valid file identifier for the GIF file.
         title (:obj:`str`, optional): Title for the result.caption (:obj:`str`, optional):
         caption (:obj:`str`, optional): Caption of the GIF file to be sent,
@@ -54,7 +56,9 @@ class InlineQueryResultCachedGif(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GIF`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         gif_file_id (:obj:`str`): A valid file identifier for the GIF file.
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption of the GIF file to be sent,

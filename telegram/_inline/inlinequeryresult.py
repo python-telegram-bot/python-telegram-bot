@@ -19,6 +19,9 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram InlineQueryResult."""
 
+from typing import ClassVar
+
+from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -38,11 +41,15 @@ class InlineQueryResult(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of the result.
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
 
     Attributes:
         type (:obj:`str`): Type of the result.
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
 
     """
 
@@ -56,3 +63,14 @@ class InlineQueryResult(TelegramObject):
         self.id = str(id)  # pylint: disable=invalid-name
 
         self._id_attrs = (self.id,)
+
+    MIN_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MIN_ID_LENGTH
+    """:const:`telegram.constants.InlineQueryResultLimit.MIN_ID_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MAX_ID_LENGTH
+    """:const:`telegram.constants.InlineQueryResultLimit.MAX_ID_LENGTH`
+
+    .. versionadded:: 20.0
+    """

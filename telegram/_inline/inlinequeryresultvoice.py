@@ -39,7 +39,9 @@ class InlineQueryResultVoice(InlineQueryResult):
     the voice message.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.
         title (:obj:`str`): Recording title.
         caption (:obj:`str`, optional): Caption,
@@ -55,7 +57,9 @@ class InlineQueryResultVoice(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VOICE`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.
         title (:obj:`str`): Recording title.
         caption (:obj:`str`): Optional. Caption,

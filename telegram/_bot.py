@@ -681,8 +681,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             text (:obj:`str`): Text of the message to be sent. Max
-                :tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
-                parsing.
+                :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
+                entities parsing.
             parse_mode (:obj:`str`): |parse_mode|
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of
@@ -1723,7 +1723,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Note:
             To use this method, the file must have the type :mimetype:`audio/ogg` and be no more
-            than ``1MB`` in size. ``1-20MB`` voice notes will be sent as files.
+            than :tg-const:`telegram.constants.FileSizeLimit.VOICE_NOTE_FILE_SIZE` in size.
+            :tg-const:`telegram.constants.FileSizeLimit.VOICE_NOTE_FILE_SIZE`-
+            :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD` voice notes will be
+            sent as files.
 
         .. seealso:: :attr:`telegram.Message.reply_voice`, :attr:`telegram.Chat.send_voice`,
             :attr:`telegram.User.send_voice`
@@ -1971,13 +1974,18 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 measured in meters;
                 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
             live_period (:obj:`int`, optional): Period in seconds for which the location will be
-                updated, should be between 60 and 86400.
+                updated, should be between
+                :tg-const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD` and
+                :tg-const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`.
             heading (:obj:`int`, optional): For live locations, a direction in which the user is
-                moving, in degrees. Must be between 1 and
-                :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+                moving, in degrees. Must be between
+                :tg-const:`telegram.constants.LocationLimit.MIN_HEADING` and
+                :tg-const:`telegram.constants.LocationLimit.MAX_HEADING` if specified.
             proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
                 for proximity alerts about approaching another chat member, in meters. Must be
-                between 1 and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+                between :tg-const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
+                and :tg-const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
+                if specified.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -2088,10 +2096,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 location, measured in meters;
                 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
             heading (:obj:`int`, optional): Direction in which the user is moving, in degrees. Must
-                be between 1 and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+                be between :tg-const:`telegram.constants.LocationLimit.MIN_HEADING`
+                and :tg-const:`telegram.constants.LocationLimit.MAX_HEADING` if specified.
             proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts
-                about approaching another chat member, in meters. Must be between 1 and
-                :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+                about approaching another chat member, in meters. Must be between
+                :tg-const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
+                and :tg-const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
+                if specified.
             reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): An object for a new
                 inline keyboard.
 
@@ -2369,7 +2380,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             first_name (:obj:`str`, optional): Contact's first name.
             last_name (:obj:`str`, optional): Contact's last name.
             vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
-                0-2048 bytes.
+                0-:tg-const:`telegram.constants.ContactLimit.VCARD` bytes.
             disable_notification (:obj:`bool`, optional): |disable_notification|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -2699,13 +2710,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             next_offset (:obj:`str`, optional): Pass the offset that a client should send in the
                 next query with the same text to receive more results. Pass an empty string if
                 there are no more results or if you don't support pagination. Offset length can't
-                exceed 64 bytes.
+                exceed :tg-const:`telegram.InlineQuery.MAX_OFFSET_LENGTH` bytes.
             switch_pm_text (:obj:`str`, optional): If passed, clients will display a button with
                 specified text that switches the user to a private chat with the bot and sends the
                 bot a start message with the parameter :paramref:`switch_pm_parameter`.
             switch_pm_parameter (:obj:`str`, optional): Deep-linking parameter for the
                 :guilabel:`/start` message sent to the bot when user presses the switch button.
-                1-:tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
+                :tg-const:`telegram.InlineQuery.MIN_SWITCH_PM_TEXT_LENGTH`-
+                :tg-const:`telegram.InlineQuery.MAX_SWITCH_PM_TEXT_LENGTH` characters,
                 only ``A-Z``, ``a-z``, ``0-9``, ``_`` and ``-`` are allowed.
 
         Keyword Args:
@@ -2775,7 +2787,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             offset (:obj:`int`, optional): Sequential number of the first photo to be returned.
                 By default, all photos are returned.
             limit (:obj:`int`, optional): Limits the number of photos to be retrieved. Values
-                between 1-100 are accepted. Defaults to ``100``.
+                between :tg-const:`telegram.constants.UserProfilePhotosLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.UserProfilePhotosLimit.MAX_LIMIT` are accepted.
+                Defaults to ``100``.
 
         Returns:
             :class:`telegram.UserProfilePhotos`
@@ -3193,8 +3207,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             inline_message_id (:obj:`str`, optional): Required if :paramref:`chat_id` and
                 :paramref:`message_id` are not specified. Identifier of the inline message.
             text (:obj:`str`): New text of the message,
-                1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
-                parsing.
+                :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
+                :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after
+                entities parsing.
             parse_mode (:obj:`str`, optional): |parse_mode|
             entities (List[:class:`telegram.MessageEntity`], optional): List of special entities
                 that appear in message text, which can be specified instead of
@@ -3471,7 +3486,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 can be specified to retrieve updates starting from -offset update from the end of
                 the updates queue. All previous updates will forgotten.
             limit (:obj:`int`, optional): Limits the number of updates to be retrieved. Values
-                between 1-100 are accepted. Defaults to ``100``.
+                between :tg-const:`telegram.constants.PollingLimit.MIN_LIMIT`-
+                :tg-const:`telegram.constants.PollingLimit.MAX_LIMIT` are accepted.
+                Defaults to ``100``.
             timeout (:obj:`int`, optional): Timeout in seconds for long polling. Defaults to ``0``,
                 i.e. usual short polling. Should be positive, short polling should be used for
                 testing purposes only.
@@ -3591,9 +3608,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             ip_address (:obj:`str`, optional): The fixed IP address which will be used to send
                 webhook requests instead of the IP address resolved through DNS.
             max_connections (:obj:`int`, optional): Maximum allowed number of simultaneous HTTPS
-                connections to the webhook for update delivery, 1-100. Defaults to ``40``. Use
-                lower values to limit the load on your bot's server, and higher values to increase
-                your bot's throughput.
+                connections to the webhook for update delivery,
+                :tg-const:`telegram.constants.WebhookLimit.MIN_CONNECTIONS_LIMIT`-
+                :tg-const:`telegram.constants.WebhookLimit.MAX_CONNECTIONS_LIMIT`.
+                Defaults to ``40``. Use lower values to limit the load on your bot's server,
+                and higher values to increase your bot's throughput.
             allowed_updates (List[:obj:`str`], optional): A list the types of
                 updates you want your bot to receive. For example, specify ["message",
                 "edited_channel_post", "callback_query"] to only receive updates of these types.
@@ -4728,8 +4747,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             user_id (:obj:`int`): Unique identifier of the target administrator.
-            custom_title (:obj:`str`): New custom title for the administrator; 0-16 characters,
-                emoji are not allowed.
+            custom_title (:obj:`str`): New custom title for the administrator;
+                0-:tg-const:`telegram.constants.ChatLimit.CHAT_ADMINISTRATOR_CUSTOM_TITLE_LENGTH`
+                characters, emoji are not allowed.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4832,7 +4852,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
-                1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
+                :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
+                :tg-const:`telegram.constants.ChatInviteLinkLimit.MAX_MEMBER_LIMIT`.
             name (:obj:`str`, optional): Invite link name;
                 0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
@@ -4919,7 +4940,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 used.
             member_limit (:obj:`int`, optional): Maximum number of users that can be members of
                 the chat simultaneously after joining the chat via this invite link;
-                1-:tg-const:`telegram.constants.ChatInviteLinkLimit.MEMBER_LIMIT`.
+                :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
+                :tg-const:`telegram.constants.ChatInviteLinkLimit.MAX_MEMBER_LIMIT`.
             name (:obj:`str`, optional): Invite link name;
                 0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
@@ -5261,7 +5283,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            description (:obj:`str`, optional): New chat description, 0-255 characters.
+            description (:obj:`str`, optional): New chat description,
+                0-:tg-const:`telegram.constants.ChatDescriptionLimit.DESCRIPTION_LENGTH`
+                characters.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5591,8 +5615,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 (e.g., animals). Can contain only english letters, digits and underscores.
                 Must begin with a letter, can't contain consecutive underscores and
                 must end in "_by_<bot username>". <bot_username> is case insensitive.
-                1-64 characters.
-            title (:obj:`str`): Sticker set title, 1-64 characters.
+                :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
+                :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
+            title (:obj:`str`): Sticker set title,
+                :tg-const:`telegram.constants.StickerLimit.MIN_NAME_AND_TITLE`-
+                :tg-const:`telegram.constants.StickerLimit.MAX_NAME_AND_TITLE` characters.
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
@@ -5980,11 +6007,13 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
-            question (:obj:`str`): Poll question, 1-:tg-const:`telegram.Poll.MAX_QUESTION_LENGTH`
-                characters.
+            question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
+                :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
             options (List[:obj:`str`]): List of answer options,
-                2-:tg-const:`telegram.Poll.MAX_OPTION_NUMBER` strings
-                1-:tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters each.
+                :tg-const:`telegram.Poll.MIN_OPTION_NUMBER`-
+                :tg-const:`telegram.Poll.MAX_OPTION_NUMBER` strings
+                :tg-const:`telegram.Poll.MIN_OPTION_LENGTH`-
+                :tg-const:`telegram.Poll.MAX_OPTION_LENGTH` characters each.
             is_anonymous (:obj:`bool`, optional): :obj:`True`, if the poll needs to be anonymous,
                 defaults to :obj:`True`.
             type (:obj:`str`, optional): Poll type, :tg-const:`telegram.Poll.QUIZ` or
@@ -5994,8 +6023,10 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             correct_option_id (:obj:`int`, optional): 0-based identifier of the correct answer
                 option, required for polls in quiz mode.
             explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
-                answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most
-                2 line feeds after entities parsing.
+                answer or taps on the lamp icon in a quiz-style poll,
+                0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters with at most
+                :tg-const:`telegram.Poll.MAX_EXPLANATION_LINE_FEEDS` line feeds after entities
+                parsing.
             explanation_parse_mode (:obj:`str`, optional): Mode for parsing entities in the
                 explanation. See the constants in :class:`telegram.constants.ParseMode` for the
                 available modes.
@@ -6003,11 +6034,14 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 entities that appear in message text, which can be specified instead of
                 :paramref:`explanation_parse_mode`.
             open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
-                after creation, 5-600. Can't be used together with :paramref:`close_date`.
+                after creation, :tg-const:`telegram.Poll.MIN_OPEN_PERIOD`-
+                :tg-const:`telegram.Poll.MAX_OPEN_PERIOD`. Can't be used together with
+                :paramref:`close_date`.
             close_date (:obj:`int` | :obj:`datetime.datetime`, optional): Point in time (Unix
-                timestamp) when the poll will be automatically closed. Must be at least 5 and no
-                more than 600 seconds in the future. Can't be used together with
-                :paramref:`open_period`.
+                timestamp) when the poll will be automatically closed. Must be at least
+                :tg-const:`telegram.Poll.MIN_OPEN_PERIOD` and no more than
+                :tg-const:`telegram.Poll.MAX_OPEN_PERIOD` seconds in the future.
+                Can't be used together with :paramref:`open_period`.
                 For timezone naive :obj:`datetime.datetime` objects, the default timezone of the
                 bot will be used, which is UTC unless :attr:`telegram.ext.Defaults.tzinfo` is
                 used.
@@ -6158,16 +6192,19 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 keyboard, instructions to remove reply keyboard or to force a reply from the user
             emoji (:obj:`str`, optional): Emoji on which the dice throw animation is based.
                 Currently, must be one of :class:`telegram.constants.DiceEmoji`. Dice can have
-                values 1-6 for :tg-const:`telegram.constants.DiceEmoji.DICE`,
-                :tg-const:`telegram.constants.DiceEmoji.DARTS` and
-                :tg-const:`telegram.constants.DiceEmoji.BOWLING`, values 1-5 for
-                :tg-const:`telegram.constants.DiceEmoji.BASKETBALL` and
-                :tg-const:`telegram.constants.DiceEmoji.FOOTBALL`, and values 1-64
-                for :tg-const:`telegram.constants.DiceEmoji.SLOT_MACHINE`. Defaults to
-                :tg-const:`telegram.constants.DiceEmoji.DICE`.
+                values
+                :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_BOWLING`
+                for :tg-const:`telegram.Dice.DICE`, :tg-const:`telegram.Dice.DARTS` and
+                :tg-const:`telegram.Dice.BOWLING`, values
+                :tg-const:`telegram.Dice.MIN_VALUE`-:tg-const:`telegram.Dice.MAX_VALUE_BASKETBALL`
+                for :tg-const:`telegram.Dice.BASKETBALL` and :tg-const:`telegram.Dice.FOOTBALL`,
+                and values :tg-const:`telegram.Dice.MIN_VALUE`-
+                :tg-const:`telegram.Dice.MAX_VALUE_SLOT_MACHINE`
+                for :tg-const:`telegram.Dice.SLOT_MACHINE`. Defaults to
+                :tg-const:`telegram.Dice.DICE`.
 
                 .. versionchanged:: 13.4
-                   Added the :tg-const:`telegram.constants.DiceEmoji.BOWLING` emoji..
+                   Added the :tg-const:`telegram.Dice.BOWLING` emoji.
             allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
             protect_content (:obj:`bool`, optional): |protect_content|
 
@@ -6377,8 +6414,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         Args:
             commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list
-                of bot commands to be set as the list of the bot's commands. At most 100 commands
-                can be specified.
+                of bot commands to be set as the list of the bot's commands. At most
+                :tg-const:`telegram.constants.BotCommandLimit.MAX_COMMAND_NUMBER` commands can be
+                specified.
             scope (:class:`telegram.BotCommandScope`, optional): An object,
                 describing scope of users for which the commands are relevant. Defaults to
                 :class:`telegram.BotCommandScopeDefault`.

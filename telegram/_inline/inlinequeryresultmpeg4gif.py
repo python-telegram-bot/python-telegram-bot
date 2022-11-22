@@ -39,7 +39,9 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     animation.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
         mpeg4_width (:obj:`int`, optional): Video width.
         mpeg4_height (:obj:`int`, optional): Video height.
@@ -60,7 +62,9 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.MPEG4GIF`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
         mpeg4_width (:obj:`int`): Optional. Video width.
         mpeg4_height (:obj:`int`): Optional. Video height.

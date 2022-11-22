@@ -38,7 +38,9 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
     to send a message with the specified content instead of the file.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         title (:obj:`str`): Title for the result.
         document_file_id (:obj:`str`): A valid file identifier for the file.
         description (:obj:`str`, optional): Short description of the result.
@@ -54,7 +56,9 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.DOCUMENT`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         title (:obj:`str`): Title for the result.
         document_file_id (:obj:`str`): A valid file identifier for the file.
         description (:obj:`str`): Optional. Short description of the result.

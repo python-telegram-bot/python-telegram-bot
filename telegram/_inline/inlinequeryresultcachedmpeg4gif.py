@@ -39,7 +39,9 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
     with the specified content instead of the animation.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         mpeg4_file_id (:obj:`str`): A valid file identifier for the MP4 file.
         title (:obj:`str`, optional): Title for the result.
         caption (:obj:`str`, optional): Caption of the MPEG-4 file to be sent,
@@ -54,7 +56,9 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.MPEG4GIF`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         mpeg4_file_id (:obj:`str`): A valid file identifier for the MP4 file.
         title (:obj:`str`): Optional. Title for the result.
         caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent,

@@ -38,7 +38,9 @@ class InlineQueryResultGif(InlineQueryResult):
     send a message with the specified content instead of the animation.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
         gif_width (:obj:`int`, optional): Width of the GIF.
         gif_height (:obj:`int`, optional): Height of the GIF.
@@ -60,7 +62,9 @@ class InlineQueryResultGif(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.GIF`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         gif_url (:obj:`str`): A valid URL for the GIF file. File size must not exceed 1MB.
         gif_width (:obj:`int`): Optional. Width of the GIF.
         gif_height (:obj:`int`): Optional. Height of the GIF.

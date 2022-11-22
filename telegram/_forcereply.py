@@ -18,6 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ForceReply."""
 
+from typing import ClassVar
+
+from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -46,7 +49,10 @@ class ForceReply(TelegramObject):
                original message.
 
         input_field_placeholder (:obj:`str`, optional): The placeholder to be shown in the input
-            field when the reply is active; 1-64 characters.
+            field when the reply is active;
+            :tg-const:`telegram.ForceReply.MIN_INPUT_FIELD_PLACEHOLDER`-
+            :tg-const:`telegram.ForceReply.MAX_INPUT_FIELD_PLACEHOLDER`
+            characters.
 
             .. versionadded:: 13.7
 
@@ -76,3 +82,14 @@ class ForceReply(TelegramObject):
         self.input_field_placeholder = input_field_placeholder
 
         self._id_attrs = (self.selective,)
+
+    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER`
+
+    .. versionadded:: 20.0
+    """
+    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER`
+
+    .. versionadded:: 20.0
+    """

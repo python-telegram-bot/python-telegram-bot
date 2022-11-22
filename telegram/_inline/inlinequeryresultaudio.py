@@ -38,7 +38,9 @@ class InlineQueryResultAudio(InlineQueryResult):
     content instead of the audio.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         audio_url (:obj:`str`): A valid URL for the audio file.
         title (:obj:`str`): Title.
         performer (:obj:`str`, optional): Performer.
@@ -55,7 +57,9 @@ class InlineQueryResultAudio(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.AUDIO`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         audio_url (:obj:`str`): A valid URL for the audio file.
         title (:obj:`str`): Title.
         performer (:obj:`str`): Optional. Performer.

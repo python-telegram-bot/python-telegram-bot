@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InlineKeyboardButton."""
 
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, ClassVar, Optional, Union
 
+from telegram import constants
 from telegram._games.callbackgame import CallbackGame
 from telegram._loginurl import LoginUrl
 from telegram._telegramobject import TelegramObject
@@ -86,8 +87,10 @@ class InlineKeyboardButton(TelegramObject):
             Caution:
                 Only ``HTTPS`` links are allowed after Bot API 6.1.
         callback_data (:obj:`str` | :obj:`object`, optional): Data to be sent in a callback query
-            to the bot when button is pressed, UTF-8 1-64 bytes. If the bot instance allows
-            arbitrary callback data, anything can be passed.
+            to the bot when button is pressed, UTF-8
+            :tg-const:`telegram.InlineKeyboardButton.MIN_CALLBACK_DATA`-
+            :tg-const:`telegram.InlineKeyboardButton.MAX_CALLBACK_DATA` bytes.
+            If the bot instance allows arbitrary callback data, anything can be passed.
 
             Tip:
                 The value entered here will be available in :attr:`telegram.CallbackQuery.data`.
@@ -135,7 +138,9 @@ class InlineKeyboardButton(TelegramObject):
             Caution:
                 Only ``HTTPS`` links are allowed after Bot API 6.1.
         callback_data (:obj:`str` | :obj:`object`): Optional. Data to be sent in a callback query
-            to the bot when button is pressed, UTF-8 1-64 bytes.
+            to the bot when button is pressed, UTF-8
+            :tg-const:`telegram.InlineKeyboardButton.MIN_CALLBACK_DATA`-
+            :tg-const:`telegram.InlineKeyboardButton.MAX_CALLBACK_DATA` bytes.
         web_app (:obj:`telegram.WebAppInfo`): Optional. Description of the `Web App
             <https://core.telegram.org/bots/webapps>`_  that will be launched when the user presses
             the button. The Web App will be able to send an arbitrary message on behalf of the user
@@ -236,3 +241,14 @@ class InlineKeyboardButton(TelegramObject):
         """
         self.callback_data = callback_data
         self._set_id_attrs()
+
+    MIN_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
+    """:const:`telegram.constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA`
+
+    .. versionadded:: 20.0
+    """
+    MAX_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA
+    """:const:`telegram.constants.InlineKeyboardButtonLimit.MAX_CALLBACK_DATA`
+
+    .. versionadded:: 20.0
+    """

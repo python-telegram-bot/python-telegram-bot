@@ -38,7 +38,9 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
     send a message with the specified content instead of the voice message.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.
         title (:obj:`str`): Voice message title.
         caption (:obj:`str`, optional): Caption,
@@ -53,7 +55,9 @@ class InlineQueryResultCachedVoice(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VOICE`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         voice_file_id (:obj:`str`): A valid file identifier for the voice message.
         title (:obj:`str`): Voice message title.
         caption (:obj:`str`): Optional. Caption,

@@ -139,7 +139,7 @@ class Message(TelegramObject):
         media_group_id (:obj:`str`, optional): The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`, optional): For text messages, the actual UTF-8 text of the message,
-            0-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters.
+            0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         entities (List[:class:`telegram.MessageEntity`], optional): For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.
@@ -308,7 +308,7 @@ class Message(TelegramObject):
         media_group_id (:obj:`str`): Optional. The unique identifier of a media message group this
             message belongs to.
         text (:obj:`str`): Optional. For text messages, the actual UTF-8 text of the message,
-            0-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters.
+            0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         entities (List[:class:`telegram.MessageEntity`]): Optional. For text messages, special
             entities like usernames, URLs, bot commands, etc. that appear in the text. See
             :attr:`parse_entity` and :attr:`parse_entities` methods for how to use properly.

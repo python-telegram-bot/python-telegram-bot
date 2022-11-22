@@ -38,7 +38,9 @@ class InlineQueryResultPhoto(InlineQueryResult):
     specified content instead of the photo.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size
             must not exceed 5MB.
         thumb_url (:obj:`str`): URL of the thumbnail for the photo.
@@ -58,7 +60,9 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.PHOTO`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         photo_url (:obj:`str`): A valid URL of the photo. Photo must be in JPEG format. Photo size
             must not exceed 5MB.
         thumb_url (:obj:`str`): URL of the thumbnail for the photo.
