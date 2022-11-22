@@ -43,15 +43,6 @@ def all_subclasses(cls):
 TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
 
 
-class OldChat(Chat):  # defined here since we can't pickle local objects in methods
-    __slots__ = ("all_members_are_administrators",)
-
-    def __init__(self, all_members_are_administrators, **kwargs):
-        self.all_members_are_administrators = all_members_are_administrators
-
-    pass
-
-
 class TestTelegramObject:
     class Sub(TelegramObject):
         def __init__(self, private, normal, b):
