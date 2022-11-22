@@ -257,15 +257,21 @@ class TestTelegramObject:
         assert obj.foo == "bar"
         assert obj.api_kwargs == {}
 
-    def test_pickle_removed_attribute(self):
+    async def test_pickle_removed_attribute(self):
         """Test when newer versions of the library remove attributes from classes (which the old
         pickled versions still have).
         """
-        # load old Chat object, which doesn't have api_kwargs attribute, and has now removed attr
-        # `all_members_are_administrators`.
-        pp = PicklePersistence(data_file("old_chat.pickle"))
-        chat = pp._load_file(data_file("old_chat.pickle"))
-        assert chat.api_kwargs == {"all_members_are_administrators": None}
+        # We use a modified version of the 20.0a5 Chat class, which has a `all_members_are_admins`
+        # attribute, along with an non-empty `api_kwargs` dict. This specific version was pickled
+        # using PicklePersistence.update_chat_data and that's what we use here to test if the (now)
+        # removed attribute was added to api_kwargs.
+        pp = PicklePersistence(data_file("20a5_modified_chat.pickle"))
+        chat = (await pp.get_chat_data())[1]
+        assert chat.id == 1 and chat.type == Chat.PRIVATE
+        assert chat.api_kwargs == {
+            "all_members_are_administrators": True,
+            "something": "Manually inserted",
+        }
         assert getattr(chat, "all_members_are_administrators", False) is False
 
     def test_deepcopy_telegram_obj(self, bot):

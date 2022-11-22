@@ -196,13 +196,12 @@ class TelegramObject:
         # this as Bots are not pickable.
         setattr(self, "_bot", None)
 
+        setattr(self, "api_kwargs", state.pop("api_kwargs", {}))  # assign api_kwargs first
+
         for key, val in state.items():
             try:
                 setattr(self, key, val)
             except AttributeError:  # catch cases when old attributes are removed from new versions
-                setattr(self, "api_kwargs", state.get("api_kwargs", {}))  # assign api_kwargs first
-                if self.api_kwargs is None:  # should never happen, but just in case
-                    setattr(self, "api_kwargs", {})
                 self.api_kwargs[key] = val  # add it to api_kwargs as fallback
 
         self._apply_api_kwargs()
