@@ -39,12 +39,15 @@ __all__ = [
     "ChatAction",
     "ChatID",
     "ChatInviteLinkLimit",
+    "ChatLimit",
     "ChatMemberStatus",
     "ChatType",
     "CustomEmojiStickerLimit",
     "DiceEmoji",
     "FileSizeLimit",
     "FloodLimit",
+    "ForumIconColor",
+    "ForumTopicLimit",
     "InlineKeyboardMarkupLimit",
     "InlineQueryLimit",
     "InlineQueryResultType",
@@ -97,7 +100,7 @@ class _BotAPIVersion(NamedTuple):
 #: :data:`telegram.__bot_api_version_info__`.
 #:
 #: .. versionadded:: 20.0
-BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=2)
+BOT_API_VERSION_INFO = _BotAPIVersion(major=6, minor=3)
 #: :obj:`str`: Telegram Bot API
 #: version supported by this version of `python-telegram-bot`. Also available as
 #: :data:`telegram.__bot_api_version__`.
@@ -237,6 +240,34 @@ class ChatInviteLinkLimit(IntEnum):
     :meth:`telegram.Bot.create_chat_invite_link` and :meth:`telegram.Bot.edit_chat_invite_link`."""
 
 
+class ChatLimit(IntEnum):
+    """This enum contains limitations for
+    :meth:`telegram.Bot.set_chat_administrator_custom_title` and
+    :meth:`telegram.Bot.set_chat_title`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    CHAT_ADMINISTRATOR_CUSTOM_TITLE_LENGTH = 16
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_administrator_custom_title.custom_title` parameter of
+    :meth:`telegram.Bot.set_chat_administrator_custom_title`.
+    """
+    MIN_CHAT_TITLE_LENGTH = 1
+    """:obj:`int`: Minimum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_title.title` parameter of
+    :meth:`telegram.Bot.set_chat_title`.
+    """
+    MAX_CHAT_TITLE_LENGTH = 128
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.set_chat_title.title` parameter of
+    :meth:`telegram.Bot.set_chat_title`.
+    """
+
+
 class ChatMemberStatus(StringEnum):
     """This enum contains the available states for :class:`telegram.ChatMember`. The enum
     members of this enumeration are instances of :class:`str` and can be treated as such.
@@ -367,6 +398,66 @@ class FloodLimit(IntEnum):
     MESSAGES_PER_MINUTE_PER_GROUP = 20
     """:obj:`int`: The number of messages that can roughly be sent to a particular group within one
     minute.
+    """
+
+
+class ForumIconColor(IntEnum):
+    """This enum contains the available colors for use in
+    :paramref:`telegram.Bot.create_forum_topic.icon_color`. The enum members of this enumeration
+    are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    BLUE = 0x6FB9F0
+    """:obj:`int`: An icon with a color which corresponds to blue (``0x6FB9F0``).
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#6FB9F0;"></div>
+
+    """
+    YELLOW = 0xFFD67E
+    """:obj:`int`: An icon with a color which corresponds to yellow (``0xFFD67E``).
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#FFD67E;"></div>
+
+    """
+    PURPLE = 0xCB86DB
+    """:obj:`int`: An icon with a color which corresponds to purple (``0xCB86DB``).
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#CB86DB;"></div>
+
+    """
+    GREEN = 0x8EEE98
+    """:obj:`int`: An icon with a color which corresponds to green (``0x8EEE98``).
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#8EEE98;"></div>
+
+    """
+    PINK = 0xFF93B2
+    """:obj:`int`: An icon with a color which corresponds to pink (``0xFF93B2``).
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#FF93B2;"></div>
+
+    """
+    RED = 0xFB6F5F
+    """:obj:`int`: An icon with a color which corresponds to red (``0xFB6F5F``).
+
+    .. raw:: html
+
+        <div style="height:15px; width:15px; background-color:#FB6F5F;"></div>
+
     """
 
 
@@ -901,3 +992,27 @@ class WebhookLimit(IntEnum):
     """:obj:`int`: Minimum length of the secret token."""
     MAX_SECRET_TOKEN_LENGTH = 256
     """:obj:`int`: Maximum length of the secret token."""
+
+
+class ForumTopicLimit(IntEnum):
+    """This enum contains limitations for :paramref:`telegram.Bot.create_forum_topic.name` and
+    :paramref:`telegram.Bot.edit_forum_topic.name`.
+    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
+
+    .. versionadded:: 20.0
+    """
+
+    __slots__ = ()
+
+    MIN_NAME_LENGTH = 1
+    """:obj:`int`: Minimum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
+    :meth:`telegram.Bot.create_forum_topic` and :paramref:`~telegram.Bot.edit_forum_topic.name`
+    parameter of :meth:`telegram.Bot.edit_forum_topic`.
+    """
+    MAX_NAME_LENGTH = 128
+    """:obj:`int`: Maximum length of a :obj:`str` passed as the
+    :paramref:`~telegram.Bot.create_forum_topic.name` parameter of
+    :meth:`telegram.Bot.create_forum_topic` and :paramref:`~telegram.Bot.edit_forum_topic.name`
+    parameter of :meth:`telegram.Bot.edit_forum_topic`.
+    """

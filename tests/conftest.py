@@ -208,6 +208,11 @@ def super_group_id(bot_info):
 
 
 @pytest.fixture(scope="session")
+def forum_group_id(bot_info):
+    return int(bot_info["forum_group_id"])
+
+
+@pytest.fixture(scope="session")
 def channel_id(bot_info):
     return bot_info["channel_id"]
 

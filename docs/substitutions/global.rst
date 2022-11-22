@@ -26,6 +26,10 @@
 
 .. |chat_id_group| replace:: Unique identifier for the target chat or username of the target supergroup (in the format ``@supergroupusername``).
 
+.. |message_thread_id| replace:: Unique identifier for the target message thread of the forum topic.
+
+.. |message_thread_id_arg| replace:: Unique identifier for the target message thread (topic) of the forum; for forum supergroups only.
+
 .. |parse_mode| replace:: Mode for parsing entities. See :class:`telegram.constants.ParseMode` and `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for more details.
 
 .. |allow_sending_without_reply| replace:: Pass :obj:`True`, if the message should be sent even if the specified replied-to message is not found.

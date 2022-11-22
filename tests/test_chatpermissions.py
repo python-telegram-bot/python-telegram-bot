@@ -33,6 +33,7 @@ def chat_permissions():
         can_change_info=True,
         can_invite_users=True,
         can_pin_messages=True,
+        can_manage_topics=True,
     )
 
 
@@ -45,6 +46,7 @@ class TestChatPermissions:
     can_change_info = False
     can_invite_users = None
     can_pin_messages = None
+    can_manage_topics = None
 
     def test_slot_behaviour(self, chat_permissions, mro_slots):
         inst = chat_permissions
@@ -62,6 +64,7 @@ class TestChatPermissions:
             "can_change_info": self.can_change_info,
             "can_invite_users": self.can_invite_users,
             "can_pin_messages": self.can_pin_messages,
+            "can_manage_topics": self.can_manage_topics,
         }
         permissions = ChatPermissions.de_json(json_dict, bot)
         assert permissions.api_kwargs == {}
@@ -74,6 +77,7 @@ class TestChatPermissions:
         assert permissions.can_change_info == self.can_change_info
         assert permissions.can_invite_users == self.can_invite_users
         assert permissions.can_pin_messages == self.can_pin_messages
+        assert permissions.can_manage_topics == self.can_manage_topics
 
     def test_to_dict(self, chat_permissions):
         permissions_dict = chat_permissions.to_dict()
@@ -94,6 +98,7 @@ class TestChatPermissions:
         assert permissions_dict["can_change_info"] == chat_permissions.can_change_info
         assert permissions_dict["can_invite_users"] == chat_permissions.can_invite_users
         assert permissions_dict["can_pin_messages"] == chat_permissions.can_pin_messages
+        assert permissions_dict["can_manage_topics"] == chat_permissions.can_manage_topics
 
     def test_equality(self):
         a = ChatPermissions(
