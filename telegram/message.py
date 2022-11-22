@@ -60,6 +60,7 @@ from telegram import (
     WebAppData,
     VideoChatScheduled,
 )
+from telegram.forumtopic import ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
 from telegram.utils.helpers import (
     escape_markdown,
     from_timestamp,
@@ -263,6 +264,26 @@ class Message(TelegramObject):
             .. versionadded:: 13.12
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message. ``login_url`` buttons are represented as ordinary url buttons.
+        is_topic_message (:obj:`bool`, optional): :obj:`True`, if the message is sent to a forum
+            topic.
+
+            .. versionadded:: 13.15
+        message_thread_id (:obj:`int`, optional): Unique identifier of a message thread to which
+            the message belongs; for supergroups only.
+
+            .. versionadded:: 13.15
+        forum_topic_created (:class:`telegram.ForumTopicCreated`, optional): Service message:
+            forum topic created
+
+            .. versionadded:: 13.15
+        forum_topic_closed (:class:`telegram.ForumTopicClosed`, optional): Service message:
+            forum topic closed
+
+            .. versionadded:: 13.15
+        forum_topic_reopened (:class:`telegram.ForumTopicReopened`, optional): Service message:
+            forum topic reopened
+
+            .. versionadded:: 13.15
         bot (:class:`telegram.Bot`, optional): The Bot to use for instance methods.
 
     Attributes:
@@ -405,6 +426,26 @@ class Message(TelegramObject):
             .. versionadded:: 13.12
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
+        is_topic_message (:obj:`bool`): Optional. :obj:`True`, if the message is sent to a forum
+            topic.
+
+            .. versionadded:: 13.15
+        message_thread_id (:obj:`int`): Optional. Unique identifier of a message thread to which
+            the message belongs; for supergroups only.
+
+            .. versionadded:: 13.15
+        forum_topic_created (:class:`telegram.ForumTopicCreated`): Optional. Service message:
+            forum topic created
+
+            .. versionadded:: 13.15
+        forum_topic_closed (:class:`telegram.ForumTopicClosed`): Optional. Service message:
+            forum topic closed
+
+            .. versionadded:: 13.15
+        forum_topic_reopened (:class:`telegram.ForumTopicReopened`): Optional. Service message:
+            forum topic reopened
+
+            .. versionadded:: 13.15
         bot (:class:`telegram.Bot`): Optional. The Bot to use for instance methods.
 
     .. |custom_emoji_formatting_note| replace:: Custom emoji entities will currently be ignored
@@ -478,6 +519,11 @@ class Message(TelegramObject):
         'is_automatic_forward',
         'has_protected_content',
         'web_app_data',
+        'is_topic_message',
+        'message_thread_id',
+        'forum_topic_created',
+        'forum_topic_closed',
+        'forum_topic_reopened',
         '_id_attrs',
     )
 
@@ -587,6 +633,11 @@ class Message(TelegramObject):
         video_chat_ended: VideoChatEnded = None,
         video_chat_participants_invited: VideoChatParticipantsInvited = None,
         web_app_data: WebAppData = None,
+        is_topic_message: bool = None,
+        message_thread_id: int = None,
+        forum_topic_created: ForumTopicCreated = None,
+        forum_topic_closed: ForumTopicClosed = None,
+        forum_topic_reopened: ForumTopicReopened = None,
         **_kwargs: Any,
     ):
         if (
@@ -690,7 +741,11 @@ class Message(TelegramObject):
         self.voice_chat_participants_invited = temp3
         self.video_chat_participants_invited = temp3
         self.web_app_data = web_app_data
-
+        self.is_topic_message = is_topic_message
+        self.message_thread_id = message_thread_id
+        self.forum_topic_created = forum_topic_created
+        self.forum_topic_closed = forum_topic_closed
+        self.forum_topic_reopened = forum_topic_reopened
         self.bot = bot
 
         self._effective_attachment = DEFAULT_NONE
@@ -781,6 +836,13 @@ class Message(TelegramObject):
             data.get('video_chat_participants_invited'), bot
         )
         data['web_app_data'] = WebAppData.de_json(data.get('web_app_data'), bot)
+        data["forum_topic_closed"] = ForumTopicClosed.de_json(data.get("forum_topic_closed"), bot)
+        data["forum_topic_created"] = ForumTopicCreated.de_json(
+            data.get("forum_topic_created"), bot
+        )
+        data["forum_topic_reopened"] = ForumTopicReopened.de_json(
+            data.get("forum_topic_reopened"), bot
+        )
 
         return cls(bot=bot, **data)
 
@@ -893,6 +955,7 @@ class Message(TelegramObject):
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -924,6 +987,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_markdown(
@@ -939,6 +1003,7 @@ class Message(TelegramObject):
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -980,6 +1045,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_markdown_v2(
@@ -995,6 +1061,7 @@ class Message(TelegramObject):
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1032,6 +1099,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_html(
@@ -1047,6 +1115,7 @@ class Message(TelegramObject):
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1084,6 +1153,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_media_group(
@@ -1098,6 +1168,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> List['Message']:
         """Shortcut for::
 
@@ -1127,6 +1198,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_photo(
@@ -1144,6 +1216,7 @@ class Message(TelegramObject):
         filename: str = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1176,6 +1249,7 @@ class Message(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_audio(
@@ -1197,6 +1271,7 @@ class Message(TelegramObject):
         filename: str = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1233,6 +1308,7 @@ class Message(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_document(
@@ -1252,6 +1328,7 @@ class Message(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1286,6 +1363,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_animation(
@@ -1307,6 +1385,7 @@ class Message(TelegramObject):
         filename: str = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1343,6 +1422,7 @@ class Message(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_sticker(
@@ -1356,6 +1436,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1384,6 +1465,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_video(
@@ -1406,6 +1488,7 @@ class Message(TelegramObject):
         filename: str = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1443,6 +1526,7 @@ class Message(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_video_note(
@@ -1460,6 +1544,7 @@ class Message(TelegramObject):
         filename: str = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1492,6 +1577,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_voice(
@@ -1510,6 +1596,7 @@ class Message(TelegramObject):
         filename: str = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1543,6 +1630,7 @@ class Message(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_location(
@@ -1562,6 +1650,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1596,6 +1685,7 @@ class Message(TelegramObject):
             proximity_alert_radius=proximity_alert_radius,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_venue(
@@ -1617,6 +1707,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1653,6 +1744,7 @@ class Message(TelegramObject):
             google_place_type=google_place_type,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_contact(
@@ -1670,6 +1762,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1702,6 +1795,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_poll(
@@ -1726,6 +1820,7 @@ class Message(TelegramObject):
         explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1765,6 +1860,7 @@ class Message(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             explanation_entities=explanation_entities,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_dice(
@@ -1778,6 +1874,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1806,6 +1903,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_chat_action(
@@ -1844,6 +1942,7 @@ class Message(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1874,6 +1973,7 @@ class Message(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_invoice(
@@ -1907,6 +2007,7 @@ class Message(TelegramObject):
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1965,6 +2066,7 @@ class Message(TelegramObject):
             max_tip_amount=max_tip_amount,
             suggested_tip_amounts=suggested_tip_amounts,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def forward(
@@ -1974,6 +2076,7 @@ class Message(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -2005,6 +2108,7 @@ class Message(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def copy(
@@ -2020,6 +2124,7 @@ class Message(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -2049,6 +2154,7 @@ class Message(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def reply_copy(
@@ -2066,6 +2172,7 @@ class Message(TelegramObject):
         api_kwargs: JSONDict = None,
         quote: bool = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -2104,6 +2211,7 @@ class Message(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def edit_text(
@@ -2513,6 +2621,145 @@ class Message(TelegramObject):
         return self.bot.unpin_chat_message(
             chat_id=self.chat_id,
             message_id=self.message_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def edit_forum_topic(
+        self,
+        name: str,
+        icon_custom_emoji_id: str,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+              bot.edit_forum_topic(
+                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.edit_forum_topic`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.edit_forum_topic(
+            chat_id=self.chat_id,
+            message_thread_id=self.message_thread_id,
+            name=name,
+            icon_custom_emoji_id=icon_custom_emoji_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def close_forum_topic(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+              bot.close_forum_topic(
+                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.close_forum_topic`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.close_forum_topic(
+            chat_id=self.chat_id,
+            message_thread_id=self.message_thread_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def reopen_forum_topic(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             bot.reopen_forum_topic(
+                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.reopen_forum_topic`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.reopen_forum_topic(
+            chat_id=self.chat_id,
+            message_thread_id=self.message_thread_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def delete_forum_topic(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+              bot.delete_forum_topic(
+                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_forum_topic`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.delete_forum_topic(
+            chat_id=self.chat_id,
+            message_thread_id=self.message_thread_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def unpin_all_forum_topic_messages(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+              bot.unpin_all_forum_topic_messages(
+                chat_id=message.chat_id, message_thread_id=message.message_thread_id, *args,
+                **kwargs
+             )
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.unpin_all_forum_topic_messages`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.unpin_all_forum_topic_messages(
+            chat_id=self.chat_id,
+            message_thread_id=self.message_thread_id,
             timeout=timeout,
             api_kwargs=api_kwargs,
         )

@@ -39,6 +39,10 @@ telegram package
     telegram.error
     telegram.file
     telegram.forcereply
+    telegram.forumtopic
+    telegram.forumtopicclosed
+    telegram.forumtopiccreated
+    telegram.forumtopicreopened
     telegram.inlinekeyboardbutton
     telegram.inlinekeyboardmarkup
     telegram.inputfile

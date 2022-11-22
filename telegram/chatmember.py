@@ -288,6 +288,7 @@ class ChatMember(TelegramObject):
         'can_manage_voice_chats',
         'can_manage_video_chats',
         'until_date',
+        'can_manage_topics',
         '_id_attrs',
     )
 
@@ -329,6 +330,7 @@ class ChatMember(TelegramObject):
         can_manage_chat: bool = None,
         can_manage_voice_chats: bool = None,
         can_manage_video_chats: bool = None,
+        can_manage_topics: bool = None,
         **_kwargs: Any,
     ):
         # check before required to not waste resources if the error is raised
@@ -371,6 +373,7 @@ class ChatMember(TelegramObject):
         )
         self.can_manage_voice_chats = temp
         self.can_manage_video_chats = temp
+        self.can_manage_topics = can_manage_topics
 
         self._id_attrs = (self.user, self.status)
 
@@ -494,6 +497,10 @@ class ChatMemberAdministrator(ChatMember):
             new users to the chat.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only.
+
+            .. versionadded:: 13.15
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -536,6 +543,10 @@ class ChatMemberAdministrator(ChatMember):
             new users to the chat.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
             to pin messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only
+
+            .. versionadded:: 13.15
     """
 
     __slots__ = ()
@@ -557,6 +568,7 @@ class ChatMemberAdministrator(ChatMember):
         can_invite_users: bool = None,
         can_pin_messages: bool = None,
         can_manage_video_chats: bool = None,
+        can_manage_topics: bool = None,
         **_kwargs: Any,
     ):
         super().__init__(
@@ -576,6 +588,7 @@ class ChatMemberAdministrator(ChatMember):
             can_invite_users=can_invite_users,
             can_pin_messages=can_pin_messages,
             can_manage_video_chats=can_manage_video_chats,
+            can_manage_topics=can_manage_topics,
         )
 
 
@@ -631,6 +644,10 @@ class ChatMemberRestricted(ChatMember):
            allowed to add web page previews to their messages.
         until_date (:class:`datetime.datetime`, optional): Date when restrictions
            will be lifted for this user.
+        can_manage_topics (:obj:`bool`): :obj:`True`, if the user is allowed to create
+            forum topics.
+
+            .. versionadded:: 13.15
 
     Attributes:
         status (:obj:`str`): The member's status in the chat,
@@ -656,6 +673,10 @@ class ChatMemberRestricted(ChatMember):
            allowed to add web page previews to their messages.
         until_date (:class:`datetime.datetime`): Optional. Date when restrictions
            will be lifted for this user.
+        can_manage_topics (:obj:`bool`): :obj:`True`, if the user is allowed to create
+            forum topics.
+
+            .. versionadded:: 13.15
 
     """
 
@@ -674,6 +695,7 @@ class ChatMemberRestricted(ChatMember):
         can_send_other_messages: bool = None,
         can_add_web_page_previews: bool = None,
         until_date: datetime.datetime = None,
+        can_manage_topics: bool = None,
         **_kwargs: Any,
     ):
         super().__init__(
@@ -689,6 +711,7 @@ class ChatMemberRestricted(ChatMember):
             can_send_other_messages=can_send_other_messages,
             can_add_web_page_previews=can_add_web_page_previews,
             until_date=until_date,
+            can_manage_topics=can_manage_topics,
         )
 
 
