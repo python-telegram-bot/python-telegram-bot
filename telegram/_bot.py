@@ -5284,7 +5284,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
             description (:obj:`str`, optional): New chat description,
-                0-:tg-const:`telegram.constants.ChatDescriptionLimit.DESCRIPTION_LENGTH`
+                0-:tg-const:`telegram.constants.ChatLimit.CHAT_DESCRIPTION_LENGTH`
                 characters.
 
         Returns:
