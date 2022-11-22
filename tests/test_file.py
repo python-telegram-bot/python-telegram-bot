@@ -132,7 +132,7 @@ class TestFile:
             return self.file_content
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
-        out_file = await file.download_to_memory()
+        out_file = await file.download_to_drive()
 
         try:
             assert out_file.read_bytes() == self.file_content
@@ -140,7 +140,7 @@ class TestFile:
             out_file.unlink()
 
     async def test_download_local_file(self, local_file):
-        assert await local_file.download_to_memory() == Path(local_file.file_path)
+        assert await local_file.download_to_drive() == Path(local_file.file_path)
 
     @pytest.mark.parametrize(
         "custom_path_type", [str, Path], ids=["str custom_path", "pathlib.Path custom_path"]
@@ -153,7 +153,7 @@ class TestFile:
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
         try:
-            out_file = await file.download_to_memory(custom_path_type(custom_path))
+            out_file = await file.download_to_drive(custom_path_type(custom_path))
             assert out_file == custom_path
             assert out_file.read_bytes() == self.file_content
         finally:
@@ -167,7 +167,7 @@ class TestFile:
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
         try:
-            out_file = await local_file.download_to_memory(custom_path_type(custom_path))
+            out_file = await local_file.download_to_drive(custom_path_type(custom_path))
             assert out_file == custom_path
             assert out_file.read_bytes() == self.file_content
         finally:
@@ -181,7 +181,7 @@ class TestFile:
         file.file_path = None
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
-        out_file = await file.download_to_memory()
+        out_file = await file.download_to_drive()
 
         assert str(out_file)[-len(file.file_id) :] == file.file_id
         try:
@@ -195,13 +195,13 @@ class TestFile:
 
         monkeypatch.setattr(file.get_bot().request, "retrieve", test)
         with TemporaryFile() as custom_fobj:
-            await file.download_to_object(out=custom_fobj)
+            await file.download_to_memory(out=custom_fobj)
             custom_fobj.seek(0)
             assert custom_fobj.read() == self.file_content
 
     async def test_download_file_obj_local_file(self, local_file):
         with TemporaryFile() as custom_fobj:
-            await local_file.download_to_object(out=custom_fobj)
+            await local_file.download_to_memory(out=custom_fobj)
             custom_fobj.seek(0)
             assert custom_fobj.read() == self.file_content
 
@@ -239,7 +239,7 @@ class TestFile:
             return data_file("image_encrypted.jpg").read_bytes()
 
         monkeypatch.setattr(encrypted_file.get_bot().request, "retrieve", test)
-        out_file = await encrypted_file.download_to_memory()
+        out_file = await encrypted_file.download_to_drive()
 
         try:
             assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
@@ -252,12 +252,12 @@ class TestFile:
 
         monkeypatch.setattr(encrypted_file.get_bot().request, "retrieve", test)
         with TemporaryFile() as custom_fobj:
-            await encrypted_file.download_to_object(out=custom_fobj)
+            await encrypted_file.download_to_memory(out=custom_fobj)
             custom_fobj.seek(0)
             assert custom_fobj.read() == data_file("image_decrypted.jpg").read_bytes()
 
     async def test_download_local_file_encrypted(self, encrypted_local_file):
-        out_file = await encrypted_local_file.download_to_memory()
+        out_file = await encrypted_local_file.download_to_drive()
         try:
             assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
         finally:
@@ -272,7 +272,7 @@ class TestFile:
         file_handle, custom_path = mkstemp()
         custom_path = Path(custom_path)
         try:
-            out_file = await encrypted_local_file.download_to_memory(custom_path_type(custom_path))
+            out_file = await encrypted_local_file.download_to_drive(custom_path_type(custom_path))
             assert out_file == custom_path
             assert out_file.read_bytes() == data_file("image_decrypted.jpg").read_bytes()
         finally:
@@ -285,7 +285,7 @@ class TestFile:
 
         monkeypatch.setattr(encrypted_local_file.get_bot().request, "retrieve", test)
         with TemporaryFile() as custom_fobj:
-            await encrypted_local_file.download_to_object(out=custom_fobj)
+            await encrypted_local_file.download_to_memory(out=custom_fobj)
             custom_fobj.seek(0)
             assert custom_fobj.read() == data_file("image_decrypted.jpg").read_bytes()
 

@@ -36,21 +36,21 @@ if TYPE_CHECKING:
 class File(TelegramObject):
     """
     This object represents a file ready to be downloaded. The file can be e.g. downloaded with
-    :attr:`download_to_memory`. It is guaranteed that the link will be valid for at least 1 hour.
+    :attr:`download_to_drive`. It is guaranteed that the link will be valid for at least 1 hour.
     When the link expires, a new one can be requested by calling :meth:`telegram.Bot.get_file`.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
     .. versionchanged:: 20.0:
-        ``download`` was split into :meth:`download_to_memory` and :meth:`download_to_object`.
+        ``download`` was split into :meth:`download_to_drive` and :meth:`download_to_memory`.
 
     Note:
         * Maximum file size to download is
           :tg-const:`telegram.constants.FileSizeLimit.FILESIZE_DOWNLOAD`.
         * If you obtain an instance of this class from :attr:`telegram.PassportFile.get_file`,
           then it will automatically be decrypted as it downloads when you call e.g.
-          :meth:`download_to_memory`.
+          :meth:`download_to_drive`.
 
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
@@ -59,7 +59,7 @@ class File(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`int`, optional): Optional. File size in bytes, if known.
-        file_path (:obj:`str`, optional): File path. Use e.g. :meth:`download_to_memory` to get the
+        file_path (:obj:`str`, optional): File path. Use e.g. :meth:`download_to_drive` to get the
             file.
 
     Attributes:
@@ -68,7 +68,7 @@ class File(TelegramObject):
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
         file_size (:obj:`str`): Optional. File size in bytes.
-        file_path (:obj:`str`): Optional. File path. Use e.g. :meth:`download_to_memory` to get
+        file_path (:obj:`str`): Optional. File path. Use e.g. :meth:`download_to_drive` to get
             the file.
     """
 
@@ -114,7 +114,7 @@ class File(TelegramObject):
     def _prepare_decrypt(self, buf: bytes) -> bytes:
         return decrypt(b64decode(self._credentials.secret), b64decode(self._credentials.hash), buf)
 
-    async def download_to_memory(
+    async def download_to_drive(
         self,
         custom_path: FilePathInput = None,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -145,7 +145,7 @@ class File(TelegramObject):
             * Returns :class:`pathlib.Path` object in cases where previously a :obj:`str` was
               returned.
             * This method was previously called ``download``. It was split into
-              :meth:`download_to_memory` and :meth:`download_to_object`.
+              :meth:`download_to_drive` and :meth:`download_to_memory`.
 
 
         Args:
@@ -207,7 +207,7 @@ class File(TelegramObject):
         filename.write_bytes(buf)
         return filename
 
-    async def download_to_object(
+    async def download_to_memory(
         self,
         out: BinaryIO,
         read_timeout: ODVInput[float] = DEFAULT_NONE,

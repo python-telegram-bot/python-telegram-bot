@@ -77,25 +77,25 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             for file in data.files:
                 actual_file = await file.get_file()
                 print(actual_file)
-                await actual_file.download_to_memory()
+                await actual_file.download_to_drive()
         if (
             data.type in ("passport", "driver_license", "identity_card", "internal_passport")
             and data.front_side
         ):
             front_file = await data.front_side.get_file()
             print(data.type, front_file)
-            await front_file.download_to_memory()
+            await front_file.download_to_drive()
         if data.type in ("driver_license" and "identity_card") and data.reverse_side:
             reverse_file = await data.reverse_side.get_file()
             print(data.type, reverse_file)
-            await reverse_file.download_to_memory()
+            await reverse_file.download_to_drive()
         if (
             data.type in ("passport", "driver_license", "identity_card", "internal_passport")
             and data.selfie
         ):
             selfie_file = await data.selfie.get_file()
             print(data.type, selfie_file)
-            await selfie_file.download_to_memory()
+            await selfie_file.download_to_drive()
         if data.translation and data.type in (
             "passport",
             "driver_license",
@@ -111,7 +111,7 @@ async def msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             for file in data.translation:
                 actual_file = await file.get_file()
                 print(actual_file)
-                await actual_file.download_to_memory()
+                await actual_file.download_to_drive()
 
 
 def main() -> None:
