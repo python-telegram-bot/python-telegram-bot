@@ -130,13 +130,13 @@ class File(TelegramObject):
 
         Note:
             If :paramref:`custom_path` isn't provided and :attr:`file_path` is the path of a
-              local file (which is the case when a Bot API Server is running in local mode), this
-              method will just return the path.
+            local file (which is the case when a Bot API Server is running in local mode), this
+            method will just return the path.
 
             The only exception to this are encrypted files (e.g. a passport file). For these, a
-              file with the prefix `decrypted_` will be created in the same directory as the
-              original file in order to decrypt the file without changing the existing one
-              in-place.
+            file with the prefix `decrypted_` will be created in the same directory as the
+            original file in order to decrypt the file without changing the existing one
+            in-place.
 
 
         .. versionchanged:: 20.0
