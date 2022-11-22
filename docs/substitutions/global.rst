@@ -26,7 +26,7 @@
 
 .. |chat_id_group| replace:: Unique identifier for the target chat or username of the target supergroup (in the format ``@supergroupusername``).
 
-.. |parse_mode| replace:: Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message. See the constants in :class:`telegram.constants.ParseMode` for the available modes.
+.. |parse_mode| replace:: Mode for parsing entities. See :class:`telegram.constants.ParseMode` and `formatting options <https://core.telegram.org/bots/api#formatting-options>`__ for more details.
 
 .. |allow_sending_without_reply| replace:: Pass :obj:`True`, if the message should be sent even if the specified replied-to message is not found.
 

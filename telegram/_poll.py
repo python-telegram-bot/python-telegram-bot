@@ -152,7 +152,7 @@ class Poll(TelegramObject):
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`, optional): A zero based identifier of the correct answer
+        correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer
             option. Available only for closed polls in the quiz mode, which were sent
             (not forwarded), by the bot or to a private chat with the bot.
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect

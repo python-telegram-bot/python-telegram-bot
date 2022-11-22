@@ -175,7 +175,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         single_file (:obj:`bool`): Optional. When :obj:`False` will store 5 separate files of
             `filename_user_data`, `filename_bot_data`, `filename_chat_data`,
             `filename_callback_data` and `filename_conversations`. Default is :obj:`True`.
-        on_flush (:obj:`bool`, optional): When :obj:`True` will only save to file when
+        on_flush (:obj:`bool`): Optional. When :obj:`True` will only save to file when
             :meth:`flush` is called and keep data in memory until that happens. When
             :obj:`False` will store data on any transaction *and* on call to :meth:`flush`.
             Default is :obj:`False`.
