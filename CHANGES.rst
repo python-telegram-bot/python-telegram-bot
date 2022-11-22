@@ -2,6 +2,156 @@
 Changelog
 =========
 
+Version 20.0a5
+==============
+*Released 2022-11-22*
+
+This is the technical changelog for version 20.0a5. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Major Changes
+-------------
+
+- API 6.3 (`#3346`_, `#3343`_, `#3342`_, `#3360`_)
+- Explicit ``local_mode`` Setting (`#3154`_)
+- Make Almost All 3rd Party Dependencies Optional (`#3267`_)
+- Split ``File.download`` Into ``File.download_to_drive`` And ``File.download_to_memory`` (`#3223`_)
+
+New Features
+------------
+
+- Add Properties for API Settings of ``Bot`` (`#3247`_)
+- Add ``chat_id`` and ``username`` Parameters to ``ChatJoinRequestHandler`` (`#3261`_)
+- Introduce ``TelegramObject.api_kwargs`` (`#3233`_)
+- Add Two Constants Related to Local Bot API Servers (`#3296`_)
+- Add ``recursive`` Parameter to ``TelegramObject.to_dict()`` (`#3276`_)
+- Overhaul String Representation of ``TelegramObject`` (`#3234`_)
+- Add Methods ``Chat.mention_{html, markdown, markdown_v2}`` (`#3308`_)
+- Add ``constants.MessageLimit.DEEP_LINK_LENGTH`` (`#3315`_)
+- Add Shortcut Parameters ``caption``, ``parse_mode`` and ``caption_entities`` to ``Bot.send_media_group`` (`#3295`_)
+- Add Several New Enums To Constants (`#3351`_)
+
+Bug Fixes
+---------
+
+- Fix ``CallbackQueryHandler`` Not Handling Non-String Data Correctly With Regex Patterns (`#3252`_)
+- Fix Defaults Handling in ``Bot.answer_web_app_query`` (`#3362`_)
+
+Documentation Improvements
+--------------------------
+
+- Update PR Template (`#3361`_)
+- Document Dunder Methods of ``TelegramObject`` (`#3319`_)
+- Add Several References to Wiki pages (`#3306`_)
+- Overhaul Search bar (`#3218`_)
+- Unify Documentation of Arguments and Attributes of Telegram Classes (`#3217`_, `#3292`_, `#3303`_, `#3312`_, `#3314`_)
+- Several Smaller Improvements (`#3214`_, `#3271`_, `#3289`_, `#3326`_, `#3370`_, `#3376`_, `#3366`_)
+
+Minor Changes, Documentation Improvements and CI
+------------------------------------------------
+
+- Improve Warning About Unknown ``ConversationHandler`` States (`#3242`_)
+- Switch from Stale Bot to ``GitHub`` Actions (`#3243`_)
+- Bump Python 3.11 to RC2 in Test Matrix (`#3246`_)
+- Make ``Job.job`` a Property and Make ``Jobs`` Hashable (`#3250`_)
+- Skip ``JobQueue`` Tests on Windows Again (`#3280`_)
+- Read-Only ``CallbackDataCache`` (`#3266`_)
+- Type Hinting Fix for ``Message.effective_attachment`` (`#3294`_)
+- Run Unit Tests in Parallel (`#3283`_)
+- Update Test Matrix to Use Stable Python 3.11 (`#3313`_)
+- Don't Edit Objects In-Place When Inserting ``ext.Defaults`` (`#3311`_)
+- Add a Test for ``MessageAttachmentType`` (`#3335`_)
+- Add Three New Test Bots (`#3347`_)
+- Improve Unit Tests Regarding ``ChatMemberUpdated.difference`` (`#3352`_)
+- Flaky Unit Tests: Use ``pytest`` Marker (`#3354`_)
+- Fix ``DeepSource`` Issues (`#3357`_)
+- Handle Lists and Tuples and Datetimes Directly in ``TelegramObject.to_dict`` (`#3353`_)
+- Update Meta Config (`#3365`_)
+- Merge ``ChatDescriptionLimit`` Enum Into ``ChatLimit`` (`#3377`_)
+
+Dependencies
+------------
+
+- Bump ``pytest`` from 7.1.2 to 7.1.3 (`#3228`_)
+- ``pre-commit`` Updates (`#3221`_)
+- Bump ``sphinx`` from 5.1.1 to 5.2.3 (`#3269`_)
+- Bump ``furo`` from 2022.6.21 to 2022.9.29 (`#3268`_)
+- Bump ``actions/stale`` from 5 to 6 (`#3277`_)
+- ``pre-commit`` autoupdate (`#3282`_)
+- Bump ``sphinx`` from 5.2.3 to 5.3.0 (`#3300`_)
+- Bump ``pytest-asyncio`` from 0.19.0 to 0.20.1 (`#3299`_)
+- Bump ``pytest`` from 7.1.3 to 7.2.0 (`#3318`_)
+- Bump ``pytest-xdist`` from 2.5.0 to 3.0.2 (`#3317`_)
+- ``pre-commit`` autoupdate (`#3325`_)
+- Bump ``pytest-asyncio`` from 0.20.1 to 0.20.2 (`#3359`_)
+- Update ``httpx`` requirement from ~=0.23.0 to ~=0.23.1 (`#3373`_)
+
+.. _`#3346`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3346
+.. _`#3343`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3343
+.. _`#3342`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3342
+.. _`#3360`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3360
+.. _`#3154`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3154
+.. _`#3267`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3267
+.. _`#3223`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3223
+.. _`#3247`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3247
+.. _`#3261`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3261
+.. _`#3233`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3233
+.. _`#3296`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3296
+.. _`#3276`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3276
+.. _`#3234`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3234
+.. _`#3308`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3308
+.. _`#3315`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3315
+.. _`#3295`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3295
+.. _`#3351`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3351
+.. _`#3252`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3252
+.. _`#3362`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3362
+.. _`#3361`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3361
+.. _`#3319`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3319
+.. _`#3306`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3306
+.. _`#3218`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3218
+.. _`#3217`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3217
+.. _`#3292`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3292
+.. _`#3303`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3303
+.. _`#3312`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3312
+.. _`#3314`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3314
+.. _`#3214`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3214
+.. _`#3271`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3271
+.. _`#3289`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3289
+.. _`#3326`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3326
+.. _`#3370`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3370
+.. _`#3376`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3376
+.. _`#3366`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3366
+.. _`#3242`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3242
+.. _`#3243`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3243
+.. _`#3246`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3246
+.. _`#3250`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3250
+.. _`#3280`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3280
+.. _`#3266`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3266
+.. _`#3294`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3294
+.. _`#3283`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3283
+.. _`#3313`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3313
+.. _`#3311`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3311
+.. _`#3335`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3335
+.. _`#3347`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3347
+.. _`#3352`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3352
+.. _`#3354`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3354
+.. _`#3357`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3357
+.. _`#3353`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3353
+.. _`#3365`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3365
+.. _`#3377`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3377
+.. _`#3228`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3228
+.. _`#3221`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3221
+.. _`#3269`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3269
+.. _`#3268`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3268
+.. _`#3277`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3277
+.. _`#3282`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3282
+.. _`#3300`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3300
+.. _`#3299`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3299
+.. _`#3318`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3318
+.. _`#3317`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3317
+.. _`#3325`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3325
+.. _`#3359`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3359
+.. _`#3373`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3373
+
 Version 20.0a4
 ==============
 *Released 2022-08-27*

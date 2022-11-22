@@ -9,6 +9,8 @@ The current development team includes
 - `Poolitzer <https://github.com/Poolitzer>`_ (community liaison)
 - `Shivam <https://github.com/Starry69>`_
 - `Harshil <https://github.com/harshil21>`_
+- `Dmitry Kolomatskiy <https://github.com/lemontree210>`_
+- `Aditya <https://github.com/clot27>`_
 
 Emeritus maintainers include
 `Jannes Höke <https://github.com/jh0ker>`_ (`@jh0ker <https://t.me/jh0ker>`_ on Telegram),
@@ -35,7 +37,6 @@ The following wonderful people contributed directly or indirectly to this projec
 - `daimajia <https://github.com/daimajia>`_
 - `Daniel Reed <https://github.com/nmlorg>`_
 - `D David Livingston <https://github.com/daviddl9>`_
-- `Dmitry Kolomatskiy <https://github.com/lemontree210>`_
 - `DonalDuck004 <https://github.com/DonalDuck004>`_
 - `Eana Hufwe <https://github.com/blueset>`_
 - `Ehsan Online <https://github.com/ehsanonline>`_
