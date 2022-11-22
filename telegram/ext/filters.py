@@ -61,6 +61,7 @@ __all__ = (
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
+    "IS_TOPIC_MESSAGE",
     "LOCATION",
     "Language",
     "MessageFilter",

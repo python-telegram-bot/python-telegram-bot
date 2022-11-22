@@ -126,6 +126,22 @@ class TestFilters:
             for attr in cls.__slots__:
                 assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}' for {name}"
 
+    def test__all__(self):
+        expected = {
+            key
+            for key, member in filters.__dict__.items()
+            if (
+                not key.startswith("_")
+                # exclude imported stuff
+                and getattr(member, "__module__", "unknown module") == "telegram.ext.filters"
+                and key != "sys"
+            )
+        }
+        actual = set(filters.__all__)
+        assert (
+            actual == expected
+        ), f"Members {expected - actual} were not listed in constants.__all__"
+
     def test_filters_all(self, update):
         assert filters.ALL.check_update(update)
 
