@@ -45,36 +45,35 @@ jobs:
           # Test without passport
           pytest -v --cov -k test_no_passport.py
           status=$?
-          
+
           # test without pytz
           pytest -v --cov --cov-append -k test_datetime.py
           status=$(( $? > status ? $? : status))
           pytest -v --cov --cov-append -k test_defaults.py
           status=$(( $? > status ? $? : status))
-          
+
           # test without pytz & jobqueue
           pytest -v --cov --cov-append -k test_jobqueue.py
           pytest -v --cov --cov-append -k test_applicationbuilder.py
           status=$(( $? > status ? $? : status))
-          
+
           # Test without ratelimiter
           pytest -v --cov --cov-append -k test_ratelimiter.py
           status=$(( $? > status ? $? : status))
-          
+
           # Test without webhooks
           pytest -v --cov --cov-append -k test_updater.py
           status=$(( $? > status ? $? : status))
-          
+
           # Test without callback-data
           pytest -v --cov --cov-append -k test_callbackdatacache.py
           status=$(( $? > status ? $? : status))
-          
+
           # Test without socks
           pytest -v --cov --cov-append -k test_request.py
           status=$(( $? > status ? $? : status))
-          
+
           # Test the rest
-          
           export TEST_WITH_OPT_DEPS='true'
           pip install -r requirements-opts.txt
           # `-n auto --dist loadfile` uses pytest-xdist to run each test file on a different CPU

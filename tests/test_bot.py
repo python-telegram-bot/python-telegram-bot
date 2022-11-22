@@ -2259,6 +2259,7 @@ class TestBot:
                 can_promote_members=True,
                 can_manage_chat=True,
                 can_manage_video_chats=True,
+                can_manage_topics=True,
             )
 
         # Test that we pass the correct params to TG
@@ -2278,6 +2279,7 @@ class TestBot:
                 and data.get("can_promote_members") == 9
                 and data.get("can_manage_chat") == 10
                 and data.get("can_manage_video_chats") == 11
+                and data.get("can_manage_topics") == 12
             )
 
         monkeypatch.setattr(bot, "_post", make_assertion)
@@ -2295,6 +2297,7 @@ class TestBot:
             can_promote_members=9,
             can_manage_chat=10,
             can_manage_video_chats=11,
+            can_manage_topics=12,
         )
 
     @pytest.mark.flaky(3, 1)
@@ -2565,6 +2568,9 @@ class TestBot:
     # set_sticker_position_in_set, delete_sticker_from_set and get_custom_emoji_stickers
     # are tested in the test_sticker module.
 
+    # get_forum_topic_icon_stickers, edit_forum_topic, etc...
+    # are tested in the test_forum module.
+
     async def test_timeout_propagation_explicit(self, monkeypatch, bot, chat_id):
         # Use BaseException that's not a subclass of Exception such that
         # OkException should not be caught anywhere
@@ -2709,6 +2715,7 @@ class TestBot:
         assert my_admin_rights_ch.can_promote_members is my_rights.can_promote_members
         assert my_admin_rights_ch.can_restrict_members is my_rights.can_restrict_members
         assert my_admin_rights_ch.can_pin_messages is None  # Not returned for channels
+        assert my_admin_rights_ch.can_manage_topics is None  # Not returned for channels
 
     @pytest.mark.asyncio
     async def test_get_set_chat_menu_button(self, bot, chat_id):
@@ -2822,6 +2829,7 @@ class TestBot:
                     data["caption_entities"]
                     == [MessageEntity(MessageEntity.BOLD, 0, 4).to_dict()],
                     data["protect_content"] is True,
+                    data["message_thread_id"] == 1,
                 ]
             ):
                 pytest.fail("I got wrong parameters in post")
@@ -2839,6 +2847,7 @@ class TestBot:
             reply_markup=keyboard.to_json() if json_keyboard else keyboard,
             disable_notification=True,
             protect_content=True,
+            message_thread_id=1,
         )
 
     @pytest.mark.flaky(3, 1)

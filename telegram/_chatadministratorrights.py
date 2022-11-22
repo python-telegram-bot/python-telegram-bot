@@ -29,7 +29,12 @@ class ChatAdministratorRights(TelegramObject):
     considered equal, if their :attr:`is_anonymous`, :attr:`can_manage_chat`,
     :attr:`can_delete_messages`, :attr:`can_manage_video_chats`, :attr:`can_restrict_members`,
     :attr:`can_promote_members`, :attr:`can_change_info`, :attr:`can_invite_users`,
-    :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages` are equal.
+    :attr:`can_post_messages`, :attr:`can_edit_messages`, :attr:`can_pin_messages`,
+    :attr:`can_manage_topics` are equal.
+
+    .. versionchanged:: 20.0
+        :attr:`can_manage_topics` is considered as well when comparing objects of
+        this type in terms of equality.
 
     .. seealso: :meth:`Bot.set_my_default_administrator_rights`,
         :meth:`Bot.get_my_default_administrator_rights`
@@ -62,6 +67,10 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only.
+
+            .. versionadded:: 20.0
 
     Attributes:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -89,6 +98,10 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only.
+
+            .. versionadded:: 20.0
     """
 
     __slots__ = (
@@ -103,6 +116,7 @@ class ChatAdministratorRights(TelegramObject):
         "can_post_messages",
         "can_edit_messages",
         "can_pin_messages",
+        "can_manage_topics",
     )
 
     def __init__(
@@ -118,6 +132,7 @@ class ChatAdministratorRights(TelegramObject):
         can_post_messages: bool = None,
         can_edit_messages: bool = None,
         can_pin_messages: bool = None,
+        can_manage_topics: bool = None,
         *,
         api_kwargs: JSONDict = None,
     ) -> None:
@@ -135,6 +150,7 @@ class ChatAdministratorRights(TelegramObject):
         self.can_post_messages = can_post_messages
         self.can_edit_messages = can_edit_messages
         self.can_pin_messages = can_pin_messages
+        self.can_manage_topics = can_manage_topics
 
         self._id_attrs = (
             self.is_anonymous,
@@ -148,6 +164,7 @@ class ChatAdministratorRights(TelegramObject):
             self.can_post_messages,
             self.can_edit_messages,
             self.can_pin_messages,
+            self.can_manage_topics,
         )
 
     @classmethod
@@ -159,7 +176,7 @@ class ChatAdministratorRights(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(True, True, True, True, True, True, True, True, True, True, True)
+        return cls(True, True, True, True, True, True, True, True, True, True, True, True)
 
     @classmethod
     def no_rights(cls) -> "ChatAdministratorRights":
@@ -169,4 +186,6 @@ class ChatAdministratorRights(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(False, False, False, False, False, False, False, False, False, False, False)
+        return cls(
+            False, False, False, False, False, False, False, False, False, False, False, False
+        )

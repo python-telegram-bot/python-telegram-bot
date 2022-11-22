@@ -126,6 +126,22 @@ class TestFilters:
             for attr in cls.__slots__:
                 assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}' for {name}"
 
+    def test__all__(self):
+        expected = {
+            key
+            for key, member in filters.__dict__.items()
+            if (
+                not key.startswith("_")
+                # exclude imported stuff
+                and getattr(member, "__module__", "unknown module") == "telegram.ext.filters"
+                and key != "sys"
+            )
+        }
+        actual = set(filters.__all__)
+        assert (
+            actual == expected
+        ), f"Members {expected - actual} were not listed in constants.__all__"
+
     def test_filters_all(self, update):
         assert filters.ALL.check_update(update)
 
@@ -980,6 +996,21 @@ class TestFilters:
         assert filters.StatusUpdate.WEB_APP_DATA.check_update(update)
         update.message.web_app_data = None
 
+        update.message.forum_topic_created = "topic"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_CREATED.check_update(update)
+        update.message.forum_topic_created = None
+
+        update.message.forum_topic_closed = "topic"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_CLOSED.check_update(update)
+        update.message.forum_topic_closed = None
+
+        update.message.forum_topic_reopened = "topic"
+        assert filters.StatusUpdate.ALL.check_update(update)
+        assert filters.StatusUpdate.FORUM_TOPIC_REOPENED.check_update(update)
+        update.message.forum_topic_reopened = None
+
     def test_filters_forwarded(self, update):
         assert not filters.FORWARDED.check_update(update)
         update.message.forward_date = datetime.datetime.utcnow()
@@ -1763,6 +1794,11 @@ class TestFilters:
         assert not filters.IS_AUTOMATIC_FORWARD.check_update(update)
         update.message.is_automatic_forward = True
         assert filters.IS_AUTOMATIC_FORWARD.check_update(update)
+
+    def test_filters_is_topic_message(self, update):
+        assert not filters.IS_TOPIC_MESSAGE.check_update(update)
+        update.message.is_topic_message = True
+        assert filters.IS_TOPIC_MESSAGE.check_update(update)
 
     def test_filters_has_protected_content(self, update):
         assert not filters.HAS_PROTECTED_CONTENT.check_update(update)

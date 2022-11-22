@@ -638,7 +638,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
             close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
-                closed upon shutdown.
+                closed upon shutdown. Defaults to :obj:`True`.
 
                 .. seealso::
                     :meth:`asyncio.loop.close`

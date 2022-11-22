@@ -36,15 +36,11 @@ class Defaults:
         networking backend directly via :class:`telegram.ext.ApplicationBuilder` instead.
 
     Parameters:
-        parse_mode (:obj:`str`, optional): Send :attr:`~telegram.constants.ParseMode.MARKDOWN` or
-            :attr:`~telegram.constants.ParseMode.HTML`, if you want Telegram apps to show
-            bold, italic, fixed-width text or URLs in your bot's message.
-        disable_notification (:obj:`bool`, optional): Sends the message silently. Users will
-            receive a notification with no sound.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        disable_notification (:obj:`bool`, optional): |disable_notification|
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in this
             message.
-        allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
-            should be sent even if the specified replied-to message is not found.
+        allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
         quote (:obj:`bool`, optional): If set to :obj:`True`, the reply is sent as an actual reply
             to the message. If ``reply_to_message_id`` is passed, this parameter will
             be ignored. Default: :obj:`True` in group chats and :obj:`False` in private chats.
@@ -58,8 +54,7 @@ class Defaults:
             parameter
             of handlers and error handlers registered through :meth:`Application.add_handler` and
             :meth:`Application.add_error_handler`. Defaults to :obj:`True`.
-        protect_content (:obj:`bool`, optional): Protects the contents of the sent message from
-            forwarding and saving.
+        protect_content (:obj:`bool`, optional): |protect_content|
 
             .. versionadded:: 20.0
     """
