@@ -25,6 +25,8 @@ from pathlib import Path
 import pytest
 
 from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
+from telegram.ext import PicklePersistence
+from tests.conftest import data_file
 
 
 def all_subclasses(cls):
@@ -40,12 +42,15 @@ def all_subclasses(cls):
 
 TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
 
+
 class OldChat(Chat):  # defined here since we can't pickle local objects in methods
     __slots__ = ("all_members_are_administrators",)
+
     def __init__(self, all_members_are_administrators, **kwargs):
-        super().__init__(**kwargs)
         self.all_members_are_administrators = all_members_are_administrators
+
     pass
+
 
 class TestTelegramObject:
     class Sub(TelegramObject):
@@ -265,19 +270,12 @@ class TestTelegramObject:
         """Test when newer versions of the library remove attributes from classes (which the old
         pickled versions still have).
         """
-        # Unfortuantely its difficult to test this when old class doesn't have api_kwargs, the
-        # attempt to do so was commented out.
-        chat = OldChat(all_members_are_administrators=True, id=1, type=Chat.PRIVATE)
-        delattr(chat, "api_kwargs")
-        # delattr(TelegramObject, "api_kwargs")  # emulate old version without api_kwargs
-        assert chat.all_members_are_administrators
-        assert getattr(chat, "api_kwargs", False) is False
-
-        pickled = pickle.dumps(chat)
-        delattr(OldChat, 'all_members_are_administrators')
-        # setattr(TelegramObject, "api_kwargs", {})  # emulate new version with api_kwargs
-        unpickled = pickle.loads(pickled)
-        assert unpickled.api_kwargs == {'all_members_are_administrators': True}
+        # load old Chat object, which doesn't have api_kwargs attribute, and has now removed attr
+        # `all_members_are_administrators`.
+        pp = PicklePersistence(data_file("old_chat.pickle"))
+        chat = pp._load_file(data_file("old_chat.pickle"))
+        assert chat.api_kwargs == {"all_members_are_administrators": None}
+        assert getattr(chat, "all_members_are_administrators", False) is False
 
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
