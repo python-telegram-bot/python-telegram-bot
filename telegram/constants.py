@@ -75,7 +75,6 @@ __all__ = [
     "SUPPORTED_WEBHOOK_PORTS",
     "StickerLimit",
     "StickerType",
-    "TitleLimit",
     "WebhookLimit",
     "UpdateType",
     "UserProfilePhotosLimit",
@@ -1413,34 +1412,6 @@ class UpdateType(StringEnum):
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_member`."""
     CHAT_JOIN_REQUEST = "chat_join_request"
     """:obj:`str`: Updates with :attr:`telegram.Update.chat_join_request`."""
-
-
-class TitleLimit(IntEnum):
-    """This enum contains limitations for
-    :meth:`telegram.Bot.set_chat_administrator_custom_title` and
-    :meth:`telegram.Bot.set_chat_title`.
-    The enum members of this enumeration are instances of :class:`int` and can be treated as such.
-
-    .. versionadded:: 20.0
-    """
-
-    __slots__ = ()
-
-    CHAT_ADMINISTRATOR_CUSTOM_TITLE_LENGTH = 16
-    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.set_chat_administrator_custom_title.custom_title` parameter of
-    :meth:`telegram.Bot.set_chat_administrator_custom_title`.
-    """
-    MIN_CHAT_TITLE_LENGTH = 1
-    """:obj:`int`: Minimum number of characters in a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.set_chat_title.title` parameter of
-    :meth:`telegram.Bot.set_chat_title`.
-    """
-    MAX_CHAT_TITLE_LENGTH = 128
-    """:obj:`int`: Maximum number of characters in a :obj:`str` passed as the
-    :paramref:`~telegram.Bot.set_chat_title.title` parameter of
-    :meth:`telegram.Bot.set_chat_title`.
-    """
 
 
 class InvoiceLimit(IntEnum):

@@ -4748,7 +4748,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             user_id (:obj:`int`): Unique identifier of the target administrator.
             custom_title (:obj:`str`): New custom title for the administrator;
-                0-:tg-const:`telegram.constants.TitleLimit.CHAT_ADMINISTRATOR_CUSTOM_TITLE_LENGTH`
+                0-:tg-const:`telegram.constants.ChatLimit.CHAT_ADMINISTRATOR_CUSTOM_TITLE_LENGTH`
                 characters, emoji are not allowed.
 
         Returns:
