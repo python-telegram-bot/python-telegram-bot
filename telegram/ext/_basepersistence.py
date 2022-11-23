@@ -178,8 +178,7 @@ class BasePersistence(Generic[UD, CD, BD], ABC):
 
         Raises:
             :exc:`TypeError`: If :attr:`PersistenceInput.callback_data` is :obj:`True` and the
-                :paramref:`bot` is not an instance of :class:`telegram.ext.ExtBot` or
-                :attr:`~telegram.ext.ExtBot.callback_data_cache` is :obj:`None`.
+                :paramref:`bot` is not an instance of :class:`telegram.ext.ExtBot`.
         """
         if self.store_data.callback_data and (not isinstance(bot, ExtBot)):
             raise TypeError("callback_data can only be stored when using telegram.ext.ExtBot.")
