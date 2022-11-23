@@ -37,7 +37,6 @@ from telegram.ext import (
     BasePersistence,
     CallbackContext,
     ConversationHandler,
-    ExtBot,
     MessageHandler,
     PersistenceInput,
     filters,
@@ -389,9 +388,6 @@ class TestBasePersistence:
     def test_set_bot_error(self, papp):
         with pytest.raises(TypeError, match="when using telegram.ext.ExtBot"):
             papp.persistence.set_bot(Bot(papp.bot.token))
-
-        with pytest.raises(TypeError, match="when using telegram.ext.ExtBot"):
-            papp.persistence.set_bot(ExtBot(papp.bot.token))
 
     def test_construction_with_bad_persistence(self, caplog, bot):
         class MyPersistence:
