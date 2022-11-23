@@ -26,6 +26,7 @@ from telegram import constants
 from telegram._chatlocation import ChatLocation
 from telegram._chatpermissions import ChatPermissions
 from telegram._files.chatphoto import ChatPhoto
+from telegram._forumtopic import ForumTopic
 from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
@@ -2628,7 +2629,7 @@ class Chat(TelegramObject):
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> bool:
+    ) -> ForumTopic:
         """Shortcut for::
 
              await bot.create_forum_topic(chat_id=update.effective_chat.id, *args, **kwargs)
@@ -2639,7 +2640,7 @@ class Chat(TelegramObject):
         .. versionadded:: 20.0
 
         Returns:
-            :obj:`bool`: On success, :obj:`True` is returned.
+            :class:`telegram.ForumTopic`
         """
         return await self.get_bot().create_forum_topic(
             chat_id=self.id,
