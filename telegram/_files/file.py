@@ -117,6 +117,7 @@ class File(TelegramObject):
     async def download_to_drive(
         self,
         custom_path: FilePathInput = None,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -138,7 +139,6 @@ class File(TelegramObject):
             original file in order to decrypt the file without changing the existing one
             in-place.
 
-
         .. versionchanged:: 20.0
 
             * :paramref:`custom_path` parameter now also accepts :class:`pathlib.Path` as argument.
@@ -147,10 +147,11 @@ class File(TelegramObject):
             * This method was previously called ``download``. It was split into
               :meth:`download_to_drive` and :meth:`download_to_memory`.
 
-
         Args:
             custom_path (:class:`pathlib.Path` | :obj:`str` , optional): The path where the file
                 will be saved to. If not specified, will be saved in the current working directory.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -210,6 +211,7 @@ class File(TelegramObject):
     async def download_to_memory(
         self,
         out: BinaryIO,
+        *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -222,10 +224,11 @@ class File(TelegramObject):
 
         .. versionadded:: 20.0
 
-
         Args:
             out (:obj:`io.BufferedIOBase`): A file-like object. Must be opened for writing in
                 binary mode.
+
+        Keyword Args:
             read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
                 :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
                 :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
@@ -256,11 +259,41 @@ class File(TelegramObject):
             buf = self._prepare_decrypt(buf)
         out.write(buf)
 
-    async def download_as_bytearray(self, buf: bytearray = None) -> bytearray:
+    async def download_as_bytearray(
+        self,
+        buf: bytearray = None,
+        *,
+        read_timeout: ODVInput[float] = DEFAULT_NONE,
+        write_timeout: ODVInput[float] = DEFAULT_NONE,
+        connect_timeout: ODVInput[float] = DEFAULT_NONE,
+        pool_timeout: ODVInput[float] = DEFAULT_NONE,
+    ) -> bytearray:
         """Download this file and return it as a bytearray.
 
         Args:
             buf (:obj:`bytearray`, optional): Extend the given bytearray with the downloaded data.
+
+        Keyword Args:
+            read_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.read_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+                .. versionadded:: 20.0
+            write_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.write_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+                .. versionadded:: 20.0
+            connect_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.connect_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+                .. versionadded:: 20.0
+            pool_timeout (:obj:`float` | :obj:`None`, optional): Value to pass to
+                :paramref:`telegram.request.BaseRequest.post.pool_timeout`. Defaults to
+                :attr:`~telegram.request.BaseRequest.DEFAULT_NONE`.
+
+                .. versionadded:: 20.0
 
         Returns:
             :obj:`bytearray`: The same object as :paramref:`buf` if it was specified. Otherwise a
@@ -273,7 +306,13 @@ class File(TelegramObject):
         if is_local_file(self.file_path):
             bytes_data = Path(self.file_path).read_bytes()
         else:
-            bytes_data = await self.get_bot().request.retrieve(self._get_encoded_url())
+            bytes_data = await self.get_bot().request.retrieve(
+                self._get_encoded_url(),
+                read_timeout=read_timeout,
+                write_timeout=write_timeout,
+                connect_timeout=connect_timeout,
+                pool_timeout=pool_timeout,
+            )
         if self._credentials:
             buf.extend(self._prepare_decrypt(bytes_data))
         else:
