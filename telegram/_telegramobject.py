@@ -22,7 +22,19 @@ import inspect
 import json
 from copy import deepcopy
 from itertools import chain
-from typing import TYPE_CHECKING, Dict, List, Optional, Set, Sized, Tuple, Type, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Sized,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.types import JSONDict
@@ -183,11 +195,15 @@ class TelegramObject:
         """
         Overrides :meth:`object.__setstate__` to customize the unpickling process of objects of
         this type. Modifies the object in-place.
+
         If any data was stored in the :attr:`api_kwargs` of the pickled object, this method checks
         if the class now has dedicated attributes for those keys and moves the values from
         :attr:`api_kwargs` to the dedicated attributes.
         This can happen, if serialized data is loaded with a new version of this library, where
         the new version was updated to account for updates of the Telegram Bot API.
+
+        If on the contrary an attribute was removed from the class, the value is not discarded but
+        made available via :attr:`api_kwargs`.
 
         Args:
             state (:obj:`dict`): The data to set as attributes of this object.
@@ -196,8 +212,14 @@ class TelegramObject:
         # this as Bots are not pickable.
         setattr(self, "_bot", None)
 
+        setattr(self, "api_kwargs", state.pop("api_kwargs", {}))  # assign api_kwargs first
+
         for key, val in state.items():
-            setattr(self, key, val)
+            try:
+                setattr(self, key, val)
+            except AttributeError:  # catch cases when old attributes are removed from new versions
+                self.api_kwargs[key] = val  # add it to api_kwargs as fallback
+
         self._apply_api_kwargs()
 
     def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
@@ -221,14 +243,44 @@ class TelegramObject:
         result = cls.__new__(cls)  # create a new instance
         memodict[id(self)] = result  # save the id of the object in the dict
 
-        attrs = self._get_attrs(include_private=True)  # get all its attributes
-
-        for k in attrs:  # now we set the attributes in the deepcopied object
-            setattr(result, k, deepcopy(getattr(self, k), memodict))
+        for k in self._get_attrs_names(
+            include_private=True
+        ):  # now we set the attributes in the deepcopied object
+            try:
+                setattr(result, k, deepcopy(getattr(self, k), memodict))
+            except AttributeError:
+                # Skip missing attributes. This can happen if the object was loaded from a pickle
+                # file that was created with an older version of the library, where the class
+                # did not have the attribute yet.
+                continue
 
         result.set_bot(bot)  # Assign the bots back
         self.set_bot(bot)
         return result
+
+    def _get_attrs_names(self, include_private: bool) -> Iterator[str]:
+        """
+        Returns the names of the attributes of this object. This is used to determine which
+        attributes should be serialized when pickling the object.
+
+        Args:
+            include_private (:obj:`bool`): Whether to include private attributes.
+
+        Returns:
+            Iterator[:obj:`str`]: An iterator over the names of the attributes of this object.
+        """
+        # We want to get all attributes for the class, using self.__slots__ only includes the
+        # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
+        # and then get their attributes. The `[:-1]` slice excludes the `object` class
+        all_slots = (s for c in self.__class__.__mro__[:-1] for s in c.__slots__)  # type: ignore
+        # chain the class's slots with the user defined subclass __dict__ (class has no slots)
+        all_attrs = (
+            chain(all_slots, self.__dict__.keys()) if hasattr(self, "__dict__") else all_slots
+        )
+
+        if include_private:
+            return all_attrs
+        return (attr for attr in all_attrs if not attr.startswith("_"))
 
     def _get_attrs(
         self,
@@ -249,14 +301,7 @@ class TelegramObject:
         """
         data = {}
 
-        # We want to get all attributes for the class, using self.__slots__ only includes the
-        # attributes used by that class itself, and not its superclass(es). Hence, we get its MRO
-        # and then get their attributes. The `[:-1]` slice excludes the `object` class
-        all_slots = (s for c in self.__class__.__mro__[:-1] for s in c.__slots__)  # type: ignore
-        # chain the class's slots with the user defined subclass __dict__ (class has no slots)
-        for key in chain(self.__dict__, all_slots) if hasattr(self, "__dict__") else all_slots:
-            if not include_private and key.startswith("_"):
-                continue
+        for key in self._get_attrs_names(include_private=include_private):
 
             value = getattr(self, key, None)
             if value is not None:

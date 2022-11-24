@@ -248,7 +248,7 @@ PROJECT_ROOT_PATH = Path(__file__).parent.parent.resolve()
 TEST_DATA_PATH = Path(__file__).parent.resolve() / "data"
 
 
-def data_file(filename: str):
+def data_file(filename: str) -> Path:
     return TEST_DATA_PATH / filename
 
 

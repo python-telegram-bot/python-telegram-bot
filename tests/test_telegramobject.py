@@ -25,6 +25,8 @@ from pathlib import Path
 import pytest
 
 from telegram import Bot, BotCommand, Chat, Message, PhotoSize, TelegramObject, User
+from telegram.ext import PicklePersistence
+from tests.conftest import data_file
 
 
 def all_subclasses(cls):
@@ -138,6 +140,18 @@ class TestTelegramObject:
         to = TelegramObject(api_kwargs={"foo": "bar"})
         assert to.to_dict() == {"foo": "bar"}
 
+    def test_to_dict_missing_attribute(self):
+        message = Message(
+            1, datetime.datetime.now(), Chat(1, "private"), from_user=User(1, "", False)
+        )
+        del message.chat
+
+        message_dict = message.to_dict()
+        assert "chat" not in message_dict
+
+        message_dict = message.to_dict(recursive=False)
+        assert message_dict["chat"] is None
+
     def test_to_dict_recursion(self):
         class Recursive(TelegramObject):
             __slots__ = ("recursive",)
@@ -243,7 +257,7 @@ class TestTelegramObject:
         assert unpickled.date == date, f"{unpickled.date} != {date}"
         assert unpickled.photo[0] == photo
 
-    def test_pickle_apply_api_kwargs(self, bot):
+    def test_pickle_apply_api_kwargs(self):
         """Makes sure that when a class gets new attributes, the api_kwargs are moved to the
         new attributes on unpickling."""
         obj = self.ChangingTO(api_kwargs={"foo": "bar"})
@@ -254,6 +268,32 @@ class TestTelegramObject:
 
         assert obj.foo == "bar"
         assert obj.api_kwargs == {}
+
+    async def test_pickle_removed_and_added_attribute(self):
+        """Test when newer versions of the library remove or add attributes from classes (which
+        the old pickled versions still/don't have).
+        """
+        # We use a modified version of the 20.0a5 Chat class, which
+        # * has an `all_members_are_admins` attribute,
+        # * a non-empty `api_kwargs` dict
+        # * does not have the `is_forum` attribute
+        # This specific version was pickled
+        # using PicklePersistence.update_chat_data and that's what we use here to test if
+        # * the (now) removed attribute `all_members_are_admins` was added to api_kwargs
+        # * the (now) added attribute `is_forum` does not affect the unpickling
+        pp = PicklePersistence(data_file("20a5_modified_chat.pickle"))
+        chat = (await pp.get_chat_data())[1]
+        assert chat.id == 1 and chat.type == Chat.PRIVATE
+        assert chat.api_kwargs == {
+            "all_members_are_administrators": True,
+            "something": "Manually inserted",
+        }
+        with pytest.raises(AttributeError):
+            # removed attribute should not be available as attribute, only though api_kwargs
+            chat.all_members_are_administrators
+        with pytest.raises(AttributeError):
+            # New attribute should not be available either as is always the case for pickle
+            chat.is_forum
 
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)
