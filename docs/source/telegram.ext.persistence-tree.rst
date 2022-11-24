@@ -2,6 +2,7 @@ Persistence
 -----------
 
 .. toctree::
+    :titlesonly:
 
     telegram.ext.basepersistence
     telegram.ext.dictpersistence

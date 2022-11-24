@@ -2,6 +2,7 @@ Games
 -----
 
 .. toctree::
+    :titlesonly:
 
     telegram.callbackgame
     telegram.game

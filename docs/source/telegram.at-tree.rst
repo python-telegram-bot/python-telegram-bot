@@ -2,6 +2,7 @@ Available Types
 ---------------
 
 .. toctree::
+    :titlesonly:
 
     telegram.animation
     telegram.audio
