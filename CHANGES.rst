@@ -2,6 +2,25 @@
 Changelog
 =========
 
+Version 20.0a6
+==============
+*Released 2022-11-24*
+
+This is the technical changelog for version 20.0a6. More elaborate release notes can be found in the news channel `@pythontelegrambotchannel <https://t.me/pythontelegrambotchannel>`_.
+
+Bug Fixes
+---------
+
+- Only Persist Arbitrary ``callback_data`` if ``ExtBot.callback_data_cache`` is Present (`#3384`_)
+- Improve Backwards Compatibility of ``TelegramObjects`` Pickle Behavior (`#3382`_)
+- Fix Naming and Keyword Arguments of ``File.download_*`` Methods (`#3380`_)
+- Fix Return Value Annotation of ``Chat.create_forum_topic`` (`#3381`_)
+
+.. _`#3384`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3384
+.. _`#3382`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3382
+.. _`#3380`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3380
+.. _`#3381`: https://github.com/python-telegram-bot/python-telegram-bot/pull/3381
+
 Version 20.0a5
 ==============
 *Released 2022-11-22*
