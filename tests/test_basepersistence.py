@@ -37,6 +37,7 @@ from telegram.ext import (
     BasePersistence,
     CallbackContext,
     ConversationHandler,
+    ExtBot,
     MessageHandler,
     PersistenceInput,
     filters,
@@ -388,6 +389,12 @@ class TestBasePersistence:
     def test_set_bot_error(self, papp):
         with pytest.raises(TypeError, match="when using telegram.ext.ExtBot"):
             papp.persistence.set_bot(Bot(papp.bot.token))
+
+        # just making sure that setting an ExtBoxt without callback_data_cache doesn't raise an
+        # error even though store_callback_data is True
+        bot = ExtBot(papp.bot.token)
+        assert bot.callback_data_cache is None
+        assert papp.persistence.set_bot(bot) is None
 
     def test_construction_with_bad_persistence(self, caplog, bot):
         class MyPersistence:
