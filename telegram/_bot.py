@@ -438,10 +438,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict,
         reply_to_message_id: int = None,
         disable_notification: ODVInput[bool] = DEFAULT_NONE,
+        # To reduce repetition (if-clauses) in methods that call this method, following parameters
+        # are included separately instead of just passing them in data parameter:
+        # reply_to_message_id, reply_markup, message_thread_id, caption, caption_entities.
         reply_markup: ReplyMarkup = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        caption: str = None,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -463,6 +468,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         if message_thread_id is not None:
             data["message_thread_id"] = message_thread_id
+
+        if caption is not None:
+            data["caption"] = caption
+
+        if caption_entities is not None:
+            data["caption_entities"] = caption_entities
 
         result = await self._post(
             endpoint,
@@ -940,12 +951,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "parse_mode": parse_mode,
         }
 
-        if caption:
-            data["caption"] = caption
-
-        if caption_entities:
-            data["caption_entities"] = caption_entities
-
         return await self._send_message(  # type: ignore[return-value]
             "sendPhoto",
             data,
@@ -955,6 +960,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1072,11 +1079,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data["performer"] = performer
         if title:
             data["title"] = title
-        if caption:
-            data["caption"] = caption
 
-        if caption_entities:
-            data["caption_entities"] = caption_entities
         if thumb:
             data["thumb"] = self._parse_file_input(thumb, attach=True)
 
@@ -1089,6 +1092,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1195,11 +1200,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "parse_mode": parse_mode,
         }
 
-        if caption:
-            data["caption"] = caption
-
-        if caption_entities:
-            data["caption_entities"] = caption_entities
         if disable_content_type_detection is not None:
             data["disable_content_type_detection"] = disable_content_type_detection
         if thumb:
@@ -1214,6 +1214,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1409,10 +1411,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         if duration:
             data["duration"] = duration
-        if caption:
-            data["caption"] = caption
-        if caption_entities:
-            data["caption_entities"] = caption_entities
         if supports_streaming:
             data["supports_streaming"] = supports_streaming
         if width:
@@ -1431,6 +1429,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1670,10 +1670,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data["height"] = height
         if thumb:
             data["thumb"] = self._parse_file_input(thumb, attach=True)
-        if caption:
-            data["caption"] = caption
-        if caption_entities:
-            data["caption_entities"] = caption_entities
 
         return await self._send_message(  # type: ignore[return-value]
             "sendAnimation",
@@ -1684,6 +1680,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1787,11 +1785,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         if duration:
             data["duration"] = duration
-        if caption:
-            data["caption"] = caption
-
-        if caption_entities:
-            data["caption_entities"] = caption_entities
 
         return await self._send_message(  # type: ignore[return-value]
             "sendVoice",
@@ -1802,6 +1795,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
