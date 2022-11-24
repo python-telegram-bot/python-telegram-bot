@@ -451,50 +451,21 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union[bool, Message]:
-        """Protected method to send messages of any type. Currently calls :meth:`_post`.
+        """Protected method to send or edit messages of any type.
 
-        Note:
-            To reduce repetition (`if`-clauses) in public methods, the parameters
-            :paramref:`caption`, :paramref:`caption_entities`, :paramref:`message_thread_id`,
-            :paramref:`reply_markup`, and :paramref:`reply_to_message_id` are included
-            separately instead of them being passed in :paramref:`data`
+        It is here to reduce repetition of if-else closes in the different bot methods,
+        i.e. this method takes care of adding its parameters to `data` if appropriate.
 
-        Args:
-            endpoint (:obj:`str`): Telegram API endpoint
-            data (:class:`telegram._utils.types.JSONDict`): Data to be sent
-            reply_to_message_id (:obj:`int`, optional): |reply_to_msg_id|
-            disable_notification (:obj:`bool`, optional): |disable_notification|
-            reply_markup (:class:`ReplyMarkup`, optional): Additional interface options.
-                An object for an inline keyboard, custom reply keyboard, instructions to remove
-                reply keyboard or to force a reply from the user.
-            allow_sending_without_reply (:obj:`bool`, optional): |allow_sending_without_reply|
-            protect_content (:obj:`bool`, optional): |protect_content|
-
-                .. versionadded:: 13.10
-            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
-
-                .. versionadded:: 20.0
-            caption (:obj:`str`, optional): Media caption (may also be used when resending photos
-                by file_id), 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH`
-                characters after entities parsing.
-            caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-        Returns:
-            :class:`telegram.Message`: On success, depending on a type of operation, the message
-                or :obj:`True` is returned.
-
-        Raises:
-            :class:`telegram.error.TelegramError`
-
+        Depending on the bot method, returns either `True` or the message.
         """
-        if reply_to_message_id is not None:
-            data["reply_to_message_id"] = reply_to_message_id
-
         # We don't check if (DEFAULT_)None here, so that _post is able to insert the defaults
         # correctly, if necessary
         data["disable_notification"] = disable_notification
         data["allow_sending_without_reply"] = allow_sending_without_reply
         data["protect_content"] = protect_content
+
+        if reply_to_message_id is not None:
+            data["reply_to_message_id"] = reply_to_message_id
 
         if reply_markup is not None:
             data["reply_markup"] = reply_markup
