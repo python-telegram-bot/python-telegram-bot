@@ -3303,10 +3303,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {"parse_mode": parse_mode}
 
-        if caption:
-            data["caption"] = caption
-        if caption_entities:
-            data["caption_entities"] = caption_entities
         if chat_id:
             data["chat_id"] = chat_id
         if message_id:
@@ -3318,6 +3314,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "editMessageCaption",
             data,
             reply_markup=reply_markup,
+            caption=caption,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
