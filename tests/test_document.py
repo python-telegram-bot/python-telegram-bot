@@ -118,7 +118,7 @@ class TestDocument:
         assert new_file.file_unique_id == document.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_memory("telegram.png")
+        await new_file.download_to_drive("telegram.png")
 
         assert path.is_file()
 

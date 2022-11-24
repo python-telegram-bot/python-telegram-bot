@@ -128,7 +128,7 @@ class TestAnimation:
         assert new_file.file_id == animation.file_id
         assert new_file.file_path.startswith("https://")
 
-        new_filepath = await new_file.download_to_memory("game.gif")
+        new_filepath = await new_file.download_to_drive("game.gif")
 
         assert new_filepath.is_file()
 
