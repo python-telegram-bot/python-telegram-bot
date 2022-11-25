@@ -494,6 +494,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=caption_entities,
+            disable_web_page_preview=disable_web_page_preview,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
