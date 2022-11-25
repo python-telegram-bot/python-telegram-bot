@@ -112,14 +112,14 @@ class TestConstants:
 
     @pytest.mark.flaky(3, 1)
     async def test_max_message_length(self, bot, chat_id):
-        await bot.send_message(chat_id=chat_id, text="a" * constants.MessageLimit.TEXT_LENGTH)
+        await bot.send_message(chat_id=chat_id, text="a" * constants.MessageLimit.MAX_TEXT_LENGTH)
 
         with pytest.raises(
             BadRequest,
             match="Message is too long",
         ):
             await bot.send_message(
-                chat_id=chat_id, text="a" * (constants.MessageLimit.TEXT_LENGTH + 1)
+                chat_id=chat_id, text="a" * (constants.MessageLimit.MAX_TEXT_LENGTH + 1)
             )
 
     @pytest.mark.flaky(3, 1)

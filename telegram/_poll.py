@@ -41,11 +41,15 @@ class PollOption(TelegramObject):
     considered equal, if their :attr:`text` and :attr:`voter_count` are equal.
 
     Args:
-        text (:obj:`str`): Option text, 1-100 characters.
+        text (:obj:`str`): Option text,
+            :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
+            characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
 
     Attributes:
-        text (:obj:`str`): Option text, 1-100 characters.
+        text (:obj:`str`): Option text,
+            :tg-const:`telegram.PollOption.MIN_LENGTH`-:tg-const:`telegram.PollOption.MAX_LENGTH`
+            characters.
         voter_count (:obj:`int`): Number of users that voted for this option.
 
     """
@@ -61,8 +65,16 @@ class PollOption(TelegramObject):
 
         self._freeze()
 
-    MAX_LENGTH: ClassVar[int] = constants.PollLimit.OPTION_LENGTH
-    """:const:`telegram.constants.PollLimit.OPTION_LENGTH`"""
+    MIN_LENGTH: ClassVar[int] = constants.PollLimit.MIN_OPTION_LENGTH
+    """:const:`telegram.constants.PollLimit.MIN_OPTION_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_LENGTH: ClassVar[int] = constants.PollLimit.MAX_OPTION_LENGTH
+    """:const:`telegram.constants.PollLimit.MAX_OPTION_LENGTH`
+
+    .. versionadded:: 20.0
+    """
 
 
 class PollAnswer(TelegramObject):
@@ -130,12 +142,12 @@ class Poll(TelegramObject):
 
     Args:
         id (:obj:`str`): Unique poll identifier.
-        question (:obj:`str`): Poll question, 1-300 characters.
+        question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
+            :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
         options (Sequence[:class:`PollOption`]): List of poll options.
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
-
         is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
@@ -144,7 +156,8 @@ class Poll(TelegramObject):
             option. Available only for closed polls in the quiz mode, which were sent
             (not forwarded), by the bot or to a private chat with the bot.
         explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
-            answer or taps on the lamp icon in a quiz-style poll, 0-200 characters.
+            answer or taps on the lamp icon in a quiz-style poll,
+            0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.
         explanation_entities (List[:class:`telegram.MessageEntity`], optional): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
             This list is empty if the message does not contain explanation entities.
@@ -160,22 +173,23 @@ class Poll(TelegramObject):
 
     Attributes:
         id (:obj:`str`): Unique poll identifier.
-        question (:obj:`str`): Poll question, 1-300 characters.
+        question (:obj:`str`): Poll question, :tg-const:`telegram.Poll.MIN_QUESTION_LENGTH`-
+            :tg-const:`telegram.Poll.MAX_QUESTION_LENGTH` characters.
         options (Tuple[:class:`PollOption`]): List of poll options.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
-
         total_voter_count (:obj:`int`): Total number of users that voted in the poll.
         is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
         allows_multiple_answers (:obj:`bool`): :obj:`True`, if the poll allows multiple answers.
-        correct_option_id (:obj:`int`, optional): A zero based identifier of the correct answer
+        correct_option_id (:obj:`int`): Optional. A zero based identifier of the correct answer
             option. Available only for closed polls in the quiz mode, which were sent
             (not forwarded), by the bot or to a private chat with the bot.
         explanation (:obj:`str`): Optional. Text that is shown when a user chooses an incorrect
-            answer or taps on the lamp icon in a quiz-style poll, 0-200 characters.
+            answer or taps on the lamp icon in a quiz-style poll,
+            0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.
         explanation_entities (Tuple[:class:`telegram.MessageEntity`]): Special entities
             like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
             This list is empty if the message does not contain explanation entities.
@@ -323,12 +337,53 @@ class Poll(TelegramObject):
     """:const:`telegram.constants.PollType.REGULAR`"""
     QUIZ: ClassVar[str] = constants.PollType.QUIZ
     """:const:`telegram.constants.PollType.QUIZ`"""
-    MAX_QUESTION_LENGTH: ClassVar[int] = constants.PollLimit.QUESTION_LENGTH
-    """:const:`telegram.constants.PollLimit.QUESTION_LENGTH`"""
-    MAX_OPTION_LENGTH: ClassVar[int] = constants.PollLimit.OPTION_LENGTH
-    """:const:`telegram.constants.PollLimit.OPTION_LENGTH`"""
-    MAX_OPTION_NUMBER: ClassVar[int] = constants.PollLimit.OPTION_NUMBER
-    """:const:`telegram.constants.PollLimit.OPTION_NUMBER`
+    MAX_EXPLANATION_LENGTH: ClassVar[int] = constants.PollLimit.MAX_EXPLANATION_LENGTH
+    """:const:`telegram.constants.PollLimit.MAX_EXPLANATION_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_EXPLANATION_LINE_FEEDS: ClassVar[int] = constants.PollLimit.MAX_EXPLANATION_LINE_FEEDS
+    """:const:`telegram.constants.PollLimit.MAX_EXPLANATION_LINE_FEEDS`
+
+    .. versionadded:: 20.0
+    """
+    MIN_OPEN_PERIOD: ClassVar[int] = constants.PollLimit.MIN_OPEN_PERIOD
+    """:const:`telegram.constants.PollLimit.MIN_OPEN_PERIOD`
+
+    .. versionadded:: 20.0
+    """
+    MAX_OPEN_PERIOD: ClassVar[int] = constants.PollLimit.MAX_OPEN_PERIOD
+    """:const:`telegram.constants.PollLimit.MAX_OPEN_PERIOD`
+
+    .. versionadded:: 20.0
+    """
+    MIN_QUESTION_LENGTH: ClassVar[int] = constants.PollLimit.MIN_QUESTION_LENGTH
+    """:const:`telegram.constants.PollLimit.MIN_QUESTION_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_QUESTION_LENGTH: ClassVar[int] = constants.PollLimit.MAX_QUESTION_LENGTH
+    """:const:`telegram.constants.PollLimit.MAX_QUESTION_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MIN_OPTION_LENGTH: ClassVar[int] = constants.PollLimit.MIN_OPTION_LENGTH
+    """:const:`telegram.constants.PollLimit.MIN_OPTION_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_OPTION_LENGTH: ClassVar[int] = constants.PollLimit.MAX_OPTION_LENGTH
+    """:const:`telegram.constants.PollLimit.MAX_OPTION_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MIN_OPTION_NUMBER: ClassVar[int] = constants.PollLimit.MIN_OPTION_NUMBER
+    """:const:`telegram.constants.PollLimit.MIN_OPTION_NUMBER`
+
+    .. versionadded:: 20.0
+    """
+    MAX_OPTION_NUMBER: ClassVar[int] = constants.PollLimit.MAX_OPTION_NUMBER
+    """:const:`telegram.constants.PollLimit.MAX_OPTION_NUMBER`
 
     .. versionadded:: 20.0
     """

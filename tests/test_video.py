@@ -148,7 +148,7 @@ class TestVideo:
         assert new_file.file_unique_id == video.file_unique_id
         assert new_file.file_path.startswith("https://")
 
-        await new_file.download_to_memory("telegram.mp4")
+        await new_file.download_to_drive("telegram.mp4")
 
         assert path.is_file()
 

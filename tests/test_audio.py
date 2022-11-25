@@ -143,7 +143,7 @@ class TestAudio:
         assert new_file.file_unique_id == audio.file_unique_id
         assert str(new_file.file_path).startswith("https://")
 
-        await new_file.download_to_memory("telegram.mp3")
+        await new_file.download_to_drive("telegram.mp3")
 
         assert path.is_file()
 

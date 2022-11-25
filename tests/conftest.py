@@ -214,6 +214,11 @@ def super_group_id(bot_info):
 
 
 @pytest.fixture(scope="session")
+def forum_group_id(bot_info):
+    return int(bot_info["forum_group_id"])
+
+
+@pytest.fixture(scope="session")
 def channel_id(bot_info):
     return bot_info["channel_id"]
 
@@ -249,7 +254,7 @@ PROJECT_ROOT_PATH = Path(__file__).parent.parent.resolve()
 TEST_DATA_PATH = Path(__file__).parent.resolve() / "data"
 
 
-def data_file(filename: str):
+def data_file(filename: str) -> Path:
     return TEST_DATA_PATH / filename
 
 

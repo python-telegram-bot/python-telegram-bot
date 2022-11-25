@@ -29,9 +29,9 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "20.0a4"  # telegram.__version__[:3]
+version = "20.0a6"  # telegram.__version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = "20.0a4"  # telegram.__version__
+release = "20.0a6"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "5.1.1"
@@ -295,7 +295,7 @@ class TGConstXRefRole(PyXRefRole):
 
     Example:
 
-        :tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` renders as `4096` but links to the
+        :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` renders as `4096` but links to the
         constant.
     """
 

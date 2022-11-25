@@ -451,14 +451,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 raise ValueError(
                     f"bot_data must be of type {self.context_types.bot_data.__name__}"
                 )
-        if self.persistence.store_data.callback_data:
+
+        # Mypy doesn't know that persistence.set_bot (see above) already checks that
+        # self.bot is an instance of ExtBot if callback_data should be stored ...
+        if self.persistence.store_data.callback_data and (
+            self.bot.callback_data_cache is not None  # type: ignore[attr-defined]
+        ):
             persistent_data = await self.persistence.get_callback_data()
             if persistent_data is not None:
                 if not isinstance(persistent_data, tuple) or len(persistent_data) != 2:
                     raise ValueError("callback_data must be a tuple of length 2")
-
-                # Mypy doesn't know that persistence.set_bot (see above) already checks that
-                # self.bot is an instance of ExtBot if callback_data should be stored ...
                 self.bot.callback_data_cache.load_persistence_data(  # type: ignore[attr-defined]
                     persistent_data
                 )
@@ -639,7 +641,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
             close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
-                closed upon shutdown.
+                closed upon shutdown. Defaults to :obj:`True`.
 
                 .. seealso::
                     :meth:`asyncio.loop.close`
@@ -1349,9 +1351,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         coroutines: Set[Coroutine] = set()
 
-        if self.persistence.store_data.callback_data:
-            # Mypy doesn't know that persistence.set_bot (see above) already checks that
-            # self.bot is an instance of ExtBot if callback_data should be stored ...
+        # Mypy doesn't know that persistence.set_bot (see above) already checks that
+        # self.bot is an instance of ExtBot if callback_data should be stored ...
+        if self.persistence.store_data.callback_data and (
+            self.bot.callback_data_cache is not None  # type: ignore[attr-defined]
+        ):
             coroutines.add(
                 self.persistence.update_callback_data(
                     deepcopy(

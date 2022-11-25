@@ -38,7 +38,9 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
     animation.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
         mpeg4_width (:obj:`int`, optional): Video width.
         mpeg4_height (:obj:`int`, optional): Video height.
@@ -50,12 +52,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         caption (:obj:`str`, optional): Caption of the MPEG-4 file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
@@ -67,7 +65,9 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.MPEG4GIF`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         mpeg4_url (:obj:`str`): A valid URL for the MP4 file. File size must not exceed 1MB.
         mpeg4_width (:obj:`int`): Optional. Video width.
         mpeg4_height (:obj:`int`): Optional. Video height.
@@ -79,12 +79,8 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
         caption (:obj:`str`): Optional. Caption of the MPEG-4 file to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
