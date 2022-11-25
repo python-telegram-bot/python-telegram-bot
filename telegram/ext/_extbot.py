@@ -472,6 +472,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,

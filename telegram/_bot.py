@@ -445,6 +445,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         caption: str = None,
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -465,6 +466,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data["allow_sending_without_reply"] = allow_sending_without_reply
         data["protect_content"] = protect_content
         data["parse_mode"] = parse_mode
+        data["disable_web_page_preview"] = disable_web_page_preview
 
         if reply_to_message_id is not None:
             data["reply_to_message_id"] = reply_to_message_id
@@ -730,7 +732,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "text": text,
-            "disable_web_page_preview": disable_web_page_preview,
         }
 
         if entities:
@@ -746,6 +747,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3228,10 +3230,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {
-            "text": text,
-            "disable_web_page_preview": disable_web_page_preview,
-        }
+        data: JSONDict = {"text": text}
 
         if chat_id:
             data["chat_id"] = chat_id
@@ -3247,6 +3246,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data,
             reply_markup=reply_markup,
             parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
