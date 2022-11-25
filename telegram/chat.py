@@ -1986,7 +1986,7 @@ class Chat(TelegramObject):
         .. versionadded:: 13.15
 
         Returns:
-            :obj:`bool`: On success, :obj:`True` is returned.
+            :class:`telegram.ForumTopic`
         """
         return self.bot.create_forum_topic(
             chat_id=self.id,
