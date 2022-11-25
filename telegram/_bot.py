@@ -443,6 +443,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
         caption: str = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -463,6 +464,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data["disable_notification"] = disable_notification
         data["allow_sending_without_reply"] = allow_sending_without_reply
         data["protect_content"] = protect_content
+        data["parse_mode"] = parse_mode
 
         if reply_to_message_id is not None:
             data["reply_to_message_id"] = reply_to_message_id
@@ -728,7 +730,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "text": text,
-            "parse_mode": parse_mode,
             "disable_web_page_preview": disable_web_page_preview,
         }
 
@@ -744,6 +745,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            parse_mode=parse_mode,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -952,7 +954,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         return await self._send_message(  # type: ignore[return-value]
@@ -965,6 +966,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             caption=caption,
+            parse_mode=parse_mode,
             caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1074,7 +1076,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "audio": self._parse_file_input(audio, Audio, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         if duration:
@@ -1097,6 +1098,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             caption=caption,
+            parse_mode=parse_mode,
             caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1201,7 +1203,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "document": self._parse_file_input(document, Document, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         if disable_content_type_detection is not None:
@@ -1219,6 +1220,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             caption=caption,
+            parse_mode=parse_mode,
             caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1410,7 +1412,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "video": self._parse_file_input(video, Video, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         if duration:
@@ -1434,6 +1435,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             caption=caption,
+            parse_mode=parse_mode,
             caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1663,7 +1665,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "animation": self._parse_file_input(animation, Animation, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         if duration:
@@ -1685,6 +1686,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             caption=caption,
+            parse_mode=parse_mode,
             caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1784,7 +1786,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "voice": self._parse_file_input(voice, Voice, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         if duration:
@@ -1800,6 +1801,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             protect_content=protect_content,
             message_thread_id=message_thread_id,
             caption=caption,
+            parse_mode=parse_mode,
             caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -3228,7 +3230,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         data: JSONDict = {
             "text": text,
-            "parse_mode": parse_mode,
             "disable_web_page_preview": disable_web_page_preview,
         }
 
@@ -3245,6 +3246,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "editMessageText",
             data,
             reply_markup=reply_markup,
+            parse_mode=parse_mode,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3301,7 +3303,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"parse_mode": parse_mode}
+        data: JSONDict = {}
 
         if chat_id:
             data["chat_id"] = chat_id
@@ -3315,6 +3317,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data,
             reply_markup=reply_markup,
             caption=caption,
+            parse_mode=parse_mode,
             caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
