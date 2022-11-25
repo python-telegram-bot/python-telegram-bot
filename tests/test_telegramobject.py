@@ -290,7 +290,7 @@ class TestTelegramObject:
         assert obj.foo == "bar"
         assert obj.api_kwargs == {}
 
-    async def test_pickle_removed_and_added_attribute(self):
+    async def test_pickle_backwards_compatibility(self):
         """Test when newer versions of the library remove or add attributes from classes (which
         the old pickled versions still/don't have).
         """
@@ -315,6 +315,11 @@ class TestTelegramObject:
         with pytest.raises(AttributeError):
             # New attribute should not be available either as is always the case for pickle
             chat.is_forum
+
+        # Ensure that loading objects that were pickled before attributes were made immutable
+        # are still mutable
+        chat.id = 7
+        assert chat.id == 7
 
     def test_deepcopy_telegram_obj(self, bot):
         chat = Chat(2, Chat.PRIVATE)

@@ -162,7 +162,7 @@ class TelegramObject:
             # Drop api_kwargs from the representation, if empty
             as_dict.pop("api_kwargs", None)
         else:
-            # Otherwise, we want want to skip the "mappingproxy" part of the repr
+            # Otherwise, we want to skip the "mappingproxy" part of the repr
             as_dict["api_kwargs"] = dict(self.api_kwargs)
 
         contents = ", ".join(
@@ -276,7 +276,9 @@ class TelegramObject:
         setattr(self, "api_kwargs", MappingProxyType(api_kwargs))
 
         # Apply freezing if necessary
-        if state["_frozen"]:
+        # we .get(…) the setting for backwards compatibility with objects that were pickled
+        # before the freeze feature was introduced
+        if state.get("_frozen", False):
             self._freeze()
 
     def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
@@ -313,7 +315,13 @@ class TelegramObject:
                 setattr(result, k, MappingProxyType(deepcopy(dict(self.api_kwargs), memodict)))
                 continue
 
-            setattr(result, k, deepcopy(getattr(self, k), memodict))
+            try:
+                setattr(result, k, deepcopy(getattr(self, k), memodict))
+            except AttributeError:
+                # Skip missing attributes. This can happen if the object was loaded from a pickle
+                # file that was created with an older version of the library, where the class
+                # did not have the attribute yet.
+                continue
 
         # Apply freezing if necessary
         if self._frozen:
