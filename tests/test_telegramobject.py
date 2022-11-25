@@ -154,6 +154,7 @@ class TestTelegramObject:
         message = Message(
             1, datetime.datetime.now(), Chat(1, "private"), from_user=User(1, "", False)
         )
+        message._unfreeze()
         del message.chat
 
         message_dict = message.to_dict()

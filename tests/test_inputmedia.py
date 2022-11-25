@@ -476,7 +476,7 @@ class TestSendMediaGroup:
             media_group,
             message_thread_id=real_topic.message_thread_id,
         )
-        assert isinstance(messages, list)
+        assert isinstance(messages, tuple)
         assert len(messages) == 3
         assert all(isinstance(mes, Message) for mes in messages)
         assert all(i.message_thread_id == real_topic.message_thread_id for i in messages)
