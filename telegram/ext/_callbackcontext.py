@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Coroutine, Dict, Generic, List, Match, NoRetur
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
 from telegram.ext._extbot import ExtBot
+from telegram._utils.warnings import warn
 from telegram.ext._utils.types import BD, BT, CD, UD
 
 if TYPE_CHECKING:
@@ -389,6 +390,11 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         .. seealso:: `Job Queue <https://github.com/python-telegram-bot/
             python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
         """
+        if self._application.job_queue is None:
+            warn(
+                "No `JobQueue` Set up. To use `JobQueue`, you must install PTB via"
+                "`pip install python-telegram-bot[job_queue]`."
+            )
         return self._application.job_queue
 
     @property

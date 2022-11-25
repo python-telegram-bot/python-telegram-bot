@@ -10,6 +10,8 @@ See https://telegram.org/blog/passport for info about what telegram passport is.
 See https://github.com/python-telegram-bot/python-telegram-bot/wiki/Telegram-Passport
  for how to use Telegram Passport properly with python-telegram-bot.
 
+Note:
+To use telegram passport, you must install PTB via `pip install python-telegram-bot[passport]`
 """
 import logging
 from pathlib import Path
