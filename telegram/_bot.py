@@ -442,6 +442,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: ODVInput[bool] = DEFAULT_NONE,
         message_thread_id: int = None,
+        caption: str = None,
+        parse_mode: ODVInput[str] = DEFAULT_NONE,
+        caption_entities: Union[List["MessageEntity"], Tuple["MessageEntity", ...]] = None,
+        disable_web_page_preview: ODVInput[bool] = DEFAULT_NONE,
         *,
         read_timeout: ODVInput[float] = DEFAULT_NONE,
         write_timeout: ODVInput[float] = DEFAULT_NONE,
@@ -449,20 +453,35 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
     ) -> Union[bool, Message]:
-        if reply_to_message_id is not None:
-            data["reply_to_message_id"] = reply_to_message_id
+        """Protected method to send or edit messages of any type.
 
+        It is here to reduce repetition of if-else closes in the different bot methods,
+        i.e. this method takes care of adding its parameters to `data` if appropriate.
+
+        Depending on the bot method, returns either `True` or the message.
+        """
         # We don't check if (DEFAULT_)None here, so that _post is able to insert the defaults
         # correctly, if necessary
         data["disable_notification"] = disable_notification
         data["allow_sending_without_reply"] = allow_sending_without_reply
         data["protect_content"] = protect_content
+        data["parse_mode"] = parse_mode
+        data["disable_web_page_preview"] = disable_web_page_preview
+
+        if reply_to_message_id is not None:
+            data["reply_to_message_id"] = reply_to_message_id
 
         if reply_markup is not None:
             data["reply_markup"] = reply_markup
 
         if message_thread_id is not None:
             data["message_thread_id"] = message_thread_id
+
+        if caption is not None:
+            data["caption"] = caption
+
+        if caption_entities is not None:
+            data["caption_entities"] = caption_entities
 
         result = await self._post(
             endpoint,
@@ -713,8 +732,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "text": text,
-            "parse_mode": parse_mode,
-            "disable_web_page_preview": disable_web_page_preview,
         }
 
         if entities:
@@ -729,6 +746,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -937,14 +956,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "photo": self._parse_file_input(photo, PhotoSize, filename=filename),
-            "parse_mode": parse_mode,
         }
-
-        if caption:
-            data["caption"] = caption
-
-        if caption_entities:
-            data["caption_entities"] = caption_entities
 
         return await self._send_message(  # type: ignore[return-value]
             "sendPhoto",
@@ -955,6 +967,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1063,7 +1078,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "audio": self._parse_file_input(audio, Audio, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         if duration:
@@ -1072,11 +1086,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data["performer"] = performer
         if title:
             data["title"] = title
-        if caption:
-            data["caption"] = caption
 
-        if caption_entities:
-            data["caption_entities"] = caption_entities
         if thumb:
             data["thumb"] = self._parse_file_input(thumb, attach=True)
 
@@ -1089,6 +1099,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1192,14 +1205,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "document": self._parse_file_input(document, Document, filename=filename),
-            "parse_mode": parse_mode,
         }
 
-        if caption:
-            data["caption"] = caption
-
-        if caption_entities:
-            data["caption_entities"] = caption_entities
         if disable_content_type_detection is not None:
             data["disable_content_type_detection"] = disable_content_type_detection
         if thumb:
@@ -1214,6 +1221,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1404,15 +1414,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "video": self._parse_file_input(video, Video, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         if duration:
             data["duration"] = duration
-        if caption:
-            data["caption"] = caption
-        if caption_entities:
-            data["caption_entities"] = caption_entities
         if supports_streaming:
             data["supports_streaming"] = supports_streaming
         if width:
@@ -1431,6 +1436,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1659,7 +1667,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "animation": self._parse_file_input(animation, Animation, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         if duration:
@@ -1670,10 +1677,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             data["height"] = height
         if thumb:
             data["thumb"] = self._parse_file_input(thumb, attach=True)
-        if caption:
-            data["caption"] = caption
-        if caption_entities:
-            data["caption_entities"] = caption_entities
 
         return await self._send_message(  # type: ignore[return-value]
             "sendAnimation",
@@ -1684,6 +1687,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -1782,16 +1788,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "voice": self._parse_file_input(voice, Voice, filename=filename),
-            "parse_mode": parse_mode,
         }
 
         if duration:
             data["duration"] = duration
-        if caption:
-            data["caption"] = caption
-
-        if caption_entities:
-            data["caption_entities"] = caption_entities
 
         return await self._send_message(  # type: ignore[return-value]
             "sendVoice",
@@ -1802,6 +1802,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
             message_thread_id=message_thread_id,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3227,11 +3230,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {
-            "text": text,
-            "parse_mode": parse_mode,
-            "disable_web_page_preview": disable_web_page_preview,
-        }
+        data: JSONDict = {"text": text}
 
         if chat_id:
             data["chat_id"] = chat_id
@@ -3246,6 +3245,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "editMessageText",
             data,
             reply_markup=reply_markup,
+            parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -3302,12 +3303,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"parse_mode": parse_mode}
+        data: JSONDict = {}
 
-        if caption:
-            data["caption"] = caption
-        if caption_entities:
-            data["caption_entities"] = caption_entities
         if chat_id:
             data["chat_id"] = chat_id
         if message_id:
@@ -3319,6 +3316,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "editMessageCaption",
             data,
             reply_markup=reply_markup,
+            caption=caption,
+            parse_mode=parse_mode,
+            caption_entities=caption_entities,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
