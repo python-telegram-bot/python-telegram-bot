@@ -41,14 +41,16 @@ class InlineKeyboardMarkup(TelegramObject):
 
     Args:
         inline_keyboard (Sequence[Sequence[:class:`telegram.InlineKeyboardButton`]]): Sequence of
-            button rows, each represented by a sequence of InlineKeyboardButton objects.
+            button rows, each represented by a sequence of :class:~`telegram.InlineKeyboardButton`
+            objects.
 
             .. versionchanged:: 20.0
                 |squenceclassargs|
 
     Attributes:
         inline_keyboard (Tuple[Tuple[:class:`telegram.InlineKeyboardButton`]]): Tuple of
-            button rows, each represented by a tuple of InlineKeyboardButton objects.
+            button rows, each represented by a tuple of :class:~`telegram.InlineKeyboardButton`
+            objects.
 
             .. versionchanged:: 20.0
                 |tupleclassattrs|
