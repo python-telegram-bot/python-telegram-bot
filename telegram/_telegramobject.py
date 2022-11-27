@@ -21,6 +21,7 @@ import datetime
 import inspect
 import json
 from collections.abc import Sized
+from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
@@ -94,11 +95,25 @@ class TelegramObject:
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
         self.api_kwargs: Mapping[str, Any] = MappingProxyType(api_kwargs or {})
 
+        self._freeze()
+
     def _freeze(self) -> None:
         self._frozen = True
 
     def _unfreeze(self) -> None:
         self._frozen = False
+
+    @contextmanager
+    def _unfrozen(self: Tele_co) -> Iterator[Tele_co]:
+        """Context manager to temporarily unfreeze the object. For internal use only.
+
+        Note:
+            with to._unfrozen() as other_to:
+                assert to is other_to
+        """
+        self._unfreeze()
+        yield self
+        self._freeze()
 
     def _apply_api_kwargs(self, api_kwargs: JSONDict) -> None:
         """Loops through the api kwargs and for every key that exists as attribute of the
