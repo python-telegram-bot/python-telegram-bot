@@ -40,9 +40,6 @@ class ReplyKeyboardMarkup(TelegramObject):
         * :any:`Conversation Bot <examples.conversationbot>`
         * :any:`Conversation Bot 2 <examples.conversationbot2>`
 
-    .. seealso:: :any:`Conversationbot Example <examples.conversationbot>`,
-        :any:`Conversationbot Example 2 <examples.conversationbot2>`
-
     Args:
         keyboard (List[List[:obj:`str` | :class:`telegram.KeyboardButton`]]): Array of button rows,
             each represented by an Array of :class:`telegram.KeyboardButton` objects.
