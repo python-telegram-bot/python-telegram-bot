@@ -149,21 +149,19 @@ class Sticker(_BaseThumbedMedium):
             thumb=thumb,
             api_kwargs=api_kwargs,
         )
-        self._unfreeze()
-        # Required
-        self.width = width
-        self.height = height
-        self.is_animated = is_animated
-        self.is_video = is_video
-        self.type = type
-        # Optional
-        self.emoji = emoji
-        self.set_name = set_name
-        self.mask_position = mask_position
-        self.premium_animation = premium_animation
-        self.custom_emoji_id = custom_emoji_id
-
-        self._freeze()
+        with self._unfrozen():
+            # Required
+            self.width = width
+            self.height = height
+            self.is_animated = is_animated
+            self.is_video = is_video
+            self.type = type
+            # Optional
+            self.emoji = emoji
+            self.set_name = set_name
+            self.mask_position = mask_position
+            self.premium_animation = premium_animation
+            self.custom_emoji_id = custom_emoji_id
 
     REGULAR: ClassVar[str] = constants.StickerType.REGULAR
     """:const:`telegram.constants.StickerType.REGULAR`"""

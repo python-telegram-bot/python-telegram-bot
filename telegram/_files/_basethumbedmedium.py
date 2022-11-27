@@ -74,7 +74,6 @@ class _BaseThumbedMedium(_BaseMedium):
             file_size=file_size,
             api_kwargs=api_kwargs,
         )
-        self._unfreeze()
         self.thumb = thumb
 
     @classmethod

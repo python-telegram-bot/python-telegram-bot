@@ -241,10 +241,9 @@ class InlineKeyboardButton(TelegramObject):
         Args:
             callback_data (:class:`object`): The new callback data.
         """
-        self._unfreeze()
-        self.callback_data = callback_data
-        self._set_id_attrs()
-        self._freeze()
+        with self._unfrozen():
+            self.callback_data = callback_data
+            self._set_id_attrs()
 
     MIN_CALLBACK_DATA: ClassVar[int] = constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA
     """:const:`telegram.constants.InlineKeyboardButtonLimit.MIN_CALLBACK_DATA`

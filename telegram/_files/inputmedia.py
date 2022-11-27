@@ -193,13 +193,11 @@ class InputMediaAnimation(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
-        self._unfreeze()
-        self.thumb = self._parse_thumb_input(thumb)
-        self.width = width
-        self.height = height
-        self.duration = duration
-
-        self._freeze()
+        with self._unfrozen():
+            self.thumb = self._parse_thumb_input(thumb)
+            self.width = width
+            self.height = height
+            self.duration = duration
 
 
 class InputMediaPhoto(InputMedia):
@@ -362,14 +360,12 @@ class InputMediaVideo(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
-        self._unfreeze()
-        self.width = width
-        self.height = height
-        self.duration = duration
-        self.thumb = self._parse_thumb_input(thumb)
-        self.supports_streaming = supports_streaming
-
-        self._freeze()
+        with self._unfrozen():
+            self.width = width
+            self.height = height
+            self.duration = duration
+            self.thumb = self._parse_thumb_input(thumb)
+            self.supports_streaming = supports_streaming
 
 
 class InputMediaAudio(InputMedia):
@@ -462,13 +458,11 @@ class InputMediaAudio(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
-        self._unfreeze()
-        self.thumb = self._parse_thumb_input(thumb)
-        self.duration = duration
-        self.title = title
-        self.performer = performer
-
-        self._freeze()
+        with self._unfrozen():
+            self.thumb = self._parse_thumb_input(thumb)
+            self.duration = duration
+            self.title = title
+            self.performer = performer
 
 
 class InputMediaDocument(InputMedia):
@@ -545,8 +539,6 @@ class InputMediaDocument(InputMedia):
             parse_mode,
             api_kwargs=api_kwargs,
         )
-        self._unfreeze()
-        self.thumb = self._parse_thumb_input(thumb)
-        self.disable_content_type_detection = disable_content_type_detection
-
-        self._freeze()
+        with self._unfrozen():
+            self.thumb = self._parse_thumb_input(thumb)
+            self.disable_content_type_detection = disable_content_type_detection

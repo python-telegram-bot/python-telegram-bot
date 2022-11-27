@@ -104,16 +104,14 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.video_file_id = video_file_id
-        self.title = title
+        with self._unfrozen():
+            self.video_file_id = video_file_id
+            self.title = title
 
-        # Optionals
-        self.description = description
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = tuple(caption_entities) if caption_entities else None
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-
-        self._freeze()
+            # Optionals
+            self.description = description
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = tuple(caption_entities) if caption_entities else None
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content

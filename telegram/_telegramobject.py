@@ -95,8 +95,6 @@ class TelegramObject:
         # We don't do anything with api_kwargs here - see docstring of _apply_api_kwargs
         self.api_kwargs: Mapping[str, Any] = MappingProxyType(api_kwargs or {})
 
-        self._freeze()
-
     def _freeze(self) -> None:
         self._frozen = True
 

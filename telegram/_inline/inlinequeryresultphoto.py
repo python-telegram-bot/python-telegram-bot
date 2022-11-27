@@ -121,19 +121,17 @@ class InlineQueryResultPhoto(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.PHOTO, id, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.photo_url = photo_url
-        self.thumb_url = thumb_url
+        with self._unfrozen():
+            self.photo_url = photo_url
+            self.thumb_url = thumb_url
 
-        # Optionals
-        self.photo_width = photo_width
-        self.photo_height = photo_height
-        self.title = title
-        self.description = description
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = tuple(caption_entities) if caption_entities else None
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-
-        self._freeze()
+            # Optionals
+            self.photo_width = photo_width
+            self.photo_height = photo_height
+            self.title = title
+            self.description = description
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = tuple(caption_entities) if caption_entities else None
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content

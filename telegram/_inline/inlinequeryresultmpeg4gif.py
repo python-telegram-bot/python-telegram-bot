@@ -128,20 +128,18 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.MPEG4GIF, id, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.mpeg4_url = mpeg4_url
-        self.thumb_url = thumb_url
+        with self._unfrozen():
+            self.mpeg4_url = mpeg4_url
+            self.thumb_url = thumb_url
 
-        # Optional
-        self.mpeg4_width = mpeg4_width
-        self.mpeg4_height = mpeg4_height
-        self.mpeg4_duration = mpeg4_duration
-        self.title = title
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = tuple(caption_entities) if caption_entities else None
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_mime_type = thumb_mime_type
-
-        self._freeze()
+            # Optional
+            self.mpeg4_width = mpeg4_width
+            self.mpeg4_height = mpeg4_height
+            self.mpeg4_duration = mpeg4_duration
+            self.title = title
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = tuple(caption_entities) if caption_entities else None
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content
+            self.thumb_mime_type = thumb_mime_type

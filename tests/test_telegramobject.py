@@ -19,6 +19,7 @@
 import datetime
 import inspect
 import pickle
+import re
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType
@@ -425,7 +426,16 @@ class TestTelegramObject:
             return
 
         source_lines, first_line = inspect.getsourcelines(cls.__init__)
-        assert " self._freeze()" in source_lines[-1], f"{cls.__name__} is not frozen correctly"
+
+        # We use regex matching since a simple "if self._freeze() in source_lines[-1]" would also
+        # allo commented lines.
+        last_line_freezes = re.match(r"\s*self\.\_freeze\(\)", source_lines[-1])
+        uses_with_unfrozen = re.search(
+            r"\n\s*with self\.\_unfrozen\(\)\:", inspect.getsource(cls.__init__)
+        )
+
+        print(last_line_freezes, uses_with_unfrozen)
+        assert last_line_freezes or uses_with_unfrozen, f"{cls.__name__} is not frozen correctly"
 
     def test_freeze_unfreeze(self):
         class TestSub(TelegramObject):

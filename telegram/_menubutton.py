@@ -147,13 +147,11 @@ class MenuButtonWebApp(MenuButton):
 
     def __init__(self, text: str, web_app: WebAppInfo, *, api_kwargs: JSONDict = None):
         super().__init__(type=constants.MenuButtonType.WEB_APP, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.text = text
-        self.web_app = web_app
+        with self._unfrozen():
+            self.text = text
+            self.web_app = web_app
 
-        self._id_attrs = (self.type, self.text, self.web_app)
-
-        self._freeze()
+            self._id_attrs = (self.type, self.text, self.web_app)
 
     @classmethod
     def de_json(cls, data: Optional[JSONDict], bot: "Bot") -> Optional["MenuButtonWebApp"]:

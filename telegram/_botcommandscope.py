@@ -199,13 +199,11 @@ class BotCommandScopeChat(BotCommandScope):
 
     def __init__(self, chat_id: Union[str, int], *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.CHAT, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.chat_id = (
-            chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
-        )
-        self._id_attrs = (self.type, self.chat_id)
-
-        self._freeze()
+        with self._unfrozen():
+            self.chat_id = (
+                chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
+            )
+            self._id_attrs = (self.type, self.chat_id)
 
 
 class BotCommandScopeChatAdministrators(BotCommandScope):
@@ -228,13 +226,11 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
 
     def __init__(self, chat_id: Union[str, int], *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.CHAT_ADMINISTRATORS, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.chat_id = (
-            chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
-        )
-        self._id_attrs = (self.type, self.chat_id)
-
-        self._freeze()
+        with self._unfrozen():
+            self.chat_id = (
+                chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
+            )
+            self._id_attrs = (self.type, self.chat_id)
 
 
 class BotCommandScopeChatMember(BotCommandScope):
@@ -260,11 +256,9 @@ class BotCommandScopeChatMember(BotCommandScope):
 
     def __init__(self, chat_id: Union[str, int], user_id: int, *, api_kwargs: JSONDict = None):
         super().__init__(type=BotCommandScope.CHAT_MEMBER, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.chat_id = (
-            chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
-        )
-        self.user_id = user_id
-        self._id_attrs = (self.type, self.chat_id, self.user_id)
-
-        self._freeze()
+        with self._unfrozen():
+            self.chat_id = (
+                chat_id if isinstance(chat_id, str) and chat_id.startswith("@") else int(chat_id)
+            )
+            self.user_id = user_id
+            self._id_attrs = (self.type, self.chat_id, self.user_id)

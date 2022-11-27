@@ -359,17 +359,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             if isinstance(val, InputMedia):
                 # Copy object as not to edit it in-place
                 val = copy.copy(val)
-                val._unfreeze()  # pylint: disable=protected-access
-                val.parse_mode = DefaultValue.get_value(val.parse_mode)
-                val._freeze()  # pylint: disable=protected-access
+                with val._unfrozen():  # pylint: disable=protected-access
+                    val.parse_mode = DefaultValue.get_value(val.parse_mode)
                 data[key] = val
             elif key == "media" and isinstance(val, list):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy.copy(media) for media in val]
                 for media in copy_list:
-                    media._unfreeze()  # pylint: disable=protected-access
-                    media.parse_mode = DefaultValue.get_value(media.parse_mode)
-                    media._freeze()  # pylint: disable=protected-access
+                    with media._unfrozen():  # pylint: disable=protected-access
+                        media.parse_mode = DefaultValue.get_value(media.parse_mode)
 
                 data[key] = copy_list
             # 2)
@@ -1908,14 +1906,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             # Copy first item (to avoid mutation of original object), apply group caption to it.
             # This will lead to the group being shown with this caption.
             item_to_get_caption = copy.copy(media[0])
-            item_to_get_caption._unfreeze()  # pylint: disable=protected-access
-            item_to_get_caption.caption = caption
-            if parse_mode is not DEFAULT_NONE:
-                item_to_get_caption.parse_mode = parse_mode
-            item_to_get_caption.caption_entities = (
-                tuple(caption_entities) if caption_entities else None
-            )
-            item_to_get_caption._freeze()  # pylint: disable=protected-access
+            with item_to_get_caption._unfrozen():  # pylint: disable=protected-access
+                item_to_get_caption.caption = caption
+                if parse_mode is not DEFAULT_NONE:
+                    item_to_get_caption.parse_mode = parse_mode
+                item_to_get_caption.caption_entities = (
+                    tuple(caption_entities) if caption_entities else None
+                )
 
             # copy the list (just the references) to avoid mutating the original list
             media = media[:]
@@ -2647,9 +2644,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if hasattr(res, "parse_mode"):
             res = copy.copy(res)
             copied = True
-            res._unfreeze()  # pylint: disable=protected-access
-            res.parse_mode = DefaultValue.get_value(res.parse_mode)
-            res._freeze()  # pylint: disable=protected-access
+            with res._unfrozen():  # pylint: disable=protected-access
+                res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, "input_message_content") and res.input_message_content:
             if hasattr(res.input_message_content, "parse_mode"):
                 if not copied:
@@ -2658,22 +2654,20 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
                 res._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content = copy.copy(res.input_message_content)
-                res.input_message_content._unfreeze()  # pylint: disable=protected-access
-                res.input_message_content.parse_mode = DefaultValue.get_value(
-                    res.input_message_content.parse_mode
-                )
-                res.input_message_content._freeze()  # pylint: disable=protected-access
+                with res.input_message_content._unfrozen():  # pylint: disable=protected-access
+                    res.input_message_content.parse_mode = DefaultValue.get_value(
+                        res.input_message_content.parse_mode
+                    )
             if hasattr(res.input_message_content, "disable_web_page_preview"):
                 if not copied:
                     res = copy.copy(res)
 
                 res._unfreeze()  # pylint: disable=protected-access
                 res.input_message_content = copy.copy(res.input_message_content)
-                res.input_message_content._unfreeze()  # pylint: disable=protected-access
-                res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
-                    res.input_message_content.disable_web_page_preview
-                )
-                res.input_message_content._freeze()  # pylint: disable=protected-access
+                with res.input_message_content._unfrozen():  # pylint: disable=protected-access
+                    res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
+                        res.input_message_content.disable_web_page_preview
+                    )
 
             res._freeze()  # pylint: disable=protected-access
 

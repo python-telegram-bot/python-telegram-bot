@@ -99,14 +99,12 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
     ):
         # Required
         super().__init__(InlineQueryResultType.AUDIO, id, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.audio_file_id = audio_file_id
+        with self._unfrozen():
+            self.audio_file_id = audio_file_id
 
-        # Optionals
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = tuple(caption_entities) if caption_entities else None
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-
-        self._freeze()
+            # Optionals
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = tuple(caption_entities) if caption_entities else None
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content

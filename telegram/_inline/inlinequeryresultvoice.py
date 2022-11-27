@@ -109,16 +109,14 @@ class InlineQueryResultVoice(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.VOICE, id, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.voice_url = voice_url
-        self.title = title
+        with self._unfrozen():
+            self.voice_url = voice_url
+            self.title = title
 
-        # Optional
-        self.voice_duration = voice_duration
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = tuple(caption_entities) if caption_entities else None
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-
-        self._freeze()
+            # Optional
+            self.voice_duration = voice_duration
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = tuple(caption_entities) if caption_entities else None
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content

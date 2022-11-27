@@ -138,21 +138,19 @@ class InlineQueryResultVideo(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.video_url = video_url
-        self.mime_type = mime_type
-        self.thumb_url = thumb_url
-        self.title = title
+        with self._unfrozen():
+            self.video_url = video_url
+            self.mime_type = mime_type
+            self.thumb_url = thumb_url
+            self.title = title
 
-        # Optional
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = tuple(caption_entities) if caption_entities else None
-        self.video_width = video_width
-        self.video_height = video_height
-        self.video_duration = video_duration
-        self.description = description
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-
-        self._freeze()
+            # Optional
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = tuple(caption_entities) if caption_entities else None
+            self.video_width = video_width
+            self.video_height = video_height
+            self.video_duration = video_duration
+            self.description = description
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content

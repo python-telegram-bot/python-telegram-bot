@@ -127,20 +127,18 @@ class InlineQueryResultGif(InlineQueryResult):
 
         # Required
         super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
-        self._unfreeze()
-        self.gif_url = gif_url
-        self.thumb_url = thumb_url
+        with self._unfrozen():
+            self.gif_url = gif_url
+            self.thumb_url = thumb_url
 
-        # Optionals
-        self.gif_width = gif_width
-        self.gif_height = gif_height
-        self.gif_duration = gif_duration
-        self.title = title
-        self.caption = caption
-        self.parse_mode = parse_mode
-        self.caption_entities = tuple(caption_entities) if caption_entities else None
-        self.reply_markup = reply_markup
-        self.input_message_content = input_message_content
-        self.thumb_mime_type = thumb_mime_type
-
-        self._freeze()
+            # Optionals
+            self.gif_width = gif_width
+            self.gif_height = gif_height
+            self.gif_duration = gif_duration
+            self.title = title
+            self.caption = caption
+            self.parse_mode = parse_mode
+            self.caption_entities = tuple(caption_entities) if caption_entities else None
+            self.reply_markup = reply_markup
+            self.input_message_content = input_message_content
+            self.thumb_mime_type = thumb_mime_type

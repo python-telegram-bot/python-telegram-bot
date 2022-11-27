@@ -429,15 +429,13 @@ class _CredentialsBase(TelegramObject):
         self, hash: str, secret: str, *, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
     ):
         super().__init__(api_kwargs=api_kwargs)
-        super()._unfreeze()
-        self.hash = hash
-        self.secret = secret
+        with self._unfrozen():
+            self.hash = hash
+            self.secret = secret
 
-        # Aliases just to be sure
-        self.file_hash = self.hash
-        self.data_hash = self.hash
-
-        self._freeze()
+            # Aliases just to be sure
+            self.file_hash = self.hash
+            self.data_hash = self.hash
 
 
 class DataCredentials(_CredentialsBase):

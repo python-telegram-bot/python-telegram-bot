@@ -86,13 +86,11 @@ class Audio(_BaseThumbedMedium):
             thumb=thumb,
             api_kwargs=api_kwargs,
         )
-        self._unfreeze()
-        # Required
-        self.duration = duration
-        # Optional
-        self.performer = performer
-        self.title = title
-        self.mime_type = mime_type
-        self.file_name = file_name
-
-        self._freeze()
+        with self._unfrozen():
+            # Required
+            self.duration = duration
+            # Optional
+            self.performer = performer
+            self.title = title
+            self.mime_type = mime_type
+            self.file_name = file_name
