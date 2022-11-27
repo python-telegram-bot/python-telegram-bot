@@ -39,17 +39,15 @@ class InlineQueryResultDocument(InlineQueryResult):
     using this method.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`, optional): Caption of the document to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
             or "application/zip".
@@ -64,17 +62,15 @@ class InlineQueryResultDocument(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.DOCUMENT`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         title (:obj:`str`): Title for the result.
         caption (:obj:`str`): Optional. Caption of the document to be sent,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters
             after entities parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in the media caption. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"
             or "application/zip".

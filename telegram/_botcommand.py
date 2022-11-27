@@ -18,6 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
 
+from typing import ClassVar
+
+from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -30,9 +33,12 @@ class BotCommand(TelegramObject):
     considered equal, if their :attr:`command` and :attr:`description` are equal.
 
     Args:
-        command (:obj:`str`): Text of the command; 1-32 characters. Can contain only lowercase
+        command (:obj:`str`): Text of the command; :tg-const:`telegram.BotCommand.MIN_COMMAND`-
+            :tg-const:`telegram.BotCommand.MAX_COMMAND` characters. Can contain only lowercase
             English letters, digits and underscores.
-        description (:obj:`str`): Description of the command; 1-256 characters.
+        description (:obj:`str`): Description of the command;
+            :tg-const:`telegram.BotCommand.MIN_DESCRIPTION`-
+            :tg-const:`telegram.BotCommand.MAX_DESCRIPTION` characters.
 
     Attributes:
         command (:obj:`str`): Text of the command.
@@ -48,3 +54,24 @@ class BotCommand(TelegramObject):
         self.description = description
 
         self._id_attrs = (self.command, self.description)
+
+    MIN_COMMAND: ClassVar[int] = constants.BotCommandLimit.MIN_COMMAND
+    """:const:`telegram.constants.BotCommandLimit.MIN_COMMAND`
+
+    .. versionadded:: 20.0
+    """
+    MAX_COMMAND: ClassVar[int] = constants.BotCommandLimit.MAX_COMMAND
+    """:const:`telegram.constants.BotCommandLimit.MAX_COMMAND`
+
+    .. versionadded:: 20.0
+    """
+    MIN_DESCRIPTION: ClassVar[int] = constants.BotCommandLimit.MIN_DESCRIPTION
+    """:const:`telegram.constants.BotCommandLimit.MIN_DESCRIPTION`
+
+    .. versionadded:: 20.0
+    """
+    MAX_DESCRIPTION: ClassVar[int] = constants.BotCommandLimit.MAX_DESCRIPTION
+    """:const:`telegram.constants.BotCommandLimit.MAX_DESCRIPTION`
+
+    .. versionadded:: 20.0
+    """

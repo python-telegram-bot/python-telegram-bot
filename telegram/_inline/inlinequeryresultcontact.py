@@ -36,12 +36,14 @@ class InlineQueryResultContact(InlineQueryResult):
     content instead of the contact.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         phone_number (:obj:`str`): Contact's phone number.
         first_name (:obj:`str`): Contact's first name.
         last_name (:obj:`str`, optional): Contact's last name.
         vcard (:obj:`str`, optional): Additional data about the contact in the form of a vCard,
-            0-2048 bytes.
+            0-:tg-const:`telegram.constants.ContactLimit.VCARD` bytes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -52,12 +54,14 @@ class InlineQueryResultContact(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.CONTACT`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         phone_number (:obj:`str`): Contact's phone number.
         first_name (:obj:`str`): Contact's first name.
         last_name (:obj:`str`): Optional. Contact's last name.
         vcard (:obj:`str`): Optional. Additional data about the contact in the form of a vCard,
-            0-2048 bytes.
+            0-:tg-const:`telegram.constants.ContactLimit.VCARD` bytes.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the

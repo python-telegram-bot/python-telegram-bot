@@ -52,7 +52,8 @@ class InlineQuery(TelegramObject):
     Args:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
-        query (:obj:`str`): Text of the query (up to 256 characters).
+        query (:obj:`str`): Text of the query (up to
+            :tg-const:`telegram.InlineQuery.MAX_QUERY_LENGTH` characters).
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
         chat_type (:obj:`str`, optional): Type of the chat, from which the inline query was sent.
             Can be either :tg-const:`telegram.Chat.SENDER` for a private chat with the inline query
@@ -68,11 +69,12 @@ class InlineQuery(TelegramObject):
     Attributes:
         id (:obj:`str`): Unique identifier for this query.
         from_user (:class:`telegram.User`): Sender.
-        query (:obj:`str`): Text of the query (up to 256 characters).
+        query (:obj:`str`): Text of the query (up to
+            :tg-const:`telegram.InlineQuery.MAX_QUERY_LENGTH` characters).
         offset (:obj:`str`): Offset of the results to be returned, can be controlled by the bot.
         location (:class:`telegram.Location`): Optional. Sender location, only for bots that
             request user location.
-        chat_type (:obj:`str`, optional): Type of the chat, from which the inline query was sent.
+        chat_type (:obj:`str`): Optional. Type of the chat, from which the inline query was sent.
 
             .. versionadded:: 13.5
 
@@ -185,8 +187,23 @@ class InlineQuery(TelegramObject):
 
     .. versionadded:: 13.2
     """
-    MAX_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH
-    """:const:`telegram.constants.InlineQueryLimit.SWITCH_PM_TEXT_LENGTH`
+    MIN_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH
+    """:const:`telegram.constants.InlineQueryLimit.MIN_SWITCH_PM_TEXT_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_SWITCH_PM_TEXT_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH
+    """:const:`telegram.constants.InlineQueryLimit.MAX_SWITCH_PM_TEXT_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_OFFSET_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_OFFSET_LENGTH
+    """:const:`telegram.constants.InlineQueryLimit.MAX_OFFSET_LENGTH`
+
+    .. versionadded:: 20.0
+    """
+    MAX_QUERY_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_QUERY_LENGTH
+    """:const:`telegram.constants.InlineQueryLimit.MAX_QUERY_LENGTH`
 
     .. versionadded:: 20.0
     """

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import time
+from datetime import datetime
 
 import pytest
 
@@ -39,7 +40,7 @@ from telegram import (
 )
 from telegram._utils.datetime import from_timestamp
 
-message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
+message = Message(1, datetime.utcnow(), Chat(1, ""), from_user=User(1, "", False), text="Text")
 chat_member_updated = ChatMemberUpdated(
     Chat(1, "chat"),
     User(1, "", False),

@@ -60,6 +60,7 @@ class CMDefaults:
     is_member: bool = True
     can_manage_chat: bool = True
     can_manage_video_chats: bool = True
+    can_manage_topics: bool = True
 
 
 def chat_member_owner():
@@ -81,6 +82,7 @@ def chat_member_administrator():
         CMDefaults.can_post_messages,
         CMDefaults.can_edit_messages,
         CMDefaults.can_pin_messages,
+        CMDefaults.can_manage_topics,
         CMDefaults.custom_title,
     )
 
@@ -101,6 +103,7 @@ def chat_member_restricted():
         CMDefaults.can_send_polls,
         CMDefaults.can_send_other_messages,
         CMDefaults.can_add_web_page_previews,
+        CMDefaults.can_manage_topics,
         CMDefaults.until_date,
     )
 
@@ -222,6 +225,9 @@ class TestChatMemberTypes:
         assert isinstance(chat_member_dict, dict)
         assert chat_member_dict["status"] == chat_member_type.status
         assert chat_member_dict["user"] == chat_member_type.user.to_dict()
+
+        for slot in chat_member_type.__slots__:  # additional verification for the optional args
+            assert getattr(chat_member_type, slot) == chat_member_dict[slot]
 
     def test_equality(self, chat_member_type):
         a = ChatMember(status="status", user=CMDefaults.user)

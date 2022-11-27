@@ -25,7 +25,7 @@ Warning:
     user. Changes to this module are not considered breaking changes and may not be documented in
     the changelog.
 """
-import warnings
+import warnings  # skipcq: PYL-R0201
 from typing import Type
 
 from telegram.warnings import PTBUserWarning

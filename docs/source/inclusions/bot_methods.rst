@@ -259,6 +259,35 @@
 .. raw:: html
 
    <details>
+   <summary>Forum topic management</summary>
+
+.. list-table::
+    :align: left
+    :widths: 1 4
+
+    * - :meth:`~telegram.Bot.close_forum_topic`
+      - Used for closing a forum topic
+    * - :meth:`~telegram.Bot.create_forum_topic`
+      - Used to create a topic
+    * - :meth:`~telegram.Bot.delete_forum_topic`
+      - Used for deleting a forum topic
+    * - :meth:`~telegram.Bot.edit_forum_topic`
+      - Used to edit a topic
+    * - :meth:`~telegram.Bot.reopen_forum_topic`
+      - Used to reopen a topic
+    * - :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
+      - Used to get custom emojis to use as topic icons
+    * - :meth:`~telegram.Bot.unpin_all_forum_topic_messages`
+      - Used to unpin all messages in a forum topic
+
+.. raw:: html
+
+   </details>
+   <br>
+
+.. raw:: html
+
+   <details>
    <summary>Miscellaneous</summary>
 
 .. list-table::

@@ -27,7 +27,6 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
 import pytest
-import pytz
 from httpx import AsyncClient, Response
 
 from telegram import (
@@ -83,6 +82,11 @@ def env_var_2_bool(env_var: object) -> bool:
     if not isinstance(env_var, str):
         return False
     return env_var.lower().strip() == "true"
+
+
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
+if TEST_WITH_OPT_DEPS:
+    import pytz
 
 
 # Redefine the event_loop fixture to have a session scope. Otherwise `bot` fixture can't be
@@ -204,6 +208,11 @@ def super_group_id(bot_info):
 
 
 @pytest.fixture(scope="session")
+def forum_group_id(bot_info):
+    return int(bot_info["forum_group_id"])
+
+
+@pytest.fixture(scope="session")
 def channel_id(bot_info):
     return bot_info["channel_id"]
 
@@ -239,7 +248,7 @@ PROJECT_ROOT_PATH = Path(__file__).parent.parent.resolve()
 TEST_DATA_PATH = Path(__file__).parent.resolve() / "data"
 
 
-def data_file(filename: str):
+def data_file(filename: str) -> Path:
     return TEST_DATA_PATH / filename
 
 
@@ -266,7 +275,7 @@ def make_bot(bot_info=None, **kwargs):
     kwargs.pop("token", None)
     _bot = DictExtBot(
         token=token,
-        private_key=private_key,
+        private_key=private_key if TEST_WITH_OPT_DEPS else None,
         request=TestHttpxRequest(8),
         get_updates_request=TestHttpxRequest(1),
         **kwargs,
@@ -391,9 +400,25 @@ def false_update(request):
     return Update(update_id=1, **request.param)
 
 
+class BasicTimezone(datetime.tzinfo):
+    def __init__(self, offset, name):
+        self.offset = offset
+        self.name = name
+
+    def utcoffset(self, dt):
+        return self.offset
+
+    def dst(self, dt):
+        return datetime.timedelta(0)
+
+
 @pytest.fixture(params=["Europe/Berlin", "Asia/Singapore", "UTC"])
 def tzinfo(request):
-    return pytz.timezone(request.param)
+    if TEST_WITH_OPT_DEPS:
+        return pytz.timezone(request.param)
+    else:
+        hours_offset = {"Europe/Berlin": 2, "Asia/Singapore": 8, "UTC": 0}[request.param]
+        return BasicTimezone(offset=datetime.timedelta(hours=hours_offset), name=request.param)
 
 
 @pytest.fixture()
@@ -699,6 +724,10 @@ async def check_defaults_handling(
         if isinstance(value.default, DefaultValue) and not kwarg.endswith("_timeout")
     ]
 
+    if method.__name__.endswith("_media_group"):
+        # the parse_mode is applied to the first media item, and we test this elsewhere
+        kwargs_need_default.remove("parse_mode")
+
     defaults_no_custom_defaults = Defaults()
     kwargs = {kwarg: "custom_default" for kwarg in inspect.signature(Defaults).parameters.keys()}
     kwargs["tzinfo"] = pytz.timezone("America/New_York")
@@ -712,7 +741,7 @@ async def check_defaults_handling(
         data = request_data.parameters
 
         # Check regular arguments that need defaults
-        for arg in (dkw for dkw in kwargs_need_default if dkw != "timeout"):
+        for arg in kwargs_need_default:
             # 'None' should not be passed along to Telegram
             if df_value in [None, DEFAULT_NONE]:
                 if arg in data:

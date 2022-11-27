@@ -48,7 +48,7 @@ class Game(TelegramObject):
             game message. Can be automatically edited to include current high scores for the game
             when the bot calls :meth:`telegram.Bot.set_game_score`, or manually edited
             using :meth:`telegram.Bot.edit_message_text`.
-            0-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters.
+            0-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters.
         text_entities (List[:class:`telegram.MessageEntity`], optional): Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
         animation (:class:`telegram.Animation`, optional): Animation that will be displayed in the
@@ -116,16 +116,6 @@ class Game(TelegramObject):
         data["animation"] = Animation.de_json(data.get("animation"), bot)
 
         return super().de_json(data=data, bot=bot)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["photo"] = [p.to_dict() for p in self.photo]
-        if self.text_entities:
-            data["text_entities"] = [x.to_dict() for x in self.text_entities]
-
-        return data
 
     def parse_text_entity(self, entity: MessageEntity) -> str:
         """Returns the text from a given :class:`telegram.MessageEntity`.

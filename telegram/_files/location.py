@@ -18,6 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Location."""
 
+from typing import ClassVar
+
+from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -32,11 +35,12 @@ class Location(TelegramObject):
         longitude (:obj:`float`): Longitude as defined by sender.
         latitude (:obj:`float`): Latitude as defined by sender.
         horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
-            measured in meters; 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
+            measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
         live_period (:obj:`int`, optional): Time relative to the message sending date, during which
             the location can be updated, in seconds. For active live locations only.
         heading (:obj:`int`, optional): The direction in which user is moving, in degrees;
-            1-:tg-const:`telegram.constants.LocationLimit.HEADING`. For active live locations only.
+            :tg-const:`telegram.Location.MIN_HEADING`-:tg-const:`telegram.Location.MAX_HEADING`.
+            For active live locations only.
         proximity_alert_radius (:obj:`int`, optional): Maximum distance for proximity alerts about
             approaching another chat member, in meters. For sent live locations only.
 
@@ -88,3 +92,19 @@ class Location(TelegramObject):
         )
 
         self._id_attrs = (self.longitude, self.latitude)
+
+    HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
+    """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
+
+    .. versionadded:: 20.0
+    """
+    MIN_HEADING: ClassVar[int] = constants.LocationLimit.MIN_HEADING
+    """:const:`telegram.constants.LocationLimit.MIN_HEADING`
+
+    .. versionadded:: 20.0
+    """
+    MAX_HEADING: ClassVar[int] = constants.LocationLimit.MAX_HEADING
+    """:const:`telegram.constants.LocationLimit.MAX_HEADING`
+
+    .. versionadded:: 20.0
+    """

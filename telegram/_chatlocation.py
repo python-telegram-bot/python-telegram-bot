@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a location to which a chat is connected."""
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, ClassVar, Optional
 
+from telegram import constants
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
@@ -37,7 +38,9 @@ class ChatLocation(TelegramObject):
     Args:
         location (:class:`telegram.Location`): The location to which the supergroup is connected.
             Can't be a live location.
-        address (:obj:`str`): Location address; 1-64 characters, as defined by the chat owner
+        address (:obj:`str`): Location address;
+            :tg-const:`telegram.ChatLocation.MIN_ADDRESS`-
+            :tg-const:`telegram.ChatLocation.MAX_ADDRESS` characters, as defined by the chat owner
     Attributes:
         location (:class:`telegram.Location`): The location to which the supergroup is connected.
         address (:obj:`str`): Location address, as defined by the chat owner
@@ -70,3 +73,14 @@ class ChatLocation(TelegramObject):
         data["location"] = Location.de_json(data.get("location"), bot)
 
         return super().de_json(data=data, bot=bot)
+
+    MIN_ADDRESS: ClassVar[int] = constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS
+    """:const:`telegram.constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS`
+
+    .. versionadded:: 20.0
+    """
+    MAX_ADDRESS: ClassVar[int] = constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS
+    """:const:`telegram.constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS`
+
+    .. versionadded:: 20.0
+    """

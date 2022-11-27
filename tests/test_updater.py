@@ -18,6 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import asyncio
 import logging
+import os
 from collections import defaultdict
 from http import HTTPStatus
 from pathlib import Path
@@ -29,18 +30,37 @@ from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.error import InvalidToken, RetryAfter, TelegramError, TimedOut
 from telegram.ext import ExtBot, InvalidCallbackData, Updater
-from telegram.ext._utils.webhookhandler import WebhookServer
 from telegram.request import HTTPXRequest
 from tests.conftest import (
     DictBot,
     data_file,
+    env_var_2_bool,
     make_bot,
     make_message,
     make_message_update,
     send_webhook_message,
 )
 
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
+if TEST_WITH_OPT_DEPS:
+    from telegram.ext._utils.webhookhandler import WebhookServer
+
+
+@pytest.mark.skipif(
+    TEST_WITH_OPT_DEPS, reason="Only relevant if the optional dependency is not installed"
+)
+class TestNoWebhooks:
+    async def test_no_webhooks(self, bot):
+        with pytest.raises(RuntimeError, match=r"python-telegram-bot\[webhooks\]"):
+            async with Updater(bot=bot, update_queue=asyncio.Queue()) as updater:
+                await updater.start_webhook()
+
+
+@pytest.mark.skipif(
+    not TEST_WITH_OPT_DEPS,
+    reason="Only relevant if the optional dependency is installed",
+)
 class TestUpdater:
     message_count = 0
     received = None

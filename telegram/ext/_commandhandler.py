@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the CommandHandler and PrefixHandler classes."""
+"""This module contains the CommandHandler class."""
 import re
 from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, TypeVar, Union
 
@@ -57,8 +57,9 @@ class CommandHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. seealso:: :any:`Timer Bot Example <examples.timerbot>`,
-        :any:`Error Handler Bot Example <examples.errorhandlerbot>`
+    Examples:
+        * :any:`Timer Bot <examples.timerbot>`
+        * :any:`Error Handler Bot <examples.errorhandlerbot>`
 
     .. versionchanged:: 20.0
 
@@ -166,8 +167,8 @@ class CommandHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,
-        application: "Application",
+        update: Update,  # skipcq: BAN-B301
+        application: "Application",  # skipcq: BAN-B301
         check_result: Optional[Union[bool, Tuple[List[str], Optional[bool]]]],
     ) -> None:
         """Add text after the command to :attr:`CallbackContext.args` as list, split on single

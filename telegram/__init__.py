@@ -67,6 +67,10 @@ __all__ = (  # Keep this alphabetically ordered
     "File",
     "FileCredentials",
     "ForceReply",
+    "ForumTopic",
+    "ForumTopicClosed",
+    "ForumTopicCreated",
+    "ForumTopicReopened",
     "Game",
     "GameHighScore",
     "helpers",
@@ -175,7 +179,7 @@ __all__ = (  # Keep this alphabetically ordered
 )
 
 
-from . import _version
+from . import _version, constants, error, helpers, request, warnings
 from ._bot import Bot
 from ._botcommand import BotCommand
 from ._botcommandscope import (
@@ -230,6 +234,7 @@ from ._files.video import Video
 from ._files.videonote import VideoNote
 from ._files.voice import Voice
 from ._forcereply import ForceReply
+from ._forumtopic import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
 from ._games.callbackgame import CallbackGame
 from ._games.game import Game
 from ._games.gamehighscore import GameHighScore
@@ -312,6 +317,15 @@ from ._telegramobject import TelegramObject
 from ._update import Update
 from ._user import User
 from ._userprofilephotos import UserProfilePhotos
+from ._videochat import (
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
+    VideoChatStarted,
+)
+from ._webappdata import WebAppData
+from ._webappinfo import WebAppInfo
+from ._webhookinfo import WebhookInfo
 
 #: :obj:`str`: The version of the `python-telegram-bot` library as string.
 #: To get detailed information about the version number, please use :data:`__version_info__`
@@ -335,13 +349,3 @@ __bot_api_version__ = _version.__bot_api_version__
 #:
 #: .. versionadded:: 20.0
 __bot_api_version_info__ = _version.__bot_api_version_info__
-
-from ._videochat import (
-    VideoChatEnded,
-    VideoChatParticipantsInvited,
-    VideoChatScheduled,
-    VideoChatStarted,
-)
-from ._webappdata import WebAppData
-from ._webappinfo import WebAppInfo
-from ._webhookinfo import WebhookInfo

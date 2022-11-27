@@ -20,7 +20,6 @@ import asyncio
 import datetime
 
 import pytest
-import pytz
 
 from telegram import (
     Bot,
@@ -35,6 +34,7 @@ from telegram import (
     Update,
     User,
 )
+from telegram._utils.datetime import UTC
 from telegram.ext import CallbackContext, ChatJoinRequestHandler, JobQueue
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
@@ -71,7 +71,7 @@ def false_update(request):
 
 @pytest.fixture(scope="class")
 def time():
-    return datetime.datetime.now(tz=pytz.utc)
+    return datetime.datetime.now(tz=UTC)
 
 
 @pytest.fixture(scope="class")

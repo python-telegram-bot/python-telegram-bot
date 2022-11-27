@@ -46,7 +46,8 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
           chats and may not be set for inline queries coming from third-party clients. These
           updates won't be handled, if :attr:`chat_types` is passed.
 
-    .. seealso:: :any:`Inlinebot Example <examples.inlinebot>`
+    Examples:
+        :any:`Inline Bot <examples.inlinebot>`
 
 
     Args:
@@ -129,8 +130,8 @@ class InlineQueryHandler(BaseHandler[Update, CCT]):
     def collect_additional_context(
         self,
         context: CCT,
-        update: Update,
-        application: "Application",
+        update: Update,  # skipcq: BAN-B301
+        application: "Application",  # skipcq: BAN-B301
         check_result: Optional[Union[bool, Match]],
     ) -> None:
         """Add the result of ``re.match(pattern, update.inline_query.query)`` to

@@ -32,10 +32,13 @@ if TYPE_CHECKING:
 class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
-    .. seealso:: :any:`Inline Example <examples.inlinebot>`
+    Examples:
+        :any:`Inline Bot <examples.inlinebot>`
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         title (:obj:`str`): Title of the result.
         input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
             be sent.
@@ -51,7 +54,9 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.ARTICLE`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         title (:obj:`str`): Title of the result.
         input_message_content (:class:`telegram.InputMessageContent`): Content of the message to
             be sent.

@@ -133,11 +133,13 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         finally:
             await application.shutdown()
 
+    Examples:
+        :any:`Echo Bot <examples.echobot>`
+
     .. seealso:: `Your First Bot <https://github.com/\
         python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Your-first-Bot>`_,
         `Architecture Overview <https://github.com/\
-        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_,
-        :any:`Echobot Example <examples.echobot>`
+        python-telegram-bot/python-telegram-bot/wiki/Architecture>`_
 
     .. versionchanged:: 20.0
 
@@ -449,13 +451,16 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
                 raise ValueError(
                     f"bot_data must be of type {self.context_types.bot_data.__name__}"
                 )
-        if self.persistence.store_data.callback_data:
+
+        # Mypy doesn't know that persistence.set_bot (see above) already checks that
+        # self.bot is an instance of ExtBot if callback_data should be stored ...
+        if self.persistence.store_data.callback_data and (
+            self.bot.callback_data_cache is not None  # type: ignore[attr-defined]
+        ):
             persistent_data = await self.persistence.get_callback_data()
             if persistent_data is not None:
                 if not isinstance(persistent_data, tuple) or len(persistent_data) != 2:
                     raise ValueError("callback_data must be a tuple of length 2")
-                # Mypy doesn't know that persistence.set_bot (see above) already checks that
-                # self.bot is an instance of ExtBot if callback_data should be stored ...
                 self.bot.callback_data_cache.load_persistence_data(  # type: ignore[attr-defined]
                     persistent_data
                 )
@@ -636,7 +641,7 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             allowed_updates (List[:obj:`str`], optional): Passed to
                 :meth:`telegram.Bot.get_updates`.
             close_loop (:obj:`bool`, optional): If :obj:`True`, the current event loop will be
-                closed upon shutdown.
+                closed upon shutdown. Defaults to :obj:`True`.
 
                 .. seealso::
                     :meth:`asyncio.loop.close`
@@ -716,6 +721,14 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         If :attr:`post_shutdown` is set, it will be called after both :meth:`shutdown`
         and :meth:`telegram.ext.Updater.shutdown`.
+
+        Important:
+            If you want to use this method, you must install PTB with the optional requirement
+            ``webhooks``, i.e.
+
+            .. code-block:: bash
+
+               pip install python-telegram-bot[webhooks]
 
         .. include:: inclusions/application_run_tip.rst
 
@@ -1338,9 +1351,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
 
         coroutines: Set[Coroutine] = set()
 
-        if self.persistence.store_data.callback_data:
-            # Mypy doesn't know that persistence.set_bot (see above) already checks that
-            # self.bot is an instance of ExtBot if callback_data should be stored ...
+        # Mypy doesn't know that persistence.set_bot (see above) already checks that
+        # self.bot is an instance of ExtBot if callback_data should be stored ...
+        if self.persistence.store_data.callback_data and (
+            self.bot.callback_data_cache is not None  # type: ignore[attr-defined]
+        ):
             coroutines.add(
                 self.persistence.update_callback_data(
                     deepcopy(
@@ -1449,8 +1464,10 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         Note:
             Attempts to add the same callback multiple times will be ignored.
 
-        .. seealso:: :any:`Errorhandler Example <examples.errorhandlerbot>`,
-            `Exceptions, Warnings and Logging <https://github.com/\
+        Examples:
+            :any:`Errorhandler Bot <examples.errorhandlerbot>`
+
+        .. seealso:: `Exceptions, Warnings and Logging <https://github.com/\
             python-telegram-bot/python-telegram-bot/wiki/Exceptions%2C-Warnings-and-Logging>`_
 
         Args:

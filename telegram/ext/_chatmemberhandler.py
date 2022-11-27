@@ -35,7 +35,8 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
         When setting :paramref:`block` to :obj:`False`, you cannot rely on adding custom
         attributes to :class:`telegram.ext.CallbackContext`. See its docs for more info.
 
-    .. seealso:: :any:`Chat Member Bot Example <examples.chatmemberbot>`
+    Examples:
+        :any:`Chat Member Bot <examples.chatmemberbot>`
 
     .. versionadded:: 13.4
 
@@ -61,7 +62,7 @@ class ChatMemberHandler(BaseHandler[Update, CCT]):
 
     Attributes:
         callback (:term:`coroutine function`): The callback function for this handler.
-        chat_member_types (:obj:`int`, optional): Specifies if this handler should handle
+        chat_member_types (:obj:`int`): Optional. Specifies if this handler should handle
             only updates with :attr:`telegram.Update.my_chat_member`,
             :attr:`telegram.Update.chat_member` or both.
         block (:obj:`bool`): Determines whether the return value of the callback should be

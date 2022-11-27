@@ -19,8 +19,6 @@
 import datetime as dtm
 import os
 import time
-from importlib import reload
-from unittest import mock
 
 import pytest
 
@@ -43,36 +41,27 @@ RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
 
 """
-This part is here for ptb-raw, where we don't have pytz (unless the user installs it)
+This part is here because pytz is just installed as dependency of the optional dependency
+APScheduler, so we don't always have pytz (unless the user installs it).
 Because imports in pytest are intricate, we just run
 
-    pytest -k test_helpers.py
+    pytest -k test_datetime.py
 
-with the TEST_PYTZ environment variable set to False in addition to the regular test suite.
-Because actually uninstalling pytz would lead to errors in the test suite we just mock the
-import to raise the expected exception.
-
-Note that a fixture that just does this for every test that needs it is a nice idea, but for some
-reason makes test_updater.py hang indefinitely on GitHub Actions (at least when Hinrich tried that)
+with the TEST_WITH_OPT_DEPS=False environment variable in addition to the regular test suite.
 """
-TEST_PYTZ = env_var_2_bool(os.getenv("TEST_PYTZ", True))
-
-if not TEST_PYTZ:
-    orig_import = __import__
-
-    def import_mock(module_name, *args, **kwargs):
-        if module_name == "pytz":
-            raise ModuleNotFoundError("We are testing without pytz here")
-        return orig_import(module_name, *args, **kwargs)
-
-    with mock.patch("builtins.__import__", side_effect=import_mock):
-        reload(tg_dtm)
+TEST_WITH_OPT_DEPS = env_var_2_bool(os.getenv("TEST_WITH_OPT_DEPS", True))
 
 
 class TestDatetime:
+    @staticmethod
+    def localize(dt, tzinfo):
+        if TEST_WITH_OPT_DEPS:
+            return tzinfo.localize(dt)
+        return dt.replace(tzinfo=tzinfo)
+
     def test_helpers_utc(self):
         # Here we just test, that we got the correct UTC variant
-        if not TEST_PYTZ:
+        if not TEST_WITH_OPT_DEPS:
             assert tg_dtm.UTC is tg_dtm.DTM_UTC
         else:
             assert tg_dtm.UTC is not tg_dtm.DTM_UTC
@@ -97,7 +86,7 @@ class TestDatetime:
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
-        datetime = timezone.localize(test_datetime)
+        datetime = self.localize(test_datetime, timezone)
         assert (
             tg_dtm.to_float_timestamp(datetime)
             == 1573431976.1 - timezone.utcoffset(test_datetime).total_seconds()
@@ -132,7 +121,7 @@ class TestDatetime:
         ref_datetime = dtm.datetime(1970, 1, 1, 12)
         utc_offset = timezone.utcoffset(ref_datetime)
         ref_t, time_of_day = tg_dtm._datetime_to_float_timestamp(ref_datetime), ref_datetime.time()
-        aware_time_of_day = timezone.localize(ref_datetime).timetz()
+        aware_time_of_day = self.localize(ref_datetime, timezone).timetz()
 
         # first test that naive time is assumed to be utc:
         assert tg_dtm.to_float_timestamp(time_of_day, ref_t) == pytest.approx(ref_t)
@@ -173,7 +162,7 @@ class TestDatetime:
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         test_datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, 10**5)
-        datetime = timezone.localize(test_datetime)
+        datetime = self.localize(test_datetime, timezone)
         assert (
             tg_dtm.from_timestamp(1573431976.1 - timezone.utcoffset(test_datetime).total_seconds())
             == datetime

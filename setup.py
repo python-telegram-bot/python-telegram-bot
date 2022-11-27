@@ -8,15 +8,13 @@ from pathlib import Path
 from setuptools import find_packages, setup
 
 
-def get_requirements(raw=False):
+def get_requirements():
     """Build the requirements list for this project"""
     requirements_list = []
 
     with Path("requirements.txt").open() as reqs:
         for install in reqs:
-            if install.startswith("# only telegram.ext:"):
-                if raw:
-                    break
+            if install.startswith("#"):
                 continue
             requirements_list.append(install.strip())
 
@@ -25,7 +23,7 @@ def get_requirements(raw=False):
 
 def get_packages_requirements(raw=False):
     """Build the package & requirements list for this project"""
-    reqs = get_requirements(raw=raw)
+    reqs = get_requirements()
 
     exclude = ["tests*"]
     if raw:
@@ -42,7 +40,8 @@ def get_optional_requirements(raw=False):
 
     with Path("requirements-opts.txt").open() as reqs:
         for line in reqs:
-            if line.startswith("#"):
+            line = line.strip()
+            if not line or line.startswith("#"):
                 continue
             dependency, names = line.split("#")
             dependency = dependency.strip()
@@ -53,7 +52,9 @@ def get_optional_requirements(raw=False):
                         continue
                     else:
                         name = name[:-4]
+                        requirements["ext"].append(dependency)
                 requirements[name].append(dependency)
+                requirements["all"].append(dependency)
 
     return requirements
 

@@ -18,6 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InputLocationMessageContent."""
 
+from typing import ClassVar
+
+from telegram import constants
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._utils.types import JSONDict
 
@@ -34,15 +37,21 @@ class InputLocationMessageContent(InputMessageContent):
         latitude (:obj:`float`): Latitude of the location in degrees.
         longitude (:obj:`float`): Longitude of the location in degrees.
         horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
-            measured in meters; 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
-        live_period	(:obj:`int`, optional): Period in seconds for which the location can be
-            updated, should be between 60 and 86400.
+            measured in meters; 0-
+            :tg-const:`telegram.InputLocationMessageContent.HORIZONTAL_ACCURACY`.
+        live_period (:obj:`int`, optional): Period in seconds for which the location will be
+            updated, should be between
+            :tg-const:`telegram.InputLocationMessageContent.MIN_LIVE_PERIOD` and
+            :tg-const:`telegram.InputLocationMessageContent.MAX_LIVE_PERIOD`.
         heading (:obj:`int`, optional): For live locations, a direction in which the user is
-            moving, in degrees. Must be between 1 and
-            :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
-        proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance for
-            proximity alerts about approaching another chat member, in meters. Must be between 1
-            and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+            moving, in degrees. Must be between
+            :tg-const:`telegram.InputLocationMessageContent.MIN_HEADING` and
+            :tg-const:`telegram.InputLocationMessageContent.MAX_HEADING` if specified.
+        proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
+            for proximity alerts about approaching another chat member, in meters. Must be
+            between :tg-const:`telegram.InputLocationMessageContent.MIN_PROXIMITY_ALERT_RADIUS`
+            and :tg-const:`telegram.InputLocationMessageContent.MAX_PROXIMITY_ALERT_RADIUS`
+            if specified.
 
     Attributes:
         latitude (:obj:`float`): Latitude of the location in degrees.
@@ -87,3 +96,39 @@ class InputLocationMessageContent(InputMessageContent):
         )
 
         self._id_attrs = (self.latitude, self.longitude)
+
+    HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
+    """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
+
+    .. versionadded:: 20.0
+    """
+    MIN_HEADING: ClassVar[int] = constants.LocationLimit.MIN_HEADING
+    """:const:`telegram.constants.LocationLimit.MIN_HEADING`
+
+    .. versionadded:: 20.0
+    """
+    MAX_HEADING: ClassVar[int] = constants.LocationLimit.MAX_HEADING
+    """:const:`telegram.constants.LocationLimit.MAX_HEADING`
+
+    .. versionadded:: 20.0
+    """
+    MIN_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MIN_LIVE_PERIOD
+    """:const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD`
+
+    .. versionadded:: 20.0
+    """
+    MAX_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MAX_LIVE_PERIOD
+    """:const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`
+
+    .. versionadded:: 20.0
+    """
+    MIN_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS
+    """:const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
+
+    .. versionadded:: 20.0
+    """
+    MAX_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS
+    """:const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
+
+    .. versionadded:: 20.0
+    """

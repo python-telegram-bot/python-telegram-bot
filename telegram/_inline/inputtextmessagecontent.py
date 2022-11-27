@@ -33,31 +33,25 @@ class InputTextMessageContent(InputMessageContent):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`message_text` is equal.
 
-    .. seealso:: :any:`Inline Example <examples.inlinebot>`
+    Examples:
+        :any:`Inline Bot <examples.inlinebot>`
 
     Args:
         message_text (:obj:`str`): Text of the message to be sent,
-            1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
+            :tg-const:`telegram.constants.MessageLimit.MIN_TEXT_LENGTH`-
+            :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
-        parse_mode (:obj:`str`, optional): Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        entities (List[:class:`telegram.MessageEntity`], optional): List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`, optional): |parse_mode|
+        entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
 
     Attributes:
         message_text (:obj:`str`): Text of the message to be sent,
-            1-:tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` characters after entities
+            1-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
-        parse_mode (:obj:`str`): Optional. Send Markdown or HTML, if you want Telegram apps to show
-            bold, italic, fixed-width text or inline URLs in your bot's message. See the constants
-            in :class:`telegram.constants.ParseMode` for the available modes.
-        entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption, which can be specified instead of
-            :paramref:`parse_mode`.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
@@ -83,12 +77,3 @@ class InputTextMessageContent(InputMessageContent):
         self.disable_web_page_preview = disable_web_page_preview
 
         self._id_attrs = (self.message_text,)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        if self.entities:
-            data["entities"] = [ce.to_dict() for ce in self.entities]
-
-        return data

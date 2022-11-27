@@ -29,9 +29,9 @@ author = "Leandro Toledo"
 # built documents.
 #
 # The short X.Y version.
-version = "20.0a4"  # telegram.__version__[:3]
+version = "20.0a6"  # telegram.__version__[:3]
 # The full version, including alpha/beta/rc tags.
-release = "20.0a4"  # telegram.__version__
+release = "20.0a6"  # telegram.__version__
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = "5.1.1"
@@ -295,7 +295,7 @@ class TGConstXRefRole(PyXRefRole):
 
     Example:
 
-        :tg-const:`telegram.constants.MessageLimit.TEXT_LENGTH` renders as `4096` but links to the
+        :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` renders as `4096` but links to the
         constant.
     """
 
@@ -406,7 +406,7 @@ def find_insert_pos(lines: List[str]) -> int:
         if value.startswith(":returns:"):
             return idx
     else:
-        raise ValueError("Could not find the correct position to insert the keyword args.")
+        return False
 
 
 def is_write_timeout_20(obj: object) -> int:
@@ -449,6 +449,11 @@ def autodoc_process_docstring(
         and check_timeout_and_api_kwargs_presence(obj)
     ):
         insert_index = find_insert_pos(lines)
+        if not insert_index:
+            raise ValueError(
+                f"Couldn't find the correct position to insert the keyword args for {obj}."
+            )
+
         long_write_timeout = is_write_timeout_20(obj)
         get_updates_sub = 1 if (method_name == "get_updates") else 0
         # The below can be done in 1 line with itertools.chain, but this must be modified in-place

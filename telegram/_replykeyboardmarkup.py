@@ -18,8 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
-from typing import List, Sequence, Union
+from typing import ClassVar, List, Sequence, Union
 
+from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils.markup import check_keyboard_type
@@ -32,9 +33,12 @@ class ReplyKeyboardMarkup(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their size of :attr:`keyboard` and all the buttons are equal.
 
-    Example:
-        A user requests to change the bot's language, bot replies to the request with a keyboard
-        to select the new language. Other users in the group don't see the keyboard.
+    Examples:
+        * Example usage: A user requests to change the bot's language, bot replies to the request
+          with a keyboard to select the new language. Other users in the group don't see
+          the keyboard.
+        * :any:`Conversation Bot <examples.conversationbot>`
+        * :any:`Conversation Bot 2 <examples.conversationbot2>`
 
     .. seealso:: :any:`Conversationbot Example <examples.conversationbot>`,
         :any:`Conversationbot Example 2 <examples.conversationbot2>`
@@ -61,7 +65,10 @@ class ReplyKeyboardMarkup(TelegramObject):
             Defaults to :obj:`False`.
 
         input_field_placeholder (:obj:`str`, optional): The placeholder to be shown in the input
-            field when the keyboard is active; 1-64 characters.
+            field when the keyboard is active;
+            :tg-const:`telegram.ReplyKeyboardMarkup.MIN_INPUT_FIELD_PLACEHOLDER`-
+            :tg-const:`telegram.ReplyKeyboardMarkup.MAX_INPUT_FIELD_PLACEHOLDER`
+            characters.
 
             .. versionadded:: 13.7
 
@@ -121,15 +128,6 @@ class ReplyKeyboardMarkup(TelegramObject):
         self.input_field_placeholder = input_field_placeholder
 
         self._id_attrs = (self.keyboard,)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["keyboard"] = []
-        for row in self.keyboard:
-            data["keyboard"].append([button.to_dict() for button in row])
-        return data
 
     @classmethod
     def from_button(
@@ -296,3 +294,14 @@ class ReplyKeyboardMarkup(TelegramObject):
                 self.selective,
             )
         )
+
+    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER`
+
+    .. versionadded:: 20.0
+    """
+    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
+    """:const:`telegram.constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER`
+
+    .. versionadded:: 20.0
+    """

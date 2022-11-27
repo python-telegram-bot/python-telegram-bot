@@ -2,6 +2,7 @@ Available Types
 ---------------
 
 .. toctree::
+    :titlesonly:
 
     telegram.animation
     telegram.audio
@@ -35,6 +36,10 @@ Available Types
     telegram.document
     telegram.file
     telegram.forcereply
+    telegram.forumtopic
+    telegram.forumtopicclosed
+    telegram.forumtopiccreated
+    telegram.forumtopicreopened
     telegram.inlinekeyboardbutton
     telegram.inlinekeyboardmarkup
     telegram.inputfile

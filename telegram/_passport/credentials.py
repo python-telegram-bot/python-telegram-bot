@@ -245,25 +245,25 @@ class SecureData(TelegramObject):
     All fields are optional and depend on fields that were requested.
 
     Attributes:
-        personal_details (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+        personal_details (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             personal details.
-        passport (:class:`telegram.SecureValue`, optional): Credentials for encrypted passport.
-        internal_passport (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+        passport (:class:`telegram.SecureValue`): Optional. Credentials for encrypted passport.
+        internal_passport (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             internal passport.
-        driver_license (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+        driver_license (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             driver license.
-        identity_card (:class:`telegram.SecureValue`, optional): Credentials for encrypted ID card
-        address (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+        identity_card (:class:`telegram.SecureValue`): Optional. Credentials for encrypted ID card
+        address (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             residential address.
-        utility_bill (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+        utility_bill (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             utility bill.
-        bank_statement (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+        bank_statement (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             bank statement.
-        rental_agreement (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+        rental_agreement (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             rental agreement.
-        passport_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+        passport_registration (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             registration from internal passport.
-        temporary_registration (:class:`telegram.SecureValue`, optional): Credentials for encrypted
+        temporary_registration (:class:`telegram.SecureValue`): Optional. Credentials for encrypted
             temporary registration.
     """
 
@@ -345,22 +345,22 @@ class SecureValue(TelegramObject):
     All fields are optional and depend on the type of field.
 
     Attributes:
-        data (:class:`telegram.DataCredentials`, optional): Credentials for encrypted Telegram
+        data (:class:`telegram.DataCredentials`): Optional. Credentials for encrypted Telegram
             Passport data. Available for "personal_details", "passport", "driver_license",
             "identity_card", "identity_passport" and "address" types.
-        front_side (:class:`telegram.FileCredentials`, optional): Credentials for encrypted
+        front_side (:class:`telegram.FileCredentials`): Optional. Credentials for encrypted
             document's front side. Available for "passport", "driver_license", "identity_card"
             and "internal_passport".
-        reverse_side (:class:`telegram.FileCredentials`, optional): Credentials for encrypted
+        reverse_side (:class:`telegram.FileCredentials`): Optional. Credentials for encrypted
             document's reverse side. Available for "driver_license" and "identity_card".
-        selfie (:class:`telegram.FileCredentials`, optional): Credentials for encrypted selfie
+        selfie (:class:`telegram.FileCredentials`): Optional. Credentials for encrypted selfie
             of the user with a document. Can be available for "passport", "driver_license",
             "identity_card" and "internal_passport".
-        translation (List[:class:`telegram.FileCredentials`], optional): Credentials for an
+        translation (List[:class:`telegram.FileCredentials`]): Optional. Credentials for an
             encrypted translation of the document. Available for "passport", "driver_license",
             "identity_card", "internal_passport", "utility_bill", "bank_statement",
             "rental_agreement", "passport_registration" and "temporary_registration".
-        files (List[:class:`telegram.FileCredentials`], optional): Credentials for encrypted
+        files (List[:class:`telegram.FileCredentials`]): Optional. Credentials for encrypted
             files. Available for "utility_bill", "bank_statement", "rental_agreement",
             "passport_registration" and "temporary_registration" types.
 
@@ -404,15 +404,6 @@ class SecureValue(TelegramObject):
 
         return super().de_json(data=data, bot=bot)
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        data["files"] = [p.to_dict() for p in self.files]  # type: ignore[union-attr]
-        data["translation"] = [p.to_dict() for p in self.translation]  # type: ignore[union-attr]
-
-        return data
-
 
 class _CredentialsBase(TelegramObject):
     """Base class for DataCredentials and FileCredentials."""
@@ -420,8 +411,8 @@ class _CredentialsBase(TelegramObject):
     __slots__ = ("hash", "secret", "file_hash", "data_hash")
 
     def __init__(
-        self, hash: str, secret: str, *, api_kwargs: JSONDict = None
-    ):  # skipcq: PYL-W0622
+        self, hash: str, secret: str, *, api_kwargs: JSONDict = None  # skipcq: PYL-W0622
+    ):
         super().__init__(api_kwargs=api_kwargs)
         self.hash = hash
         self.secret = secret
@@ -450,15 +441,6 @@ class DataCredentials(_CredentialsBase):
     def __init__(self, data_hash: str, secret: str, *, api_kwargs: JSONDict = None):
         super().__init__(hash=data_hash, secret=secret, api_kwargs=api_kwargs)
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        del data["file_hash"]
-        del data["hash"]
-
-        return data
-
 
 class FileCredentials(_CredentialsBase):
     """
@@ -478,12 +460,3 @@ class FileCredentials(_CredentialsBase):
 
     def __init__(self, file_hash: str, secret: str, *, api_kwargs: JSONDict = None):
         super().__init__(hash=file_hash, secret=secret, api_kwargs=api_kwargs)
-
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
-
-        del data["data_hash"]
-        del data["hash"]
-
-        return data

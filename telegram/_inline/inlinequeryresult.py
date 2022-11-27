@@ -19,6 +19,9 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram InlineQueryResult."""
 
+from typing import ClassVar
+
+from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -33,15 +36,20 @@ class InlineQueryResult(TelegramObject):
         All URLs passed in inline query results will be available to end users and therefore must
         be assumed to be *public*.
 
-    .. seealso:: :any:`Inline Bot Example <examples.inlinebot>`
+    Examples:
+        :any:`Inline Bot <examples.inlinebot>`
 
     Args:
         type (:obj:`str`): Type of the result.
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
 
     Attributes:
         type (:obj:`str`): Type of the result.
-        id (:obj:`str`): Unique identifier for this result, 1-64 Bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
 
     """
 
@@ -56,17 +64,13 @@ class InlineQueryResult(TelegramObject):
 
         self._id_attrs = (self.id,)
 
-    def to_dict(self, recursive: bool = True) -> JSONDict:
-        """See :meth:`telegram.TelegramObject.to_dict`."""
-        data = super().to_dict(recursive=recursive)
+    MIN_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MIN_ID_LENGTH
+    """:const:`telegram.constants.InlineQueryResultLimit.MIN_ID_LENGTH`
 
-        # pylint: disable=no-member
-        if (
-            hasattr(self, "caption_entities")
-            and self.caption_entities  # type: ignore[attr-defined]
-        ):
-            data["caption_entities"] = [
-                ce.to_dict() for ce in self.caption_entities  # type: ignore[attr-defined]
-            ]
+    .. versionadded:: 20.0
+    """
+    MAX_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MAX_ID_LENGTH
+    """:const:`telegram.constants.InlineQueryResultLimit.MAX_ID_LENGTH`
 
-        return data
+    .. versionadded:: 20.0
+    """

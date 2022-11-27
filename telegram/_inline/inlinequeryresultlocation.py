@@ -18,12 +18,12 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultLocation."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
+from telegram import constants
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._utils.types import JSONDict
-from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
@@ -36,20 +36,28 @@ class InlineQueryResultLocation(InlineQueryResult):
     content instead of the location.
 
     Args:
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.
         horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the location,
-            measured in meters; 0-:tg-const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`.
-        live_period (:obj:`int`, optional): Period in seconds for which the location can be
-            updated, should be between 60 and 86400.
+            measured in meters; 0-
+            :tg-const:`telegram.InlineQueryResultLocation.HORIZONTAL_ACCURACY`.
+        live_period (:obj:`int`, optional): Period in seconds for which the location will be
+            updated, should be between
+            :tg-const:`telegram.InlineQueryResultLocation.MIN_LIVE_PERIOD` and
+            :tg-const:`telegram.InlineQueryResultLocation.MAX_LIVE_PERIOD`.
         heading (:obj:`int`, optional): For live locations, a direction in which the user is
-            moving, in degrees. Must be between 1 and
-            :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
-        proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance for
-            proximity alerts about approaching another chat member, in meters. Must be between 1
-            and :tg-const:`telegram.constants.LocationLimit.HEADING` if specified.
+            moving, in degrees. Must be between
+            :tg-const:`telegram.InlineQueryResultLocation.MIN_HEADING` and
+            :tg-const:`telegram.InlineQueryResultLocation.MAX_HEADING` if specified.
+        proximity_alert_radius (:obj:`int`, optional): For live locations, a maximum distance
+            for proximity alerts about approaching another chat member, in meters. Must be
+            between :tg-const:`telegram.InlineQueryResultLocation.MIN_PROXIMITY_ALERT_RADIUS`
+            and :tg-const:`telegram.InlineQueryResultLocation.MAX_PROXIMITY_ALERT_RADIUS`
+            if specified.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
@@ -60,7 +68,9 @@ class InlineQueryResultLocation(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.LOCATION`.
-        id (:obj:`str`): Unique identifier for this result, 1-64 bytes.
+        id (:obj:`str`): Unique identifier for this result,
+            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.
@@ -116,7 +126,7 @@ class InlineQueryResultLocation(InlineQueryResult):
         api_kwargs: JSONDict = None,
     ):
         # Required
-        super().__init__(InlineQueryResultType.LOCATION, id, api_kwargs=api_kwargs)
+        super().__init__(constants.InlineQueryResultType.LOCATION, id, api_kwargs=api_kwargs)
         self.latitude = latitude
         self.longitude = longitude
         self.title = title
@@ -133,3 +143,39 @@ class InlineQueryResultLocation(InlineQueryResult):
         self.proximity_alert_radius = (
             int(proximity_alert_radius) if proximity_alert_radius else None
         )
+
+    HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
+    """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
+
+    .. versionadded:: 20.0
+    """
+    MIN_HEADING: ClassVar[int] = constants.LocationLimit.MIN_HEADING
+    """:const:`telegram.constants.LocationLimit.MIN_HEADING`
+
+    .. versionadded:: 20.0
+    """
+    MAX_HEADING: ClassVar[int] = constants.LocationLimit.MAX_HEADING
+    """:const:`telegram.constants.LocationLimit.MAX_HEADING`
+
+    .. versionadded:: 20.0
+    """
+    MIN_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MIN_LIVE_PERIOD
+    """:const:`telegram.constants.LocationLimit.MIN_LIVE_PERIOD`
+
+    .. versionadded:: 20.0
+    """
+    MAX_LIVE_PERIOD: ClassVar[int] = constants.LocationLimit.MAX_LIVE_PERIOD
+    """:const:`telegram.constants.LocationLimit.MAX_LIVE_PERIOD`
+
+    .. versionadded:: 20.0
+    """
+    MIN_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS
+    """:const:`telegram.constants.LocationLimit.MIN_PROXIMITY_ALERT_RADIUS`
+
+    .. versionadded:: 20.0
+    """
+    MAX_PROXIMITY_ALERT_RADIUS: ClassVar[int] = constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS
+    """:const:`telegram.constants.LocationLimit.MAX_PROXIMITY_ALERT_RADIUS`
+
+    .. versionadded:: 20.0
+    """
