@@ -1424,6 +1424,7 @@ class TestApplication:
             events.append("post_init")
 
         app = Application.builder().token(bot.token).post_init(post_init).build()
+        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(
             app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
@@ -1466,6 +1467,7 @@ class TestApplication:
             events.append("post_shutdown")
 
         app = Application.builder().token(bot.token).post_shutdown(post_shutdown).build()
+        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         monkeypatch.setattr(
             app, "shutdown", call_after(app.shutdown, lambda _: events.append("shutdown"))
@@ -1646,6 +1648,7 @@ class TestApplication:
             events.append("post_init")
 
         app = Application.builder().token(bot.token).post_init(post_init).build()
+        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
         monkeypatch.setattr(
@@ -1705,6 +1708,7 @@ class TestApplication:
             events.append("post_shutdown")
 
         app = Application.builder().token(bot.token).post_shutdown(post_shutdown).build()
+        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)
         monkeypatch.setattr(
