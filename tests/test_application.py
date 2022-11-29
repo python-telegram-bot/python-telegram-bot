@@ -201,6 +201,16 @@ class TestApplication:
                 post_shutdown=None,
             )
 
+    def test_job_queue(self, bot, recwarn):
+        expected_warning = (
+            "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
+            "`pip install python-telegram-bot[job_queue]`."
+        )
+        application = ApplicationBuilder().token(bot.token).job_queue(None).build()
+        assert application.job_queue is None
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == expected_warning
+
     def test_custom_context_init(self, bot):
         cc = ContextTypes(
             context=CustomContext,
@@ -384,23 +394,18 @@ class TestApplication:
         builder_1.token(app.bot.token)
         builder_2.token(app.bot.token)
 
-    @pytest.mark.parametrize("job_queue", (True, False))
-    async def test_start_stop_processing_updates(self, bot, job_queue):
+    # @pytest.mark.parametrize("job_queue", (True, False))
+    async def test_start_stop_processing_updates(self, bot):
         # TODO: repeat a similar test for create_task, persistence processing and job queue
-        if job_queue:
-            app = ApplicationBuilder().token(bot.token).build()
-        else:
-            app = ApplicationBuilder().token(bot.token).job_queue(None).build()
+        app = ApplicationBuilder().token(bot.token).build()
 
         async def callback(u, c):
             self.received = u
 
         assert not app.running
         assert not app.updater.running
-        if job_queue:
-            assert not app.job_queue.scheduler.running
-        else:
-            assert app.job_queue is None
+        assert not app.job_queue.scheduler.running
+
         app.add_handler(TypeHandler(object, callback))
 
         await app.update_queue.put(1)
@@ -411,10 +416,7 @@ class TestApplication:
         async with app:
             await app.start()
             assert app.running
-            if job_queue:
-                assert app.job_queue.scheduler.running
-            else:
-                assert app.job_queue is None
+            assert app.job_queue.scheduler.running
             # app.start() should not start the updater!
             assert not app.updater.running
             await asyncio.sleep(0.05)
@@ -426,10 +428,7 @@ class TestApplication:
             assert not app.running
             # app.stop() should not stop the updater!
             assert app.updater.running
-            if job_queue:
-                assert not app.job_queue.scheduler.running
-            else:
-                assert app.job_queue is None
+            assert not app.job_queue.scheduler.running
             await app.update_queue.put(2)
             await asyncio.sleep(0.05)
             assert not app.update_queue.empty()

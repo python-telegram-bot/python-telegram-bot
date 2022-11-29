@@ -151,8 +151,6 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
         update_queue (:class:`asyncio.Queue`): The synchronized queue that will contain the
             updates.
         updater (:class:`telegram.ext.Updater`): Optional. The updater used by this application.
-        job_queue (:class:`telegram.ext.JobQueue`): Optional. The :class:`telegram.ext.JobQueue`
-            instance to pass onto handler callbacks.
         chat_data (:obj:`types.MappingProxyType`): A dictionary handlers can use to store data for
             the chat. For each integer chat id, the corresponding value of this mapping is
             available as :attr:`telegram.ext.CallbackContext.chat_data` in handler callbacks for
