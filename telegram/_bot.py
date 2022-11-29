@@ -1073,7 +1073,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "duration": duration,
             "performer": performer,
             "title": title,
-            "thumb": self._parse_file_input(thumb, attach=True),  # type: ignore[arg-type]
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
 
         return await self._send_message(  # type: ignore[return-value]
@@ -1192,7 +1192,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "chat_id": chat_id,
             "document": self._parse_file_input(document, Document, filename=filename),
             "disable_content_type_detection": disable_content_type_detection,
-            "thumb": self._parse_file_input(thumb, attach=True),  # type: ignore[arg-type]
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
 
         return await self._send_message(  # type: ignore[return-value]
@@ -1401,7 +1401,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "width": width,
             "height": height,
             "supports_streaming": supports_streaming,
-            "thumb": self._parse_file_input(thumb, attach=True),  # type: ignore[arg-type]
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
 
         return await self._send_message(  # type: ignore[return-value]
@@ -1520,7 +1520,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "video_note": self._parse_file_input(video_note, VideoNote, filename=filename),
             "duration": duration,
             "length": length,
-            "thumb": self._parse_file_input(thumb, attach=True),  # type: ignore[arg-type]
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
 
         return await self._send_message(  # type: ignore[return-value]
@@ -1643,7 +1643,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "duration": duration,
             "width": width,
             "height": height,
-            "thumb": self._parse_file_input(thumb, attach=True),  # type: ignore[arg-type]
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
 
         return await self._send_message(  # type: ignore[return-value]
@@ -2817,7 +2817,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs=api_kwargs,
         )
 
-        file_path = result.get("file_path") if isinstance(result, dict) else None
+        file_path = cast(dict, result).get("file_path")
         if file_path and not is_local_file(file_path):
             result["file_path"] = f"{self._base_file_url}/{file_path}"  # type: ignore[index]
 
@@ -3163,7 +3163,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "chat_id": chat_id,
             "message_id": message_id,
             "inline_message_id": inline_message_id,
-            "entities": [e.to_dict(recursive=True) for e in entities] if entities else None,
+            "entities": entities,
         }
 
         return await self._send_message(
@@ -4263,9 +4263,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "shipping_query_id": shipping_query_id,
             "ok": ok,
-            "shipping_options": [option.to_dict(True) for option in shipping_options]
-            if shipping_options is not None
-            else None,
+            "shipping_options": shipping_options,
             "error_message": error_message,
         }
 
@@ -5537,9 +5535,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "name": name,
             "title": title,
             "emojis": emojis,
-            "png_sticker": self._parse_file_input(png_sticker),  # type: ignore[arg-type]
-            "tgs_sticker": self._parse_file_input(tgs_sticker),  # type: ignore[arg-type]
-            "webm_sticker": self._parse_file_input(webm_sticker),  # type: ignore[arg-type]
+            "png_sticker": self._parse_file_input(png_sticker) if png_sticker else None,
+            "tgs_sticker": self._parse_file_input(tgs_sticker) if tgs_sticker else None,
+            "webm_sticker": self._parse_file_input(webm_sticker) if webm_sticker else None,
             "mask_position": mask_position,
             "sticker_type": sticker_type,
         }
@@ -5636,9 +5634,9 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "user_id": user_id,
             "name": name,
             "emojis": emojis,
-            "png_sticker": self._parse_file_input(png_sticker),  # type: ignore[arg-type]
-            "tgs_sticker": self._parse_file_input(tgs_sticker),  # type: ignore[arg-type]
-            "webm_sticker": self._parse_file_input(webm_sticker),  # type: ignore[arg-type]
+            "png_sticker": self._parse_file_input(png_sticker) if png_sticker else None,
+            "tgs_sticker": self._parse_file_input(tgs_sticker) if tgs_sticker else None,
+            "webm_sticker": self._parse_file_input(webm_sticker) if webm_sticker else None,
             "mask_position": mask_position,
         }
 
@@ -5771,7 +5769,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         data: JSONDict = {
             "name": name,
             "user_id": user_id,
-            "thumb": self._parse_file_input(thumb),  # type: ignore[arg-type]
+            "thumb": self._parse_file_input(thumb) if thumb else None,
         }
 
         result = await self._post(
