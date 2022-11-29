@@ -3485,6 +3485,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                server response.
             3. To take full advantage of this library take a look at :class:`telegram.ext.Updater`
 
+        .. seealso:: :meth:`telegram.ext.Application.run_polling`,
+            :meth:`telegram.ext.Updater.start_polling`
+
         Args:
             offset (:obj:`int`, optional): Identifier of the first update to be returned. Must be
                 greater by one than the highest among the identifiers of previously received
@@ -3601,6 +3604,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
             If you're having any trouble setting up webhooks, please check out this `guide to
             Webhooks`_.
+
+        .. seealso:: :meth:`telegram.ext.Updater.start_webhook`
 
         Examples:
             :any:`Custom Webhook Bot <examples.customwebhookbot>`
