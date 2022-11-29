@@ -4367,7 +4367,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :class:`telegram.Update` with a :attr:`telegram.Update.shipping_query` field to the bot.
         Use this method to reply to shipping queries.
 
-        .. seealso:: :attr:`telegram.ShippingQuery.answer`
+        .. seealso:: :meth:`telegram.ShippingQuery.answer`
 
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
