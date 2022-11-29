@@ -6371,6 +6371,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to get the current list of the bot's commands for the given scope and user
         language.
 
+        .. seealso:: :meth:`set_my_commands`, :meth:`delete_my_commands`
+
         Args:
             scope (:class:`telegram.BotCommandScope`, optional): An object,
                 describing scope of users. Defaults to :class:`telegram.BotCommandScopeDefault`.
@@ -6427,6 +6429,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to change the list of the bot's commands. See the
         `Telegram docs <https://core.telegram.org/bots/features#commands>`_ for more details about
         bot commands.
+
+        .. seealso:: :meth:`get_my_commands`, :meth:`delete_my_commands`
 
         Args:
             commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list
@@ -6492,6 +6496,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         will be shown to affected users.
 
         .. versionadded:: 13.7
+
+        .. seealso:: :meth:`get_my_commands`, :meth:`set_my_commands`
 
         Args:
             scope (:class:`telegram.BotCommandScope`, optional): An object,
