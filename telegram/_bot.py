@@ -2848,9 +2848,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             is received.
 
         .. seealso:: :meth:`telegram.Animation.get_file`, :meth:`telegram.Audio.get_file`,
-            :meth:`telegram.Document.get_file`, :meth:`telegram.PhotoSize.get_file`,
-            :meth:`telegram.Sticker.get_file`, :meth:`telegram.Video.get_file`,
-            :meth:`telegram.VideoNote.get_file`, :meth:`telegram.Voice.get_file`
+            :meth:`telegram.ChatPhoto.get_big_file`, :meth:`telegram.ChatPhoto.get_small_file`,
+            :meth:`telegram.Document.get_file`, :meth:`telegram.PassportFile.get_file`,
+            :meth:`telegram.PhotoSize.get_file`, :meth:`telegram.Sticker.get_file`,
+            :meth:`telegram.Video.get_file`, :meth:`telegram.VideoNote.get_file`,
+            :meth:`telegram.Voice.get_file`
 
         Args:
             file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
