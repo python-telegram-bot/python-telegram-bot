@@ -3208,7 +3208,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             |editreplymarkup|.
 
         .. seealso:: :meth:`telegram.Message.edit_text`,
-            :meth:`telegram.CallbackQuery.edit_message_text`
+            :meth:`telegram.CallbackQuery.edit_message_text`, :attr:`telegram.Game.text`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
@@ -4037,7 +4037,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to set the score of the specified user in a game message.
 
-        .. seealso::`telegram.CallbackQuery.set_game_score`
+        .. seealso:: :meth:`telegram.CallbackQuery.set_game_score`, :attr:`telegram.Game.text`
 
         Args:
             user_id (:obj:`int`): User identifier.
