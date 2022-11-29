@@ -2847,6 +2847,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             You should save the file's MIME type and name (if available) when the File object
             is received.
 
+        .. seealso:: :meth:`telegram.Animation.get_file`, :meth:`telegram.Audio.get_file`,
+            :meth:`telegram.Document.get_file`, :meth:`telegram.PhotoSize.get_file`,
+            :meth:`telegram.Sticker.get_file`, :meth:`telegram.Video.get_file`,
+            :meth:`telegram.VideoNote.get_file`, :meth:`telegram.Voice.get_file`
+
         Args:
             file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
                      :class:`telegram.ChatPhoto` | :class:`telegram.Document` |                   \
