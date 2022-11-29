@@ -694,8 +694,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """Use this method to send text messages.
 
-        .. seealso:: :meth:`telegram.Message.reply_text`, :meth:`telegram.Chat.send_message`,
-            :meth:`telegram.User.send_message`
+        .. seealso:: :meth:`telegram.Chat.send_message`, :meth:`telegram.User.send_message`,
+            :meth:`telegram.Message.reply_text`, :meth:`telegram.Message.reply_html`,
+            :meth:`telegram.Message.reply_markdown`, :meth:`telegram.Message.reply_markdown_v2`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
