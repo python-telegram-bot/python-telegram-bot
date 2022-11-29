@@ -4113,7 +4113,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             closest neighbors on each side. Will also return the top three users if the user and
             his neighbors are not among them. Please note that this behavior is subject to change.
 
-        .. seealso:: :meth:`telegram.CallbackQuery.get_game_high_scores`
+        .. seealso:: :meth:`telegram.CallbackQuery.get_game_high_scores`,
+            :meth:`telegram.Message.get_game_high_scores`
 
         Args:
             user_id (:obj:`int`): Target user id.
@@ -5342,7 +5343,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
         right in a channel.
 
-        .. seealso:: :meth:`telegram.Chat.pin_message`, :meth:`telegram.User.pin_message`
+        .. seealso:: :meth:`telegram.Chat.pin_message`, :meth:`telegram.Message.pin`,
+            :meth:`telegram.User.pin_message`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -5393,7 +5395,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
         right in a channel.
 
-        .. seealso:: :meth:`telegram.Chat.unpin_message`, :meth:`telegram.User.unpin_message`
+        .. seealso:: :meth:`telegram.Chat.unpin_message`, :meth:`telegram.Message.unpin`,
+            :meth:`telegram.User.unpin_message`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
