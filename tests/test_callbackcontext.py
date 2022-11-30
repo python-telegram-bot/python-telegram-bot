@@ -46,7 +46,7 @@ class TestCallbackContext:
         assert len(mro_slots(c)) == len(set(mro_slots(c))), "duplicate slot"
 
     def test_from_job(self, app):
-        job = app._job_queue.run_once(lambda x: x, 10)
+        job = app.job_queue.run_once(lambda x: x, 10)
 
         callback_context = CallbackContext.from_job(job, app)
 
@@ -55,7 +55,7 @@ class TestCallbackContext:
         assert callback_context.user_data is None
         assert callback_context.bot_data is app.bot_data
         assert callback_context.bot is app.bot
-        assert callback_context.job_queue is app._job_queue
+        assert callback_context.job_queue is app.job_queue
         assert callback_context.update_queue is app.update_queue
 
     def test_job_queue(self, bot, app, recwarn):
@@ -65,7 +65,7 @@ class TestCallbackContext:
         )
 
         callback_context = CallbackContext(app)
-        assert callback_context.job_queue is app._job_queue
+        assert callback_context.job_queue is app.job_queue
         app = ApplicationBuilder().job_queue(None).token(bot.token).build()
         callback_context = CallbackContext(app)
         assert callback_context.job_queue is None
@@ -84,7 +84,7 @@ class TestCallbackContext:
         assert callback_context.user_data == {}
         assert callback_context.bot_data is app.bot_data
         assert callback_context.bot is app.bot
-        assert callback_context.job_queue is app._job_queue
+        assert callback_context.job_queue is app.job_queue
         assert callback_context.update_queue is app.update_queue
 
         callback_context_same_user_chat = CallbackContext.from_update(update, app)
@@ -114,7 +114,7 @@ class TestCallbackContext:
         assert callback_context.user_data is None
         assert callback_context.bot_data is app.bot_data
         assert callback_context.bot is app.bot
-        assert callback_context.job_queue is app._job_queue
+        assert callback_context.job_queue is app.job_queue
         assert callback_context.update_queue is app.update_queue
 
         callback_context = CallbackContext.from_update("", app)
@@ -123,7 +123,7 @@ class TestCallbackContext:
         assert callback_context.user_data is None
         assert callback_context.bot_data is app.bot_data
         assert callback_context.bot is app.bot
-        assert callback_context.job_queue is app._job_queue
+        assert callback_context.job_queue is app.job_queue
         assert callback_context.update_queue is app.update_queue
 
     def test_from_error(self, app):
@@ -142,7 +142,7 @@ class TestCallbackContext:
         assert callback_context.user_data == {}
         assert callback_context.bot_data is app.bot_data
         assert callback_context.bot is app.bot
-        assert callback_context.job_queue is app._job_queue
+        assert callback_context.job_queue is app.job_queue
         assert callback_context.update_queue is app.update_queue
         assert callback_context.coroutine is coroutine
 
@@ -159,7 +159,7 @@ class TestCallbackContext:
         assert callback_context.user_data == {}
         assert callback_context.bot_data is app.bot_data
         assert callback_context.bot is app.bot
-        assert callback_context.job_queue is app._job_queue
+        assert callback_context.job_queue is app.job_queue
         assert callback_context.update_queue is app.update_queue
         assert callback_context.job is job
 
