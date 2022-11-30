@@ -51,7 +51,7 @@ def builder():
 @pytest.mark.skipif(TEST_WITH_OPT_DEPS, reason="Optional dependencies are installed")
 class TestApplicationBuilderNoOptDeps:
     def test_init(self, builder):
-        builder.token("token").job_queue(None)
+        builder.token("token")
         app = builder.build()
         assert app.job_queue is None
 
