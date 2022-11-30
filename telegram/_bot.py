@@ -3605,7 +3605,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             If you're having any trouble setting up webhooks, please check out this `guide to
             Webhooks`_.
 
-        .. seealso:: :meth:`telegram.ext.Updater.start_webhook`
+        .. seealso:: :meth:`telegram.ext.Application.run_webhook`,
+            :meth:`telegram.ext.Updater.start_webhook`
 
         Examples:
             :any:`Custom Webhook Bot <examples.customwebhookbot>`
