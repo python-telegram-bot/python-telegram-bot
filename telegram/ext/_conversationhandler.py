@@ -676,14 +676,11 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         try:
             # both job_queue & conversation_timeout are checked before calling _schedule_job
             j_queue = application.job_queue
-            if j_queue:
-                self.timeout_jobs[conversation_key] = j_queue.run_once(
-                    self._trigger_timeout,
-                    self.conversation_timeout,  # type: ignore[arg-type]
-                    data=_ConversationTimeoutContext(
-                        conversation_key, update, application, context
-                    ),
-                )
+            self.timeout_jobs[conversation_key] = j_queue.run_once(
+                self._trigger_timeout,
+                self.conversation_timeout,  # type: ignore[arg-type]
+                data=_ConversationTimeoutContext(conversation_key, update, application, context),
+            )
         except Exception as exc:
             _logger.exception("Failed to schedule timeout.", exc_info=exc)
 

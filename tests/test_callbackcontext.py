@@ -71,6 +71,7 @@ class TestCallbackContext:
         assert callback_context.job_queue is None
         assert len(recwarn) == 1
         assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
 
     def test_from_update(self, app):
         update = Update(

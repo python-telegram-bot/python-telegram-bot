@@ -1000,7 +1000,7 @@ class TestConversationHandler:
         # and then set app.job_queue to None.
         jqueue = app.job_queue
         if not jq:
-            app.job_queue = None
+            app = ApplicationBuilder().token(bot.token).job_queue(None)
         app.add_handler(handler)
 
         message = Message(
@@ -1031,7 +1031,7 @@ class TestConversationHandler:
         class DictJB(JobQueue):
             pass
 
-        app.job_queue = DictJB()
+        app = ApplicationBuilder().token(bot.token).job_queue(DictJB())
         monkeypatch.setattr(app.job_queue, "run_once", mocked_run_once)
         handler = ConversationHandler(
             entry_points=self.entry_points,

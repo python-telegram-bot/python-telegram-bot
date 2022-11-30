@@ -416,6 +416,7 @@ class TestApplicationBuilder:
         assert isinstance(app.job_queue, JobQueue)
         assert app.job_queue.application is app
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     def test_no_job_queue(self, bot, builder):
         app = builder.token(bot.token).job_queue(None).build()
         assert app.bot.token == bot.token
