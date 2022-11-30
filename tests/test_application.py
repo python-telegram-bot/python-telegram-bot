@@ -169,7 +169,7 @@ class TestApplication:
         )
         assert app.bot is bot
         assert app.update_queue is update_queue
-        assert app.job_queue is job_queue
+        assert app._job_queue is job_queue
         assert app.persistence is persistence
         assert app.context_types is context_types
         assert app.updater is updater
@@ -440,9 +440,9 @@ class TestApplication:
             # app.stop() should not stop the updater!
             assert app.updater.running
             if job_queue:
-                assert not app.job_queue.scheduler.running
+                assert not app._job_queue.scheduler.running
             else:
-                assert app.job_queue is None
+                assert app._job_queue is None
             await app.update_queue.put(2)
             await asyncio.sleep(0.05)
             assert not app.update_queue.empty()
@@ -1378,7 +1378,7 @@ class TestApplication:
             # Check that everything's running
             assertions["app_running"] = app.running
             assertions["updater_running"] = app.updater.running
-            assertions["job_queue_running"] = app.job_queue.scheduler.running
+            assertions["job_queue_running"] = app._job_queue.scheduler.running
 
             # Check that we're getting updates
             update_event.wait()
@@ -1396,7 +1396,7 @@ class TestApplication:
             # # Assert that everything has stopped running
             assertions["app_not_running"] = not app.running
             assertions["updater_not_running"] = not app.updater.running
-            assertions["job_queue_not_running"] = not app.job_queue.scheduler.running
+            assertions["job_queue_not_running"] = not app._job_queue.scheduler.running
 
         monkeypatch.setattr(app.bot, "get_updates", get_updates)
         app.add_error_handler(self.error_handler_context)
@@ -1585,7 +1585,7 @@ class TestApplication:
             # Check that everything's running
             assertions["app_running"] = app.running
             assertions["updater_running"] = app.updater.running
-            assertions["job_queue_running"] = app.job_queue.scheduler.running
+            assertions["job_queue_running"] = app._job_queue.scheduler.running
 
             # Check that we're getting updates
             loop = asyncio.new_event_loop()
@@ -1602,7 +1602,7 @@ class TestApplication:
             # # Assert that everything has stopped running
             assertions["app_not_running"] = not app.running
             assertions["updater_not_running"] = not app.updater.running
-            assertions["job_queue_not_running"] = not app.job_queue.scheduler.running
+            assertions["job_queue_not_running"] = not app._job_queue.scheduler.running
 
         monkeypatch.setattr(app.bot, "set_webhook", set_webhook)
         monkeypatch.setattr(app.bot, "delete_webhook", delete_webhook)

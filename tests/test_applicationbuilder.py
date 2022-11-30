@@ -53,7 +53,7 @@ class TestApplicationBuilderNoOptDeps:
     def test_init(self, builder):
         builder.token("token")
         app = builder.build()
-        assert app.job_queue is None
+        assert app._job_queue is None
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")
@@ -127,8 +127,8 @@ class TestApplicationBuilder:
         assert app.updater.bot is app.bot
         assert app.updater.update_queue is app.update_queue
 
-        assert isinstance(app.job_queue, JobQueue)
-        assert app.job_queue.application is app
+        assert isinstance(app._job_queue, JobQueue)
+        assert app._job_queue.application is app
 
         assert app.persistence is None
         assert app.post_init is None
@@ -370,8 +370,8 @@ class TestApplicationBuilder:
             .post_shutdown(post_shutdown)
             .arbitrary_callback_data(True)
         ).build()
-        assert app.job_queue is job_queue
-        assert app.job_queue.application is app
+        assert app._job_queue is job_queue
+        assert app._job_queue.application is app
         assert app.persistence is persistence
         assert app.persistence.bot is app.bot
         assert app.update_queue is update_queue
@@ -413,13 +413,13 @@ class TestApplicationBuilder:
         assert app.bot.token == bot.token
         assert app.updater is None
         assert isinstance(app.update_queue, asyncio.Queue)
-        assert isinstance(app.job_queue, JobQueue)
-        assert app.job_queue.application is app
+        assert isinstance(app._job_queue, JobQueue)
+        assert app._job_queue.application is app
 
     @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     def test_no_job_queue(self, bot, builder):
         app = builder.token(bot.token).job_queue(None).build()
         assert app.bot.token == bot.token
-        assert app.job_queue is None
+        assert app._job_queue is None
         assert isinstance(app.update_queue, asyncio.Queue)
         assert isinstance(app.updater, Updater)

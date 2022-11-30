@@ -271,15 +271,15 @@ class TestJobQueue:
     async def test_in_application(self, bot):
         app = ApplicationBuilder().token(bot.token).build()
         async with app:
-            assert not app.job_queue.scheduler.running
+            assert not app._job_queue.scheduler.running
             await app.start()
-            assert app.job_queue.scheduler.running
+            assert app._job_queue.scheduler.running
 
-            app.job_queue.run_repeating(self.job_run_once, 0.2)
+            app._job_queue.run_repeating(self.job_run_once, 0.2)
             await asyncio.sleep(0.3)
             assert self.result == 1
             await app.stop()
-            assert not app.job_queue.scheduler.running
+            assert not app._job_queue.scheduler.running
             await asyncio.sleep(1)
             assert self.result == 1
 
@@ -425,7 +425,7 @@ class TestJobQueue:
         # we're parametrizing this with two different UTC offsets to exclude the possibility
         # of an xpass when the test is run in a timezone with the same UTC offset
         app = ApplicationBuilder().bot(tz_bot).build()
-        jq = app.job_queue
+        jq = app._job_queue
         await jq.start()
 
         when = dtm.datetime.now(tz_bot.defaults.tzinfo) + dtm.timedelta(seconds=0.1)
@@ -447,7 +447,7 @@ class TestJobQueue:
         assert job_queue.get_jobs_by_name("name2") == (job3,)
 
     async def test_job_run(self, app):
-        job = app.job_queue.run_repeating(self.job_run_once, 0.02)
+        job = app._job_queue.run_repeating(self.job_run_once, 0.02)
         await asyncio.sleep(0.05)
         assert self.result == 0
         await job.run(app)
