@@ -1911,7 +1911,7 @@ class TestBot:
     ):
         async def make_assertion(url, request_data: RequestData, *args, **kwargs):
             data = request_data.parameters
-            return bool(data.get("drop_pending_updates")) == drop_pending_updates
+            return data.get("drop_pending_updates") == drop_pending_updates
 
         monkeypatch.setattr(bot.request, "post", make_assertion)
 
