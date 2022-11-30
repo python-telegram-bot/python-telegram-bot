@@ -694,8 +694,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
     ) -> Message:
         """Use this method to send text messages.
 
-        .. seealso:: :meth:`telegram.Message.reply_text`, :meth:`telegram.Chat.send_message`,
-            :meth:`telegram.User.send_message`
+        .. seealso:: :meth:`telegram.Chat.send_message`, :meth:`telegram.User.send_message`,
+            :meth:`telegram.Message.reply_text`, :meth:`telegram.Message.reply_html`,
+            :meth:`telegram.Message.reply_markdown`, :meth:`telegram.Message.reply_markdown_v2`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -2846,6 +2847,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             You should save the file's MIME type and name (if available) when the File object
             is received.
 
+        .. seealso:: :meth:`telegram.Animation.get_file`, :meth:`telegram.Audio.get_file`,
+            :meth:`telegram.ChatPhoto.get_big_file`, :meth:`telegram.ChatPhoto.get_small_file`,
+            :meth:`telegram.Document.get_file`, :meth:`telegram.PassportFile.get_file`,
+            :meth:`telegram.PhotoSize.get_file`, :meth:`telegram.Sticker.get_file`,
+            :meth:`telegram.Video.get_file`, :meth:`telegram.VideoNote.get_file`,
+            :meth:`telegram.Voice.get_file`
+
         Args:
             file_id (:obj:`str` | :class:`telegram.Animation` | :class:`telegram.Audio` |         \
                      :class:`telegram.ChatPhoto` | :class:`telegram.Document` |                   \
@@ -3200,7 +3208,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             |editreplymarkup|.
 
         .. seealso:: :meth:`telegram.Message.edit_text`,
-            :meth:`telegram.CallbackQuery.edit_message_text`
+            :meth:`telegram.CallbackQuery.edit_message_text`, :attr:`telegram.Game.text`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
@@ -3477,6 +3485,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                server response.
             3. To take full advantage of this library take a look at :class:`telegram.ext.Updater`
 
+        .. seealso:: :meth:`telegram.ext.Application.run_polling`,
+            :meth:`telegram.ext.Updater.start_polling`
+
         Args:
             offset (:obj:`int`, optional): Identifier of the first update to be returned. Must be
                 greater by one than the highest among the identifiers of previously received
@@ -3593,6 +3604,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
             If you're having any trouble setting up webhooks, please check out this `guide to
             Webhooks`_.
+
+        .. seealso:: :meth:`telegram.ext.Application.run_webhook`,
+            :meth:`telegram.ext.Updater.start_webhook`
 
         Examples:
             :any:`Custom Webhook Bot <examples.customwebhookbot>`
@@ -4029,7 +4043,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         Use this method to set the score of the specified user in a game message.
 
-        .. seealso::`telegram.CallbackQuery.set_game_score`
+        .. seealso:: :meth:`telegram.CallbackQuery.set_game_score`, :attr:`telegram.Game.text`
 
         Args:
             user_id (:obj:`int`): User identifier.
@@ -4100,7 +4114,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             closest neighbors on each side. Will also return the top three users if the user and
             his neighbors are not among them. Please note that this behavior is subject to change.
 
-        .. seealso:: :meth:`telegram.CallbackQuery.get_game_high_scores`
+        .. seealso:: :meth:`telegram.CallbackQuery.get_game_high_scores`,
+            :meth:`telegram.Message.get_game_high_scores`
 
         Args:
             user_id (:obj:`int`): Target user id.
@@ -4353,7 +4368,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         :class:`telegram.Update` with a :attr:`telegram.Update.shipping_query` field to the bot.
         Use this method to reply to shipping queries.
 
-        .. seealso:: :attr:`telegram.ShippingQuery.answer`
+        .. seealso:: :meth:`telegram.ShippingQuery.answer`
 
         Args:
             shipping_query_id (:obj:`str`): Unique identifier for the query to be answered.
@@ -5329,7 +5344,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
         right in a channel.
 
-        .. seealso:: :meth:`telegram.Chat.pin_message`, :meth:`telegram.User.pin_message`
+        .. seealso:: :meth:`telegram.Chat.pin_message`, :meth:`telegram.Message.pin`,
+            :meth:`telegram.User.pin_message`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -5380,7 +5396,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         right in a supergroup or :attr:`~telegram.ChatMemberAdministrator.can_edit_messages` admin
         right in a channel.
 
-        .. seealso:: :meth:`telegram.Chat.unpin_message`, :meth:`telegram.User.unpin_message`
+        .. seealso:: :meth:`telegram.Chat.unpin_message`, :meth:`telegram.Message.unpin`,
+            :meth:`telegram.User.unpin_message`
 
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_channel|
@@ -6355,6 +6372,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to get the current list of the bot's commands for the given scope and user
         language.
 
+        .. seealso:: :meth:`set_my_commands`, :meth:`delete_my_commands`
+
         Args:
             scope (:class:`telegram.BotCommandScope`, optional): An object,
                 describing scope of users. Defaults to :class:`telegram.BotCommandScopeDefault`.
@@ -6411,6 +6430,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Use this method to change the list of the bot's commands. See the
         `Telegram docs <https://core.telegram.org/bots/features#commands>`_ for more details about
         bot commands.
+
+        .. seealso:: :meth:`get_my_commands`, :meth:`delete_my_commands`
 
         Args:
             commands (List[:class:`BotCommand` | (:obj:`str`, :obj:`str`)]): A list
@@ -6476,6 +6497,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         will be shown to affected users.
 
         .. versionadded:: 13.7
+
+        .. seealso:: :meth:`get_my_commands`, :meth:`set_my_commands`
 
         Args:
             scope (:class:`telegram.BotCommandScope`, optional): An object,
