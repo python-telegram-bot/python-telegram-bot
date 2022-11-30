@@ -381,7 +381,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
                 # Copy object as not to edit it in-place
                 val = copy(val)
-                with val._unfrozen():  # pylint: disable=protected-access
+                with val._unfrozen():
                     val.parse_mode = self.defaults.parse_mode if self.defaults else None
                 data[key] = val
             elif key == "media" and isinstance(val, list):
@@ -389,7 +389,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 copy_list = [copy(media) for media in val]
                 for media in copy_list:
                     if media.parse_mode is DEFAULT_NONE:
-                        with media._unfrozen():  # pylint: disable=protected-access
+                        with media._unfrozen():
                             media.parse_mode = self.defaults.parse_mode if self.defaults else None
 
                 data[key] = copy_list
@@ -567,7 +567,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 # We build a new result in case the user wants to use the same object in
                 # different places
                 new_result = copy(result)
-                with new_result._unfrozen():  # pylint: disable=protected-access
+                with new_result._unfrozen():
                     markup = self._replace_keyboard(
                         result.reply_markup  # type: ignore[attr-defined]
                     )
@@ -587,7 +587,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         copied = False
         if hasattr(res, "parse_mode") and res.parse_mode is DEFAULT_NONE:
             res = copy(res)
-            with res._unfrozen():  # pylint: disable=protected-access
+            with res._unfrozen():
                 copied = True
                 res.parse_mode = self.defaults.parse_mode if self.defaults else None
         if hasattr(res, "input_message_content") and res.input_message_content:
@@ -598,7 +598,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 if not copied:
                     res = copy(res)
                     copied = True
-                with res.input_message_content._unfrozen():  # pylint: disable=protected-access
+                with res.input_message_content._unfrozen():
                     res.input_message_content.parse_mode = (
                         self.defaults.parse_mode if self.defaults else None
                     )
@@ -608,7 +608,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             ):
                 if not copied:
                     res = copy(res)
-                with res.input_message_content._unfrozen():  # pylint: disable=protected-access
+                with res.input_message_content._unfrozen():
                     res.input_message_content.disable_web_page_preview = (
                         self.defaults.disable_web_page_preview if self.defaults else None
                     )

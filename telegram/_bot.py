@@ -359,14 +359,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             if isinstance(val, InputMedia):
                 # Copy object as not to edit it in-place
                 val = copy.copy(val)
-                with val._unfrozen():  # pylint: disable=protected-access
+                with val._unfrozen():
                     val.parse_mode = DefaultValue.get_value(val.parse_mode)
                 data[key] = val
             elif key == "media" and isinstance(val, list):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy.copy(media) for media in val]
                 for media in copy_list:
-                    with media._unfrozen():  # pylint: disable=protected-access
+                    with media._unfrozen():
                         media.parse_mode = DefaultValue.get_value(media.parse_mode)
 
                 data[key] = copy_list
@@ -1909,7 +1909,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             # Copy first item (to avoid mutation of original object), apply group caption to it.
             # This will lead to the group being shown with this caption.
             item_to_get_caption = copy.copy(media[0])
-            with item_to_get_caption._unfrozen():  # pylint: disable=protected-access
+            with item_to_get_caption._unfrozen():
                 item_to_get_caption.caption = caption
                 if parse_mode is not DEFAULT_NONE:
                     item_to_get_caption.parse_mode = parse_mode
@@ -2647,7 +2647,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         if hasattr(res, "parse_mode"):
             res = copy.copy(res)
             copied = True
-            with res._unfrozen():  # pylint: disable=protected-access
+            with res._unfrozen():
                 res.parse_mode = DefaultValue.get_value(res.parse_mode)
         if hasattr(res, "input_message_content") and res.input_message_content:
             if hasattr(res.input_message_content, "parse_mode"):
@@ -2655,9 +2655,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                     res = copy.copy(res)
                     copied = True
 
-                res._unfreeze()  # pylint: disable=protected-access
-                res.input_message_content = copy.copy(res.input_message_content)
-                with res.input_message_content._unfrozen():  # pylint: disable=protected-access
+                with res._unfrozen():
+                    res.input_message_content = copy.copy(res.input_message_content)
+                with res.input_message_content._unfrozen():
                     res.input_message_content.parse_mode = DefaultValue.get_value(
                         res.input_message_content.parse_mode
                     )
@@ -2665,14 +2665,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 if not copied:
                     res = copy.copy(res)
 
-                res._unfreeze()  # pylint: disable=protected-access
-                res.input_message_content = copy.copy(res.input_message_content)
-                with res.input_message_content._unfrozen():  # pylint: disable=protected-access
+                with res._unfrozen():
+                    res.input_message_content = copy.copy(res.input_message_content)
+                with res.input_message_content._unfrozen():
                     res.input_message_content.disable_web_page_preview = DefaultValue.get_value(
                         res.input_message_content.disable_web_page_preview
                     )
-
-            res._freeze()  # pylint: disable=protected-access
 
         return res
 

@@ -116,7 +116,7 @@ class TelegramObject:
     def _apply_api_kwargs(self, api_kwargs: JSONDict) -> None:
         """Loops through the api kwargs and for every key that exists as attribute of the
         object (and is None), it moves the value from `api_kwargs` to the attribute.
-        *Edits `api_kwargs` in pace!*
+        *Edits `api_kwargs` in place!*
 
         This method is currently only called in the unpickling process, i.e. not on "normal" init.
         This is because
@@ -134,6 +134,11 @@ class TelegramObject:
                 setattr(self, key, api_kwargs.pop(key))
 
     def __setattr__(self, key: str, value: object) -> None:
+        """ "Overrides :meth:`object.__setattr__` to prevent the overriding of attributes.
+
+        Raises:
+            :exc:`AttributeError`
+        """
         # protected attributes can always be set for convenient internal use
         if (key == "_frozen") or (not getattr(self, "_frozen", True)) or key.startswith("_"):
             super().__setattr__(key, value)
@@ -144,6 +149,11 @@ class TelegramObject:
         )
 
     def __delattr__(self, key: str) -> None:
+        """ "Overrides :meth:`object.__delattr__` to prevent the deletion of attributes.
+
+        Raises:
+            :exc:`AttributeError`
+        """
         # protected attributes can always be set for convenient internal use
         if (key == "_frozen") or (not getattr(self, "_frozen", True)) or key.startswith("_"):
             super().__delattr__(key)
@@ -267,14 +277,10 @@ class TelegramObject:
 
         # get api_kwargs first because we may need to add entries to it (see try-except below)
         api_kwargs = state.pop("api_kwargs", {})
+        # get _frozen before the loop to avoid setting it to True in the loop
+        frozen = state.pop("_frozen", False)
 
         for key, val in state.items():
-            if key == "_frozen":
-                # Setting the frozen status to True would prevent the attributes from being set
-                continue
-            if key == "api_kwargs":
-                # See below
-                continue
 
             try:
                 setattr(self, key, val)
@@ -291,7 +297,7 @@ class TelegramObject:
         # Apply freezing if necessary
         # we .get(…) the setting for backwards compatibility with objects that were pickled
         # before the freeze feature was introduced
-        if state.get("_frozen", False):
+        if frozen:
             self._freeze()
 
     def __deepcopy__(self: Tele_co, memodict: dict) -> Tele_co:
