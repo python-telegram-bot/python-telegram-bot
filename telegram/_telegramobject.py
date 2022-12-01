@@ -65,6 +65,9 @@ class TelegramObject:
         * String representations objects of this type was overhauled. See :meth:`__repr__` for
           details. As this class doesn't implement :meth:`object.__str__`, the default
           implementation will be used, which is equivalent to :meth:`__repr__`.
+        * Objects of this class (or subclasses) are now immutable. This means that you can't set
+          or delete attributes anymore. Moreover, attributes that were formerly of type
+          :obj:`list` are now of type :obj:`tuple`.
 
     Arguments:
         api_kwargs (Dict[:obj:`str`, any], optional): |toapikwargsarg|

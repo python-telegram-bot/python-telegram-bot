@@ -239,7 +239,7 @@ class Chat(TelegramObject):
             #collectible-usernames>`_; for private chats, supergroups and channels. Returned
             only in :meth:`telegram.Bot.get_chat`.
             This list is empty if the chat has no active usernames or this chat instance was not
-            obtained via :meth:`~telegram.bot.get_chat`.
+            obtained via :meth:`~telegram.Bot.get_chat`.
 
             .. versionadded:: 20.0
         emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
