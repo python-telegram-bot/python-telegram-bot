@@ -390,13 +390,13 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         .. seealso:: `Job Queue <https://github.com/python-telegram-bot/
             python-telegram-bot/wiki/Extensions-%E2%80%93-JobQueue>`_
         """
-        if self._application._job_queue is None:
+        if self._application._job_queue is None:  # pylint: disable=protected-access
             warn(
                 "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
                 "`pip install python-telegram-bot[job_queue]`.",
                 stacklevel=2,
             )
-        return self._application._job_queue
+        return self._application._job_queue  # pylint: disable=protected-access
 
     @property
     def update_queue(self) -> "Queue[object]":
