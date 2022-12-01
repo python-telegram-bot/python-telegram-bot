@@ -44,11 +44,8 @@ class MessageHandler(BaseHandler[Update, CCT]):
         filters (:class:`telegram.ext.filters.BaseFilter`): A filter inheriting from
             :class:`telegram.ext.filters.BaseFilter`. Standard filters can be found in
             :mod:`telegram.ext.filters`. Filters can be combined using bitwise
-            operators (& for and, | for or, ~ for not). This defaults to all message updates
-            being: :attr:`telegram.Update.message`, :attr:`telegram.Update.edited_message`,
-            :attr:`telegram.Update.channel_post` and :attr:`telegram.Update.edited_channel_post`.
-            If you don't want or need any of those pass ``~filters.UpdateType.*`` in the filter
-            argument.
+            operators (& for and, | for or, ~ for not). Passing :obj:`None` is a shortcut
+            to passing :class:`telegram.ext.filters.ALL`.
 
             .. seealso:: `Advanced Filters <https://github.com/\
                 python-telegram-bot/python-telegram-bot/wiki/Extensions-–-Advanced-Filters>`_
