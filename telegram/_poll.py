@@ -159,9 +159,10 @@ class Poll(TelegramObject):
         explanation (:obj:`str`, optional): Text that is shown when a user chooses an incorrect
             answer or taps on the lamp icon in a quiz-style poll,
             0-:tg-const:`telegram.Poll.MAX_EXPLANATION_LENGTH` characters.
-        explanation_entities (List[:class:`telegram.MessageEntity`], optional): Special entities
-            like usernames, URLs, bot commands, etc. that appear in the :attr:`explanation`.
-            This list is empty if the message does not contain explanation entities.
+        explanation_entities (Sequence[:class:`telegram.MessageEntity`], optional): Special
+            entities like usernames, URLs, bot commands, etc. that appear in the
+            :attr:`explanation`. This list is empty if the message does not contain explanation
+            entities.
 
             .. versionchanged:: 20.0
 

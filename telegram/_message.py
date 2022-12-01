@@ -165,8 +165,8 @@ class Message(TelegramObject):
             about the animation. For backward compatibility, when this field is set, the document
             field will also be set.
         game (:class:`telegram.Game`, optional): Message is a game, information about the game.
-        photo (List[:class:`telegram.PhotoSize`], optional): Message is a photo, available sizes
-            of the photo. This list is empty if the message does not contain a photo.
+        photo (Sequence[:class:`telegram.PhotoSize`], optional): Message is a photo, available
+            sizes of the photo. This list is empty if the message does not contain a photo.
 
             .. versionchanged:: 20.0
                 |sequenceeclassargs|
@@ -179,9 +179,9 @@ class Message(TelegramObject):
             the file.
         video_note (:class:`telegram.VideoNote`, optional): Message is a video note, information
             about the video message.
-        new_chat_members (List[:class:`telegram.User`], optional): New members that were added to
-            the group or supergroup and information about them (the bot itself may be one of these
-            members). This list is empty if the message does not contain new chat members.
+        new_chat_members (Sequence[:class:`telegram.User`], optional): New members that were added
+            to the group or supergroup and information about them (the bot itself may be one of
+            these members). This list is empty if the message does not contain new chat members.
 
             .. versionchanged:: 20.0
                 |sequenceeclassargs|
@@ -198,8 +198,8 @@ class Message(TelegramObject):
         left_chat_member (:class:`telegram.User`, optional): A member was removed from the group,
             information about them (this member may be the bot itself).
         new_chat_title (:obj:`str`, optional): A chat title was changed to this value.
-        new_chat_photo (List[:class:`telegram.PhotoSize`], optional): A chat photo was changed to
-            this value. This list is empty if the message does not contain a new chat photo.
+        new_chat_photo (Sequence[:class:`telegram.PhotoSize`], optional): A chat photo was changed
+            to this value. This list is empty if the message does not contain a new chat photo.
 
             .. versionchanged:: 20.0
                 |sequenceeclassargs|

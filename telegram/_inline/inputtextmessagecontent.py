@@ -41,7 +41,11 @@ class InputTextMessageContent(InputMessageContent):
             :tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
-        entities (List[:class:`telegram.MessageEntity`], optional): |caption_entities|
+        entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
+
+            .. versionchanged:: 20.0
+                |sequenceeclassargs|
+
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.
 
@@ -50,7 +54,10 @@ class InputTextMessageContent(InputMessageContent):
             1-:tg-const:`telegram.constants.MessageLimit.MAX_TEXT_LENGTH` characters after entities
             parsing.
         parse_mode (:obj:`str`): Optional. |parse_mode|
-        entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+        entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
+
+            .. versionchanged:: 20.0
+                |tupleclassattrs|
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
