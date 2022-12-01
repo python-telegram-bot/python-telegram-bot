@@ -74,7 +74,7 @@ class Game(TelegramObject):
             game message. Can be automatically edited to include current high scores for the game
             when the bot calls :meth:`telegram.Bot.set_game_score`, or manually edited
             using :meth:`telegram.Bot.edit_message_text`.
-        text_entities (Tuple[:class:`telegram.MessageEntity`]): Special entities that
+        text_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. Special entities that
             appear in text, such as usernames, URLs, bot commands, etc.
             This list is empty if the message does not contain text entities.
 

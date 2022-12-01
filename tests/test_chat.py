@@ -163,6 +163,15 @@ class TestChat:
         assert chat_dict["active_usernames"] == list(chat.active_usernames)
         assert chat_dict["emoji_status_custom_emoji_id"] == chat.emoji_status_custom_emoji_id
 
+    def test_always_tuples_attributes(self):
+        chat = Chat(
+            id=123,
+            title="title",
+            type=Chat.PRIVATE,
+        )
+        assert isinstance(chat.active_usernames, tuple)
+        assert chat.active_usernames == ()
+
     def test_enum_init(self):
         chat = Chat(id=1, type="foo")
         assert chat.type == "foo"

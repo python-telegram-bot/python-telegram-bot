@@ -434,7 +434,6 @@ class TestTelegramObject:
             r"\n\s*with self\.\_unfrozen\(\)\:", inspect.getsource(cls.__init__)
         )
 
-        print(last_line_freezes, uses_with_unfrozen)
         assert last_line_freezes or uses_with_unfrozen, f"{cls.__name__} is not frozen correctly"
 
     def test_freeze_unfreeze(self):

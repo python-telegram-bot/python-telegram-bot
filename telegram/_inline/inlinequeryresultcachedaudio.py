@@ -64,7 +64,7 @@ class InlineQueryResultCachedAudio(InlineQueryResult):
         caption (:obj:`str`): Optional. Caption,
             0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
             parsing.
-        parse_mode (:obj:`str`, optional): |parse_mode|
+        parse_mode (:obj:`str`): Optional. |parse_mode|
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0

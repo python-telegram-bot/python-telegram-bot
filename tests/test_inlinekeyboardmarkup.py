@@ -97,6 +97,7 @@ class TestInlineKeyboardMarkup:
             )
         with pytest.raises(ValueError):
             InlineKeyboardMarkup("strings_are_not_allowed")
+        with pytest.raises(ValueError):
             InlineKeyboardMarkup(["strings_are_not_allowed"], ["in_the_rows_either"])
         with pytest.raises(ValueError):
             InlineKeyboardMarkup(InlineKeyboardButton("b1", "1"))

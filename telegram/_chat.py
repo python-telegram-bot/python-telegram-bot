@@ -158,9 +158,6 @@ class Chat(TelegramObject):
             #collectible-usernames>`_; for private chats, supergroups and channels. Returned
             only in :meth:`telegram.Bot.get_chat`.
 
-            .. versionchanged:: 20.0
-                |squenceclassargs|
-
             .. versionadded:: 20.0
         emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji
             status of the other party in a private chat. Returned only in
@@ -241,9 +238,8 @@ class Chat(TelegramObject):
             usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
             #collectible-usernames>`_; for private chats, supergroups and channels. Returned
             only in :meth:`telegram.Bot.get_chat`.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
+            This list is empty if the chat has no active usernames or this chat instance was not
+            obtained via :meth:`~telegram.bot.get_chat`.
 
             .. versionadded:: 20.0
         emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
@@ -358,7 +354,7 @@ class Chat(TelegramObject):
         self.join_by_request = join_by_request
         self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
         self.is_forum = is_forum
-        self.active_usernames = tuple(active_usernames) if active_usernames else None
+        self.active_usernames = tuple(active_usernames) if active_usernames else ()
         self.emoji_status_custom_emoji_id = emoji_status_custom_emoji_id
 
         self._id_attrs = (self.id,)

@@ -97,8 +97,7 @@ class TestReplyKeyboardMarkup:
 
     def test_expected_values(self, reply_keyboard_markup):
         assert isinstance(reply_keyboard_markup.keyboard, tuple)
-        for row in reply_keyboard_markup.keyboard:
-            assert isinstance(row, tuple)
+        assert all(isinstance(row, tuple) for row in reply_keyboard_markup.keyboard)
         assert isinstance(reply_keyboard_markup.keyboard[0][0], KeyboardButton)
         assert isinstance(reply_keyboard_markup.keyboard[0][1], KeyboardButton)
         assert reply_keyboard_markup.resize_keyboard == self.resize_keyboard
@@ -110,6 +109,7 @@ class TestReplyKeyboardMarkup:
             ReplyKeyboardMarkup([["button1"], 1])
         with pytest.raises(ValueError):
             ReplyKeyboardMarkup("strings_are_not_allowed")
+        with pytest.raises(ValueError):
             ReplyKeyboardMarkup(["strings_are_not_allowed"], ["in_the_rows_either"])
         with pytest.raises(ValueError):
             ReplyKeyboardMarkup(KeyboardButton("button1"))
