@@ -39,7 +39,7 @@ class UserProfilePhotos(TelegramObject):
             to 4 sizes each).
 
             .. versionchanged:: 20.0
-                |squenceclassargs|
+                |sequenceeclassargs|
 
     Attributes:
         total_count (:obj:`int`): Total number of profile pictures.

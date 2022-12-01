@@ -93,7 +93,7 @@ class VideoChatParticipantsInvited(TelegramObject):
         users (Sequence[:class:`telegram.User`]): New members that were invited to the video chat.
 
             .. versionchanged:: 20.0
-                |squenceclassargs|
+                |sequenceeclassargs|
 
     Attributes:
         users (Tuple[:class:`telegram.User`]): New members that were invited to the video chat.

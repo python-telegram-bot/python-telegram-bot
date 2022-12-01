@@ -45,7 +45,7 @@ class Game(TelegramObject):
             message in chats.
 
             .. versionchanged:: 20.0
-                |squenceclassargs|
+                |sequenceeclassargs|
 
         text (:obj:`str`, optional): Brief description of the game or high scores included in the
             game message. Can be automatically edited to include current high scores for the game
@@ -56,7 +56,7 @@ class Game(TelegramObject):
             appear in text, such as usernames, URLs, bot commands, etc.
 
             .. versionchanged:: 20.0
-                |squenceclassargs|
+                |sequenceeclassargs|
 
         animation (:class:`telegram.Animation`, optional): Animation that will be displayed in the
             game message in chats. Upload via `BotFather <https://t.me/BotFather>`_.

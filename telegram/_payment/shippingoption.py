@@ -41,7 +41,7 @@ class ShippingOption(TelegramObject):
         prices (Sequence[:class:`telegram.LabeledPrice`]): List of price portions.
 
             .. versionchanged:: 20.0
-                |squenceclassargs|
+                |sequenceeclassargs|
 
     Attributes:
         id (:obj:`str`): Shipping option identifier.

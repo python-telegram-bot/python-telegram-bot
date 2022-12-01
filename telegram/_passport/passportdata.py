@@ -43,7 +43,7 @@ class PassportData(TelegramObject):
             the bot.
 
             .. versionchanged:: 20.0
-                |squenceclassargs|
+                |sequenceeclassargs|
 
         credentials (:class:`telegram.EncryptedCredentials`)): Encrypted credentials.
 

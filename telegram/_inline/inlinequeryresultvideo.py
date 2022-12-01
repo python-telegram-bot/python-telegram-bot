@@ -56,7 +56,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |squenceclassargs|
+                |sequenceeclassargs|
 
         video_width (:obj:`int`, optional): Video width.
         video_height (:obj:`int`, optional): Video height.
@@ -85,7 +85,7 @@ class InlineQueryResultVideo(InlineQueryResult):
         caption_entities (Sequence[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
-                |squenceclassargs|
+                |sequenceeclassargs|
 
         video_width (:obj:`int`): Optional. Video width.
         video_height (:obj:`int`): Optional. Video height.

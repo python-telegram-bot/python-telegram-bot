@@ -45,7 +45,7 @@ class InlineKeyboardMarkup(TelegramObject):
             objects.
 
             .. versionchanged:: 20.0
-                |squenceclassargs|
+                |sequenceeclassargs|
 
     Attributes:
         inline_keyboard (Tuple[Tuple[:class:`telegram.InlineKeyboardButton`]]): Tuple of

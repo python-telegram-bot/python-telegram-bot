@@ -85,7 +85,7 @@ for name, cls in classes:
 
             class_source_lines[j - 1] += (
                 f"\n\n{whitespaces * ' '}.. versionchanged:: 20.0\n{whitespaces * ' '}"
-                "    |squenceclassargs|"
+                "    |sequenceeclassargs|"
             )
             if class_source_lines[j]:
                 class_source_lines[j - 1] += "\n"
