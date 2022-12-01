@@ -110,7 +110,7 @@ class TestReplyKeyboardMarkup:
         with pytest.raises(ValueError):
             ReplyKeyboardMarkup("strings_are_not_allowed")
         with pytest.raises(ValueError):
-            ReplyKeyboardMarkup(["strings_are_not_allowed"], ["in_the_rows_either"])
+            ReplyKeyboardMarkup(["strings_are_not_allowed_in_the_rows_either"])
         with pytest.raises(ValueError):
             ReplyKeyboardMarkup(KeyboardButton("button1"))
 
