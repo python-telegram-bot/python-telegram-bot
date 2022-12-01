@@ -1018,11 +1018,16 @@ class TestConversationHandler:
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.5)
-            assert len(recwarn) == 1
-            assert str(recwarn[0].message).startswith("Ignoring `conversation_timeout`")
-            assert ("is not running" if jq else "has no JobQueue.") in str(recwarn[0].message)
+            if jq:
+                assert len(recwarn) == 1
+            else:
+                assert len(recwarn) == 2
+            assert str(recwarn[0].message if jq else recwarn[1].message).startswith(
+                "Ignoring `conversation_timeout`"
+            )
+            assert ("is not running" if jq else "No `JobQueue` set up.") in str(recwarn[0].message)
             # now set app.job_queue back to it's original value
-            app.job_queue = jqueue
+            app._job_queue = jqueue
 
     async def test_schedule_job_exception(self, app, bot, user1, monkeypatch, caplog):
         def mocked_run_once(*a, **kw):
