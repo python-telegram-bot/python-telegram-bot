@@ -50,10 +50,11 @@ def builder():
 
 @pytest.mark.skipif(TEST_WITH_OPT_DEPS, reason="Optional dependencies are installed")
 class TestApplicationBuilderNoOptDeps:
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     def test_init(self, builder):
         builder.token("token")
         app = builder.build()
-        assert app._job_queue is None
+        assert app.job_queue is None
 
 
 @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="Optional dependencies not installed")

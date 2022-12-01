@@ -996,9 +996,6 @@ class TestConversationHandler:
             fallbacks=self.fallbacks,
             conversation_timeout=0.5,
         )
-        # save app.job_queue in temp variable jqueue
-        # and then set app.job_queue to None.
-        jqueue = app.job_queue
         if not jq:
             app = ApplicationBuilder().token(bot.token).job_queue(None).build()
         app.add_handler(handler)
@@ -1027,7 +1024,6 @@ class TestConversationHandler:
             )
             assert ("is not running" if jq else "No `JobQueue` set up.") in str(recwarn[0].message)
             # now set app.job_queue back to it's original value
-            app._job_queue = jqueue
 
     async def test_schedule_job_exception(self, app, bot, user1, monkeypatch, caplog):
         def mocked_run_once(*a, **kw):
