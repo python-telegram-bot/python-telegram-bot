@@ -92,7 +92,8 @@ class PollAnswer(TelegramObject):
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
         user (:class:`telegram.User`): The user, who changed the answer to the poll.
-        option_ids (List[:obj:`int`]): Identifiers of answer options, chosen by the user.
+        option_ids (List[:obj:`int`]): 0-based identifiers of answer options, chosen by the user.
+            May be empty if the user retracted their vote.
 
     """
 
