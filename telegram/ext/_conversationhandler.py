@@ -676,7 +676,7 @@ class ConversationHandler(BaseHandler[Update, CCT]):
         try:
             # both job_queue & conversation_timeout are checked before calling _schedule_job
             j_queue = application.job_queue
-            self.timeout_jobs[conversation_key] = j_queue.run_once(
+            self.timeout_jobs[conversation_key] = j_queue.run_once(  # type: ignore[union-attr]
                 self._trigger_timeout,
                 self.conversation_timeout,  # type: ignore[arg-type]
                 data=_ConversationTimeoutContext(conversation_key, update, application, context),

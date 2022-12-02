@@ -50,6 +50,7 @@ def builder():
 
 @pytest.mark.skipif(TEST_WITH_OPT_DEPS, reason="Optional dependencies are installed")
 class TestApplicationBuilderNoOptDeps:
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     def test_init(self, builder):
         builder.token("token")
         app = builder.build()
@@ -416,6 +417,7 @@ class TestApplicationBuilder:
         assert isinstance(app.job_queue, JobQueue)
         assert app.job_queue.application is app
 
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     def test_no_job_queue(self, bot, builder):
         app = builder.token(bot.token).job_queue(None).build()
         assert app.bot.token == bot.token

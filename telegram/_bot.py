@@ -740,13 +740,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {
-            "chat_id": chat_id,
-            "text": text,
-        }
-
-        if entities:
-            data["entities"] = entities
+        data: JSONDict = {"chat_id": chat_id, "text": text, "entities": entities}
 
         return await self._send_message(
             "sendMessage",
@@ -870,14 +864,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        data: JSONDict = {}
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "from_chat_id": from_chat_id,
+            "message_id": message_id,
+        }
 
-        if chat_id:
-            data["chat_id"] = chat_id
-        if from_chat_id:
-            data["from_chat_id"] = from_chat_id
-        if message_id:
-            data["message_id"] = message_id
         return await self._send_message(
             "forwardMessage",
             data,
@@ -1089,17 +1081,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "audio": self._parse_file_input(audio, Audio, filename=filename),
+            "duration": duration,
+            "performer": performer,
+            "title": title,
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
-
-        if duration:
-            data["duration"] = duration
-        if performer:
-            data["performer"] = performer
-        if title:
-            data["title"] = title
-
-        if thumb:
-            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(
             "sendAudio",
@@ -1216,12 +1202,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "document": self._parse_file_input(document, Document, filename=filename),
+            "disable_content_type_detection": disable_content_type_detection,
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
-
-        if disable_content_type_detection is not None:
-            data["disable_content_type_detection"] = disable_content_type_detection
-        if thumb:
-            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(
             "sendDocument",
@@ -1425,18 +1408,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "video": self._parse_file_input(video, Video, filename=filename),
+            "duration": duration,
+            "width": width,
+            "height": height,
+            "supports_streaming": supports_streaming,
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
-
-        if duration:
-            data["duration"] = duration
-        if supports_streaming:
-            data["supports_streaming"] = supports_streaming
-        if width:
-            data["width"] = width
-        if height:
-            data["height"] = height
-        if thumb:
-            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(
             "sendVideo",
@@ -1552,14 +1529,10 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "video_note": self._parse_file_input(video_note, VideoNote, filename=filename),
+            "duration": duration,
+            "length": length,
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
-
-        if duration is not None:
-            data["duration"] = duration
-        if length is not None:
-            data["length"] = length
-        if thumb:
-            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(
             "sendVideoNote",
@@ -1678,16 +1651,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "animation": self._parse_file_input(animation, Animation, filename=filename),
+            "duration": duration,
+            "width": width,
+            "height": height,
+            "thumb": self._parse_file_input(thumb, attach=True) if thumb else None,
         }
-
-        if duration:
-            data["duration"] = duration
-        if width:
-            data["width"] = width
-        if height:
-            data["height"] = height
-        if thumb:
-            data["thumb"] = self._parse_file_input(thumb, attach=True)
 
         return await self._send_message(
             "sendAnimation",
@@ -1799,10 +1767,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         data: JSONDict = {
             "chat_id": chat_id,
             "voice": self._parse_file_input(voice, Voice, filename=filename),
+            "duration": duration,
         }
-
-        if duration:
-            data["duration"] = duration
 
         return await self._send_message(
             "sendVoice",
@@ -1931,13 +1897,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "disable_notification": disable_notification,
             "allow_sending_without_reply": allow_sending_without_reply,
             "protect_content": protect_content,
+            "message_thread_id": message_thread_id,
+            "reply_to_message_id": reply_to_message_id,
         }
-
-        if reply_to_message_id:
-            data["reply_to_message_id"] = reply_to_message_id
-
-        if message_thread_id:
-            data["message_thread_id"] = message_thread_id
 
         result = await self._post(
             "sendMediaGroup",
@@ -2043,16 +2005,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             latitude = location.latitude
             longitude = location.longitude
 
-        data: JSONDict = {"chat_id": chat_id, "latitude": latitude, "longitude": longitude}
-
-        if live_period:
-            data["live_period"] = live_period
-        if horizontal_accuracy:
-            data["horizontal_accuracy"] = horizontal_accuracy
-        if heading:
-            data["heading"] = heading
-        if proximity_alert_radius:
-            data["proximity_alert_radius"] = proximity_alert_radius
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "latitude": latitude,
+            "longitude": longitude,
+            "horizontal_accuracy": horizontal_accuracy,
+            "live_period": live_period,
+            "heading": heading,
+            "proximity_alert_radius": proximity_alert_radius,
+        }
 
         return await self._send_message(
             "sendLocation",
@@ -2102,12 +2063,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :attr:`telegram.CallbackQuery.edit_message_live_location`
 
         Args:
-            chat_id (:obj:`int` | :obj:`str`, optional): Required if inline_message_id is not
-                specified. |chat_id_channel|
-            message_id (:obj:`int`, optional): Required if inline_message_id is not specified.
-                Identifier of the message to edit.
-            inline_message_id (:obj:`str`, optional): Required if chat_id and message_id are not
-                specified. Identifier of the inline message.
+            chat_id (:obj:`int` | :obj:`str`, optional): Required if :paramref:`inline_message_id`
+                is not specified. |chat_id_channel|
+            message_id (:obj:`int`, optional): Required if :paramref:`inline_message_id` is not
+                specified. Identifier of the message to edit.
+            inline_message_id (:obj:`str`, optional): Required if :paramref:`chat_id` and
+                :paramref:`message_id` are not specified. Identifier of the inline message.
             latitude (:obj:`float`, optional): Latitude of location.
             longitude (:obj:`float`, optional): Longitude of location.
             horizontal_accuracy (:obj:`float`, optional): The radius of uncertainty for the
@@ -2146,20 +2107,16 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             latitude = location.latitude
             longitude = location.longitude
 
-        data: JSONDict = {"latitude": latitude, "longitude": longitude}
-
-        if chat_id:
-            data["chat_id"] = chat_id
-        if message_id:
-            data["message_id"] = message_id
-        if inline_message_id:
-            data["inline_message_id"] = inline_message_id
-        if horizontal_accuracy:
-            data["horizontal_accuracy"] = horizontal_accuracy
-        if heading:
-            data["heading"] = heading
-        if proximity_alert_radius:
-            data["proximity_alert_radius"] = proximity_alert_radius
+        data: JSONDict = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "inline_message_id": inline_message_id,
+            "horizontal_accuracy": horizontal_accuracy,
+            "heading": heading,
+            "proximity_alert_radius": proximity_alert_radius,
+        }
 
         return await self._send_message(
             "editMessageLiveLocation",
@@ -2206,14 +2163,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.Message`: On success, if edited message is not an inline message, the
             edited message is returned, otherwise :obj:`True` is returned.
         """
-        data: JSONDict = {}
-
-        if chat_id:
-            data["chat_id"] = chat_id
-        if message_id:
-            data["message_id"] = message_id
-        if inline_message_id:
-            data["inline_message_id"] = inline_message_id
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "inline_message_id": inline_message_id,
+        }
 
         return await self._send_message(
             "stopMessageLiveLocation",
@@ -2333,16 +2287,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "longitude": longitude,
             "address": address,
             "title": title,
+            "foursquare_id": foursquare_id,
+            "foursquare_type": foursquare_type,
+            "google_place_id": google_place_id,
+            "google_place_type": google_place_type,
         }
-
-        if foursquare_id:
-            data["foursquare_id"] = foursquare_id
-        if foursquare_type:
-            data["foursquare_type"] = foursquare_type
-        if google_place_id:
-            data["google_place_id"] = google_place_id
-        if google_place_type:
-            data["google_place_type"] = google_place_type
 
         return await self._send_message(
             "sendVenue",
@@ -2446,12 +2395,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "chat_id": chat_id,
             "phone_number": phone_number,
             "first_name": first_name,
+            "last_name": last_name,
+            "vcard": vcard,
         }
-
-        if last_name:
-            data["last_name"] = last_name
-        if vcard:
-            data["vcard"] = vcard
 
         return await self._send_message(
             "sendContact",
@@ -2767,18 +2713,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             self._insert_defaults_for_ilq_results(result) for result in effective_results
         ]
 
-        data: JSONDict = {"inline_query_id": inline_query_id, "results": effective_results}
-
-        if cache_time or cache_time == 0:
-            data["cache_time"] = cache_time
-        if is_personal:
-            data["is_personal"] = is_personal
-        if next_offset is not None:
-            data["next_offset"] = next_offset
-        if switch_pm_text:
-            data["switch_pm_text"] = switch_pm_text
-        if switch_pm_parameter:
-            data["switch_pm_parameter"] = switch_pm_parameter
+        data: JSONDict = {
+            "inline_query_id": inline_query_id,
+            "results": effective_results,
+            "next_offset": next_offset,
+            "cache_time": cache_time,
+            "is_personal": is_personal,
+            "switch_pm_text": switch_pm_text,
+            "switch_pm_parameter": switch_pm_parameter,
+        }
 
         return await self._post(
             "answerInlineQuery",
@@ -2823,12 +2766,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"user_id": user_id}
-
-        if offset is not None:
-            data["offset"] = offset
-        if limit:
-            data["limit"] = limit
+        data: JSONDict = {"user_id": user_id, "offset": offset, "limit": limit}
 
         result = await self._post(
             "getUserProfilePhotos",
@@ -2884,9 +2822,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        try:
+        try:  # Try to get the file_id from the object
             file_id = file_id.file_id  # type: ignore[union-attr]
-        except AttributeError:
+        except AttributeError:  # If it fails, assume it's a string
             pass
 
         data: JSONDict = {"file_id": file_id}
@@ -2901,8 +2839,9 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             api_kwargs=api_kwargs,
         )
 
-        if result.get("file_path") and not is_local_file(result["file_path"]):
-            result["file_path"] = f"{self._base_file_url}/{result['file_path']}"
+        file_path = cast(dict, result).get("file_path")
+        if file_path and not is_local_file(file_path):
+            result["file_path"] = f"{self._base_file_url}/{file_path}"
 
         return File.de_json(result, self)  # type: ignore[return-value]
 
@@ -2955,13 +2894,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
-
-        if until_date is not None:
-            data["until_date"] = until_date
-
-        if revoke_messages is not None:
-            data["revoke_messages"] = revoke_messages
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "user_id": user_id,
+            "revoke_messages": revoke_messages,
+            "until_date": until_date,
+        }
 
         result = await self._post(
             "banChatMember",
@@ -3058,10 +2996,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
-
-        if only_if_banned is not None:
-            data["only_if_banned"] = only_if_banned
+        data: JSONDict = {"chat_id": chat_id, "user_id": user_id, "only_if_banned": only_if_banned}
 
         result = await self._post(
             "unbanChatMember",
@@ -3170,16 +3105,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"callback_query_id": callback_query_id}
-
-        if text:
-            data["text"] = text
-        if show_alert:
-            data["show_alert"] = show_alert
-        if url:
-            data["url"] = url
-        if cache_time is not None:
-            data["cache_time"] = cache_time
+        data: JSONDict = {
+            "callback_query_id": callback_query_id,
+            "cache_time": cache_time,
+            "text": text,
+            "show_alert": show_alert,
+            "url": url,
+        }
 
         result = await self._post(
             "answerCallbackQuery",
@@ -3248,16 +3180,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"text": text}
-
-        if chat_id:
-            data["chat_id"] = chat_id
-        if message_id:
-            data["message_id"] = message_id
-        if inline_message_id:
-            data["inline_message_id"] = inline_message_id
-        if entities:
-            data["entities"] = [me.to_dict(recursive=True) for me in entities]
+        data: JSONDict = {
+            "text": text,
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "inline_message_id": inline_message_id,
+            "entities": entities,
+        }
 
         return await self._send_message(
             "editMessageText",
@@ -3321,14 +3250,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {}
-
-        if chat_id:
-            data["chat_id"] = chat_id
-        if message_id:
-            data["message_id"] = message_id
-        if inline_message_id:
-            data["inline_message_id"] = inline_message_id
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "inline_message_id": inline_message_id,
+        }
 
         return await self._send_message(
             "editMessageCaption",
@@ -3391,14 +3317,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        data: JSONDict = {"media": media}
-
-        if chat_id:
-            data["chat_id"] = chat_id
-        if message_id:
-            data["message_id"] = message_id
-        if inline_message_id:
-            data["inline_message_id"] = inline_message_id
+        data: JSONDict = {
+            "media": media,
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "inline_message_id": inline_message_id,
+        }
 
         return await self._send_message(
             "editMessageMedia",
@@ -3453,14 +3377,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {}
-
-        if chat_id:
-            data["chat_id"] = chat_id
-        if message_id:
-            data["message_id"] = message_id
-        if inline_message_id:
-            data["inline_message_id"] = inline_message_id
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "inline_message_id": inline_message_id,
+        }
 
         return await self._send_message(
             "editMessageReplyMarkup",
@@ -3530,14 +3451,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"timeout": timeout}
-
-        if offset:
-            data["offset"] = offset
-        if limit:
-            data["limit"] = limit
-        if allowed_updates is not None:
-            data["allowed_updates"] = allowed_updates
+        data: JSONDict = {
+            "timeout": timeout,
+            "offset": offset,
+            "limit": limit,
+            "allowed_updates": allowed_updates,
+        }
 
         # Ideally we'd use an aggressive read timeout for the polling. However,
         # * Short polling should return within 2 seconds.
@@ -3663,20 +3582,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         .. _`guide to Webhooks`: https://core.telegram.org/bots/webhooks
 
         """
-        data: JSONDict = {"url": url}
-
-        if certificate:
-            data["certificate"] = self._parse_file_input(certificate)
-        if max_connections is not None:
-            data["max_connections"] = max_connections
-        if allowed_updates is not None:
-            data["allowed_updates"] = allowed_updates
-        if ip_address:
-            data["ip_address"] = ip_address
-        if drop_pending_updates:
-            data["drop_pending_updates"] = drop_pending_updates
-        if secret_token is not None:
-            data["secret_token"] = secret_token
+        data: JSONDict = {
+            "url": url,
+            "max_connections": max_connections,
+            "allowed_updates": allowed_updates,
+            "ip_address": ip_address,
+            "drop_pending_updates": drop_pending_updates,
+            "secret_token": secret_token,
+            "certificate": self._parse_file_input(certificate),  # type: ignore[arg-type]
+        }
 
         result = await self._post(
             "setWebhook",
@@ -3716,10 +3630,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data = {}
-
-        if drop_pending_updates:
-            data["drop_pending_updates"] = drop_pending_updates
+        data = {"drop_pending_updates": drop_pending_updates}
 
         result = await self._post(
             "deleteWebhook",
@@ -4024,7 +3935,6 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
         """
         result = await self._post(
             "getWebhookInfo",
-            None,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -4078,18 +3988,15 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 current score in the chat and :paramref:`force` is :obj:`False`.
 
         """
-        data: JSONDict = {"user_id": user_id, "score": score}
-
-        if chat_id:
-            data["chat_id"] = chat_id
-        if message_id:
-            data["message_id"] = message_id
-        if inline_message_id:
-            data["inline_message_id"] = inline_message_id
-        if force is not None:
-            data["force"] = force
-        if disable_edit_message is not None:
-            data["disable_edit_message"] = disable_edit_message
+        data: JSONDict = {
+            "user_id": user_id,
+            "score": score,
+            "force": force,
+            "disable_edit_message": disable_edit_message,
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "inline_message_id": inline_message_id,
+        }
 
         return await self._send_message(
             "setGameScore",
@@ -4145,14 +4052,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"user_id": user_id}
-
-        if chat_id:
-            data["chat_id"] = chat_id
-        if message_id:
-            data["message_id"] = message_id
-        if inline_message_id:
-            data["inline_message_id"] = inline_message_id
+        data: JSONDict = {
+            "user_id": user_id,
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "inline_message_id": inline_message_id,
+        }
 
         result = await self._post(
             "getGameHighScores",
@@ -4312,37 +4217,22 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "provider_token": provider_token,
             "currency": currency,
             "prices": prices,
+            "max_tip_amount": max_tip_amount,
+            "suggested_tip_amounts": suggested_tip_amounts,
+            "start_parameter": start_parameter,
+            "provider_data": provider_data,
+            "photo_url": photo_url,
+            "photo_size": photo_size,
+            "photo_width": photo_width,
+            "photo_height": photo_height,
+            "need_name": need_name,
+            "need_phone_number": need_phone_number,
+            "need_email": need_email,
+            "need_shipping_address": need_shipping_address,
+            "is_flexible": is_flexible,
+            "send_phone_number_to_provider": send_phone_number_to_provider,
+            "send_email_to_provider": send_email_to_provider,
         }
-        if max_tip_amount is not None:
-            data["max_tip_amount"] = max_tip_amount
-        if suggested_tip_amounts is not None:
-            data["suggested_tip_amounts"] = suggested_tip_amounts
-        if start_parameter is not None:
-            data["start_parameter"] = start_parameter
-        if provider_data is not None:
-            data["provider_data"] = provider_data
-        if photo_url is not None:
-            data["photo_url"] = photo_url
-        if photo_size is not None:
-            data["photo_size"] = photo_size
-        if photo_width is not None:
-            data["photo_width"] = photo_width
-        if photo_height is not None:
-            data["photo_height"] = photo_height
-        if need_name is not None:
-            data["need_name"] = need_name
-        if need_phone_number is not None:
-            data["need_phone_number"] = need_phone_number
-        if need_email is not None:
-            data["need_email"] = need_email
-        if need_shipping_address is not None:
-            data["need_shipping_address"] = need_shipping_address
-        if is_flexible is not None:
-            data["is_flexible"] = is_flexible
-        if send_phone_number_to_provider is not None:
-            data["send_phone_number_to_provider"] = send_phone_number_to_provider
-        if send_email_to_provider is not None:
-            data["send_email_to_provider"] = send_email_to_provider
 
         return await self._send_message(
             "sendInvoice",
@@ -4401,12 +4291,12 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"shipping_query_id": shipping_query_id, "ok": ok}
-
-        if shipping_options is not None:
-            data["shipping_options"] = [option.to_dict(True) for option in shipping_options]
-        if error_message is not None:
-            data["error_message"] = error_message
+        data: JSONDict = {
+            "shipping_query_id": shipping_query_id,
+            "ok": ok,
+            "shipping_options": shipping_options,
+            "error_message": error_message,
+        }
 
         result = await self._post(
             "answerShippingQuery",
@@ -4463,10 +4353,11 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"pre_checkout_query_id": pre_checkout_query_id, "ok": ok}
-
-        if error_message is not None:
-            data["error_message"] = error_message
+        data: JSONDict = {
+            "pre_checkout_query_id": pre_checkout_query_id,
+            "ok": ok,
+            "error_message": error_message,
+        }
 
         result = await self._post(
             "answerPreCheckoutQuery",
@@ -4572,10 +4463,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             "chat_id": chat_id,
             "user_id": user_id,
             "permissions": permissions,
+            "until_date": until_date,
         }
-
-        if until_date is not None:
-            data["until_date"] = until_date
 
         result = await self._post(
             "restrictChatMember",
@@ -4671,32 +4560,22 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "user_id": user_id}
-
-        if is_anonymous is not None:
-            data["is_anonymous"] = is_anonymous
-        if can_change_info is not None:
-            data["can_change_info"] = can_change_info
-        if can_post_messages is not None:
-            data["can_post_messages"] = can_post_messages
-        if can_edit_messages is not None:
-            data["can_edit_messages"] = can_edit_messages
-        if can_delete_messages is not None:
-            data["can_delete_messages"] = can_delete_messages
-        if can_invite_users is not None:
-            data["can_invite_users"] = can_invite_users
-        if can_restrict_members is not None:
-            data["can_restrict_members"] = can_restrict_members
-        if can_pin_messages is not None:
-            data["can_pin_messages"] = can_pin_messages
-        if can_promote_members is not None:
-            data["can_promote_members"] = can_promote_members
-        if can_manage_chat is not None:
-            data["can_manage_chat"] = can_manage_chat
-        if can_manage_video_chats is not None:
-            data["can_manage_video_chats"] = can_manage_video_chats
-        if can_manage_topics is not None:
-            data["can_manage_topics"] = can_manage_topics
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "user_id": user_id,
+            "is_anonymous": is_anonymous,
+            "can_change_info": can_change_info,
+            "can_post_messages": can_post_messages,
+            "can_edit_messages": can_edit_messages,
+            "can_delete_messages": can_delete_messages,
+            "can_invite_users": can_invite_users,
+            "can_restrict_members": can_restrict_members,
+            "can_pin_messages": can_pin_messages,
+            "can_promote_members": can_promote_members,
+            "can_manage_chat": can_manage_chat,
+            "can_manage_video_chats": can_manage_video_chats,
+            "can_manage_topics": can_manage_topics,
+        }
 
         result = await self._post(
             "promoteChatMember",
@@ -4898,19 +4777,13 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id}
-
-        if expire_date is not None:
-            data["expire_date"] = expire_date
-
-        if member_limit is not None:
-            data["member_limit"] = member_limit
-
-        if name is not None:
-            data["name"] = name
-
-        if creates_join_request is not None:
-            data["creates_join_request"] = creates_join_request
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "expire_date": expire_date,
+            "member_limit": member_limit,
+            "name": name,
+            "creates_join_request": creates_join_request,
+        }
 
         result = await self._post(
             "createChatInviteLink",
@@ -4987,19 +4860,14 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
 
         """
         link = invite_link.invite_link if isinstance(invite_link, ChatInviteLink) else invite_link
-        data: JSONDict = {"chat_id": chat_id, "invite_link": link}
-
-        if expire_date is not None:
-            data["expire_date"] = expire_date
-
-        if member_limit is not None:
-            data["member_limit"] = member_limit
-
-        if name is not None:
-            data["name"] = name
-
-        if creates_join_request is not None:
-            data["creates_join_request"] = creates_join_request
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "invite_link": link,
+            "expire_date": expire_date,
+            "member_limit": member_limit,
+            "name": name,
+            "creates_join_request": creates_join_request,
+        }
 
         result = await self._post(
             "editChatInviteLink",
@@ -5321,10 +5189,8 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id}
+        data: JSONDict = {"chat_id": chat_id, "description": description}
 
-        if description is not None:
-            data["description"] = description
         result = await self._post(
             "setChatDescription",
             data,
@@ -5421,10 +5287,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id}
-
-        if message_id is not None:
-            data["message_id"] = message_id
+        data: JSONDict = {"chat_id": chat_id, "message_id": message_id}
 
         return await self._post(
             "unpinChatMessage",
@@ -5701,18 +5564,17 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"user_id": user_id, "name": name, "title": title, "emojis": emojis}
-
-        if png_sticker is not None:
-            data["png_sticker"] = self._parse_file_input(png_sticker)
-        if tgs_sticker is not None:
-            data["tgs_sticker"] = self._parse_file_input(tgs_sticker)
-        if webm_sticker is not None:
-            data["webm_sticker"] = self._parse_file_input(webm_sticker)
-        if mask_position is not None:
-            data["mask_position"] = mask_position
-        if sticker_type is not None:
-            data["sticker_type"] = sticker_type
+        data: JSONDict = {
+            "user_id": user_id,
+            "name": name,
+            "title": title,
+            "emojis": emojis,
+            "png_sticker": self._parse_file_input(png_sticker) if png_sticker else None,
+            "tgs_sticker": self._parse_file_input(tgs_sticker) if tgs_sticker else None,
+            "webm_sticker": self._parse_file_input(webm_sticker) if webm_sticker else None,
+            "mask_position": mask_position,
+            "sticker_type": sticker_type,
+        }
 
         result = await self._post(
             "createNewStickerSet",
@@ -5758,6 +5620,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Args:
             user_id (:obj:`int`): User identifier of created sticker set owner.
             name (:obj:`str`): Sticker set name.
+            emojis (:obj:`str`): One or more emoji corresponding to the sticker.
             png_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **PNG** image with the sticker,
                 must be up to 512 kilobytes in size, dimensions must not exceed 512px,
@@ -5770,6 +5633,8 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
+            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
+                should be placed on faces.
             tgs_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`, \
                 optional): **TGS** animation with the sticker. |uploadinput|
                 See https://core.telegram.org/stickers#animation-requirements for technical
@@ -5791,9 +5656,6 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
                 .. versionchanged:: 20.0
                     File paths as input is also accepted for bots *not* running in
                     :paramref:`~telegram.Bot.local_mode`.
-            emojis (:obj:`str`): One or more emoji corresponding to the sticker.
-            mask_position (:class:`telegram.MaskPosition`, optional): Position where the mask
-                should be placed on faces.
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -5802,16 +5664,15 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"user_id": user_id, "name": name, "emojis": emojis}
-
-        if png_sticker is not None:
-            data["png_sticker"] = self._parse_file_input(png_sticker)
-        if tgs_sticker is not None:
-            data["tgs_sticker"] = self._parse_file_input(tgs_sticker)
-        if webm_sticker is not None:
-            data["webm_sticker"] = self._parse_file_input(webm_sticker)
-        if mask_position is not None:
-            data["mask_position"] = mask_position
+        data: JSONDict = {
+            "user_id": user_id,
+            "name": name,
+            "emojis": emojis,
+            "png_sticker": self._parse_file_input(png_sticker) if png_sticker else None,
+            "tgs_sticker": self._parse_file_input(tgs_sticker) if tgs_sticker else None,
+            "webm_sticker": self._parse_file_input(webm_sticker) if webm_sticker else None,
+            "mask_position": mask_position,
+        }
 
         result = await self._post(
             "addStickerToSet",
@@ -5939,9 +5800,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"name": name, "user_id": user_id}
-        if thumb is not None:
-            data["thumb"] = self._parse_file_input(thumb)
+        data: JSONDict = {
+            "name": name,
+            "user_id": user_id,
+            "thumb": self._parse_file_input(thumb) if thumb else None,
+        }
 
         result = await self._post(
             "setStickerSetThumb",
@@ -6104,26 +5967,16 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "question": question,
             "options": options,
             "explanation_parse_mode": explanation_parse_mode,
+            "is_anonymous": is_anonymous,
+            "type": type,
+            "allows_multiple_answers": allows_multiple_answers,
+            "correct_option_id": correct_option_id,
+            "is_closed": is_closed,
+            "explanation": explanation,
+            "explanation_entities": explanation_entities,
+            "open_period": open_period,
+            "close_date": close_date,
         }
-
-        if not is_anonymous:
-            data["is_anonymous"] = is_anonymous
-        if type:
-            data["type"] = type
-        if allows_multiple_answers:
-            data["allows_multiple_answers"] = allows_multiple_answers
-        if correct_option_id is not None:
-            data["correct_option_id"] = correct_option_id
-        if is_closed:
-            data["is_closed"] = is_closed
-        if explanation:
-            data["explanation"] = explanation
-        if explanation_entities:
-            data["explanation_entities"] = explanation_entities
-        if open_period:
-            data["open_period"] = open_period
-        if close_date:
-            data["close_date"] = close_date
 
         return await self._send_message(
             "sendPoll",
@@ -6172,10 +6025,11 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id, "message_id": message_id}
-
-        if reply_markup:
-            data["reply_markup"] = reply_markup
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "reply_markup": reply_markup,
+        }
 
         result = await self._post(
             "stopPoll",
@@ -6250,9 +6104,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {"chat_id": chat_id}
-        if emoji:
-            data["emoji"] = emoji
+        data: JSONDict = {"chat_id": chat_id, "emoji": emoji}
 
         return await self._send_message(
             "sendDice",
@@ -6298,10 +6150,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        data: JSONDict = {}
-
-        if for_channels is not None:
-            data["for_channels"] = for_channels
+        data: JSONDict = {"for_channels": for_channels}
 
         result = await self._post(
             "getMyDefaultAdministratorRights",
@@ -6349,13 +6198,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :obj:`telegram.error.TelegramError`
         """
-        data: JSONDict = {}
-
-        if rights is not None:
-            data["rights"] = rights
-
-        if for_channels is not None:
-            data["for_channels"] = for_channels
+        data: JSONDict = {"rights": rights, "for_channels": for_channels}
 
         result = await self._post(
             "setMyDefaultAdministratorRights",
@@ -6407,13 +6250,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.error.TelegramError`
 
         """
-        data: JSONDict = {}
-
-        if scope:
-            data["scope"] = scope
-
-        if language_code:
-            data["language_code"] = language_code
+        data: JSONDict = {"scope": scope, "language_code": language_code}
 
         result = await self._post(
             "getMyCommands",
@@ -6470,13 +6307,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
 
         """
         cmds = [c if isinstance(c, BotCommand) else BotCommand(c[0], c[1]) for c in commands]
-        data: JSONDict = {"commands": cmds}
-
-        if scope:
-            data["scope"] = scope
-
-        if language_code:
-            data["language_code"] = language_code
+        data: JSONDict = {"commands": cmds, "scope": scope, "language_code": language_code}
 
         result = await self._post(
             "setMyCommands",
@@ -6524,13 +6355,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         Raises:
             :class:`telegram.error.TelegramError`
         """
-        data: JSONDict = {}
-
-        if scope:
-            data["scope"] = scope
-
-        if language_code:
-            data["language_code"] = language_code
+        data: JSONDict = {"scope": scope, "language_code": language_code}
 
         result = await self._post(
             "deleteMyCommands",
@@ -6681,17 +6506,12 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "disable_notification": disable_notification,
             "allow_sending_without_reply": allow_sending_without_reply,
             "protect_content": protect_content,
+            "caption": caption,
+            "caption_entities": caption_entities,
+            "reply_to_message_id": reply_to_message_id,
+            "reply_markup": reply_markup,
+            "message_thread_id": message_thread_id,
         }
-        if caption is not None:
-            data["caption"] = caption
-        if caption_entities:
-            data["caption_entities"] = caption_entities
-        if reply_to_message_id:
-            data["reply_to_message_id"] = reply_to_message_id
-        if reply_markup:
-            data["reply_markup"] = reply_markup
-        if message_thread_id:
-            data["message_thread_id"] = message_thread_id
 
         result = await self._post(
             "copyMessage",
@@ -6735,11 +6555,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :obj:`bool`: On success, :obj:`True` is returned.
 
         """
-        data: JSONDict = {}
-        if chat_id is not None:
-            data["chat_id"] = chat_id
-        if menu_button is not None:
-            data["menu_button"] = menu_button
+        data: JSONDict = {"chat_id": chat_id, "menu_button": menu_button}
 
         return await self._post(
             "setChatMenuButton",
@@ -6779,9 +6595,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             :class:`telegram.MenuButton`: On success, the current menu button is returned.
 
         """
-        data = {}
-        if chat_id is not None:
-            data["chat_id"] = chat_id
+        data = {"chat_id": chat_id}
 
         result = await self._post(
             "getChatMenuButton",
@@ -6891,35 +6705,21 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
             "provider_token": provider_token,
             "currency": currency,
             "prices": prices,
+            "max_tip_amount": max_tip_amount,
+            "suggested_tip_amounts": suggested_tip_amounts,
+            "provider_data": provider_data,
+            "photo_url": photo_url,
+            "photo_size": photo_size,
+            "photo_width": photo_width,
+            "photo_height": photo_height,
+            "need_name": need_name,
+            "need_phone_number": need_phone_number,
+            "need_email": need_email,
+            "need_shipping_address": need_shipping_address,
+            "is_flexible": is_flexible,
+            "send_phone_number_to_provider": send_phone_number_to_provider,
+            "send_email_to_provider": send_email_to_provider,
         }
-        if max_tip_amount is not None:
-            data["max_tip_amount"] = max_tip_amount
-        if suggested_tip_amounts is not None:
-            data["suggested_tip_amounts"] = suggested_tip_amounts
-        if provider_data is not None:
-            data["provider_data"] = provider_data
-        if photo_url is not None:
-            data["photo_url"] = photo_url
-        if photo_size is not None:
-            data["photo_size"] = photo_size
-        if photo_width is not None:
-            data["photo_width"] = photo_width
-        if photo_height is not None:
-            data["photo_height"] = photo_height
-        if need_name is not None:
-            data["need_name"] = need_name
-        if need_phone_number is not None:
-            data["need_phone_number"] = need_phone_number
-        if need_email is not None:
-            data["need_email"] = need_email
-        if need_shipping_address is not None:
-            data["need_shipping_address"] = need_shipping_address
-        if is_flexible is not None:
-            data["is_flexible"] = is_flexible
-        if send_phone_number_to_provider is not None:
-            data["send_phone_number_to_provider"] = send_phone_number_to_provider
-        if send_email_to_provider is not None:
-            data["send_email_to_provider"] = send_email_to_provider
 
         return await self._post(
             "createInvoiceLink",
