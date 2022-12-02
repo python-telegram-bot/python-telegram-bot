@@ -70,9 +70,9 @@ class User(TelegramObject):
     Args:
         id (:obj:`int`): Unique identifier for this user or bot.
         is_bot (:obj:`bool`): :obj:`True`, if this user is a bot.
-        first_name (:obj:`str`): User's or bots first name.
-        last_name (:obj:`str`, optional): User's or bots last name.
-        username (:obj:`str`, optional): User's or bots username.
+        first_name (:obj:`str`): User's or bot's first name.
+        last_name (:obj:`str`, optional): User's or bot's last name.
+        username (:obj:`str`, optional): User's or bot's username.
         language_code (:obj:`str`, optional): IETF language tag of the user's language.
         can_join_groups (:obj:`str`, optional): :obj:`True`, if the bot can be invited to groups.
             Returned only in :attr:`telegram.Bot.get_me` requests.
