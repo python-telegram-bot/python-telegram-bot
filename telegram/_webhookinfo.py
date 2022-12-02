@@ -20,6 +20,7 @@
 from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -77,12 +78,14 @@ class WebhookInfo(TelegramObject):
             most recent error that happened when trying to deliver an update via webhook.
         max_connections (:obj:`int`): Optional. Maximum allowed number of simultaneous HTTPS
             connections to the webhook for update delivery.
-        allowed_updates (Tuple[:obj:`str`]): Optional. A list of update types the bot is
+        allowed_updates (Tuple[:obj:`str`]): A list of update types the bot is
             subscribed to. Defaults to all update types, except
             :attr:`telegram.Update.chat_member`.
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         last_synchronization_error_date (:obj:`int`): Optional. Unix time of the most recent error
             that happened when trying to synchronize available updates with Telegram datacenters.
 
@@ -126,7 +129,7 @@ class WebhookInfo(TelegramObject):
         self.last_error_date = last_error_date
         self.last_error_message = last_error_message
         self.max_connections = max_connections
-        self.allowed_updates = tuple(allowed_updates) if allowed_updates else None
+        self.allowed_updates = parse_sequence_arg(allowed_updates)
         self.last_synchronization_error_date = last_synchronization_error_date
 
         self._id_attrs = (

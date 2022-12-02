@@ -30,6 +30,7 @@ from telegram._forumtopic import ForumTopic
 from telegram._menubutton import MenuButton
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
 from telegram.helpers import escape_markdown
@@ -354,7 +355,7 @@ class Chat(TelegramObject):
         self.join_by_request = join_by_request
         self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
         self.is_forum = is_forum
-        self.active_usernames = tuple(active_usernames) if active_usernames else ()
+        self.active_usernames = parse_sequence_arg(active_usernames)
         self.emoji_status_custom_emoji_id = emoji_status_custom_emoji_id
 
         self._id_attrs = (self.id,)

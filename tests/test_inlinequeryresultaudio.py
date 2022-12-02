@@ -107,6 +107,10 @@ class TestInlineQueryResultAudio:
             == inline_query_result_audio.reply_markup.to_dict()
         )
 
+    def test_caption_entities_always_tuple(self):
+        inline_query_result_audio = InlineQueryResultAudio(self.id_, self.audio_url, self.title)
+        assert inline_query_result_audio.caption_entities == ()
+
     def test_equality(self):
         a = InlineQueryResultAudio(self.id_, self.audio_url, self.title)
         b = InlineQueryResultAudio(self.id_, self.title, self.title)

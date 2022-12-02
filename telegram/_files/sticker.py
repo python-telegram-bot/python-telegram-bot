@@ -24,6 +24,7 @@ from telegram._files._basethumbedmedium import _BaseThumbedMedium
 from telegram._files.file import File
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -266,7 +267,7 @@ class StickerSet(TelegramObject):
         self.title = title
         self.is_animated = is_animated
         self.is_video = is_video
-        self.stickers = tuple(stickers)
+        self.stickers = parse_sequence_arg(stickers)
         self.sticker_type = sticker_type
         # Optional
         self.thumb = thumb

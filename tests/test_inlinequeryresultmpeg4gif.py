@@ -88,6 +88,10 @@ class TestInlineQueryResultMpeg4Gif:
         )
         assert inline_query_result_mpeg4_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
+    def test_caption_entities_always_tuple(self):
+        result = InlineQueryResultMpeg4Gif(self.id_, self.mpeg4_url, self.thumb_url)
+        assert result.caption_entities == ()
+
     def test_to_dict(self, inline_query_result_mpeg4_gif):
         inline_query_result_mpeg4_gif_dict = inline_query_result_mpeg4_gif.to_dict()
 

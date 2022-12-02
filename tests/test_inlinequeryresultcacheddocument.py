@@ -80,6 +80,10 @@ class TestInlineQueryResultCachedDocument:
             == self.reply_markup.to_dict()
         )
 
+    def test_caption_entities_always_tuple(self):
+        test = InlineQueryResultCachedDocument(self.id_, self.title, self.document_file_id)
+        assert test.caption_entities == ()
+
     def test_to_dict(self, inline_query_result_cached_document):
         inline_query_result_cached_document_dict = inline_query_result_cached_document.to_dict()
 

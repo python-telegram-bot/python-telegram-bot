@@ -45,3 +45,5 @@
 .. |sequenceclassargs| replace:: Accepts any :class:`collections.abc.Sequence` as input instead of just a list. The input is converted to a tuple.
 
 .. |tupleclassattrs| replace:: This attribute is now an immutable tuple.
+
+.. |alwaystuple| replace:: This attribute is now always a tuple, that may be empty.

@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._payment.labeledprice import LabeledPrice
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -71,7 +72,9 @@ class InputInvoiceMessageContent(InputMessageContent):
             :attr:`max_tip_amount`.
 
             .. versionchanged:: 20.0
-                |sequenceclassargs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
 
         provider_data (:obj:`str`, optional): An object for data about the invoice,
             which will be shared with the payment provider. A detailed description of the required
@@ -203,12 +206,10 @@ class InputInvoiceMessageContent(InputMessageContent):
         self.payload = payload
         self.provider_token = provider_token
         self.currency = currency
-        self.prices = tuple(prices)
+        self.prices = parse_sequence_arg(prices)
         # Optionals
         self.max_tip_amount = max_tip_amount
-        self.suggested_tip_amounts = (
-            tuple(suggested_tip_amounts) if suggested_tip_amounts else None
-        )
+        self.suggested_tip_amounts = parse_sequence_arg(suggested_tip_amounts)
         self.provider_data = provider_data
         self.photo_url = photo_url
         self.photo_size = photo_size

@@ -88,6 +88,10 @@ class TestInlineQueryResultDocument:
         )
         assert inline_query_result_document.reply_markup.to_dict() == self.reply_markup.to_dict()
 
+    def test_caption_entities_always_tuple(self):
+        result = InlineQueryResultDocument(self.id_, self.document_url, self.title, self.mime_type)
+        assert result.caption_entities == ()
+
     def test_to_dict(self, inline_query_result_document):
         inline_query_result_document_dict = inline_query_result_document.to_dict()
 

@@ -21,6 +21,7 @@ from typing import Sequence
 
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._messageentity import MessageEntity
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -57,7 +58,9 @@ class InputTextMessageContent(InputMessageContent):
         entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         disable_web_page_preview (:obj:`bool`): Optional. Disables link previews for links in the
             sent message.
 
@@ -79,7 +82,7 @@ class InputTextMessageContent(InputMessageContent):
         self.message_text = message_text
         # Optionals
         self.parse_mode = parse_mode
-        self.entities = tuple(entities) if entities else None
+        self.entities = parse_sequence_arg(entities)
         self.disable_web_page_preview = disable_web_page_preview
 
         self._id_attrs = (self.message_text,)

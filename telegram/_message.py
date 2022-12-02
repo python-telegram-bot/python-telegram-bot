@@ -48,6 +48,7 @@ from telegram._poll import Poll
 from telegram._proximityalerttriggered import ProximityAlertTriggered
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import from_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
@@ -641,12 +642,12 @@ class Message(TelegramObject):
         self.edit_date = edit_date
         self.has_protected_content = has_protected_content
         self.text = text
-        self.entities = tuple(entities) if entities else ()
-        self.caption_entities = tuple(caption_entities) if caption_entities else ()
+        self.entities = parse_sequence_arg(entities)
+        self.caption_entities = parse_sequence_arg(caption_entities)
         self.audio = audio
         self.game = game
         self.document = document
-        self.photo = tuple(photo) if photo else ()
+        self.photo = parse_sequence_arg(photo)
         self.sticker = sticker
         self.video = video
         self.voice = voice
@@ -655,10 +656,10 @@ class Message(TelegramObject):
         self.contact = contact
         self.location = location
         self.venue = venue
-        self.new_chat_members = tuple(new_chat_members) if new_chat_members else ()
+        self.new_chat_members = parse_sequence_arg(new_chat_members)
         self.left_chat_member = left_chat_member
         self.new_chat_title = new_chat_title
-        self.new_chat_photo = tuple(new_chat_photo) if new_chat_photo else ()
+        self.new_chat_photo = parse_sequence_arg(new_chat_photo)
         self.delete_chat_photo = bool(delete_chat_photo)
         self.group_chat_created = bool(group_chat_created)
         self.supergroup_chat_created = bool(supergroup_chat_created)

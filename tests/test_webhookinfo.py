@@ -99,6 +99,12 @@ class TestWebhookInfo:
         none = WebhookInfo.de_json(None, bot)
         assert none is None
 
+    def test_always_tuple_allowed_updates(self):
+        webhook_info = WebhookInfo(
+            self.url, self.has_custom_certificate, self.pending_update_count
+        )
+        assert webhook_info.allowed_updates == ()
+
     def test_equality(self):
         a = WebhookInfo(
             url=self.url,

@@ -38,6 +38,7 @@ except ImportError:
     CRYPTO_INSTALLED = False
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 from telegram.error import PassportDecryptionError
 
@@ -375,7 +376,9 @@ class SecureValue(TelegramObject):
             "passport_registration" and "temporary_registration" types.
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
 
     """
 
@@ -397,8 +400,8 @@ class SecureValue(TelegramObject):
         self.front_side = front_side
         self.reverse_side = reverse_side
         self.selfie = selfie
-        self.files = tuple(files) if files else None
-        self.translation = tuple(translation) if translation else None
+        self.files = parse_sequence_arg(files)
+        self.translation = parse_sequence_arg(translation)
 
         self._freeze()
 

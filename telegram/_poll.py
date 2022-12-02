@@ -26,6 +26,7 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils import enum
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -112,7 +113,7 @@ class PollAnswer(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.poll_id = poll_id
         self.user = user
-        self.option_ids = tuple(option_ids)
+        self.option_ids = parse_sequence_arg(option_ids)
 
         self._id_attrs = (self.poll_id, self.user, tuple(self.option_ids))
 
@@ -245,7 +246,7 @@ class Poll(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
         self.id = id  # pylint: disable=invalid-name
         self.question = question
-        self.options = tuple(options)
+        self.options = parse_sequence_arg(options)
         self.total_voter_count = total_voter_count
         self.is_closed = is_closed
         self.is_anonymous = is_anonymous
@@ -253,7 +254,7 @@ class Poll(TelegramObject):
         self.allows_multiple_answers = allows_multiple_answers
         self.correct_option_id = correct_option_id
         self.explanation = explanation
-        self.explanation_entities = tuple(explanation_entities) if explanation_entities else ()
+        self.explanation_entities = parse_sequence_arg(explanation_entities)
         self.open_period = open_period
         self.close_date = close_date
 

@@ -20,6 +20,7 @@
 from typing import TYPE_CHECKING, Sequence
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -67,7 +68,7 @@ class ShippingOption(TelegramObject):
 
         self.id = id  # pylint: disable=invalid-name
         self.title = title
-        self.prices = tuple(prices)
+        self.prices = parse_sequence_arg(prices)
 
         self._id_attrs = (self.id,)
 

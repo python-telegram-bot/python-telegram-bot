@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Optional, Sequence
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.datetime import from_timestamp
 from telegram._utils.types import JSONDict
 
@@ -112,7 +113,7 @@ class VideoChatParticipantsInvited(TelegramObject):
         api_kwargs: JSONDict = None,
     ) -> None:
         super().__init__(api_kwargs=api_kwargs)
-        self.users = tuple(users)
+        self.users = parse_sequence_arg(users)
         self._id_attrs = (self.users,)
 
         self._freeze()

@@ -24,6 +24,7 @@ from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
 from telegram._passport.passportfile import PassportFile
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -106,7 +107,9 @@ class EncryptedPassportElement(TelegramObject):
             "rental_agreement", "passport_registration" and "temporary_registration" types.
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
 
         front_side (:class:`telegram.PassportFile`): Optional. Encrypted/decrypted file with the
             front side of the document, provided by the user. Available for "passport",
@@ -125,7 +128,9 @@ class EncryptedPassportElement(TelegramObject):
             "temporary_registration" types.
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
 
     """
 
@@ -166,11 +171,11 @@ class EncryptedPassportElement(TelegramObject):
         self.data = data
         self.phone_number = phone_number
         self.email = email
-        self.files = tuple(files) if files else None
+        self.files = parse_sequence_arg(files)
         self.front_side = front_side
         self.reverse_side = reverse_side
         self.selfie = selfie
-        self.translation = tuple(translation) if translation else None
+        self.translation = parse_sequence_arg(translation)
         self.hash = hash
 
         self._id_attrs = (

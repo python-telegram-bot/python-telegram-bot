@@ -24,6 +24,7 @@ from telegram._files.animation import Animation
 from telegram._files.photosize import PhotoSize
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -110,10 +111,10 @@ class Game(TelegramObject):
         # Required
         self.title = title
         self.description = description
-        self.photo = tuple(photo)
+        self.photo = parse_sequence_arg(photo)
         # Optionals
         self.text = text
-        self.text_entities = tuple(text_entities) if text_entities else ()
+        self.text_entities = parse_sequence_arg(text_entities)
         self.animation = animation
 
         self._id_attrs = (self.title, self.description, self.photo)

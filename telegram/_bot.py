@@ -88,6 +88,7 @@ from telegram._telegramobject import TelegramObject
 from telegram._update import Update
 from telegram._user import User
 from telegram._userprofilephotos import UserProfilePhotos
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.files import is_local_file, parse_file_input
 from telegram._utils.types import DVInput, FileInput, JSONDict, ODVInput, ReplyMarkup
@@ -1918,9 +1919,7 @@ class Bot(TelegramObject, AbstractAsyncContextManager):
                 item_to_get_caption.caption = caption
                 if parse_mode is not DEFAULT_NONE:
                     item_to_get_caption.parse_mode = parse_mode
-                item_to_get_caption.caption_entities = (
-                    tuple(caption_entities) if caption_entities else None
-                )
+                item_to_get_caption.caption_entities = parse_sequence_arg(caption_entities)
 
             # copy the list (just the references) to avoid mutating the original list
             media = media[:]

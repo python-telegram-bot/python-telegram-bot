@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Sequence
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 from telegram.constants import InlineQueryResultType
@@ -83,7 +84,9 @@ class InlineQueryResultGif(InlineQueryResult):
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
@@ -138,7 +141,7 @@ class InlineQueryResultGif(InlineQueryResult):
             self.title = title
             self.caption = caption
             self.parse_mode = parse_mode
-            self.caption_entities = tuple(caption_entities) if caption_entities else None
+            self.caption_entities = parse_sequence_arg(caption_entities)
             self.reply_markup = reply_markup
             self.input_message_content = input_message_content
             self.thumb_mime_type = thumb_mime_type

@@ -75,6 +75,10 @@ class TestInlineQueryResultCachedVoice:
             inline_query_result_cached_voice.reply_markup.to_dict() == self.reply_markup.to_dict()
         )
 
+    def test_caption_entities_always_tuple(self):
+        result = InlineQueryResultCachedVoice(self.id_, self.voice_file_id, self.title)
+        assert result.caption_entities == ()
+
     def test_to_dict(self, inline_query_result_cached_voice):
         inline_query_result_cached_voice_dict = inline_query_result_cached_voice.to_dict()
 

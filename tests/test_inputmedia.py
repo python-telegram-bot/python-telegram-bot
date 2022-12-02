@@ -149,6 +149,10 @@ class TestInputMediaVideo:
         assert input_media_video.supports_streaming == self.supports_streaming
         assert isinstance(input_media_video.thumb, InputFile)
 
+    def test_caption_entities_always_tuple(self):
+        input_media_video = InputMediaVideo(self.media)
+        assert input_media_video.caption_entities == ()
+
     def test_to_dict(self, input_media_video):
         input_media_video_dict = input_media_video.to_dict()
         assert input_media_video_dict["type"] == input_media_video.type
@@ -208,6 +212,10 @@ class TestInputMediaPhoto:
         assert input_media_photo.parse_mode == self.parse_mode
         assert input_media_photo.caption_entities == tuple(self.caption_entities)
 
+    def test_caption_entities_always_tuple(self):
+        input_media_photo = InputMediaPhoto(self.media)
+        assert input_media_photo.caption_entities == ()
+
     def test_to_dict(self, input_media_photo):
         input_media_photo_dict = input_media_photo.to_dict()
         assert input_media_photo_dict["type"] == input_media_photo.type
@@ -260,6 +268,10 @@ class TestInputMediaAnimation:
         assert input_media_animation.parse_mode == self.parse_mode
         assert input_media_animation.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_animation.thumb, InputFile)
+
+    def test_caption_entities_always_tuple(self):
+        input_media_animation = InputMediaAnimation(self.media)
+        assert input_media_animation.caption_entities == ()
 
     def test_to_dict(self, input_media_animation):
         input_media_animation_dict = input_media_animation.to_dict()
@@ -322,6 +334,10 @@ class TestInputMediaAudio:
         assert input_media_audio.parse_mode == self.parse_mode
         assert input_media_audio.caption_entities == tuple(self.caption_entities)
         assert isinstance(input_media_audio.thumb, InputFile)
+
+    def test_caption_entities_always_tuple(self):
+        input_media_audio = InputMediaAudio(self.media)
+        assert input_media_audio.caption_entities == ()
 
     def test_to_dict(self, input_media_audio):
         input_media_audio_dict = input_media_audio.to_dict()
@@ -386,6 +402,10 @@ class TestInputMediaDocument:
             == self.disable_content_type_detection
         )
         assert isinstance(input_media_document.thumb, InputFile)
+
+    def test_caption_entities_always_tuple(self):
+        input_media_document = InputMediaDocument(self.media)
+        assert input_media_document.caption_entities == ()
 
     def test_to_dict(self, input_media_document):
         input_media_document_dict = input_media_document.to_dict()

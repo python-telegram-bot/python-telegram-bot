@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 from telegram._passport.credentials import EncryptedCredentials
 from telegram._passport.encryptedpassportelement import EncryptedPassportElement
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -71,7 +72,7 @@ class PassportData(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
 
-        self.data = tuple(data)
+        self.data = parse_sequence_arg(data)
         self.credentials = credentials
 
         self._decrypted_data: Optional[Tuple[EncryptedPassportElement]] = None

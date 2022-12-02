@@ -73,6 +73,10 @@ class TestInlineQueryResultCachedGif:
         )
         assert inline_query_result_cached_gif.reply_markup.to_dict() == self.reply_markup.to_dict()
 
+    def test_caption_entities_always_tuple(self):
+        result = InlineQueryResultCachedGif(self.id_, self.gif_file_id)
+        assert result.caption_entities == ()
+
     def test_to_dict(self, inline_query_result_cached_gif):
         inline_query_result_cached_gif_dict = inline_query_result_cached_gif.to_dict()
 

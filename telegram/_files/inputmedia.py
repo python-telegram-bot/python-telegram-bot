@@ -27,6 +27,7 @@ from telegram._files.photosize import PhotoSize
 from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
+from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput, JSONDict, ODVInput
@@ -70,7 +71,9 @@ class InputMedia(TelegramObject):
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
 
     """
 
@@ -90,7 +93,7 @@ class InputMedia(TelegramObject):
         self.type = media_type
         self.media = media
         self.caption = caption
-        self.caption_entities = tuple(caption_entities) if caption_entities else None
+        self.caption_entities = parse_sequence_arg(caption_entities)
         self.parse_mode = parse_mode
 
         self._freeze()
@@ -150,7 +153,9 @@ class InputMediaAnimation(InputMedia):
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
 
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
         width (:obj:`int`): Optional. Animation width.
@@ -232,7 +237,9 @@ class InputMediaPhoto(InputMedia):
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
 
     """
 
@@ -314,7 +321,9 @@ class InputMediaVideo(InputMedia):
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         width (:obj:`int`): Optional. Video width.
         height (:obj:`int`): Optional. Video height.
         duration (:obj:`int`): Optional. Video duration in seconds.
@@ -415,7 +424,9 @@ class InputMediaAudio(InputMedia):
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         duration (:obj:`int`): Duration of the audio in seconds.
         performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
             tags.
@@ -506,7 +517,9 @@ class InputMediaDocument(InputMedia):
         caption_entities (Tuple[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
 
             .. versionchanged:: 20.0
-                |tupleclassattrs|
+
+                * |tupleclassattrs|
+                * |alwaystuple|
         thumb (:class:`telegram.InputFile`): Optional. Thumbnail of the file to send.
         disable_content_type_detection (:obj:`bool`): Optional. Disables automatic server-side
             content type detection for files uploaded using multipart/form-data. Always true, if
