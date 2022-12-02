@@ -44,7 +44,8 @@ class ChatInviteLink(TelegramObject):
        * Comparing objects of this class now also takes :attr:`creates_join_request` into account.
 
     Args:
-        invite_link (:obj:`str`): The invite link.
+        invite_link (:obj:`str`): The invite link. If the link was created by another chat
+            administrator, then the second part of the link will be replaced with ``'…'``.
         creator (:class:`telegram.User`): Creator of the link.
         creates_join_request (:obj:`bool`): :obj:`True`, if users joining the chat via
             the link need to be approved by chat administrators.
@@ -83,6 +84,7 @@ class ChatInviteLink(TelegramObject):
             :tg-const:`telegram.constants.ChatInviteLinkLimit.MIN_MEMBER_LIMIT`-
             :tg-const:`telegram.constants.ChatInviteLinkLimit.MAX_MEMBER_LIMIT`.
         name (:obj:`str`): Optional. Invite link name.
+            0-:tg-const:`telegram.constants.ChatInviteLinkLimit.NAME_LENGTH` characters.
 
             .. versionadded:: 13.8
         pending_join_request_count (:obj:`int`): Optional. Number of pending join requests
