@@ -84,6 +84,19 @@ class TestTelegramObject:
         assert to.api_kwargs == {"foo": "bar"}
         assert to.get_bot() is bot
 
+    def test_de_list(self, bot):
+        class SubClass(TelegramObject):
+            def __init__(self, arg: int, **kwargs):
+                super().__init__(**kwargs)
+                self.arg = arg
+
+                self._id_attrs = (self.arg,)
+
+        assert SubClass.de_list([{"arg": 1}, None, {"arg": 2}, None], bot) == (
+            SubClass(1),
+            SubClass(2),
+        )
+
     def test_api_kwargs_read_only(self):
         tg_object = TelegramObject(api_kwargs={"foo": "bar"})
         tg_object._freeze()

@@ -292,7 +292,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         write_timeout: ODVInput[float] = DEFAULT_NONE,
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
-    ) -> Union[bool, JSONDict, None]:
+    ) -> Union[bool, JSONDict, List[JSONDict]]:
         """Order of method calls is: Bot.some_method -> Bot._post -> Bot._do_post.
         So we can override Bot._do_post to add rate limiting.
         """

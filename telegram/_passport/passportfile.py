@@ -122,7 +122,9 @@ class PassportFile(TelegramObject):
         passport credentials.
 
         .. versionchanged:: 20.0
-           Returns a tuple instead of a list.
+
+           * Returns a tuple instead of a list.
+           * Filters out any :obj:`None` values
 
         Args:
             data (List[Dict[:obj:`str`, ...]]): The JSON data.
@@ -137,8 +139,13 @@ class PassportFile(TelegramObject):
             return ()
 
         return tuple(
-            cls.de_json_decrypted(passport_file, bot, credentials[i])
-            for i, passport_file in enumerate(data)
+            filter(
+                None,
+                (
+                    cls.de_json_decrypted(passport_file, bot, credentials[i])
+                    for i, passport_file in enumerate(data)
+                ),
+            )
         )
 
     async def get_file(
