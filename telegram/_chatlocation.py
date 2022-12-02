@@ -40,10 +40,13 @@ class ChatLocation(TelegramObject):
             Can't be a live location.
         address (:obj:`str`): Location address;
             :tg-const:`telegram.ChatLocation.MIN_ADDRESS`-
-            :tg-const:`telegram.ChatLocation.MAX_ADDRESS` characters, as defined by the chat owner
+            :tg-const:`telegram.ChatLocation.MAX_ADDRESS` characters, as defined by the chat owner.
     Attributes:
         location (:class:`telegram.Location`): The location to which the supergroup is connected.
-        address (:obj:`str`): Location address, as defined by the chat owner
+            Can't be a live location.
+        address (:obj:`str`): Location address;
+            :tg-const:`telegram.ChatLocation.MIN_ADDRESS`-
+            :tg-const:`telegram.ChatLocation.MAX_ADDRESS` characters, as defined by the chat owner.
 
     """
 
