@@ -1304,7 +1304,7 @@ class Chat(TelegramObject):
         For the documentation of the arguments, please see :meth:`telegram.Bot.send_media_group`.
 
         Returns:
-            Tuple[:class:`telegram.Message`:] On success, a tuple of :class:`~telegram.Message`
+            Tuple[:class:`telegram.Message`]: On success, a tuple of :class:`~telegram.Message`
             instances that were sent is returned.
 
         """

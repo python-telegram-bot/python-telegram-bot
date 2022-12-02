@@ -143,7 +143,7 @@ class TelegramObject:
             :exc:`AttributeError`
         """
         # protected attributes can always be set for convenient internal use
-        if (key == "_frozen") or (not getattr(self, "_frozen", True)) or key.startswith("_"):
+        if key[0] == "_" or not getattr(self, "_frozen", True):
             super().__setattr__(key, value)
             return
 
@@ -158,7 +158,7 @@ class TelegramObject:
             :exc:`AttributeError`
         """
         # protected attributes can always be set for convenient internal use
-        if (key == "_frozen") or (not getattr(self, "_frozen", True)) or key.startswith("_"):
+        if key[0] == "_" or not getattr(self, "_frozen", True):
             super().__delattr__(key)
             return
 
