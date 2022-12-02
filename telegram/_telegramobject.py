@@ -486,7 +486,7 @@ class TelegramObject:
         if not data:
             return ()
 
-        return tuple(filter(None, (cls.de_json(d, bot) for d in data)))
+        return tuple(obj for obj in (cls.de_json(d, bot) for d in data) if obj is not None)
 
     def to_json(self) -> str:
         """Gives a JSON representation of object.

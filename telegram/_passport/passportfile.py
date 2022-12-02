@@ -139,13 +139,12 @@ class PassportFile(TelegramObject):
             return ()
 
         return tuple(
-            filter(
-                None,
-                (
-                    cls.de_json_decrypted(passport_file, bot, credentials[i])
-                    for i, passport_file in enumerate(data)
-                ),
+            obj
+            for obj in (
+                cls.de_json_decrypted(passport_file, bot, credentials[i])
+                for i, passport_file in enumerate(data)
             )
+            if obj is not None
         )
 
     async def get_file(
