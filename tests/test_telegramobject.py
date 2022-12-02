@@ -59,17 +59,20 @@ class TestTelegramObject:
         pass
 
     def test_to_json(self, monkeypatch):
-        # to_json simply takes whatever comes from to_dict, therefore we only need to test it once
-        telegram_object = TelegramObject()
+        class Subclass(TelegramObject):
+            def __init__(self):
+                super().__init__()
+                self.arg = "arg"
+                self.arg2 = ["arg2", "arg2"]
+                self.arg3 = {"arg3": "arg3"}
+                self.empty_tuple = ()
 
-        # Test that it works with a dict with str keys as well as dicts as lists as values
-        d = {"str": "str", "str2": ["str", "str"], "str3": {"str": "str"}}
-        monkeypatch.setattr("telegram.TelegramObject.to_dict", lambda _: d)
-        json = telegram_object.to_json()
+        json = Subclass().to_json()
         # Order isn't guarantied
-        assert '"str": "str"' in json
-        assert '"str2": ["str", "str"]' in json
-        assert '"str3": {"str": "str"}' in json
+        assert '"arg": "arg"' in json
+        assert '"arg2": ["arg2", "arg2"]' in json
+        assert '"arg3": {"arg3": "arg3"}' in json
+        assert "empty_tuple" not in json
 
         # Now make sure that it doesn't work with not json stuff and that it fails loudly
         # Tuples aren't allowed as keys in json
@@ -77,7 +80,7 @@ class TestTelegramObject:
 
         monkeypatch.setattr("telegram.TelegramObject.to_dict", lambda _: d)
         with pytest.raises(TypeError):
-            telegram_object.to_json()
+            TelegramObject().to_json()
 
     def test_de_json_api_kwargs(self, bot):
         to = TelegramObject.de_json(data={"foo": "bar"}, bot=bot)

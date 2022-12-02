@@ -126,7 +126,7 @@ class TestVideoChatParticipantsInvited:
             assert video_chat_dict["users"][0]["id"] == user1.id
             assert video_chat_dict["users"][1]["id"] == user2.id
         else:
-            assert video_chat_dict == {"users": ()}
+            assert video_chat_dict == {}
 
     def test_equality(self, user1, user2):
         a = VideoChatParticipantsInvited([user1])

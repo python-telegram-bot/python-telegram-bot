@@ -503,7 +503,9 @@ class TelegramObject:
         """Gives representation of object as :obj:`dict`.
 
         .. versionchanged:: 20.0
-            Now includes all entries of :attr:`api_kwargs`.
+
+            * Now includes all entries of :attr:`api_kwargs`.
+            * Attributes whose values are empty sequences are no longer included.
 
         Args:
             recursive (:obj:`bool`, optional): If :obj:`True`, will convert any TelegramObjects
@@ -520,8 +522,14 @@ class TelegramObject:
         # Now we should convert TGObjects to dicts inside objects such as sequences, and convert
         # datetimes to timestamps. This mostly eliminates the need for subclasses to override
         # `to_dict`
+        pop_keys: Set[str] = set()
         for key, value in out.items():
-            if isinstance(value, (tuple, list)) and value:
+            if isinstance(value, (tuple, list)):
+                if not value:
+                    # not popping directly to avoid changing the dict size during iteration
+                    pop_keys.add(key)
+                    continue
+
                 val = []  # empty list to append our converted values to
                 for item in value:
                     if hasattr(item, "to_dict"):
@@ -540,6 +548,9 @@ class TelegramObject:
 
             elif isinstance(value, datetime.datetime):
                 out[key] = to_timestamp(value)
+
+        for key in pop_keys:
+            out.pop(key)
 
         # Effectively "unpack" api_kwargs into `out`:
         out.update(out.pop("api_kwargs", {}))  # type: ignore[call-overload]
