@@ -146,7 +146,7 @@ class Message(TelegramObject):
             This list is empty if the message does not contain entities.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): For messages with a
             Caption. Special entities like usernames, URLs, bot commands, etc. that appear in the
@@ -155,7 +155,7 @@ class Message(TelegramObject):
             caption entities.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         audio (:class:`telegram.Audio`, optional): Message is an audio file, information
             about the file.
@@ -169,7 +169,7 @@ class Message(TelegramObject):
             sizes of the photo. This list is empty if the message does not contain a photo.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         sticker (:class:`telegram.Sticker`, optional): Message is a sticker, information
             about the sticker.
@@ -184,7 +184,7 @@ class Message(TelegramObject):
             these members). This list is empty if the message does not contain new chat members.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         caption (:obj:`str`, optional): Caption for the animation, audio, document, photo, video
             or voice, 0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters.
@@ -202,7 +202,7 @@ class Message(TelegramObject):
             to this value. This list is empty if the message does not contain a new chat photo.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         delete_chat_photo (:obj:`bool`, optional): Service message: The chat photo was deleted.
         group_chat_created (:obj:`bool`, optional): Service message: The group has been created.

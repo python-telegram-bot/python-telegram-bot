@@ -44,7 +44,7 @@ class InputTextMessageContent(InputMessageContent):
         entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         disable_web_page_preview (:obj:`bool`, optional): Disables link previews for links in the
             sent message.

@@ -59,7 +59,7 @@ class WebhookInfo(TelegramObject):
             :attr:`telegram.Update.chat_member`.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         last_synchronization_error_date (:obj:`int`, optional): Unix time of the most recent error
             that happened when trying to synchronize available updates with Telegram datacenters.

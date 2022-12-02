@@ -209,7 +209,7 @@ class StickerSet(TelegramObject):
         stickers (Sequence[:class:`telegram.Sticker`]): List of all set stickers.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         sticker_type (:obj:`str`): Type of stickers in the set, currently one of
             :attr:`telegram.Sticker.REGULAR`, :attr:`telegram.Sticker.MASK`,

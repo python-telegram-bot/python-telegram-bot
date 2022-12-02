@@ -64,7 +64,7 @@ class EncryptedPassportElement(TelegramObject):
             "rental_agreement", "passport_registration" and "temporary_registration" types.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         front_side (:class:`telegram.PassportFile`, optional): Encrypted/decrypted file with the
             front side of the document, provided by the user. Available for "passport",
@@ -83,7 +83,7 @@ class EncryptedPassportElement(TelegramObject):
             "temporary_registration" types.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
     Attributes:
         type (:obj:`str`): Element type. One of "personal_details", "passport", "driver_license",

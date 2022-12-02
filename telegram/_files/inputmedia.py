@@ -58,7 +58,7 @@ class InputMedia(TelegramObject):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         parse_mode (:obj:`str`, optional): |parse_mode|
 
@@ -136,7 +136,7 @@ class InputMediaAnimation(InputMedia):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         width (:obj:`int`, optional): Animation width.
         height (:obj:`int`, optional): Animation height.
@@ -222,7 +222,7 @@ class InputMediaPhoto(InputMedia):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InputMediaType.PHOTO`.
@@ -293,7 +293,7 @@ class InputMediaVideo(InputMedia):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         width (:obj:`int`, optional): Video width.
         height (:obj:`int`, optional): Video height.
@@ -395,7 +395,7 @@ class InputMediaAudio(InputMedia):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
         performer (:obj:`str`, optional): Performer of the audio as defined by sender or by audio
@@ -487,7 +487,7 @@ class InputMediaDocument(InputMedia):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         thumb (:term:`file object` | :obj:`bytes` | :class:`pathlib.Path` | :obj:`str`, \
                 optional): |thumbdocstringnopath|

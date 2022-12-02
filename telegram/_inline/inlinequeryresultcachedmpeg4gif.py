@@ -50,7 +50,7 @@ class InlineQueryResultCachedMpeg4Gif(InlineQueryResult):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
             to the message.

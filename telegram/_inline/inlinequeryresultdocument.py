@@ -49,7 +49,7 @@ class InlineQueryResultDocument(InlineQueryResult):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         document_url (:obj:`str`): A valid URL for the file.
         mime_type (:obj:`str`): Mime type of the content of the file, either "application/pdf"

@@ -91,7 +91,7 @@ class PollAnswer(TelegramObject):
             user. May be empty if the user retracted their vote.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
     Attributes:
         poll_id (:obj:`str`): Unique poll identifier.
@@ -148,7 +148,7 @@ class Poll(TelegramObject):
         options (Sequence[:class:`PollOption`]): List of poll options.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
         is_closed (:obj:`bool`): :obj:`True`, if the poll is closed.
         is_anonymous (:obj:`bool`): :obj:`True`, if the poll is anonymous.
         type (:obj:`str`): Poll type, currently can be :attr:`REGULAR` or :attr:`QUIZ`.
@@ -167,7 +167,7 @@ class Poll(TelegramObject):
             .. versionchanged:: 20.0
 
                * This attribute is now always a (possibly empty) list and never :obj:`None`.
-               * |sequenceeclassargs|
+               * |sequenceclassargs|
         open_period (:obj:`int`, optional): Amount of time in seconds the poll will be active
             after creation.
         close_date (:obj:`datetime.datetime`, optional): Point in time (Unix timestamp) when the

@@ -56,7 +56,7 @@ class InputInvoiceMessageContent(InputMessageContent):
             etc.)
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         max_tip_amount (:obj:`int`, optional): The maximum accepted amount for tips in the
             *smallest* units of the currency (integer, **not** float/double). For example, for a
@@ -71,7 +71,7 @@ class InputInvoiceMessageContent(InputMessageContent):
             :attr:`max_tip_amount`.
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         provider_data (:obj:`str`, optional): An object for data about the invoice,
             which will be shared with the payment provider. A detailed description of the required

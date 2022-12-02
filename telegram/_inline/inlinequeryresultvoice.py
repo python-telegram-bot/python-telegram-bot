@@ -50,7 +50,7 @@ class InlineQueryResultVoice(InlineQueryResult):
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
 
             .. versionchanged:: 20.0
-                |sequenceeclassargs|
+                |sequenceclassargs|
 
         voice_duration (:obj:`int`, optional): Recording duration in seconds.
         reply_markup (:class:`telegram.InlineKeyboardMarkup`, optional): Inline keyboard attached
