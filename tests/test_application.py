@@ -201,6 +201,18 @@ class TestApplication:
                 post_shutdown=None,
             )
 
+    def test_job_queue(self, bot, app, recwarn):
+        expected_warning = (
+            "No `JobQueue` set up. To use `JobQueue`, you must install PTB via "
+            "`pip install python-telegram-bot[job_queue]`."
+        )
+        assert app.job_queue is app._job_queue
+        application = ApplicationBuilder().token(bot.token).job_queue(None).build()
+        assert application.job_queue is None
+        assert len(recwarn) == 1
+        assert str(recwarn[0].message) == expected_warning
+        assert recwarn[0].filename == __file__, "wrong stacklevel"
+
     def test_custom_context_init(self, bot):
         cc = ContextTypes(
             context=CustomContext,
@@ -385,6 +397,7 @@ class TestApplication:
         builder_2.token(app.bot.token)
 
     @pytest.mark.parametrize("job_queue", (True, False))
+    @pytest.mark.filterwarnings("ignore::telegram.warnings.PTBUserWarning")
     async def test_start_stop_processing_updates(self, bot, job_queue):
         # TODO: repeat a similar test for create_task, persistence processing and job queue
         if job_queue:
