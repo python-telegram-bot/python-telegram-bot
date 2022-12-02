@@ -6940,7 +6940,7 @@ CUSTOM_EMOJI_IDENTIFIER_LIMIT` custom emoji identifiers can be specified.
         connect_timeout: ODVInput[float] = DEFAULT_NONE,
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> Tuple[Sticker]:
+    ) -> Tuple[Sticker, ...]:
         """Use this method to get custom emoji stickers, which can be used as a forum topic
          icon by any user. Requires no parameters.
 

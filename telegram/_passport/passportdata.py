@@ -93,7 +93,7 @@ class PassportData(TelegramObject):
         return super().de_json(data=data, bot=bot)
 
     @property
-    def decrypted_data(self) -> Tuple[EncryptedPassportElement]:
+    def decrypted_data(self) -> Tuple[EncryptedPassportElement, ...]:
         """
         Tuple[:class:`telegram.EncryptedPassportElement`]: Lazily decrypt and return information
             about documents and other Telegram Passport elements which were shared with the bot.
