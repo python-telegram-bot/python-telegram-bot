@@ -31,10 +31,6 @@ class ChatPermissions(TelegramObject):
     :attr:`can_send_polls`, :attr:`can_send_other_messages`, :attr:`can_add_web_page_previews`,
     :attr:`can_change_info`, :attr:`can_invite_users` and :attr:`can_pin_messages` are equal.
 
-    .. versionchanged:: 13.15
-        :attr:`can_manage_topics` is considered as well when comparing objects of
-        this type in terms of equality.
-
     Note:
         Though not stated explicitly in the official docs, Telegram changes not only the
         permissions that are set, but also sets all the others to :obj:`False`. However, since not
