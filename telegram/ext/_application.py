@@ -489,6 +489,11 @@ class Application(Generic[BT, CCT, UD, CD, BD, JQ], AbstractAsyncContextManager)
             either start :attr:`updater` manually or use one of :meth:`run_polling` or
             :meth:`run_webhook`.
 
+        Tip:
+            When using a custom logic for startup and shutdown of the application, eventual
+            cancellation of pending tasks should happen only `after` :meth:`stop` has been called
+            in order to ensure that the tasks mentioned above are not cancelled prematurely.
+
         .. seealso::
             :meth:`stop`
 
