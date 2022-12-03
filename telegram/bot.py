@@ -2330,9 +2330,8 @@ class Bot(TelegramObject):
         current_offset: str = None,
         api_kwargs: JSONDict = None,
     ) -> bool:
-        """
-        Use this method to send answers to an inline query. No more than 50 results per query are
-        allowed.
+        """Use this method to send answers to an inline query. No more than 50 results per query
+        are allowed.
 
         Warning:
             In most use cases :attr:`current_offset` should not be passed manually. Instead of
