@@ -174,6 +174,7 @@ def check_object(h4):
             'is_anonymous',
             'is_member',
             'until_date',
+            'can_manage_topics',
         }
     if name == 'BotCommandScope':
         ignored |= {'type'}  # attributes common to all subclasses
