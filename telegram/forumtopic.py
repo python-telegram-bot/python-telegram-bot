@@ -116,6 +116,9 @@ class ForumTopicClosed(TelegramObject):
 
     __slots__ = ()
 
+    def __init__(self, **_kwargs: Any):  # skipcq: PTC-W0049
+        pass
+
 
 class ForumTopicReopened(TelegramObject):
     """
@@ -126,3 +129,6 @@ class ForumTopicReopened(TelegramObject):
     """
 
     __slots__ = ()
+
+    def __init__(self, **_kwargs: Any):  # skipcq: PTC-W0049
+        pass

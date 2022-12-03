@@ -120,6 +120,7 @@ class TestChatMember:
             'can_add_web_page_previews': False,
             'can_manage_chat': True,
             'can_manage_voice_chats': True,
+            'can_manage_topics': True,
         }
         chat_member_type = ChatMember.de_json(json_dict, bot)
 
@@ -221,6 +222,7 @@ class TestChatMember:
             'can_add_web_page_previews': False,
             'can_manage_chat': True,
             'can_manage_video_chats': True,
+            'can_manage_topics': True,
         }
         assert type(cls.de_json(json_dict, bot)) is cls
 

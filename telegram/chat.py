@@ -22,7 +22,7 @@ import warnings
 from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional, ClassVar, Union, Tuple, Any
 
-from telegram import ChatPhoto, TelegramObject, constants, MenuButton, ForumTopic
+from telegram import ChatPhoto, TelegramObject, constants, MenuButton
 from telegram.utils.types import JSONDict, FileInput, ODVInput, DVInput
 from telegram.utils.deprecate import TelegramDeprecationWarning
 
@@ -35,6 +35,7 @@ if TYPE_CHECKING:
         Bot,
         ChatMember,
         ChatInviteLink,
+        ForumTopic,
         Message,
         MessageId,
         ReplyMarkup,
@@ -1975,7 +1976,7 @@ class Chat(TelegramObject):
         icon_custom_emoji_id: str = None,
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
-    ) -> ForumTopic:
+    ) -> "ForumTopic":
         """Shortcut for::
 
              bot.create_forum_topic(chat_id=update.effective_chat.id, *args, **kwargs)
