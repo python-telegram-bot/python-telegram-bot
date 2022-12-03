@@ -58,18 +58,19 @@ class File(TelegramObject):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`int`, optional): Optional. File size in bytes, if known.
+        file_size (:obj:`int`, optional): File size in bytes, if known.
         file_path (:obj:`str`, optional): File path. Use e.g. :meth:`download_to_drive` to get the
             file.
 
     Attributes:
-        file_id (:obj:`str`): Identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`str`): Optional. File size in bytes.
-        file_path (:obj:`str`): Optional. File path. Use e.g. :meth:`download_to_drive` to get
-            the file.
+        file_size (:obj:`int`): Optional. File size in bytes, if known.
+        file_path (:obj:`str`): Optional. File path. Use e.g. :meth:`download_to_drive` to get the
+            file.
     """
 
     __slots__ = (
