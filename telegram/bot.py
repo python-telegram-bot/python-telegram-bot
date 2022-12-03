@@ -6282,8 +6282,6 @@ class Bot(TelegramObject):
         data: JSONDict = {
             "chat_id": chat_id,
             "name": name,
-            "icon_color": icon_color,
-            "icon_custom_emoji_id": icon_custom_emoji_id,
         }
 
         if icon_color is not None:
