@@ -90,7 +90,7 @@ class ForumTopicCreated(TelegramObject):
             as the topic icon.
     """
 
-    __slots__ = ("name", "icon_color", "icon_custom_emoji_id")
+    __slots__ = ("name", "icon_color", "icon_custom_emoji_id", "_id_attrs")
 
     def __init__(
         self,
