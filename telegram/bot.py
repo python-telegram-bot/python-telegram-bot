@@ -1957,7 +1957,8 @@ class Bot(TelegramObject):
 
                 .. versionadded:: 13.10
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
-                .. versionadded:: 20.0
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -2065,7 +2066,8 @@ class Bot(TelegramObject):
 
                 .. versionadded:: 13.10
             message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
-                .. versionadded:: 20.0
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -6283,6 +6285,13 @@ class Bot(TelegramObject):
             "icon_color": icon_color,
             "icon_custom_emoji_id": icon_custom_emoji_id,
         }
+
+        if icon_color is not None:
+            data["icon_color"] = icon_color
+
+        if icon_custom_emoji_id is not None:
+            data["icon_custom_emoji_id"] = icon_custom_emoji_id
+
         result = self._post(
             "createForumTopic",
             data,
@@ -6315,6 +6324,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
             name (:obj:`str`): New topic name, 1-128 characters.
             icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
                 the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
@@ -6366,6 +6377,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -6411,6 +6424,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -6455,6 +6470,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).
@@ -6500,6 +6517,8 @@ class Bot(TelegramObject):
         Args:
             chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
             message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
                 the connection pool).

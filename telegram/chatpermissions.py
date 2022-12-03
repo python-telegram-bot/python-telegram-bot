@@ -29,8 +29,7 @@ class ChatPermissions(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`can_send_messages`, :attr:`can_send_media_messages`,
     :attr:`can_send_polls`, :attr:`can_send_other_messages`, :attr:`can_add_web_page_previews`,
-    :attr:`can_change_info`, :attr:`can_invite_users`, :attr:`can_pin_messages` and
-    :attr:`can_manage_topics` are equal.
+    :attr:`can_change_info`, :attr:`can_invite_users` and :attr:`can_pin_messages` are equal.
 
     .. versionchanged:: 13.15
         :attr:`can_manage_topics` is considered as well when comparing objects of
@@ -139,5 +138,4 @@ class ChatPermissions(TelegramObject):
             self.can_change_info,
             self.can_invite_users,
             self.can_pin_messages,
-            self.can_manage_topics,
         )
