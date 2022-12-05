@@ -42,11 +42,11 @@ class InlineKeyboardMarkup(TelegramObject):
 
     Args:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
-            each represented by a list of InlineKeyboardButton objects.
+            each represented by a list of :class:`~telegram.InlineKeyboardButton` objects.
 
     Attributes:
         inline_keyboard (List[List[:class:`telegram.InlineKeyboardButton`]]): List of button rows,
-            each represented by a list of InlineKeyboardButton objects.
+            each represented by a list of :class:`~telegram.InlineKeyboardButton` objects.
 
     """
 
