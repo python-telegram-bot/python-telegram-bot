@@ -62,10 +62,9 @@ class Sticker(_BaseThumbedMedium):
         thumb (:class:`telegram.PhotoSize`, optional): Sticker thumbnail in the ``.WEBP`` or
             ``.JPG`` format.
         emoji (:obj:`str`, optional): Emoji associated with the sticker
-        set_name (:obj:`str`, optional): Name of the sticker set to which the sticker
-            belongs.
-        mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the
-            position where the mask should be placed.
+        set_name (:obj:`str`, optional): Name of the sticker set to which the sticker belongs.
+        mask_position (:class:`telegram.MaskPosition`, optional): For mask stickers, the position
+            where the mask should be placed.
         file_size (:obj:`int`, optional): File size in bytes.
 
         premium_animation (:class:`telegram.File`, optional): For premium regular stickers,
@@ -78,7 +77,8 @@ class Sticker(_BaseThumbedMedium):
             .. versionadded:: 20.0
 
     Attributes:
-        file_id (:obj:`str`): Identifier for this file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
