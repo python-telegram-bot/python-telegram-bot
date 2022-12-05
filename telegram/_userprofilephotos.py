@@ -41,7 +41,8 @@ class UserProfilePhotos(TelegramObject):
 
     Attributes:
         total_count (:obj:`int`): Total number of profile pictures.
-        photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures.
+        photos (List[List[:class:`telegram.PhotoSize`]]): Requested profile pictures (in up to 4
+            sizes each).
 
     """
 
