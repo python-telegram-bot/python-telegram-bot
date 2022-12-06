@@ -569,9 +569,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 # different places
                 new_result = copy(result)
                 with new_result._unfrozen():
-                    markup = self._replace_keyboard(
-                        result.reply_markup  # type: ignore[attr-defined]
-                    )
+                    markup = self._replace_keyboard(result.reply_markup)
                     new_result.reply_markup = markup
 
                 results.append(new_result)

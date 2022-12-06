@@ -63,8 +63,8 @@ def load_file(
     except AttributeError:
         return None, cast(Union[bytes, "InputFile", str, Path], obj)
 
-    if hasattr(obj, "name") and not isinstance(obj.name, int):  # type: ignore[union-attr]
-        filename = Path(obj.name).name  # type: ignore[union-attr]
+    if hasattr(obj, "name") and not isinstance(obj.name, int):
+        filename = Path(obj.name).name
     else:
         filename = None
 
