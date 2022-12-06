@@ -137,7 +137,7 @@ class TelegramObject:
                 setattr(self, key, api_kwargs.pop(key))
 
     def __setattr__(self, key: str, value: object) -> None:
-        """ "Overrides :meth:`object.__setattr__` to prevent the overriding of attributes.
+        """Overrides :meth:`object.__setattr__` to prevent the overriding of attributes.
 
         Raises:
             :exc:`AttributeError`
@@ -152,7 +152,7 @@ class TelegramObject:
         )
 
     def __delattr__(self, key: str) -> None:
-        """ "Overrides :meth:`object.__delattr__` to prevent the deletion of attributes.
+        """Overrides :meth:`object.__delattr__` to prevent the deletion of attributes.
 
         Raises:
             :exc:`AttributeError`
