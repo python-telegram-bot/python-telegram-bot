@@ -5044,7 +5044,7 @@ class Bot(TelegramObject):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
+            webm_sticker (:obj:`str` | filelike object | :obj:`bytes` | :class:`pathlib.Path`,\
                 optional): **WEBM** video with the sticker, uploaded using multipart/form-data.
                 See https://core.telegram.org/stickers#video-sticker-requirements for
                 technical requirements.
@@ -5145,7 +5145,7 @@ class Bot(TelegramObject):
 
                 .. versionchanged:: 13.2
                    Accept :obj:`bytes` as input.
-            webm_sticker (:obj:`str` | :term:`file object` | :obj:`bytes` | :class:`pathlib.Path`,\
+            webm_sticker (:obj:`str` | filelike object | :obj:`bytes` | :class:`pathlib.Path`,\
                 optional): **WEBM** video with the sticker, uploaded using multipart/form-data.
                 See https://core.telegram.org/stickers#video-sticker-requirements for
                 technical requirements.
