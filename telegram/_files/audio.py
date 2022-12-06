@@ -46,11 +46,11 @@ class Audio(_BaseThumbedMedium):
             which the music file belongs.
 
     Attributes:
-        file_id (:obj:`str`): Identifier for this file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        duration (:obj:`int`): Duration of the audio in seconds.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
+            the same over time and for different bots. Can't be used to download or reuse the file.
+        duration (:obj:`int`): Duration of the audio in seconds as defined by sender.
         performer (:obj:`str`): Optional. Performer of the audio as defined by sender or by audio
             tags.
         title (:obj:`str`): Optional. Title of the audio as defined by sender or by audio tags.
