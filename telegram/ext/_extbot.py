@@ -563,7 +563,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 # We build a new result in case the user wants to use the same object in
                 # different places
                 new_result = copy(result)
-                markup = self._replace_keyboard(result.reply_markup)  # type: ignore[attr-defined]
+                markup = self._replace_keyboard(result.reply_markup)
                 new_result.reply_markup = markup  # type: ignore[attr-defined]
                 results.append(new_result)
 
