@@ -64,6 +64,7 @@ from .replymarkup import ReplyMarkup
 from .replykeyboardmarkup import ReplyKeyboardMarkup
 from .replykeyboardremove import ReplyKeyboardRemove
 from .forcereply import ForceReply
+from .forumtopic import ForumTopic, ForumTopicClosed, ForumTopicCreated, ForumTopicReopened
 from .error import TelegramError
 from .files.inputfile import InputFile
 from .files.file import File
@@ -230,6 +231,10 @@ __all__ = (  # Keep this alphabetically ordered
     'File',
     'FileCredentials',
     'ForceReply',
+    'ForumTopic',
+    'ForumTopicClosed',
+    'ForumTopicCreated',
+    'ForumTopicReopened',
     'Game',
     'GameHighScore',
     'IdDocumentData',

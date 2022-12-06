@@ -1264,6 +1264,36 @@ officedocument.wordprocessingml.document")``.
         web_app_data = _WebAppData()
         """Messages that contain :attr:`telegram.Message.web_app_data`."""
 
+        class _ForumTopicCreated(MessageFilter):
+            __slots__ = ()
+            name = 'Filters.status_update.forum_topic_created'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.forum_topic_created)
+
+        forum_topic_created = _ForumTopicCreated()
+        """Messages that contain :attr:`telegram.Message.forum_topic_created`."""
+
+        class _ForumTopicClosed(MessageFilter):
+            __slots__ = ()
+            name = 'Filters.status_update.forum_topic_closed'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.forum_topic_closed)
+
+        forum_topic_closed = _ForumTopicClosed()
+        """Messages that contain :attr:`telegram.Message.forum_topic_closed`."""
+
+        class _ForumTopicReopened(MessageFilter):
+            __slots__ = ()
+            name = 'Filters.status_update.forum_topic_reopened'
+
+            def filter(self, message: Message) -> bool:
+                return bool(message.forum_topic_reopened)
+
+        forum_topic_reopened = _ForumTopicReopened()
+        """Messages that contain :attr:`telegram.Message.forum_topic_reopened`."""
+
         name = 'Filters.status_update'
 
         def filter(self, message: Update) -> bool:
@@ -1288,6 +1318,9 @@ officedocument.wordprocessingml.document")``.
                 or self.video_chat_ended(message)
                 or self.video_chat_participants_invited(message)
                 or self.web_app_data(message)
+                or self.forum_topic_created(message)
+                or self.forum_topic_closed(message)
+                or self.forum_topic_reopened(message)
             )
 
     status_update = _StatusUpdate()
@@ -1361,6 +1394,22 @@ officedocument.wordprocessingml.document")``.
             :attr:`telegram.Message.video_chat_participants_invited`.
 
             .. versionadded:: 13.12
+        web_app_data: Messages that contain
+            :attr:`telegram.Message.web_app_data`.
+
+            .. versionadded:: 13.12
+        forum_topic_created: Messages that contain
+            :attr:`telegram.Message.forum_topic_created`.
+
+            .. versionadded:: 13.15
+        forum_topic_closed: Messages that contain
+            :attr:`telegram.Message.forum_topic_closed`.
+
+            .. versionadded:: 13.15
+        forum_topic_reopened: Messages that contain
+            :attr:`telegram.Message.forum_topic_reopened`.
+
+            .. versionadded:: 13.15
 
     """
 
@@ -2210,6 +2259,19 @@ officedocument.wordprocessingml.document")``.
     """Messages that contain :attr:`telegram.Message.is_automatic_forward`.
 
         .. versionadded:: 13.9
+    """
+
+    class _IsTopicMessage(MessageFilter):
+        __slots__ = ()
+        name = 'Filters.is_topic_message'
+
+        def filter(self, message: Message) -> bool:
+            return bool(message.is_topic_message)
+
+    is_topic_message = _IsTopicMessage()
+    """Messages that contain :attr:`telegram.Message.is_topic_message`.
+
+        .. versionadded:: 13.15
     """
 
     class _HasProtectedContent(MessageFilter):

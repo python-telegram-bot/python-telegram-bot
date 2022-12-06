@@ -621,6 +621,7 @@ class CallbackQuery(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -650,6 +651,7 @@ class CallbackQuery(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     MAX_ANSWER_TEXT_LENGTH: ClassVar[int] = constants.MAX_ANSWER_CALLBACK_QUERY_TEXT_LENGTH

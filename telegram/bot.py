@@ -94,6 +94,7 @@ from telegram import (
 )
 from telegram.constants import MAX_INLINE_QUERY_RESULTS
 from telegram.error import InvalidToken, TelegramError
+from telegram.forumtopic import ForumTopic
 from telegram.utils.deprecate import TelegramDeprecationWarning
 from telegram.utils.helpers import (
     DEFAULT_NONE,
@@ -310,12 +311,16 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Union[bool, Message]:
         if reply_to_message_id is not None:
             data['reply_to_message_id'] = reply_to_message_id
 
         if protect_content:
             data['protect_content'] = protect_content
+
+        if message_thread_id is not None:
+            data["message_thread_id"] = message_thread_id
 
         # We don't check if (DEFAULT_)None here, so that _put is able to insert the defaults
         # correctly, if necessary
@@ -471,6 +476,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """Use this method to send text messages.
 
@@ -492,6 +498,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
             allow_sending_without_reply (:obj:`bool`, optional): Pass :obj:`True`, if the message
@@ -532,6 +541,7 @@ class Bot(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -547,6 +557,8 @@ class Bot(TelegramObject):
         limitations:
 
             - A message can only be deleted if it was sent less than 48 hours ago.
+            - Service messages about a supergroup, channel, or forum topic creation can't be
+              deleted.
             - A dice message in a private chat can only be deleted if it was sent more than 24
               hours ago.
             - Bots can delete outgoing messages in private chats, groups, and supergroups.
@@ -590,6 +602,7 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """Use this method to forward messages of any kind. Service messages can't be forwarded.
 
@@ -613,6 +626,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
                 the read timeout from the server (instead of the one specified during creation of
@@ -642,6 +658,7 @@ class Bot(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -660,6 +677,7 @@ class Bot(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """Use this method to send photos.
 
@@ -698,6 +716,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -739,6 +760,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -761,6 +783,7 @@ class Bot(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """
         Use this method to send audio files, if you want Telegram clients to display them in the
@@ -809,6 +832,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -867,6 +893,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -887,6 +914,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """
         Use this method to send general files.
@@ -929,6 +957,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -983,6 +1014,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -997,6 +1029,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """
         Use this method to send static ``.WEBP``, animated ``.TGS``, or video ``.WEBM`` stickers.
@@ -1023,6 +1056,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1054,6 +1090,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -1077,6 +1114,7 @@ class Bot(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """
         Use this method to send video files, Telegram clients support mp4 videos
@@ -1128,6 +1166,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1187,6 +1228,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -1205,6 +1247,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """
         As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long.
@@ -1243,6 +1286,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1293,6 +1339,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -1315,6 +1362,7 @@ class Bot(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """
         Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -1323,7 +1371,7 @@ class Bot(TelegramObject):
 
         Note:
             ``thumb`` will be ignored for small files, for which Telegram can easily
-            generate thumb nails. However, this behaviour is undocumented and might be changed
+            generate thumbnails. However, this behaviour is undocumented and might be changed
             by Telegram.
 
         Args:
@@ -1369,6 +1417,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1417,6 +1468,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -1436,6 +1488,7 @@ class Bot(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """
         Use this method to send audio files, if you want Telegram clients to display the file
@@ -1479,6 +1532,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1522,6 +1578,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -1537,6 +1594,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> List[Message]:
         """Use this method to send a group of photos or videos as an album.
 
@@ -1552,6 +1610,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1587,6 +1648,9 @@ class Bot(TelegramObject):
         if protect_content:
             data['protect_content'] = protect_content
 
+        if message_thread_id:
+            data["message_thread_id"] = message_thread_id
+
         result = self._post('sendMediaGroup', data, timeout=timeout, api_kwargs=api_kwargs)
 
         return Message.de_list(result, self)  # type: ignore
@@ -1609,6 +1673,7 @@ class Bot(TelegramObject):
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """Use this method to send point on the map.
 
@@ -1636,6 +1701,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+           message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                     original message.
@@ -1692,6 +1760,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -1853,6 +1922,7 @@ class Bot(TelegramObject):
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """Use this method to send information about a venue.
 
@@ -1886,6 +1956,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -1950,6 +2023,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -1968,6 +2042,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """Use this method to send phone contacts.
 
@@ -1990,6 +2065,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -2043,6 +2121,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -2057,6 +2136,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """Use this method to send a game.
 
@@ -2070,6 +2150,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -2103,6 +2186,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -2246,9 +2330,8 @@ class Bot(TelegramObject):
         current_offset: str = None,
         api_kwargs: JSONDict = None,
     ) -> bool:
-        """
-        Use this method to send answers to an inline query. No more than 50 results per query are
-        allowed.
+        """Use this method to send answers to an inline query. No more than 50 results per query
+        are allowed.
 
         Warning:
             In most use cases :attr:`current_offset` should not be passed manually. Instead of
@@ -3627,6 +3710,7 @@ class Bot(TelegramObject):
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """Use this method to send invoices.
 
@@ -3705,6 +3789,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+           message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -3779,6 +3866,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -4031,6 +4119,7 @@ class Bot(TelegramObject):
         can_manage_chat: bool = None,
         can_manage_voice_chats: bool = None,
         can_manage_video_chats: bool = None,
+        can_manage_topics: bool = None,
     ) -> bool:
         """
         Use this method to promote or demote a user in a supergroup or a channel. The bot must be
@@ -4086,6 +4175,10 @@ class Bot(TelegramObject):
                 the connection pool).
             api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
                 Telegram API.
+            can_manage_topics (:obj:`bool`, optional): Pass :obj:`True`, if the user is
+                allowed to create, rename, close, and reopen forum topics; supergroups only.
+
+                .. versionadded:: 13.15
 
         Returns:
             :obj:`bool`: On success, :obj:`True` is returned.
@@ -4125,6 +4218,8 @@ class Bot(TelegramObject):
             data['can_manage_video_chats'] = can_manage_voice_chats
         if can_manage_video_chats is not None:
             data['can_manage_video_chats'] = can_manage_video_chats
+        if can_manage_topics is not None:
+            data["can_manage_topics"] = can_manage_topics
 
         result = self._post('promoteChatMember', data, timeout=timeout, api_kwargs=api_kwargs)
 
@@ -5273,6 +5368,7 @@ class Bot(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """
         Use this method to send a native poll.
@@ -5315,6 +5411,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -5376,6 +5475,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -5436,6 +5536,7 @@ class Bot(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Message:
         """
         Use this method to send an animated emoji that will display a random value.
@@ -5456,6 +5557,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+           message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -5492,6 +5596,7 @@ class Bot(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     @log
@@ -5813,6 +5918,7 @@ class Bot(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> MessageId:
         """
         Use this method to copy messages of any kind. Service messages and invoice messages can't
@@ -5838,6 +5944,9 @@ class Bot(TelegramObject):
                 forwarding and saving.
 
                 .. versionadded:: 13.10
+            message_thread_id (:obj:`int`, optional): |message_thread_id_arg|
+
+                .. versionadded:: 13.15
 
             reply_to_message_id (:obj:`int`, optional): If the message is a reply, ID of the
                 original message.
@@ -5881,6 +5990,8 @@ class Bot(TelegramObject):
                 data['reply_markup'] = reply_markup.to_json()
             else:
                 data['reply_markup'] = reply_markup
+        if message_thread_id:
+            data["message_thread_id"] = message_thread_id
 
         result = self._post('copyMessage', data, timeout=timeout, api_kwargs=api_kwargs)
         return MessageId.de_json(result, self)  # type: ignore[return-value, arg-type]
@@ -6096,6 +6207,338 @@ class Bot(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
+    @log
+    def get_forum_topic_icon_stickers(
+        self,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> List[Sticker]:
+        """Use this method to get custom emoji stickers, which can be used as a forum topic
+         icon by any user. Requires no parameters.
+
+        .. versionadded:: 13.15
+
+        Args:
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            List[:class:`telegram.Sticker`]
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        result = self._post(
+            "getForumTopicIconStickers",
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+        return Sticker.de_list(result, self)  # type: ignore[return-value, arg-type]
+
+    @log
+    def create_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        name: str,
+        icon_color: int = None,
+        icon_custom_emoji_id: str = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> ForumTopic:
+        """
+        Use this method to create a topic in a forum supergroup chat. The bot must be
+        an administrator in the chat for this to work and must have
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights.
+
+        .. seealso:: :meth:`telegram.Chat.create_forum_topic`,
+
+        .. versionadded:: 13.15
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            name (:obj:`str`): New topic name, 1-128 characters.
+            icon_color (:obj:`int`, optional): Color of the topic icon in RGB format. Currently,
+                must be one of 7322096 (0x6FB9F0), 16766590 (0xFFD67E), 13338331 (0xCB86DB),
+                9367192 (0x8EEE98), 16749490 (0xFF93B2), or 16478047 (0xFB6F5F)
+            icon_custom_emoji_id (:obj:`str`, optional): New unique identifier of the custom emoji
+                shown as the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers`
+                to get all allowed custom emoji identifiers.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :class:`telegram.ForumTopic`
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "name": name,
+        }
+
+        if icon_color is not None:
+            data["icon_color"] = icon_color
+
+        if icon_custom_emoji_id is not None:
+            data["icon_custom_emoji_id"] = icon_custom_emoji_id
+
+        result = self._post(
+            "createForumTopic",
+            data,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+        return ForumTopic.de_json(result, self)  # type: ignore[return-value, arg-type]
+
+    @log
+    def edit_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: int,
+        name: str,
+        icon_custom_emoji_id: str,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
+        unless it is the creator of the topic.
+
+        .. seealso:: :meth:`telegram.Message.edit_forum_topic`,
+            :meth:`telegram.Chat.edit_forum_topic`,
+
+        .. versionadded:: 13.15
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
+            name (:obj:`str`): New topic name, 1-128 characters.
+            icon_custom_emoji_id (:obj:`str`): New unique identifier of the custom emoji shown as
+                the topic icon. Use :meth:`~telegram.Bot.get_forum_topic_icon_stickers` to get all
+                allowed custom emoji identifiers.
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_thread_id": message_thread_id,
+            "name": name,
+            "icon_custom_emoji_id": icon_custom_emoji_id,
+        }
+        return self._post(  # type: ignore[return-value]
+            "editForumTopic",
+            data,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @log
+    def close_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to close an open topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :attr:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
+        unless it is the creator of the topic.
+
+        .. seealso:: :meth:`telegram.Message.close_forum_topic`,
+            :meth:`telegram.Chat.close_forum_topic`,
+
+        .. versionadded:: 13.15
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_thread_id": message_thread_id,
+        }
+        return self._post(  # type: ignore[return-value]
+            "closeForumTopic",
+            data,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @log
+    def reopen_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to reopen a closed topic in a forum supergroup chat. The bot must
+        be an administrator in the chat for this to work and must have
+        :meth:`~telegram.ChatAdministratorRights.can_manage_topics` administrator rights,
+        unless it is the creator of the topic.
+
+        .. seealso:: :meth:`telegram.Message.reopen_forum_topic`,
+            :meth:`telegram.Chat.reopen_forum_topic`,
+
+        .. versionadded:: 13.15
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_thread_id": message_thread_id,
+        }
+        return self._post(  # type: ignore[return-value]
+            "reopenForumTopic",
+            data,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @log
+    def delete_forum_topic(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to delete a forum topic along with all its messages in a forum supergroup
+        chat. The bot must be an administrator in the chat for this to work and must have
+        :meth:`~telegram.ChatAdministratorRights.can_delete_messages` administrator rights.
+
+        .. seealso:: :meth:`telegram.Message.delete_forum_topic`,
+            :meth:`telegram.Chat.delete_forum_topic`,
+
+        .. versionadded:: 13.15
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_thread_id": message_thread_id,
+        }
+        return self._post(  # type: ignore[return-value]
+            "deleteForumTopic",
+            data,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    @log
+    def unpin_all_forum_topic_messages(
+        self,
+        chat_id: Union[str, int],
+        message_thread_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """
+        Use this method to clear the list of pinned messages in a forum topic. The bot must
+        be an administrator in the chat for this to work and must have
+        :meth:`~telegram.ChatAdministratorRights.can_pin_messages` administrator rights
+        in the supergroup.
+
+        .. seealso:: :meth:`telegram.Message.unpin_all_forum_topic_messages`,
+            :meth:`telegram.Chat.unpin_all_forum_topic_messages`,
+
+        .. versionadded:: 13.15
+
+        Args:
+            chat_id (:obj:`int` | :obj:`str`): |chat_id_group|
+            message_thread_id (:obj:`int`): |message_thread_id|
+
+                .. versionadded:: 13.15
+            timeout (:obj:`int` | :obj:`float`, optional): If this value is specified, use it as
+                the read timeout from the server (instead of the one specified during creation of
+                the connection pool).
+            api_kwargs (:obj:`dict`, optional): Arbitrary keyword arguments to be passed to the
+                Telegram API.
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+
+        Raises:
+            :class:`telegram.error.TelegramError`
+        """
+        data: JSONDict = {
+            "chat_id": chat_id,
+            "message_thread_id": message_thread_id,
+        }
+        return self._post(  # type: ignore[return-value]
+            "unpinAllForumTopicMessages",
+            data,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
     def to_dict(self) -> JSONDict:
         """See :meth:`telegram.TelegramObject.to_dict`."""
         data: JSONDict = {'id': self.id, 'username': self.username, 'first_name': self.first_name}
@@ -6292,3 +6735,17 @@ class Bot(TelegramObject):
     """Alias for :meth:`set_my_default_administrator_rights`"""
     createInvoiceLink = create_invoice_link
     """Alias for :meth:`create_invoice_link`"""
+    getForumTopicIconStickers = get_forum_topic_icon_stickers
+    """Alias for :meth:`get_forum_topic_icon_stickers`"""
+    createForumTopic = create_forum_topic
+    """Alias for :meth:`create_forum_topic`"""
+    editForumTopic = edit_forum_topic
+    """Alias for :meth:`edit_forum_topic`"""
+    closeForumTopic = close_forum_topic
+    """Alias for :meth:`close_forum_topic`"""
+    reopenForumTopic = reopen_forum_topic
+    """Alias for :meth:`reopen_forum_topic`"""
+    deleteForumTopic = delete_forum_topic
+    """Alias for :meth:`delete_forum_topic`"""
+    unpinAllForumTopicMessages = unpin_all_forum_topic_messages
+    """Alias for :meth:`unpin_all_forum_topic_messages`"""

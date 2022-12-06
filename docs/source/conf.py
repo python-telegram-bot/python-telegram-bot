@@ -13,6 +13,7 @@
 # serve to show the default.
 import sys
 import os
+from pathlib import Path
 # import telegram
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -49,6 +50,9 @@ source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
+
+# Global substitutions
+rst_prolog = (Path.cwd() / "substitutions/global.rst").read_text(encoding="utf-8")
 
 # General information about the project.
 project = u'python-telegram-bot'

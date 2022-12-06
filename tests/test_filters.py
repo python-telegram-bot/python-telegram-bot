@@ -969,6 +969,21 @@ class TestFilters:
         assert Filters.status_update.web_app_data(update)
         update.message.web_app_data = None
 
+        update.message.forum_topic_created = "topic"
+        assert Filters.status_update(update)
+        assert Filters.status_update.forum_topic_created(update)
+        update.message.forum_topic_created = None
+
+        update.message.forum_topic_closed = "topic"
+        assert Filters.status_update(update)
+        assert Filters.status_update.forum_topic_closed(update)
+        update.message.forum_topic_closed = None
+
+        update.message.forum_topic_reopened = "topic"
+        assert Filters.status_update(update)
+        assert Filters.status_update.forum_topic_reopened(update)
+        update.message.forum_topic_reopened = None
+
     def test_filters_forwarded(self, update):
         assert not Filters.forwarded(update)
         update.message.forward_date = datetime.datetime.utcnow()
@@ -1761,6 +1776,11 @@ class TestFilters:
         assert not Filters.is_automatic_forward(update)
         update.message.is_automatic_forward = True
         assert Filters.is_automatic_forward(update)
+
+    def test_filters_is_topic_message(self, update):
+        assert not Filters.is_topic_message(update)
+        update.message.is_topic_message = True
+        assert Filters.is_topic_message(update)
 
     def test_filters_has_protected_content(self, update):
         assert not Filters.has_protected_content(update)

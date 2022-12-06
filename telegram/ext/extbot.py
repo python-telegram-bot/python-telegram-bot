@@ -196,6 +196,7 @@ class ExtBot(telegram.bot.Bot):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> Union[bool, Message]:
         # We override this method to call self._replace_keyboard and self._insert_callback_data.
         # This covers most methods that have a reply_markup
@@ -209,6 +210,7 @@ class ExtBot(telegram.bot.Bot):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
         if isinstance(result, Message):
             self._insert_callback_data(result)
@@ -304,6 +306,7 @@ class ExtBot(telegram.bot.Bot):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> MessageId:
         # We override this method to call self._replace_keyboard
         return super().copy_message(
@@ -320,6 +323,7 @@ class ExtBot(telegram.bot.Bot):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def get_chat(

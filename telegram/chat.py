@@ -35,6 +35,7 @@ if TYPE_CHECKING:
         Bot,
         ChatMember,
         ChatInviteLink,
+        ForumTopic,
         Message,
         MessageId,
         ReplyMarkup,
@@ -131,6 +132,21 @@ class Chat(TelegramObject):
             in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.14
+        is_forum (:obj:`bool`, optional): :obj:`True`, if the supergroup chat is a forum
+            (has topics_ enabled).
+
+            .. versionadded:: 13.15
+        active_usernames (List[:obj:`str`], optional):  If set, the list of all `active chat
+            usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
+            #collectible-usernames>`_; for private chats, supergroups and channels. Returned
+            only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.15
+        emoji_status_custom_emoji_id (:obj:`str`, optional): Custom emoji identifier of emoji
+            status of the other party in a private chat. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.15
         **kwargs (:obj:`dict`): Arbitrary keyword arguments.
 
     Attributes:
@@ -190,6 +206,23 @@ class Chat(TelegramObject):
             in the private chat. Returned only in :meth:`telegram.Bot.get_chat`.
 
             .. versionadded:: 13.14
+        is_forum (:obj:`bool`): Optional. :obj:`True`, if the supergroup chat is a forum
+            (has topics_ enabled).
+
+            .. versionadded:: 13.15
+        active_usernames (List[:obj:`str`]): Optional. If set, the list of all `active chat
+            usernames <https://telegram.org/blog/topics-in-groups-collectible-usernames\
+            #collectible-usernames>`_; for private chats, supergroups and channels. Returned
+            only in :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.15
+        emoji_status_custom_emoji_id (:obj:`str`): Optional. Custom emoji identifier of emoji
+            status of the other party in a private chat. Returned only in
+            :meth:`telegram.Bot.get_chat`.
+
+            .. versionadded:: 13.15
+
+    .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     """
 
     __slots__ = (
@@ -218,6 +251,9 @@ class Chat(TelegramObject):
         'join_to_send_messages',
         'join_by_request',
         'has_restricted_voice_and_video_messages',
+        'is_forum',
+        'active_usernames',
+        'emoji_status_custom_emoji_id',
         '_id_attrs',
     )
 
@@ -261,6 +297,9 @@ class Chat(TelegramObject):
         join_to_send_messages: bool = None,
         join_by_request: bool = None,
         has_restricted_voice_and_video_messages: bool = None,
+        is_forum: bool = None,
+        active_usernames: List[str] = None,
+        emoji_status_custom_emoji_id: str = None,
         **_kwargs: Any,
     ):
         # Required
@@ -292,6 +331,9 @@ class Chat(TelegramObject):
         self.join_to_send_messages = join_to_send_messages
         self.join_by_request = join_by_request
         self.has_restricted_voice_and_video_messages = has_restricted_voice_and_video_messages
+        self.is_forum = is_forum
+        self.active_usernames = active_usernames
+        self.emoji_status_custom_emoji_id = emoji_status_custom_emoji_id
 
         self.bot = bot
         self._id_attrs = (self.id,)
@@ -629,6 +671,7 @@ class Chat(TelegramObject):
         can_manage_chat: bool = None,
         can_manage_voice_chats: bool = None,
         can_manage_video_chats: bool = None,
+        can_manage_topics: bool = None,
     ) -> bool:
         """Shortcut for::
 
@@ -663,6 +706,7 @@ class Chat(TelegramObject):
             can_manage_chat=can_manage_chat,
             can_manage_voice_chats=can_manage_voice_chats,
             can_manage_video_chats=can_manage_video_chats,
+            can_manage_topics=can_manage_topics,
         )
 
     def restrict_member(
@@ -836,6 +880,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -860,6 +905,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             entities=entities,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_media_group(
@@ -873,6 +919,7 @@ class Chat(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> List['Message']:
         """Shortcut for::
 
@@ -893,6 +940,7 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_chat_action(
@@ -935,6 +983,7 @@ class Chat(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -960,6 +1009,7 @@ class Chat(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_contact(
@@ -976,6 +1026,7 @@ class Chat(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1001,6 +1052,7 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_audio(
@@ -1021,6 +1073,7 @@ class Chat(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1050,6 +1103,7 @@ class Chat(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_document(
@@ -1068,6 +1122,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1095,6 +1150,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             caption_entities=caption_entities,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_dice(
@@ -1107,6 +1163,7 @@ class Chat(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1128,6 +1185,7 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_game(
@@ -1140,6 +1198,7 @@ class Chat(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1161,6 +1220,7 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_invoice(
@@ -1193,6 +1253,7 @@ class Chat(TelegramObject):
         max_tip_amount: int = None,
         suggested_tip_amounts: List[int] = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1242,6 +1303,7 @@ class Chat(TelegramObject):
             max_tip_amount=max_tip_amount,
             suggested_tip_amounts=suggested_tip_amounts,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_location(
@@ -1260,6 +1322,7 @@ class Chat(TelegramObject):
         proximity_alert_radius: int = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1287,6 +1350,7 @@ class Chat(TelegramObject):
             proximity_alert_radius=proximity_alert_radius,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_animation(
@@ -1307,6 +1371,7 @@ class Chat(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1336,6 +1401,7 @@ class Chat(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_sticker(
@@ -1348,6 +1414,7 @@ class Chat(TelegramObject):
         api_kwargs: JSONDict = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1369,6 +1436,7 @@ class Chat(TelegramObject):
             api_kwargs=api_kwargs,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_venue(
@@ -1389,6 +1457,7 @@ class Chat(TelegramObject):
         google_place_type: str = None,
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1418,6 +1487,7 @@ class Chat(TelegramObject):
             google_place_type=google_place_type,
             allow_sending_without_reply=allow_sending_without_reply,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_video(
@@ -1439,6 +1509,7 @@ class Chat(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1469,6 +1540,7 @@ class Chat(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_video_note(
@@ -1485,6 +1557,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1510,6 +1583,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_voice(
@@ -1527,6 +1601,7 @@ class Chat(TelegramObject):
         caption_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         filename: str = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1553,6 +1628,7 @@ class Chat(TelegramObject):
             caption_entities=caption_entities,
             filename=filename,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_poll(
@@ -1577,6 +1653,7 @@ class Chat(TelegramObject):
         allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
         explanation_entities: Union[List['MessageEntity'], Tuple['MessageEntity', ...]] = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'Message':
         """Shortcut for::
 
@@ -1609,6 +1686,7 @@ class Chat(TelegramObject):
             allow_sending_without_reply=allow_sending_without_reply,
             explanation_entities=explanation_entities,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def send_copy(
@@ -1625,6 +1703,7 @@ class Chat(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -1650,6 +1729,7 @@ class Chat(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def copy_message(
@@ -1666,6 +1746,7 @@ class Chat(TelegramObject):
         timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict = None,
         protect_content: bool = None,
+        message_thread_id: int = None,
     ) -> 'MessageId':
         """Shortcut for::
 
@@ -1691,6 +1772,7 @@ class Chat(TelegramObject):
             timeout=timeout,
             api_kwargs=api_kwargs,
             protect_content=protect_content,
+            message_thread_id=message_thread_id,
         )
 
     def export_invite_link(
@@ -1883,6 +1965,165 @@ class Chat(TelegramObject):
         return self.bot.set_chat_menu_button(
             chat_id=self.id,
             menu_button=menu_button,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def create_forum_topic(
+        self,
+        name: str,
+        icon_color: int = None,
+        icon_custom_emoji_id: str = None,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> "ForumTopic":
+        """Shortcut for::
+
+             bot.create_forum_topic(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.create_forum_topic`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :class:`telegram.ForumTopic`
+        """
+        return self.bot.create_forum_topic(
+            chat_id=self.id,
+            name=name,
+            icon_color=icon_color,
+            icon_custom_emoji_id=icon_custom_emoji_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def edit_forum_topic(
+        self,
+        message_thread_id: int,
+        name: str,
+        icon_custom_emoji_id: str,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             bot.edit_forum_topic(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.edit_forum_topic`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.edit_forum_topic(
+            chat_id=self.id,
+            message_thread_id=message_thread_id,
+            name=name,
+            icon_custom_emoji_id=icon_custom_emoji_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def close_forum_topic(
+        self,
+        message_thread_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             bot.close_forum_topic(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.close_forum_topic`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.close_forum_topic(
+            chat_id=self.id,
+            message_thread_id=message_thread_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def reopen_forum_topic(
+        self,
+        message_thread_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             bot.reopen_forum_topic(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.reopen_forum_topic`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.reopen_forum_topic(
+            chat_id=self.id,
+            message_thread_id=message_thread_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def delete_forum_topic(
+        self,
+        message_thread_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             bot.delete_forum_topic(chat_id=update.effective_chat.id, *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.delete_forum_topic`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.delete_forum_topic(
+            chat_id=self.id,
+            message_thread_id=message_thread_id,
+            timeout=timeout,
+            api_kwargs=api_kwargs,
+        )
+
+    def unpin_all_forum_topic_messages(
+        self,
+        message_thread_id: int,
+        timeout: ODVInput[float] = DEFAULT_NONE,
+        api_kwargs: JSONDict = None,
+    ) -> bool:
+        """Shortcut for::
+
+             bot.unpin_all_forum_topic_messages(chat_id=update.effective_chat.id,
+                *args, **kwargs)
+
+        For the documentation of the arguments, please see
+        :meth:`telegram.Bot.unpin_all_forum_topic_messages`.
+
+        .. versionadded:: 13.15
+
+        Returns:
+            :obj:`bool`: On success, :obj:`True` is returned.
+        """
+        return self.bot.unpin_all_forum_topic_messages(
+            chat_id=self.id,
+            message_thread_id=message_thread_id,
             timeout=timeout,
             api_kwargs=api_kwargs,
         )

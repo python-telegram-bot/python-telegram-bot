@@ -62,6 +62,10 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`, optional): :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`, optional): :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only.
+
+            .. versionadded:: 13.15
 
     Attributes:
         is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
@@ -89,6 +93,10 @@ class ChatAdministratorRights(TelegramObject):
             messages of other users.
         can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
             messages; groups and supergroups only.
+        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
+            to create, rename, close, and reopen forum topics; supergroups only.
+
+            .. versionadded:: 13.15
     """
 
     __slots__ = (
@@ -103,6 +111,7 @@ class ChatAdministratorRights(TelegramObject):
         'can_post_messages',
         'can_edit_messages',
         'can_pin_messages',
+        'can_manage_topics',
         '_id_attrs',
     )
 
@@ -119,6 +128,7 @@ class ChatAdministratorRights(TelegramObject):
         can_post_messages: bool = None,
         can_edit_messages: bool = None,
         can_pin_messages: bool = None,
+        can_manage_topics: bool = None,
         **_kwargs: Any,
     ) -> None:
         # Required
@@ -134,6 +144,7 @@ class ChatAdministratorRights(TelegramObject):
         self.can_post_messages = can_post_messages
         self.can_edit_messages = can_edit_messages
         self.can_pin_messages = can_pin_messages
+        self.can_manage_topics = can_manage_topics
 
         self._id_attrs = (
             self.is_anonymous,
@@ -156,7 +167,7 @@ class ChatAdministratorRights(TelegramObject):
         :obj:`True`. This is e.g. useful when changing the bot's default administrator rights with
         :meth:`telegram.Bot.set_my_default_administrator_rights`.
         """
-        return cls(True, True, True, True, True, True, True, True, True, True, True)
+        return cls(True, True, True, True, True, True, True, True, True, True, True, True)
 
     @classmethod
     def no_rights(cls) -> 'ChatAdministratorRights':
@@ -164,4 +175,6 @@ class ChatAdministratorRights(TelegramObject):
         This method returns the :class:`ChatAdministratorRights` object with all attributes set to
         :obj:`False`.
         """
-        return cls(False, False, False, False, False, False, False, False, False, False, False)
+        return cls(
+            False, False, False, False, False, False, False, False, False, False, False, False
+        )
