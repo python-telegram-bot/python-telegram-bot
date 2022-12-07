@@ -61,10 +61,11 @@ class InputMedia(TelegramObject):
     Attributes:
         type (:obj:`str`): Type of the input media.
         media (:obj:`str` | :class:`telegram.InputFile`): Media to send.
-        caption (:obj:`str`): Optional. Caption of the media to be sent.
-        parse_mode (:obj:`str`): Optional. The parse mode to use for text formatting.
-        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. List of special
-            entities that appear in the caption.
+        caption (:obj:`str`): Optional. Caption of the media to be sent,
+            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
+            parsing.
+        parse_mode (:obj:`str`): Optional. |parse_mode|
+        caption_entities (List[:class:`telegram.MessageEntity`]): Optional. |caption_entities|
     """
 
     __slots__ = ("caption", "caption_entities", "media", "parse_mode", "type")
