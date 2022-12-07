@@ -59,9 +59,17 @@ class ForceReply(TelegramObject):
     Attributes:
         force_reply (:obj:`True`): Shows reply interface to the user, as if they manually selected
             the bots message and tapped 'Reply'.
-        selective (:obj:`bool`): Optional. Force reply from specific users only.
-        input_field_placeholder (:obj:`str`): Optional. The placeholder shown in the input
-            field when the reply is active.
+        selective (:obj:`bool`): Optional. Force reply from specific users only. Targets:
+
+            1) Users that are @mentioned in the :attr:`~telegram.Message.text` of the
+               :class:`telegram.Message` object.
+            2) If the bot's message is a reply (has ``reply_to_message_id``), sender of the
+               original message.
+        input_field_placeholder (:obj:`str`): Optional. The placeholder to be shown in the input
+            field when the reply is active;
+            :tg-const:`telegram.ForceReply.MIN_INPUT_FIELD_PLACEHOLDER`-
+            :tg-const:`telegram.ForceReply.MAX_INPUT_FIELD_PLACEHOLDER`
+            characters.
 
             .. versionadded:: 13.7
 
