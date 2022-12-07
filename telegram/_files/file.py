@@ -42,7 +42,7 @@ class File(TelegramObject):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`file_unique_id` is equal.
 
-    .. versionchanged:: 20.0:
+    .. versionchanged:: 20.0
         ``download`` was split into :meth:`download_to_drive` and :meth:`download_to_memory`.
 
     Note:
