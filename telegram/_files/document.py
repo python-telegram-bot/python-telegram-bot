@@ -41,15 +41,14 @@ class Document(_BaseThumbedMedium):
         file_size (:obj:`int`, optional): File size in bytes.
 
     Attributes:
-        file_id (:obj:`str`): File identifier.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail.
-        file_name (:obj:`str`): Original filename.
-        mime_type (:obj:`str`): Optional. MIME type of the file.
+        file_id (:obj:`str`): Identifier for this file, which can be used to download
+            or reuse the file.
+        file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
+            the same over time and for different bots. Can't be used to download or reuse the file.
+        thumb (:class:`telegram.PhotoSize`): Optional. Document thumbnail as defined by sender.
+        file_name (:obj:`str`): Optional. Original filename as defined by sender.
+        mime_type (:obj:`str`): Optional. MIME type of the file as defined by sender.
         file_size (:obj:`int`): Optional. File size in bytes.
-
 
     """
 
